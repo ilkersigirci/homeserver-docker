@@ -1,0 +1,570 @@
+version: "3.7"
+
+networks:
+  t2_proxy:
+    external: true
+
+services:
+  ############################# SERVER #############################
+  jellyfin:
+    image: linuxserver/jellyfin:latest # nightly 
+    container_name: jellyfin
+    restart: $MEDIA_RESTART_POLICY
+    # profiles:
+    # - media
+    networks:
+      - t2_proxy
+    ports:
+      - "8096:8096"
+    # devices:
+    #   - /dev/dri:/dev/dri # for harware transcoding
+    security_opt:
+      - no-new-privileges:true
+    #  deploy:
+    #    resources:
+    #      limits:
+    #        cpus: '0.4'
+    #        memory: 276M
+    #      reservations:
+    #        cpus: '0.25'
+    #        memory: 128M
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      UMASK: 022
+    volumes:
+      - $DOCKERDIR/appdata/jellyfin:/config
+      - $DATADIR/docker/appdata/jellyfin/metadata:/config/data/metadata
+      - $DATADIR/downloads:/data/downloads
+      - $JELLYFIN_MEDIA_DIR:/data/local
+      - $ONEDRIVE_DIR:/data/onedrive
+      # - /dev/shm:/data/transcode # Offload transcoding to RAM if you have enough RAM
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.jellyfin-rtr.entrypoints=https"
+      - "traefik.http.routers.jellyfin-rtr.rule=Host(`jellyfin.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.jellyfin-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.jellyfin-rtr.service=jellyfin-svc"
+      - "traefik.http.services.jellyfin-svc.loadbalancer.server.port=8096"
+  
+  jellyfin-alpha:
+    image: jellyfin/jellyfin:10.8.0-alpha5
+    container_name: jellyfin-alpha
+    restart: $MEDIA_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    # user: $PGID:$PUID
+    user: 0:0
+    # environment:
+      # - JELLYFIN_PublishedServerUrl=http://example.com
+    volumes:
+      - $DOCKERDIR/appdata/jellyfin-alpha:/config
+      - $DOCKERDIR/appdata/jellyfin-alpha/cache:/cache
+      - $DATADIR/docker/appdata/jellyfin/metadata:/config/metadata
+      - $DATADIR/downloads:/media/downloads:ro
+      - $JELLYFIN_MEDIA_DIR:/media/local:ro
+      - $ONEDRIVE_DIR:/media/onedrive:ro
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.jellyfin-alpha-rtr.entrypoints=https"
+      - "traefik.http.routers.jellyfin-alpha-rtr.rule=Host(`jellyfin_alpha.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.jellyfin-alpha-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.jellyfin-alpha-rtr.service=jellyfin-alpha-svc"
+      - "traefik.http.services.jellyfin-alpha-svc.loadbalancer.server.port=8096"
+
+  ############################# DOWNLOAD #############################
+
+  # Default user-pass: admin / adminadmin
+  # qbittorrent:
+  #   image: lscr.io/linuxserver/qbittorrent
+  #   container_name: qbittorrent
+  #   restart: $MEDIA_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - $DOCKERDIR/appdata/qbittorrent:/config
+  #     # - $DATADIR/downloads:/downloads
+  #     - $JELLYFIN_MEDIA_DIR/Downloads:/downloads
+  #   environment:
+  #     PUID: $PUID
+  #     PGID: $PGID
+  #     TZ: $TZ
+  #     WEBUI_PORT: 8080
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers Auth
+  #     - "traefik.http.routers.qbittorrent-rtr.entrypoints=https"
+  #     - "traefik.http.routers.qbittorrent-rtr.rule=Host(`torrent.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.qbittorrent-rtr.middlewares=chain-no-auth@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.qbittorrent-rtr.service=qbittorrent-svc"
+  #     - "traefik.http.services.qbittorrent-svc.loadbalancer.server.port=8080"
+  #     - traefik.http.services.qbittorrent-svc.loadbalancer.passhostheader=false
+
+  # jdownloader:
+  #   image: jlesage/jdownloader-2:latest
+  #   container_name: jdownloader
+  #   restart: $MEDIA_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   # ports:
+  #   #   - 5800:5800
+  #   volumes:
+  #     - $DOCKERDIR/appdata/jdownloader:/config:rw
+  #     - $JELLYFIN_MEDIA_DIR/Downloads:/output:rw
+  #   environment:
+  #     USER_ID: $PUID
+  #     GROUP_ID: $PGID
+  #     TZ: $TZ
+  #     UMASK: 002
+  #     KEEP_APP_RUNNING: 1
+  #     CLEAN_TMP_DIR: 1
+  #     DISPLAY_WIDTH: 2560
+  #     DISPLAY_HEIGHT: 1440
+  #   #      VNC_PASSWORD: $JDOWN_VNC_PASSWD
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.jdownloader-rtr.entrypoints=https"
+  #     - "traefik.http.routers.jdownloader-rtr.rule=Host(`download.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.jdownloader-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.jdownloader-rtr.service=jdownloader-svc"
+  #     - "traefik.http.services.jdownloader-svc.loadbalancer.server.port=5800"
+
+# NOTE: only works on localhost because of RPC server issue
+  # aria2:
+  #   image: abcminiuser/docker-aria2-with-webui:latest
+  #   container_name: aria2
+  #   restart: $MEDIA_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  # #  expose:
+  # #    - 6800
+  #   ports:
+  #     - 6800:6800
+  #     - 6880:80
+  #   volumes:
+  #     - $DOCKERDIR/appdata/aria2:/conf
+  #     - $JELLYFIN_MEDIA_DIR/Downloads:/data
+  #   environment:
+  #     PUID: $PUID
+  #     PGID: $PGID
+  #   #  SECRET: aria
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.aria2-rtr.entrypoints=https"
+  #     - "traefik.http.routers.aria2-rtr.rule=Host(`aria2.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.aria2-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.aria2-rtr.service=aria2-svc"
+  #     - "traefik.http.services.aria2-svc.loadbalancer.server.port=80"
+
+  # Diffent GUIs in web home:
+  # /combustion-release/ -- /transmission-web-control/ -- /kettu/ -- /flood-for-transmission/
+  transmission:
+    image: lscr.io/linuxserver/transmission
+    container_name: transmission
+    restart: $MEDIA_RESTART_POLICY
+    networks:
+      - t2_proxy
+#      t2_proxy:
+#        ipv4_address: 192.168.90.160
+#    ports:
+#      - "9091:9091"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/transmission:/config
+      - $JELLYFIN_MEDIA_DIR/Downloads:/downloads
+      # If not set, tranmission creates reduntant volumes
+      - $JELLYFIN_MEDIA_DIR/Downloads/torrent_files:/watch
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      TRANSMISSION_WEB_HOME: /flood-for-transmission
+#      USER: username
+#      PASS: password
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.transmission-rtr.entrypoints=https"
+      - "traefik.http.routers.transmission-rtr.rule=Host(`torrent.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.transmission-rtr.middlewares=chain-authelia@file"
+#      - "traefik.http.routers.transmission-rtr.middlewares=middlewares-rate-limit@file"
+      ## HTTP Services
+      - "traefik.http.routers.transmission-rtr.service=transmission-svc"
+      - "traefik.http.services.transmission-svc.loadbalancer.server.port=9091"
+
+  ############################# INDEXERS #############################
+
+  # prowlarr:
+  #   image: linuxserver/prowlarr:develop # there is no main branch atm
+  #   container_name: prowlarr
+  #   depends_on:
+  #     - transmission
+  #   restart: $MEDIA_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   #  t2_proxy:
+  #   #    ipv4_address: 192.168.90.161
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #      - $DOCKERDIR/appdata/prowlarr:/config
+  #      - $DATADIR/downloads:/data/downloads
+  #      - "/etc/localtime:/etc/localtime:ro"
+  #   environment:
+  #     PUID: $PUID
+  #     PGID: $PGID
+  #     TZ: $TZ
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.prowlarr-rtr.entrypoints=https"
+  #     - "traefik.http.routers.prowlarr-rtr.rule=Host(`prowlarr.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.prowlarr-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.prowlarr-rtr.service=prowlarr-svc"
+  #     - "traefik.http.services.prowlarr-svc.loadbalancer.server.port=9696"
+
+  # # NZBHydra2 - NZB meta search
+  # hydra:
+  #   image: linuxserver/nzbhydra2:latest
+  #   container_name: hydra
+  #   restart: $MEDIA_RESTART_POLICY
+  #   # profiles:
+  #   # - media
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   # ports:
+  #   #   - "$NZBHYDRA_PORT:5076"
+  #   volumes:
+  #     - $DOCKERDIR/appdata/hydra2:/config
+  #     - $DATADIR/downloads:/data/downloads
+  #   environment:
+  #     PUID: $PUID
+  #     PGID: $PGID
+  #     TZ: $TZ
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.hydra-rtr.entrypoints=https"
+  #     - "traefik.http.routers.hydra-rtr.rule=Host(`hydra.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.hydra-rtr.middlewares=chain-oauth@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.hydra-rtr.service=hydra-svc"
+  #     - "traefik.http.services.hydra-svc.loadbalancer.server.port=5076"
+
+  ############################## PVRS #############################
+
+  # # Lidarr - Music Management
+  # # Set url_base in lidarr settings if using PathPrefix
+  # lidarr:
+  #   image: linuxserver/lidarr:latest
+  #   container_name: lidarr
+  #   restart: $MEDIA_RESTART_POLICY
+  #   # profiles:
+  #   # - media
+  #   networks:
+  #     t2_proxy:
+  #       ipv4_address: 192.168.90.163
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   # ports:
+  #   #  - "$LIDARR_PORT:8686"
+  #   volumes:
+  #     - $DOCKERDIR/appdata/lidarr:/config
+  #     # Optional. See why MediaCover is mounted as volume https://github.com/htpcBeginner/docker-traefik/discussions/147
+  #     - $DATADIR/docker/appdata/lidarr/MediaCover:/config/MediaCover
+  #     - $DATADIR/downloads:/data/downloads
+  #     - $DATADIR/media/music:/data/media/music
+  #     - "/etc/localtime:/etc/localtime:ro"
+  #   environment:
+  #     PUID: $PUID
+  #     PGID: $PGID
+  #     TZ: $TZ
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers Auth Bypass
+  #     - "traefik.http.routers.lidarr-rtr-bypass.entrypoints=https"
+  #     - "traefik.http.routers.lidarr-rtr-bypass.rule=Host(`lidarr.$DOMAINNAME`) && (Headers(`X-Api-Key`, `$LIDARR_API_KEY`) || Query(`apikey`, `$LIDARR_API_KEY`))"
+  #     - "traefik.http.routers.lidarr-rtr-bypass.priority=100"
+  #     ## HTTP Routers Auth
+  #     - "traefik.http.routers.lidarr-rtr.entrypoints=https"
+  #     - "traefik.http.routers.lidarr-rtr.rule=Host(`lidarr.$DOMAINNAME`)"
+  #     - "traefik.http.routers.lidarr-rtr.priority=99"
+  #     ## Middlewares
+  #     - "traefik.http.routers.lidarr-rtr-bypass.middlewares=chain-no-auth@file"
+  #     - "traefik.http.routers.lidarr-rtr.middlewares=chain-oauth@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.lidarr-rtr.service=lidarr-svc"
+  #     - "traefik.http.routers.lidarr-rtr-bypass.service=lidarr-svc"
+  #     - "traefik.http.services.lidarr-svc.loadbalancer.server.port=8686"
+
+  # Movie management
+  # radarr:
+  #   image: linuxserver/radarr:latest
+  #   container_name: radarr
+  #   depends_on:
+  #     - transmission
+  #     - prowlarr
+  #   restart: $MEDIA_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   #  t2_proxy:
+  #   #    ipv4_address: 192.168.90.162
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - $DOCKERDIR/appdata/radarr:/config
+  #     # Optional. See why MediaCover is mounted as volume https://github.com/htpcBeginner/docker-traefik/discussions/147
+  #     - $DATADIR/docker/appdata/radarr/MediaCover:/config/MediaCover
+  #     - $DATADIR/downloads:/data/downloads
+  #     - $DATADIR/media:/data/media
+  #     - "/etc/localtime:/etc/localtime:ro"
+  #   environment:
+  #     PUID: $PUID
+  #     PGID: $PGID
+  #     TZ: $TZ
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers Auth Bypass
+  #     #- "traefik.http.routers.radarr-rtr-bypass.entrypoints=https"
+  #     #- "traefik.http.routers.radarr-rtr-bypass.rule=Host(`radarr.$DOMAINNAME`) && (Headers(`X-Api-Key`, `$RADARR_API_KEY`) || Query(`apikey`, `$RADARR_API_KEY`))"
+  #     #- "traefik.http.routers.radarr-rtr-bypass.priority=100"
+  #     ## HTTP Routers Auth
+  #     - "traefik.http.routers.radarr-rtr.entrypoints=https"
+  #     - "traefik.http.routers.radarr-rtr.rule=Host(`radarr.$DOMAINNAME`)"
+  #     #- "traefik.http.routers.radarr-rtr.priority=99"
+  #     ## Middlewares
+  #     # - "traefik.http.routers.radarr-rtr-bypass.middlewares=chain-no-auth@file"
+  #     - "traefik.http.routers.radarr-rtr.middlewares=chain-no-auth@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.radarr-rtr.service=radarr-svc"
+  #     #- "traefik.http.routers.radarr-rtr-bypass.service=radarr-svc"
+  #     - "traefik.http.services.radarr-svc.loadbalancer.server.port=7878"
+
+  #  TV Shows management
+  # Set url_base in sonarr settings if using PathPrefix
+  # sonarr:
+  #   image: linuxserver/sonarr:latest
+  #   container_name: sonarr
+  #   restart: $MEDIA_RESTART_POLICY
+  #   # profiles:
+  #   # - media
+  #   networks:
+  #     t2_proxy:
+  #       ipv4_address: 192.168.90.167
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   # ports:
+  #   #  - "$SONARR_PORT:8989"
+  #   volumes:
+  #     - $DOCKERDIR/appdata/sonarr:/config
+  #     # Optional. See why MediaCover is mounted as volume https://github.com/htpcBeginner/docker-traefik/discussions/147
+  #     - $DATADIR/docker/appdata/sonarr/MediaCover:/config/MediaCover
+  #     - $DATADIR/downloads:/data/downloads
+  #     - $DATADIR/media:/data/media
+  #     - "/etc/localtime:/etc/localtime:ro"
+  #   environment:
+  #     PUID: $PUID
+  #     PGID: $PGID
+  #     TZ: $TZ
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers Auth Bypass
+  #     - "traefik.http.routers.sonarr-rtr-bypass.entrypoints=https"
+  #     - "traefik.http.routers.sonarr-rtr-bypass.rule=Host(`sonarr.$DOMAINNAME`) && (Headers(`X-Api-Key`, `$SONARR_API_KEY`) || Query(`apikey`, `$SONARR_API_KEY`))"
+  #     - "traefik.http.routers.sonarr-rtr-bypass.priority=100"
+  #     ## HTTP Routers Auth
+  #     - "traefik.http.routers.sonarr-rtr.entrypoints=https"
+  #     - "traefik.http.routers.sonarr-rtr.rule=Host(`sonarr.$DOMAINNAME`)"
+  #     - "traefik.http.routers.sonarr-rtr.priority=99"
+  #     ## Middlewares
+  #     - "traefik.http.routers.sonarr-rtr-bypass.middlewares=chain-no-auth@file"
+  #     - "traefik.http.routers.sonarr-rtr.middlewares=chain-oauth@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.sonarr-rtr.service=sonarr-svc"
+  #     - "traefik.http.routers.sonarr-rtr-bypass.service=sonarr-svc"
+  #     - "traefik.http.services.sonarr-svc.loadbalancer.server.port=8989"
+
+  # Books management
+  # # Set url_base in readarr settings if using PathPrefix
+  # readarr:
+  #   image: hotio/readarr:nightly
+  #   container_name: readarr
+  #   restart: $MEDIA_RESTART_POLICY
+  #   # profiles:
+  #   # - media
+  #   networks:
+  #     t2_proxy:
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   # ports:
+  #   #  - "$READARR_PORT:8989"
+  #   volumes:
+  #     - $DOCKERDIR/appdata/readarr:/config
+  #     - $DATADIR/downloads:/data/downloads
+  #     - $DATADIR/media/books:/data/media/books
+  #     - "/etc/localtime:/etc/localtime:ro"
+  #   environment:
+  #     PUID: $PUID
+  #     PGID: $PGID
+  #     TZ: $TZ
+  #     UMASK: 002
+  #     #ARGS: ""
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers Auth
+  #     - "traefik.http.routers.readarr-rtr.entrypoints=https"
+  #     - "traefik.http.routers.readarr-rtr.rule=Host(`readarr.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.readarr-rtr.middlewares=chain-oauth@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.readarr-rtr.service=readarr-svc"
+  #     - "traefik.http.services.readarr-svc.loadbalancer.server.port=8787"
+
+  # Ebooks and Management
+  # lazylibrarian:
+  #   image: linuxserver/lazylibrarian
+  #   container_name: lazylibrarian
+  #   restart: unless-stopped
+  #   # profiles:
+  #   # - media
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   # ports:
+  #   #  - "$LAZYLIBRARIAN_PORT:5299"
+  #   volumes:
+  #     - $DOCKERDIR/appdata/lazylibrarian:/config
+  #     - $DATADIR/downloads:/data/downloads
+  #     - $DOCKERDIR/appdata/calibre/books:/books:rw
+  #     - "/etc/localtime:/etc/localtime:ro"
+  #   environment:
+  #     PUID: $PUID
+  #     PGID: $PGID
+  #     TZ: $TZ
+  #     DOCKER_MODS: linuxserver/calibre-web:calibre # set the path to converter tool to /app/calibre/ebook-convert
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers Auth
+  #     - "traefik.http.routers.lazylibrarian-rtr.entrypoints=https"
+  #     - "traefik.http.routers.lazylibrarian-rtr.rule=Host(`lazy.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.lazylibrarian-rtr.middlewares=chain-oauth@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.lazylibrarian-rtr.service=lazylibrarian-svc"
+  #     - "traefik.http.services.lazylibrarian-svc.loadbalancer.server.port=5299"
+
+  ############################### YOUTUBE ###############################
+  metube:
+    image: alexta69/metube:latest
+    container_name: metube
+    restart: $MEDIA_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $JELLYFIN_MEDIA_DIR/Youtube:/downloads
+#      - /path/to/cookies:/cookies
+    environment:
+      OUTPUT_TEMPLATE: '%(title)s [%(id)s].%(ext)s'
+      YTDL_OPTIONS: '{"writethumbnail": true}'  # "writeinfojson": true,
+      # - YTDL_OPTIONS={"cookiefile":"/cookies/cookies.txt"}
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.metube-rtr.entrypoints=https"
+      - "traefik.http.routers.metube-rtr.rule=Host(`metube.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.metube-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.metube-rtr.service=metube-svc"
+      - "traefik.http.services.metube-svc.loadbalancer.server.port=8081"
+
+  # tubearchivist:
+  #   image: bbilly1/tubearchivist:latest
+  #   container_name: tubearchivist
+  #   restart: $MEDIA_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - $JELLYFIN_MEDIA_DIR/Youtube:/youtube
+  #   environment:
+  #     - TA_USERNAME=admin
+  #     - TA_PASSWORD=admin
+  #     - HOST_UID=$PUID
+  #     - HOST_GID=$PGID
+  #     - TZ=$TZ
+  #     - ELASTIC_PASSWORD=admin
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers Auth
+  #     - "traefik.http.routers.tubearchivist-rtr.entrypoints=https"
+  #     - "traefik.http.routers.tubearchivist-rtr.rule=Host(`tubearch.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.tubearchivist-rtr.middlewares=chain-authelia@file"
+  #   #  - "traefik.http.routers.transmission-rtr.middlewares=middlewares-rate-limit@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.tubearchivist-rtr.service=tubearchivist-svc"
+  #     - "traefik.http.services.tubearchivist-svc.loadbalancer.server.port=8000"
+
+  # tubesync:
+  #   image: ghcr.io/meeb/tubesync:latest
+  #   container_name: tubesync
+  #   restart: $MEDIA_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - $DOCKERDIR/appdata/tubesync:/config
+  #     - $JELLYFIN_MEDIA_DIR/Youtube:/downloads
+  #   environment:
+  #     - PUID=$PUID
+  #     - PGID=$PGID
+  #     - TZ=$TZ
+  #     # - HTTP_USER=admin
+  #     # - HTTP_PASS=admin
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers Auth
+  #     - "traefik.http.routers.tubesync-rtr.entrypoints=https"
+  #     - "traefik.http.routers.tubesync-rtr.rule=Host(`tubesync.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.tubesync-rtr.middlewares=chain-authelia@file"
+  # #      - "traefik.http.routers.transmission-rtr.middlewares=middlewares-rate-limit@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.tubesync-rtr.service=tubesync-svc"
+  #     - "traefik.http.services.tubesync-svc.loadbalancer.server.port=4848"

@@ -1,0 +1,221 @@
+version: "3.7"
+
+networks:
+  t2_proxy:
+    external: true
+  internal:
+    name: internal
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.22.0/24
+
+# secrets:
+#   firefly_app_key:
+#     file: $DOCKERDIR/secrets/firefly_app_key
+
+services: 
+  # portainer:
+  #   container_name: portainer
+  #   image: portainer/portainer-ce:latest
+  #   restart: $OTHERS_RESTART_POLICY
+  #   # profiles:
+  #   # - apps
+  #   # command: -H tcp://socket-proxy:2375
+  #   networks:
+  #     - t2_proxy
+  #   #  - socket_proxy
+  #   #ports:
+  #   #  - 9000
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro # # Use Docker Socket Proxy instead for improved security
+  #     - $DOCKERDIR/appdata/portainer/data:/data # Change to local directory if you want to save/transfer config locally
+  #   environment:
+  #     - TZ=$TZ
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.portainer-rtr.entrypoints=https"
+  #     - "traefik.http.routers.portainer-rtr.rule=Host(`portainer.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.portainer-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.portainer-rtr.service=portainer-svc"
+  #     - "traefik.http.services.portainer-svc.loadbalancer.server.port=9000"
+
+  # wg-easy:
+  #   image: weejewel/wg-easy
+  #   container_name: wg-easy
+  #   restart: $OTHERS_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   volumes:
+  #     - $DOCKERDIR/appdata/wg-easy:/etc/wireguard
+  #   environment:
+  #     - WG_HOST=178.62.75.212
+  #     # - PASSWORD=ilker
+  #     # - WG_PORT=51820
+  #     # - WG_DEFAULT_ADDRESS=10.8.0.x
+  #     # - WG_DEFAULT_DNS=1.1.1.1
+  #     # - WG_ALLOWED_IPS=192.168.15.0/24, 10.0.1.0/24
+  #   ports:
+  #     - "51820:51820/udp"
+  #     # - "51821:51821/tcp"
+  #   #    security_opt:
+  #   # - no-new-privileges:true
+  #   cap_add:
+  #     - NET_ADMIN
+  #     - SYS_MODULE
+  #   sysctls:
+  #     - net.ipv4.ip_forward=1
+  #     - net.ipv4.conf.all.src_valid_mark=1
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers Auth
+  #     - "traefik.http.routers.wg-easy-rtr.entrypoints=https"
+  #     - "traefik.http.routers.wg-easy-rtr.rule=Host(`wireguard.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.wg-easy-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.wg-easy-rtr.service=wg-easy-svc"
+  #     - "traefik.http.services.wg-easy-svc.loadbalancer.server.port=51821"
+
+  syncthing:
+    container_name: syncthing
+    image: linuxserver/syncthing:latest
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t2_proxy
+    # ports:
+    #   - 22000:22000/tcp
+    #   - 22000:22000/udp
+    #   - 21027:21027/udp
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/syncthing:/config
+      - $APK_DIR:/apk
+      - $NOTES_DIR:/notes
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      # - "traefik.http.routers.syncthing-rtr.tls=true"
+      ## HTTP Routers
+      - "traefik.http.routers.syncthing-rtr.entrypoints=https"
+      - "traefik.http.routers.syncthing-rtr.rule=Host(`syncthing.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.syncthing-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.syncthing-rtr.service=syncthing-svc"
+      - "traefik.http.services.syncthing-svc.loadbalancer.server.port=8384"
+
+  ######### RSS #########
+
+  # freshrss:
+  #   container_name: freshrss
+  #   image: lscr.io/linuxserver/freshrss
+  #   restart: $OTHERS_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - $DOCKERDIR/appdata/freshrss:/config
+  #   environment:
+  #     - PUID=$PUID
+  #     - PGID=$PGID
+  #     - TZ=$TZ
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.freshrss-rtr.entrypoints=https"
+  #     - "traefik.http.routers.freshrss-rtr.rule=Host(`freshrss.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.freshrss-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.freshrss-rtr.service=freshrss-svc"
+  #     - "traefik.http.services.freshrss-svc.loadbalancer.server.port=80"
+  
+  # miniflux-db:
+  #   container_name: miniflux-db
+  #   image: postgres:latest
+  #   restart: $OTHERS_RESTART_POLICY
+  #   networks:
+  #     - internal
+  #   environment:
+  #     - POSTGRES_DB=miniflux
+  #     - POSTGRES_USER=miniflux
+  #     - POSTGRES_PASSWORD=miniflux
+  #   volumes:
+  #     - $DOCKERDIR/appdata/miniflux-db:/var/lib/postgresql/data
+  #   # healthcheck:
+  #   #   test: ["CMD", "pg_isready", "-U", "miniflux"]
+  #   #   interval: 10s
+  #   #   start_period: 30s
+  
+  # miniflux:
+  #   container_name: miniflux
+  #   image: miniflux/miniflux:latest
+  #   restart: $OTHERS_RESTART_POLICY
+  #   depends_on:
+  #     - miniflux-db
+  #   networks:
+  #     - t2_proxy
+  #     - internal
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   # volumes:
+  #   #   - $DOCKERDIR/appdata/miniflux:/config
+  #   environment:
+  #     - DATABASE_URL=postgres://miniflux:miniflux@miniflux-db/miniflux?sslmode=disable
+  #     - RUN_MIGRATIONS=1
+  #     - CREATE_ADMIN=1
+  #     - ADMIN_USERNAME=miniflux
+  #     - ADMIN_PASSWORD=miniflux
+  #     - BASE_URL=https://miniflux.$DOMAINNAME
+  #     # - "POCKET_CONSUMER_KEY=YOUR_POCKET_CONSUMER_KEY"
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.freshrss-rtr.entrypoints=https"
+  #     - "traefik.http.routers.freshrss-rtr.rule=Host(`miniflux.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.freshrss-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.freshrss-rtr.service=freshrss-svc"
+  #     - "traefik.http.services.freshrss-svc.loadbalancer.server.port=8080"
+
+  #Expanse Tracker
+  # firefly:
+  #   container_name: firefly
+  #   image: fireflyiii/core:latest
+  #   restart: $OTHERS_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - $DOCKERDIR/appdata/freshrss:/config
+  #   environment:
+  #     - TZ=$TZ
+  #     - APP_KEY_FILE=/run/secrets/firefly_app_key
+  #     - AUTHENTICATION_GUARD="web" # remote_user_guard
+  #   #  - AUTHENTICATION_GUARD_HEADER=REMOTE_USER # HTTP_REMOTE_USER
+  #     - DB_CONNECTION=sqlite # Options: pgsql, mysql
+  #   secrets:
+  #     - firefly_app_key
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.firefly-rtr.entrypoints=https"
+  #     - "traefik.http.routers.firefly-rtr.rule=Host(`firefly.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.firefly-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.firefly-rtr.service=firefly-svc"
+  #     - "traefik.http.services.firefly-svc.loadbalancer.server.port=8080"

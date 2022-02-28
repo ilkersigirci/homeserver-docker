@@ -1,0 +1,38 @@
+################## AUTOMATION
+
+  # # n8n automation tool
+  # n8n:
+  #   image: n8nio/n8n
+  #   container_name: n8n
+  #   restart: "no"
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   ports:
+  #     - "5678:5678"
+  #   environment:
+  #     - PUID=$PUID
+  #     - PGID=$PGID
+  #     - TZ=$TZ
+  #     - N8N_BASIC_AUTH_ACTIVE=true
+  #     - N8N_BASIC_AUTH_USER
+  #     - N8N_BASIC_AUTH_PASSWORD
+  #     - N8N_HOST=${DOMAINNAME}
+  #     - N8N_PORT=5678
+  #     - N8N_PROTOCOL=https
+  #     - NODE_ENV=production
+  #     - N8N_PATH
+  #     - WEBHOOK_URL=https://${DOMAINNAME}${N8N_PATH}
+  #   volumes:
+  #     - ${DATA_FOLDER}/.n8n:/home/node/.n8n
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.n8n-rtr.entrypoints=https"
+  #     - "traefik.http.routers.n8n-rtr.rule=Host(`n8n.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.n8n-rtr.middlewares=chain-no-auth@file"
+  #     ## HTTP Services
+  #     # - "traefik.http.routers.jellyfin-rtr.service=jellyfin-svc"
+  #     # - "traefik.http.services.jellyfin-svc.loadbalancer.server.port=8096"

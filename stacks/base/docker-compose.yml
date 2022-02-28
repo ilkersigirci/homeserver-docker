@@ -1,0 +1,421 @@
+version: "3.7"
+
+networks:
+  t2_proxy:
+    name: t2_proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.90.0/24
+  default:
+    driver: bridge
+  # nextcloud:
+  #   name: nextcloud
+  #   driver: bridge
+  # socket_proxy:
+  #   name: socket_proxy
+  #   driver: bridge
+  #   ipam:
+  #     config:
+  #       - subnet: 192.168.91.0/24
+
+########################### SECRETS
+secrets:
+  cloudflare_email:
+    file: $DOCKERDIR/secrets/cloudflare_email
+  cloudflare_api_key:
+    file: $DOCKERDIR/secrets/cloudflare_api_key
+  traefik_pilot_token:
+    file: $DOCKERDIR/secrets/traefik_pilot_token
+  authelia_jwt_secret:
+    file: $DOCKERDIR/secrets/authelia_jwt_secret
+  authelia_session_secret:
+    file: $DOCKERDIR/secrets/authelia_session_secret
+#  authelia_duo_api_secret_key:
+#    file: $DOCKERDIR/secrets/authelia_duo_api_secret_key
+  authelia_storage_encryption_key:
+    file: $DOCKERDIR/secrets/authelia_storage_encryption_key
+  mysql_root_password:
+    file: $DOCKERDIR/secrets/mysql_root_password
+  mysql_password:
+    file: $DOCKERDIR/secrets/mysql_password
+
+########################### SERVICES
+services:
+
+  # Traefik 2 - Reverse Proxy
+  # Touch (create empty files) traefik.log and acme/acme.json. Set acme.json permissions to 600.
+  # touch $DOCKERDIR/traefik2/acme/acme.json
+  # chmod 600 $DOCKERDIR/traefik2/acme/acme.json
+  # touch $DOCKERDIR/traefik2/traefik.log
+  traefik:
+    container_name: traefik
+    image: traefik:2.5 # brie v2.5
+    restart: $BASE_RESTART_POLICY
+    # profiles:
+    # - core
+    command: # CLI arguments
+      - --global.checkNewVersion=true
+      - --global.sendAnonymousUsage=true
+      - --entryPoints.http.address=:80
+      - --entryPoints.https.address=:443
+      # - --entrypoints.websecure.address=:443 # TODO: Learn difference with https
+      # Allow these IPs to set the X-Forwarded-* headers - Cloudflare IPs: https://www.cloudflare.com/ips/
+      - --entrypoints.https.forwardedHeaders.trustedIPs=173.245.48.0/20,103.21.244.0/22,103.22.200.0/22,103.31.4.0/22,141.101.64.0/18,108.162.192.0/18,190.93.240.0/20,188.114.96.0/20,197.234.240.0/22,198.41.128.0/17,162.158.0.0/15,104.16.0.0/13,104.24.0.0/14,172.64.0.0/13,131.0.72.0/22 #, 18.158.161.205, 18.159.239.239, 3.123.181.162, 67.205.175.202
+      - --entryPoints.traefik.address=:8080
+      # - --entryPoints.ping.address=:8081
+      - --api=true
+      # - --api.insecure=true
+      - --api.dashboard=true
+      #- --ping=true
+      # - --serversTransport.insecureSkipVerify=true
+      - --log=true
+      - --log.level=WARN # (Default: error) DEBUG, INFO, WARN, ERROR, FATAL, PANIC
+      - --accessLog=true
+      - --accessLog.filePath=/traefik.log
+      - --accessLog.bufferingSize=100 # Configuring a buffer of 100 lines
+      - --accessLog.filters.statusCodes=400-499
+      - --providers.docker=true
+      - --providers.docker.endpoint=unix:///var/run/docker.sock # Use Docker Socket Proxy instead for improved security
+      # - --providers.docker.endpoint=tcp://socket-proxy:2375
+      # Automatically set Host rule for services
+      # - --providers.docker.defaultrule=Host(`{{ index .Labels "com.docker.compose.service" }}.$DOMAINNAME`)
+      - --providers.docker.exposedByDefault=false
+      # - --entrypoints.https.http.middlewares=chain-oauth@file
+      - --entrypoints.https.http.tls.options=tls-opts@file
+      # Add dns-cloudflare as default certresolver for all services. Also enables TLS and no need to specify on individual services
+      - --entrypoints.https.http.tls.certresolver=dns-cloudflare
+      - --entrypoints.https.http.tls.domains[0].main=$DOMAINNAME
+      - --entrypoints.https.http.tls.domains[0].sans=*.$DOMAINNAME
+      # - --entrypoints.https.http.tls.domains[1].main=$DOMAINNAME1 # Pulls main cert for second domain
+      # - --entrypoints.https.http.tls.domains[1].sans=*.$DOMAINNAME1 # Pulls wildcard cert for second domain
+      - --providers.docker.network=t2_proxy
+      - --providers.docker.swarmMode=false
+      - --providers.file.directory=/rules # Load dynamic configuration from one or more .toml or .yml files in a directory
+      # - --providers.file.filename=/path/to/file # Load dynamic configuration from a file
+      - --providers.file.watch=true # Only works on top level files in the rules folder
+      # - --certificatesResolvers.dns-cloudflare.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory # LetsEncrypt Staging Server - uncomment when testing
+      - --certificatesResolvers.dns-cloudflare.acme.email=/run/secrets/cloudflare_email # $CLOUDFLARE_EMAIL
+      - --certificatesResolvers.dns-cloudflare.acme.storage=/acme.json
+      - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.provider=cloudflare
+      - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.resolvers=1.1.1.1:53,1.0.0.1:53
+      - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.delayBeforeCheck=90 # To delay DNS check and reduce LE hitrate
+      ## Traefik Pilot and Plugins
+      - --pilot.token=/run/secrets/traefik_pilot_token # TODO: make this work as secret -> $TRAEFIK_PILOT_TOKEN
+      # - --experimental.plugins.traefik-ondemand-plugin.modulename=github.com/acouvreur/traefik-ondemand-plugin
+      # - --experimental.plugins.traefik-ondemand-plugin.version=v1.2.0
+    networks:
+      t2_proxy:
+        ipv4_address: 192.168.90.254 # You can specify a static IP
+      # socket_proxy:
+      # nextcloud:
+    security_opt:
+      - no-new-privileges:true
+    #healthcheck:
+    #  test: ["CMD", "traefik", "healthcheck", "--ping"]
+    #  interval: 5s
+    #  retries: 3
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+      - target: 443
+        published: 443
+        protocol: tcp
+        mode: host
+      # - target: 8080
+      #   published: 8080
+      #   protocol: tcp
+      #   mode: host
+    volumes:
+      - $DOCKERDIR/appdata/traefik2/rules:/rules # file provider directory
+      - /var/run/docker.sock:/var/run/docker.sock:ro # Use Docker Socket Proxy instead for improved security
+      - $DOCKERDIR/appdata/traefik2/acme/acme.json:/acme.json # cert location - you must touch this file and change permissions to 600
+      - $DOCKERDIR/appdata/traefik2/traefik.log:/traefik.log # for fail2ban - make sure to touch file before starting container
+    environment:
+      - CF_API_EMAIL_FILE=/run/secrets/cloudflare_email
+      - CF_API_KEY_FILE=/run/secrets/cloudflare_api_key
+    secrets:
+      - cloudflare_email
+      - cloudflare_api_key
+      - traefik_pilot_token
+    labels:
+      #- "autoheal=true"
+      - "traefik.enable=true"
+      # HTTP-to-HTTPS Redirect
+      - "traefik.http.routers.http-catchall.entrypoints=http"
+      - "traefik.http.routers.http-catchall.rule=HostRegexp(`{host:.+}`)"
+      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+      # HTTP Routers
+      - "traefik.http.routers.traefik-rtr.entrypoints=https"
+      - "traefik.http.routers.traefik-rtr.rule=Host(`traefik.$DOMAINNAME`)"
+      ## Services - API
+      - "traefik.http.routers.traefik-rtr.service=api@internal"
+      ## Healthcheck/ping
+      - "traefik.http.routers.ping.rule=Host(`traefik.$DOMAINNAME`) && Path(`/ping`)"
+      #- "traefik.http.routers.ping.tls=true"
+      #- "traefik.http.routers.ping.service=ping@internal"
+      ## Middlewares
+      - "traefik.http.routers.traefik-rtr.middlewares=chain-authelia@file"
+
+  # Docker Socket Proxy - Security Enchanced Proxy for Docker Socket
+  # socket-proxy:
+  #   container_name: socket-proxy
+  #   image: tecnativa/docker-socket-proxy:latest
+  #   restart: unless-stopped
+  #   # profiles:
+  #   # - core
+  #   networks:
+  #     socket_proxy:
+  #       ipv4_address: 192.168.91.254 # You can specify a static IP
+  #   privileged: true
+  #   ports:
+  #   # - "127.0.0.1:2375:2375" # Port 2375 should only ever get exposed to the internal network. When possible use this line.
+  #   # I use the next line instead, as I want portainer to manage multiple docker endpoints within my home network.
+  #   - "2375:2375"
+  #   volumes:
+  #     - "/var/run/docker.sock:/var/run/docker.sock"
+  #   environment:
+  #     - LOG_LEVEL=info # debug,info,notice,warning,err,crit,alert,emerg
+  #     ## Variables match the URL prefix (i.e. AUTH blocks access to /auth/* parts of the API, etc.).
+  #     # 0 to revoke access.
+  #     # 1 to grant access.
+  #     ## Granted by Default
+  #     - EVENTS=1
+  #     - PING=1
+  #     - VERSION=1
+  #     ## Revoked by Default
+  #     # Security critical
+  #     - AUTH=0
+  #     - SECRETS=0
+  #     - POST=1 # Ouroboros
+  #     # Not always needed
+  #     - BUILD=0
+  #     - COMMIT=0
+  #     - CONFIGS=0
+  #     - CONTAINERS=1 # Traefik, portainer, etc.
+  #     - DISTRIBUTION=0
+  #     - EXEC=0
+  #     - IMAGES=1 # Portainer
+  #     - INFO=1 # Portainer
+  #     - NETWORKS=1 # Portainer
+  #     - NODES=0
+  #     - PLUGINS=0
+  #     - SERVICES=1 # Portainer
+  #     - SESSION=0
+  #     - SWARM=0
+  #     - SYSTEM=0
+  #     - TASKS=1 # Portaienr
+  #     - VOLUMES=1 # Portainer
+
+  # Authelia (Lite) - Self-Hosted Single Sign-On and Two-Factor Authentication
+  authelia:
+    container_name: authelia
+    # Check this before upgrading: https://github.com/authelia/authelia/blob/master/BREAKING.md
+    image: authelia/authelia:latest
+    restart: $BASE_RESTART_POLICY
+    # profiles:
+    # - core
+    networks:
+      - t2_proxy
+      - default
+    volumes:
+      - $DOCKERDIR/appdata/authelia:/config
+    environment:
+      - TZ=$TZ
+      - AUTHELIA_JWT_SECRET_FILE=/run/secrets/authelia_jwt_secret
+      - AUTHELIA_SESSION_SECRET_FILE=/run/secrets/authelia_session_secret
+      - AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE=/run/secrets/authelia_storage_encryption_key
+#      - AUTHELIA_STORAGE_MYSQL_PASSWORD_FILE=/run/secrets/authelia_storage_mysql_password
+#      - AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE=/run/secrets/authelia_notifier_smtp_password
+#      - AUTHELIA_DUO_API_SECRET_KEY_FILE=/run/secrets/authelia_duo_api_secret_key
+    secrets:
+      - authelia_jwt_secret
+      - authelia_session_secret
+      - authelia_storage_encryption_key
+#      - authelia_storage_mysql_password
+#      - authelia_notifier_smtp_password
+#      - authelia_duo_api_secret_key
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.authelia-rtr.entrypoints=https"
+      - "traefik.http.routers.authelia-rtr.rule=Host(`authelia.$DOMAINNAME`)"
+      - "traefik.http.routers.authelia-rtr.tls=true"  # TODO: learn what is this for
+      ## Middlewares
+      - "traefik.http.routers.authelia-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.authelia-rtr.service=authelia-svc"
+      - "traefik.http.services.authelia-svc.loadbalancer.server.port=9091"
+
+  # Default email:password = admin@yacht.local:pass
+  yacht:
+    container_name: yacht
+    image: selfhostedpro/yacht:devel
+    restart: $BASE_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro # # Use Docker Socket Proxy instead for improved security
+      - $DOCKERDIR/appdata/yacht:/config # Change to local directory if you want to save/transfer config locally
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - DISABLE_AUTH=True
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.yacht-rtr.entrypoints=https"
+      - "traefik.http.routers.yacht-rtr.rule=Host(`yacht.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.yacht-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.yacht-rtr.service=yacht-svc"
+      - "traefik.http.services.yacht-svc.loadbalancer.server.port=8000"
+
+  homer:
+    container_name: homer
+    image: b4bz/homer
+    restart: $BASE_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/homer/assets:/www/assets
+      - $DOCKERDIR/appdata/homer/tools:/www/assets/tools
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.homer-rtr.entrypoints=https"
+      - "traefik.http.routers.homer-rtr.rule=Host(`home.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.homer-rtr.middlewares=chain-authelia@file"
+      #   # Redirect non-www to www middleware
+      # - "traefik.http.middlewares.homer-redirect.redirectregex.regex=^https?://$DOMAINNAME/(.*)"
+      # - "traefik.http.middlewares.homer-redirect.redirectregex.replacement=https://www.$DOMAINNAME/$${1}"
+      # - "traefik.http.middlewares.homer-redirect.redirectregex.permanent=true"
+      ## HTTP Services
+      - "traefik.http.routers.homer-rtr.service=homer-svc"
+      - "traefik.http.services.homer-svc.loadbalancer.server.port=8080"
+
+  vaultwarden:
+    container_name: vaultwarden
+    image: vaultwarden/server:latest
+    restart: $BASE_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/vaultwarden:/data/
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.vaultwarden-rtr.entrypoints=https"
+      - "traefik.http.routers.vaultwarden-rtr.rule=Host(`vaultwarden.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.vaultwarden-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.vaultwarden-rtr.service=vaultwarden-svc"
+      - "traefik.http.services.vaultwarden-svc.loadbalancer.server.port=80"
+
+  ##################### File Browser #####################
+  # For custom.css: change Global Settings->branding path to "custom"
+  # filebrowser:
+  #   container_name: filebrowser
+  #   image: filebrowser/filebrowser:latest
+  #   restart: $BASE_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - $DOCKERDIR/appdata/filebrowser/database.db:/database.db
+  #     - $DOCKERDIR/appdata/filebrowser/custom.css:/custom/custom.css
+  #     - $HARDDISK_ROOT_DIR:/srv
+  #   environment:
+  #     - PUID=$PUID
+  #     - PGID=$PGID
+  #     - TZ=$TZ
+  #     - FB_NOAUTH=1
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.filebrowser-rtr.entrypoints=https"
+  #     - "traefik.http.routers.filebrowser-rtr.rule=Host(`filebrowser.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.filebrowser-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.filebrowser-rtr.service=filebrowser-svc"
+  #     - "traefik.http.services.filebrowser-svc.loadbalancer.server.port=80"
+
+
+  filerun_db:
+    container_name: filerun_db
+    image: linuxserver/mariadb:latest
+    restart: $PHOTO_RESTART_POLICY
+    hostname: filerun_db
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/filerun_db/data:/config
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - MYSQL_DATABASE=filerun
+      - MYSQL_USER=filerun
+      - MYSQL_PASSWORD=filerun
+      - MYSQL_ROOT_PASSWORD=filerun
+      # - FILE__MYSQL_PASSWORD=/run/secrets/mysql_password
+      # - FILE__MYSQL_ROOT_PASSWORD=/run/secrets/mysql_root_password
+    secrets:
+      - mysql_root_password
+      - mysql_password
+
+  filerun:
+    image: filerun/filerun
+    container_name: filerun
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/filerun/html:/var/www/html
+      - $HARDDISK_ROOT_DIR:/user-files:ro
+    depends_on:
+      - filerun_db
+    links:
+      - filerun_db:db
+    environment:
+      FR_DB_HOST: filerun_db
+      FR_DB_PORT: 3306
+      FR_DB_NAME: filerun
+      FR_DB_USER: filerun
+      FR_DB_PASS: filerun
+      APACHE_RUN_USER: www-data
+      APACHE_RUN_USER_ID: 33
+      APACHE_RUN_GROUP: www-data
+      APACHE_RUN_GROUP_ID: 33
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.filerun-rtr.entrypoints=https"
+      - "traefik.http.routers.filerun-rtr.rule=Host(`filerun.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.filerun-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.filerun-rtr.service=filerun-svc"
+      - "traefik.http.services.filerun-svc.loadbalancer.server.port=80"

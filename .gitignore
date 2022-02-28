@@ -1,0 +1,5 @@
+.env
+appdata
+data
+docker-traefik-master
+secrets

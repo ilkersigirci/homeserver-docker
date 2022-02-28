@@ -1,0 +1,340 @@
+version: "3.7"
+
+networks:
+  t2_proxy:
+    external: true
+
+services:
+  # # Traefik Certs Dumper - Extract LetsEncrypt Certificates - Traefik2 Compatible
+  # certdumper:
+  #   container_name: traefik_certdumper
+  #   image: humenius/traefik-certs-dumper:latest
+  #   network_mode: none
+  #   # profiles:
+  #   # - core
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   # command: --restart-containers container1,container2,container3
+  #   volumes:
+  #     - $DOCKERDIR/appdata/traefik2/acme:/traefik:ro
+  #     - $DOCKERDIR/shared/certs:/output:rw
+  #     # - /var/run/docker.sock:/var/run/docker.sock:ro # Only needed if restarting containers (use Docker Socket Proxy instead)
+  #   environment:
+  #     DOMAIN: $DOMAINNAME
+
+  # # Cloudflare-Companion - Automatic CNAME DNS Creation
+  # cf-companion:
+  #   container_name: cf-companion
+  #   image: tiredofit/traefik-cloudflare-companion:latest
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   restart: $MAINTANENCE_RESTART_POLICY
+  #   # profiles:
+  #   # - core
+  #   networks:
+  #     - socket_proxy
+  #   #depends_on:
+  #   #  - socket-proxy
+  #   environment:
+  #     - TIMEZONE=$TZ
+  #     - TRAEFIK_VERSION=2
+  #     #- CF_EMAIL=$CLOUDFLARE_EMAIL
+  #     # - CF_TOKEN=$CLOUDFLARE_API_TOKEN
+  #     - TARGET_DOMAIN=$DOMAINNAME
+  #     - DOMAIN1=$DOMAINNAME
+  #     - DOMAIN1_ZONE_ID=$CLOUDFLARE_ZONEID # Copy from Cloudflare Overview page
+  #     - DOMAIN1_PROXIED=TRUE
+  #     - DOCKER_HOST=tcp://socket-proxy:2375
+  #   # secrets: # not working
+  #   #   - cloudflare_api_token
+  #   labels:
+  #     # Add hosts specified in rules here to force cf-companion to create the CNAMEs
+  #     # Since cf-companion creates CNAMEs based on host rules, this a workaround for non-docker/external apps
+  #     - "traefik.http.routers.cf-companion-rtr.rule=Host(`mox.$DOMAINNAME`) || Host(`pwt.$DOMAINNAME`) || Host(`webmin.$DOMAINNAME`) || Host(`shell.$DOMAINNAME`)"
+
+  duplicati:
+    image: lscr.io/linuxserver/duplicati
+    container_name: duplicati
+    restart: $MAINTANENCE_RESTART_POLICY
+    networks:
+      - t2_proxy
+    volumes:
+      - $DOCKERDIR/appdata/duplicati:/config
+      - $BACKUP_DIR:/backups
+      - $DOCKERDIR:/source
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.duplicati-rtr.entrypoints=https"
+      - "traefik.http.routers.duplicati-rtr.rule=Host(`duplicati.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.duplicati-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.duplicati-rtr.service=duplicati-svc"
+      - "traefik.http.services.duplicati-svc.loadbalancer.server.port=8200"
+
+  # watchtower:
+  #   image: containrrr/watchtower
+  #   container_name: watchtower
+  #   restart: unless-stopped
+  #   networks:
+  #     - t2_proxy
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   environment:
+  #     TZ: $TZ
+  #     WATCHTOWER_SCHEDULE: 0 30 18 * * *
+  #     WATCHTOWER_MONITOR_ONLY: "true"
+  #     WATCHTOWER_CLEANUP: "true"
+  #     WATCHTOWER_NO_STARTUP_MESSAGE: "true"
+  #     WATCHTOWER_NOTIFICATIONS: "shoutrrr"
+  #     WATCHTOWER_NOTIFICATION_URL: "telegram://$BOT_TOKEN@telegram/?channels=$CHAT_ID"
+  #   labels:
+  #     - "traefik.enable=true"
+
+  ## Usage
+  # First, Run as root with 0 user and privileged: true
+  # In $DOCKERDIR/appdata/code-server/.config/code-server/config.yaml: Change auth to none
+  # Then change user from 0 to normal and comment privileged
+  ## Then change permissions to user:docker and 775. -> Didn't try. Is needed?
+  code-server:
+    image: codercom/code-server:latest
+    container_name: code-server
+    restart: $MAINTANENCE_RESTART_POLICY
+    networks:
+      - t2_proxy
+    # privileged: true
+    volumes:
+      - $DOCKERDIR/appdata/code-server:/home/coder
+      - $DOCKERDIR:/home/coder/docker
+      - $NOTES_DIR:/home/coder/notes
+    environment:
+      # user: "0"
+      user: $PUID:$PGID
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.code-server-rtr.entrypoints=https"
+      - "traefik.http.routers.code-server-rtr.rule=Host(`code.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.code-server-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.code-server-rtr.service=code-server-svc"
+      - "traefik.http.services.code-server-svc.loadbalancer.server.port=8080"
+
+  # Linuxserver
+  # code-server-ls:
+  #   image: lscr.io/linuxserver/code-server
+  #   container_name: code-server-ls
+  #   restart: $MAINTANENCE_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   volumes:
+  #     - $DOCKERDIR/appdata/code-server-ls:/config
+  #     - $DOCKERDIR:/config/workspace/docker
+  #     - $NOTES_DIR:/config/workspace/notes
+  #   environment:
+  #     PUID: $PUID
+  #     PGID: $PGID
+  #     TZ: $TZ
+  #     DEFAULT_WORKSPACE: /config/workspace
+  #     # PASSWORD: password
+  #     # HASHED_PASSWORD: 
+  #     SUDO_PASSWORD: ilker
+  #     # SUDO_PASSWORD_HASH: 
+  #     # PROXY_DOMAIN: code-server-ls.my.domain
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.code-server-ls-rtr.entrypoints=https"
+  #     - "traefik.http.routers.code-server-ls-rtr.rule=Host(`codels.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.code-server-ls-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.code-server-ls-rtr.service=code-server-ls-svc"
+  #     - "traefik.http.services.code-server-ls-svc.loadbalancer.server.port=8443"
+
+  # OpenVscode - Gitpod
+  # openvscode:
+  #   image: gitpod/openvscode-server
+  #   container_name: openvscode
+  #   restart: $MAINTANENCE_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   volumes:
+  #     - $DOCKERDIR/appdata/openvscode:/home/workspace:cached
+  # #      - $DOCKERDIR:/home/workspace/docker:cached
+  # #      - $NOTES_DIR:/home/workspace/notes:cached
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.openvscode-rtr.entrypoints=https"
+  #     - "traefik.http.routers.openvscode-rtr.rule=Host(`code.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.openvscode-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.openvscode-rtr.service=openvscode-svc"
+  #     - "traefik.http.services.openvscode-svc.loadbalancer.server.port=3000"
+
+########################################## MONITORING ##########################################
+
+  # node-exporter:
+  #   image: prom/node-exporter:latest
+  #   container_name: node-exporter
+  #   restart: $MAINTANENCE_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  # #      - default
+  #   # Expose ports within stack without publishing them to the host machine
+  #   expose:
+  #     - 9100
+  #   volumes:
+  #     - /proc:/host/proc:ro
+  #     - /sys:/host/sys:ro
+  #     - /:/rootfs:ro
+  #   command:
+  #     - '--path.procfs=/host/proc'
+  #     - '--path.rootfs=/rootfs'
+  #     - '--path.sysfs=/host/sys'
+  #     - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: $MAINTANENCE_RESTART_POLICY
+    user: $PUID:$PGID  # IMPORTANT
+    networks:
+      - t2_proxy
+#      - default
+    # expose:
+    #   - 9090
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/prometheus:/etc/prometheus
+      - $DATADIR/prometheus:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.prometheus-rtr.entrypoints=https"
+      - "traefik.http.routers.prometheus-rtr.rule=Host(`prometheus.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.prometheus-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.prometheus-rtr.service=prometheus-svc"
+      - "traefik.http.services.prometheus-svc.loadbalancer.server.port=9090"
+
+   # Grafana - Graphical data visualization for InfluxDB data
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    depends_on:
+      - prometheus
+    restart: $MAINTANENCE_RESTART_POLICY
+    networks:
+      - t2_proxy
+#      - default
+    security_opt:
+      - no-new-privileges:true
+    # ports:
+    #   - "$GRAFANA_PORT:3000"
+    user: "0"
+    volumes:
+      # - grafana_data:/var/lib/grafana  # alternetive to bind way
+      - $DOCKERDIR/appdata/grafana:/var/lib/grafana
+      - $DOCKERDIR/appdata/grafana/grafana.ini:/etc/grafana/grafana.ini
+    environment:
+      GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource,grafana-worldmap-panel,grafana-piechart-panel"
+      # GF_SECURITY_ADMIN_USER: 'admin'
+      # GF_SECURITY_ADMIN_PASSWORD: 'admin'
+      # GF_USERS_ALLOW_SIGN_UP: 'true'
+      # GF_LOG_LEVEL: 'debug'
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.grafana-rtr.entrypoints=https"
+      - "traefik.http.routers.grafana-rtr.rule=Host(`grafana.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.grafana-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.grafana-rtr.service=grafana-svc"
+      - "traefik.http.services.grafana-svc.loadbalancer.server.port=3000"
+
+  # uptime-kuma:
+  #   image: louislam/uptime-kuma:latest
+  #   container_name: uptime-kuma
+  #   restart: $MAINTANENCE_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - $DOCKERDIR/appdata/uptime-kuma:/app/data
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.uptime-kuma-rtr.entrypoints=https"
+  #     - "traefik.http.routers.uptime-kuma-rtr.rule=Host(`uptimekuma.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.uptime-kuma-rtr.middlewares=chain-no-auth@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.uptime-kuma-rtr.service=uptime-kuma-svc"
+  #     - "traefik.http.services.uptime-kuma-svc.loadbalancer.server.port=3001"
+
+  # Contaits guacamole web client, the guacd server and a postgres database
+  # Default user/pass: guacadmin/guacadmin
+  # guacamole:
+  #   image: oznu/guacamole
+  #   container_name: guacamole
+  #   restart: $MAINTANENCE_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - $DOCKERDIR/appdata/guacamole:/config
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.guacamole-rtr.entrypoints=https"
+  #     - "traefik.http.routers.guacamole-rtr.rule=Host(`guacamole.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.guacamole-rtr.middlewares=chain-no-auth@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.guacamole-rtr.service=guacamole-svc"
+  #     - "traefik.http.services.guacamole-svc.loadbalancer.server.port=8080"
+
+  # remmina:
+  #   image: lscr.io/linuxserver/remmina
+  #   container_name: remmina
+  #   restart: $MAINTANENCE_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - $DOCKERDIR/appdata/remmina:/config
+  #   environment:
+  #     PUID: $PUID
+  #     PGID: $PGID
+  #     TZ: $TZ
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.remmina-rtr.entrypoints=https"
+  #     - "traefik.http.routers.remmina-rtr.rule=Host(`remmina.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.remmina-rtr.middlewares=chain-no-auth@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.remmina-rtr.service=remmina-svc"
+  #     - "traefik.http.services.remmina-svc.loadbalancer.server.port=3000"
