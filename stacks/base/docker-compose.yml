@@ -331,33 +331,33 @@ services:
 
   ##################### File Browser #####################
   # For custom.css: change Global Settings->branding path to "custom"
-  # filebrowser:
-  #   container_name: filebrowser
-  #   image: filebrowser/filebrowser:latest
-  #   restart: $BASE_RESTART_POLICY
-  #   networks:
-  #     - t2_proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   volumes:
-  #     - $DOCKERDIR/appdata/filebrowser/database.db:/database.db
-  #     - $DOCKERDIR/appdata/filebrowser/custom.css:/custom/custom.css
-  #     - $HARDDISK_ROOT_DIR:/srv
-  #   environment:
-  #     - PUID=$PUID
-  #     - PGID=$PGID
-  #     - TZ=$TZ
-  #     - FB_NOAUTH=1
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.filebrowser-rtr.entrypoints=https"
-  #     - "traefik.http.routers.filebrowser-rtr.rule=Host(`filebrowser.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.filebrowser-rtr.middlewares=chain-authelia@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.filebrowser-rtr.service=filebrowser-svc"
-  #     - "traefik.http.services.filebrowser-svc.loadbalancer.server.port=80"
+  filebrowser:
+    container_name: filebrowser
+    image: filebrowser/filebrowser:latest
+    restart: $BASE_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/filebrowser/database.db:/database.db
+      - $DOCKERDIR/appdata/filebrowser/custom.css:/custom/custom.css
+      - $HARDDISK_ROOT_DIR:/srv
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - FB_NOAUTH=1
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.filebrowser-rtr.entrypoints=https"
+      - "traefik.http.routers.filebrowser-rtr.rule=Host(`filebrowser.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.filebrowser-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.filebrowser-rtr.service=filebrowser-svc"
+      - "traefik.http.services.filebrowser-svc.loadbalancer.server.port=80"
 
 
   filerun_db:

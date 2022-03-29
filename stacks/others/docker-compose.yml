@@ -96,7 +96,7 @@ services:
       - no-new-privileges:true
     volumes:
       - $DOCKERDIR/appdata/syncthing:/config
-      - $APK_DIR:/apk
+      # - $APK_DIR:/apk
       - $NOTES_DIR:/notes
     environment:
       - PUID=$PUID
@@ -141,54 +141,54 @@ services:
   #     - "traefik.http.routers.freshrss-rtr.service=freshrss-svc"
   #     - "traefik.http.services.freshrss-svc.loadbalancer.server.port=80"
   
-  # miniflux-db:
-  #   container_name: miniflux-db
-  #   image: postgres:latest
-  #   restart: $OTHERS_RESTART_POLICY
-  #   networks:
-  #     - internal
-  #   environment:
-  #     - POSTGRES_DB=miniflux
-  #     - POSTGRES_USER=miniflux
-  #     - POSTGRES_PASSWORD=miniflux
-  #   volumes:
-  #     - $DOCKERDIR/appdata/miniflux-db:/var/lib/postgresql/data
-  #   # healthcheck:
-  #   #   test: ["CMD", "pg_isready", "-U", "miniflux"]
-  #   #   interval: 10s
-  #   #   start_period: 30s
+  miniflux-db:
+    container_name: miniflux-db
+    image: postgres:latest
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - internal
+    environment:
+      - POSTGRES_DB=miniflux
+      - POSTGRES_USER=miniflux
+      - POSTGRES_PASSWORD=miniflux
+    volumes:
+      - $DOCKERDIR/appdata/miniflux-db:/var/lib/postgresql/data
+    # healthcheck:
+    #   test: ["CMD", "pg_isready", "-U", "miniflux"]
+    #   interval: 10s
+    #   start_period: 30s
   
-  # miniflux:
-  #   container_name: miniflux
-  #   image: miniflux/miniflux:latest
-  #   restart: $OTHERS_RESTART_POLICY
-  #   depends_on:
-  #     - miniflux-db
-  #   networks:
-  #     - t2_proxy
-  #     - internal
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   # volumes:
-  #   #   - $DOCKERDIR/appdata/miniflux:/config
-  #   environment:
-  #     - DATABASE_URL=postgres://miniflux:miniflux@miniflux-db/miniflux?sslmode=disable
-  #     - RUN_MIGRATIONS=1
-  #     - CREATE_ADMIN=1
-  #     - ADMIN_USERNAME=miniflux
-  #     - ADMIN_PASSWORD=miniflux
-  #     - BASE_URL=https://miniflux.$DOMAINNAME
-  #     # - "POCKET_CONSUMER_KEY=YOUR_POCKET_CONSUMER_KEY"
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.freshrss-rtr.entrypoints=https"
-  #     - "traefik.http.routers.freshrss-rtr.rule=Host(`miniflux.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.freshrss-rtr.middlewares=chain-authelia@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.freshrss-rtr.service=freshrss-svc"
-  #     - "traefik.http.services.freshrss-svc.loadbalancer.server.port=8080"
+  miniflux:
+    container_name: miniflux
+    image: miniflux/miniflux:latest
+    restart: $OTHERS_RESTART_POLICY
+    depends_on:
+      - miniflux-db
+    networks:
+      - t2_proxy
+      - internal
+    security_opt:
+      - no-new-privileges:true
+    # volumes:
+    #   - $DOCKERDIR/appdata/miniflux:/config
+    environment:
+      - DATABASE_URL=postgres://miniflux:miniflux@miniflux-db/miniflux?sslmode=disable
+      - RUN_MIGRATIONS=1
+      - CREATE_ADMIN=1
+      - ADMIN_USERNAME=miniflux
+      - ADMIN_PASSWORD=miniflux
+      - BASE_URL=https://miniflux.$DOMAINNAME
+      # - "POCKET_CONSUMER_KEY=YOUR_POCKET_CONSUMER_KEY"
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.freshrss-rtr.entrypoints=https"
+      - "traefik.http.routers.freshrss-rtr.rule=Host(`miniflux.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.freshrss-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.freshrss-rtr.service=freshrss-svc"
+      - "traefik.http.services.freshrss-svc.loadbalancer.server.port=8080"
 
   #Expanse Tracker
   # firefly:

@@ -86,81 +86,66 @@ services:
   #     ## HTTP Services
   #     - "traefik.http.routers.photoprism-rtr.service=photoprism-svc"
   #     - "traefik.http.services.photoprism-svc.loadbalancer.server.port=2342"
-
-  # filerun-db:
-  #   image: mariadb:10.1
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: filerun
-  #     MYSQL_USER: filerun
-  #     MYSQL_PASSWORD: filerun
-  #     MYSQL_DATABASE: filerun
-  #   volumes:
-  #     - /filerun/db:/var/lib/mysql
     
 ### IMMICH
-#   redis:
-#     container_name: immich_redis
-#     image: redis:6.2
-#     networks:
-#       - t2_proxy  
+  redis:
+    container_name: immich_redis
+    image: redis:6.2
+    networks:
+      - t2_proxy  
 
-#   database:
-#     container_name: immich_postgres
-#     image: postgres:14
-#     # env_file:
-#     #   - .env
-#     networks:
-#       - t2_proxy
-#     ports:
-#       - 5432:5432
-#     environment:
-#       POSTGRES_PASSWORD: immich
-#       POSTGRES_USER: immich
-#       POSTGRES_DB: immich
-#       PG_DATA: /var/lib/postgresql/data
-#     volumes:
-#       - pgdata:/var/lib/postgresql/data
+  database:
+    container_name: immich_postgres
+    image: postgres:14
+    # env_file:
+    #   - .env
+    networks:
+      - t2_proxy
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: immich
+      POSTGRES_USER: immich
+      POSTGRES_DB: immich
+      PG_DATA: /var/lib/postgresql/data
+    volumes:
+      - pgdata:/var/lib/postgresql/data
 
-#   # https://hub.docker.com/r/altran1502/immich-server/
-#   # Register user:
-#   # curl --location --request POST 'https://immich.ilkerflix.com/auth/signUp' \
-#   # --header 'Content-Type: application/json' \
-#   # --data-raw '{
-#   #     "email": "testuser@email.com",
-#   #     "password": "password"
-#   # }'
-#   immich_server:
-#     container_name: immich_server
-#     image: altran1502/immich-server:latest
-#     depends_on:
-#       - redis
-#       - database
-#     networks:
-#       - t2_proxy
-#     # ports:
-#     #   - 2283:3000
-#     volumes:
-#       - /usr/src/app/node_modules
-#       - $IMMICH_UPLOAD_DIR:/usr/src/app/upload
-#       # - $DOCKERDIR/appdata/immich:/usr/src/app
-#       # - $DOCKERDIR/appdata/immich/node_modules:/usr/src/app/node_modules
-#     environment:
-#       DB_USERNAME: immich
-#       DB_PASSWORD: immich
-#       DB_DATABASE_NAME: immich
-#       UPLOAD_LOCATION: $IMMICH_UPLOAD_DIR
-#       JWT_SECRET: "False"
-#       # NODE_ENV: production
-#     labels:
-#       - "traefik.enable=true"
-#       ## HTTP Routers
-#       - "traefik.http.routers.immich-rtr.entrypoints=https"
-#       - "traefik.http.routers.immich-rtr.rule=Host(`immich.$DOMAINNAME`)"
-#       ## Middlewares
-#       # - "traefik.http.routers.immich-rtr.middlewares=chain-authelia@file"
-#       ## HTTP Services
-#       # - "traefik.http.routers.immich-rtr.service=immich-svc"
-#       - "traefik.http.services.immich-svc.loadbalancer.server.port=3000"  
+  # https://hub.docker.com/r/altran1502/immich-server/
+  # Register user:
+  # curl --location --request POST 'https://immich.ilkerflix.com/auth/signUp' --header 'Content-Type: application/json' --data-raw '{"email": "testuser@email.com","password": "password"}'
+  immich_server:
+    container_name: immich_server
+    image: altran1502/immich-server:latest
+    depends_on:
+      - redis
+      - database
+    networks:
+      - t2_proxy
+    volumes:
+      - /usr/src/app/node_modules
+      - $IMMICH_UPLOAD_DIR:/usr/src/app/upload
+      # - $DOCKERDIR/appdata/immich:/usr/src/app
+      # - $DOCKERDIR/appdata/immich/node_modules:/usr/src/app/node_modules
+    environment:
+      DB_USERNAME: immich
+      DB_PASSWORD: immich
+      DB_DATABASE_NAME: immich
+      UPLOAD_LOCATION: $IMMICH_UPLOAD_DIR
+      JWT_SECRET: "False"
+      # NODE_ENV: production
+      ENABLE_MAPBOX: "False"
+      # MAPBOX_KEY: ""
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.immich-rtr.entrypoints=https"
+      - "traefik.http.routers.immich-rtr.rule=Host(`immich.$DOMAINNAME`)"
+      ## Middlewares
+      # - "traefik.http.routers.immich-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      # - "traefik.http.routers.immich-rtr.service=immich-svc"
+      - "traefik.http.services.immich-svc.loadbalancer.server.port=3000"  
 
-# volumes:
-#   pgdata:
+volumes:
+  pgdata:
