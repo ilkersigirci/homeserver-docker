@@ -88,10 +88,11 @@ services:
     restart: $OTHERS_RESTART_POLICY
     networks:
       - t2_proxy
-    # ports:
-    #   - 22000:22000/tcp
-    #   - 22000:22000/udp
-    #   - 21027:21027/udp
+    # TODO: Probably needed for connecting to phone
+    ports:
+      - 22000:22000/tcp
+      - 22000:22000/udp
+      - 21027:21027/udp
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -158,6 +159,7 @@ services:
     #   interval: 10s
     #   start_period: 30s
   
+  # Fever api endpoint: fever/?api
   miniflux:
     container_name: miniflux
     image: miniflux/miniflux:latest

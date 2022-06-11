@@ -11,6 +11,9 @@ secrets:
   mysql_password:
     file: $DOCKERDIR/secrets/mysql_password
 
+volumes:
+  pgdata:
+
 services:
   # MariaDB - MySQL Database
   # After starting container for first time dexec and mysqladmin -u root password <password>
@@ -91,18 +94,17 @@ services:
   redis:
     container_name: immich_redis
     image: redis:6.2
+    restart: $MEDIA_RESTART_POLICY
     networks:
       - t2_proxy  
 
   database:
     container_name: immich_postgres
     image: postgres:14
-    # env_file:
-    #   - .env
     networks:
       - t2_proxy
-    ports:
-      - 5432:5432
+    # ports:
+    #   - 5432:5432
     environment:
       POSTGRES_PASSWORD: immich
       POSTGRES_USER: immich
@@ -113,10 +115,12 @@ services:
 
   # https://hub.docker.com/r/altran1502/immich-server/
   # Register user:
-  # curl --location --request POST 'https://immich.ilkerflix.com/auth/signUp' --header 'Content-Type: application/json' --data-raw '{"email": "testuser@email.com","password": "password"}'
-  immich_server:
-    container_name: immich_server
+  # curl --location --request POST 'https://immichserver.ilkerflix.com/auth/signUp' --header 'Content-Type: application/json' --data-raw '{"email": "ilker@mail.com","password": "ilker"}'
+  immich-server:
+    container_name: immich-server
     image: altran1502/immich-server:latest
+    entrypoint: ["/bin/sh", "./entrypoint.sh"]
+    restart: $MEDIA_RESTART_POLICY
     depends_on:
       - redis
       - database
@@ -133,9 +137,35 @@ services:
       DB_DATABASE_NAME: immich
       UPLOAD_LOCATION: $IMMICH_UPLOAD_DIR
       JWT_SECRET: "False"
-      # NODE_ENV: production
+      NODE_ENV: production
       ENABLE_MAPBOX: "False"
       # MAPBOX_KEY: ""
+      VITE_SERVER_ENDPOINT: https://immichserver.ilkerflix.com:443
+      # VITE_SERVER_ENDPOINT: immichserver.$DOMAINNAME
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.immich-server-rtr.entrypoints=https"
+      - "traefik.http.routers.immich-server-rtr.rule=Host(`immichserver.$DOMAINNAME`)"
+      ## Middlewares
+      # - "traefik.http.routers.immich-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.immich-server-rtr.service=immich-server-svc"
+      - "traefik.http.services.immich-server-svc.loadbalancer.server.port=3000"
+
+  immich-web:
+    container_name: immich-web
+    image: altran1502/immich-web:latest
+    entrypoint: ["/bin/sh", "./entrypoint.sh"]
+    # ports:
+    #   - 2285:3000
+    restart: $MEDIA_RESTART_POLICY
+    depends_on:
+      - immich-server
+    networks:
+      - t2_proxy
+    environment:
+      VITE_SERVER_ENDPOINT: https://immichserver.ilkerflix.com:443
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
@@ -144,8 +174,49 @@ services:
       ## Middlewares
       # - "traefik.http.routers.immich-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
-      # - "traefik.http.routers.immich-rtr.service=immich-svc"
-      - "traefik.http.services.immich-svc.loadbalancer.server.port=3000"  
+      - "traefik.http.routers.immich-rtr.service=immich-svc"
+      - "traefik.http.services.immich-svc.loadbalancer.server.port=3000"
 
-volumes:
-  pgdata:
+  immich-microservices:
+    container_name: immich-microservices
+    image: altran1502/immich-microservices:latest
+    entrypoint: ["/bin/sh", "./entrypoint.sh"]
+    restart: $MEDIA_RESTART_POLICY
+    depends_on:
+      - database
+    # build:
+    #   context: ../microservices
+    #   dockerfile: Dockerfile
+    # entrypoint: ["/bin/sh", "./entrypoint.sh"]
+    networks:
+      - t2_proxy
+    expose:
+      - "3001"
+    volumes:
+      - /usr/src/app
+      - $IMMICH_UPLOAD_DIR:/usr/src/app/upload
+      - /usr/src/app/node_modules
+    environment:
+      DB_USERNAME: immich
+      DB_PASSWORD: immich
+      DB_DATABASE_NAME: immich
+      UPLOAD_LOCATION: $IMMICH_UPLOAD_DIR
+      JWT_SECRET: "False"
+      NODE_ENV: production
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [ gpu ]
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.immich-microservices.entrypoints=https"
+      - "traefik.http.routers.immich-microservices.rule=Host(`immich-ml.$DOMAINNAME`)"
+      ## Middlewares
+      # - "traefik.http.routers.immich-microservices.middlewares=chain-authelia@file"
+      ## HTTP Services
+      # - "traefik.http.routers.immich-microservices.service=immich-microservices-svc"
+      - "traefik.http.services.immich-microservices-svc.loadbalancer.server.port=3001"

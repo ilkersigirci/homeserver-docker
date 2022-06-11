@@ -253,7 +253,7 @@ services:
   # Default email:password = admin@yacht.local:pass
   yacht:
     container_name: yacht
-    image: selfhostedpro/yacht:devel
+    image: selfhostedpro/yacht:latest #devel
     restart: $BASE_RESTART_POLICY
     networks:
       - t2_proxy
@@ -392,6 +392,8 @@ services:
       - t2_proxy
     security_opt:
       - no-new-privileges:true
+    # user: $PGID:$PUID
+    user: 0:0
     volumes:
       - $DOCKERDIR/appdata/filerun/html:/var/www/html
       - $HARDDISK_ROOT_DIR:/user-files:ro

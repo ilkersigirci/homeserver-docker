@@ -101,20 +101,54 @@ services:
   # In $DOCKERDIR/appdata/code-server/.config/code-server/config.yaml: Change auth to none
   # Then change user from 0 to normal and comment privileged
   ## Then change permissions to user:docker and 775. -> Didn't try. Is needed?
+#   code-server-orig:
+#     image: codercom/code-server:latest
+#     container_name: code-server-orig
+#     restart: $MAINTANENCE_RESTART_POLICY
+#     networks:
+#       - t2_proxy
+#     user: "0"
+#     privileged: true
+#     volumes:
+#       - $DOCKERDIR/appdata/code-server-orig/.config:/home/coder/.config
+#       - $DOCKERDIR:/home/coder/docker
+#       - $NOTES_DIR:/home/coder/notes
+# #    environment:
+#       # user: "0"
+# #      DOCKER_USER: $PUID
+#       # user: $PUID:$PGID
+#     labels:
+#       - "traefik.enable=true"
+#       ## HTTP Routers
+#       - "traefik.http.routers.code-server-orig-rtr.entrypoints=https"
+#       - "traefik.http.routers.code-server-orig-rtr.rule=Host(`codeorig.$DOMAINNAME`)"
+#       ## Middlewares
+#       - "traefik.http.routers.code-server-orig-rtr.middlewares=chain-authelia@file"
+#       ## HTTP Services
+#       - "traefik.http.routers.code-server-orig-rtr.service=code-server-orig-svc"
+#       - "traefik.http.services.code-server-orig-svc.loadbalancer.server.port=8080"
+
+  # Linuxserver
   code-server:
-    image: codercom/code-server:latest
+    image: linuxserver/code-server
     container_name: code-server
     restart: $MAINTANENCE_RESTART_POLICY
     networks:
       - t2_proxy
-    # privileged: true
     volumes:
-      - $DOCKERDIR/appdata/code-server:/home/coder
-      - $DOCKERDIR:/home/coder/docker
-      - $NOTES_DIR:/home/coder/notes
+      - $DOCKERDIR/appdata/code-server:/config
+      - $DOCKERDIR:/config/workspace/docker
+      - $NOTES_DIR:/config/workspace/notes
     environment:
-      # user: "0"
-      user: $PUID:$PGID
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      DEFAULT_WORKSPACE: /config/workspace
+      # PASSWORD: password
+      # HASHED_PASSWORD: 
+      SUDO_PASSWORD: ilker
+      # SUDO_PASSWORD_HASH: 
+      # PROXY_DOMAIN: code-server-ls.my.domain
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
@@ -124,39 +158,7 @@ services:
       - "traefik.http.routers.code-server-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
       - "traefik.http.routers.code-server-rtr.service=code-server-svc"
-      - "traefik.http.services.code-server-svc.loadbalancer.server.port=8080"
-
-  # Linuxserver
-  # code-server-ls:
-  #   image: lscr.io/linuxserver/code-server
-  #   container_name: code-server-ls
-  #   restart: $MAINTANENCE_RESTART_POLICY
-  #   networks:
-  #     - t2_proxy
-  #   volumes:
-  #     - $DOCKERDIR/appdata/code-server-ls:/config
-  #     - $DOCKERDIR:/config/workspace/docker
-  #     - $NOTES_DIR:/config/workspace/notes
-  #   environment:
-  #     PUID: $PUID
-  #     PGID: $PGID
-  #     TZ: $TZ
-  #     DEFAULT_WORKSPACE: /config/workspace
-  #     # PASSWORD: password
-  #     # HASHED_PASSWORD: 
-  #     SUDO_PASSWORD: ilker
-  #     # SUDO_PASSWORD_HASH: 
-  #     # PROXY_DOMAIN: code-server-ls.my.domain
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.code-server-ls-rtr.entrypoints=https"
-  #     - "traefik.http.routers.code-server-ls-rtr.rule=Host(`codels.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.code-server-ls-rtr.middlewares=chain-authelia@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.code-server-ls-rtr.service=code-server-ls-svc"
-  #     - "traefik.http.services.code-server-ls-svc.loadbalancer.server.port=8443"
+      - "traefik.http.services.code-server-svc.loadbalancer.server.port=8443"
 
   # OpenVscode - Gitpod
   # openvscode:
