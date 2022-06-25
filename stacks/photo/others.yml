@@ -1,0 +1,89 @@
+version: "3.7"
+
+networks:
+  t2_proxy:
+    external: true
+
+########################### SECRETS
+secrets:
+  mysql_root_password:
+    file: $DOCKERDIR/secrets/mysql_root_password
+  mysql_password:
+    file: $DOCKERDIR/secrets/mysql_password
+
+services:
+
+  # MariaDB - MySQL Database
+  # After starting container for first time dexec and mysqladmin -u root password <password>
+  # mariadb:
+  #   container_name: mariadb
+  #   image: linuxserver/mariadb:latest
+  #   restart: $PHOTO_RESTART_POLICY
+  #   hostname: mariadb
+  #   networks:
+  #     t2_proxy:
+  #       ipv4_address: 192.168.90.250
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - $DOCKERDIR/appdata/mariadb/data:/config
+  #   environment:
+  #     - PUID=$PUID
+  #     - PGID=$PGID
+  #     - TZ=$TZ
+  #     - MYSQL_DATABASE=photoprism
+  #     - MYSQL_USER=photoprism
+  #     - FILE__MYSQL_PASSWORD=/run/secrets/mysql_password
+  #     # Note FILE__ (double underscore) - Issue #127
+  #     - FILE__MYSQL_ROOT_PASSWORD=/run/secrets/mysql_root_password
+  #   secrets:
+  #     - mysql_root_password
+  #     - mysql_password
+
+  # # Photoprism
+  # # https://dl.photoprism.org/docker/docker-compose.yml
+  # photoprism:
+  #   image: photoprism/photoprism:latest
+  #   container_name: photoprism
+  #   restart: $PHOTO_RESTART_POLICY
+  #   depends_on:
+  #     - mariadb
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #     # - seccomp:unconfined
+  #     # - apparmor:unconfined
+  #   volumes:
+  #     - $JELLYFIN_MEDIA_DIR/Photos:/photoprism/originals
+  #     - $DOCKERDIR/appdata/photoprism:/photoprism/storage   # writable* storage folder for cache, database, and sidecar files (never remove)
+  #   environment:
+  #     PHOTOPRISM_UID: 0 # $PUID
+  #     PHOTOPRISM_GID: 0 # $PGID
+  #     TZ: $TZ
+  #     PHOTOPRISM_ADMIN_PASSWORD: "photoprism" # mSboN@@xPWxA7NMTwvi4
+  #     # Site Related
+  #     PHOTOPRISM_SITE_TITLE: "Photo-Video"
+  #     PHOTOPRISM_SITE_CAPTION: "Browse Your Life"
+  #     PHOTOPRISM_SITE_DESCRIPTION: "Open-Source Photo Management"
+  #     PHOTOPRISM_SITE_AUTHOR: "@ilker"
+  #     PHOTOPRISM_DEBUG: "false"
+  #     PHOTOPRISM_READONLY: "true"                   # Don't modify originals directory
+  #     PHOTOPRISM_PUBLIC: "false"                    # No authentication required
+  #     PHOTOPRISM_DISABLE_TENSORFLOW: "true"         # Don't use TensorFlow for image classification
+  #     PHOTOPRISM_DISABLE_FACES: "false"             # Disables facial recognition
+  #     PHOTOPRISM_DISABLE_CLASSIFICATION: "false"    # Disables image classification
+  #     PHOTOPRISM_DETECT_NSFW: "true"                # Flag photos as private that MAY be offensive (requires TensorFlow)
+  #     PHOTOPRISM_UPLOAD_NSFW: "true"                # Allows uploads that may be offensive
+  #     PHOTOPRISM_EXPERIMENTAL: "false"              # Enable experimental features
+  #     PHOTOPRISM_WORKERS: 1
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.photoprism-rtr.entrypoints=https"
+  #     - "traefik.http.routers.photoprism-rtr.rule=Host(`photoprism.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.photoprism-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.photoprism-rtr.service=photoprism-svc"
+  #     - "traefik.http.services.photoprism-svc.loadbalancer.server.port=2342"
