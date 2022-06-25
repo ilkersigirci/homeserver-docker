@@ -6,80 +6,80 @@ networks:
 
 services:
   ############################# SERVER #############################
-  jellyfin:
-    image: linuxserver/jellyfin:latest
-    container_name: jellyfin
-    restart: $MEDIA_RESTART_POLICY
-    # profiles:
-    # - media
-    networks:
-      - t2_proxy
-    ports:
-      - "8096:8096"
-    # devices:
-    #   - /dev/dri:/dev/dri # for harware transcoding
-    security_opt:
-      - no-new-privileges:true
-    #  deploy:
-    #    resources:
-    #      limits:
-    #        cpus: '0.4'
-    #        memory: 276M
-    #      reservations:
-    #        cpus: '0.25'
-    #        memory: 128M
-    environment:
-      PUID: $PUID
-      PGID: $PGID
-      TZ: $TZ
-      UMASK: 022
-    volumes:
-      - $DOCKERDIR/appdata/jellyfin:/config
-      - $DATADIR/docker/appdata/jellyfin/metadata:/config/data/metadata
-      - $DATADIR/downloads:/data/downloads
-      - $JELLYFIN_MEDIA_DIR:/data/local
-      - $ONEDRIVE_DIR:/data/onedrive
-      # - /dev/shm:/data/transcode # Offload transcoding to RAM if you have enough RAM
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.jellyfin-rtr.entrypoints=https"
-      - "traefik.http.routers.jellyfin-rtr.rule=Host(`jellyfin.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.jellyfin-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.jellyfin-rtr.service=jellyfin-svc"
-      - "traefik.http.services.jellyfin-svc.loadbalancer.server.port=8096"
-  
-  # jellyfin-beta:
-  #   image: jellyfin/jellyfin:10.8.0-beta3
-  #   container_name: jellyfin-beta
+  # jellyfin:
+  #   image: linuxserver/jellyfin:latest
+  #   container_name: jellyfin
   #   restart: $MEDIA_RESTART_POLICY
+  #   # profiles:
+  #   # - media
   #   networks:
   #     - t2_proxy
   #   ports:
   #     - "8096:8096"
+  #   # devices:
+  #   #   - /dev/dri:/dev/dri # for harware transcoding
   #   security_opt:
   #     - no-new-privileges:true
-  #   # user: $PGID:$PUID
-  #   user: 0:0
+  #   #  deploy:
+  #   #    resources:
+  #   #      limits:
+  #   #        cpus: '0.4'
+  #   #        memory: 276M
+  #   #      reservations:
+  #   #        cpus: '0.25'
+  #   #        memory: 128M
+  #   environment:
+  #     PUID: $PUID
+  #     PGID: $PGID
+  #     TZ: $TZ
+  #     UMASK: 022
   #   volumes:
-  #     - $DOCKERDIR/appdata/jellyfin-beta:/config
-  #     - $DOCKERDIR/appdata/jellyfin-beta/cache:/cache
-  #     - $DATADIR/docker/appdata/jellyfin/metadata:/config/metadata
-  #     - $DATADIR/downloads:/media/downloads:ro
-  #     - $JELLYFIN_MEDIA_DIR:/media/local:ro
-  #     - $ONEDRIVE_DIR:/media/onedrive:ro
+  #     - $DOCKERDIR/appdata/jellyfin:/config
+  #     - $DATADIR/docker/appdata/jellyfin/metadata:/config/data/metadata
+  #     - $DATADIR/downloads:/data/downloads
+  #     - $JELLYFIN_MEDIA_DIR:/data/local
+  #     - $ONEDRIVE_DIR:/data/onedrive
+  #     # - /dev/shm:/data/transcode # Offload transcoding to RAM if you have enough RAM
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers
-  #     - "traefik.http.routers.jellyfin-beta-rtr.entrypoints=https"
-  #     - "traefik.http.routers.jellyfin-beta-rtr.rule=Host(`jellyfin.$DOMAINNAME`)"
+  #     - "traefik.http.routers.jellyfin-rtr.entrypoints=https"
+  #     - "traefik.http.routers.jellyfin-rtr.rule=Host(`jellyfin.$DOMAINNAME`)"
   #     ## Middlewares
-  #     - "traefik.http.routers.jellyfin-beta-rtr.middlewares=chain-authelia@file"
+  #     - "traefik.http.routers.jellyfin-rtr.middlewares=chain-authelia@file"
   #     ## HTTP Services
-  #     - "traefik.http.routers.jellyfin-beta-rtr.service=jellyfin-beta-svc"
-  #     - "traefik.http.services.jellyfin-beta-svc.loadbalancer.server.port=8096"
+  #     - "traefik.http.routers.jellyfin-rtr.service=jellyfin-svc"
+  #     - "traefik.http.services.jellyfin-svc.loadbalancer.server.port=8096"
+  
+  jellyfin-beta:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin-beta
+    restart: $MEDIA_RESTART_POLICY
+    networks:
+      - t2_proxy
+    ports:
+      - "8096:8096"
+    security_opt:
+      - no-new-privileges:true
+    # user: $PGID:$PUID
+    user: 0:0
+    volumes:
+      - $DOCKERDIR/appdata/jellyfin-beta:/config
+      - $DOCKERDIR/appdata/jellyfin-beta/cache:/cache
+      - $DATADIR/docker/appdata/jellyfin/metadata:/config/metadata
+      - $DATADIR/downloads:/media/downloads:ro
+      - $JELLYFIN_MEDIA_DIR:/media/local:ro
+      - $ONEDRIVE_DIR:/media/onedrive:ro
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.jellyfin-beta-rtr.entrypoints=https"
+      - "traefik.http.routers.jellyfin-beta-rtr.rule=Host(`jellyfin.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.jellyfin-beta-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.jellyfin-beta-rtr.service=jellyfin-beta-svc"
+      - "traefik.http.services.jellyfin-beta-svc.loadbalancer.server.port=8096"
     
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
