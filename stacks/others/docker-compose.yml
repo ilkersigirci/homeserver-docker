@@ -115,6 +115,34 @@ services:
       - "traefik.http.routers.syncthing-rtr.service=syncthing-svc"
       - "traefik.http.services.syncthing-svc.loadbalancer.server.port=8384"
 
+  # TODO: Add local.ini
+  # https://github.com/vrtmrz/obsidian-livesync/blob/main/docs/setup_own_server.md#setup-couchdb-to-your-server
+  couchdb:
+    container_name: couchdb
+    image: couchdb:latest
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/couchdb:/opt/couchdb/data
+      # - local.ini:/opt/couchdb/etc/local.ini
+      # - $NOTES_DIR:/notes
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=admin
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.couchdb-rtr.entrypoints=https"
+      - "traefik.http.routers.couchdb-rtr.rule=Host(`couchdb.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.couchdb-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.couchdb-rtr.service=couchdb-svc"
+      - "traefik.http.services.couchdb-svc.loadbalancer.server.port=5984"
+
   ######### RSS #########
 
   # freshrss:

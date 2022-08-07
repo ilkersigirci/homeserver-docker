@@ -360,64 +360,64 @@ services:
       - "traefik.http.services.filebrowser-svc.loadbalancer.server.port=80"
 
 
-  filerun_db:
-    container_name: filerun_db
-    image: linuxserver/mariadb:latest
-    restart: $PHOTO_RESTART_POLICY
-    hostname: filerun_db
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - $DOCKERDIR/appdata/filerun_db/data:/config
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-      - MYSQL_DATABASE=filerun
-      - MYSQL_USER=filerun
-      - MYSQL_PASSWORD=filerun
-      - MYSQL_ROOT_PASSWORD=filerun
-      # - FILE__MYSQL_PASSWORD=/run/secrets/mysql_password
-      # - FILE__MYSQL_ROOT_PASSWORD=/run/secrets/mysql_root_password
-    secrets:
-      - mysql_root_password
-      - mysql_password
+  # filerun_db:
+  #   container_name: filerun_db
+  #   image: linuxserver/mariadb:latest
+  #   restart: $PHOTO_RESTART_POLICY
+  #   hostname: filerun_db
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - $DOCKERDIR/appdata/filerun_db/data:/config
+  #   environment:
+  #     - PUID=$PUID
+  #     - PGID=$PGID
+  #     - TZ=$TZ
+  #     - MYSQL_DATABASE=filerun
+  #     - MYSQL_USER=filerun
+  #     - MYSQL_PASSWORD=filerun
+  #     - MYSQL_ROOT_PASSWORD=filerun
+  #     # - FILE__MYSQL_PASSWORD=/run/secrets/mysql_password
+  #     # - FILE__MYSQL_ROOT_PASSWORD=/run/secrets/mysql_root_password
+  #   secrets:
+  #     - mysql_root_password
+  #     - mysql_password
 
-  filerun:
-    image: filerun/filerun
-    container_name: filerun
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    # user: $PGID:$PUID
-    user: 0:0
-    volumes:
-      - $DOCKERDIR/appdata/filerun/html:/var/www/html
-      - $HARDDISK_ROOT_DIR:/user-files:ro
-    depends_on:
-      - filerun_db
-    links:
-      - filerun_db:db
-    environment:
-      FR_DB_HOST: filerun_db
-      FR_DB_PORT: 3306
-      FR_DB_NAME: filerun
-      FR_DB_USER: filerun
-      FR_DB_PASS: filerun
-      APACHE_RUN_USER: www-data
-      APACHE_RUN_USER_ID: 33
-      APACHE_RUN_GROUP: www-data
-      APACHE_RUN_GROUP_ID: 33
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.filerun-rtr.entrypoints=https"
-      - "traefik.http.routers.filerun-rtr.rule=Host(`filerun.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.filerun-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.filerun-rtr.service=filerun-svc"
-      - "traefik.http.services.filerun-svc.loadbalancer.server.port=80"
+  # filerun:
+  #   image: filerun/filerun
+  #   container_name: filerun
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   # user: $PGID:$PUID
+  #   user: 0:0
+  #   volumes:
+  #     - $DOCKERDIR/appdata/filerun/html:/var/www/html
+  #     - $HARDDISK_ROOT_DIR:/user-files:ro
+  #   depends_on:
+  #     - filerun_db
+  #   links:
+  #     - filerun_db:db
+  #   environment:
+  #     FR_DB_HOST: filerun_db
+  #     FR_DB_PORT: 3306
+  #     FR_DB_NAME: filerun
+  #     FR_DB_USER: filerun
+  #     FR_DB_PASS: filerun
+  #     APACHE_RUN_USER: www-data
+  #     APACHE_RUN_USER_ID: 33
+  #     APACHE_RUN_GROUP: www-data
+  #     APACHE_RUN_GROUP_ID: 33
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.filerun-rtr.entrypoints=https"
+  #     - "traefik.http.routers.filerun-rtr.rule=Host(`filerun.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.filerun-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.filerun-rtr.service=filerun-svc"
+  #     - "traefik.http.services.filerun-svc.loadbalancer.server.port=80"
