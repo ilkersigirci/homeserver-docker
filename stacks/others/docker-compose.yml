@@ -117,6 +117,7 @@ services:
 
   # TODO: Add local.ini
   # https://github.com/vrtmrz/obsidian-livesync/blob/main/docs/setup_own_server.md#setup-couchdb-to-your-server
+  # passphase: obsidiannotes
   couchdb:
     container_name: couchdb
     image: couchdb:latest
@@ -127,7 +128,7 @@ services:
       - no-new-privileges:true
     volumes:
       - $DOCKERDIR/appdata/couchdb:/opt/couchdb/data
-      # - local.ini:/opt/couchdb/etc/local.ini
+      - $DOCKERDIR/appdata/couchdb/local.ini:/opt/couchdb/etc/local.ini
       # - $NOTES_DIR:/notes
     environment:
       - COUCHDB_USER=admin
@@ -138,7 +139,7 @@ services:
       - "traefik.http.routers.couchdb-rtr.entrypoints=https"
       - "traefik.http.routers.couchdb-rtr.rule=Host(`couchdb.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.couchdb-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.couchdb-rtr.middlewares=chain-couchdb@file" # NOTE: chain-authelia not working
       ## HTTP Services
       - "traefik.http.routers.couchdb-rtr.service=couchdb-svc"
       - "traefik.http.services.couchdb-svc.loadbalancer.server.port=5984"

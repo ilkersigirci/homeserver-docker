@@ -445,33 +445,33 @@ services:
 
   # Books management
   # # Set url_base in readarr settings if using PathPrefix
-  readarr:
-    image: lscr.io/linuxserver/readarr:develop
-    container_name: readarr
-    restart: $MEDIA_RESTART_POLICY
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - $DOCKERDIR/appdata/readarr:/config
-      # - /path/to/books:/books #optional
-      - $JELLYFIN_MEDIA_DIR/Downloads:/downloads
-    environment:
-      PUID: $PUID
-      PGID: $PGID
-      TZ: $TZ
-      # UMASK: 002
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers Auth
-      - "traefik.http.routers.readarr-rtr.entrypoints=https"
-      - "traefik.http.routers.readarr-rtr.rule=Host(`readarr.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.readarr-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.readarr-rtr.service=readarr-svc"
-      - "traefik.http.services.readarr-svc.loadbalancer.server.port=8787"
+  # readarr:
+  #   image: lscr.io/linuxserver/readarr:develop
+  #   container_name: readarr
+  #   restart: $MEDIA_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - $DOCKERDIR/appdata/readarr:/config
+  #     # - /path/to/books:/books #optional
+  #     - $JELLYFIN_MEDIA_DIR/Downloads:/downloads
+  #   environment:
+  #     PUID: $PUID
+  #     PGID: $PGID
+  #     TZ: $TZ
+  #     # UMASK: 002
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers Auth
+  #     - "traefik.http.routers.readarr-rtr.entrypoints=https"
+  #     - "traefik.http.routers.readarr-rtr.rule=Host(`readarr.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.readarr-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.readarr-rtr.service=readarr-svc"
+  #     - "traefik.http.services.readarr-svc.loadbalancer.server.port=8787"
 
   # Ebooks and Management
   # lazylibrarian:
