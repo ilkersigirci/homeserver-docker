@@ -1,5 +1,7 @@
 .env
 appdata
+!appdata/traefik2/rules/*
 data
 docker-traefik-master
 secrets
+settings.json
