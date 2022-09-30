@@ -85,7 +85,7 @@ services:
 
   # Nextcloud Docker Application
   nextcloud:
-    image: nextcloud:22
+    image: nextcloud:latest
     container_name: nextcloud
     # Same as above
     hostname: nextcloud

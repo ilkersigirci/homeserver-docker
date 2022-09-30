@@ -243,7 +243,7 @@ services:
       ## HTTP Routers
       - "traefik.http.routers.authelia-rtr.entrypoints=https"
       - "traefik.http.routers.authelia-rtr.rule=Host(`authelia.$DOMAINNAME`)"
-      - "traefik.http.routers.authelia-rtr.tls=true"  # TODO: learn what is this for
+      - "traefik.http.routers.authelia-rtr.tls=true"  # TODO: This shouldn't be needed. might remove?
       ## Middlewares
       - "traefik.http.routers.authelia-rtr.middlewares=chain-authelia@file"
       ## HTTP Services

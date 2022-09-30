@@ -105,7 +105,6 @@ services:
       - TZ=$TZ
     labels:
       - "traefik.enable=true"
-      # - "traefik.http.routers.syncthing-rtr.tls=true"
       ## HTTP Routers
       - "traefik.http.routers.syncthing-rtr.entrypoints=https"
       - "traefik.http.routers.syncthing-rtr.rule=Host(`syncthing.$DOMAINNAME`)"
@@ -143,6 +142,27 @@ services:
       ## HTTP Services
       - "traefik.http.routers.couchdb-rtr.service=couchdb-svc"
       - "traefik.http.services.couchdb-svc.loadbalancer.server.port=5984"
+
+  logseq:
+    container_name: logseq
+    image: ghcr.io/logseq/logseq-webapp:latest
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    # volumes:
+      # - $NOTES_DIR:/notes
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.logseq-rtr.entrypoints=https"
+      - "traefik.http.routers.logseq-rtr.rule=Host(`logseq.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.logseq-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.logseq-rtr.service=logseq-svc"
+      - "traefik.http.services.logseq-svc.loadbalancer.server.port=80"
 
   ######### RSS #########
 
@@ -213,13 +233,44 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.freshrss-rtr.entrypoints=https"
-      - "traefik.http.routers.freshrss-rtr.rule=Host(`miniflux.$DOMAINNAME`)"
+      - "traefik.http.routers.miniflux-rtr.entrypoints=https"
+      - "traefik.http.routers.miniflux-rtr.rule=Host(`miniflux.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.freshrss-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.miniflux-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
-      - "traefik.http.routers.freshrss-rtr.service=freshrss-svc"
-      - "traefik.http.services.freshrss-svc.loadbalancer.server.port=8080"
+      - "traefik.http.routers.miniflux-rtr.service=miniflux-svc"
+      - "traefik.http.services.miniflux-svc.loadbalancer.server.port=8080"
+
+  # https://github.com/AbdBarho/stable-diffusion-webui-docker
+  stable-diffusion:
+    # build: $STABLE_DIFFUSION_DIR/services/AUTOMATIC1111
+    image: others-stable-diffusion:latest
+    ports:
+      - "7860:7860"
+    volumes:
+      - $STABLE_DIFFUSION_DIR/cache:/cache
+      - $STABLE_DIFFUSION_DIR/output:/output
+      - $STABLE_DIFFUSION_DIR/services/AUTOMATIC1111/config.json:/stable-diffusion-webui/config.json
+      - $STABLE_DIFFUSION_DIR/embeddings:/stable-diffusion-webui/embeddings
+    environment:
+      - CLI_ARGS=--allow-code --medvram
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ['0']
+              capabilities: [gpu]
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.sd-rtr.entrypoints=https"
+      - "traefik.http.routers.sd-rtr.rule=Host(`sd.$DOMAINNAME`)"
+      ## Middlewares
+      # - "traefik.http.routers.sd-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.sd-rtr.service=sd-svc"
+      - "traefik.http.services.sd-svc.loadbalancer.server.port=7860"
 
   #Expanse Tracker
   # firefly:
