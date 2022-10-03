@@ -1,19 +1,18 @@
-# rick_a:
-#   preset: "yt_video"
-#   youtube:
-#     video_url: "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-#     # video_url: "https://www.youtube.com/watch?v=Uo2R6woI5YA"
-#   overrides:
-#     tv_show_name: "Music Videos"
-
-a_ride_through_mcu:
-# rick_a_music_video_playlist:
-  preset: "yt_playlist"
+technology:
+  preset: "yt_video"
   youtube:
-    # playlist_url: "https://www.youtube.com/playlist?list=PLlaN88a7y2_plecYoJxvRFTLHVbIVAOoc"
-    playlist_url: "https://youtube.com/playlist?list=PLpT1Gph26DnTXXPEcl-havUPokmJGR-lh"
+    video_url: "https://www.youtube.com/watch?v=gtY_KPgHCWE&list=WL"
   overrides:
-    tv_show_name: "A Ride Thorough MCU"
+    tv_show_name: "Technology"
+
+# a_ride_through_mcu:
+# # rick_a_music_video_playlist:
+#   preset: "yt_playlist"
+#   youtube:
+#     # playlist_url: "https://www.youtube.com/playlist?list=PLlaN88a7y2_plecYoJxvRFTLHVbIVAOoc"
+#     playlist_url: "https://youtube.com/playlist?list=PLpT1Gph26DnTXXPEcl-havUPokmJGR-lh"
+#   overrides:
+#     tv_show_name: "A Ride Thorough MCU"
 
 # rick_a_channel:
 #   preset: "yt_channel_recent"

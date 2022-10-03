@@ -4,7 +4,8 @@ configuration:
     video: "--preset yt_video"
     video-url: "--youtube.video_url"
     tv-show-name: "--overrides.tv_show_name"
-    single-music-video: "--preset yt_video --overrides.tv_show_name 'Music Video' --youtube.video_url"
+    single-video-with-foldername: "--preset yt_video"
+    single-video: "--preset yt_video --overrides.tv_show_name 'Video' --youtube.video_url"
 
 presets:
   yt_video:
@@ -15,6 +16,12 @@ presets:
       output_directory: "/tv_shows/{tv_show_name_sanitized}"
       file_name: "{episode_path}.{ext}"
       thumbnail_name: "{episode_path}-thumb.{thumbnail_ext}"
+    
+    # https://github.com/yt-dlp/yt-dlp/blob/2022.04.08/yt_dlp/YoutubeDL.py#L197
+    # TODO: First try to pull a native MP4 version off YouTube, and failing that, transcode to MP4 immediately after downloading:
+    # yt-dlp -S res,ext:mp4:m4a --recode mp4 https://www.youtube.com/watch?v=dQw4w9WgXcQ
+    ytdl_options:
+      format: mp4
 
     overrides:
       tv_show_name: "OVERRIDE IN SUBSCRIPTION"
@@ -31,15 +38,43 @@ presets:
         title: "{title}"
         season: "{season}"
         episode: "{episode}"
+        plot: "{description}"
         year: "{upload_year}"
         aired: "{upload_date_standardized}"
-        plot: "{description}"
+        # genre:
+        #   - "Comedy"
+        #   - "Drama"
 
     output_directory_nfo_tags:
       nfo_name: "tvshow.nfo"
       nfo_root: "tvshow"
       tags:
         title: "{tv_show_name}"
+        plot: "{source_description}"
+      kodi_safe: True
+    
+    chapters:
+      embed_chapters: True
+      sponsorblock_categories:
+        - "outro"
+        - "selfpromo"
+        - "preview"
+        - "interaction"
+        - "sponsor"
+        - "music_offtopic"
+        - "intro"
+      remove_sponsorblock_categories: "all"
+      remove_chapters_regex:
+        - "Intro"
+        - "Outro"
+      force_key_frames: False
+    
+    subtitles:
+      subtitles_name: "{title_sanitized}.{lang}.{subtitles_ext}"
+      subtitles_type: "srt"
+      embed_subtitles: False
+      languages: "en"  # supports list of multiple languages
+      allow_auto_generated_subtitles: False
 
   yt_playlist:
     preset: "yt_video"
