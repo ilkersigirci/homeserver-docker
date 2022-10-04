@@ -1,9 +1,19 @@
-technology:
+metadata:
   preset: "yt_video"
   youtube:
-    video_url: "https://www.youtube.com/watch?v=gtY_KPgHCWE&list=WL"
+    video_url: "https://www.youtube.com/watch?v=6TyEGJuwZfQ&t=1s"
+  ytdl_options:
+    # skip_download: true
+    external_downloader: ffmpeg
+    external_downloader_args: {'ffmpeg_i': ['-ss', '00:00:01.00', '-to', '00:00:02.00']}
   overrides:
-    tv_show_name: "Technology"
+    tv_show_name: "Metadata"
+
+# jellyfin_video:
+#   preset: "jellyfin_tv_show"
+#   overrides:
+#     tv_show_name: "Jellyfin_TvShow"
+#     url: "https://youtu.be/m1k3Cpke4yU"
 
 # a_ride_through_mcu:
 # # rick_a_music_video_playlist:

@@ -1,11 +1,13 @@
 configuration:
   working_directory: '/tmp/ytdl-sub-downloads'
-  dl_aliases:
+  dl_aliases: # TODO: Simplify this when ytdl-sub supports nested aliases
     video: "--preset yt_video"
     video-url: "--youtube.video_url"
     tv-show-name: "--overrides.tv_show_name"
-    single-video-with-foldername: "--preset yt_video"
+    single-video-with-foldername: "--preset yt_video --youtube.video_url"
     single-video: "--preset yt_video --overrides.tv_show_name 'Video' --youtube.video_url"
+    # FIXME: Not working
+    # single-video-metadata: "--preset yt_video --ytdl_options.external_downloader ffmpeg --ytdl_options.external_downloader_args {'ffmpeg_i': ['-ss', '00:00:01.00', '-to', '00:00:02.00']} --overrides.tv_show_name 'Metadata' --youtube.video_url"
 
 presets:
   yt_video:
@@ -96,3 +98,16 @@ presets:
       after: "now-6months"
     output_options:
       keep_files_after: "now-6months"
+  
+  jellyfin_tv_show:
+    preset:
+      - "jellyfin_tv_show_by_date"
+      - "season_by_year__episode_by_month_day"
+    overrides:
+      # required
+      tv_show_name: "32.Gun"
+      tv_show_directory: "/tv_shows/{tv_show_name_sanitized}"
+      url: "https://youtu.be/m1k3Cpke4yU"
+      # can be modified from their default value
+      # episode_title: "{upload_date_standardized} - {title}"
+      # episode_description: "{webpage_url}"
