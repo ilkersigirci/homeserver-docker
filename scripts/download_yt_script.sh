@@ -2,6 +2,7 @@
 
 # Usage: docker exec -u abc ytdl-sub ./config/download_yt.sh <VIDEO_LINK>
 # Usage with temp container: docker-compose --env-file ~/docker/.env run --rm -d ytdl-sub ./config/download_yt.sh <VIDEO_LINK>
+# Alias: alias ytdl='docker-compose --file ~/docker/stacks/media/docker-compose.yml --env-file ~/docker/.env run --rm -d ytdl-sub ./config/download_yt.sh'
 
 # Default arg
 # ARG2=${2:-'Video'}
