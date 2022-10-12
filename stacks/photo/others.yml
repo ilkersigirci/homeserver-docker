@@ -55,7 +55,7 @@ services:
   #     # - seccomp:unconfined
   #     # - apparmor:unconfined
   #   volumes:
-  #     - $JELLYFIN_MEDIA_DIR/Photos:/photoprism/originals
+  #     - $MEDIADIR/Photos:/photoprism/originals
   #     - $DOCKERDIR/appdata/photoprism:/photoprism/storage   # writable* storage folder for cache, database, and sidecar files (never remove)
   #   environment:
   #     PHOTOPRISM_UID: 0 # $PUID

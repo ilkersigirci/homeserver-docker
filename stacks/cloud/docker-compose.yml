@@ -1,4 +1,5 @@
 version: "3.9"
+name: cloud
 
 networks:
   t2_proxy:

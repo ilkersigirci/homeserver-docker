@@ -1,4 +1,5 @@
 version: "3.9"
+name: photo
 
 networks:
   t2_proxy:

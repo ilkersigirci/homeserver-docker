@@ -1,4 +1,5 @@
 version: "3.9"
+name: others
 
 networks:
   t2_proxy:
@@ -14,37 +15,7 @@ networks:
 #   firefly_app_key:
 #     file: $DOCKERDIR/secrets/firefly_app_key
 
-services: 
-  # portainer:
-  #   container_name: portainer
-  #   image: portainer/portainer-ce:latest
-  #   restart: $OTHERS_RESTART_POLICY
-  #   # profiles:
-  #   # - apps
-  #   # command: -H tcp://socket-proxy:2375
-  #   networks:
-  #     - t2_proxy
-  #   #  - socket_proxy
-  #   #ports:
-  #   #  - 9000
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock:ro # # Use Docker Socket Proxy instead for improved security
-  #     - $DOCKERDIR/appdata/portainer/data:/data # Change to local directory if you want to save/transfer config locally
-  #   environment:
-  #     - TZ=$TZ
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.portainer-rtr.entrypoints=https"
-  #     - "traefik.http.routers.portainer-rtr.rule=Host(`portainer.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.portainer-rtr.middlewares=chain-authelia@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.portainer-rtr.service=portainer-svc"
-  #     - "traefik.http.services.portainer-svc.loadbalancer.server.port=9000"
-
+services:
   # wg-easy:
   #   image: weejewel/wg-easy
   #   container_name: wg-easy
@@ -54,7 +25,7 @@ services:
   #   volumes:
   #     - $DOCKERDIR/appdata/wg-easy:/etc/wireguard
   #   environment:
-  #     - WG_HOST=178.62.75.212
+  #     - WG_HOST=$SERVER_IP
   #     # - PASSWORD=ilker
   #     # - WG_PORT=51820
   #     # - WG_DEFAULT_ADDRESS=10.8.0.x
@@ -97,8 +68,8 @@ services:
       - no-new-privileges:true
     volumes:
       - $DOCKERDIR/appdata/syncthing:/config
-      # - $APK_DIR:/apk
-      - $NOTES_DIR:/notes
+      # - $APKDIR:/apk
+      - $NOTESDIR:/notes
     environment:
       - PUID=$PUID
       - PGID=$PGID
@@ -128,7 +99,7 @@ services:
     volumes:
       - $DOCKERDIR/appdata/couchdb:/opt/couchdb/data
       - $DOCKERDIR/appdata/couchdb/local.ini:/opt/couchdb/etc/local.ini
-      # - $NOTES_DIR:/notes
+      # - $NOTESDIR:/notes
     environment:
       - COUCHDB_USER=admin
       - COUCHDB_PASSWORD=admin
@@ -152,7 +123,7 @@ services:
     security_opt:
       - no-new-privileges:true
     # volumes:
-      # - $NOTES_DIR:/notes
+      # - $NOTESDIR:/notes
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
@@ -240,18 +211,41 @@ services:
       ## HTTP Services
       - "traefik.http.routers.miniflux-rtr.service=miniflux-svc"
       - "traefik.http.services.miniflux-svc.loadbalancer.server.port=8080"
+  
+  # Handbrake - Video Conversion (Transcoding and compression)
+  # handbrake:
+  #   container_name: handbrake
+  #   image: jlesage/handbrake:latest
+  #   <<: *common-keys-apps # See EXTENSION FIELDS at the top
+  #   ports:
+  #     - "5801:5800"
+  #   volumes:
+  #     - $DATADIR/downloads:/data/downloads
+  #     - $DOCKERDIR/appdata/handbrake/config:/config
+  #     - $DOCKERDIR/appdata/handbrake/watch:/watch
+  #   environment:
+  #     USER_ID: $PUID
+  #     GROUP_ID: $PGID
+  #     UMASK: 002
+  #     TZ: $TZ
+  #     KEEP_APP_RUNNING: 1
+  #     CLEAN_TMP_DIR: 1
+  #     DISPLAY_WIDTH: 1600
+  #     DISPLAY_HEIGHT: 960
+  #     AUTOMATED_CONVERSION_KEEP_SOURCE: 1
+  #     VNC_PASSWORD: $HANDBRAKE_VNC_PASSWD
 
   # https://github.com/AbdBarho/stable-diffusion-webui-docker
   stable-diffusion:
-    # build: $STABLE_DIFFUSION_DIR/services/AUTOMATIC1111
+    # build: $STABLEDIFFUSIONDIR/services/AUTOMATIC1111
     image: others-stable-diffusion:latest
     ports:
       - "7860:7860"
     volumes:
-      - $STABLE_DIFFUSION_DIR/cache:/cache
-      - $STABLE_DIFFUSION_DIR/output:/output
-      - $STABLE_DIFFUSION_DIR/services/AUTOMATIC1111/config.json:/stable-diffusion-webui/config.json
-      - $STABLE_DIFFUSION_DIR/embeddings:/stable-diffusion-webui/embeddings
+      - $STABLEDIFFUSIONDIR/cache:/cache
+      - $STABLEDIFFUSIONDIR/output:/output
+      - $STABLEDIFFUSIONDIR/services/AUTOMATIC1111/config.json:/stable-diffusion-webui/config.json
+      - $STABLEDIFFUSIONDIR/embeddings:/stable-diffusion-webui/embeddings
     environment:
       - CLI_ARGS=--allow-code --medvram
     deploy:

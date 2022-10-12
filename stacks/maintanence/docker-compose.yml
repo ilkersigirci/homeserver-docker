@@ -1,4 +1,5 @@
 version: "3.9"
+name: maintanence
 
 networks:
   t2_proxy:
@@ -60,7 +61,7 @@ services:
       - t2_proxy
     volumes:
       - $DOCKERDIR/appdata/duplicati:/config
-      - $BACKUP_DIR:/backups
+      - $BACKUPDIR:/backups
       - $DOCKERDIR:/source
     environment:
       PUID: $PUID
@@ -112,7 +113,7 @@ services:
 #     volumes:
 #       - $DOCKERDIR/appdata/code-server-orig/.config:/home/coder/.config
 #       - $DOCKERDIR:/home/coder/docker
-#       - $NOTES_DIR:/home/coder/notes
+#       - $NOTESDIR:/home/coder/notes
 # #    environment:
 #       # user: "0"
 # #      DOCKER_USER: $PUID
@@ -138,7 +139,7 @@ services:
     volumes:
       - $DOCKERDIR/appdata/code-server:/config
       - $DOCKERDIR:/config/workspace/docker
-      - $NOTES_DIR:/config/workspace/notes
+      - $NOTESDIR:/config/workspace/notes
     environment:
       PUID: $PUID
       PGID: $PGID
@@ -170,7 +171,7 @@ services:
   #   volumes:
   #     - $DOCKERDIR/appdata/openvscode:/home/workspace:cached
   # #      - $DOCKERDIR:/home/workspace/docker:cached
-  # #      - $NOTES_DIR:/home/workspace/notes:cached
+  # #      - $NOTESDIR:/home/workspace/notes:cached
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers
@@ -217,14 +218,15 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/prometheus:/etc/prometheus
-      - $DATADIR/prometheus:/prometheus
+      - $DOCKERDIR/appdata/prometheus/config:/etc/prometheus
+      - $DOCKERDIR/appdata/prometheus/data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--web.console.libraries=/etc/prometheus/console_libraries'
       - '--web.console.templates=/etc/prometheus/consoles'
       - '--web.enable-lifecycle'
+      - '--web.enable-admin-api'
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
@@ -340,3 +342,36 @@ services:
   #     ## HTTP Services
   #     - "traefik.http.routers.remmina-rtr.service=remmina-svc"
   #     - "traefik.http.services.remmina-svc.loadbalancer.server.port=3000"
+
+  # CrowdSec - Open-source & collaborative security IPS
+  # crowdsec:
+  #   <<: *common-keys-core # See EXTENSION FIELDS at the top
+  #   image: crowdsecurity/crowdsec
+  #   container_name: crowdsec
+  #   ports:
+  #     - "$CROWDSEC_API_PORT:8080"
+  #   environment:
+  #     COLLECTIONS: "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/whitelist-good-actors crowdsecurity/iptables crowdsecurity/linux crowdsecurity/nginx crowdsecurity/sshd"
+  #     GID: "${GID-1000}"
+  #     CUSTOM_HOSTNAME: "cDoc"
+  #     DISABLE_LOCAL_API: "true" # Only after successfully registering and validating remote agent below.
+  #     # For the following, check local_api_credentials.yaml after cscli lapi register (secondary machine) and cscli machine validate (on primary machine)
+  #     AGENT_USERNAME: $CROWDSEC_AGENT_USERNAME 
+  #     AGENT_PASSWORD: $CROWDSEC_AGENT_PASSWORD 
+  #     LOCAL_API_URL: $CROWDSEC_LOCAL_API_URL 
+  #   volumes:
+  #     - $DOCKERDIR/logs/cloudserver:/logs:ro
+  #     - /var/log:/var/log:ro
+  #     - /media/cbox/log:/cbox/log:ro
+  #     - $DOCKERDIR/appdata/crowdsec/data:/var/lib/crowdsec/data
+  #     - $DOCKERDIR/appdata/crowdsec/config:/etc/crowdsec
+
+  # # CrowdSec Bouncer - Traefik
+  # traefik-bouncer:
+  #   <<: *common-keys-core # See EXTENSION FIELDS at the top
+  #   image: fbonalair/traefik-crowdsec-bouncer
+  #   container_name: traefik-bouncer
+  #   environment:
+  #     GIN_MODE: release # default is debug (more logs)
+  #     CROWDSEC_BOUNCER_API_KEY: $CROWDSEC_BOUNCER_TRAEFIK_API_KEY
+  #     CROWDSEC_AGENT_HOST: $CROWDSEC_LAPI_HOST:$CROWDSEC_LAPI_PORT # CrowdSec host and port
