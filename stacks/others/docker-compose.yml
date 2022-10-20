@@ -91,7 +91,7 @@ services:
   couchdb:
     container_name: couchdb
     image: couchdb:latest
-    restart: $OTHERS_RESTART_POLICY
+    restart: $BASE_RESTART_POLICY
     networks:
       - t2_proxy
     security_opt:
