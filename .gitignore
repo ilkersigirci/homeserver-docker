@@ -3,5 +3,5 @@ configs
 data
 logs
 secrets
-settings.json
+.vscode
 stacks/photo/.env
