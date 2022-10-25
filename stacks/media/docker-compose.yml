@@ -36,7 +36,7 @@ services:
   #     UMASK: 022
   #   volumes:
   #     - $DOCKERDIR/appdata/jellyfin:/config
-  #     - $DATADIR/docker/appdata/jellyfin/metadata:/config/data/metadata
+  #     - $DATADIR/jellyfin/metadata:/config/data/metadata
   #     - $DATADIR/downloads:/data/downloads
   #     - $MEDIADIR:/data/local
   #     - $ONEDRIVEDIR:/data/onedrive
@@ -70,7 +70,7 @@ services:
     volumes:
       - $DOCKERDIR/appdata/jellyfin-beta:/config
       - $DOCKERDIR/appdata/jellyfin-beta/cache:/cache
-      - $DATADIR/docker/appdata/jellyfin/metadata:/config/metadata
+      - $DATADIR/jellyfin/metadata:/config/metadata
       - $DATADIR/downloads:/media/downloads:ro
       - $MEDIADIR:/media/local:ro
       - $ONEDRIVEDIR:/media/onedrive:ro
@@ -332,7 +332,7 @@ services:
   #   volumes:
   #     - $DOCKERDIR/appdata/lidarr:/config
   #     # Optional. See why MediaCover is mounted as volume https://github.com/htpcBeginner/docker-traefik/discussions/147
-  #     - $DATADIR/docker/appdata/lidarr/MediaCover:/config/MediaCover
+  #     - $DATADIR/lidarr/MediaCover:/config/MediaCover
   #     - $DATADIR/downloads:/data/downloads
   #     - $DATADIR/media/music:/data/media/music
   #     - "/etc/localtime:/etc/localtime:ro"
@@ -375,7 +375,7 @@ services:
     volumes:
       - $DOCKERDIR/appdata/radarr:/config
       # Optional. See why MediaCover is mounted as volume https://github.com/htpcBeginner/docker-traefik/discussions/147
-      - $DATADIR/docker/appdata/radarr/MediaCover:/config/MediaCover
+      - $DATADIR/radarr/MediaCover:/config/MediaCover
       - $MEDIADIR/Downloads:/data/downloads
       # - $MEDIADIR/Downloads:/data
       - $MEDIADIR/Movies_Radarr:/data/media
@@ -420,7 +420,7 @@ services:
   #   volumes:
   #     - $DOCKERDIR/appdata/sonarr:/config
   #     # Optional. See why MediaCover is mounted as volume https://github.com/htpcBeginner/docker-traefik/discussions/147
-  #     - $DATADIR/docker/appdata/sonarr/MediaCover:/config/MediaCover
+  #     - $DATADIR/sonarr/MediaCover:/config/MediaCover
   #     - $DATADIR/downloads:/data/downloads
   #     - $DATADIR/media:/data/media
   #     - "/etc/localtime:/etc/localtime:ro"

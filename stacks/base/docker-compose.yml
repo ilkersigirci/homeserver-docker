@@ -350,8 +350,8 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/homer/assets:/www/assets
-      - $DOCKERDIR/appdata/homer/tools:/www/assets/tools
+      - $CONFIGDIR/homer/config.yml:/www/assets/config.yml
+      - $CONFIGDIR/homer/tools:/www/assets/tools
     environment:
       - PUID=$PUID
       - PGID=$PGID
@@ -382,7 +382,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/vaultwarden:/data/
+      - $DATADIR/vaultwarden:/data/
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
