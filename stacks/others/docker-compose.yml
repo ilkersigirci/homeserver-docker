@@ -98,7 +98,7 @@ services:
       - no-new-privileges:true
     volumes:
       - $DOCKERDIR/appdata/couchdb:/opt/couchdb/data
-      - $DOCKERDIR/appdata/couchdb/local.ini:/opt/couchdb/etc/local.ini
+      - $CONFIGDIR/couchdb/local.ini:/opt/couchdb/etc/local.ini
       # - $NOTESDIR:/notes
     environment:
       - COUCHDB_USER=admin

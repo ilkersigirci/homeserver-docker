@@ -218,8 +218,8 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/prometheus/config:/etc/prometheus
-      - $DOCKERDIR/appdata/prometheus/data:/prometheus
+      - $CONFIGDIR/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - $DOCKERDIR/appdata/prometheus:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -254,9 +254,8 @@ services:
     #   - "$GRAFANA_PORT:3000"
     user: "0"
     volumes:
-      # - grafana_data:/var/lib/grafana  # alternetive to bind way
       - $DOCKERDIR/appdata/grafana:/var/lib/grafana
-      - $DOCKERDIR/appdata/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - $CONFIGDIR/grafana/grafana.ini:/etc/grafana/grafana.ini
     environment:
       GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource,grafana-worldmap-panel,grafana-piechart-panel"
       # GF_SECURITY_ADMIN_USER: 'admin'

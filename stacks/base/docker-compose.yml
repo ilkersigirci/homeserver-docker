@@ -130,15 +130,15 @@ services:
       #   protocol: tcp
       #   mode: host
     volumes:
-      - $DOCKERDIR/appdata/traefik2/rules:/rules # file provider directory
       - /var/run/docker.sock:/var/run/docker.sock:ro # Use Docker Socket Proxy instead for improved security
-      - $DOCKERDIR/appdata/traefik2/acme/acme.json:/acme.json # cert location - you must touch this file and change permissions to 600
+      - $CONFIGDIR/traefik2/rules:/rules # file provider directory
+      - $CONFIGDIR/traefik2/acme/acme.json:/acme.json # cert location - you must touch this file and change permissions to 600
       - $DOCKERDIR/logs/traefik:/logs # for fail2ban or crowdsec - make sure to touch file before starting container
     environment:
       - TZ=$TZ
       - CF_API_EMAIL_FILE=/run/secrets/cloudflare_email
       - CF_API_KEY_FILE=/run/secrets/cloudflare_api_key
-      - DOMAINNAME # Passing the domain name to traefik container to be able to use the variable in rules. 
+      - DOMAINNAME # Passing the domain name to traefik container to be able to use the variable in rules.
     secrets:
       - cloudflare_email
       - cloudflare_api_key
@@ -246,7 +246,8 @@ services:
       - t2_proxy
       - default
     volumes:
-      - $DOCKERDIR/appdata/authelia:/config
+      - $CONFIGDIR/authelia/configuration.yml:/config/configuration.yml
+      - $CONFIGDIR/authelia/users_database.yml:/config/users_database.yml
     environment:
       - TZ=$TZ
       - AUTHELIA_JWT_SECRET_FILE=/run/secrets/authelia_jwt_secret
@@ -285,7 +286,7 @@ services:
   #     - no-new-privileges:true
   #   volumes:
   #     - /var/run/docker.sock:/var/run/docker.sock:ro # # Use Docker Socket Proxy instead for improved security
-  #     - $DOCKERDIR/appdata/yacht:/config # Change to local directory if you want to save/transfer config locally
+  #     # - $DOCKERDIR/appdata/yacht:/config # Change to local directory if you want to save/transfer config locally
   #   environment:
   #     - PUID=$PUID
   #     - PGID=$PGID
@@ -407,8 +408,8 @@ services:
       - no-new-privileges:true
     volumes:
       - $DOCKERDIR/appdata/filebrowser/database.db:/database.db
-      - $DOCKERDIR/appdata/filebrowser/custom.css:/custom/custom.css
-      - $HARDDISKROOTDIR:/srv  # NOTE: When down container, provide .env file, otherwise gives error
+      - $CONFIGDIR/filebrowser/custom.css:/custom/custom.css
+      - $HARDDISKROOTDIR:/srv  # NOTE: When downing container, provide .env file, otherwise gives error
     environment:
       - PUID=$PUID
       - PGID=$PGID

@@ -1,7 +1,7 @@
-.env
 appdata
-!appdata/traefik2/rules/*
+configs
 data
-docker-traefik-master
+logs
 secrets
 settings.json
+stacks/photo/.env

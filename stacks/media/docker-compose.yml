@@ -547,8 +547,11 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $CONFIGDIR/ytdl-sub/config:/config
-      - $MEDIADIR/Youtube_Sub:/tv_shows # optional
+      # - $CONFIGDIR/ytdl-sub/config:/config
+      - $CONFIGDIR/ytdl-sub/config.yaml:/config/config.yaml
+      - $CONFIGDIR/ytdl-sub/subscriptions.yaml:/config/subscriptions.yaml
+      - $CONFIGDIR/ytdl-sub/download_yt.sh:/config/download_yt.sh
+      - $MEDIADIR/Youtube_Sub:/tv_shows
       # - MEDIADIR/Movies:/movies # optional
       # - <path/to/music_videos>:/music_videos # optional
       # - MEDIADIR/Music:/music # optional
