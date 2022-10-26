@@ -210,14 +210,16 @@ services:
 
   # Glances - System Information
   glances:
-    <<: *common-keys-apps # See EXTENSION FIELDS at the top
-    image: nicolargo/glances:latest
+    image: nicolargo/glances:latest # latest-full
     container_name: glances
+    restart: $MAINTANENCE_RESTART_POLICY
     # network_mode: host
     networks:
       - t2_proxy
       - socket_proxy
-      - default
+      # - default
+    security_opt:
+      - no-new-privileges:true
     pid: host
     volumes:
       # - $CONFIGDIR/glances/glances.conf:/glances/conf/glances.conf # Use this if you want to add a glances.conf file
@@ -235,7 +237,7 @@ services:
       - "traefik.http.routers.glances-rtr.entrypoints=https"
       - "traefik.http.routers.glances-rtr.rule=Host(`glances.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.glances-rtr.middlewares=chain-oauth@file"
+      - "traefik.http.routers.glances-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
       - "traefik.http.routers.glances-rtr.service=glances-svc"
       - "traefik.http.services.glances-svc.loadbalancer.server.port=61208"
