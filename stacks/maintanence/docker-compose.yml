@@ -4,6 +4,8 @@ name: maintanence
 networks:
   t2_proxy:
     external: true
+  socket_proxy:
+    external: true
 
 services:
   # # Traefik Certs Dumper - Extract LetsEncrypt Certificates - Traefik2 Compatible
@@ -145,6 +147,7 @@ services:
       PGID: $PGID
       TZ: $TZ
       DEFAULT_WORKSPACE: /config/workspace
+      # DOCKER_HOST: tcp://docker-socket-proxy:2375
       # PASSWORD: password
       # HASHED_PASSWORD: 
       SUDO_PASSWORD: ilker
@@ -205,6 +208,38 @@ services:
   #     - '--path.sysfs=/host/sys'
   #     - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
 
+  # Glances - System Information
+  glances:
+    <<: *common-keys-apps # See EXTENSION FIELDS at the top
+    image: nicolargo/glances:latest
+    container_name: glances
+    # network_mode: host
+    networks:
+      - t2_proxy
+      - socket_proxy
+      - default
+    pid: host
+    volumes:
+      # - $CONFIGDIR/glances/glances.conf:/glances/conf/glances.conf # Use this if you want to add a glances.conf file
+      - $USERDIR:/data/home:ro
+      # - /media/data:/data/data:ro
+      # - /var/run/docker.sock:/var/run/docker.sock:ro # Use Docker Socket Proxy instead for improved security
+    environment:
+      # GLANCES_OPT: "-C /glances/conf/glances.conf --quiet --export influxdb"
+      # GLANCES_OPT: "--export influxdb"
+      GLANCES_OPT: "-w"
+      DOCKER_HOST: tcp://socket-proxy:2375
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.glances-rtr.entrypoints=https"
+      - "traefik.http.routers.glances-rtr.rule=Host(`glances.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.glances-rtr.middlewares=chain-oauth@file"
+      ## HTTP Services
+      - "traefik.http.routers.glances-rtr.service=glances-svc"
+      - "traefik.http.services.glances-svc.loadbalancer.server.port=61208"
+
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
@@ -238,7 +273,6 @@ services:
       - "traefik.http.routers.prometheus-rtr.service=prometheus-svc"
       - "traefik.http.services.prometheus-svc.loadbalancer.server.port=9090"
 
-   # Grafana - Graphical data visualization for InfluxDB data
   grafana:
     image: grafana/grafana:latest
     container_name: grafana

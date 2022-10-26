@@ -13,12 +13,12 @@ networks:
   # nextcloud:
   #   name: nextcloud
   #   driver: bridge
-  # socket_proxy:
-  #   name: socket_proxy
-  #   driver: bridge
-  #   ipam:
-  #     config:
-  #       - subnet: 192.168.91.0/24
+  socket_proxy:
+    name: socket_proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.91.0/24
 
 ########################### SECRETS
 secrets:
@@ -75,8 +75,8 @@ services:
       - --accessLog.bufferingSize=100 # Configuring a buffer of 100 lines
       - --accessLog.filters.statusCodes=204-299,400-499,500-599
       - --providers.docker=true
-      - --providers.docker.endpoint=unix:///var/run/docker.sock # Use Docker Socket Proxy instead for improved security
-      # - --providers.docker.endpoint=tcp://socket-proxy:2375
+      # - --providers.docker.endpoint=unix:///var/run/docker.sock # Use Docker Socket Proxy instead for improved security
+      - --providers.docker.endpoint=tcp://docker-socket-proxy:2375
       # Automatically set Host rule for services
       # - --providers.docker.defaultrule=Host(`{{ index .Labels "com.docker.compose.service" }}.$DOMAINNAME`)
       - --providers.docker.exposedByDefault=false
@@ -108,7 +108,7 @@ services:
     networks:
       t2_proxy:
         ipv4_address: 192.168.90.254 # You can specify a static IP
-      # socket_proxy:
+      socket_proxy:
       # nextcloud:
     security_opt:
       - no-new-privileges:true
@@ -130,7 +130,7 @@ services:
       #   protocol: tcp
       #   mode: host
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro # Use Docker Socket Proxy instead for improved security
+      # - /var/run/docker.sock:/var/run/docker.sock:ro # Use Docker Socket Proxy instead for improved security
       - $CONFIGDIR/traefik2/rules:/rules # file provider directory
       - $CONFIGDIR/traefik2/acme/acme.json:/acme.json # cert location - you must touch this file and change permissions to 600
       - $DOCKERDIR/logs/traefik:/logs # for fail2ban or crowdsec - make sure to touch file before starting container
@@ -183,54 +183,54 @@ services:
   #     - /var/run/docker.sock:/var/run/docker.sock
 
   # Docker Socket Proxy - Security Enchanced Proxy for Docker Socket
-  # socket-proxy:
-  #   container_name: socket-proxy
-  #   image: tecnativa/docker-socket-proxy:latest
-  #   restart: unless-stopped
-  #   # profiles:
-  #   # - core
-  #   networks:
-  #     socket_proxy:
-  #       ipv4_address: 192.168.91.254 # You can specify a static IP
-  #   privileged: true
-  #   ports:
-  #   # - "127.0.0.1:2375:2375" # Port 2375 should only ever get exposed to the internal network. When possible use this line.
-  #   # I use the next line instead, as I want portainer to manage multiple docker endpoints within my home network.
-  #   - "2375:2375"
-  #   volumes:
-  #     - "/var/run/docker.sock:/var/run/docker.sock"
-  #   environment:
-  #     - LOG_LEVEL=info # debug,info,notice,warning,err,crit,alert,emerg
-  #     ## Variables match the URL prefix (i.e. AUTH blocks access to /auth/* parts of the API, etc.).
-  #     # 0 to revoke access.
-  #     # 1 to grant access.
-  #     ## Granted by Default
-  #     - EVENTS=1
-  #     - PING=1
-  #     - VERSION=1
-  #     ## Revoked by Default
-  #     # Security critical
-  #     - AUTH=0
-  #     - SECRETS=0
-  #     - POST=1 # Ouroboros
-  #     # Not always needed
-  #     - BUILD=0
-  #     - COMMIT=0
-  #     - CONFIGS=0
-  #     - CONTAINERS=1 # Traefik, portainer, etc.
-  #     - DISTRIBUTION=0
-  #     - EXEC=0
-  #     - IMAGES=1 # Portainer
-  #     - INFO=1 # Portainer
-  #     - NETWORKS=1 # Portainer
-  #     - NODES=0
-  #     - PLUGINS=0
-  #     - SERVICES=1 # Portainer
-  #     - SESSION=0
-  #     - SWARM=0
-  #     - SYSTEM=0
-  #     - TASKS=1 # Portaienr
-  #     - VOLUMES=1 # Portainer
+  docker-socket-proxy:
+    container_name: docker-socket-proxy
+    image: tecnativa/docker-socket-proxy:latest
+    restart: unless-stopped
+    # profiles:
+    # - core
+    networks:
+      socket_proxy:
+        ipv4_address: 192.168.91.254 # You can specify a static IP
+    privileged: true
+    ports:
+    # - "127.0.0.1:2375:2375" # Port 2375 should only ever get exposed to the internal network. When possible use this line.
+    # I use the next line instead, as I want portainer to manage multiple docker endpoints within my home network.
+      - "2375:2375"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    environment:
+      - LOG_LEVEL=info # debug,info,notice,warning,err,crit,alert,emerg
+      ## Variables match the URL prefix (i.e. AUTH blocks access to /auth/* parts of the API, etc.).
+      # 0 to revoke access.
+      # 1 to grant access.
+      ## Granted by Default
+      - EVENTS=1
+      - PING=1
+      - VERSION=1
+      ## Revoked by Default
+      # Security critical
+      - AUTH=0
+      - SECRETS=0
+      - POST=0 # 1- Watchtower
+      # Not always needed
+      - BUILD=0
+      - COMMIT=0
+      - CONFIGS=0
+      - CONTAINERS=3 # Traefik, portainer, etc.
+      - DISTRIBUTION=0
+      - EXEC=0
+      - IMAGES=1 # Portainer
+      - INFO=1 # Portainer
+      - NETWORKS=1 # Portainer
+      - NODES=0
+      - PLUGINS=0
+      - SERVICES=1 # Portainer
+      - SESSION=0
+      - SWARM=0
+      - SYSTEM=0
+      - TASKS=1 # Portainer
+      - VOLUMES=1 # Portainer
 
   # Authelia (Lite) - Self-Hosted Single Sign-On and Two-Factor Authentication
   authelia:
@@ -313,18 +313,17 @@ services:
     restart: $BASE_RESTART_POLICY
     # profiles:
     # - apps
-    command: -H unix:///var/run/docker.sock # Use Docker Socket Proxy and comment this line out, for improved security.
-    # command: -H tcp://socket-proxy:2375 # Use this instead, if you have Socket Proxy enabled.
-    # command: -H tcp://socket-proxy:2375 # TODO: Remove
+    # command: -H unix:///var/run/docker.sock # Use Docker Socket Proxy and comment this line out, for improved security.
+    command: -H tcp://docker-socket-proxy:2375 # Use this instead, if you have Socket Proxy enabled.
     networks:
       - t2_proxy
-    #  - socket_proxy
+      - socket_proxy
     #ports:
     #  - 9000
     security_opt:
       - no-new-privileges:true
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro # # Use Docker Socket Proxy instead for improved security
+      # - /var/run/docker.sock:/var/run/docker.sock:ro # # Use Docker Socket Proxy instead for improved security
       - $DOCKERDIR/appdata/portainer/data:/data # Change to local directory if you want to save/transfer config locally
     environment:
       - TZ=$TZ
@@ -370,6 +369,25 @@ services:
       ## HTTP Services
       - "traefik.http.routers.homer-rtr.service=homer-svc"
       - "traefik.http.services.homer-svc.loadbalancer.server.port=8080"
+
+  homepage:
+    image: ghcr.io/benphelps/homepage:latest
+    container_name: homepage
+    networks:
+      - t2_proxy
+      - socket_proxy
+    volumes:
+      - $CONFIGDIR/homepage:/app/config
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.homepage-rtr.entrypoints=https"
+      - "traefik.http.routers.homepage-rtr.rule=Host(`homepage.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.homepage-rtr.middlewares=chain-no-auth@file" # NOTE: authelia rate-limits it
+      ## HTTP Services
+      - "traefik.http.routers.homepage-rtr.service=homepage-svc"
+      - "traefik.http.services.homepage-svc.loadbalancer.server.port=3000"    
 
   vaultwarden:
     container_name: vaultwarden
