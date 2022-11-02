@@ -1,0 +1,243 @@
+version: "3.9"
+name: monitoring
+
+networks:
+  t2_proxy:
+    external: true
+  socket_proxy:
+    external: true
+  monitoring:
+    name: monitoring
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.92.0/24
+
+volumes:
+  netdataconfig:
+  netdatalib:
+  netdatacache:
+
+services:
+  # Glances - System Information
+  glances:
+    image: nicolargo/glances:latest # latest-full
+    container_name: glances
+    restart: $MAINTANENCE_RESTART_POLICY
+    # network_mode: host
+    networks:
+      - t2_proxy
+      - socket_proxy
+      - monitoring
+    security_opt:
+      - no-new-privileges:true
+    pid: host
+    volumes:
+      # - $CONFIGDIR/glances/glances.conf:/glances/conf/glances.conf # Use this if you want to add a glances.conf file
+      - $USERDIR:/data/home:ro
+      # - /media/data:/data/data:ro
+      # - /var/run/docker.sock:/var/run/docker.sock:ro # Use Docker Socket Proxy instead for improved security
+    environment:
+      # GLANCES_OPT: "-C /glances/conf/glances.conf --quiet --export influxdb"
+      # GLANCES_OPT: "--export influxdb"
+      GLANCES_OPT: "-w"
+      DOCKER_HOST: tcp://socket-proxy:2375
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.glances-rtr.entrypoints=https"
+      - "traefik.http.routers.glances-rtr.rule=Host(`glances.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.glances-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.glances-rtr.service=glances-svc"
+      - "traefik.http.services.glances-svc.loadbalancer.server.port=61208"
+  
+  # netdata:
+  #   image: netdata/netdata:latest
+  #   container_name: netdata
+  #   restart: $MAINTANENCE_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #     # - socket_proxy
+  #     - monitoring
+  #   hostname: $DOMAINNAME # set to fqdn of host
+  #   cap_add:
+  #     - SYS_PTRACE
+  #   security_opt:
+  #     - apparmor:unconfined
+  #   volumes:
+  #     - netdataconfig:/etc/netdata
+  #     - netdatalib:/var/lib/netdata
+  #     - netdatacache:/var/cache/netdata
+  #     - /etc/passwd:/host/etc/passwd:ro
+  #     - /etc/group:/host/etc/group:ro
+  #     - /proc:/host/proc:ro
+  #     - /sys:/host/sys:ro
+  #     - /etc/os-release:/host/etc/os-release:ro
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.netdata-rtr.entrypoints=https"
+  #     - "traefik.http.routers.netdata-rtr.rule=Host(`netdata.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.netdata-rtr.middlewares=chain-no-auth@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.netdata-rtr.service=netdata-svc"
+  #     - "traefik.http.services.netdata-svc.loadbalancer.server.port=19999"
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: $MAINTANENCE_RESTART_POLICY
+    networks:
+      - t2_proxy
+      - monitoring
+    # Expose ports within stack without publishing them to the host machine
+    expose:
+      - 9100
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+      # - /:/host:ro,rslave
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+      # - --collector.filesystem.ignored-mount-points
+      # - "^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)"
+
+  # alertmanager:
+  #   image: prom/alertmanager:latest
+  #   container_name: alertmanager
+  #   restart: $MAINTANENCE_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #     - monitoring
+  #   expose:
+  #     - 9093
+  #   volumes:
+  #     - $CONFIGDIR/alertmanager/config.yml:/etc/alertmanager/config.yml
+  #   command:
+  #     - '--config.file=/etc/alertmanager/config.yml'
+  #     - '--storage.path=/alertmanager'
+  #   # deploy:
+  #   #   placement:
+  #   #     constraints:
+  #   #       - node.role==manager
+  #   # labels:
+  #   #   - "traefik.enable=true"
+  #   #   ## HTTP Routers
+  #   #   - "traefik.http.routers.alertmanager-rtr.entrypoints=https"
+  #   #   - "traefik.http.routers.alertmanager-rtr.rule=Host(`alertmanager.$DOMAINNAME`)"
+  #   #   ## Middlewares
+  #   #   - "traefik.http.routers.alertmanager-rtr.middlewares=chain-no-auth@file"
+  #   #   ## HTTP Services
+  #   #   - "traefik.http.routers.alertmanager-rtr.service=alertmanager-svc"
+  #   #   - "traefik.http.services.alertmanager-svc.loadbalancer.server.port=9093"
+
+  # sudo chown -R nobody:nogroup $DOCKERDIR/appdata/prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    depends_on:
+      - node-exporter
+    restart: $MAINTANENCE_RESTART_POLICY
+    user: 65534:65534
+    networks:
+      - t2_proxy
+      - monitoring
+    expose:
+      - 9090
+    # links:
+    #   - cadvisor:cadvisor
+    #   - alertmanager:alertmanager
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/prometheus:/prometheus
+      - $CONFIGDIR/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      # - '--web.enable-lifecycle'
+      # - '--web.enable-admin-api'
+    # deploy:
+    #   placement:
+    #     constraints:
+    #       - node.role==manager
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.prometheus-rtr.entrypoints=https"
+      - "traefik.http.routers.prometheus-rtr.rule=Host(`prometheus.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.prometheus-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.prometheus-rtr.service=prometheus-svc"
+      - "traefik.http.services.prometheus-svc.loadbalancer.server.port=9090"
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    depends_on:
+      - prometheus
+    restart: $MAINTANENCE_RESTART_POLICY
+    networks:
+      - t2_proxy
+      - monitoring
+    security_opt:
+      - no-new-privileges:true
+    # ports:
+    #   - "$GRAFANA_PORT:3000"
+    user: "0"
+    volumes:
+      - $DOCKERDIR/appdata/grafana:/var/lib/grafana
+      - $CONFIGDIR/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - $CONFIGDIR/grafana/provisioning/:/etc/grafana/provisioning/
+    environment:
+      GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource,grafana-worldmap-panel,grafana-piechart-panel"
+      GF_SECURITY_ADMIN_USER: 'admin'
+      GF_SECURITY_ADMIN_PASSWORD: 'admin'
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+      GF_LOG_LEVEL: 'debug'
+    # deploy:
+    #   placement:
+    #     constraints:
+    #       - node.role==manager
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.grafana-rtr.entrypoints=https"
+      - "traefik.http.routers.grafana-rtr.rule=Host(`grafana.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.grafana-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.grafana-rtr.service=grafana-svc"
+      - "traefik.http.services.grafana-svc.loadbalancer.server.port=3000"
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    container_name: uptime-kuma
+    restart: $MAINTANENCE_RESTART_POLICY
+    networks:
+      - t2_proxy
+      # - monitoring
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/uptime-kuma:/app/data
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.uptime-kuma-rtr.entrypoints=https"
+      - "traefik.http.routers.uptime-kuma-rtr.rule=Host(`uptimekuma.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.uptime-kuma-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.uptime-kuma-rtr.service=uptime-kuma-svc"
+      - "traefik.http.services.uptime-kuma-svc.loadbalancer.server.port=3001"

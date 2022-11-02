@@ -338,37 +338,37 @@ services:
       - "traefik.http.routers.portainer-rtr.service=portainer-svc"
       - "traefik.http.services.portainer-svc.loadbalancer.server.port=9000"
 
-  homer:
-    container_name: homer
-    image: b4bz/homer
-    depends_on:
-      - traefik
-    restart: $BASE_RESTART_POLICY
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - $CONFIGDIR/homer/config.yml:/www/assets/config.yml
-      - $CONFIGDIR/homer/tools:/www/assets/tools
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.homer-rtr.entrypoints=https"
-      - "traefik.http.routers.homer-rtr.rule=Host(`home.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.homer-rtr.middlewares=chain-authelia@file"
-      #   # Redirect non-www to www middleware
-      # - "traefik.http.middlewares.homer-redirect.redirectregex.regex=^https?://$DOMAINNAME/(.*)"
-      # - "traefik.http.middlewares.homer-redirect.redirectregex.replacement=https://www.$DOMAINNAME/$${1}"
-      # - "traefik.http.middlewares.homer-redirect.redirectregex.permanent=true"
-      ## HTTP Services
-      - "traefik.http.routers.homer-rtr.service=homer-svc"
-      - "traefik.http.services.homer-svc.loadbalancer.server.port=8080"
+#  homer:
+#    container_name: homer
+#    image: b4bz/homer
+#    depends_on:
+#      - traefik
+#    restart: $BASE_RESTART_POLICY
+#    networks:
+#      - t2_proxy
+#    security_opt:
+#      - no-new-privileges:true
+#    volumes:
+#      - $CONFIGDIR/homer/config.yml:/www/assets/config.yml
+#      - $CONFIGDIR/homer/tools:/www/assets/tools
+#    environment:
+#      - PUID=$PUID
+#      - PGID=$PGID
+#      - TZ=$TZ
+#    labels:
+#      - "traefik.enable=true"
+#      ## HTTP Routers
+#      - "traefik.http.routers.homer-rtr.entrypoints=https"
+#      - "traefik.http.routers.homer-rtr.rule=Host(`home.$DOMAINNAME`)"
+#      ## Middlewares
+#      - "traefik.http.routers.homer-rtr.middlewares=chain-authelia@file"
+#      #   # Redirect non-www to www middleware
+#      # - "traefik.http.middlewares.homer-redirect.redirectregex.regex=^https?://$DOMAINNAME/(.*)"
+#      # - "traefik.http.middlewares.homer-redirect.redirectregex.replacement=https://www.$DOMAINNAME/$${1}"
+#      # - "traefik.http.middlewares.homer-redirect.redirectregex.permanent=true"
+#      ## HTTP Services
+#      - "traefik.http.routers.homer-rtr.service=homer-svc"
+#      - "traefik.http.services.homer-svc.loadbalancer.server.port=8080"
 
   homepage:
     image: ghcr.io/benphelps/homepage:latest
@@ -427,7 +427,8 @@ services:
     volumes:
       - $DOCKERDIR/appdata/filebrowser/database.db:/database.db
       - $CONFIGDIR/filebrowser/custom.css:/custom/custom.css
-      - $HARDDISKROOTDIR:/srv  # NOTE: When downing container, provide .env file, otherwise gives error
+      - $USERDIR:/srv/Home  # NOTE: When downing container, provide .env file, otherwise gives error
+      - $HARDDISKROOTDIR:/srv/Harddisk  # NOTE: When downing container, provide .env file, otherwise gives error
     environment:
       - PUID=$PUID
       - PGID=$PGID

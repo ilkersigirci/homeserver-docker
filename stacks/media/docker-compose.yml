@@ -511,31 +511,31 @@ services:
   #     - "traefik.http.services.lazylibrarian-svc.loadbalancer.server.port=5299"
 
   ############################### YOUTUBE ###############################
-  metube:
-    image: alexta69/metube:latest
-    container_name: metube
-    restart: $MEDIA_RESTART_POLICY
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - $MEDIADIR/Youtube:/downloads
-#      - /path/to/cookies:/cookies
-    environment:
-      OUTPUT_TEMPLATE: '%(title)s [%(id)s].%(ext)s'
-      YTDL_OPTIONS: '{"writethumbnail": true, "writeinfojson": true}'  # "writeinfojson": true,
-      # - YTDL_OPTIONS={"cookiefile":"/cookies/cookies.txt"}
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers Auth
-      - "traefik.http.routers.metube-rtr.entrypoints=https"
-      - "traefik.http.routers.metube-rtr.rule=Host(`metube.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.metube-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.metube-rtr.service=metube-svc"
-      - "traefik.http.services.metube-svc.loadbalancer.server.port=8081"
+#   metube:
+#     image: alexta69/metube:latest
+#     container_name: metube
+#     restart: $MEDIA_RESTART_POLICY
+#     networks:
+#       - t2_proxy
+#     security_opt:
+#       - no-new-privileges:true
+#     volumes:
+#       - $MEDIADIR/Youtube:/downloads
+# #      - /path/to/cookies:/cookies
+#     environment:
+#       OUTPUT_TEMPLATE: '%(title)s [%(id)s].%(ext)s'
+#       YTDL_OPTIONS: '{"writethumbnail": true, "writeinfojson": true}'  # "writeinfojson": true,
+#       # - YTDL_OPTIONS={"cookiefile":"/cookies/cookies.txt"}
+#     labels:
+#       - "traefik.enable=true"
+#       ## HTTP Routers Auth
+#       - "traefik.http.routers.metube-rtr.entrypoints=https"
+#       - "traefik.http.routers.metube-rtr.rule=Host(`metube.$DOMAINNAME`)"
+#       ## Middlewares
+#       - "traefik.http.routers.metube-rtr.middlewares=chain-authelia@file"
+#       ## HTTP Services
+#       - "traefik.http.routers.metube-rtr.service=metube-svc"
+#       - "traefik.http.services.metube-svc.loadbalancer.server.port=8081"
 
   # docker exec -u abc -it ytdl-sub /bin/bash
   ytdl-sub:
