@@ -113,12 +113,42 @@ services:
 
 
   ############################# DOWNLOAD #############################
+  # For torrent VPN
+  # gluetun:
+  #   image: qmcgaw/gluetun
+  #   container_name: gluetun
+  #   # line above must be uncommented to allow external containers to connect. See https://github.com/qdm12/gluetun/wiki/Connect-a-container-to-gluetun#external-container-to-gluetun
+  #   cap_add:
+  #     - NET_ADMIN
+  #   devices:
+  #     - /dev/net/tun:/dev/net/tun
+  #   ports:
+  #     - 8888:8888/tcp # HTTP proxy
+  #     - 8388:8388/tcp # Shadowsocks
+  #     - 8388:8388/udp # Shadowsocks
+  #     # qbittorrent ports
+  #     - 8080:8080
+  #     - 6881:6881
+  #     - 6881:6881/udp
+  #   restart: unless-stopped
+  #   volumes:
+  #     - /tmp:/gluetun
+  #   environment:
+  #     # See https://github.com/qdm12/gluetun/wiki
+  #     - VPN_SERVICE_PROVIDER=private internet access
+  #     - VPN_TYPE=openvpn
+  #     - OPENVPN_USER=redacted
+  #     - OPENVPN_PASSWORD=redacted
+  #     - SERVER_REGIONS=US California
 
   # Default user-pass: admin / adminadmin
-  # qbittorrent:
+  # qbittorrent-lscr:
   #   image: lscr.io/linuxserver/qbittorrent
-  #   container_name: qbittorrent
+  #   container_name: qbittorrent-lscr
   #   restart: $MEDIA_RESTART_POLICY
+  #   # network_mode: "service:gluetun"
+  #   # depends_on:
+  #   #   - gluetun
   #   networks:
   #     - t2_proxy
   #   security_opt:
@@ -134,14 +164,43 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers Auth
-  #     - "traefik.http.routers.qbittorrent-rtr.entrypoints=https"
-  #     - "traefik.http.routers.qbittorrent-rtr.rule=Host(`torrent.$DOMAINNAME`)"
+  #     - "traefik.http.routers.qbittorrent-lscr-rtr.entrypoints=https"
+  #     - "traefik.http.routers.qbittorrent-lscr-rtr.rule=Host(`qtorrent.$DOMAINNAME`)"
   #     ## Middlewares
-  #     - "traefik.http.routers.qbittorrent-rtr.middlewares=chain-no-auth@file"
+  #     - "traefik.http.routers.qbittorrent-lscr-rtr.middlewares=chain-authelia@file"
   #     ## HTTP Services
-  #     - "traefik.http.routers.qbittorrent-rtr.service=qbittorrent-svc"
-  #     - "traefik.http.services.qbittorrent-svc.loadbalancer.server.port=8080"
-  #     - traefik.http.services.qbittorrent-svc.loadbalancer.passhostheader=false
+  #     - "traefik.http.routers.qbittorrent-lscr-rtr.service=qbittorrent-lscr-svc"
+  #     - "traefik.http.services.qbittorrent-lscr-svc.loadbalancer.server.port=8080"
+  #     # - traefik.http.services.qbittorrent-lscr-svc.loadbalancer.passhostheader=false # Not needed
+  
+  # Default user-pass: admin / adminadmin
+  # Tools -> Options -> Web UI -> Click use alternative Web UI
+  qbittorrent:
+    image: cr.hotio.dev/hotio/qbittorrent
+    container_name: qbittorrent
+    restart: $MEDIA_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/qbittorrent:/config
+      - $MEDIADIR/Downloads:/data/downloads # Ensure that downloads folder is set to /data/downloads in qBittorrent
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      WEBUI_PORT: 8080
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.qbittorrent-rtr.entrypoints=https"
+      - "traefik.http.routers.qbittorrent-rtr.rule=Host(`qtorrent.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.qbittorrent-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.qbittorrent-rtr.service=qbittorrent-svc"
+      - "traefik.http.services.qbittorrent-svc.loadbalancer.server.port=8080"
 
   # jdownloader:
   #   image: jlesage/jdownloader-2:latest
