@@ -68,11 +68,11 @@ services:
     restart: $OTHERS_RESTART_POLICY
     networks:
       - t2_proxy
-    # TODO: Probably needed for connecting to phone
-    ports:
-      - 22000:22000/tcp
-      - 22000:22000/udp
-      - 21027:21027/udp
+    # NOTE: Enable them. Probably needed for connecting to phone (RESEARCH)
+    # ports:
+    #   - 22000:22000/tcp
+    #   - 22000:22000/udp
+    #   - 21027:21027/udp
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -93,6 +93,33 @@ services:
       ## HTTP Services
       - "traefik.http.routers.syncthing-rtr.service=syncthing-svc"
       - "traefik.http.services.syncthing-svc.loadbalancer.server.port=8384"
+
+  duplicati:
+    image: lscr.io/linuxserver/duplicati
+    container_name: duplicati
+    restart: $MAINTANENCE_RESTART_POLICY
+    networks:
+      - t2_proxy
+    volumes:
+      - $DOCKERDIR/appdata/duplicati:/config
+      - $BACKUPDIR:/backups
+      - $DOCKERDIR:/source
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      # CLI_ARGS:
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.duplicati-rtr.entrypoints=https"
+      - "traefik.http.routers.duplicati-rtr.rule=Host(`duplicati.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.duplicati-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.duplicati-rtr.service=duplicati-svc"
+      - "traefik.http.services.duplicati-svc.loadbalancer.server.port=8200"
+
   # # Traefik Certs Dumper - Extract LetsEncrypt Certificates - Traefik2 Compatible
   # certdumper:
   #   container_name: traefik_certdumper
@@ -140,30 +167,6 @@ services:
   #     # Since cf-companion creates CNAMEs based on host rules, this a workaround for non-docker/external apps
   #     - "traefik.http.routers.cf-companion-rtr.rule=Host(`mox.$DOMAINNAME`) || Host(`pwt.$DOMAINNAME`) || Host(`webmin.$DOMAINNAME`) || Host(`shell.$DOMAINNAME`)"
 
-  # duplicati:
-  #   image: lscr.io/linuxserver/duplicati
-  #   container_name: duplicati
-  #   restart: $MAINTANENCE_RESTART_POLICY
-  #   networks:
-  #     - t2_proxy
-  #   volumes:
-  #     - $DOCKERDIR/appdata/duplicati:/config
-  #     - $BACKUPDIR:/backups
-  #     - $DOCKERDIR:/source
-  #   environment:
-  #     PUID: $PUID
-  #     PGID: $PGID
-  #     TZ: $TZ
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.duplicati-rtr.entrypoints=https"
-  #     - "traefik.http.routers.duplicati-rtr.rule=Host(`duplicati.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.duplicati-rtr.middlewares=chain-authelia@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.duplicati-rtr.service=duplicati-svc"
-  #     - "traefik.http.services.duplicati-svc.loadbalancer.server.port=8200"
 
   # watchtower:
   #   image: containrrr/watchtower

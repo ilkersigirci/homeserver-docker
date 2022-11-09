@@ -175,32 +175,35 @@ services:
   
   # Default user-pass: admin / adminadmin
   # Tools -> Options -> Web UI -> Click use alternative Web UI
-  qbittorrent:
-    image: cr.hotio.dev/hotio/qbittorrent
-    container_name: qbittorrent
-    restart: $MEDIA_RESTART_POLICY
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - $DOCKERDIR/appdata/qbittorrent:/config
-      - $MEDIADIR/Downloads:/data/downloads # Ensure that downloads folder is set to /data/downloads in qBittorrent
-    environment:
-      PUID: $PUID
-      PGID: $PGID
-      TZ: $TZ
-      WEBUI_PORT: 8080
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers Auth
-      - "traefik.http.routers.qbittorrent-rtr.entrypoints=https"
-      - "traefik.http.routers.qbittorrent-rtr.rule=Host(`qtorrent.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.qbittorrent-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.qbittorrent-rtr.service=qbittorrent-svc"
-      - "traefik.http.services.qbittorrent-svc.loadbalancer.server.port=8080"
+  # qbittorrent:
+  #   image: cr.hotio.dev/hotio/qbittorrent
+  #   container_name: qbittorrent
+  #   # cpus: "0.5"
+  #   mem_reservation: "4096M"
+  #   mem_limit: "4096M"
+  #   restart: $MEDIA_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - $DOCKERDIR/appdata/qbittorrent:/config
+  #     - $MEDIADIR/Downloads:/data/downloads # Ensure that downloads folder is set to /data/downloads in qBittorrent
+  #   environment:
+  #     PUID: $PUID
+  #     PGID: $PGID
+  #     TZ: $TZ
+  #     WEBUI_PORT: 8080
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers Auth
+  #     - "traefik.http.routers.qbittorrent-rtr.entrypoints=https"
+  #     - "traefik.http.routers.qbittorrent-rtr.rule=Host(`qtorrent.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.qbittorrent-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.qbittorrent-rtr.service=qbittorrent-svc"
+  #     - "traefik.http.services.qbittorrent-svc.loadbalancer.server.port=8080"
 
   # jdownloader:
   #   image: jlesage/jdownloader-2:latest
@@ -273,6 +276,9 @@ services:
   transmission:
     image: lscr.io/linuxserver/transmission
     container_name: transmission
+    # cpus: "0.5"
+    mem_reservation: "4096M"
+    mem_limit: "4096M"
     restart: $MEDIA_RESTART_POLICY
     networks:
       - t2_proxy
@@ -628,6 +634,30 @@ services:
       ## HTTP Services
       # - "traefik.http.routers.ytdl-rtr.service=ytdl-svc"
       # - "traefik.http.services.ytdl-svc.loadbalancer.server.port=8081"
+
+  # stremio:
+  #   image: sleeyax/stremio-streaming-server:latest
+  #   container_name: stremio
+  #   restart: $MEDIA_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - $DOCKERDIR/appdata/stremio:/root/.stremio-server
+  #   environment:
+  #     - FORCE_HTTPS=1
+  #     # - FIX_UNSUPPORTED_MEDIA=1
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers Auth
+  #     - "traefik.http.routers.stremio-rtr.entrypoints=https"
+  #     - "traefik.http.routers.stremio-rtr.rule=Host(`stremio.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.stremio-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.stremio-rtr.service=stremio-svc"
+  #     - "traefik.http.services.stremio-svc.loadbalancer.server.port=11470"
 
   # tubearchivist:
   #   image: bbilly1/tubearchivist:latest
