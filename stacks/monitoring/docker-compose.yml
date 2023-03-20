@@ -21,7 +21,7 @@ volumes:
 services:
   # Glances - System Information
   glances:
-    image: nicolargo/glances:latest # latest-full
+    image: nicolargo/glances:latest # latest-full  # TODO: ghcr.io/
     container_name: glances
     restart: $MAINTANENCE_RESTART_POLICY
     # network_mode: host

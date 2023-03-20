@@ -8,7 +8,7 @@ networks:
 services:
   ############################# SERVER #############################
   # jellyfin:
-  #   image: linuxserver/jellyfin:latest
+  #   image: lscr.io/linuxserver/jellyfin:latest
   #   container_name: jellyfin
   #   restart: $MEDIA_RESTART_POLICY
   #   # profiles:
@@ -53,7 +53,7 @@ services:
   #     - "traefik.http.services.jellyfin-svc.loadbalancer.server.port=8096"
   
   jellyfin:
-    image: jellyfin/jellyfin:latest
+    image: jellyfin/jellyfin:latest  # TODO: ghrc.io
     container_name: jellyfin
     # cpus: "0.5"
     mem_reservation: "4096M"
@@ -86,7 +86,7 @@ services:
       - "traefik.http.services.jellyfin-svc.loadbalancer.server.port=8096"
     
   jellyseerr:
-    image: fallenbagel/jellyseerr:latest
+    image: fallenbagel/jellyseerr:latest  # TODO: ghrc.io
     container_name: jellyseerr
     restart: $MEDIA_RESTART_POLICY
     networks:
@@ -298,7 +298,7 @@ services:
       PUID: $PUID
       PGID: $PGID
       TZ: $TZ
-      TRANSMISSION_WEB_HOME: /flood-for-transmission
+      # TRANSMISSION_WEB_HOME: /flood-for-transmission (Not working > 4.0.0)
 #      USER: username
 #      PASS: password
     labels:
@@ -316,7 +316,7 @@ services:
   ############################# INDEXERS #############################
 
   prowlarr:
-    image: linuxserver/prowlarr:develop # there is no main branch atm
+    image: lscr.io/linuxserver/prowlarr:develop # there is no main branch atm
     container_name: prowlarr
     depends_on:
       - transmission
@@ -348,7 +348,7 @@ services:
 
   # # NZBHydra2 - NZB meta search
   # hydra:
-  #   image: linuxserver/nzbhydra2:latest
+  #   image: lscr.io/linuxserver/nzbhydra2:latest
   #   container_name: hydra
   #   restart: $MEDIA_RESTART_POLICY
   #   # profiles:
@@ -382,7 +382,7 @@ services:
   # # Lidarr - Music Management
   # # Set url_base in lidarr settings if using PathPrefix
   # lidarr:
-  #   image: linuxserver/lidarr:latest
+  #   image: lscr.io/linuxserver/lidarr:latest
   #   container_name: lidarr
   #   restart: $MEDIA_RESTART_POLICY
   #   # profiles:
@@ -425,7 +425,7 @@ services:
 
   # Movie management
   radarr:
-    image: linuxserver/radarr:latest
+    image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
     depends_on:
       - transmission
@@ -470,7 +470,7 @@ services:
   #  TV Shows management
   # Set url_base in sonarr settings if using PathPrefix
   # sonarr:
-  #   image: linuxserver/sonarr:latest
+  #   image: lscr.io/linuxserver/sonarr:latest
   #   container_name: sonarr
   #   restart: $MEDIA_RESTART_POLICY
   #   # profiles:
@@ -543,7 +543,7 @@ services:
 
   # Ebooks and Management
   # lazylibrarian:
-  #   image: linuxserver/lazylibrarian
+  #   image: lscr.io/linuxserver/lazylibrarian
   #   container_name: lazylibrarian
   #   restart: unless-stopped
   #   # profiles:
@@ -634,6 +634,31 @@ services:
       ## HTTP Services
       # - "traefik.http.routers.ytdl-rtr.service=ytdl-svc"
       # - "traefik.http.services.ytdl-svc.loadbalancer.server.port=8081"
+
+  podgrab:
+    image: akhilrex/podgrab:latest
+    container_name: podgrab
+    restart: $MEDIA_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/podgrab:/config
+      - $MEDIADIR/Podcasts:/assets
+    environment:
+      - CHECK_FREQUENCY=240
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.podgrab-rtr.entrypoints=https"
+      - "traefik.http.routers.podgrab-rtr.rule=Host(`podgrab.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.podgrab-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.podgrab-rtr.service=podgrab-svc"
+      - "traefik.http.services.podgrab-svc.loadbalancer.server.port=8080"
+    
 
   # stremio:
   #   image: sleeyax/stremio-streaming-server:latest

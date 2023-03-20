@@ -49,7 +49,7 @@ services:
   # touch $DOCKERDIR/appdata/traefik2/traefik.log
   traefik:
     container_name: traefik
-    image: traefik:2.9
+    image: traefik:2.9  # TODO: ghcr.io/
     restart: $BASE_RESTART_POLICY
     # profiles:
     # - core
@@ -185,7 +185,7 @@ services:
   # Docker Socket Proxy - Security Enchanced Proxy for Docker Socket
   docker-socket-proxy:
     container_name: docker-socket-proxy
-    image: tecnativa/docker-socket-proxy:latest
+    image: ghcr.io/tecnativa/docker-socket-proxy:latest
     restart: unless-stopped
     # profiles:
     # - core
@@ -236,7 +236,7 @@ services:
   authelia:
     container_name: authelia
     # Check this before upgrading: https://github.com/authelia/authelia/blob/master/BREAKING.md
-    image: authelia/authelia:latest
+    image: ghcr.io/authelia/authelia:latest
     depends_on:
       - traefik
     restart: $BASE_RESTART_POLICY
@@ -303,18 +303,19 @@ services:
   #     - "traefik.http.routers.yacht-rtr.service=yacht-svc"
   #     - "traefik.http.services.yacht-svc.loadbalancer.server.port=8000"
 
+  # FIXME: docker-socket-proxy NOT WORKING !
   # TODO: Authelia integration
   # https://www.authelia.com/integration/openid-connect/portainer/
   portainer:
     container_name: portainer
-    image: portainer/portainer-ce:latest
+    image: portainer/portainer-ce:latest # TODO: ghcr.io/
     depends_on:
       - traefik
     restart: $BASE_RESTART_POLICY
     # profiles:
     # - apps
-    # command: -H unix:///var/run/docker.sock # Use Docker Socket Proxy and comment this line out, for improved security.
-    command: -H tcp://docker-socket-proxy:2375 # Use this instead, if you have Socket Proxy enabled.
+    command: -H unix:///var/run/docker.sock # Use Docker Socket Proxy and comment this line out, for improved security.
+    # command: -H tcp://docker-socket-proxy:2375 # Use this instead, if you have Socket Proxy enabled.
     networks:
       - t2_proxy
       - socket_proxy
@@ -323,7 +324,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      # - /var/run/docker.sock:/var/run/docker.sock:ro # # Use Docker Socket Proxy instead for improved security
+      - /var/run/docker.sock:/var/run/docker.sock:ro # # Use Docker Socket Proxy instead for improved security
       - $DOCKERDIR/appdata/portainer/data:/data # Change to local directory if you want to save/transfer config locally
     environment:
       - TZ=$TZ
@@ -391,7 +392,7 @@ services:
 
   vaultwarden:
     container_name: vaultwarden
-    image: vaultwarden/server:latest
+    image: vaultwarden/server:latest # TODO: ghcr.io/
     depends_on:
       - traefik
     restart: $BASE_RESTART_POLICY
@@ -416,7 +417,7 @@ services:
   # For custom.css: change Global Settings->branding path to "custom"
   filebrowser:
     container_name: filebrowser
-    image: filebrowser/filebrowser:latest
+    image: filebrowser/filebrowser:latest # TODO: ghcr.io/
     depends_on:
       - traefik
     restart: $BASE_RESTART_POLICY
