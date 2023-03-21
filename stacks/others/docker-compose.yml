@@ -237,21 +237,22 @@ services:
 
   # https://github.com/AbdBarho/stable-diffusion-webui-docker
   stable-diffusion:
-    # build: $STABLEDIFFUSIONDIR/services/AUTOMATIC1111
     container_name: stable-diffusion
-    image: sd-auto:14
+    build: $STABLEDIFFUSIONDIR/services/AUTOMATIC1111
+    image: sd-auto:49
     restart: $OTHERS_RESTART_POLICY
+    stop_signal: SIGINT
     networks:
       - t2_proxy
-    ports:
-      - "7860:7860"
+    # ports:
+    #   - "7860:7860"
     volumes:
       - $STABLEDIFFUSIONDIR/data:/data
       - $STABLEDIFFUSIONDIR/output:/output
       # - $STABLEDIFFUSIONDIR/services/AUTOMATIC1111/config.json:/stable-diffusion-webui/config.json
       # - $STABLEDIFFUSIONDIR/embeddings:/stable-diffusion-webui/embeddings
     environment:
-      - CLI_ARGS=--allow-code --medvram --xformers
+      - CLI_ARGS=--allow-code --medvram --xformers --enable-insecure-extension-access --api
     deploy:
       resources:
         reservations:
