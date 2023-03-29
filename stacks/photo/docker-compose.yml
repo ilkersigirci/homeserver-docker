@@ -28,13 +28,13 @@ services:
       POSTGRES_DB: ${DB_DATABASE_NAME}
       PG_DATA: /var/lib/postgresql/data
 
-  immich-typesense:
-    container_name: immich-typesense
+  typesense:
+    container_name: typesense
     image: typesense/typesense:0.24.0
     networks:
       - t2_proxy
     volumes:
-      - $DOCKERDIR/appdata/immich-typesense:/data
+      - $DOCKERDIR/appdata/typesense:/data
     environment:
       - TYPESENSE_API_KEY=${TYPESENSE_API_KEY}
       - TYPESENSE_DATA_DIR=/data
@@ -49,11 +49,14 @@ services:
     depends_on:
       - immich-redis
       - immich-postgres
-      - immich-typesense
+      - typesense
     networks:
       - t2_proxy
     volumes:
-      - ${UPLOAD_LOCATION}:/usr/src/app/upload
+      - ${ORIGINAL_UPLOAD_LOCATION}/library:/usr/src/app/upload/library
+      - ${GENERATED_UPLOAD_LOCATION}/thumbs:/usr/src/app/upload/thumbs
+      - ${GENERATED_UPLOAD_LOCATION}/profile:/usr/src/app/upload/profile
+      - ${GENERATED_UPLOAD_LOCATION}/encoded-videos:/usr/src/app/upload/encoded-videos
     env_file:
       - .env
     environment:
@@ -78,11 +81,14 @@ services:
     depends_on:
       - immich-redis
       - immich-postgres
-      - immich-typesense
+      - typesense
     networks:
       - t2_proxy
     volumes:
-      - ${UPLOAD_LOCATION}:/usr/src/app/upload
+      - ${ORIGINAL_UPLOAD_LOCATION}/library:/usr/src/app/upload/library
+      - ${GENERATED_UPLOAD_LOCATION}/thumbs:/usr/src/app/upload/thumbs
+      - ${GENERATED_UPLOAD_LOCATION}/profile:/usr/src/app/upload/profile
+      - ${GENERATED_UPLOAD_LOCATION}/encoded-videos:/usr/src/app/upload/encoded-videos
     env_file:
       - .env
     environment:
@@ -105,8 +111,11 @@ services:
     networks:
       - t2_proxy
     volumes:
-      - ${UPLOAD_LOCATION}:/usr/src/app/upload
       - $DOCKERDIR/appdata/immich-ml/model-cache:/cache
+      - ${ORIGINAL_UPLOAD_LOCATION}/library:/usr/src/app/upload/library
+      - ${GENERATED_UPLOAD_LOCATION}/thumbs:/usr/src/app/upload/thumbs
+      - ${GENERATED_UPLOAD_LOCATION}/profile:/usr/src/app/upload/profile
+      - ${GENERATED_UPLOAD_LOCATION}/encoded-videos:/usr/src/app/upload/encoded-videos
     env_file:
       - .env
     environment:
