@@ -1,0 +1,145 @@
+version: "3.9"
+name: notes
+
+networks:
+  t2_proxy:
+    external: true
+
+services:
+  syncthing:
+    container_name: syncthing
+    image: linuxserver/syncthing:latest
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t2_proxy
+    # TODO: Probably needed for connecting to phone
+    ports:
+      - 22000:22000/tcp
+      - 22000:22000/udp
+      - 21027:21027/udp
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/syncthing:/config
+      # - $APKDIR:/apk
+      - $NOTESDIR:/notes
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.syncthing-rtr.entrypoints=https"
+      - "traefik.http.routers.syncthing-rtr.rule=Host(`syncthing.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.syncthing-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.syncthing-rtr.service=syncthing-svc"
+      - "traefik.http.services.syncthing-svc.loadbalancer.server.port=8384"
+
+  # TODO: Add local.ini
+  # https://github.com/vrtmrz/obsidian-livesync/blob/main/docs/setup_own_server.md#setup-couchdb-to-your-server
+  # passphase: obsidian
+  couchdb:
+    container_name: couchdb
+    image: couchdb:latest  # TODO: ghcr.io/
+    restart: $BASE_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/couchdb:/opt/couchdb/data
+      - $CONFIGDIR/couchdb/local.ini:/opt/couchdb/etc/local.ini
+      # - $NOTESDIR:/notes
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=admin
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.couchdb-rtr.entrypoints=https"
+      - "traefik.http.routers.couchdb-rtr.rule=Host(`couchdb.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.couchdb-rtr.middlewares=chain-couchdb@file" # NOTE: chain-authelia not working
+      ## HTTP Services
+      - "traefik.http.routers.couchdb-rtr.service=couchdb-svc"
+      - "traefik.http.services.couchdb-svc.loadbalancer.server.port=5984"
+
+  logseq:
+    container_name: logseq
+    image: ghcr.io/logseq/logseq-webapp:latest
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+      # volumes:
+      # - $NOTESDIR:/notes
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.logseq-rtr.entrypoints=https"
+      - "traefik.http.routers.logseq-rtr.rule=Host(`logseq.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.logseq-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.logseq-rtr.service=logseq-svc"
+      - "traefik.http.services.logseq-svc.loadbalancer.server.port=80"
+  
+  flatnotes:
+    container_name: flatnotes
+    image: dullage/flatnotes:latest
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $NOTESDIR/Markdown:/app/data
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - FLATNOTES_AUTH_TYPE=none
+      # - FLATNOTES_USERNAME="user"
+      # - FLATNOTES_PASSWORD="changeMe!"
+      - FLATNOTES_SECRET_KEY="change-stability-pushchair"
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.notes-rtr.entrypoints=https"
+      - "traefik.http.routers.notes-rtr.rule=Host(`notes.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.notes-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.notes-rtr.service=notes-svc"
+      - "traefik.http.services.notes-svc.loadbalancer.server.port=80"
+
+  # obsidian:
+  #   container_name: obsidian
+  #   image: ghcr.io/sytone/obsidian-remote:latest
+  #   restart: $OTHERS_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - $NOTESDIR/Markdown:/vaults
+  #     # - /home/law/obsidian/config:/config
+  #   environment:
+  #     - PUID=$PUID
+  #     - PGID=$PGID
+  #     - TZ=$TZ
+  #     # - DOCKER_MODS=linuxserver/mods:universal-git
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.obsidian-rtr.entrypoints=https"
+  #     - "traefik.http.routers.obsidian-rtr.rule=Host(`obsidian.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.obsidian-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.obsidian-rtr.service=obsidian-svc"
+  #     - "traefik.http.services.obsidian-svc.loadbalancer.server.port=8080"

@@ -28,6 +28,7 @@ services:
       POSTGRES_DB: ${DB_DATABASE_NAME}
       PG_DATA: /var/lib/postgresql/data
 
+  # NOTE: When renaming to immich-typesense, it is not working
   typesense:
     container_name: typesense
     image: typesense/typesense:0.24.0
@@ -52,11 +53,17 @@ services:
       - typesense
     networks:
       - t2_proxy
+    ports:
+      - "3001:3001"
+    # expose:
+    #   - "3001"
     volumes:
-      - ${ORIGINAL_UPLOAD_LOCATION}/library:/usr/src/app/upload/library
+      - ${ORIGINAL_UPLOAD_LOCATION}:/usr/src/app/upload
+      # - ${ORIGINAL_UPLOAD_LOCATION}/library:/usr/src/app/upload/library
       - ${GENERATED_UPLOAD_LOCATION}/thumbs:/usr/src/app/upload/thumbs
-      - ${GENERATED_UPLOAD_LOCATION}/profile:/usr/src/app/upload/profile
-      - ${GENERATED_UPLOAD_LOCATION}/encoded-videos:/usr/src/app/upload/encoded-videos
+      # - ${GENERATED_UPLOAD_LOCATION}/profile:/usr/src/app/upload/profile
+      # - ${GENERATED_UPLOAD_LOCATION}/encoded-videos:/usr/src/app/upload/encoded-videos
+      ## - ${GENERATED_UPLOAD_LOCATION}/upload:/usr/src/app/upload/upload
     env_file:
       - .env
     environment:
@@ -65,7 +72,7 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.immich-server-rtr.entrypoints=https"
-      - "traefik.http.routers.immich-server-rtr.rule=Host(`immich.$DOMAINNAME`) && Pathprefix(`/api`)"
+      - "traefik.http.routers.immich-server-rtr.rule=Host(`photos.$DOMAINNAME`) && Pathprefix(`/api`)"
       ## Middlewares
       - "traefik.http.routers.immich-server-rtr.middlewares=add-api" # chain-authelia@file
       - "traefik.http.middlewares.add-api.stripprefix.prefixes=/api"
@@ -77,7 +84,8 @@ services:
     container_name: immich-microservices
     image: ghcr.io/immich-app/immich-server:release
     entrypoint: ["/bin/sh", "./start-microservices.sh"]
-    restart: $MEDIA_RESTART_POLICY
+    # restart: $MEDIA_RESTART_POLICY
+    restart: on-failure
     depends_on:
       - immich-redis
       - immich-postgres
@@ -85,10 +93,12 @@ services:
     networks:
       - t2_proxy
     volumes:
-      - ${ORIGINAL_UPLOAD_LOCATION}/library:/usr/src/app/upload/library
+      - ${ORIGINAL_UPLOAD_LOCATION}:/usr/src/app/upload
+      # - ${ORIGINAL_UPLOAD_LOCATION}/library:/usr/src/app/upload/library
       - ${GENERATED_UPLOAD_LOCATION}/thumbs:/usr/src/app/upload/thumbs
-      - ${GENERATED_UPLOAD_LOCATION}/profile:/usr/src/app/upload/profile
-      - ${GENERATED_UPLOAD_LOCATION}/encoded-videos:/usr/src/app/upload/encoded-videos
+      # - ${GENERATED_UPLOAD_LOCATION}/profile:/usr/src/app/upload/profile
+      # - ${GENERATED_UPLOAD_LOCATION}/encoded-videos:/usr/src/app/upload/encoded-videos
+      ## - ${GENERATED_UPLOAD_LOCATION}/upload:/usr/src/app/upload/upload
     env_file:
       - .env
     environment:
@@ -103,30 +113,6 @@ services:
     #   ## HTTP Services
     #   # - "traefik.http.routers.immich-microservices.service=immich-microservices-svc"
     #   - "traefik.http.services.immich-microservices-svc.loadbalancer.server.port=3001"
-
-  immich-machine-learning:
-    container_name: immich-machine-learning
-    image: ghcr.io/immich-app/immich-machine-learning:release
-    restart: $MEDIA_RESTART_POLICY
-    networks:
-      - t2_proxy
-    volumes:
-      - $DOCKERDIR/appdata/immich-ml/model-cache:/cache
-      - ${ORIGINAL_UPLOAD_LOCATION}/library:/usr/src/app/upload/library
-      - ${GENERATED_UPLOAD_LOCATION}/thumbs:/usr/src/app/upload/thumbs
-      - ${GENERATED_UPLOAD_LOCATION}/profile:/usr/src/app/upload/profile
-      - ${GENERATED_UPLOAD_LOCATION}/encoded-videos:/usr/src/app/upload/encoded-videos
-    env_file:
-      - .env
-    environment:
-      NODE_ENV: production
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
 
   immich-web:
     container_name: immich-web
@@ -143,9 +129,35 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.immich-rtr.entrypoints=https"
-      - "traefik.http.routers.immich-rtr.rule=Host(`immich.$DOMAINNAME`)"
+      - "traefik.http.routers.immich-rtr.rule=Host(`photos.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.immich-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
       - "traefik.http.routers.immich-rtr.service=immich-svc"
       - "traefik.http.services.immich-svc.loadbalancer.server.port=3000"
+
+  # immich-machine-learning:
+  #   container_name: immich-machine-learning
+  #   image: ghcr.io/immich-app/immich-machine-learning:release
+  #   restart: $MEDIA_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   volumes:
+  #     - $DOCKERDIR/appdata/immich-ml/model-cache:/cache
+  #     - ${ORIGINAL_UPLOAD_LOCATION}:/usr/src/app/upload
+  #     # - ${ORIGINAL_UPLOAD_LOCATION}/library:/usr/src/app/upload/library
+  #     - ${GENERATED_UPLOAD_LOCATION}/thumbs:/usr/src/app/upload/thumbs
+  #     # - ${GENERATED_UPLOAD_LOCATION}/profile:/usr/src/app/upload/profile
+  #     # - ${GENERATED_UPLOAD_LOCATION}/encoded-videos:/usr/src/app/upload/encoded-videos
+  #     ## - ${GENERATED_UPLOAD_LOCATION}/upload:/usr/src/app/upload/upload
+  #   env_file:
+  #     - .env
+  #   environment:
+  #     NODE_ENV: production
+  #   deploy:
+  #     resources:
+  #       reservations:
+  #         devices:
+  #           - driver: nvidia
+  #             count: 1
+  #             capabilities: [gpu]

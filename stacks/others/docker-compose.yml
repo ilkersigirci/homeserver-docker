@@ -53,88 +53,6 @@ services:
   #     - "traefik.http.routers.wg-easy-rtr.service=wg-easy-svc"
   #     - "traefik.http.services.wg-easy-svc.loadbalancer.server.port=51821"
 
-  syncthing:
-    container_name: syncthing
-    image: linuxserver/syncthing:latest
-    restart: $OTHERS_RESTART_POLICY
-    networks:
-      - t2_proxy
-    # TODO: Probably needed for connecting to phone
-    ports:
-      - 22000:22000/tcp
-      - 22000:22000/udp
-      - 21027:21027/udp
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - $DOCKERDIR/appdata/syncthing:/config
-      # - $APKDIR:/apk
-      - $NOTESDIR:/notes
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.syncthing-rtr.entrypoints=https"
-      - "traefik.http.routers.syncthing-rtr.rule=Host(`syncthing.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.syncthing-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.syncthing-rtr.service=syncthing-svc"
-      - "traefik.http.services.syncthing-svc.loadbalancer.server.port=8384"
-
-  # TODO: Add local.ini
-  # https://github.com/vrtmrz/obsidian-livesync/blob/main/docs/setup_own_server.md#setup-couchdb-to-your-server
-  # passphase: obsidian
-  couchdb:
-    container_name: couchdb
-    image: couchdb:latest  # TODO: ghcr.io/
-    restart: $BASE_RESTART_POLICY
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - $DOCKERDIR/appdata/couchdb:/opt/couchdb/data
-      - $CONFIGDIR/couchdb/local.ini:/opt/couchdb/etc/local.ini
-      # - $NOTESDIR:/notes
-    environment:
-      - COUCHDB_USER=admin
-      - COUCHDB_PASSWORD=admin
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.couchdb-rtr.entrypoints=https"
-      - "traefik.http.routers.couchdb-rtr.rule=Host(`couchdb.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.couchdb-rtr.middlewares=chain-couchdb@file" # NOTE: chain-authelia not working
-      ## HTTP Services
-      - "traefik.http.routers.couchdb-rtr.service=couchdb-svc"
-      - "traefik.http.services.couchdb-svc.loadbalancer.server.port=5984"
-
-  logseq:
-    container_name: logseq
-    image: ghcr.io/logseq/logseq-webapp:latest
-    restart: $OTHERS_RESTART_POLICY
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-      # volumes:
-      # - $NOTESDIR:/notes
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.logseq-rtr.entrypoints=https"
-      - "traefik.http.routers.logseq-rtr.rule=Host(`logseq.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.logseq-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.logseq-rtr.service=logseq-svc"
-      - "traefik.http.services.logseq-svc.loadbalancer.server.port=80"
-
   ######### RSS #########
 
   # freshrss:
@@ -345,34 +263,6 @@ services:
     #   # FIXME: (Not working) https://docs.linuxserver.io/faq#strict-proxy
     #   - traefik.http.services.kasm-svc.loadbalancer.serverstransport=ignorecert
     #   - traefik.http.services.kasm-svc.loadbalancer.server.scheme=https
-
-  obsidian:
-    container_name: obsidian
-    image: ghcr.io/sytone/obsidian-remote:latest
-    restart: $OTHERS_RESTART_POLICY
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - $NOTESDIR/Markdown:/vaults
-      # - /home/law/obsidian/config:/config
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-      # - DOCKER_MODS=linuxserver/mods:universal-git
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.obsidian-rtr.entrypoints=https"
-      - "traefik.http.routers.obsidian-rtr.rule=Host(`obsidian.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.obsidian-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.obsidian-rtr.service=obsidian-svc"
-      - "traefik.http.services.obsidian-svc.loadbalancer.server.port=8080"
-      
 
   #Expanse Tracker
   # firefly:

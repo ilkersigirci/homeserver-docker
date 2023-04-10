@@ -1,0 +1,148 @@
+version: "3.9"
+name: dagster
+
+networks:
+  t2_proxy:
+    external: true
+
+x-app-vars:
+  &postgres_envs
+  DAGSTER_POSTGRES_HOSTNAME: "postgresql"
+  DAGSTER_POSTGRES_DB: "postgres_db"
+  DAGSTER_POSTGRES_USER: "postgres_user"
+  DAGSTER_POSTGRES_PASSWORD: "postgres_password"
+
+
+services:
+  # This service runs the postgres DB used by dagster for run storage, schedule storage,
+  # and event log storage.
+  postgresql:
+    container_name: postgresql
+    image: postgres:11
+    restart: $DAGSTER_RESTART_POLICY
+    networks:
+      - t2_proxy
+    environment:
+      POSTGRES_DB: postgres_db
+      POSTGRES_USER: postgres_user
+      POSTGRES_PASSWORD: postgres_password
+    volumes:
+      - $DOCKERDIR/appdata/dagster-postgres:/var/lib/postgresql/data
+
+  # localstack:
+  #   image: localstack/localstack
+  #   container_name: localstack
+  #   ports:
+  #     - "4566:4566"
+  #   environment:
+  #     HOSTNAME: localhost
+  #     SERVICES: s3
+  #     AWS_ACCESS_KEY_ID: test
+  #     AWS_SECRET_ACCESS_KEY: test
+  #     DEFAULT_REGION: us-east-1
+  #   volumes:
+  #     - ./scripts/local_stack.sh:/docker-entrypoint-initaws.d/create_localstack_infra.sh
+  #   networks:
+  #     - t2_proxy
+
+  # This service runs the gRPC server that loads your user code, in both dagit
+  # and dagster-daemon. By setting DAGSTER_CURRENT_IMAGE to its own image, we tell the
+  # run launcher to use this same image when launching runs in a new container as well.
+  # Multiple containers like this can be deployed separately - each just needs to run on
+  # its own port, and have its own entry in the workspace.yaml file that's loaded by dagit.
+  user-code:
+    container_name: user-code
+    image: user-code
+    build:
+      context: $HOMESERVERAUTOMATIONDIR
+      dockerfile: $HOMESERVERAUTOMATIONDIR/docker/Dockerfile_user_code
+    restart: $DAGSTER_RESTART_POLICY
+    depends_on:
+      # - localstack
+      - postgresql  # TODO: Is needed?
+    networks:
+      - t2_proxy
+    expose:
+      - 4000
+    # profiles:
+    #   - dagster
+    environment:
+      << : *postgres_envs
+      # DAGSTER_CURRENT_IMAGE: "docker_example_user_code_image"
+      AWS_ACCESS_KEY_ID: test # for localstack
+      AWS_SECRET_ACCESS_KEY: test # for localstack
+    volumes:
+      - $HOMESERVERAUTOMATIONDIR/homeserver_automation:/opt/dagster/app/homeserver_automation
+
+  # This service runs dagit, which loads your user code from the user code container.
+  # Since our instance uses the QueuedRunCoordinator, any runs submitted from dagit will be put on
+  # a queue and later dequeued and launched by dagster-daemon.
+  dagit:
+    container_name: dagit
+    image: dagit
+    build:
+      context: $HOMESERVERAUTOMATIONDIR
+      dockerfile: $HOMESERVERAUTOMATIONDIR/docker/Dockerfile_dagster
+    entrypoint:
+      - dagit
+      - -h
+      - "0.0.0.0"
+      - -p
+      - "3000"
+      - -w
+      - workspace.yaml
+    restart: $DAGSTER_RESTART_POLICY
+    depends_on:
+      - postgresql
+      - user-code
+    networks:
+      - t2_proxy
+    # ports:
+    #   - "3000:3000"
+    # profiles:
+    #   - dagster
+    environment:
+      << : *postgres_envs
+    volumes:
+    #   - /tmp/io_manager_storage:/tmp/io_manager_storage  # TODO: Is needed?
+      - $HOMESERVERAUTOMATIONDIR/dagster.yaml:/opt/dagster/dagster_home/dagster.yaml
+      - $HOMESERVERAUTOMATIONDIR/workspace.yaml:/opt/dagster/dagster_home/workspace.yaml
+    #   - /var/run/docker.sock:/var/run/docker.sock # Make docker client accessible so we can terminate containers from dagit
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.dagster-rtr.entrypoints=https"
+      - "traefik.http.routers.dagster-rtr.rule=Host(`dagster.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.dagster-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.dagster-rtr.service=dagster-svc"
+      - "traefik.http.services.dagster-svc.loadbalancer.server.port=3000"
+
+
+  # This service runs the dagster-daemon process, which is responsible for taking runs
+  # off of the queue and launching them, as well as creating runs from schedules or sensors.
+  dagster-daemon:
+    container_name: dagster-daemon
+    image: dagster-daemon
+    build:
+      context: $HOMESERVERAUTOMATIONDIR
+      dockerfile: $HOMESERVERAUTOMATIONDIR/docker/Dockerfile_dagster
+    entrypoint:
+      - dagster-daemon
+      - run
+    restart: $DAGSTER_RESTART_POLICY
+    depends_on:
+      - postgresql
+      - user-code
+    networks:
+      - t2_proxy
+    # profiles:
+    #   - dagster
+    environment:
+      << : *postgres_envs
+    volumes:
+    #   - /tmp/io_manager_storage:/tmp/io_manager_storage  # TODO: Is needed?
+      - $HOMESERVERAUTOMATIONDIR/dagster.yaml:/opt/dagster/dagster_home/dagster.yaml
+      - $HOMESERVERAUTOMATIONDIR/workspace.yaml:/opt/dagster/dagster_home/workspace.yaml
+    #   - /var/run/docker.sock:/var/run/docker.sock # Make docker client accessible so we can terminate containers from dagit

@@ -379,6 +379,11 @@ services:
       - socket_proxy
     volumes:
       - $CONFIGDIR/homepage:/app/config
+      - /mnt/d:/mnt/d  # NOTE: Need for Disk usage widget
+    environment:
+      - HOMEPAGE_VAR_DOMAINNAME=$DOMAINNAME
+      - HOMEPAGE_VAR_JELLYFIN_API_KEY=$JELLYFIN_API_KEY
+      - HOMEPAGE_VAR_IMMICH_API_KEY=$IMMICH_API_KEY
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
