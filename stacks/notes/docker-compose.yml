@@ -90,14 +90,15 @@ services:
   
   flatnotes:
     container_name: flatnotes
-    image: dullage/flatnotes:latest
+    # image: dullage/flatnotes:latest
+    image: dullage/flatnotes:v3.0.0-rc.3
     restart: $OTHERS_RESTART_POLICY
     networks:
       - t2_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $NOTESDIR/Markdown:/app/data
+      - $NOTESDIR/Markdown:/data
     environment:
       - PUID=$PUID
       - PGID=$PGID
@@ -115,7 +116,7 @@ services:
       - "traefik.http.routers.notes-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
       - "traefik.http.routers.notes-rtr.service=notes-svc"
-      - "traefik.http.services.notes-svc.loadbalancer.server.port=80"
+      - "traefik.http.services.notes-svc.loadbalancer.server.port=8080"
 
   # obsidian:
   #   container_name: obsidian

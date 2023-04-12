@@ -17,7 +17,7 @@ services:
       - t2_proxy
     volumes:
       - $DOCKERDIR/appdata/code-server:/config
-      - $DOCKERDIR:/config/workspace/docker
+      # - $DOCKERDIR:/config/workspace/docker
       - $NOTESDIR:/config/workspace/notes
     environment:
       PUID: $PUID

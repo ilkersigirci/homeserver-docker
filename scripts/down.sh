@@ -10,6 +10,8 @@ cd $STACKS_ROOT/media
 docker compose --env-file ~/docker/configs/.env down --volumes --remove-orphans
 # cd $STACKS_ROOT/others
 # docker compose --env-file ~/docker/configs/.env down --volumes --remove-orphans
+cd $STACKS_ROOT/maintanence
+docker compose --env-file ~/docker/configs/.env down --volumes --remove-orphans
 cd $STACKS_ROOT/monitoring
 docker compose --env-file ~/docker/configs/.env down --volumes --remove-orphans
 cd $STACKS_ROOT/photo
