@@ -5,7 +5,7 @@ STACKS_ROOT=~/docker/stacks
 cd $STACKS_ROOT/base
 docker compose --env-file ~/docker/configs/.env up -d
 cd $STACKS_ROOT/notes
-docker compose --env-file ~/docker/configs/.env up -d couchdb flatnotes
+docker compose --env-file ~/docker/configs/.env up -d flatnotes obsidian # couchdb 
 cd $STACKS_ROOT/media
 docker compose --env-file ~/docker/configs/.env up -d transmission jellyfin ytdl-sub
 # cd $STACKS_ROOT/others

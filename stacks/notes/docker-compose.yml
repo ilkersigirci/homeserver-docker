@@ -41,31 +41,31 @@ services:
   # TODO: Add local.ini
   # https://github.com/vrtmrz/obsidian-livesync/blob/main/docs/setup_own_server.md#setup-couchdb-to-your-server
   # passphase: obsidian
-  couchdb:
-    container_name: couchdb
-    image: couchdb:latest  # TODO: ghcr.io/
-    restart: $BASE_RESTART_POLICY
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - $DOCKERDIR/appdata/couchdb:/opt/couchdb/data
-      - $CONFIGDIR/couchdb/local.ini:/opt/couchdb/etc/local.ini
-      # - $NOTESDIR:/notes
-    environment:
-      - COUCHDB_USER=admin
-      - COUCHDB_PASSWORD=admin
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.couchdb-rtr.entrypoints=https"
-      - "traefik.http.routers.couchdb-rtr.rule=Host(`couchdb.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.couchdb-rtr.middlewares=chain-couchdb@file" # NOTE: chain-authelia not working
-      ## HTTP Services
-      - "traefik.http.routers.couchdb-rtr.service=couchdb-svc"
-      - "traefik.http.services.couchdb-svc.loadbalancer.server.port=5984"
+  # couchdb:
+  #   container_name: couchdb
+  #   image: couchdb:latest  # TODO: ghcr.io/
+  #   restart: $BASE_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - $DOCKERDIR/appdata/couchdb:/opt/couchdb/data
+  #     - $CONFIGDIR/couchdb/local.ini:/opt/couchdb/etc/local.ini
+  #     # - $NOTESDIR:/notes
+  #   environment:
+  #     - COUCHDB_USER=admin
+  #     - COUCHDB_PASSWORD=admin
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.couchdb-rtr.entrypoints=https"
+  #     - "traefik.http.routers.couchdb-rtr.rule=Host(`couchdb.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.couchdb-rtr.middlewares=chain-couchdb@file" # NOTE: chain-authelia not working
+  #     ## HTTP Services
+  #     - "traefik.http.routers.couchdb-rtr.service=couchdb-svc"
+  #     - "traefik.http.services.couchdb-svc.loadbalancer.server.port=5984"
 
   logseq:
     container_name: logseq
@@ -118,7 +118,37 @@ services:
       - "traefik.http.routers.notes-rtr.service=notes-svc"
       - "traefik.http.services.notes-svc.loadbalancer.server.port=8080"
 
-  # obsidian:
+  obsidian:
+    container_name: obsidian
+    image: obsidian:latest
+    build:
+      context: $OBSIDIANBUILDDIR
+      dockerfile: $OBSIDIANBUILDDIR/Dockerfile
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $NOTESDIR/Markdown:/vaults
+      # - /home/law/obsidian/config:/config
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      # - DOCKER_MODS=linuxserver/mods:universal-git
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.obsidian-rtr.entrypoints=https"
+      - "traefik.http.routers.obsidian-rtr.rule=Host(`obsidian.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.obsidian-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.obsidian-rtr.service=obsidian-svc"
+      - "traefik.http.services.obsidian-svc.loadbalancer.server.port=3000"
+
+  # obsidian-remote:
   #   container_name: obsidian
   #   image: ghcr.io/sytone/obsidian-remote:latest
   #   restart: $OTHERS_RESTART_POLICY
