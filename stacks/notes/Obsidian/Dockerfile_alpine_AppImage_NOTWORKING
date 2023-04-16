@@ -1,0 +1,44 @@
+FROM ghcr.io/linuxserver/baseimage-kasmvnc:alpine317
+
+RUN \
+    apk --no-cache add \
+    # Packages needed to download and extract obsidian.
+    libgtk-3-0 \
+    libnotify4 \
+    libatspi2.0-0 \
+    libsecret-1-0 \
+    libnss3
+
+ARG OBSIDIAN_VERSION=1.1.16
+
+RUN \
+    echo "**** Download Obsidian ****" && \
+    curl -L \
+    https://github.com/obsidianmd/obsidian-releases/releases/download/v${OBSIDIAN_VERSION}/Obsidian-${OBSIDIAN_VERSION}.AppImage \
+    -o obsidian.AppImage
+
+RUN \
+    echo "**** Extract Obsidian ****" && \
+    chmod +x /obsidian.AppImage && \
+    /obsidian.AppImage --appimage-extract
+    # chown -R root:root /squashfs-root
+
+
+# RUN dl_url=$( curl -s https://api.github.com/repos/obsidianmd/obsidian-releases/releases/latest  \
+#     | grep "browser_download_url.*AppImage" | tail -n 1 | cut -d '"' -f 4 ) && \
+#     curl --location --output Obsidian.AppImage "$dl_url" && \
+#     chmod +x /Obsidian.AppImage && \
+#     /Obsidian.AppImage --appimage-extract
+
+ENV \
+    CUSTOM_PORT="3000" \
+    CUSTOM_HTTPS_PORT="3001" \
+    TITLE="Obsidian v$OBSIDIAN_VERSION" \
+    FM_HOME="/vaults"
+    # FM_HOME="/config"
+
+# add local files
+COPY /root /
+
+EXPOSE 3000
+VOLUME ["/config","/vaults"]
