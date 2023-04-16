@@ -6,8 +6,8 @@ cd $STACKS_ROOT/base
 docker compose --env-file ~/docker/configs/.env pull
 docker compose --env-file ~/docker/configs/.env up -d
 cd $STACKS_ROOT/notes
-docker compose --env-file ~/docker/configs/.env pull flatnotes obsidian
-docker compose --env-file ~/docker/configs/.env up -d flatnotes obsidian
+docker compose --env-file ~/docker/configs/.env pull flatnotes obsidian okular
+docker compose --env-file ~/docker/configs/.env up -d flatnotes obsidian okular
 cd $STACKS_ROOT/media
 docker compose --env-file ~/docker/configs/.env pull transmission jellyfin jellyseerr ytdl-sub
 docker compose --env-file ~/docker/configs/.env up -d transmission jellyfin jellyseerr ytdl-sub
