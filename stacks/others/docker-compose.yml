@@ -130,29 +130,6 @@ services:
       - "traefik.http.routers.miniflux-rtr.service=miniflux-svc"
       - "traefik.http.services.miniflux-svc.loadbalancer.server.port=8080"
 
-  # Handbrake - Video Conversion (Transcoding and compression)
-  # handbrake:
-  #   container_name: handbrake
-  #   image: jlesage/handbrake:latest
-  #   <<: *common-keys-apps # See EXTENSION FIELDS at the top
-  #   ports:
-  #     - "5801:5800"
-  #   volumes:
-  #     - $DATADIR/downloads:/data/downloads
-  #     - $DOCKERDIR/appdata/handbrake/config:/config
-  #     - $DOCKERDIR/appdata/handbrake/watch:/watch
-  #   environment:
-  #     USER_ID: $PUID
-  #     GROUP_ID: $PGID
-  #     UMASK: 002
-  #     TZ: $TZ
-  #     KEEP_APP_RUNNING: 1
-  #     CLEAN_TMP_DIR: 1
-  #     DISPLAY_WIDTH: 1600
-  #     DISPLAY_HEIGHT: 960
-  #     AUTOMATED_CONVERSION_KEEP_SOURCE: 1
-  #     VNC_PASSWORD: $HANDBRAKE_VNC_PASSWD
-
   # https://github.com/AbdBarho/stable-diffusion-webui-docker
   stable-diffusion:
     container_name: stable-diffusion

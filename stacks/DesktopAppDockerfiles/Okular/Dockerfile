@@ -7,7 +7,7 @@ COPY /root /
 ENV \
     CUSTOM_PORT="3000" \
     CUSTOM_HTTPS_PORT="3001" \
-    TITLE="Obsidian v$OBSIDIAN_VERSION" \
+    TITLE="Okular" \
     FM_HOME="/books"
 
 # add local files

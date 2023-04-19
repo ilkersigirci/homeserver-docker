@@ -379,6 +379,7 @@ services:
       - socket_proxy
     volumes:
       - $CONFIGDIR/homepage:/app/config
+      - $CONFIGDIR/homepage/icons:/app/public/icons
       - /mnt/d:/mnt/d  # NOTE: Need for Disk usage widget
     environment:
       - HOMEPAGE_VAR_DOMAINNAME=$DOMAINNAME

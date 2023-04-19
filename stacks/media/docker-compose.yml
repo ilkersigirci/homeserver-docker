@@ -741,3 +741,96 @@ services:
   #     ## HTTP Services
   #     - "traefik.http.routers.tubesync-rtr.service=tubesync-svc"
   #     - "traefik.http.services.tubesync-svc.loadbalancer.server.port=4848"
+
+  ############################### Transcode ###############################
+
+  # Handbrake - Video Conversion (Transcoding and compression)
+  # handbrake:
+  #   container_name: handbrake
+  #   image: jlesage/handbrake:latest
+  #   <<: *common-keys-apps # See EXTENSION FIELDS at the top
+  #   ports:
+  #     - "5801:5800"
+  #   volumes:
+  #     - $DATADIR/downloads:/data/downloads
+  #     - $DOCKERDIR/appdata/handbrake/config:/config
+  #     - $DOCKERDIR/appdata/handbrake/watch:/watch
+  #   environment:
+  #     USER_ID: $PUID
+  #     GROUP_ID: $PGID
+  #     UMASK: 002
+  #     TZ: $TZ
+  #     KEEP_APP_RUNNING: 1
+  #     CLEAN_TMP_DIR: 1
+  #     DISPLAY_WIDTH: 1600
+  #     DISPLAY_HEIGHT: 960
+  #     AUTOMATED_CONVERSION_KEEP_SOURCE: 1
+  #     VNC_PASSWORD: $HANDBRAKE_VNC_PASSWD
+
+  # NOTE: Not working with traefik yet
+  tdarr:
+    container_name: tdarr
+    image: ghcr.io/haveagitgat/tdarr:latest
+    restart: $MEDIA_RESTART_POLICY
+    network_mode: bridge
+    networks:
+      - t2_proxy
+    ports:
+      # - 8265:8265 # webUI port
+      - 8266:8266 # server port
+      # - 8267:8267 # Internal node port
+      # - 8268:8268 # Example extra node port
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/tdarr/server:/app/server
+      - $CONFIGDIR/tdarr:/app/configs
+      - $DOCKERDIR/logs/tdarr:/app/logs
+      - /transcode_cache:/temp
+      - $MEDIADIR/Movies_Radarr:/media
+    environment:
+      - TZ=$TZ
+      - PUID=$PUID
+      - PGID=$PGID
+      - UMASK_SET=002
+      - serverIP=0.0.0.0
+      - serverPort=8266
+      - webUIPort=8265
+      - internalNode=true
+      - inContainer=true
+      - nodeName=MyInternalNode
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.tdarr-rtr.entrypoints=https"
+      - "traefik.http.routers.tdarr-rtr.rule=Host(`tdarr.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.tdarr-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.tdarr-rtr.service=tdarr-svc"
+      - "traefik.http.services.tdarr-svc.loadbalancer.server.port=8265"
+
+  # NOTE: Not working with traefik yet
+  tdarr-node:
+    container_name: tdarr-node
+    image: ghcr.io/haveagitgat/tdarr_node:latest
+    restart: $MEDIA_RESTART_POLICY
+    network_mode: service:tdarr
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $CONFIGDIR/tdarr:/app/configs
+      - $DOCKERDIR/logs/tdarr:/app/logs
+      - /transcode_cache:/temp
+      - $MEDIADIR/Movies_Radarr:/media
+    environment:
+      - TZ=$TZ
+      - PUID=$PUID
+      - PGID=$PGID
+      - UMASK_SET=002
+      - nodeName=MainNode
+      - serverIP=0.0.0.0
+      - serverPort=8266
+      - inContainer=true
