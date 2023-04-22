@@ -94,31 +94,31 @@ services:
       - "traefik.http.routers.syncthing-rtr.service=syncthing-svc"
       - "traefik.http.services.syncthing-svc.loadbalancer.server.port=8384"
 
-  duplicati:
-    image: lscr.io/linuxserver/duplicati
-    container_name: duplicati
-    restart: $MAINTANENCE_RESTART_POLICY
-    networks:
-      - t2_proxy
-    volumes:
-      - $DOCKERDIR/appdata/duplicati:/config
-      - $BACKUPDIR:/backups
-      - $DOCKERDIR:/source
-    environment:
-      PUID: $PUID
-      PGID: $PGID
-      TZ: $TZ
-      # CLI_ARGS:
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.duplicati-rtr.entrypoints=https"
-      - "traefik.http.routers.duplicati-rtr.rule=Host(`duplicati.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.duplicati-rtr.middlewares=chain-no-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.duplicati-rtr.service=duplicati-svc"
-      - "traefik.http.services.duplicati-svc.loadbalancer.server.port=8200"
+  # duplicati:
+  #   image: lscr.io/linuxserver/duplicati
+  #   container_name: duplicati
+  #   restart: $MAINTANENCE_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   volumes:
+  #     - $DOCKERDIR/appdata/duplicati:/config
+  #     - $BACKUPDIR:/backups
+  #     - $DOCKERDIR:/source
+  #   environment:
+  #     PUID: $PUID
+  #     PGID: $PGID
+  #     TZ: $TZ
+  #     # CLI_ARGS:
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.duplicati-rtr.entrypoints=https"
+  #     - "traefik.http.routers.duplicati-rtr.rule=Host(`duplicati.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.duplicati-rtr.middlewares=chain-no-auth@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.duplicati-rtr.service=duplicati-svc"
+  #     - "traefik.http.services.duplicati-svc.loadbalancer.server.port=8200"
 
   # # Traefik Certs Dumper - Extract LetsEncrypt Certificates - Traefik2 Compatible
   # certdumper:

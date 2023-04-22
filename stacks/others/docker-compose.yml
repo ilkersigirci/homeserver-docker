@@ -165,8 +165,6 @@ services:
       ## HTTP Services
       - "traefik.http.routers.sd-rtr.service=sd-svc"
       - "traefik.http.services.sd-svc.loadbalancer.server.port=7860"
-
-
   whisper-api:
     container_name: whisper-api
     image: onerahmet/openai-whisper-asr-webservice:latest-gpu
@@ -198,6 +196,32 @@ services:
       ## HTTP Services
       - "traefik.http.routers.whisper-api-rtr.service=whisper-api-svc"
       - "traefik.http.services.whisper-api-svc.loadbalancer.server.port=9000"
+
+  darktable:
+    container_name: darktable
+    image: lscr.io/linuxserver/darktable:latest
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $MEDIADIR/Photos:/photos
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      # - DOCKER_MODS=linuxserver/mods:universal-git
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.darktable-rtr.entrypoints=https"
+      - "traefik.http.routers.darktable-rtr.rule=Host(`darktable.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.darktable-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.darktable-rtr.service=darktable-svc"
+      - "traefik.http.services.darktable-svc.loadbalancer.server.port=3000"
 
   # admin@kasm.local / admin
   # user@kasm.local

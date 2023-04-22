@@ -124,6 +124,7 @@ services:
     build:
       context: $DESKTOPAPPDOCKERFILES/Obsidian
       dockerfile: $DESKTOPAPPDOCKERFILES/Obsidian/Dockerfile
+      # dockerfile: $DESKTOPAPPDOCKERFILES/Obsidian/Dockerfile_Appimage
     restart: $OTHERS_RESTART_POLICY
     networks:
       - t2_proxy
