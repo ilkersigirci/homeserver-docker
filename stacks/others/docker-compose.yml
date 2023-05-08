@@ -225,10 +225,12 @@ services:
 
   # admin@kasm.local / admin
   # user@kasm.local
-  # NOTE: Wizard: https://<YOUR_IP_ADDRESS>:3001/
+  # NOTE: Wizard: https://<YOUR_IP_ADDRESS>:3030/
   # GPU should be disabled. Otherwise, not working.
   # To re-enable please remove the /opt/NO_WIZARD file
   # And restart the container
+
+  # Set Zone -> Proxy Port = 0 (NOT NEEDED)
   
   # Workspaces: https://<YOUR_IP_ADDRESS>:4443/
   kasm:
@@ -244,26 +246,26 @@ services:
     #   - /dev/input:/dev/input #optional
     #   - /run/udev/data:/run/udev/data #optional
     ports:
-      - 3001:3000
-      - 4443:4443
+      - 3030:3000
+      # - 4443:4443
     # expose:
     #   - 4443
     environment:
-      - KASM_PORT=4443
+      - KASM_PORT=4433
       - TZ=$TZ
-    # labels:
-    #   - "traefik.enable=true"
-    #   ## HTTP Routers
-    #   - "traefik.http.routers.kasm-rtr.entrypoints=https"
-    #   - "traefik.http.routers.kasm-rtr.rule=Host(`kasm.$DOMAINNAME`)"
-    #   ## Middlewares
-    #   - "traefik.http.routers.kasm-rtr.middlewares=chain-no-auth@file"
-    #   ## HTTP Services
-    #   - "traefik.http.routers.kasm-rtr.service=kasm-svc"
-    #   - "traefik.http.services.kasm-svc.loadbalancer.server.port=4443"
-    #   # FIXME: (Not working) https://docs.linuxserver.io/faq#strict-proxy
-    #   - traefik.http.services.kasm-svc.loadbalancer.serverstransport=ignorecert
-    #   - traefik.http.services.kasm-svc.loadbalancer.server.scheme=https
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.kasm-rtr.entrypoints=https"
+      - "traefik.http.routers.kasm-rtr.rule=Host(`kasm.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.kasm-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.kasm-rtr.service=kasm-svc"
+      - "traefik.http.services.kasm-svc.loadbalancer.server.port=4443"
+      # NOTE: https://docs.linuxserver.io/faq#strict-proxy
+      - traefik.http.services.kasm-svc.loadbalancer.serverstransport=ignorecert@file
+      - traefik.http.services.kasm-svc.loadbalancer.server.scheme=https
 
   #Expanse Tracker
   # firefly:
