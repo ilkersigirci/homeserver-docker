@@ -53,7 +53,7 @@ services:
   #     - "traefik.http.services.jellyfin-svc.loadbalancer.server.port=8096"
   
   jellyfin:
-    image: jellyfin/jellyfin:latest  # TODO: ghrc.io
+    image: jellyfin/jellyfin:latest  # TODO: ghcr.io
     container_name: jellyfin
     # cpus: "0.5"
     mem_reservation: "4096M"
@@ -86,7 +86,7 @@ services:
       - "traefik.http.services.jellyfin-svc.loadbalancer.server.port=8096"
     
   jellyseerr:
-    image: fallenbagel/jellyseerr:latest  # TODO: ghrc.io
+    image: fallenbagel/jellyseerr:latest  # TODO: ghcr.io
     container_name: jellyseerr
     restart: $MEDIA_RESTART_POLICY
     networks:
@@ -423,6 +423,80 @@ services:
   #     - "traefik.http.routers.lidarr-rtr-bypass.service=lidarr-svc"
   #     - "traefik.http.services.lidarr-svc.loadbalancer.server.port=8686"
 
+
+  # Lidarr extended - Music Management
+  lidarr-extended:
+    image: randomninjaatk/lidarr-extended:latest
+    container_name: lidarr-extended
+    restart: $MEDIA_RESTART_POLICY
+    # profiles:
+    # - media
+    networks:
+      t2_proxy:
+        ipv4_address: 192.168.90.163
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/lidarr-extended:/config
+      # Optional. See why MediaCover is mounted as volume https://github.com/htpcBeginner/docker-traefik/discussions/147
+      # - $DATADIR/lidarr/MediaCover:/config/MediaCover
+      - $MEDIADIR/Music/Lidarr/downloads:/downloads-lidarr-extended
+      - $MEDIADIR/Music/Lidarr/music:/music
+      - $MEDIADIR/Music/Lidarr/music-videos:/music-videos
+      # - "/etc/localtime:/etc/localtime:ro"
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - enableAudioScript=true
+      - enableVideoScript=false
+      - videoContainer=mp4
+      - scriptInterval=15m
+      - configureLidarrWithOptimalSettings=true
+      - searchSort=date
+      # FIXME:
+      - audioFormat=native # native
+      - audioBitrate=lossless #lossless
+      - requireQuality=true
+      - enableReplaygainTags=true
+      - audioLyricType=both
+      - dlClientSource=both
+      - arlToken=$DEEZER_ARL_TOKEN
+      - tidalCountryCode=US
+      - addDeezerTopArtists=false
+      - addDeezerTopAlbumArtists=false
+      - addDeezerTopTrackArtists=false
+      - topLimit=10
+      - addRelatedArtists=false
+      - numberOfRelatedArtistsToAddPerArtist=5
+      - lidarrSearchForMissing=true
+      - addFeaturedVideoArtists=false
+      - youtubeSubtitleLanguage=en
+      # - webHook=https://myhook.mydomain.com  # TODO: Add webhook
+      - enableQueueCleaner=true
+      - matchDistance=5
+      - enableBeetsTagging=true
+      - beetsMatchPercentage=90
+      - retryNotFound=90
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth Bypass
+      # - "traefik.http.routers.lidarr-extended-rtr-bypass.entrypoints=https"
+      # - "traefik.http.routers.lidarr-extended-rtr-bypass.rule=Host(`lidarr.$DOMAINNAME`) && (Headers(`X-Api-Key`, `$LIDARR_API_KEY`) || Query(`apikey`, `$LIDARR_API_KEY`))"
+      # - "traefik.http.routers.lidarr-extended-rtr-bypass.priority=100"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.lidarr-extended-rtr.entrypoints=https"
+      - "traefik.http.routers.lidarr-extended-rtr.rule=Host(`lidarr.$DOMAINNAME`)"
+      - "traefik.http.routers.lidarr-extended-rtr.priority=99"
+      ## Middlewares
+      # - "traefik.http.routers.lidarr-extended-rtr-bypass.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.lidarr-extended-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.lidarr-extended-rtr.service=lidarr-extended-svc"
+      - "traefik.http.routers.lidarr-extended-rtr-bypass.service=lidarr-extended-svc"
+      - "traefik.http.services.lidarr-extended-svc.loadbalancer.server.port=8686"
+
+
   # Movie management
   radarr:
     image: lscr.io/linuxserver/radarr:latest
@@ -659,6 +733,60 @@ services:
       - "traefik.http.routers.podgrab-rtr.service=podgrab-svc"
       - "traefik.http.services.podgrab-svc.loadbalancer.server.port=8080"
     
+  deemix:
+    image: registry.gitlab.com/bockiii/deemix-docker
+    container_name: deemix
+    restart: $MEDIA_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/deemix:/config # TODO: Move to config folder
+      - $MEDIADIR/Music/Deemix:/downloads
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - UMASK_SET=022
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.deemix-rtr.entrypoints=https"
+      - "traefik.http.routers.deemix-rtr.rule=Host(`deemix.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.deemix-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.deemix-rtr.service=deemix-svc"
+      - "traefik.http.services.deemix-svc.loadbalancer.server.port=6595"
+
+  beets:
+    image: lscr.io/linuxserver/beets:latest
+    container_name: beets
+    restart: $MEDIA_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      # - $CONFIGDIR/beets/config.yaml:/config/config.yaml # FIXME: not working
+      - $DOCKERDIR/appdata/beets:/config
+      - $MEDIADIR/Music/Beets_TEST/Music:/music
+      - $MEDIADIR/Music/Beets_TEST/Downloads:/downloads
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.beets-rtr.entrypoints=https"
+      - "traefik.http.routers.beets-rtr.rule=Host(`beets.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.beets-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.beets-rtr.service=beets-svc"
+      - "traefik.http.services.beets-svc.loadbalancer.server.port=8337"
 
   # stremio:
   #   image: sleeyax/stremio-streaming-server:latest
@@ -768,69 +896,69 @@ services:
   #     VNC_PASSWORD: $HANDBRAKE_VNC_PASSWD
 
   # NOTE: Not working with traefik yet
-  tdarr:
-    container_name: tdarr
-    image: ghcr.io/haveagitgat/tdarr:latest
-    restart: $MEDIA_RESTART_POLICY
-    network_mode: bridge
-    networks:
-      - t2_proxy
-    ports:
-      # - 8265:8265 # webUI port
-      - 8266:8266 # server port
-      # - 8267:8267 # Internal node port
-      # - 8268:8268 # Example extra node port
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - $DOCKERDIR/appdata/tdarr/server:/app/server
-      - $CONFIGDIR/tdarr:/app/configs
-      - $DOCKERDIR/logs/tdarr:/app/logs
-      - /transcode_cache:/temp
-      - $MEDIADIR/Movies_Radarr:/media
-    environment:
-      - TZ=$TZ
-      - PUID=$PUID
-      - PGID=$PGID
-      - UMASK_SET=002
-      - serverIP=0.0.0.0
-      - serverPort=8266
-      - webUIPort=8265
-      - internalNode=true
-      - inContainer=true
-      - nodeName=MyInternalNode
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.tdarr-rtr.entrypoints=https"
-      - "traefik.http.routers.tdarr-rtr.rule=Host(`tdarr.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.tdarr-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.tdarr-rtr.service=tdarr-svc"
-      - "traefik.http.services.tdarr-svc.loadbalancer.server.port=8265"
+  # tdarr:
+  #   container_name: tdarr
+  #   image: ghcr.io/haveagitgat/tdarr:latest
+  #   restart: $MEDIA_RESTART_POLICY
+  #   # network_mode: bridge
+  #   networks:
+  #     - t2_proxy
+  #   ports:
+  #     # - 8265:8265 # webUI port
+  #     - 8266:8266 # server port
+  #     # - 8267:8267 # Internal node port
+  #     # - 8268:8268 # Example extra node port
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - $DOCKERDIR/appdata/tdarr/server:/app/server
+  #     - $CONFIGDIR/tdarr:/app/configs
+  #     - $DOCKERDIR/logs/tdarr:/app/logs
+  #     - /transcode_cache:/temp
+  #     - $MEDIADIR/Movies_Radarr:/media
+  #   environment:
+  #     - TZ=$TZ
+  #     - PUID=$PUID
+  #     - PGID=$PGID
+  #     - UMASK_SET=002
+  #     - serverIP=0.0.0.0
+  #     - serverPort=8266
+  #     - webUIPort=8265
+  #     - internalNode=true
+  #     - inContainer=true
+  #     - nodeName=MyInternalNode
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.tdarr-rtr.entrypoints=https"
+  #     - "traefik.http.routers.tdarr-rtr.rule=Host(`tdarr.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.tdarr-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.tdarr-rtr.service=tdarr-svc"
+  #     - "traefik.http.services.tdarr-svc.loadbalancer.server.port=8265"
 
-  # NOTE: Not working with traefik yet
-  tdarr-node:
-    container_name: tdarr-node
-    image: ghcr.io/haveagitgat/tdarr_node:latest
-    restart: $MEDIA_RESTART_POLICY
-    network_mode: service:tdarr
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - $CONFIGDIR/tdarr:/app/configs
-      - $DOCKERDIR/logs/tdarr:/app/logs
-      - /transcode_cache:/temp
-      - $MEDIADIR/Movies_Radarr:/media
-    environment:
-      - TZ=$TZ
-      - PUID=$PUID
-      - PGID=$PGID
-      - UMASK_SET=002
-      - nodeName=MainNode
-      - serverIP=0.0.0.0
-      - serverPort=8266
-      - inContainer=true
+  # # NOTE: Not working with traefik yet
+  # tdarr-node:
+  #   container_name: tdarr-node
+  #   image: ghcr.io/haveagitgat/tdarr_node:latest
+  #   restart: $MEDIA_RESTART_POLICY
+  #   network_mode: service:tdarr
+  #   # networks:
+  #   #   - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - $CONFIGDIR/tdarr:/app/configs
+  #     - $DOCKERDIR/logs/tdarr:/app/logs
+  #     - /transcode_cache:/temp
+  #     - $MEDIADIR/Movies_Radarr:/media
+  #   environment:
+  #     - TZ=$TZ
+  #     - PUID=$PUID
+  #     - PGID=$PGID
+  #     - UMASK_SET=002
+  #     - nodeName=MainNode
+  #     - serverIP=0.0.0.0
+  #     - serverPort=8266
+  #     - inContainer=true

@@ -223,16 +223,6 @@ services:
       - "traefik.http.routers.darktable-rtr.service=darktable-svc"
       - "traefik.http.services.darktable-svc.loadbalancer.server.port=3000"
 
-  # admin@kasm.local / admin
-  # user@kasm.local
-  # NOTE: Wizard: https://<YOUR_IP_ADDRESS>:3030/
-  # GPU should be disabled. Otherwise, not working.
-  # To re-enable please remove the /opt/NO_WIZARD file
-  # And restart the container
-
-  # Set Zone -> Proxy Port = 0 (NOT NEEDED)
-  
-  # Workspaces: https://<YOUR_IP_ADDRESS>:4443/
   kasm:
     container_name: kasm
     image: lscr.io/linuxserver/kasm:latest
@@ -266,6 +256,36 @@ services:
       # NOTE: https://docs.linuxserver.io/faq#strict-proxy
       - traefik.http.services.kasm-svc.loadbalancer.serverstransport=ignorecert@file
       - traefik.http.services.kasm-svc.loadbalancer.server.scheme=https
+
+  ## TODO: Not Complete
+  ## TODO: Is it possible only run kasmvnc as a server without kasmweb ui?
+  ## echo -n "kasm_user:yourmostawesomepasswordhere" | base64
+  ## a2FzbV91c2VyOnlvdXJtb3N0YXdlc29tZXBhc3N3b3JkaGVyZQ==
+  # kasmvnc:
+  #   container_name: kasmvnc
+  #   image: kasmweb/desktop::latest
+  #   restart: $OTHERS_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   # volumes:
+  #     # - $DOCKERDIR/appdata/kasmvnc:/TODO
+  #   environment:
+  #     - VNC_PW=yourmostawesomepasswordhere
+  #     - TZ=$TZ
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.kasmvnc-rtr.entrypoints=https"
+  #     - "traefik.http.routers.kasmvnc-rtr.rule=Host(`kasmvnc.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.kasmvnc-rtr.middlewares=chain-no-auth@file"
+  #     - "traefik.http.middlewares.kasmauth.headers.customrequestheaders.Authorization=Basic a2FzbV91c2VyOnlvdXJtb3N0YXdlc29tZXBhc3N3b3JkaGVyZQ=="
+  #     ## HTTP Services
+  #     - "traefik.http.routers.kasmvnc-rtr.service=kasmvnc-svc"
+  #     - "traefik.http.services.kasmvnc-svc.loadbalancer.server.port=6901"
+  #     # NOTE: https://docs.linuxserver.io/faq#strict-proxy
+  #     # - traefik.http.services.kasmvnc-svc.loadbalancer.serverstransport=ignorecert@file
+  #     # - traefik.http.services.kasmvnc-svc.loadbalancer.server.scheme=https
 
   #Expanse Tracker
   # firefly:

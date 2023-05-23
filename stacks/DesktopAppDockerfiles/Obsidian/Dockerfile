@@ -18,7 +18,7 @@ RUN \
         /var/tmp/* \
         /tmp/*
 
-ARG OBSIDIAN_VERSION=1.1.16
+ARG OBSIDIAN_VERSION=1.2.8
 
 RUN dl_url="https://github.com/obsidianmd/obsidian-releases/releases/download/v${OBSIDIAN_VERSION}/obsidian_${OBSIDIAN_VERSION}_amd64.deb" && \
     curl --location --output obsidian.deb "$dl_url" && \
@@ -27,7 +27,8 @@ RUN dl_url="https://github.com/obsidianmd/obsidian-releases/releases/download/v$
 ENV \
     CUSTOM_PORT="3000" \
     CUSTOM_HTTPS_PORT="3001" \
-    TITLE="Obsidian v$OBSIDIAN_VERSION" \
+    TITLE="Obsidian" \
+    # TITLE="Obsidian v$OBSIDIAN_VERSION" \
     FM_HOME="/vaults"
     # FM_HOME="/config"
 

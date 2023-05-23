@@ -136,28 +136,28 @@ services:
       - "traefik.http.routers.immich-rtr.service=immich-svc"
       - "traefik.http.services.immich-svc.loadbalancer.server.port=3000"
 
-  # immich-machine-learning:
-  #   container_name: immich-machine-learning
-  #   image: ghcr.io/immich-app/immich-machine-learning:release
-  #   restart: $MEDIA_RESTART_POLICY
-  #   networks:
-  #     - t2_proxy
-  #   volumes:
-  #     - $DOCKERDIR/appdata/immich-ml/model-cache:/cache
-  #     - ${ORIGINAL_UPLOAD_LOCATION}:/usr/src/app/upload
-  #     # - ${ORIGINAL_UPLOAD_LOCATION}/library:/usr/src/app/upload/library
-  #     - ${GENERATED_UPLOAD_LOCATION}/thumbs:/usr/src/app/upload/thumbs
-  #     # - ${GENERATED_UPLOAD_LOCATION}/profile:/usr/src/app/upload/profile
-  #     # - ${GENERATED_UPLOAD_LOCATION}/encoded-videos:/usr/src/app/upload/encoded-videos
-  #     ## - ${GENERATED_UPLOAD_LOCATION}/upload:/usr/src/app/upload/upload
-  #   env_file:
-  #     - .env
-  #   environment:
-  #     NODE_ENV: production
-  #   deploy:
-  #     resources:
-  #       reservations:
-  #         devices:
-  #           - driver: nvidia
-  #             count: 1
-  #             capabilities: [gpu]
+  immich-machine-learning:
+    container_name: immich-machine-learning
+    image: ghcr.io/immich-app/immich-machine-learning:release
+    restart: $MEDIA_RESTART_POLICY
+    networks:
+      - t2_proxy
+    volumes:
+      - $DOCKERDIR/appdata/immich-ml/model-cache:/cache
+      - ${ORIGINAL_UPLOAD_LOCATION}:/usr/src/app/upload
+      # - ${ORIGINAL_UPLOAD_LOCATION}/library:/usr/src/app/upload/library
+      - ${GENERATED_UPLOAD_LOCATION}/thumbs:/usr/src/app/upload/thumbs
+      # - ${GENERATED_UPLOAD_LOCATION}/profile:/usr/src/app/upload/profile
+      # - ${GENERATED_UPLOAD_LOCATION}/encoded-videos:/usr/src/app/upload/encoded-videos
+      ## - ${GENERATED_UPLOAD_LOCATION}/upload:/usr/src/app/upload/upload
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: production
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

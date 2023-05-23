@@ -5,12 +5,9 @@ STACKS_ROOT=~/docker/stacks
 cd $STACKS_ROOT/base
 docker compose --env-file ~/docker/configs/.env pull
 docker compose --env-file ~/docker/configs/.env up -d
-cd $STACKS_ROOT/notes
-docker compose --env-file ~/docker/configs/.env pull flatnotes obsidian okular
-docker compose --env-file ~/docker/configs/.env up -d flatnotes obsidian okular
 cd $STACKS_ROOT/media
-docker compose --env-file ~/docker/configs/.env pull transmission jellyfin jellyseerr ytdl-sub
-docker compose --env-file ~/docker/configs/.env up -d transmission jellyfin jellyseerr ytdl-sub
+docker compose --env-file ~/docker/configs/.env pull transmission jellyfin ytdl-sub deemix beets
+docker compose --env-file ~/docker/configs/.env up -d transmission jellyfin ytdl-sub deemix beets
 # cd $STACKS_ROOT/others
 # docker compose --env-file ~/docker/configs/.env pull stable-diffusion
 # docker compose --env-file ~/docker/configs/.env up -d stable-diffusion
@@ -23,5 +20,11 @@ docker compose --env-file ~/docker/configs/.env up -d glances
 cd $STACKS_ROOT/photo
 docker compose pull
 docker compose up -d
+cd $STACKS_ROOT/notes
+docker pull ghcr.io/linuxserver/baseimage-kasmvnc:alpine317
+docker pull ghcr.io/linuxserver/baseimage-kasmvnc:debianbullseye
+docker compose --env-file ~/docker/configs/.env build obsidian okular
+docker compose --env-file ~/docker/configs/.env pull flatnotes
+docker compose --env-file ~/docker/configs/.env up -d flatnotes obsidian okular
 
 docker image prune --all --force
