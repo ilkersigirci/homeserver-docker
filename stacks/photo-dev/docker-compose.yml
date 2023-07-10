@@ -28,6 +28,7 @@ services:
       POSTGRES_DB: ${DB_DATABASE_NAME}
       PG_DATA: /var/lib/postgresql/data
 
+  # NOTE: Change `TYPESENSE_HOST` env variable accordingly
   immich-typesense-dev:
     container_name: immich-typesense-dev
     image: typesense/typesense:0.24.0

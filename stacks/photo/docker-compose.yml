@@ -28,14 +28,14 @@ services:
       POSTGRES_DB: ${DB_DATABASE_NAME}
       PG_DATA: /var/lib/postgresql/data
 
-  # NOTE: When renaming to immich-typesense, it is not working
-  typesense:
-    container_name: typesense
+  # NOTE: Change `TYPESENSE_HOST` env variable accordingly
+  immich-typesense:
+    container_name: immich-typesense
     image: typesense/typesense:0.24.0
     networks:
       - t2_proxy
     volumes:
-      - $DOCKERDIR/appdata/typesense:/data
+      - $DOCKERDIR/appdata/immich-typesense:/data
     environment:
       - TYPESENSE_API_KEY=${TYPESENSE_API_KEY}
       - TYPESENSE_DATA_DIR=/data
@@ -50,16 +50,14 @@ services:
     depends_on:
       - immich-redis
       - immich-postgres
-      - typesense
+      - immich-typesense
     networks:
       - t2_proxy
     volumes:
-      - ${ORIGINAL_UPLOAD_LOCATION}:/usr/src/app/upload
-      # - ${ORIGINAL_UPLOAD_LOCATION}/library:/usr/src/app/upload/library
+      - ${ORIGINAL_UPLOAD_LOCATION}/library:/usr/src/app/upload/library
       - ${GENERATED_UPLOAD_LOCATION}/thumbs:/usr/src/app/upload/thumbs
-      # - ${GENERATED_UPLOAD_LOCATION}/profile:/usr/src/app/upload/profile
-      # - ${GENERATED_UPLOAD_LOCATION}/encoded-videos:/usr/src/app/upload/encoded-videos
-      ## - ${GENERATED_UPLOAD_LOCATION}/upload:/usr/src/app/upload/upload
+      - ${GENERATED_UPLOAD_LOCATION}/profile:/usr/src/app/upload/profile
+      - ${GENERATED_UPLOAD_LOCATION}/encoded-videos:/usr/src/app/upload/encoded-videos
       # - ${MEDIADIR}/Photos:/imported_photos:ro
       - ${MEDIADIR}/Photos:/mnt/d/Media/Photos:ro
     env_file:
@@ -87,16 +85,14 @@ services:
     depends_on:
       - immich-redis
       - immich-postgres
-      - typesense
+      - immich-typesense
     networks:
       - t2_proxy
     volumes:
-      - ${ORIGINAL_UPLOAD_LOCATION}:/usr/src/app/upload
-      # - ${ORIGINAL_UPLOAD_LOCATION}/library:/usr/src/app/upload/library
+      - ${ORIGINAL_UPLOAD_LOCATION}/library:/usr/src/app/upload/library
       - ${GENERATED_UPLOAD_LOCATION}/thumbs:/usr/src/app/upload/thumbs
-      # - ${GENERATED_UPLOAD_LOCATION}/profile:/usr/src/app/upload/profile
-      # - ${GENERATED_UPLOAD_LOCATION}/encoded-videos:/usr/src/app/upload/encoded-videos
-      ## - ${GENERATED_UPLOAD_LOCATION}/upload:/usr/src/app/upload/upload
+      - ${GENERATED_UPLOAD_LOCATION}/profile:/usr/src/app/upload/profile
+      - ${GENERATED_UPLOAD_LOCATION}/encoded-videos:/usr/src/app/upload/encoded-videos
       # - ${MEDIADIR}/Photos:/imported_photos:ro
       - ${MEDIADIR}/Photos:/mnt/d/Media/Photos:ro
     env_file:
@@ -143,12 +139,10 @@ services:
       - t2_proxy
     volumes:
       - $DOCKERDIR/appdata/immich-ml/model-cache:/cache
-      - ${ORIGINAL_UPLOAD_LOCATION}:/usr/src/app/upload
-      # - ${ORIGINAL_UPLOAD_LOCATION}/library:/usr/src/app/upload/library
+      - ${ORIGINAL_UPLOAD_LOCATION}/library:/usr/src/app/upload/library
       - ${GENERATED_UPLOAD_LOCATION}/thumbs:/usr/src/app/upload/thumbs
-      # - ${GENERATED_UPLOAD_LOCATION}/profile:/usr/src/app/upload/profile
-      # - ${GENERATED_UPLOAD_LOCATION}/encoded-videos:/usr/src/app/upload/encoded-videos
-      ## - ${GENERATED_UPLOAD_LOCATION}/upload:/usr/src/app/upload/upload
+      - ${GENERATED_UPLOAD_LOCATION}/profile:/usr/src/app/upload/profile
+      - ${GENERATED_UPLOAD_LOCATION}/encoded-videos:/usr/src/app/upload/encoded-videoss
     env_file:
       - .env
     environment:
