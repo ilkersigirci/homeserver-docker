@@ -20,6 +20,8 @@ docker compose --env-file ~/docker/configs/.env up -d glances
 cd $STACKS_ROOT/photo
 docker compose pull
 docker compose up -d
+cd $STACKS_ROOT/photo-dev
+docker compose up -d
 cd $STACKS_ROOT/notes
 docker pull ghcr.io/linuxserver/baseimage-kasmvnc:alpine317
 docker pull ghcr.io/linuxserver/baseimage-kasmvnc:debianbullseye

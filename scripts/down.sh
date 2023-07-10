@@ -16,3 +16,5 @@ cd $STACKS_ROOT/monitoring
 docker compose --env-file ~/docker/configs/.env down --volumes --remove-orphans
 cd $STACKS_ROOT/photo
 docker compose down --volumes --remove-orphans
+cd $STACKS_ROOT/photo-dev
+docker compose down --volumes --remove-orphans

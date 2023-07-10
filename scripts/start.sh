@@ -14,5 +14,7 @@ cd $STACKS_ROOT/monitoring
 docker compose --env-file ~/docker/configs/.env up -d glances
 cd $STACKS_ROOT/photo
 docker compose up -d
+cd $STACKS_ROOT/photo-dev
+docker compose up -d
 cd $STACKS_ROOT/notes
-docker compose --env-file ~/docker/configs/.env up -d flatnotes obsidian okular # couchdb 
+docker compose --env-file ~/docker/configs/.env up -d flatnotes obsidian okular couchdb
