@@ -94,6 +94,89 @@ services:
       - "traefik.http.routers.syncthing-rtr.service=syncthing-svc"
       - "traefik.http.services.syncthing-svc.loadbalancer.server.port=8384"
 
+  czkawka:
+    container_name: czkawka
+    image: jlesage/czkawka:latest
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/czkawka:/config:rw
+      - $MEDIADIR/Photos/Pictures:/storage:rw
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - DARK_MODE=1
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.czkawka-rtr.entrypoints=https"
+      - "traefik.http.routers.czkawka-rtr.rule=Host(`czkawka.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.czkawka-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.czkawka-rtr.service=czkawka-svc"
+      - "traefik.http.services.czkawka-svc.loadbalancer.server.port=5800"
+
+  sshwifty:
+    container_name: sshwifty
+    image: niruix/sshwifty:latest
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    # volumes:
+    #   - $DOCKERDIR/appdata/czkawka:/config:rw
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.sshwifty-rtr.entrypoints=https"
+      - "traefik.http.routers.sshwifty-rtr.rule=Host(`ssh.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.sshwifty-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.sshwifty-rtr.service=sshwifty-svc"
+      - "traefik.http.services.sshwifty-svc.loadbalancer.server.port=8182"
+
+  ############################### RESTIC #######################################
+
+  # TODO: https://github.com/djmaze/resticker/
+  restic-backup:
+    container_name: restic-backup
+    image: mazzolino/restic:latest
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/czkawka:/config:rw
+      - $MEDIADIR/Photos/Pictures:/storage:rw
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.czkawka-rtr.entrypoints=https"
+      - "traefik.http.routers.czkawka-rtr.rule=Host(`czkawka.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.czkawka-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.czkawka-rtr.service=czkawka-svc"
+      - "traefik.http.services.czkawka-svc.loadbalancer.server.port=5800"
+
+  ############################### RESTIC #######################################
+
   # duplicati:
   #   image: lscr.io/linuxserver/duplicati
   #   container_name: duplicati
@@ -166,7 +249,6 @@ services:
   #     # Add hosts specified in rules here to force cf-companion to create the CNAMEs
   #     # Since cf-companion creates CNAMEs based on host rules, this a workaround for non-docker/external apps
   #     - "traefik.http.routers.cf-companion-rtr.rule=Host(`mox.$DOMAINNAME`) || Host(`pwt.$DOMAINNAME`) || Host(`webmin.$DOMAINNAME`) || Host(`shell.$DOMAINNAME`)"
-
 
   # watchtower:
   #   image: containrrr/watchtower

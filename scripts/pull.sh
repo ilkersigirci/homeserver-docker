@@ -12,8 +12,8 @@ docker compose --env-file ~/docker/configs/.env up -d transmission jellyfin ytdl
 # docker compose --env-file ~/docker/configs/.env pull stable-diffusion
 # docker compose --env-file ~/docker/configs/.env up -d stable-diffusion
 cd $STACKS_ROOT/maintanence
-docker compose --env-file ~/docker/configs/.env pull code-server
-docker compose --env-file ~/docker/configs/.env up -d code-server
+docker compose --env-file ~/docker/configs/.env pull sshwifty code-server czkawka
+docker compose --env-file ~/docker/configs/.env up -d sshwifty code-server czkawka
 cd $STACKS_ROOT/monitoring
 docker compose --env-file ~/docker/configs/.env pull glances
 docker compose --env-file ~/docker/configs/.env up -d glances
