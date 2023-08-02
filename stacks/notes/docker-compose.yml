@@ -209,6 +209,7 @@ services:
   #     - "traefik.http.routers.obsidian-rtr.service=obsidian-svc"
   #     - "traefik.http.services.obsidian-svc.loadbalancer.server.port=8080"
 
+  # NOTE: Recent file location: /config/.local/share/okular/docdata/
   okular:
     container_name: okular
     image: okular:latest
@@ -221,7 +222,9 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
+      - $DOCKERDIR/appdata/okular:/config
       - $MEDIADIR/Books:/books
+      - $HARDDISKROOTDIR/School/Thesis/Papers:/thesis
     environment:
       - PUID=$PUID
       - PGID=$PGID

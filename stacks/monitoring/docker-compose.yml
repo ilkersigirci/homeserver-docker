@@ -12,6 +12,9 @@ networks:
     ipam:
       config:
         - subnet: 192.168.92.0/24
+  # hostnet:
+  #   external: true
+  #   name: host
 
 volumes:
   netdataconfig:
@@ -19,29 +22,39 @@ volumes:
   netdatacache:
 
 services:
-  # Glances - System Information
+  # FIXME: To show wifi network usage, we need `network_mode: host`. But this way, we can't use traefik.
   glances:
-    image: nicolargo/glances:latest # latest-full  # TODO: ghcr.io/
+    image: nicolargo/glances:latest-full # latest  # TODO: ghcr.io/
     container_name: glances
     restart: $MAINTANENCE_RESTART_POLICY
-    # network_mode: host
-    networks:
-      - t2_proxy
-      - socket_proxy
-      - monitoring
-    security_opt:
-      - no-new-privileges:true
+    network_mode: host
+    # networks:
+    #   - t2_proxy
+    #   - socket_proxy
+    #   - monitoring
+      # - hostnet
+    privileged: true
+    # security_opt:
+    #   - no-new-privileges:true
     pid: host
     volumes:
-      # - $CONFIGDIR/glances/glances.conf:/glances/conf/glances.conf # Use this if you want to add a glances.conf file
       - $USERDIR:/data/home:ro
+      # - $CONFIGDIR/glances/glances.conf:/glances/conf/glances.conf # Use this if you want to add a glances.conf file
       # - /media/data:/data/data:ro
       # - /var/run/docker.sock:/var/run/docker.sock:ro # Use Docker Socket Proxy instead for improved security
     environment:
+      GLANCES_OPT: "-w"
+      DOCKER_HOST: /var/run/docker.sock:/var/run/docker.sock:ro
+      # DOCKER_HOST: tcp://socket-proxy:2375
       # GLANCES_OPT: "-C /glances/conf/glances.conf --quiet --export influxdb"
       # GLANCES_OPT: "--export influxdb"
-      GLANCES_OPT: "-w"
-      DOCKER_HOST: tcp://socket-proxy:2375
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

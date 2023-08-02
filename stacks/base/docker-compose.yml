@@ -109,7 +109,9 @@ services:
       t2_proxy:
         ipv4_address: 192.168.90.254 # You can specify a static IP
       socket_proxy:
-      # nextcloud:
+    # NOTE: To Access Docker Containers that run on Host Network. Is this working?
+    # extra_hosts:
+    #   - host.docker.internal:172.17.0.1
     security_opt:
       - no-new-privileges:true
     #healthcheck:
@@ -388,6 +390,7 @@ services:
       - HOMEPAGE_VAR_IMMICHDEV_API_KEY=$IMMICHDEV_API_KEY
       - HOMEPAGE_VAR_TAILSCALE_KEY=$TAILSCALE_KEY
       - HOMEPAGE_VAR_TAILSCALE_HOMESERVER_ID=$TAILSCALE_HOMESERVER_ID
+      - HOMEPAGE_VAR_HOMESERVER_LOCAL_STATIC_IP=$HOMESERVER_LOCAL_STATIC_IP
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
