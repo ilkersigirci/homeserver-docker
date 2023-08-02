@@ -134,7 +134,7 @@ services:
   stable-diffusion:
     container_name: stable-diffusion
     build: $STABLEDIFFUSIONDIR/services/AUTOMATIC1111
-    image: sd-auto:49
+    image: stablediff-auto:49
     restart: $OTHERS_RESTART_POLICY
     stop_signal: SIGINT
     networks:
@@ -158,13 +158,57 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.sd-rtr.entrypoints=https"
-      - "traefik.http.routers.sd-rtr.rule=Host(`sd.$DOMAINNAME`)"
+      - "traefik.http.routers.stablediff-rtr.entrypoints=https"
+      - "traefik.http.routers.stablediff-rtr.rule=Host(`stablediff.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.sd-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.stablediff-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
-      - "traefik.http.routers.sd-rtr.service=sd-svc"
-      - "traefik.http.services.sd-svc.loadbalancer.server.port=7860"
+      - "traefik.http.routers.stablediff-rtr.service=stablediff-svc"
+      - "traefik.http.services.stablediff-svc.loadbalancer.server.port=7860"
+
+  # NOTE: Not completed yet !!!
+  # https://github.com/Atinoda/text-generation-webui-docker
+  text-generation:
+    container_name: text-generation
+    image: atinoda/text-generation-webui:default
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t2_proxy
+    volumes:
+      - $TEXTGENERATIONDIR/config/characters:/app/characters
+      - $TEXTGENERATIONDIR/config/loras:/app/loras
+      - $TEXTGENERATIONDIR/config/models:/app/models
+      - $TEXTGENERATIONDIR/config/presets:/app/presets
+      - $TEXTGENERATIONDIR/config/prompts:/app/prompts
+      - $TEXTGENERATIONDIR/config/training:/app/training
+#      - $TEXTGENERATIONDIR/config/extensions:/app/extensions  # Persist all extensions
+#      - $TEXTGENERATIONDIR/config/extensions/silero_tts:/app/extensions/silero_tts  # Persist a single extension
+    environment:
+      - EXTRA_LAUNCH_ARGS="--listen --verbose --model MODEL_NAME" # Custom launch args (e.g., --model MODEL_NAME)
+#      - BUILD_EXTENSIONS_LIVE="silero_tts whisper_stt" # Install named extensions during every container launch. THIS WILL SIGNIFICANLTLY SLOW LAUNCH TIME.
+    logging:
+      driver:  json-file
+      options:
+        max-file: "3"   # number of files or file count
+        max-size: '10m'
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: [ '0' ]
+              capabilities: [ gpu ]
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.textgen-rtr.entrypoints=https"
+      - "traefik.http.routers.textgen-rtr.rule=Host(`textgen.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.textgen-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.textgen-rtr.service=textgen-svc"
+      - "traefik.http.services.textgen-svc.loadbalancer.server.port=7860"
+  
   whisper-api:
     container_name: whisper-api
     image: onerahmet/openai-whisper-asr-webservice:latest-gpu
