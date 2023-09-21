@@ -23,8 +23,9 @@ volumes:
 
 services:
   # FIXME: To show wifi network usage, we need `network_mode: host`. But this way, we can't use traefik.
+  # NOTE: latest-full doesn't show GPU
   glances:
-    image: nicolargo/glances:latest-full # latest  # TODO: ghcr.io/
+    image: nicolargo/glances:ubuntu-latest-full
     container_name: glances
     restart: $MAINTANENCE_RESTART_POLICY
     network_mode: host
@@ -38,16 +39,14 @@ services:
     #   - no-new-privileges:true
     pid: host
     volumes:
-      - $USERDIR:/data/home:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro # FIXME: Use Docker Socket Proxy instead for improved security
       # - $CONFIGDIR/glances/glances.conf:/glances/conf/glances.conf # Use this if you want to add a glances.conf file
-      # - /media/data:/data/data:ro
-      # - /var/run/docker.sock:/var/run/docker.sock:ro # Use Docker Socket Proxy instead for improved security
+      - $USERDIR:/data/home:ro
     environment:
-      GLANCES_OPT: "-w"
+      TZ: "${TZ}"
       DOCKER_HOST: /var/run/docker.sock:/var/run/docker.sock:ro
       # DOCKER_HOST: tcp://socket-proxy:2375
-      # GLANCES_OPT: "-C /glances/conf/glances.conf --quiet --export influxdb"
-      # GLANCES_OPT: "--export influxdb"
+      GLANCES_OPT: "-w" # "-C /glances/conf/glances.conf --export influxdb"
     deploy:
       resources:
         reservations:
