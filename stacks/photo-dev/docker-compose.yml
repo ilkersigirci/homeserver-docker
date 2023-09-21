@@ -58,8 +58,8 @@ services:
       - ${GENERATED_UPLOAD_LOCATION}/thumbs:/usr/src/app/upload/thumbs
       - ${GENERATED_UPLOAD_LOCATION}/profile:/usr/src/app/upload/profile
       - ${GENERATED_UPLOAD_LOCATION}/encoded-videos:/usr/src/app/upload/encoded-videos
-      # - ${MEDIADIR}/Photos:/imported_photos:ro
-      - ${MEDIADIR}/Photos:/mnt/d/Media/Photos:ro
+      - ${MEDIADIR}/Photos/Pictures:/mnt/media/Photos/Pictures:ro
+      - ${MEDIADIR}/Photos/Videos:/mnt/media/Photos/Videos:ro
     env_file:
       - .env
     environment:
@@ -93,22 +93,12 @@ services:
       - ${GENERATED_UPLOAD_LOCATION}/thumbs:/usr/src/app/upload/thumbs
       - ${GENERATED_UPLOAD_LOCATION}/profile:/usr/src/app/upload/profile
       - ${GENERATED_UPLOAD_LOCATION}/encoded-videos:/usr/src/app/upload/encoded-videos
-      # - ${MEDIADIR}/Photos:/imported_photos:ro
-      - ${MEDIADIR}/Photos:/mnt/d/Media/Photos:ro
+      - ${MEDIADIR}/Photos/Pictures:/mnt/media/Photos/Pictures:ro
+      - ${MEDIADIR}/Photos/Videos:/mnt/media/Photos/Videos:ro
     env_file:
       - .env
     environment:
       NODE_ENV: production
-    # labels:
-    #   - "traefik.enable=true"
-    #   ## HTTP Routers
-    #   - "traefik.http.routers.immich-microservices.entrypoints=https"
-    #   - "traefik.http.routers.immich-microservices.rule=Host(`immich-mc.$DOMAINNAME`)"
-    #   ## Middlewares
-    #   # - "traefik.http.routers.immich-microservices.middlewares=chain-authelia@file"
-    #   ## HTTP Services
-    #   # - "traefik.http.routers.immich-microservices.service=immich-microservices-svc"
-    #   - "traefik.http.services.immich-microservices-svc.loadbalancer.server.port=3001"
 
   immich-web-dev:
     container_name: immich-web-dev
@@ -139,10 +129,6 @@ services:
       - t2_proxy
     volumes:
       - $DOCKERDIR/appdata/immich-ml-dev/model-cache:/cache
-      - ${ORIGINAL_UPLOAD_LOCATION}/library:/usr/src/app/upload/library
-      - ${GENERATED_UPLOAD_LOCATION}/thumbs:/usr/src/app/upload/thumbs
-      - ${GENERATED_UPLOAD_LOCATION}/profile:/usr/src/app/upload/profile
-      - ${GENERATED_UPLOAD_LOCATION}/encoded-videos:/usr/src/app/upload/encoded-videos
     env_file:
       - .env
     environment:
