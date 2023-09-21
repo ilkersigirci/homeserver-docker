@@ -8,7 +8,6 @@ networks:
     external: true
 
 services:
-  # Linuxserver
   code-server:
     image: lscr.io/linuxserver/code-server
     container_name: code-server
@@ -17,7 +16,7 @@ services:
       - t2_proxy
     volumes:
       - $DOCKERDIR/appdata/code-server:/config
-      # - $DOCKERDIR:/config/workspace/docker
+      - $DOCKERDIR:/config/workspace/docker
       - $NOTESDIR:/config/workspace/notes
     environment:
       PUID: $PUID
@@ -41,27 +40,37 @@ services:
       - "traefik.http.routers.code-server-rtr.service=code-server-svc"
       - "traefik.http.services.code-server-svc.loadbalancer.server.port=8443"
 
-  # OpenVscode - Gitpod
-  # openvscode:
-  #   image: gitpod/openvscode-server
-  #   container_name: openvscode
-  #   restart: $MAINTANENCE_RESTART_POLICY
-  #   networks:
-  #     - t2_proxy
-  #   volumes:
-  #     - $DOCKERDIR/appdata/openvscode:/home/workspace:cached
-  # #      - $DOCKERDIR:/home/workspace/docker:cached
-  # #      - $NOTESDIR:/home/workspace/notes:cached
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.openvscode-rtr.entrypoints=https"
-  #     - "traefik.http.routers.openvscode-rtr.rule=Host(`code.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.openvscode-rtr.middlewares=chain-authelia@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.openvscode-rtr.service=openvscode-svc"
-  #     - "traefik.http.services.openvscode-svc.loadbalancer.server.port=3000"
+  vscodium:
+    image: lscr.io/linuxserver/vscodium:latest
+    container_name: vscodium
+    restart: $MAINTANENCE_RESTART_POLICY
+    security_opt:
+      - no-new-privileges:true
+    # cap_add:
+    #   - IPC_LOCK
+    # shm_size: "1gb"
+    networks:
+      - t2_proxy
+    volumes:
+      - $DOCKERDIR/appdata/vscodium:/config
+      - $DOCKERDIR:/config/workspace/docker
+      - $NOTESDIR:/config/workspace/notes
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.vscodium-rtr.entrypoints=https"
+      - "traefik.http.routers.vscodium-rtr.rule=Host(`vscodium.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.vscodium-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.vscodium-rtr.service=vscodium-svc"
+      - "traefik.http.services.vscodium-svc.loadbalancer.server.port=3000"
+
+  
   syncthing:
     container_name: syncthing
     image: linuxserver/syncthing:latest
