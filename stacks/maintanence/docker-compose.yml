@@ -8,6 +8,105 @@ networks:
     external: true
 
 services:
+  watchtower:
+    image: ghcr.io/containrrr/watchtower:latest
+    container_name: watchtower
+    restart: $MAINTANENCE_RESTART_POLICY
+    # privileged: true
+    networks:
+      - t2_proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      TZ: $TZ
+      # WATCHTOWER_RUN_ONCE: "true"
+      # DOCKER_HOST: tcp://socket-proxy:2375 # FIXME: Server misbehaving
+      DOCKER_API_VERSION: "1.43"
+      WATCHTOWER_SCHEDULE: 0 0 2 * * *
+      WATCHTOWER_CLEANUP: "true"
+      WATCHTOWER_LABEL_ENABLE: "true"
+      WATCHTOWER_REMOVE_VOLUMES: "true"
+      WATCHTOWER_INCLUDE_STOPPED: "true"
+      WATCHTOWER_NO_STARTUP_MESSAGE: "false"
+      WATCHTOWER_HTTP_API_METRICS: "true"
+      WATCHTOWER_HTTP_API_TOKEN: $WATCHTOWER_HTTP_API_TOKEN
+      WATCHTOWER_NOTIFICATIONS: "shoutrrr"
+      WATCHTOWER_NOTIFICATION_URL: "telegram://$TELEGRAM_BOT_TOKEN@telegram/?channels=$TELEGRAM_CHAT_ID"
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.watchtower-rtr.entrypoints=https"
+      - "traefik.http.routers.watchtower-rtr.rule=Host(`watchtower.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.watchtower-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.watchtower-rtr.service=watchtower-svc"
+      - "traefik.http.services.watchtower-svc.loadbalancer.server.port=8080"
+
+  # Default email:password = admin@yacht.local:pass
+  # yacht:
+  #   container_name: yacht
+  #   image: selfhostedpro/yacht:latest #devel, latest
+  #   restart: $BASE_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro # # Use Docker Socket Proxy instead for improved security
+  #     # - $DOCKERDIR/appdata/yacht:/config # Change to local directory if you want to save/transfer config locally
+  #   environment:
+  #     - PUID=$PUID
+  #     - PGID=$PGID
+  #     - TZ=$TZ
+  #     - DISABLE_AUTH=True
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.yacht-rtr.entrypoints=https"
+  #     - "traefik.http.routers.yacht-rtr.rule=Host(`yacht.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.yacht-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.yacht-rtr.service=yacht-svc"
+  #     - "traefik.http.services.yacht-svc.loadbalancer.server.port=8000"
+
+  # FIXME: docker-socket-proxy NOT WORKING !
+  # TODO: Authelia integration
+  # https://www.authelia.com/integration/openid-connect/portainer/
+  # portainer:
+  #   container_name: portainer
+  #   image: portainer/portainer-ce:latest # TODO: ghcr.io/
+  #   depends_on:
+  #     - traefik
+  #   restart: $BASE_RESTART_POLICY
+  #   # profiles:
+  #   # - apps
+  #   command: -H unix:///var/run/docker.sock # Use Docker Socket Proxy and comment this line out, for improved security.
+  #   # command: -H tcp://docker-socket-proxy:2375 # Use this instead, if you have Socket Proxy enabled.
+  #   networks:
+  #     - t2_proxy
+  #     - socket_proxy
+  #   #ports:
+  #   #  - 9000
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro # # Use Docker Socket Proxy instead for improved security
+  #     - $DOCKERDIR/appdata/portainer/data:/data # Change to local directory if you want to save/transfer config locally
+  #   environment:
+  #     - TZ=$TZ
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.portainer-rtr.entrypoints=https"
+  #     - "traefik.http.routers.portainer-rtr.rule=Host(`portainer.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.portainer-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.portainer-rtr.service=portainer-svc"
+  #     - "traefik.http.services.portainer-svc.loadbalancer.server.port=9000"
+
   code-server:
     image: lscr.io/linuxserver/code-server
     container_name: code-server
@@ -40,35 +139,35 @@ services:
       - "traefik.http.routers.code-server-rtr.service=code-server-svc"
       - "traefik.http.services.code-server-svc.loadbalancer.server.port=8443"
 
-  vscodium:
-    image: lscr.io/linuxserver/vscodium:latest
-    container_name: vscodium
-    restart: $MAINTANENCE_RESTART_POLICY
-    security_opt:
-      - no-new-privileges:true
-    # cap_add:
-    #   - IPC_LOCK
-    # shm_size: "1gb"
-    networks:
-      - t2_proxy
-    volumes:
-      - $DOCKERDIR/appdata/vscodium:/config
-      - $DOCKERDIR:/config/workspace/docker
-      - $NOTESDIR:/config/workspace/notes
-    environment:
-      PUID: $PUID
-      PGID: $PGID
-      TZ: $TZ
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.vscodium-rtr.entrypoints=https"
-      - "traefik.http.routers.vscodium-rtr.rule=Host(`vscodium.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.vscodium-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.vscodium-rtr.service=vscodium-svc"
-      - "traefik.http.services.vscodium-svc.loadbalancer.server.port=3000"
+  # vscodium:
+  #   image: lscr.io/linuxserver/vscodium:latest
+  #   container_name: vscodium
+  #   restart: $MAINTANENCE_RESTART_POLICY
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   # cap_add:
+  #   #   - IPC_LOCK
+  #   # shm_size: "1gb"
+  #   networks:
+  #     - t2_proxy
+  #   volumes:
+  #     - $DOCKERDIR/appdata/vscodium:/config
+  #     - $DOCKERDIR:/config/workspace/docker
+  #     - $NOTESDIR:/config/workspace/notes
+  #   environment:
+  #     PUID: $PUID
+  #     PGID: $PGID
+  #     TZ: $TZ
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.vscodium-rtr.entrypoints=https"
+  #     - "traefik.http.routers.vscodium-rtr.rule=Host(`vscodium.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.vscodium-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.vscodium-rtr.service=vscodium-svc"
+  #     - "traefik.http.services.vscodium-svc.loadbalancer.server.port=3000"
 
   
   syncthing:
@@ -258,25 +357,6 @@ services:
   #     # Add hosts specified in rules here to force cf-companion to create the CNAMEs
   #     # Since cf-companion creates CNAMEs based on host rules, this a workaround for non-docker/external apps
   #     - "traefik.http.routers.cf-companion-rtr.rule=Host(`mox.$DOMAINNAME`) || Host(`pwt.$DOMAINNAME`) || Host(`webmin.$DOMAINNAME`) || Host(`shell.$DOMAINNAME`)"
-
-  # watchtower:
-  #   image: containrrr/watchtower
-  #   container_name: watchtower
-  #   restart: unless-stopped
-  #   networks:
-  #     - t2_proxy
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #   environment:
-  #     TZ: $TZ
-  #     WATCHTOWER_SCHEDULE: 0 30 18 * * *
-  #     WATCHTOWER_MONITOR_ONLY: "true"
-  #     WATCHTOWER_CLEANUP: "true"
-  #     WATCHTOWER_NO_STARTUP_MESSAGE: "true"
-  #     WATCHTOWER_NOTIFICATIONS: "shoutrrr"
-  #     WATCHTOWER_NOTIFICATION_URL: "telegram://$BOT_TOKEN@telegram/?channels=$CHAT_ID"
-  #   labels:
-  #     - "traefik.enable=true"
 
   # Contaits guacamole web client, the guacd server and a postgres database
   # Default user/pass: guacadmin/guacadmin

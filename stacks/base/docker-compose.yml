@@ -214,7 +214,7 @@ services:
       # Security critical
       - AUTH=0
       - SECRETS=0
-      - POST=0 # 1- Watchtower
+      - POST=1 # 1- Watchtower
       # Not always needed
       - BUILD=0
       - COMMIT=0
@@ -277,70 +277,6 @@ services:
       - "traefik.http.routers.authelia-rtr.service=authelia-svc"
       - "traefik.http.services.authelia-svc.loadbalancer.server.port=9091"
 
-  # Default email:password = admin@yacht.local:pass
-  # yacht:
-  #   container_name: yacht
-  #   image: selfhostedpro/yacht:latest #devel, latest
-  #   restart: $BASE_RESTART_POLICY
-  #   networks:
-  #     - t2_proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock:ro # # Use Docker Socket Proxy instead for improved security
-  #     # - $DOCKERDIR/appdata/yacht:/config # Change to local directory if you want to save/transfer config locally
-  #   environment:
-  #     - PUID=$PUID
-  #     - PGID=$PGID
-  #     - TZ=$TZ
-  #     - DISABLE_AUTH=True
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.yacht-rtr.entrypoints=https"
-  #     - "traefik.http.routers.yacht-rtr.rule=Host(`yacht.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.yacht-rtr.middlewares=chain-authelia@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.yacht-rtr.service=yacht-svc"
-  #     - "traefik.http.services.yacht-svc.loadbalancer.server.port=8000"
-
-  # FIXME: docker-socket-proxy NOT WORKING !
-  # TODO: Authelia integration
-  # https://www.authelia.com/integration/openid-connect/portainer/
-  # portainer:
-  #   container_name: portainer
-  #   image: portainer/portainer-ce:latest # TODO: ghcr.io/
-  #   depends_on:
-  #     - traefik
-  #   restart: $BASE_RESTART_POLICY
-  #   # profiles:
-  #   # - apps
-  #   command: -H unix:///var/run/docker.sock # Use Docker Socket Proxy and comment this line out, for improved security.
-  #   # command: -H tcp://docker-socket-proxy:2375 # Use this instead, if you have Socket Proxy enabled.
-  #   networks:
-  #     - t2_proxy
-  #     - socket_proxy
-  #   #ports:
-  #   #  - 9000
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock:ro # # Use Docker Socket Proxy instead for improved security
-  #     - $DOCKERDIR/appdata/portainer/data:/data # Change to local directory if you want to save/transfer config locally
-  #   environment:
-  #     - TZ=$TZ
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.portainer-rtr.entrypoints=https"
-  #     - "traefik.http.routers.portainer-rtr.rule=Host(`portainer.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.portainer-rtr.middlewares=chain-authelia@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.portainer-rtr.service=portainer-svc"
-  #     - "traefik.http.services.portainer-svc.loadbalancer.server.port=9000"
-
 #  homer:
 #    container_name: homer
 #    image: b4bz/homer
@@ -391,6 +327,7 @@ services:
       - HOMEPAGE_VAR_TAILSCALE_KEY=$TAILSCALE_KEY
       - HOMEPAGE_VAR_TAILSCALE_HOMESERVER_ID=$TAILSCALE_HOMESERVER_ID
       - HOMEPAGE_VAR_HOMESERVER_LOCAL_STATIC_IP=$HOMESERVER_LOCAL_STATIC_IP
+      - HOMEPAGE_VAR_WATCHTOWER_HTTP_API_TOKEN=$WATCHTOWER_HTTP_API_TOKEN
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

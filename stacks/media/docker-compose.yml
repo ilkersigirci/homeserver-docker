@@ -89,6 +89,8 @@ services:
     image: fallenbagel/jellyseerr:latest  # TODO: ghcr.io
     container_name: jellyseerr
     restart: $MEDIA_RESTART_POLICY
+    depends_on:
+      - jellyfin
     networks:
       - t2_proxy
     security_opt:
@@ -110,6 +112,29 @@ services:
       ## HTTP Services
       - "traefik.http.routers.jellyseerr-rtr.service=jellyseerr-svc"
       - "traefik.http.services.jellyseerr-svc.loadbalancer.server.port=5055"
+
+  feishin:
+    image: ghcr.io/jeffvli/feishin:latest
+    container_name: feishin
+    restart: $MEDIA_RESTART_POLICY
+    depends_on:
+      - jellyfin
+    networks:
+      - t2_proxy
+    # ports:
+    #   - "9180:9180"
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      # - "traefik.http.routers.feishin-rtr.entrypoints=https"
+      - "traefik.http.routers.feishin-rtr.rule=Host(`music.$DOMAINNAME`)"
+      ## Middlewares
+      # - "traefik.http.routers.feishin-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.feishin-rtr.service=feishin-svc"
+      - "traefik.http.services.feishin-svc.loadbalancer.server.port=9180"
 
 
   ############################# DOWNLOAD #############################
@@ -819,29 +844,37 @@ services:
       - "traefik.http.services.stirlingpdf-svc.loadbalancer.server.port=8080"
   
 
-  # stremio:
-  #   image: sleeyax/stremio-streaming-server:latest
-  #   container_name: stremio
-  #   restart: $MEDIA_RESTART_POLICY
-  #   networks:
-  #     - t2_proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   volumes:
-  #     - $DOCKERDIR/appdata/stremio:/root/.stremio-server
-  #   environment:
-  #     - FORCE_HTTPS=1
-  #     # - FIX_UNSUPPORTED_MEDIA=1
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers Auth
-  #     - "traefik.http.routers.stremio-rtr.entrypoints=https"
-  #     - "traefik.http.routers.stremio-rtr.rule=Host(`stremio.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.stremio-rtr.middlewares=chain-authelia@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.stremio-rtr.service=stremio-svc"
-  #     - "traefik.http.services.stremio-svc.loadbalancer.server.port=11470"
+  stremio:
+    image: stremio/server:latest
+    container_name: stremio
+    restart: $MEDIA_RESTART_POLICY
+    networks:
+      - t2_proxy
+    ports:
+      - "11470:11470"
+      - "12470:12470"
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - NO_CORS=1
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.stremio-rtr.entrypoints=https"
+      - "traefik.http.routers.stremio-rtr.rule=Host(`stremio.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.stremio-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.stremio-rtr.service=stremio-svc"
+      - "traefik.http.services.stremio-svc.loadbalancer.server.port=11470"
+      #  ## HTTP Routers Auth
+      # - "traefik.http.routers.stremio-rtr2.entrypoints=https"
+      # - "traefik.http.routers.stremio-rtr2.rule=Host(`stremio.$DOMAINNAME`)"
+      # ## Middlewares
+      # - "traefik.http.routers.stremio-rtr2.middlewares=chain-authelia@file"
+      # ## HTTP Services
+      # - "traefik.http.routers.stremio-rtr2.service=stremio-svc2"
+      # - "traefik.http.services.stremio-svc2.loadbalancer.server.port=12470"
 
   # tubearchivist:
   #   image: bbilly1/tubearchivist:latest
