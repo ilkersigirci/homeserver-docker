@@ -341,7 +341,7 @@ services:
   ############################# INDEXERS #############################
 
   prowlarr:
-    image: lscr.io/linuxserver/prowlarr:develop # there is no main branch atm
+    image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
     depends_on:
       - transmission
@@ -350,6 +350,8 @@ services:
       - t2_proxy
     #  t2_proxy:
     #    ipv4_address: 192.168.90.161
+    ports:
+      - "9696:9696"
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -404,6 +406,25 @@ services:
 
   ############################## PVRS #############################
 
+  buildarr:
+    image: callum027/buildarr:latest
+    container_name: buildarr
+    restart: $MEDIA_RESTART_POLICY
+    depends_on:
+      - prowlarr
+      - radarr
+      # - sonarr
+    networks:
+      - t2_proxy
+    volumes:
+      - $CONFIGDIR/buildarr:/config
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      BUILDARR_LOG_LEVEL: INFO
+      BUILDARR_INSTALL_PACKAGES: "buildarr-prowlarr buildarr-radarr"
+
   # # Lidarr - Music Management
   # # Set url_base in lidarr settings if using PathPrefix
   # lidarr:
@@ -448,102 +469,29 @@ services:
   #     - "traefik.http.routers.lidarr-rtr-bypass.service=lidarr-svc"
   #     - "traefik.http.services.lidarr-svc.loadbalancer.server.port=8686"
 
-
-  # Lidarr extended - Music Management
-  lidarr-extended:
-    image: randomninjaatk/lidarr-extended:latest
-    container_name: lidarr-extended
-    restart: $MEDIA_RESTART_POLICY
-    # profiles:
-    # - media
-    networks:
-      t2_proxy:
-        ipv4_address: 192.168.90.163
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - $DOCKERDIR/appdata/lidarr-extended:/config
-      # Optional. See why MediaCover is mounted as volume https://github.com/htpcBeginner/docker-traefik/discussions/147
-      # - $DATADIR/lidarr/MediaCover:/config/MediaCover
-      - $MEDIADIR/Music/Lidarr/downloads:/downloads-lidarr-extended
-      - $MEDIADIR/Music/Lidarr/music:/music
-      - $MEDIADIR/Music/Lidarr/music-videos:/music-videos
-      # - "/etc/localtime:/etc/localtime:ro"
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-      - enableAudioScript=true
-      - enableVideoScript=false
-      - videoContainer=mp4
-      - scriptInterval=15m
-      - configureLidarrWithOptimalSettings=true
-      - searchSort=date
-      # FIXME:
-      - audioFormat=native # native
-      - audioBitrate=lossless #lossless
-      - requireQuality=true
-      - enableReplaygainTags=true
-      - audioLyricType=both
-      - dlClientSource=both
-      - arlToken=$DEEZER_ARL_TOKEN
-      - tidalCountryCode=US
-      - addDeezerTopArtists=false
-      - addDeezerTopAlbumArtists=false
-      - addDeezerTopTrackArtists=false
-      - topLimit=10
-      - addRelatedArtists=false
-      - numberOfRelatedArtistsToAddPerArtist=5
-      - lidarrSearchForMissing=true
-      - addFeaturedVideoArtists=false
-      - youtubeSubtitleLanguage=en
-      # - webHook=https://myhook.mydomain.com  # TODO: Add webhook
-      - enableQueueCleaner=true
-      - matchDistance=5
-      - enableBeetsTagging=true
-      - beetsMatchPercentage=90
-      - retryNotFound=90
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers Auth Bypass
-      # - "traefik.http.routers.lidarr-extended-rtr-bypass.entrypoints=https"
-      # - "traefik.http.routers.lidarr-extended-rtr-bypass.rule=Host(`lidarr.$DOMAINNAME`) && (Headers(`X-Api-Key`, `$LIDARR_API_KEY`) || Query(`apikey`, `$LIDARR_API_KEY`))"
-      # - "traefik.http.routers.lidarr-extended-rtr-bypass.priority=100"
-      ## HTTP Routers Auth
-      - "traefik.http.routers.lidarr-extended-rtr.entrypoints=https"
-      - "traefik.http.routers.lidarr-extended-rtr.rule=Host(`lidarr.$DOMAINNAME`)"
-      - "traefik.http.routers.lidarr-extended-rtr.priority=99"
-      ## Middlewares
-      # - "traefik.http.routers.lidarr-extended-rtr-bypass.middlewares=chain-no-auth@file"
-      - "traefik.http.routers.lidarr-extended-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.lidarr-extended-rtr.service=lidarr-extended-svc"
-      - "traefik.http.routers.lidarr-extended-rtr-bypass.service=lidarr-extended-svc"
-      - "traefik.http.services.lidarr-extended-svc.loadbalancer.server.port=8686"
-
-
   # Movie management
   radarr:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
     depends_on:
       - transmission
-      - prowlarr
+      # - prowlarr
     restart: $MEDIA_RESTART_POLICY
     networks:
       - t2_proxy
     #  t2_proxy:
     #    ipv4_address: 192.168.90.162
+    ports:
+      - "7878:7878"
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/radarr:/config
-      # Optional. See why MediaCover is mounted as volume https://github.com/htpcBeginner/docker-traefik/discussions/147
-      - $DATADIR/radarr/MediaCover:/config/MediaCover
-      - $MEDIADIR/Downloads:/data/downloads
-      # - $MEDIADIR/Downloads:/data
-      - $MEDIADIR/Movies_Radarr:/data/media
       - "/etc/localtime:/etc/localtime:ro"
+      # - $CONFIGDIR/radarr:/config
+      # Optional. See why MediaCover is mounted as volume https://github.com/htpcBeginner/docker-traefik/discussions/147
+      # - $DATADIR/radarr/MediaCover:/config/MediaCover
+      - $MEDIADIR/Downloads:/data/downloads
+      - $MEDIADIR/Movies_Radarr:/data/media
     environment:
       PUID: $PUID
       PGID: $PGID
@@ -734,6 +682,66 @@ services:
       # - "traefik.http.routers.ytdl-rtr.service=ytdl-svc"
       # - "traefik.http.services.ytdl-svc.loadbalancer.server.port=8081"
 
+  # tubearchivist:
+  #   image: bbilly1/tubearchivist:latest
+  #   container_name: tubearchivist
+  #   restart: $MEDIA_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - $MEDIADIR/Youtube:/youtube
+  #   environment:
+  #     - TA_USERNAME=admin
+  #     - TA_PASSWORD=admin
+  #     - HOST_UID=$PUID
+  #     - HOST_GID=$PGID
+  #     - TZ=$TZ
+  #     - ELASTIC_PASSWORD=admin
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers Auth
+  #     - "traefik.http.routers.tubearchivist-rtr.entrypoints=https"
+  #     - "traefik.http.routers.tubearchivist-rtr.rule=Host(`tubearch.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.tubearchivist-rtr.middlewares=chain-authelia@file"
+  #   #  - "traefik.http.routers.transmission-rtr.middlewares=middlewares-rate-limit@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.tubearchivist-rtr.service=tubearchivist-svc"
+  #     - "traefik.http.services.tubearchivist-svc.loadbalancer.server.port=8000"
+
+  # tubesync:
+  #   image: ghcr.io/meeb/tubesync:latest
+  #   container_name: tubesync
+  #   restart: $MEDIA_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - $DOCKERDIR/appdata/tubesync:/config
+  #     - $MEDIADIR/Youtube:/downloads
+  #   environment:
+  #     - PUID=$PUID
+  #     - PGID=$PGID
+  #     - TZ=$TZ
+  #     # - HTTP_USER=admin
+  #     # - HTTP_PASS=admin
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers Auth
+  #     - "traefik.http.routers.tubesync-rtr.entrypoints=https"
+  #     - "traefik.http.routers.tubesync-rtr.rule=Host(`tubesync.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.tubesync-rtr.middlewares=chain-authelia@file"
+  # #      - "traefik.http.routers.transmission-rtr.middlewares=middlewares-rate-limit@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.tubesync-rtr.service=tubesync-svc"
+  #     - "traefik.http.services.tubesync-svc.loadbalancer.server.port=4848"
+
+  ############################### OTHERS ###############################
+
   podgrab:
     image: akhilrex/podgrab:latest
     container_name: podgrab
@@ -842,7 +850,6 @@ services:
       ## HTTP Services
       - "traefik.http.routers.stirlingpdf-rtr.service=stirlingpdf-svc"
       - "traefik.http.services.stirlingpdf-svc.loadbalancer.server.port=8080"
-  
 
   stremio:
     image: stremio/server:latest
@@ -875,64 +882,6 @@ services:
       # ## HTTP Services
       # - "traefik.http.routers.stremio-rtr2.service=stremio-svc2"
       # - "traefik.http.services.stremio-svc2.loadbalancer.server.port=12470"
-
-  # tubearchivist:
-  #   image: bbilly1/tubearchivist:latest
-  #   container_name: tubearchivist
-  #   restart: $MEDIA_RESTART_POLICY
-  #   networks:
-  #     - t2_proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   volumes:
-  #     - $MEDIADIR/Youtube:/youtube
-  #   environment:
-  #     - TA_USERNAME=admin
-  #     - TA_PASSWORD=admin
-  #     - HOST_UID=$PUID
-  #     - HOST_GID=$PGID
-  #     - TZ=$TZ
-  #     - ELASTIC_PASSWORD=admin
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers Auth
-  #     - "traefik.http.routers.tubearchivist-rtr.entrypoints=https"
-  #     - "traefik.http.routers.tubearchivist-rtr.rule=Host(`tubearch.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.tubearchivist-rtr.middlewares=chain-authelia@file"
-  #   #  - "traefik.http.routers.transmission-rtr.middlewares=middlewares-rate-limit@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.tubearchivist-rtr.service=tubearchivist-svc"
-  #     - "traefik.http.services.tubearchivist-svc.loadbalancer.server.port=8000"
-
-  # tubesync:
-  #   image: ghcr.io/meeb/tubesync:latest
-  #   container_name: tubesync
-  #   restart: $MEDIA_RESTART_POLICY
-  #   networks:
-  #     - t2_proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   volumes:
-  #     - $DOCKERDIR/appdata/tubesync:/config
-  #     - $MEDIADIR/Youtube:/downloads
-  #   environment:
-  #     - PUID=$PUID
-  #     - PGID=$PGID
-  #     - TZ=$TZ
-  #     # - HTTP_USER=admin
-  #     # - HTTP_PASS=admin
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers Auth
-  #     - "traefik.http.routers.tubesync-rtr.entrypoints=https"
-  #     - "traefik.http.routers.tubesync-rtr.rule=Host(`tubesync.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.tubesync-rtr.middlewares=chain-authelia@file"
-  # #      - "traefik.http.routers.transmission-rtr.middlewares=middlewares-rate-limit@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.tubesync-rtr.service=tubesync-svc"
-  #     - "traefik.http.services.tubesync-svc.loadbalancer.server.port=4848"
 
   ############################### Transcode ###############################
 
