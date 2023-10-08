@@ -22,7 +22,7 @@ STACKS_ROOT=~/docker/stacks
 # # cd $STACKS_ROOT/photo-dev
 # # docker compose up -d
 # cd $STACKS_ROOT/notes
-# docker compose --env-file ~/docker/configs/.env up -d couchdb flatnotes obsidian # okular
+# docker compose --env-file ~/docker/configs/.env up -d couchdb flatnotes obsidian
 
 
 ############################### NORMAL ##################################
@@ -42,4 +42,4 @@ docker compose --env-file ~/docker/configs/.env up -d glances
 cd $STACKS_ROOT/photo-dev
 docker compose up -d
 cd $STACKS_ROOT/notes
-docker compose --env-file ~/docker/configs/.env up -d couchdb flatnotes obsidian okular
+docker compose --env-file ~/docker/configs/.env up -d couchdb flatnotes obsidian

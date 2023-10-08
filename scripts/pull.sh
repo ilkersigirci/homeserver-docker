@@ -23,10 +23,10 @@ docker compose --env-file ~/docker/configs/.env up -d glances
 cd $STACKS_ROOT/photo-dev
 docker compose up -d
 cd $STACKS_ROOT/notes
-docker pull ghcr.io/linuxserver/baseimage-kasmvnc:alpine317
-docker pull ghcr.io/linuxserver/baseimage-kasmvnc:debianbullseye
-docker compose --env-file ~/docker/configs/.env build obsidian okular
+docker pull ghcr.io/linuxserver/baseimage-kasmvnc:alpine318
+docker pull ghcr.io/linuxserver/baseimage-kasmvnc:debianbookworm
+docker compose --env-file ~/docker/configs/.env build obsidian
 docker compose --env-file ~/docker/configs/.env pull flatnotes
-docker compose --env-file ~/docker/configs/.env up -d couchdb flatnotes obsidian okular
+docker compose --env-file ~/docker/configs/.env up -d couchdb flatnotes obsidian
 
 docker image prune --all --force

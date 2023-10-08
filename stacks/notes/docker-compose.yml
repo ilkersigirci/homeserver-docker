@@ -209,39 +209,6 @@ services:
   #     ## HTTP Services
   #     - "traefik.http.routers.obsidian-rtr.service=obsidian-svc"
   #     - "traefik.http.services.obsidian-svc.loadbalancer.server.port=8080"
-
-  # NOTE: Recent file location: /config/.local/share/okular/docdata/
-  okular:
-    container_name: okular
-    image: okular:latest
-    build:
-      context: $DESKTOPAPPDOCKERFILES/Okular
-      dockerfile: $DESKTOPAPPDOCKERFILES/Okular/Dockerfile
-    restart: $OTHERS_RESTART_POLICY
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - $DOCKERDIR/appdata/okular:/config
-      - $MEDIADIR/Books:/books
-      - $HARDDISKROOTDIR/School/Thesis/Papers:/thesis
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-      # - DOCKER_MODS=linuxserver/mods:universal-git
-    labels:
-      - "com.centurylinklabs.watchtower.enable=false" # For watchtower
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.okular-rtr.entrypoints=https"
-      - "traefik.http.routers.okular-rtr.rule=Host(`okular.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.okular-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.okular-rtr.service=okular-svc"
-      - "traefik.http.services.okular-svc.loadbalancer.server.port=3000"
   
   # volglass:
   #   image: volglass:latest
