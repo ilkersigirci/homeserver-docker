@@ -130,13 +130,21 @@ services:
       - "traefik.http.routers.miniflux-rtr.service=miniflux-svc"
       - "traefik.http.services.miniflux-svc.loadbalancer.server.port=8080"
 
-  # https://github.com/AbdBarho/stable-diffusion-webui-docker
+  # Github Link: https://github.com/AbdBarho/stable-diffusion-webui-docker
+  # All HuggingFace Models: https://huggingface.co/models?pipeline_tag=text-to-image&sort=downloads
+  # XL- Model Instructions: https://aituts.com/sdxl/
+  # XL-Model: https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0
+  # XL-Model-Refiner: https://huggingface.co/stabilityai/stable-diffusion-xl-refiner-1.0
+  # XL VAE FIX:
+  #   - Model: https://huggingface.co/madebyollin/sdxl-vae-fp16-fix
+  #   - UI: Add the sd_vae tag in Setting -> User Interface -> Quicksettings list, then Reload UI
   stable-diffusion:
     container_name: stable-diffusion
     build: $STABLEDIFFUSIONDIR/services/AUTOMATIC1111
-    image: stablediff-auto:49
+    image: stablediff-auto:67
     restart: $OTHERS_RESTART_POLICY
     stop_signal: SIGINT
+    tty: true
     networks:
       - t2_proxy
     # ports:
@@ -145,26 +153,27 @@ services:
       - $STABLEDIFFUSIONDIR/data:/data
       - $STABLEDIFFUSIONDIR/output:/output
       # - $STABLEDIFFUSIONDIR/services/AUTOMATIC1111/config.json:/stable-diffusion-webui/config.json
-      # - $STABLEDIFFUSIONDIR/embeddings:/stable-diffusion-webui/embeddings
     environment:
-      - CLI_ARGS=--allow-code --medvram --xformers --enable-insecure-extension-access --api
+      # - ATTN_PRECISION=fp16
+      - CLI_ARGS=--allow-code --medvram-sdxl --xformers --enable-insecure-extension-access --api # --no-half-vae
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
               device_ids: [ '0' ]
-              capabilities: [ gpu ]
+              # capabilities: [ gpu ]
+              capabilities: [compute, utility]
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.stablediff-rtr.entrypoints=https"
-      - "traefik.http.routers.stablediff-rtr.rule=Host(`stablediff.$DOMAINNAME`)"
+      - "traefik.http.routers.stablediffusion-rtr.entrypoints=https"
+      - "traefik.http.routers.stablediffusion-rtr.rule=Host(`stablediffusion.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.stablediff-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.stablediffusion-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
-      - "traefik.http.routers.stablediff-rtr.service=stablediff-svc"
-      - "traefik.http.services.stablediff-svc.loadbalancer.server.port=7860"
+      - "traefik.http.routers.stablediffusion-rtr.service=stablediffusion-svc"
+      - "traefik.http.services.stablediffusion-svc.loadbalancer.server.port=7860"
 
   # NOTE: Not completed yet !!!
   # https://github.com/Atinoda/text-generation-webui-docker
