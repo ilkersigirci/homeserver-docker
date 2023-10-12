@@ -128,10 +128,10 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      # - "traefik.http.routers.feishin-rtr.entrypoints=https"
+      - "traefik.http.routers.feishin-rtr.entrypoints=https"
       - "traefik.http.routers.feishin-rtr.rule=Host(`music.$DOMAINNAME`)"
       ## Middlewares
-      # - "traefik.http.routers.feishin-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.feishin-rtr.middlewares=chain-no-auth@file"
       ## HTTP Services
       - "traefik.http.routers.feishin-rtr.service=feishin-svc"
       - "traefik.http.services.feishin-svc.loadbalancer.server.port=9180"

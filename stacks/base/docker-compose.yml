@@ -318,7 +318,7 @@ services:
     volumes:
       - $CONFIGDIR/homepage:/app/config
       - $CONFIGDIR/homepage/icons:/app/public/icons
-      - /mnt/d:/mnt/d  # NOTE: Need for Disk usage widget
+      # - /mnt/d:/mnt/d  # NOTE: Need for Disk usage widget
     environment:
       - HOMEPAGE_VAR_DOMAINNAME=$DOMAINNAME
       - HOMEPAGE_VAR_JELLYFIN_API_KEY=$JELLYFIN_API_KEY
