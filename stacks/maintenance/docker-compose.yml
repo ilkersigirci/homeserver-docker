@@ -284,8 +284,10 @@ services:
 
   # Alternative: https://github.com/djmaze/resticker/
   # TODO: Send notifications to Telegram after backup
+  # FIXME: When new files added to vaultwarden db, does it overwrites the file permissions?
   # Init remote repo: rustic -r rclone:onedrive-remote:Backups init
-  # Restore from remote repo: rustic -r rclone:onedrive-remote:Backups restore latest /tmp/restore-test
+  # Backup: rustic backup
+  # Restore: rustic -r rclone:onedrive-remote:Backups restore latest /tmp/restore-test
   rustic:
     container_name: rustic
     image: rustic:latest
@@ -300,8 +302,10 @@ services:
     volumes:
       - $CONFIGDIR/rclone:/root/.config/rclone:rw
       - $CONFIGDIR/rustic/rustic.toml:/root/rustic.toml:ro
-      # - $CONFIGDIR:/root/config_dir:ro
-      - $BACKUPDIR:/root/backup_dir:ro
+      - $BACKUPDIR:/root/backups/Backup:ro
+      - $CONFIGDIR:/root/backups/docker_configs:ro
+      - $NOTESDIR/Markdwon:/root/backups/Markdown:ro
+      - $DATADIR/vaultwarden:/root/vaultwarden_backup:ro
     environment:
       - TZ=$TZ
       - RUSTIC_PASSWORD=/run/secrets/rustic_password
