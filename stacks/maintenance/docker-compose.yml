@@ -1,5 +1,5 @@
 version: "3.9"
-name: maintanence
+name: maintenance
 
 networks:
   t2_proxy:
@@ -7,11 +7,15 @@ networks:
   socket_proxy:
     external: true
 
+secrets:
+  rustic_password:
+    file: $DOCKERDIR/secrets/rustic_password
+
 services:
   watchtower:
     image: ghcr.io/containrrr/watchtower:latest
     container_name: watchtower
-    restart: $MAINTANENCE_RESTART_POLICY
+    restart: $MAINTENANCE_RESTART_POLICY
     # privileged: true
     networks:
       - t2_proxy
@@ -132,7 +136,7 @@ services:
   code-server:
     image: lscr.io/linuxserver/code-server
     container_name: code-server
-    restart: $MAINTANENCE_RESTART_POLICY
+    restart: $MAINTENANCE_RESTART_POLICY
     networks:
       - t2_proxy
     volumes:
@@ -164,7 +168,7 @@ services:
   # vscodium:
   #   image: lscr.io/linuxserver/vscodium:latest
   #   container_name: vscodium
-  #   restart: $MAINTANENCE_RESTART_POLICY
+  #   restart: $MAINTENANCE_RESTART_POLICY
   #   security_opt:
   #     - no-new-privileges:true
   #   # cap_add:
@@ -195,7 +199,7 @@ services:
   syncthing:
     container_name: syncthing
     image: linuxserver/syncthing:latest
-    restart: $OTHERS_RESTART_POLICY
+    restart: $MAINTENANCE_RESTART_POLICY
     networks:
       - t2_proxy
     # NOTE: Enable them. Probably needed for connecting to phone (RESEARCH)
@@ -227,7 +231,7 @@ services:
   czkawka:
     container_name: czkawka
     image: jlesage/czkawka:latest
-    restart: $OTHERS_RESTART_POLICY
+    restart: $MAINTENANCE_RESTART_POLICY
     networks:
       - t2_proxy
     security_opt:
@@ -254,7 +258,7 @@ services:
   sshwifty:
     container_name: sshwifty
     image: niruix/sshwifty:latest
-    restart: $OTHERS_RESTART_POLICY
+    restart: $MAINTENANCE_RESTART_POLICY
     networks:
       - t2_proxy
     security_opt:
@@ -276,41 +280,39 @@ services:
       - "traefik.http.routers.sshwifty-rtr.service=sshwifty-svc"
       - "traefik.http.services.sshwifty-svc.loadbalancer.server.port=8182"
 
-  ############################### RESTIC #######################################
+  ############################### BACKUP #######################################
 
-  # TODO: https://github.com/djmaze/resticker/
-  restic-backup:
-    container_name: restic-backup
-    image: mazzolino/restic:latest
-    restart: $OTHERS_RESTART_POLICY
+  # Alternative: https://github.com/djmaze/resticker/
+  # TODO: Send notifications to Telegram after backup
+  # Init remote repo: rustic -r rclone:onedrive-remote:Backups init
+  # Restore from remote repo: rustic -r rclone:onedrive-remote:Backups restore latest /tmp/restore-test
+  rustic:
+    container_name: rustic
+    image: rustic:latest
+    build:
+      context: $DOCKERDIR/stacks/maintenance/Rustic
+      dockerfile: $DOCKERDIR/stacks/maintenance/Rustic/Dockerfile
+    restart: $MAINTENANCE_RESTART_POLICY
     networks:
       - t2_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/czkawka:/config:rw
-      - $MEDIADIR/Photos/Pictures:/storage:rw
+      - $CONFIGDIR/rclone:/root/.config/rclone:rw
+      - $CONFIGDIR/rustic/rustic.toml:/root/rustic.toml:ro
+      # - $CONFIGDIR:/root/config_dir:ro
+      - $BACKUPDIR:/root/backup_dir:ro
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
       - TZ=$TZ
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.czkawka-rtr.entrypoints=https"
-      - "traefik.http.routers.czkawka-rtr.rule=Host(`czkawka.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.czkawka-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.czkawka-rtr.service=czkawka-svc"
-      - "traefik.http.services.czkawka-svc.loadbalancer.server.port=5800"
-
-  ############################### RESTIC #######################################
+      - RUSTIC_PASSWORD=/run/secrets/rustic_password
+      # - RCLONE_CONFIG=/root/.config/rclone/rclone.conf
+    secrets:
+      - rustic_password
 
   # duplicati:
   #   image: lscr.io/linuxserver/duplicati
   #   container_name: duplicati
-  #   restart: $MAINTANENCE_RESTART_POLICY
+  #   restart: $MAINTENANCE_RESTART_POLICY
   #   networks:
   #     - t2_proxy
   #   volumes:
@@ -332,6 +334,7 @@ services:
   #     ## HTTP Services
   #     - "traefik.http.routers.duplicati-rtr.service=duplicati-svc"
   #     - "traefik.http.services.duplicati-svc.loadbalancer.server.port=8200"
+  ############################### BACKUP #######################################
 
   # # Traefik Certs Dumper - Extract LetsEncrypt Certificates - Traefik2 Compatible
   # certdumper:
@@ -356,7 +359,7 @@ services:
   #   image: tiredofit/traefik-cloudflare-companion:latest
   #   security_opt:
   #     - no-new-privileges:true
-  #   restart: $MAINTANENCE_RESTART_POLICY
+  #   restart: $MAINTENANCE_RESTART_POLICY
   #   # profiles:
   #   # - core
   #   networks:
@@ -385,7 +388,7 @@ services:
   # guacamole:
   #   image: oznu/guacamole
   #   container_name: guacamole
-  #   restart: $MAINTANENCE_RESTART_POLICY
+  #   restart: $MAINTENANCE_RESTART_POLICY
   #   networks:
   #     - t2_proxy
   #   security_opt:
@@ -406,7 +409,7 @@ services:
   # remmina:
   #   image: lscr.io/linuxserver/remmina
   #   container_name: remmina
-  #   restart: $MAINTANENCE_RESTART_POLICY
+  #   restart: $MAINTENANCE_RESTART_POLICY
   #   networks:
   #     - t2_proxy
   #   security_opt:

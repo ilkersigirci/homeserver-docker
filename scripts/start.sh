@@ -13,7 +13,7 @@ STACKS_ROOT=~/docker/stacks
 # # docker compose --env-file ~/docker/configs/.env up -d transmission jellyfin # ytdl-sub deemix beets
 # # cd $STACKS_ROOT/others
 # # docker compose --env-file ~/docker/configs/.env up -d stable-diffusion
-# cd $STACKS_ROOT/maintanence
+# cd $STACKS_ROOT/maintenance
 # docker compose --env-file ~/docker/configs/.env up -d sshwifty # code-server czkawka
 # cd $STACKS_ROOT/monitoring
 # docker compose --env-file ~/docker/configs/.env up -d glances
@@ -33,7 +33,7 @@ cd $STACKS_ROOT/media
 docker compose --env-file ~/docker/configs/.env up -d transmission jellyfin # ytdl-sub deemix beets
 # cd $STACKS_ROOT/others
 # docker compose --env-file ~/docker/configs/.env up -d stable-diffusion
-cd $STACKS_ROOT/maintanence
+cd $STACKS_ROOT/maintenance
 docker compose --env-file ~/docker/configs/.env up -d watchtower sshwifty code-server # czkawka
 cd $STACKS_ROOT/monitoring
 docker compose --env-file ~/docker/configs/.env up -d glances

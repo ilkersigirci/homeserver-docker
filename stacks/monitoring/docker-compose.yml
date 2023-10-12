@@ -27,7 +27,7 @@ services:
   glances:
     image: nicolargo/glances:ubuntu-latest-full
     container_name: glances
-    restart: $MAINTANENCE_RESTART_POLICY
+    restart: $MAINTENANCE_RESTART_POLICY
     network_mode: host
     # networks:
     #   - t2_proxy
@@ -68,7 +68,7 @@ services:
   # netdata:
   #   image: netdata/netdata:latest
   #   container_name: netdata
-  #   restart: $MAINTANENCE_RESTART_POLICY
+  #   restart: $MAINTENANCE_RESTART_POLICY
   #   networks:
   #     - t2_proxy
   #     # - socket_proxy
@@ -101,7 +101,7 @@ services:
   node-exporter:
     image: prom/node-exporter:latest
     container_name: node-exporter
-    restart: $MAINTANENCE_RESTART_POLICY
+    restart: $MAINTENANCE_RESTART_POLICY
     networks:
       - t2_proxy
       - monitoring
@@ -124,7 +124,7 @@ services:
   # alertmanager:
   #   image: prom/alertmanager:latest
   #   container_name: alertmanager
-  #   restart: $MAINTANENCE_RESTART_POLICY
+  #   restart: $MAINTENANCE_RESTART_POLICY
   #   networks:
   #     - t2_proxy
   #     - monitoring
@@ -156,7 +156,7 @@ services:
     container_name: prometheus
     depends_on:
       - node-exporter
-    restart: $MAINTANENCE_RESTART_POLICY
+    restart: $MAINTENANCE_RESTART_POLICY
     user: 65534:65534
     networks:
       - t2_proxy
@@ -198,7 +198,7 @@ services:
     container_name: grafana
     depends_on:
       - prometheus
-    restart: $MAINTANENCE_RESTART_POLICY
+    restart: $MAINTENANCE_RESTART_POLICY
     networks:
       - t2_proxy
       - monitoring
@@ -235,7 +235,7 @@ services:
   uptime-kuma:
     image: louislam/uptime-kuma:latest
     container_name: uptime-kuma
-    restart: $MAINTANENCE_RESTART_POLICY
+    restart: $MAINTENANCE_RESTART_POLICY
     networks:
       - t2_proxy
       # - monitoring

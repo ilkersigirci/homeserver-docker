@@ -1,0 +1,3 @@
+0 2 1 * * rustic self-update
+0 3 * * * rustic backup
+0 5 * * * rustic prune
