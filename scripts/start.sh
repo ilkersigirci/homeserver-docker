@@ -31,10 +31,10 @@ cd $STACKS_ROOT/base
 docker compose --env-file ~/docker/configs/.env up -d
 cd $STACKS_ROOT/media
 docker compose --env-file ~/docker/configs/.env up -d transmission jellyfin # ytdl-sub deemix beets
-# cd $STACKS_ROOT/others
-# docker compose --env-file ~/docker/configs/.env up -d stable-diffusion
+cd $STACKS_ROOT/others
+docker compose --env-file ~/docker/configs/.env up -d stable-diffusion
 cd $STACKS_ROOT/maintenance
-docker compose --env-file ~/docker/configs/.env up -d watchtower sshwifty code-server # czkawka
+docker compose --env-file ~/docker/configs/.env up -d rustic code-server # czkawka sshwifty watchtower
 cd $STACKS_ROOT/monitoring
 docker compose --env-file ~/docker/configs/.env up -d glances
 # cd $STACKS_ROOT/photo

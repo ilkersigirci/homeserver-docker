@@ -290,6 +290,7 @@ services:
   # Restore: rustic -r rclone:onedrive-remote:Backups restore latest /tmp/restore-test
   rustic:
     container_name: rustic
+    hostname: ${HOSTNAME}
     image: rustic:latest
     build:
       context: $DOCKERDIR/stacks/maintenance/Rustic
