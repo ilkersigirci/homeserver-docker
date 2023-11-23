@@ -210,6 +210,63 @@ services:
   #     - "traefik.http.routers.obsidian-rtr.service=obsidian-svc"
   #     - "traefik.http.services.obsidian-svc.loadbalancer.server.port=8080"
   
+  # NOTE: For client app, change (for flatpak):
+  #  nano ~/.var/app/com.librumreader.librum/config/Librum-Reader/Librum.conf
+  # selfHosted=true
+  # serverHost=https://$DOMAINNAME
+  librum:
+    container_name: librum
+    build: $LIBRUMDIR
+    image: librum:latest
+    hostname: librum
+    restart: $OTHERS_RESTART_POLICY
+    depends_on:
+      - librum_db
+    networks:
+      - t2_proxy
+    # ports:
+    #   - "5000:5000"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $MEDIADIR/Books/Librum:/var/lib/librum-server/librum_storage
+    environment:
+      - JWTValidIssuer=exampleIssuer
+      - JWTKey=exampleOfALongSecretToken
+      - SMTPEndpoint=smtp.example.com
+      - SMTPUsername=mailuser123
+      - SMTPPassword=smtpUserPassword123
+      - SMTPMailFrom=mailuser123@example.com
+      - DBConnectionString=Server=librum_db;port=3306;Database=librum;Uid=librum;Pwd=mariadb;
+      - AdminEmail=admin@mail.com
+      - AdminPassword=strongPassword123
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.librum-rtr.entrypoints=https"
+      - "traefik.http.routers.librum-rtr.rule=Host(`librum.$DOMAINNAME`)"
+      ## Middlewares
+      # - "traefik.http.routers.librum-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.librum-rtr.service=librum-svc"
+      - "traefik.http.services.librum-svc.loadbalancer.server.port=5000"
+
+  librum_db:
+    image: mariadb:latest
+    container_name: librum_db
+    hostname: librum_db
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t2_proxy
+    volumes:
+      - $DOCKERDIR/appdata/librum_db:/var/lib/mysql
+    environment:
+      - MARIADB_USER=librum
+      - MARIADB_PASSWORD=mariadb
+      - MARIADB_DATABASE=librum
+      - MARIADB_ROOT_PASSWORD=mariadb
+    
+  
   # volglass:
   #   image: volglass:latest
   #   container_name: volglass
