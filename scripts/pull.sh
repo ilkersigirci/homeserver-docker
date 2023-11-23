@@ -16,8 +16,8 @@ docker compose --env-file ~/docker/configs/.env build rustic
 docker compose --env-file ~/docker/configs/.env pull code-server  # watchtower sshwifty czkawka
 docker compose --env-file ~/docker/configs/.env up -d rustic code-server  # watchtower sshwifty czkawka
 cd $STACKS_ROOT/monitoring
-docker compose --env-file ~/docker/configs/.env pull glances
-docker compose --env-file ~/docker/configs/.env up -d glances
+docker compose --env-file ~/docker/configs/.env pull glances netdata
+docker compose --env-file ~/docker/configs/.env up -d glances netdata
 # cd $STACKS_ROOT/photo
 # docker compose pull
 # docker compose up -d

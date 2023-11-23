@@ -34,7 +34,7 @@ docker compose --env-file ~/docker/configs/.env up -d transmission jellyfin # yt
 cd $STACKS_ROOT/maintenance
 docker compose --env-file ~/docker/configs/.env up -d rustic code-server # czkawka sshwifty watchtower
 cd $STACKS_ROOT/monitoring
-docker compose --env-file ~/docker/configs/.env up -d glances
+docker compose --env-file ~/docker/configs/.env up -d glances netdata
 # cd $STACKS_ROOT/photo
 # docker compose up -d
 cd $STACKS_ROOT/photo-dev

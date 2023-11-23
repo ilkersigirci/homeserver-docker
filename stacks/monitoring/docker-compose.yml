@@ -16,11 +16,6 @@ networks:
   #   external: true
   #   name: host
 
-volumes:
-  netdataconfig:
-  netdatalib:
-  netdatacache:
-
 services:
   # FIXME: To show wifi network usage, we need `network_mode: host`. But this way, we can't use traefik.
   # NOTE: latest-full doesn't show GPU
@@ -65,38 +60,43 @@ services:
       - "traefik.http.routers.glances-rtr.service=glances-svc"
       - "traefik.http.services.glances-svc.loadbalancer.server.port=61208"
   
-  # netdata:
-  #   image: netdata/netdata:latest
-  #   container_name: netdata
-  #   restart: $MAINTENANCE_RESTART_POLICY
-  #   networks:
-  #     - t2_proxy
-  #     # - socket_proxy
-  #     - monitoring
-  #   hostname: $DOMAINNAME # set to fqdn of host
-  #   cap_add:
-  #     - SYS_PTRACE
-  #   security_opt:
-  #     - apparmor:unconfined
-  #   volumes:
-  #     - netdataconfig:/etc/netdata
-  #     - netdatalib:/var/lib/netdata
-  #     - netdatacache:/var/cache/netdata
-  #     - /etc/passwd:/host/etc/passwd:ro
-  #     - /etc/group:/host/etc/group:ro
-  #     - /proc:/host/proc:ro
-  #     - /sys:/host/sys:ro
-  #     - /etc/os-release:/host/etc/os-release:ro
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.netdata-rtr.entrypoints=https"
-  #     - "traefik.http.routers.netdata-rtr.rule=Host(`netdata.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.netdata-rtr.middlewares=chain-no-auth@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.netdata-rtr.service=netdata-svc"
-  #     - "traefik.http.services.netdata-svc.loadbalancer.server.port=19999"
+  # NOTE: To connect netdata cloud: sudo nano netdatalib/netdata_random_session_id
+  netdata:
+    image: netdata/netdata:latest
+    container_name: netdata
+    restart: $MAINTENANCE_RESTART_POLICY
+    pid: host
+    networks:
+      - t2_proxy
+      # - socket_proxy
+      # - monitoring
+    hostname: $DOMAINNAME # set to fqdn of host
+    cap_add:
+      - SYS_PTRACE
+      - SYS_ADMIN
+    security_opt:
+      - apparmor:unconfined
+    volumes:
+      # - /var/run/docker.sock:/var/run/docker.sock:ro
+      - $DOCKERDIR/appdata/netdata/netdataconfig:/etc/netdata
+      - $DOCKERDIR/appdata/netdata/netdatalib:/var/lib/netdata
+      - $DOCKERDIR/appdata/netdata/netdatacache:/var/cache/netdata
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/os-release:/host/etc/os-release:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.netdata-rtr.entrypoints=https"
+      - "traefik.http.routers.netdata-rtr.rule=Host(`netdata.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.netdata-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.netdata-rtr.service=netdata-svc"
+      - "traefik.http.services.netdata-svc.loadbalancer.server.port=19999"
 
   node-exporter:
     image: prom/node-exporter:latest
