@@ -42,13 +42,13 @@ services:
       DOCKER_HOST: /var/run/docker.sock:/var/run/docker.sock:ro
       # DOCKER_HOST: tcp://socket-proxy:2375
       GLANCES_OPT: "-w" # "-C /glances/conf/glances.conf --export influxdb"
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

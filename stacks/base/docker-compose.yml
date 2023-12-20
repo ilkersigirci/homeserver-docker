@@ -378,7 +378,7 @@ services:
       - $DOCKERDIR/appdata/filebrowser/database.db:/database.db
       - $CONFIGDIR/filebrowser/custom.css:/custom/custom.css
       - $USERDIR:/srv/Home  # NOTE: When downing container, provide .env file, otherwise gives error
-      - $HARDDISKROOTDIR:/srv/Harddisk  # NOTE: When downing container, provide .env file, otherwise gives error
+      # - $HARDDISKROOTDIR:/srv/Harddisk  # NOTE: When downing container, provide .env file, otherwise gives error
     environment:
       - PUID=$PUID
       - PGID=$PGID
@@ -418,8 +418,6 @@ services:
       ## HTTP Services
       - "traefik.http.routers.dufs-rtr.service=dufs-svc"
       - "traefik.http.services.dufs-svc.loadbalancer.server.port=5000"
-
-
 
 
   # filerun_db:
