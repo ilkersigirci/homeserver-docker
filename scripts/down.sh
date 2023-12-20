@@ -2,19 +2,10 @@
 
 STACKS_ROOT=~/docker/stacks
 
-cd $STACKS_ROOT/base
-docker compose --env-file ~/docker/configs/.env down --volumes --remove-orphans
-cd $STACKS_ROOT/notes
-docker compose --env-file ~/docker/configs/.env down --volumes --remove-orphans
-cd $STACKS_ROOT/media
-docker compose --env-file ~/docker/configs/.env down --volumes --remove-orphans
-# cd $STACKS_ROOT/others
-# docker compose --env-file ~/docker/configs/.env down --volumes --remove-orphans
-cd $STACKS_ROOT/maintenance
-docker compose --env-file ~/docker/configs/.env down --volumes --remove-orphans
-cd $STACKS_ROOT/monitoring
-docker compose --env-file ~/docker/configs/.env down --volumes --remove-orphans
-# cd $STACKS_ROOT/photo
-# docker compose down --volumes --remove-orphans
-cd $STACKS_ROOT/photo-dev
-docker compose down --volumes --remove-orphans
+stacks=("base" "notes" "media" "others" "desktop_apps" "maintenance" "monitoring" "photo-dev")
+
+for stack in "${stacks[@]}"
+do
+    cd "$STACKS_ROOT/$stack"
+    docker compose --env-file ~/docker/configs/.env down --volumes --remove-orphans
+done

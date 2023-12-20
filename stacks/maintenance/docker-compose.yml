@@ -255,30 +255,30 @@ services:
       - "traefik.http.routers.czkawka-rtr.service=czkawka-svc"
       - "traefik.http.services.czkawka-svc.loadbalancer.server.port=5800"
 
-  sshwifty:
-    container_name: sshwifty
-    image: niruix/sshwifty:latest
-    restart: $MAINTENANCE_RESTART_POLICY
-    networks:
-      - t2_proxy
-    security_opt:
-      - no-new-privileges:true
-    # volumes:
-    #   - $DOCKERDIR/appdata/czkawka:/config:rw
-    environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.sshwifty-rtr.entrypoints=https"
-      - "traefik.http.routers.sshwifty-rtr.rule=Host(`ssh.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.sshwifty-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.sshwifty-rtr.service=sshwifty-svc"
-      - "traefik.http.services.sshwifty-svc.loadbalancer.server.port=8182"
+  # sshwifty:
+  #   container_name: sshwifty
+  #   image: niruix/sshwifty:latest
+  #   restart: $MAINTENANCE_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   # volumes:
+  #   #   - $DOCKERDIR/appdata/czkawka:/config:rw
+  #   environment:
+  #     - PUID=$PUID
+  #     - PGID=$PGID
+  #     - TZ=$TZ
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.sshwifty-rtr.entrypoints=https"
+  #     - "traefik.http.routers.sshwifty-rtr.rule=Host(`ssh.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.sshwifty-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.sshwifty-rtr.service=sshwifty-svc"
+  #     - "traefik.http.services.sshwifty-svc.loadbalancer.server.port=8182"
 
   ############################### BACKUP #######################################
 
