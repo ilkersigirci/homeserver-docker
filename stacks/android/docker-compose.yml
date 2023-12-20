@@ -1,0 +1,40 @@
+version: "3.9"
+name: android
+
+networks:
+  t2_proxy:
+    external: true
+  internal:
+    name: internal
+    driver: bridge
+
+services:
+  # adb connect localhost:5555
+  # scrcpy -s localhost:5555
+  redroid:
+    container_name: redroid
+    image: redroid/redroid:13.0.0-latest
+    restart: $DESKTOP_IMAGES_RESTART_POLICY
+    privileged: true
+    networks:
+      - t2_proxy
+    ports:
+      - 5555:5555
+    # security_opt:
+    #   - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/redroid/data:/data
+    # environment:
+    #   - PUID=$PUID
+    #   - PGID=$PGID
+    #   - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.redroid-rtr.entrypoints=https"
+      - "traefik.http.routers.redroid-rtr.rule=Host(`redroid.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.redroid-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.redroid-rtr.service=redroid-svc"
+      - "traefik.http.services.redroid-svc.loadbalancer.server.port=5555"

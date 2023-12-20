@@ -154,6 +154,28 @@ services:
       ## HTTP Services
       - "traefik.http.routers.jellyfin-rtr.service=jellyfin-svc"
       - "traefik.http.services.jellyfin-svc.loadbalancer.server.port=8096"
+
+  jellyfin-vue:
+    image: ghcr.io/jellyfin/jellyfin-vue:unstable.2023-11-30.5ff058d
+    container_name: jellyfin-vue
+    restart: $MEDIA_RESTART_POLICY
+    # depends_on:
+    #   - jellyfin
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.jellyfin-vue-rtr.entrypoints=https"
+      - "traefik.http.routers.jellyfin-vue-rtr.rule=Host(`jellyfin_vue.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.jellyfin-vue-rtr.middlewares=chain-authelia@file"
+      # - "traefik.http.routers.jellyfin-vue-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.jellyfin-vue-rtr.service=jellyfin-vue-svc"
+      - "traefik.http.services.jellyfin-vue-svc.loadbalancer.server.port=80"
     
   jellyseerr:
     image: fallenbagel/jellyseerr:latest  # TODO: ghcr.io
@@ -300,39 +322,37 @@ services:
   #     - "traefik.http.routers.qbittorrent-rtr.service=qbittorrent-svc"
   #     - "traefik.http.services.qbittorrent-svc.loadbalancer.server.port=8080"
 
-  # jdownloader:
-  #   image: jlesage/jdownloader-2:latest
-  #   container_name: jdownloader
-  #   restart: $MEDIA_RESTART_POLICY
-  #   networks:
-  #     - t2_proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   # ports:
-  #   #   - 5800:5800
-  #   volumes:
-  #     - $DOCKERDIR/appdata/jdownloader:/config:rw
-  #     - $MEDIADIR/Downloads:/output:rw
-  #   environment:
-  #     USER_ID: $PUID
-  #     GROUP_ID: $PGID
-  #     TZ: $TZ
-  #     UMASK: 002
-  #     KEEP_APP_RUNNING: 1
-  #     CLEAN_TMP_DIR: 1
-  #     DISPLAY_WIDTH: 2560
-  #     DISPLAY_HEIGHT: 1440
-  #   #      VNC_PASSWORD: $JDOWN_VNC_PASSWD
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.jdownloader-rtr.entrypoints=https"
-  #     - "traefik.http.routers.jdownloader-rtr.rule=Host(`download.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.jdownloader-rtr.middlewares=chain-authelia@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.jdownloader-rtr.service=jdownloader-svc"
-  #     - "traefik.http.services.jdownloader-svc.loadbalancer.server.port=5800"
+  jdownloader:
+    image: jlesage/jdownloader-2:latest
+    container_name: jdownloader
+    restart: $MEDIA_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/jdownloader:/config:rw
+      - $MEDIADIR/Downloads:/output:rw
+    environment:
+      USER_ID: $PUID
+      GROUP_ID: $PGID
+      TZ: $TZ
+      UMASK: 002
+      KEEP_APP_RUNNING: 1
+      CLEAN_TMP_DIR: 1
+      DISPLAY_WIDTH: 1920
+      DISPLAY_HEIGHT: 1080
+    #      VNC_PASSWORD: $JDOWN_VNC_PASSWD
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.jdownloader-rtr.entrypoints=https"
+      - "traefik.http.routers.jdownloader-rtr.rule=Host(`download.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.jdownloader-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.jdownloader-rtr.service=jdownloader-svc"
+      - "traefik.http.services.jdownloader-svc.loadbalancer.server.port=5800"
 
 # NOTE: only works on localhost because of RPC server issue
   # aria2:
