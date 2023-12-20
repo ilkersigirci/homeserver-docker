@@ -13,9 +13,9 @@ services:
     networks:
       - t2_proxy
 
-  immich-postgres-dev:
-    container_name: immich-postgres-dev
-    image: postgres:14
+  immich-database-dev:
+    container_name: immich-database-dev
+    image: tensorchord/pgvecto-rs:pg14-v0.1.11
     networks:
       - t2_proxy
     volumes:
@@ -28,21 +28,6 @@ services:
       POSTGRES_DB: ${DB_DATABASE_NAME}
       PG_DATA: /var/lib/postgresql/data
 
-  # NOTE: Change `TYPESENSE_HOST` env variable accordingly
-  immich-typesense-dev:
-    container_name: immich-typesense-dev
-    image: typesense/typesense:0.24.0
-    networks:
-      - t2_proxy
-    volumes:
-      - $DOCKERDIR/appdata/immich-typesense-dev:/data
-    environment:
-      - TYPESENSE_API_KEY=${TYPESENSE_API_KEY}
-      - TYPESENSE_DATA_DIR=/data
-      - GLOG_minloglevel=1 # remove this to get debug messages
-    logging:
-      driver: none
-
   immich-server-dev:
     container_name: immich-server-dev
     image: ghcr.io/immich-app/immich-server:release
@@ -50,8 +35,7 @@ services:
     restart: $MEDIA_RESTART_POLICY
     depends_on:
       - immich-redis-dev
-      - immich-postgres-dev
-      - immich-typesense-dev
+      - immich-database-dev
     networks:
       - t2_proxy
     volumes:
@@ -87,8 +71,7 @@ services:
     restart: on-failure
     depends_on:
       - immich-redis-dev
-      - immich-postgres-dev
-      - immich-typesense-dev
+      - immich-database-dev
     networks:
       - t2_proxy
     volumes:
