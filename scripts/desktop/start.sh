@@ -28,18 +28,18 @@ STACKS_ROOT=~/docker/stacks
 ############################### NORMAL ##################################
 
 cd $STACKS_ROOT/base
-docker compose --env-file ~/docker/configs/.env up -d
+docker compose --env-file ~/docker/configs/.env up -d traefik docker-socket-proxy authelia filebrowser
 cd $STACKS_ROOT/media
 docker compose --env-file ~/docker/configs/.env up -d transmission jellyfin # ytdl-sub deemix beets
 cd $STACKS_ROOT/maintenance
-docker compose --env-file ~/docker/configs/.env up -d rustic code-server # czkawka sshwifty watchtower
+docker compose --env-file ~/docker/configs/.env up -d code-server # rustic czkawka sshwifty watchtower
 cd $STACKS_ROOT/monitoring
 docker compose --env-file ~/docker/configs/.env up -d glances netdata
 # cd $STACKS_ROOT/photo
 # docker compose up -d
 cd $STACKS_ROOT/photo-dev
 docker compose up -d
-cd $STACKS_ROOT/notes
-docker compose --env-file ~/docker/configs/.env up -d couchdb flatnotes obsidian
+# cd $STACKS_ROOT/notes
+# docker compose --env-file ~/docker/configs/.env up -d couchdb flatnotes obsidian
 # cd $STACKS_ROOT/others
 # docker compose --env-file ~/docker/configs/.env up -d stable-diffusion
