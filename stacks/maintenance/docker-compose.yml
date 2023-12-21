@@ -12,6 +12,8 @@ secrets:
     file: $DOCKERDIR/secrets/rustic_password
 
 services:
+
+  # NOTE: Because of network_mode: host, we can't use traefik for reverse proxying by docker labels
   wumps:
     image: kaistarkk/wumps
     container_name: wumps
@@ -19,16 +21,16 @@ services:
     network_mode: host
     volumes:
       - $DOCKERDIR/configs/wumps/config.ini:/app/config.ini
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.wumps-rtr.entrypoints=https"
-      - "traefik.http.routers.wumps-rtr.rule=Host(`wol.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.wumps-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.wumps-rtr.service=wumps-svc"
-      - "traefik.http.services.wumps-svc.loadbalancer.server.port=9008"
+    # labels:
+    #   - "traefik.enable=true"
+    #   ## HTTP Routers
+    #   - "traefik.http.routers.wumps-rtr.entrypoints=https"
+    #   - "traefik.http.routers.wumps-rtr.rule=Host(`wol.$DOMAINNAME`)"
+    #   ## Middlewares
+    #   - "traefik.http.routers.wumps-rtr.middlewares=chain-authelia@file"
+    #   ## HTTP Services
+    #   - "traefik.http.routers.wumps-rtr.service=wumps-svc"
+    #   - "traefik.http.services.wumps-svc.loadbalancer.server.port=9008"
 
   watchtower:
     image: ghcr.io/containrrr/watchtower:latest
