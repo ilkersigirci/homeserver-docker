@@ -133,7 +133,7 @@ services:
   stable-diffusion:
     container_name: stable-diffusion
     build: $STABLEDIFFUSIONDIR/services/AUTOMATIC1111
-    image: stablediff-auto:67
+    image: stablediff-auto:68
     restart: $OTHERS_RESTART_POLICY
     stop_signal: SIGINT
     tty: true
