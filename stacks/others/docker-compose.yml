@@ -255,8 +255,8 @@ services:
       args:
         - CUDA_VERSION=12.3.1
         - CUDA_DOCKER_ARCH=all
-    # command: ["--run", "-m", "/models/tinyllma-1.1b-chat-v1.0.Q8_0.gguf", "-p", "Building a website can be done in 10 simple steps:", "-n", "512", "--n-gpu-layers", "50"]
-    command: ["--server", "-m", "/models/tinyllma-1.1b-chat-v1.0.Q8_0.gguf", "--port", "8080", "--host", "0.0.0.0", "-c", "2048", "--n-gpu-layers", "50"]
+    command: ["--only_openapi_server", "-m", "/models/tinyllma-1.1b-chat-v1.0.Q8_0.gguf", "-c", "2048", "--n-gpu-layers", "50"] # "--only_llma_server"
+    # command: ["--only_openapi_server", "-m", "/models/nous-hermes-2-mixtral-8x7b-dpo.Q4_K_M.gguf", "-c", "2048", "--n-gpu-layers", "10"] # "--only_llma_server"
     restart: $OTHERS_RESTART_POLICY
     networks:
       - t2_proxy

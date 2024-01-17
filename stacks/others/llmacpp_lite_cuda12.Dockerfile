@@ -23,6 +23,7 @@ COPY . .
 
 # Set nvcc architecture
 ENV CUDA_DOCKER_ARCH=${CUDA_DOCKER_ARCH}
+
 # Enable cuBLAS
 ENV LLAMA_CUBLAS=1
 
@@ -32,6 +33,13 @@ FROM ${BASE_CUDA_RUN_CONTAINER} as runtime
 
 COPY --from=build /app/main /main
 COPY --from=build /app/server /server
-COPY --from=build /app/.devops/tools.sh /tools.sh
+COPY --from=build /app/examples/server/api_like_OAI.py /api_like_OAI.py
+COPY --from=build /app/.devops/start_server.sh /start_server.sh
 
-ENTRYPOINT ["/tools.sh"]
+
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip && \
+    rm -rf /var/cache/apt/lists/* && \
+    pip install --no-cache-dir requests flask
+
+ENTRYPOINT [ "/start_server.sh" ]
