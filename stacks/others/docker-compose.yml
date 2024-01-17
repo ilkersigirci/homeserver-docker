@@ -132,7 +132,7 @@ services:
 
   stable-diffusion:
     container_name: stable-diffusion
-    build: $STABLEDIFFUSIONDIR/services/AUTOMATIC1111
+    build: $GITHUBREPOSDIR/stable-diffusion-webui-docker/services/AUTOMATIC1111
     image: stablediff-auto:71
     restart: $OTHERS_RESTART_POLICY
     stop_signal: SIGINT
@@ -140,9 +140,9 @@ services:
     networks:
       - t2_proxy
     volumes:
-      - $STABLEDIFFUSIONDIR/data:/data
-      - $STABLEDIFFUSIONDIR/output:/output
-      # - $STABLEDIFFUSIONDIR/services/AUTOMATIC1111/config.json:/stable-diffusion-webui/config.json
+      - $GITHUBREPOSDIR/stable-diffusion-webui-docker/data:/data
+      - $GITHUBREPOSDIR/stable-diffusion-webui-docker/output:/output
+      # - $GITHUBREPOSDIR/stable-diffusion-webui-docker/services/AUTOMATIC1111/config.json:/stable-diffusion-webui/config.json
     environment:
       # - ATTN_PRECISION=fp16
       - CLI_ARGS=--allow-code --enable-insecure-extension-access --medvram-sdxl # --api --xformers --no-half-vae
@@ -211,14 +211,14 @@ services:
     networks:
       - t2_proxy
     volumes:
-      - $TEXTGENERATIONDIR/config/characters:/app/characters
-      - $TEXTGENERATIONDIR/config/loras:/app/loras
-      - $TEXTGENERATIONDIR/config/models:/app/models
-      - $TEXTGENERATIONDIR/config/presets:/app/presets
-      - $TEXTGENERATIONDIR/config/prompts:/app/prompts
-      - $TEXTGENERATIONDIR/config/training:/app/training
-#      - $TEXTGENERATIONDIR/config/extensions:/app/extensions  # Persist all extensions
-#      - $TEXTGENERATIONDIR/config/extensions/silero_tts:/app/extensions/silero_tts  # Persist a single extension
+      - $GITHUBREPOSDIR/text-generation-webui-docker/config/characters:/app/characters
+      - $GITHUBREPOSDIR/text-generation-webui-docker/config/loras:/app/loras
+      - $GITHUBREPOSDIR/text-generation-webui-docker/config/models:/app/models
+      - $GITHUBREPOSDIR/text-generation-webui-docker/config/presets:/app/presets
+      - $GITHUBREPOSDIR/text-generation-webui-docker/config/prompts:/app/prompts
+      - $GITHUBREPOSDIR/text-generation-webui-docker/config/training:/app/training
+#      - $GITHUBREPOSDIR/text-generation-webui-docker/config/extensions:/app/extensions  # Persist all extensions
+#      - $GITHUBREPOSDIR/text-generation-webui-docker/config/extensions/silero_tts:/app/extensions/silero_tts  # Persist a single extension
     environment:
       - EXTRA_LAUNCH_ARGS="--listen --verbose --model MODEL_NAME" # Custom launch args (e.g., --model MODEL_NAME)
 #      - BUILD_EXTENSIONS_LIVE="silero_tts whisper_stt" # Install named extensions during every container launch. THIS WILL SIGNIFICANLTLY SLOW LAUNCH TIME.
@@ -244,6 +244,43 @@ services:
       ## HTTP Services
       - "traefik.http.routers.textgen-rtr.service=textgen-svc"
       - "traefik.http.services.textgen-svc.loadbalancer.server.port=7860"
+
+  llama-cpp:
+    container_name: llama-cpp
+    # image: ghcr.io/ggerganov/llama.cpp:full-cuda # light - full - light-cuda - full-cuda
+    image: llama.cpp:lite-cuda12
+    build:
+      dockerfile: $DOCKERDIR/stacks/others/llmacpp_lite_cuda12.Dockerfile
+      context: $GITHUBREPOSDIR/llama.cpp
+      args:
+        - CUDA_VERSION=12.3.1
+        - CUDA_DOCKER_ARCH=all
+    # command: ["--run", "-m", "/models/tinyllma-1.1b-chat-v1.0.Q8_0.gguf", "-p", "Building a website can be done in 10 simple steps:", "-n", "512", "--n-gpu-layers", "50"]
+    command: ["--server", "-m", "/models/tinyllma-1.1b-chat-v1.0.Q8_0.gguf", "--port", "8080", "--host", "0.0.0.0", "-c", "2048", "--n-gpu-layers", "50"]
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t2_proxy
+    # ports:
+    #   - "8081:8080"
+    volumes:
+     - "$MLMODELSDIR/LLM:/models:ro"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: [ '0' ]
+              capabilities: [ gpu ]
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.llama-cpp-rtr.entrypoints=https"
+      - "traefik.http.routers.llama-cpp-rtr.rule=Host(`llmapi.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.llama-cpp-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.llama-cpp-rtr.service=llama-cpp-svc"
+      - "traefik.http.services.llama-cpp-svc.loadbalancer.server.port=8080"
   
   whisper-api:
     container_name: whisper-api

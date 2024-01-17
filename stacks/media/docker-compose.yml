@@ -228,6 +228,26 @@ services:
       - "traefik.http.routers.feishin-rtr.service=feishin-svc"
       - "traefik.http.services.feishin-svc.loadbalancer.server.port=9180"
 
+  # TODO: Not completed !!
+  movie-web:
+    container_name: movie-web
+    build: $GITHUBREPOSDIR/movie-web
+    image: movie-web:4.2.0
+    # image: ghcr.io/movie-web/movie-web # NOTE: There is no pushed docker image
+    restart: $MEDIA_RESTART_POLICY
+    networks:
+      - t2_proxy
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.movieweb-rtr.entrypoints=https"
+      - "traefik.http.routers.movieweb-rtr.rule=Host(`movieweb.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.movieweb-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.movieweb-rtr.service=movieweb-svc"
+      - "traefik.http.services.movieweb-svc.loadbalancer.server.port=80"
+
 
   ############################# DOWNLOAD #############################
   # For torrent VPN
@@ -399,8 +419,9 @@ services:
       - t2_proxy
 #      t2_proxy:
 #        ipv4_address: 192.168.90.160
-#    ports:
-#      - "9091:9091"
+    ports:
+      - "487:487"
+      # - "51413:51413"
     security_opt:
       - no-new-privileges:true
     volumes:

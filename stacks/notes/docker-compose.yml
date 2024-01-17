@@ -216,7 +216,7 @@ services:
   # serverHost=https://$DOMAINNAME
   librum:
     container_name: librum
-    build: $LIBRUMDIR
+    build: $GITHUBREPOSDIR/Librum-Server
     image: librum:latest
     hostname: librum
     restart: $OTHERS_RESTART_POLICY
