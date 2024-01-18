@@ -36,6 +36,8 @@ COPY --from=build /app/server /server
 COPY --from=build /app/examples/server/api_like_OAI.py /api_like_OAI.py
 COPY --from=build /app/.devops/start_server.sh /start_server.sh
 
+EXPOSE 5000
+EXPOSE 8080
 
 RUN apt-get update && \
     apt-get install -y python3 python3-pip && \

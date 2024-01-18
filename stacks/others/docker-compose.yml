@@ -245,6 +245,7 @@ services:
       - "traefik.http.routers.textgen-rtr.service=textgen-svc"
       - "traefik.http.services.textgen-svc.loadbalancer.server.port=7860"
 
+  # NOTE: If you don't have ChatML-tuned models, you must use openapi-server
   llama-cpp:
     container_name: llama-cpp
     # image: ghcr.io/ggerganov/llama.cpp:full-cuda # light - full - light-cuda - full-cuda
@@ -255,13 +256,14 @@ services:
       args:
         - CUDA_VERSION=12.3.1
         - CUDA_DOCKER_ARCH=all
-    command: ["--only_openapi_server", "-m", "/models/tinyllma-1.1b-chat-v1.0.Q8_0.gguf", "-c", "2048", "--n-gpu-layers", "50"] # "--only_llma_server"
-    # command: ["--only_openapi_server", "-m", "/models/nous-hermes-2-mixtral-8x7b-dpo.Q4_K_M.gguf", "-c", "2048", "--n-gpu-layers", "10"] # "--only_llma_server"
+    command: ["--normal-server", "-m", "/models/tinyllma-1.1b-chat-v1.0.Q8_0.gguf", "-c", "2048", "--n-gpu-layers", "50"] # "--openapi-server"
+    # command: ["--normal-server", "-m", "/models/nous-hermes-2-mixtral-8x7b-dpo.Q4_K_M.gguf", "-c", "2048", "--n-gpu-layers", "7"] # "--openapi-server"
     restart: $OTHERS_RESTART_POLICY
     networks:
       - t2_proxy
     # ports:
-    #   - "8081:8080"
+    #   - "5001:5000" # for llma_server
+    #   - "8081:8080" # for openapi_server
     volumes:
      - "$MLMODELSDIR/LLM:/models:ro"
     deploy:
@@ -274,13 +276,18 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.llama-cpp-rtr.entrypoints=https"
-      - "traefik.http.routers.llama-cpp-rtr.rule=Host(`llmapi.$DOMAINNAME`)"
+      - "traefik.http.routers.llama-cpp-normal-rtr.entrypoints=https"
+      - "traefik.http.routers.llama-cpp-normal-rtr.rule=Host(`llmapi.$DOMAINNAME`)"
+      - "traefik.http.routers.llama-cpp-openapi-rtr.entrypoints=https"
+      - "traefik.http.routers.llama-cpp-openapi-rtr.rule=Host(`llmopenapi.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.llama-cpp-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.llama-cpp-normal-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.llama-cpp-openapi-rtr.middlewares=chain-no-auth@file"
       ## HTTP Services
-      - "traefik.http.routers.llama-cpp-rtr.service=llama-cpp-svc"
-      - "traefik.http.services.llama-cpp-svc.loadbalancer.server.port=8080"
+      - "traefik.http.routers.llama-cpp-normal-rtr.service=llama-cpp-normal-svc"
+      - "traefik.http.services.llama-cpp-normal-svc.loadbalancer.server.port=5000"
+      - "traefik.http.routers.llama-cpp-openapi-rtr.service=llama-cpp-openapi-svc"
+      - "traefik.http.services.llama-cpp-openapi-svc.loadbalancer.server.port=8080"
   
   whisper-api:
     container_name: whisper-api
