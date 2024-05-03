@@ -8,14 +8,14 @@ networks:
 services:
   immich-redis-dev:
     container_name: immich-redis-dev
-    image: redis:6.2
+    image: registry.hub.docker.com/library/redis:6.2-alpine@sha256:84882e87b54734154586e5f8abd4dce69fe7311315e2fc6d67c29614c8de2672
     restart: $MEDIA_RESTART_POLICY
     networks:
       - t2_proxy
 
   immich-database-dev:
     container_name: immich-database-dev
-    image: tensorchord/pgvecto-rs:pg14-v0.1.11
+    image: registry.hub.docker.com/tensorchord/pgvecto-rs:pg14-v0.2.0@sha256:90724186f0a3517cf6914295b5ab410db9ce23190a2d9d0b9dd6463e3fa298f0
     networks:
       - t2_proxy
     volumes:
@@ -75,6 +75,7 @@ services:
     networks:
       - t2_proxy
     volumes:
+      - /etc/localtime:/etc/localtime:ro
       - ${ORIGINAL_UPLOAD_LOCATION}/library:/usr/src/app/upload/library
       - ${GENERATED_UPLOAD_LOCATION}/thumbs:/usr/src/app/upload/thumbs
       - ${GENERATED_UPLOAD_LOCATION}/profile:/usr/src/app/upload/profile
@@ -85,10 +86,20 @@ services:
       - .env
     environment:
       NODE_ENV: production
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities:
+                - gpu
+                - compute
+                - video
 
   immich-machine-learning-dev:
     container_name: immich-machine-learning-dev
-    image: ghcr.io/immich-app/immich-machine-learning:release
+    image: ghcr.io/immich-app/immich-machine-learning:release-cuda
     restart: $MEDIA_RESTART_POLICY
     networks:
       - t2_proxy
@@ -105,3 +116,21 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
+
+  ##############################################
+  # https://github.com/Salvoxia/immich-folder-album-creator
+  immich-folder-album-creator:
+    container_name: immich-folder-album-creator
+    image: salvoxia/immich-folder-album-creator:latest
+    restart: unless-stopped
+    # command: ["/script/immich_auto_album.sh"] # NOTE: Manually run
+    networks:
+      - t2_proxy
+    environment:
+      API_URL: http://immich-server-dev:3001/api
+      API_KEY: $IMMICH_API_KEY
+      ROOT_PATH: /mnt/media/Photos/Pictures
+      CRON_EXPRESSION: "0 2 * * *"
+      TZ: Europe/Istanbul
+      ALBUM_LEVELS: 1
+      LOG_LEVEL: INFO
