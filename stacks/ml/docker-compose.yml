@@ -1,0 +1,179 @@
+version: "3.9"
+name: ml
+
+networks:
+  t2_proxy:
+    external: true
+
+x-deploy: &gpu-deploy
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu, compute, utility]
+            # capabilities: [compute, utility]
+
+services:
+  stable-diffusion:
+    container_name: stable-diffusion
+    build: $GITHUBREPOSDIR/stable-diffusion-webui-docker/services/AUTOMATIC1111
+    image: stablediff-auto:71
+    restart: $OTHERS_RESTART_POLICY
+    # compute, utility
+    <<: *gpu-deploy
+    stop_signal: SIGINT
+    tty: true
+    networks:
+      - t2_proxy
+    volumes:
+      - $GITHUBREPOSDIR/stable-diffusion-webui-docker/data:/data
+      - $GITHUBREPOSDIR/stable-diffusion-webui-docker/output:/output
+      # - $GITHUBREPOSDIR/stable-diffusion-webui-docker/services/AUTOMATIC1111/config.json:/stable-diffusion-webui/config.json
+    environment:
+      # - ATTN_PRECISION=fp16
+      - CLI_ARGS=--allow-code --enable-insecure-extension-access --medvram-sdxl # --api --xformers --no-half-vae
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.stablediffusion-rtr.entrypoints=https"
+      - "traefik.http.routers.stablediffusion-rtr.rule=Host(`stablediffusion.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.stablediffusion-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.stablediffusion-rtr.service=stablediffusion-svc"
+      - "traefik.http.services.stablediffusion-svc.loadbalancer.server.port=7860"
+
+  sd-next:
+    container_name: sd-next
+    image: holaflenain/stable-diffusion:latest
+    restart: $OTHERS_RESTART_POLICY
+    <<: *gpu-deploy
+    # runtime: nvidia # NOTE: Not working
+    networks:
+      - t2_proxy
+    ports:
+      - "9999:9000/tcp"
+    volumes:
+      - $DOCKERDIR/appdata/sd-next:/config:rw
+      - $MLMODELSDIR:/config/models/stable-diffusion:ro
+    environment:
+      - WEBUI_VERSION=04
+      - NVIDIA_VISIBLE_DEVICES=all
+      - TZ=$TZ
+      - PUID=$PUID
+      - PGID=$PGID
+      # - CLEAN_ENV=true
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.sdnext-rtr.entrypoints=https"
+      - "traefik.http.routers.sdnext-rtr.rule=Host(`sdnext.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.sdnext-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.sdnext-rtr.service=sdnext-svc"
+      - "traefik.http.services.sdnext-svc.loadbalancer.server.port=9000"
+
+  # NOTE: Not completed yet !!!
+  # https://github.com/Atinoda/text-generation-webui-docker
+  text-generation:
+    container_name: text-generation
+    image: atinoda/text-generation-webui:default
+    restart: $OTHERS_RESTART_POLICY
+    <<: *gpu-deploy
+    networks:
+      - t2_proxy
+    volumes:
+      - $GITHUBREPOSDIR/text-generation-webui-docker/config/characters:/app/characters
+      - $GITHUBREPOSDIR/text-generation-webui-docker/config/loras:/app/loras
+      - $GITHUBREPOSDIR/text-generation-webui-docker/config/models:/app/models
+      - $GITHUBREPOSDIR/text-generation-webui-docker/config/presets:/app/presets
+      - $GITHUBREPOSDIR/text-generation-webui-docker/config/prompts:/app/prompts
+      - $GITHUBREPOSDIR/text-generation-webui-docker/config/training:/app/training
+#      - $GITHUBREPOSDIR/text-generation-webui-docker/config/extensions:/app/extensions  # Persist all extensions
+#      - $GITHUBREPOSDIR/text-generation-webui-docker/config/extensions/silero_tts:/app/extensions/silero_tts  # Persist a single extension
+    environment:
+      - EXTRA_LAUNCH_ARGS="--listen --verbose --model MODEL_NAME" # Custom launch args (e.g., --model MODEL_NAME)
+#      - BUILD_EXTENSIONS_LIVE="silero_tts whisper_stt" # Install named extensions during every container launch. THIS WILL SIGNIFICANLTLY SLOW LAUNCH TIME.
+    logging:
+      driver:  json-file
+      options:
+        max-file: "3"   # number of files or file count
+        max-size: '10m'
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.textgen-rtr.entrypoints=https"
+      - "traefik.http.routers.textgen-rtr.rule=Host(`textgen.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.textgen-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.textgen-rtr.service=textgen-svc"
+      - "traefik.http.services.textgen-svc.loadbalancer.server.port=7860"
+
+  ## NOTE: If you don't have ChatML-tuned models, you must use openapi-server
+  ## Models:
+  # "-m", "/models/tinyllma-1.1b-chat-v1.0.Q8_0.gguf" , "-ngl", "23"
+  # "-m", /models/openhermes-2.5-mistral-7b.Q4_K_M.gguf , "-ngl", "33"
+  # "-m", "/models/nous-hermes-2-mixtral-8x7b-dpo.Q4_K_M.gguf" , "-ngl", "7"
+  llama-cpp:
+    container_name: llama-cpp
+    # image: ghcr.io/ggerganov/llama.cpp:full-cuda # light - full - light-cuda - full-cuda
+    image: llama.cpp:lite-cuda12
+    build:
+      dockerfile: $DOCKERDIR/stacks/others/llmacpp_lite_cuda12.Dockerfile
+      context: $GITHUBREPOSDIR/llama.cpp
+      args:
+        - CUDA_VERSION=12.3.1
+        - CUDA_DOCKER_ARCH=all
+    command: ["--normal-server", "-c", "2048", "-m", "/models/tinyllma-1.1b-chat-v1.0.Q8_0.gguf", "-ngl", "23"] # "--openapi-server"
+    restart: $OTHERS_RESTART_POLICY
+    <<: *gpu-deploy
+    networks:
+      - t2_proxy
+    ports:
+      - "5001:5000" # for llma_server
+    #   - "8081:8080" # for openapi_server
+    volumes:
+     - "$MLMODELSDIR/LLM:/models:ro"
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.llama-cpp-normal-rtr.entrypoints=https"
+      - "traefik.http.routers.llama-cpp-normal-rtr.rule=Host(`llmapi.$DOMAINNAME`)"
+      - "traefik.http.routers.llama-cpp-openapi-rtr.entrypoints=https"
+      - "traefik.http.routers.llama-cpp-openapi-rtr.rule=Host(`llmopenapi.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.llama-cpp-normal-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.llama-cpp-openapi-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.llama-cpp-normal-rtr.service=llama-cpp-normal-svc"
+      - "traefik.http.services.llama-cpp-normal-svc.loadbalancer.server.port=5000"
+      - "traefik.http.routers.llama-cpp-openapi-rtr.service=llama-cpp-openapi-svc"
+      - "traefik.http.services.llama-cpp-openapi-svc.loadbalancer.server.port=8080"
+  
+  whisper-api:
+    container_name: whisper-api
+    image: onerahmet/openai-whisper-asr-webservice:latest-gpu
+    restart: $OTHERS_RESTART_POLICY
+    <<: *gpu-deploy
+    networks:
+      - t2_proxy
+    # ports:
+    #   - "9000:9000"
+    volumes:
+      - $DOCKERDIR/appdata/whisper-api:/app
+    environment:
+      - ASR_MODEL=base 
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.whisper-api-rtr.entrypoints=https"
+      - "traefik.http.routers.whisper-api-rtr.rule=Host(`whisperapi.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.whisper-api-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.whisper-api-rtr.service=whisper-api-svc"
+      - "traefik.http.services.whisper-api-svc.loadbalancer.server.port=9000"
