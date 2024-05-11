@@ -5,5 +5,4 @@ logs
 secrets
 .vscode
 stacks/photo/.env
-stacks/photo-dev/.env
 .idea

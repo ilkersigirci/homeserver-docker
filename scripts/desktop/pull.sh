@@ -18,10 +18,7 @@ docker compose --env-file ~/docker/configs/.env up -d code-server  # watchtower 
 cd $STACKS_ROOT/monitoring
 docker compose --env-file ~/docker/configs/.env pull glances netdata
 docker compose --env-file ~/docker/configs/.env up -d glances netdata
-# cd $STACKS_ROOT/photo
-# docker compose pull
-# docker compose up -d
-cd $STACKS_ROOT/photo-dev
+cd $STACKS_ROOT/photo
 docker compose pull
 docker compose up -d
 # cd $STACKS_ROOT/notes

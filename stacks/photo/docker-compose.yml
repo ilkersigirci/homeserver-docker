@@ -1,25 +1,24 @@
-version: "3.9"
-name: photo-dev
+name: photo
 
 networks:
   t2_proxy:
     external: true
 
 services:
-  immich-redis-dev:
-    container_name: immich-redis-dev
+  immich-redis:
+    container_name: immich-redis
     image: registry.hub.docker.com/library/redis:6.2-alpine@sha256:84882e87b54734154586e5f8abd4dce69fe7311315e2fc6d67c29614c8de2672
     restart: $MEDIA_RESTART_POLICY
     networks:
       - t2_proxy
 
-  immich-database-dev:
-    container_name: immich-database-dev
+  immich-database:
+    container_name: immich-database
     image: registry.hub.docker.com/tensorchord/pgvecto-rs:pg14-v0.2.0@sha256:90724186f0a3517cf6914295b5ab410db9ce23190a2d9d0b9dd6463e3fa298f0
     networks:
       - t2_proxy
     volumes:
-      - $DOCKERDIR/appdata/immich-db-dev:/var/lib/postgresql/data
+      - $DOCKERDIR/appdata/immich-db:/var/lib/postgresql/data
     env_file:
       - .env
     environment:
@@ -28,14 +27,14 @@ services:
       POSTGRES_DB: ${DB_DATABASE_NAME}
       PG_DATA: /var/lib/postgresql/data
 
-  immich-server-dev:
-    container_name: immich-server-dev
+  immich-server:
+    container_name: immich-server
     image: ghcr.io/immich-app/immich-server:release
     command: [ "start.sh", "immich" ]
     restart: $MEDIA_RESTART_POLICY
     depends_on:
-      - immich-redis-dev
-      - immich-database-dev
+      - immich-redis
+      - immich-database
     networks:
       - t2_proxy
     volumes:
@@ -52,26 +51,26 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.immich-server-dev-rtr.entrypoints=https"
-      - "traefik.http.routers.immich-server-dev-rtr.rule=Host(`photosdev.$DOMAINNAME`)"
-      # - "traefik.http.routers.immich-server-dev-rtr.rule=Host(`photosdev.$DOMAINNAME`) && Pathprefix(`/api`)"
+      - "traefik.http.routers.immich-server-rtr.entrypoints=https"
+      - "traefik.http.routers.immich-server-rtr.rule=Host(`photos.$DOMAINNAME`)"
+      # - "traefik.http.routers.immich-server-rtr.rule=Host(`photos.$DOMAINNAME`) && Pathprefix(`/api`)"
       ## Middlewares
-      - "traefik.http.routers.immich-server-dev-rtr.middlewares=chain-authelia@file"
-      # - "traefik.http.routers.immich-server-dev-rtr.middlewares=add-api"
+      - "traefik.http.routers.immich-server-rtr.middlewares=chain-authelia@file"
+      # - "traefik.http.routers.immich-server-rtr.middlewares=add-api"
       # - "traefik.http.middlewares.add-api.stripprefix.prefixes=/api"
       ## HTTP Services
-      - "traefik.http.routers.immich-server-dev-rtr.service=immich-server-dev-svc"
-      - "traefik.http.services.immich-server-dev-svc.loadbalancer.server.port=3001"
+      - "traefik.http.routers.immich-server-rtr.service=immich-server-svc"
+      - "traefik.http.services.immich-server-svc.loadbalancer.server.port=3001"
 
-  immich-microservices-dev:
-    container_name: immich-microservices-dev
+  immich-microservices:
+    container_name: immich-microservices
     image: ghcr.io/immich-app/immich-server:release
     command: [ "start.sh", "microservices" ]
     # restart: $MEDIA_RESTART_POLICY
     restart: on-failure
     depends_on:
-      - immich-redis-dev
-      - immich-database-dev
+      - immich-redis
+      - immich-database
     networks:
       - t2_proxy
     volumes:
@@ -97,14 +96,14 @@ services:
                 - compute
                 - video
 
-  immich-machine-learning-dev:
-    container_name: immich-machine-learning-dev
+  immich-machine-learning:
+    container_name: immich-machine-learning
     image: ghcr.io/immich-app/immich-machine-learning:release-cuda
     restart: $MEDIA_RESTART_POLICY
     networks:
       - t2_proxy
     volumes:
-      - $DOCKERDIR/appdata/immich-ml-dev/model-cache:/cache
+      - $DOCKERDIR/appdata/immich-ml/model-cache:/cache
     env_file:
       - .env
     environment:
@@ -127,7 +126,7 @@ services:
     networks:
       - t2_proxy
     environment:
-      API_URL: http://immich-server-dev:3001/api
+      API_URL: http://immich-server:3001/api
       API_KEY: $IMMICH_API_KEY
       ROOT_PATH: /mnt/media/Photos/Pictures
       CRON_EXPRESSION: "0 2 * * *"
