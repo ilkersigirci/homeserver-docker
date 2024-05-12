@@ -121,7 +121,7 @@ services:
   immich-folder-album-creator:
     container_name: immich-folder-album-creator
     image: salvoxia/immich-folder-album-creator:latest
-    restart: unless-stopped
+    restart: "no"
     # command: ["/script/immich_auto_album.sh"] # NOTE: Manually run
     networks:
       - t2_proxy
