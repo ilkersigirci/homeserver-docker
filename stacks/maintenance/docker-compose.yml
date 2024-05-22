@@ -14,8 +14,12 @@ services:
 
   # NOTE: Because of network_mode: host, we can't use traefik for reverse proxying by docker labels
   wumps:
-    image: kaistarkk/wumps
+    # image: kaistarkk/wumps # NOTE: Not working because of werkzeug url_quote
+    image: wumps_fixed
     container_name: wumps
+    build:
+      context: $GITHUBREPOSDIR/wumps
+      dockerfile: $GITHUBREPOSDIR/wumps/Dockerfile
     restart: $MAINTENANCE_RESTART_POLICY
     network_mode: host
     volumes:
