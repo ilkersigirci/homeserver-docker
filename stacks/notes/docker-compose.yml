@@ -157,6 +157,8 @@ services:
       context: $DESKTOPAPPDOCKERFILES/Obsidian
       dockerfile: $DESKTOPAPPDOCKERFILES/Obsidian/Dockerfile
       # dockerfile: $DESKTOPAPPDOCKERFILES/Obsidian/Dockerfile_Appimage
+      # args:
+      #   - OBSIDIAN_VERSION=1.5.12
     restart: $OTHERS_RESTART_POLICY
     networks:
       - t2_proxy

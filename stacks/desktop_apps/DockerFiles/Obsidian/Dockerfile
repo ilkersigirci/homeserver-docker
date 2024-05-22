@@ -1,4 +1,7 @@
 FROM ghcr.io/linuxserver/baseimage-kasmvnc:debianbookworm
+
+# SHELL ["/bin/bash", "-c"]
+
 RUN \
     echo "**** install packages ****" && \
         # Update and install extra packages.
@@ -6,6 +9,8 @@ RUN \
         apt-get install -y --no-install-recommends \
             # Packages needed to download and extract obsidian.
             curl \
+            jq \
+            wget \
             libgtk-3-0 \
             libnotify4 \
             libatspi2.0-0 \
@@ -18,11 +23,16 @@ RUN \
         /var/tmp/* \
         /tmp/*
 
-ARG OBSIDIAN_VERSION=1.2.8
+# Get the specific version of Obsidian
+# ARG OBSIDIAN_VERSION=1.5.12
+# RUN dl_url="https://github.com/obsidianmd/obsidian-releases/releases/download/v${OBSIDIAN_VERSION}/obsidian_${OBSIDIAN_VERSION}_amd64.deb" && \
+#     curl --location --output obsidian.deb "$dl_url" && \
+#     dpkg -i obsidian.deb
 
-RUN dl_url="https://github.com/obsidianmd/obsidian-releases/releases/download/v${OBSIDIAN_VERSION}/obsidian_${OBSIDIAN_VERSION}_amd64.deb" && \
-    curl --location --output obsidian.deb "$dl_url" && \
-    dpkg -i obsidian.deb
+# Get the latest version of Obsidian
+# RUN curl -ks https://api.github.com/repos/obsidianmd/obsidian-releases/releases/latest | grep "browser_download_url.*deb" | cut -d : -f 2,3 | tr -d \" | wget --no-check-certificate -i - \
+RUN curl -ks https://api.github.com/repos/obsidianmd/obsidian-releases/releases/latest | jq -r '.assets[] | select(.name | endswith(".deb")).browser_download_url' | wget --no-check-certificate -i - \
+    && dpkg -i *.deb
 
 ENV \
     CUSTOM_PORT="3000" \
