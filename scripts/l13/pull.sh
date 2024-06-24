@@ -16,10 +16,10 @@ cd $STACKS_ROOT/monitoring
 docker compose --env-file ~/docker/configs/.env pull glances netdata
 docker compose --env-file ~/docker/configs/.env up -d glances netdata
 cd $STACKS_ROOT/notes
-docker pull ghcr.io/linuxserver/baseimage-kasmvnc:alpine318
-docker pull ghcr.io/linuxserver/baseimage-kasmvnc:debianbookworm
-docker compose --env-file ~/docker/configs/.env build obsidian
-docker compose --env-file ~/docker/configs/.env pull flatnotes
+# docker pull ghcr.io/linuxserver/baseimage-kasmvnc:alpine318
+# docker pull ghcr.io/linuxserver/baseimage-kasmvnc:debianbookworm
+# docker compose --env-file ~/docker/configs/.env build obsidian
+docker compose --env-file ~/docker/configs/.env pull couchdb flatnotes obsidian
 docker compose --env-file ~/docker/configs/.env up -d couchdb flatnotes obsidian
 
 docker image prune --all --force

@@ -152,7 +152,37 @@ services:
 
   obsidian:
     container_name: obsidian
-    image: obsidian:latest
+    image: lscr.io/linuxserver/obsidian:latest
+    restart: $OTHERS_RESTART_POLICY
+    shm_size: "1gb"
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $NOTESDIR/Markdown:/vaults
+      # - /path/to/config:/config
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - TITLE=Obsidian
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.obsidian-rtr.entrypoints=https"
+      - "traefik.http.routers.obsidian-rtr.rule=Host(`obsidian.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.obsidian-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.obsidian-rtr.service=obsidian-svc"
+      - "traefik.http.services.obsidian-svc.loadbalancer.server.port=3000"
+    # devices:
+    #   - /dev/dri:/dev/dri #optional
+
+  obsidian-custom:
+    container_name: obsidian-custom
+    image: obsidian-custom:latest
     build:
       context: $DESKTOPAPPDOCKERFILES/Obsidian
       dockerfile: $DESKTOPAPPDOCKERFILES/Obsidian/Dockerfile
@@ -166,7 +196,7 @@ services:
       - no-new-privileges:true
     volumes:
       - $NOTESDIR/Markdown:/vaults
-      # - /home/law/obsidian/config:/config
+      # - /path/to/config:/config
     environment:
       - PUID=$PUID
       - PGID=$PGID
@@ -176,40 +206,13 @@ services:
       - "com.centurylinklabs.watchtower.enable=false" # For watchtower
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.obsidian-rtr.entrypoints=https"
-      - "traefik.http.routers.obsidian-rtr.rule=Host(`obsidian.$DOMAINNAME`)"
+      - "traefik.http.routers.obsidian-custom-rtr.entrypoints=https"
+      - "traefik.http.routers.obsidian-custom-rtr.rule=Host(`obsidiancustom.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.obsidian-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.obsidian-custom-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
-      - "traefik.http.routers.obsidian-rtr.service=obsidian-svc"
-      - "traefik.http.services.obsidian-svc.loadbalancer.server.port=3000"
-
-  # obsidian-remote:
-  #   container_name: obsidian
-  #   image: ghcr.io/sytone/obsidian-remote:latest
-  #   restart: $OTHERS_RESTART_POLICY
-  #   networks:
-  #     - t2_proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   volumes:
-  #     - $NOTESDIR/Markdown:/vaults
-  #     # - /home/law/obsidian/config:/config
-  #   environment:
-  #     - PUID=$PUID
-  #     - PGID=$PGID
-  #     - TZ=$TZ
-  #     # - DOCKER_MODS=linuxserver/mods:universal-git
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.obsidian-rtr.entrypoints=https"
-  #     - "traefik.http.routers.obsidian-rtr.rule=Host(`obsidian.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.obsidian-rtr.middlewares=chain-authelia@file"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.obsidian-rtr.service=obsidian-svc"
-  #     - "traefik.http.services.obsidian-svc.loadbalancer.server.port=8080"
+      - "traefik.http.routers.obsidian-custom-rtr.service=obsidian-custom-svc"
+      - "traefik.http.services.obsidian-custom-svc.loadbalancer.server.port=3000"
   
   # NOTE: For client app, change (for flatpak):
   #  nano ~/.var/app/com.librumreader.librum/config/Librum-Reader/Librum.conf
