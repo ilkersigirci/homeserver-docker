@@ -3,7 +3,7 @@
 STACKS_ROOT=~/docker/stacks
 
 cd $STACKS_ROOT/base
-docker compose --env-file ~/docker/configs/.env pull traefik docker-socket-proxy authelia filebrowser
+docker compose --env-file ~/docker/configs/.env pull traefik docker-socket-proxy authelia filebrowser homepage
 docker compose --env-file ~/docker/configs/.env up -d
 cd $STACKS_ROOT/media
 docker compose --env-file ~/docker/configs/.env pull transmission jellyfin # ytdl-sub deemix beets
