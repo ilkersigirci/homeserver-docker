@@ -2,7 +2,7 @@
 
 STACKS_ROOT=~/docker/stacks
 
-stacks=("base" "notes" "media" "others" "desktop_apps" "maintenance" "monitoring" "photo")
+stacks=("base" "notes" "media" "others" "desktop_apps" "maintenance" "monitoring" "photo", "ml")
 
 for stack in "${stacks[@]}"
 do

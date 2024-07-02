@@ -140,10 +140,24 @@ services:
       - "traefik.http.routers.llama-cpp-openapi-rtr.service=llama-cpp-openapi-svc"
       - "traefik.http.services.llama-cpp-openapi-svc.loadbalancer.server.port=8080"
 
+  # FIXME: No API key found error when using inside open-webui
+  searxng:
+    container_name: searxng
+    image: searxng/searxng:latest
+    restart: $ML_RESTART_POLICY
+    networks:
+      - t2_proxy
+    # ports:
+    #   - "8080:8080"
+    volumes:
+      - $DOCKERDIR/appdata/searxng:/etc/searxng   
+
   open-webui:
     container_name: open-webui
     image: ghcr.io/open-webui/open-webui:main # :ollama
     restart: $ML_RESTART_POLICY
+    # depends_on:
+    #   - searxng
     # <<: *gpu-deploy
     networks:
       - t2_proxy
@@ -153,7 +167,15 @@ services:
       - $DOCKERDIR/appdata/open-webui:/app/backend/data
       # - ollama:/root/.ollama
     environment:
+      # - WEBUI_AUTH=False
       - OPENAI_API_KEY=$OPENAI_API_KEY
+      # - OPENAI_API_BASE_URLS="https://api.openai.com/v1;URL2"
+      # - OPENAI_API_KEYS="KEY1;KEY2"
+      # - ENABLE_RAG_WEB_SEARCH=True
+      # - RAG_WEB_SEARCH_ENGINE="searxng"
+      # - RAG_WEB_SEARCH_RESULT_COUNT=3
+      # - RAG_WEB_SEARCH_CONCURRENT_REQUESTS=10
+      # - SEARXNG_QUERY_URL="http://searxng:8080/search?q=<query>"
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
@@ -164,3 +186,59 @@ services:
       ## HTTP Services
       - "traefik.http.routers.open-webui-rtr.service=open-webui-svc"
       - "traefik.http.services.open-webui-svc.loadbalancer.server.port=8080"
+
+  langfuse-db:
+    image: postgres:latest
+    container_name: langfuse-db
+    restart: $ML_RESTART_POLICY
+    # user: "$PUID:$PGID"
+    networks:
+      - t2_proxy
+    # ports:
+    #   - 5432:5432
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+      # - PGDATA=/pgdata
+    volumes:
+      - $DOCKERDIR/appdata/langfuse-db:/var/lib/postgresql/data # /pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  langfuse-server:
+    image: ghcr.io/langfuse/langfuse:2
+    container_name: langfuse-server
+    restart: $ML_RESTART_POLICY
+    depends_on:
+      langfuse-db:
+        condition: service_healthy
+    networks:
+      - t2_proxy
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@langfuse-db:5432/postgres
+      - NEXTAUTH_SECRET=mysecret
+      - SALT=mysalt
+      - HOSTNAME=0.0.0.0
+      - PORT=3000
+      - NEXTAUTH_URL=http://localhost:3000
+      - TELEMETRY_ENABLED=false
+      - NEXT_PUBLIC_SIGN_UP_DISABLED=false
+      - LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES=true
+      # - LANGFUSE_DEFAULT_PROJECT_ID=1
+      # - LANGFUSE_DEFAULT_PROJECT_ROLE=ADMIN
+      # - AUTH_DISABLE_SIGNUP=true
+      # - AUTH_DISABLE_USERNAME_PASSWORD=true
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.langfuse-server-rtr.entrypoints=https"
+      - "traefik.http.routers.langfuse-server-rtr.rule=Host(`langfuse.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.langfuse-server-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.langfuse-server-rtr.service=langfuse-server-svc"
+      - "traefik.http.services.langfuse-server-svc.loadbalancer.server.port=3000"
