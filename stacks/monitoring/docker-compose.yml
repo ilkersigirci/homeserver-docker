@@ -17,7 +17,7 @@ networks:
 
 services:
   # FIXME: To show wifi network usage, we need `network_mode: host`. But this way, we can't use traefik.
-  # NOTE: latest-full doesn't show GPU
+  # FIXME: Find a way to show GPU stats
   glances:
     # image: nicolargo/glances:ubuntu-latest-full
     image: nicolargo/glances:dev
@@ -43,13 +43,13 @@ services:
       # DOCKER_HOST: tcp://socket-proxy:2375
       # GLANCES_OPT: "-w" # "-C /glances/conf/glances.conf --export influxdb"
       GLANCES_OPT: "-C /glances/conf/glances.conf -w"
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

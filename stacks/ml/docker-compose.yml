@@ -19,7 +19,7 @@ services:
     container_name: stable-diffusion
     build: $GITHUBREPOSDIR/stable-diffusion-webui-docker/services/AUTOMATIC1111
     image: stablediff-auto:71
-    restart: $OTHERS_RESTART_POLICY
+    restart: $ML_RESTART_POLICY
     # compute, utility
     <<: *gpu-deploy
     stop_signal: SIGINT
@@ -47,7 +47,7 @@ services:
   sd-next:
     container_name: sd-next
     image: holaflenain/stable-diffusion:latest
-    restart: $OTHERS_RESTART_POLICY
+    restart: $ML_RESTART_POLICY
     <<: *gpu-deploy
     # runtime: nvidia # NOTE: Not working
     networks:
@@ -75,42 +75,29 @@ services:
       - "traefik.http.routers.sdnext-rtr.service=sdnext-svc"
       - "traefik.http.services.sdnext-svc.loadbalancer.server.port=9000"
 
-  # NOTE: Not completed yet !!!
-  # https://github.com/Atinoda/text-generation-webui-docker
-  text-generation:
-    container_name: text-generation
-    image: atinoda/text-generation-webui:default
-    restart: $OTHERS_RESTART_POLICY
+  whisper-api:
+    container_name: whisper-api
+    image: onerahmet/openai-whisper-asr-webservice:latest-gpu
+    restart: $ML_RESTART_POLICY
     <<: *gpu-deploy
     networks:
       - t2_proxy
+    # ports:
+    #   - "9000:9000"
     volumes:
-      - $GITHUBREPOSDIR/text-generation-webui-docker/config/characters:/app/characters
-      - $GITHUBREPOSDIR/text-generation-webui-docker/config/loras:/app/loras
-      - $GITHUBREPOSDIR/text-generation-webui-docker/config/models:/app/models
-      - $GITHUBREPOSDIR/text-generation-webui-docker/config/presets:/app/presets
-      - $GITHUBREPOSDIR/text-generation-webui-docker/config/prompts:/app/prompts
-      - $GITHUBREPOSDIR/text-generation-webui-docker/config/training:/app/training
-#      - $GITHUBREPOSDIR/text-generation-webui-docker/config/extensions:/app/extensions  # Persist all extensions
-#      - $GITHUBREPOSDIR/text-generation-webui-docker/config/extensions/silero_tts:/app/extensions/silero_tts  # Persist a single extension
+      - $DOCKERDIR/appdata/whisper-api:/app
     environment:
-      - EXTRA_LAUNCH_ARGS="--listen --verbose --model MODEL_NAME" # Custom launch args (e.g., --model MODEL_NAME)
-#      - BUILD_EXTENSIONS_LIVE="silero_tts whisper_stt" # Install named extensions during every container launch. THIS WILL SIGNIFICANLTLY SLOW LAUNCH TIME.
-    logging:
-      driver:  json-file
-      options:
-        max-file: "3"   # number of files or file count
-        max-size: '10m'
+      - ASR_MODEL=base 
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.textgen-rtr.entrypoints=https"
-      - "traefik.http.routers.textgen-rtr.rule=Host(`textgen.$DOMAINNAME`)"
+      - "traefik.http.routers.whisper-api-rtr.entrypoints=https"
+      - "traefik.http.routers.whisper-api-rtr.rule=Host(`whisperapi.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.textgen-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.whisper-api-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
-      - "traefik.http.routers.textgen-rtr.service=textgen-svc"
-      - "traefik.http.services.textgen-svc.loadbalancer.server.port=7860"
+      - "traefik.http.routers.whisper-api-rtr.service=whisper-api-svc"
+      - "traefik.http.services.whisper-api-svc.loadbalancer.server.port=9000"
 
   ## NOTE: If you don't have ChatML-tuned models, you must use openapi-server
   ## Models:
@@ -128,7 +115,7 @@ services:
         - CUDA_VERSION=12.3.1
         - CUDA_DOCKER_ARCH=all
     command: ["--normal-server", "-c", "2048", "-m", "/models/tinyllma-1.1b-chat-v1.0.Q8_0.gguf", "-ngl", "23"] # "--openapi-server"
-    restart: $OTHERS_RESTART_POLICY
+    restart: $ML_RESTART_POLICY
     <<: *gpu-deploy
     networks:
       - t2_proxy
@@ -152,27 +139,28 @@ services:
       - "traefik.http.services.llama-cpp-normal-svc.loadbalancer.server.port=5000"
       - "traefik.http.routers.llama-cpp-openapi-rtr.service=llama-cpp-openapi-svc"
       - "traefik.http.services.llama-cpp-openapi-svc.loadbalancer.server.port=8080"
-  
-  whisper-api:
-    container_name: whisper-api
-    image: onerahmet/openai-whisper-asr-webservice:latest-gpu
-    restart: $OTHERS_RESTART_POLICY
-    <<: *gpu-deploy
+
+  open-webui:
+    container_name: open-webui
+    image: ghcr.io/open-webui/open-webui:main # :ollama
+    restart: $ML_RESTART_POLICY
+    # <<: *gpu-deploy
     networks:
       - t2_proxy
     # ports:
     #   - "9000:9000"
     volumes:
-      - $DOCKERDIR/appdata/whisper-api:/app
+      - $DOCKERDIR/appdata/open-webui:/app/backend/data
+      # - ollama:/root/.ollama
     environment:
-      - ASR_MODEL=base 
+      - OPENAI_API_KEY=$OPENAI_API_KEY
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.whisper-api-rtr.entrypoints=https"
-      - "traefik.http.routers.whisper-api-rtr.rule=Host(`whisperapi.$DOMAINNAME`)"
+      - "traefik.http.routers.open-webui-rtr.entrypoints=https"
+      - "traefik.http.routers.open-webui-rtr.rule=Host(`chat.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.whisper-api-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.open-webui-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
-      - "traefik.http.routers.whisper-api-rtr.service=whisper-api-svc"
-      - "traefik.http.services.whisper-api-svc.loadbalancer.server.port=9000"
+      - "traefik.http.routers.open-webui-rtr.service=open-webui-svc"
+      - "traefik.http.services.open-webui-svc.loadbalancer.server.port=8080"
