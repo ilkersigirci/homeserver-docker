@@ -28,7 +28,7 @@ STACKS_ROOT=~/docker/stacks
 cd $STACKS_ROOT/base
 docker compose --env-file ~/docker/configs/.env up -d traefik docker-socket-proxy authelia filebrowser
 cd $STACKS_ROOT/media
-docker compose --env-file ~/docker/configs/.env up -d transmission jellyfin # ytdl-sub deemix beets
+docker compose --env-file ~/docker/configs/.env up -d transmission jellyfin feishin # ytdl-sub deemix beets
 cd $STACKS_ROOT/maintenance
 docker compose --env-file ~/docker/configs/.env up -d code-server # rustic czkawka sshwifty watchtower
 cd $STACKS_ROOT/monitoring
