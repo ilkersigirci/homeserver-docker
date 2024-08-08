@@ -311,6 +311,7 @@ services:
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
+    restart: $BASE_RESTART_POLICY
     networks:
       - t2_proxy
       - socket_proxy
