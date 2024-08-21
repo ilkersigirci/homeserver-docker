@@ -32,4 +32,4 @@ docker compose --env-file ~/docker/configs/.env up -d open-webui
 # docker compose --env-file ~/docker/configs/.env up -d couchdb flatnotes obsidian
 
 # docker image prune --all --force
-docker rmi $$(docker images -f "dangling=true" -q)
+docker rmi `docker images -f "dangling=true" -q`

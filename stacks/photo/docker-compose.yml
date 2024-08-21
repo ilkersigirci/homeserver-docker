@@ -91,6 +91,23 @@ services:
 
   ##############################################
   # https://github.com/Salvoxia/immich-folder-album-creator
+  immich-folder-album-creator-offline-asset-removal:
+    container_name: immich-folder-album-creator-offline-asset-removal
+    image: salvoxia/immich-folder-album-creator:latest
+    restart: "no"
+    # command: ["/script/immich_auto_album.sh"] # NOTE: Manually run
+    networks:
+      - t2_proxy
+    environment:
+      API_URL: http://immich_server:3001/api
+      API_KEY: $IMMICH_API_KEY
+      ROOT_PATH: /thisIsADummyPathThatDoesNotExist
+      CRON_EXPRESSION: "0 * * * *"
+      TZ: Europe/Istanbul
+      ALBUM_LEVELS: 1
+      LOG_LEVEL: INFO
+      SYNC_MODE: "2" # Regularly trigger offline asset removal
+
   immich-folder-album-creator:
     container_name: immich-folder-album-creator
     image: salvoxia/immich-folder-album-creator:latest
@@ -102,7 +119,8 @@ services:
       API_URL: http://immich-server:3001/api
       API_KEY: $IMMICH_API_KEY
       ROOT_PATH: /mnt/media/Photos/Pictures
-      CRON_EXPRESSION: "0 2 * * *"
+      CRON_EXPRESSION: "15 * * * *" # # Run 15 minutes past the hour to give Offline Asset Removal time to work
       TZ: Europe/Istanbul
       ALBUM_LEVELS: 1
       LOG_LEVEL: INFO
+      SYNC_MODE: "1" # Delete empty albums after each run
