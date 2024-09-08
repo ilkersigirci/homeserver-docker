@@ -305,7 +305,7 @@ services:
 
   ############################### BACKUP #######################################
 
-  # Alternative: https://github.com/djmaze/resticker/
+  # Alternative: https://github.com/garethgeorge/backrest
   # TODO: Send notifications to Telegram after backup
   # FIXME: When new files added to vaultwarden db, does it overwrites the file permissions?
   # Init remote repo: rustic -r rclone:onedrive-remote:Backups init
@@ -328,7 +328,7 @@ services:
       - $CONFIGDIR/rustic/rustic.toml:/root/rustic.toml:ro
       - $BACKUPDIR:/root/backups/Backup:ro
       - $CONFIGDIR:/root/backups/docker_configs:ro
-      - $NOTESDIR/Markdwon:/root/backups/Markdown:ro
+      - $NOTESDIR/Markdown:/root/backups/Markdown:ro
       - $DATADIR/vaultwarden:/root/vaultwarden_backup:ro
     environment:
       - TZ=$TZ
@@ -336,6 +336,113 @@ services:
       # - RCLONE_CONFIG=/root/.config/rclone/rclone.conf
     secrets:
       - rustic_password
+
+  backrest:
+    container_name: backrest
+    image: garethgeorge/backrest:latest-alpine
+    restart: $MAINTENANCE_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    hostname: backrest
+    volumes:
+      - $DOCKERDIR/appdata/backrest/data:/data
+      - $DOCKERDIR/appdata/backrest/config:/config
+      - $DOCKERDIR/appdata/backrest/cache:/cache
+      - $NOTESDIR/Markdown:/userdata/Markdown:ro # [optional] mount local paths to backup here.
+      # - /MY-REPOS:/repos # [optional] mount repos if using local storage, not necessary for remotes e.g. B2, S3, etc.
+      - $CONFIGDIR/rclone:/root/.config/rclone:rw
+    environment:
+      - BACKREST_DATA=/data # path for backrest data. restic binary and the database are placed here.
+      - BACKREST_CONFIG=/config/config.json # path for the backrest config file.
+      - XDG_CACHE_HOME=/cache # path for the restic cache which greatly improves performance.
+      - TZ=$TZ
+      # - RCLONE_CONFIG=/root/.config/rclone/rclone.conf
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.backrest-rtr.entrypoints=https"
+      - "traefik.http.routers.backrest-rtr.rule=Host(`backrest.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.backrest-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.backrest-rtr.service=backrest-svc"
+      - "traefik.http.services.backrest-svc.loadbalancer.server.port=9898"
+
+  stirlingpdf:
+    image: frooodle/s-pdf:latest
+    container_name: stirlingpdf
+    restart: $MAINTENANCE_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $CONFIGDIR/stirlingpdf/ocr_train_data:/usr/share/tesseract-ocr/4.00/tessdata #Required for extra OCR languages
+      - $DOCKERDIR/appdata/stirlingpdf:/configs
+    environment:
+      - APP_LOCALE=en_GB
+      - APP_HOME_NAME=Stirling PDF
+      # - APP_HOME_DESCRIPTION=Your locally hosted one-stop-shop for all your PDF needs.
+      # - APP_NAVBAR_NAME=Stirling PDF
+      # - APP_ROOT_PATH=/
+      # - ALLOW_GOOGLE_VISIBILITY=true
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.stirlingpdf-rtr.entrypoints=https"
+      - "traefik.http.routers.stirlingpdf-rtr.rule=Host(`stirlingpdf.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.stirlingpdf-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.stirlingpdf-rtr.service=stirlingpdf-svc"
+      - "traefik.http.services.stirlingpdf-svc.loadbalancer.server.port=8080"
+
+  it-tools:
+    image: ghcr.io/corentinth/it-tools:latest
+    container_name: it-tools
+    restart: $MAINTENANCE_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.it-tools-rtr.entrypoints=https"
+      - "traefik.http.routers.it-tools-rtr.rule=Host(`it-tools.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.it-tools-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.it-tools-rtr.service=it-tools-svc"
+      - "traefik.http.services.it-tools-svc.loadbalancer.server.port=80"
+
+  convertx: 
+    image: ghcr.io/c4illin/convertx
+    container_name: convertx
+    restart: $MAINTENANCE_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment: # Defaults are listed below. All are optional.
+      - ACCOUNT_REGISTRATION=false # true or false, doesn't matter for the first account (e.g. keep this to false if you only want one account)
+      - JWT_SECRET=aLongAndSecretStringUsedToSignTheJSONWebToken1234 # will use randomUUID() by default
+      - HTTP_ALLOWED=true # setting this to true is unsafe, only set this to true locally
+      - ALLOW_UNAUTHENTICATED=true # allows anyone to use the service without logging in, only set this to true locally
+    volumes:
+      - $DOCKERDIR/appdata/convertx:/app/data
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.convertx-rtr.entrypoints=https"
+      - "traefik.http.routers.convertx-rtr.rule=Host(`convertx.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.convertx-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.convertx-rtr.service=convertx-svc"
+      - "traefik.http.services.convertx-svc.loadbalancer.server.port=3000"
 
   # duplicati:
   #   image: lscr.io/linuxserver/duplicati
