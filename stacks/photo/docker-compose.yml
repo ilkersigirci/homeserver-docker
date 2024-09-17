@@ -45,10 +45,9 @@ services:
     networks:
       - t2_proxy
     volumes:
+      - ${GENERATED_UPLOAD_LOCATION}:/usr/src/app/upload
       - ${ORIGINAL_UPLOAD_LOCATION}/library:/usr/src/app/upload/library
-      - ${GENERATED_UPLOAD_LOCATION}/thumbs:/usr/src/app/upload/thumbs
-      - ${GENERATED_UPLOAD_LOCATION}/profile:/usr/src/app/upload/profile
-      - ${GENERATED_UPLOAD_LOCATION}/encoded-videos:/usr/src/app/upload/encoded-videos
+      - ${ORIGINAL_UPLOAD_LOCATION}/upload:/usr/src/app/upload/upload
       - ${MEDIADIR}/Photos/Pictures:/mnt/media/Photos/Pictures:ro
       - ${MEDIADIR}/Photos/Videos:/mnt/media/Photos/Videos:ro
     env_file:
