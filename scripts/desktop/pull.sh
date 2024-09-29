@@ -3,7 +3,8 @@
 STACKS_ROOT=~/docker/stacks
 
 cd $STACKS_ROOT/base
-docker compose --env-file ~/docker/configs/.env pull traefik docker-socket-proxy authelia filebrowser homepage
+# docker compose --env-file ~/docker/configs/.env pull traefik docker-socket-proxy authelia filebrowser homepage
+docker compose --env-file ~/docker/configs/.env pull
 docker compose --env-file ~/docker/configs/.env up -d
 cd $STACKS_ROOT/media
 docker compose --env-file ~/docker/configs/.env pull transmission jellyfin feishin # ytdl-sub deemix beets
@@ -24,12 +25,12 @@ docker compose up -d
 cd $STACKS_ROOT/ml
 docker compose pull open-webui
 docker compose --env-file ~/docker/configs/.env up -d open-webui
-# cd $STACKS_ROOT/notes
+cd $STACKS_ROOT/notes
 # docker pull ghcr.io/linuxserver/baseimage-kasmvnc:alpine318
 # docker pull ghcr.io/linuxserver/baseimage-kasmvnc:debianbookworm
 # docker compose --env-file ~/docker/configs/.env build obsidian
-# docker compose --env-file ~/docker/configs/.env pull flatnotes
-# docker compose --env-file ~/docker/configs/.env up -d couchdb flatnotes obsidian
+docker compose --env-file ~/docker/configs/.env pull couchdb flatnotes obsidian
+docker compose --env-file ~/docker/configs/.env up -d couchdb flatnotes obsidian
 
 # docker image prune --all --force
 docker rmi `docker images -f "dangling=true" -q`

@@ -26,7 +26,8 @@ STACKS_ROOT=~/docker/stacks
 ############################### NORMAL ##################################
 
 cd $STACKS_ROOT/base
-docker compose --env-file ~/docker/configs/.env up -d traefik docker-socket-proxy authelia filebrowser
+# docker compose --env-file ~/docker/configs/.env up -d traefik docker-socket-proxy authelia filebrowser
+docker compose --env-file ~/docker/configs/.env up -d
 cd $STACKS_ROOT/media
 docker compose --env-file ~/docker/configs/.env up -d transmission jellyfin feishin # ytdl-sub deemix beets
 cd $STACKS_ROOT/maintenance
@@ -37,7 +38,7 @@ cd $STACKS_ROOT/photo
 docker compose up -d
 cd $STACKS_ROOT/ml
 docker compose --env-file ~/docker/configs/.env up -d open-webui
-# cd $STACKS_ROOT/notes
-# docker compose --env-file ~/docker/configs/.env up -d couchdb flatnotes obsidian
+cd $STACKS_ROOT/notes
+docker compose --env-file ~/docker/configs/.env up -d couchdb flatnotes obsidian
 # cd $STACKS_ROOT/others
 # docker compose --env-file ~/docker/configs/.env up -d stable-diffusion
