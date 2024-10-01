@@ -30,7 +30,7 @@ cd $STACKS_ROOT/notes
 # docker pull ghcr.io/linuxserver/baseimage-kasmvnc:debianbookworm
 # docker compose --env-file ~/docker/configs/.env build obsidian
 docker compose --env-file ~/docker/configs/.env pull couchdb flatnotes obsidian
-docker compose --env-file ~/docker/configs/.env up -d couchdb flatnotes obsidian
+docker compose --env-file ~/docker/configs/.env up -d flatnotes obsidian
 
 # docker image prune --all --force
 docker rmi `docker images -f "dangling=true" -q`

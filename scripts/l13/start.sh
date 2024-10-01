@@ -32,6 +32,6 @@ docker compose --env-file ~/docker/configs/.env up -d wumps # rustic
 cd $STACKS_ROOT/monitoring
 docker compose --env-file ~/docker/configs/.env up -d glances netdata
 cd $STACKS_ROOT/notes
-docker compose --env-file ~/docker/configs/.env up -d couchdb flatnotes obsidian
+docker compose --env-file ~/docker/configs/.env up -d flatnotes obsidian
 # cd $STACKS_ROOT/others
 # docker compose --env-file ~/docker/configs/.env up -d stable-diffusion

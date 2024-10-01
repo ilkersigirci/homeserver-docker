@@ -64,6 +64,12 @@ services:
       ## HTTP Services
       - "traefik.http.routers.couchdb-rtr.service=couchdb-svc"
       - "traefik.http.services.couchdb-svc.loadbalancer.server.port=5984"
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail -u admin:admin -s http://localhost:5984/_up | grep -Eo '\"status\":\"ok\"' || exit 1"]
+      start_period: 15s
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   logseq:
     container_name: logseq
@@ -162,6 +168,9 @@ services:
     volumes:
       - $NOTESDIR/Markdown:/vaults
       # - /path/to/config:/config
+    depends_on:
+      couchdb:
+        condition: service_healthy
     environment:
       - PUID=$PUID
       - PGID=$PGID
@@ -179,6 +188,12 @@ services:
       - "traefik.http.services.obsidian-svc.loadbalancer.server.port=3000"
     # devices:
     #   - /dev/dri:/dev/dri #optional
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail -s http://localhost:3000 || exit 1"]
+      start_period: 15s
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   obsidian-custom:
     container_name: obsidian-custom

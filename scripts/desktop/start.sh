@@ -39,6 +39,6 @@ docker compose up -d
 cd $STACKS_ROOT/ml
 docker compose --env-file ~/docker/configs/.env up -d open-webui
 cd $STACKS_ROOT/notes
-docker compose --env-file ~/docker/configs/.env up -d couchdb flatnotes obsidian
+docker compose --env-file ~/docker/configs/.env up -d flatnotes obsidian
 # cd $STACKS_ROOT/others
 # docker compose --env-file ~/docker/configs/.env up -d stable-diffusion
