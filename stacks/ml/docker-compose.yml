@@ -187,6 +187,32 @@ services:
       - "traefik.http.routers.open-webui-rtr.service=open-webui-svc"
       - "traefik.http.services.open-webui-svc.loadbalancer.server.port=8080"
 
+  open-webui-betus:
+    container_name: open-webui-betus
+    image: ghcr.io/open-webui/open-webui:main # :ollama
+    restart: $ML_RESTART_POLICY
+    # depends_on:
+    #   - searxng
+    # <<: *gpu-deploy
+    networks:
+      - t2_proxy
+    volumes:
+      - $DOCKERDIR/appdata/open-webui-betus:/app/backend/data
+      # - ollama:/root/.ollama
+    environment:
+      - WEBUI_AUTH=False
+      - OPENAI_API_KEY=$OPENAI_API_KEY
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.open-webui-betus-rtr.entrypoints=https"
+      - "traefik.http.routers.open-webui-betus-rtr.rule=Host(`betus.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.open-webui-betus-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.open-webui-betus-rtr.service=open-webui-betus-svc"
+      - "traefik.http.services.open-webui-betus-svc.loadbalancer.server.port=8080"
+
   langfuse-db:
     image: postgres:latest
     container_name: langfuse-db

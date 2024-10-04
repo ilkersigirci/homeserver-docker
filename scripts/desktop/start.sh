@@ -37,7 +37,7 @@ docker compose --env-file ~/docker/configs/.env up -d glances netdata
 cd $STACKS_ROOT/photo
 docker compose up -d
 cd $STACKS_ROOT/ml
-docker compose --env-file ~/docker/configs/.env up -d open-webui
+docker compose --env-file ~/docker/configs/.env up -d open-webui open-webui-betus
 cd $STACKS_ROOT/notes
 docker compose --env-file ~/docker/configs/.env up -d flatnotes obsidian
 # cd $STACKS_ROOT/others
