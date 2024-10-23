@@ -10,8 +10,8 @@ docker compose --env-file ~/docker/configs/.env up -d
 # docker compose --env-file ~/docker/configs/.env up -d stable-diffusion
 cd $STACKS_ROOT/maintenance
 # docker compose --env-file ~/docker/configs/.env build rustic
-docker compose --env-file ~/docker/configs/.env pull wumps
-docker compose --env-file ~/docker/configs/.env up -d wumps # rustic
+docker compose --env-file ~/docker/configs/.env pull dozzle wumps
+docker compose --env-file ~/docker/configs/.env up -d dozzle wumps # rustic
 cd $STACKS_ROOT/monitoring
 docker compose --env-file ~/docker/configs/.env pull glances netdata
 docker compose --env-file ~/docker/configs/.env up -d glances netdata

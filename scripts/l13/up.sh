@@ -28,7 +28,7 @@ STACKS_ROOT=~/docker/stacks
 cd $STACKS_ROOT/base
 docker compose --env-file ~/docker/configs/.env up -d
 cd $STACKS_ROOT/maintenance
-docker compose --env-file ~/docker/configs/.env up -d wumps # rustic
+docker compose --env-file ~/docker/configs/.env up -d dozzle wumps # rustic
 cd $STACKS_ROOT/monitoring
 docker compose --env-file ~/docker/configs/.env up -d glances netdata
 cd $STACKS_ROOT/notes

@@ -92,6 +92,27 @@ services:
       - "traefik.http.routers.watchtower-rtr.service=watchtower-svc"
       - "traefik.http.services.watchtower-svc.loadbalancer.server.port=8080"
 
+  dozzle:
+    container_name: dozzle
+    image: amir20/dozzle:latest
+    restart: $MAINTENANCE_RESTART_POLICY
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.dozzle-rtr.entrypoints=https"
+      - "traefik.http.routers.dozzle-rtr.rule=Host(`dozzle.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.dozzle-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.dozzle-rtr.service=dozzle-svc"
+      - "traefik.http.services.dozzle-svc.loadbalancer.server.port=8080"
+
   # Default email:password = admin@yacht.local:pass
   # yacht:
   #   container_name: yacht
