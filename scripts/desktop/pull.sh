@@ -23,7 +23,7 @@ cd $STACKS_ROOT/photo
 docker compose pull
 docker compose up -d
 cd $STACKS_ROOT/ml
-docker compose pull open-webui
+docker compose --env-file ~/docker/configs/.env pull  open-webui
 docker compose --env-file ~/docker/configs/.env up -d open-webui open-webui-betus
 cd $STACKS_ROOT/notes
 # docker pull ghcr.io/linuxserver/baseimage-kasmvnc:alpine318
