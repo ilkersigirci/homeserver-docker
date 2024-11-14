@@ -187,6 +187,7 @@ services:
       - $DOCKERDIR/appdata/code-server:/config
       - $DOCKERDIR:/config/workspace/docker
       - $NOTESDIR:/config/workspace/notes
+      - $MYREPOSDIR:/config/workspace/MyRepos
     environment:
       PUID: $PUID
       PGID: $PGID

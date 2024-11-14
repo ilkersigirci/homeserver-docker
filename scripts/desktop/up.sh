@@ -31,9 +31,9 @@ docker compose --env-file ~/docker/configs/.env up -d
 cd $STACKS_ROOT/media
 docker compose --env-file ~/docker/configs/.env up -d transmission jellyfin feishin # ytdl-sub deemix beets
 cd $STACKS_ROOT/maintenance
-docker compose --env-file ~/docker/configs/.env up -d dozzle code-server # rustic czkawka sshwifty watchtower
+docker compose --env-file ~/docker/configs/.env up -d dozzle code-server stirlingpdf it-tools convertx # rustic czkawka sshwifty watchtower
 cd $STACKS_ROOT/monitoring
-docker compose --env-file ~/docker/configs/.env up -d glances netdata
+docker compose --env-file ~/docker/configs/.env up -d beszel watchyourlan #glances netdata
 cd $STACKS_ROOT/photo
 docker compose up -d
 cd $STACKS_ROOT/ml

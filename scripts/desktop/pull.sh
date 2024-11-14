@@ -14,11 +14,11 @@ docker compose --env-file ~/docker/configs/.env up -d transmission jellyfin feis
 # docker compose --env-file ~/docker/configs/.env up -d stable-diffusion
 cd $STACKS_ROOT/maintenance
 # docker compose --env-file ~/docker/configs/.env build rustic
-docker compose --env-file ~/docker/configs/.env pull dozzle code-server  # watchtower sshwifty czkawka
-docker compose --env-file ~/docker/configs/.env up -d dozzle code-server  # watchtower sshwifty czkawka
+docker compose --env-file ~/docker/configs/.env pull dozzle code-server stirlingpdf it-tools convertx
+docker compose --env-file ~/docker/configs/.env up -d dozzle code-server stirlingpdf it-tools convertx
 cd $STACKS_ROOT/monitoring
-docker compose --env-file ~/docker/configs/.env pull glances netdata
-docker compose --env-file ~/docker/configs/.env up -d glances netdata
+docker compose --env-file ~/docker/configs/.env pull beszel watchyourlan
+docker compose --env-file ~/docker/configs/.env up -d beszel watchyourlan
 cd $STACKS_ROOT/photo
 docker compose pull
 docker compose up -d

@@ -16,6 +16,82 @@ networks:
   #   name: host
 
 services:
+  beszel:
+    image: henrygd/beszel
+    container_name: beszel
+    restart: $MAINTENANCE_RESTART_POLICY
+    networks:
+      - t2_proxy
+    volumes:
+      - $DOCKERDIR/appdata/beszel:/beszel_data
+    environment:
+      TZ: "${TZ}"
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.beszel-rtr.entrypoints=https"
+      - "traefik.http.routers.beszel-rtr.rule=Host(`beszel.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.beszel-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.beszel-rtr.service=beszel-svc"
+      - "traefik.http.services.beszel-svc.loadbalancer.server.port=8090"
+
+  beszel-agent:
+    image: henrygd/beszel-agent
+    container_name: beszel-agent
+    restart: $MAINTENANCE_RESTART_POLICY
+    # network_mode: host
+    networks:
+      - t2_proxy
+    ports:
+      - "45876:45876"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # monitor other disks / partitions by mounting a folder in /extra-filesystems
+      # - /mnt/d:/extra-filesystems/sda1:ro
+    environment:
+      PORT: 45876
+      KEY: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICbYjtH7YvUc+kTFonrxuYC9B6UteA8ktzCsOTJWeUK1'
+
+  node-bootstrap:
+    image: aceberg/node-bootstrap
+    container_name: node-bootstrap
+    restart: $MAINTENANCE_RESTART_POLICY
+    ports:
+    - 8850:8850
+  
+  watchyourlan:
+    image: aceberg/watchyourlan
+    container_name: watchyourlan
+    network_mode: "host"      
+    restart: $MAINTENANCE_RESTART_POLICY
+    command: "-n http://YOUR_IP:8850"   # put your server IP or DNS name here
+    depends_on:
+      - node-bootstrap
+    volumes:
+      - $DOCKERDIR/appdata/beszel:/data/WatchYourLAN
+    environment:
+      TZ: "${TZ}"                       # required: needs your TZ for correct time
+      IFACES: "enp18s0 wlp16s0"         # required: 1 or more interface
+      HOST: "0.0.0.0"                   # optional, default: 0.0.0.0
+      PORT: "8840"                      # optional, default: 8840
+      TIMEOUT: "120"                    # optional, time in seconds, default: 120
+      SHOUTRRR_URL: ""                  # optional, set url to notify
+      THEME: "sand"                     # optional
+      COLOR: "dark"                     # optional
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.watchyourlan-rtr.entrypoints=https"
+      - "traefik.http.routers.watchyourlan-rtr.rule=Host(`watchyourlan.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.watchyourlan-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.watchyourlan-rtr.service=watchyourlan-svc"
+      - "traefik.http.services.beszel-svc.loadbalancer.server.port=8840"
+
+
   # FIXME: To show wifi network usage, we need `network_mode: host`. But this way, we can't use traefik.
   # FIXME: Find a way to show GPU stats
   glances:
