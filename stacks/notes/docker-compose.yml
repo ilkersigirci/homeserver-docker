@@ -43,7 +43,7 @@ services:
   couchdb:
     container_name: couchdb
     image: couchdb:latest  # TODO: ghcr.io/
-    restart: $BASE_RESTART_POLICY
+    restart: $OTHERS_RESTART_POLICY
     networks:
       - t2_proxy
     security_opt:
@@ -312,6 +312,56 @@ services:
       - "traefik.http.routers.mkdocs-material-rtr.service=mkdocs-material-svc"
       - "traefik.http.services.mkdocs-material-svc.loadbalancer.server.port=8000"
   
+  linkwarden-db:
+    container_name: linkwarden-db
+    image: postgres:16-alpine
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t2_proxy
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - $DOCKERDIR/appdata/linkwarden-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  linkwarden:
+    container_name: linkwarden
+    image: ghcr.io/linkwarden/linkwarden:latest
+    restart: $OTHERS_RESTART_POLICY
+    depends_on:
+      linkwarden-db:
+        condition: service_healthy
+    networks:
+      - t2_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/linkwarden:/data/data
+    environment:
+      - STORAGE_FOLDER=/data
+      - NEXTAUTH_URL=http://localhost:3000/api/v1/auth
+      - NEXTAUTH_SECRET=VERY_SENSITIVE_SECRET
+      - DATABASE_URL=postgresql://postgres:postgres@linkwarden-db:5432/postgres
+      - NEXT_PUBLIC_DISABLE_REGISTRATION=true
+      - NEXT_PUBLIC_CREDENTIALS_ENABLED=true
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.linkwarden-rtr.entrypoints=https"
+      - "traefik.http.routers.linkwarden-rtr.rule=Host(`linkwarden.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.linkwarden-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.linkwarden-rtr.service=linkwarden-svc"
+      - "traefik.http.services.linkwarden-svc.loadbalancer.server.port=3000"
+  
+  
   # volglass:
   #   image: volglass:latest
   #   container_name: volglass
@@ -342,3 +392,80 @@ services:
   #     ## HTTP Services
   #     - "traefik.http.routers.volglass-rtr.service=volglass-svc"
   #     - "traefik.http.services.volglass-svc.loadbalancer.server.port=3000"
+
+  ######### RSS #########
+
+  # freshrss:
+  #   container_name: freshrss
+  #   image: lscr.io/linuxserver/freshrss
+  #   restart: $OTHERS_RESTART_POLICY
+  #   networks:
+  #     - t2_proxy
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   volumes:
+  #     - $DOCKERDIR/appdata/freshrss:/config
+  #   environment:
+  #     - PUID=$PUID
+  #     - PGID=$PGID
+  #     - TZ=$TZ
+  #   labels:
+  #     - "traefik.enable=true"
+  #     ## HTTP Routers
+  #     - "traefik.http.routers.freshrss-rtr.entrypoints=https"
+  #     - "traefik.http.routers.freshrss-rtr.rule=Host(`freshrss.$DOMAINNAME`)"
+  #     ## Middlewares
+  #     - "traefik.http.routers.freshrss-rtr.middlewares=chain-authelia@file"
+  #     ## HTTP Services
+  #     - "traefik.http.routers.freshrss-rtr.service=freshrss-svc"
+  #     - "traefik.http.services.freshrss-svc.loadbalancer.server.port=80"
+
+  miniflux-db:
+    container_name: miniflux-db
+    image: postgres:latest
+    restart: $OTHERS_RESTART_POLICY
+    # networks:
+    #   - internal
+    environment:
+      - POSTGRES_DB=miniflux
+      - POSTGRES_USER=miniflux
+      - POSTGRES_PASSWORD=miniflux
+    volumes:
+      - $DOCKERDIR/appdata/miniflux-db:/var/lib/postgresql/data
+    # healthcheck:
+    #   test: ["CMD", "pg_isready", "-U", "miniflux"]
+    #   interval: 10s
+    #   start_period: 30s
+
+    # Fever api endpoint: fever/?api
+  miniflux:
+    container_name: miniflux
+    image: miniflux/miniflux:latest
+    restart: $OTHERS_RESTART_POLICY
+    depends_on:
+      - miniflux-db
+    networks:
+      - t2_proxy
+      # - internal
+    security_opt:
+      - no-new-privileges:true
+    # volumes:
+    #   - $DOCKERDIR/appdata/miniflux:/config
+    environment:
+      - DATABASE_URL=postgres://miniflux:miniflux@miniflux-db/miniflux?sslmode=disable
+      - RUN_MIGRATIONS=1
+      - CREATE_ADMIN=1
+      - ADMIN_USERNAME=miniflux
+      - ADMIN_PASSWORD=miniflux
+      - BASE_URL=https://miniflux.$DOMAINNAME
+      # - "POCKET_CONSUMER_KEY=YOUR_POCKET_CONSUMER_KEY"
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.miniflux-rtr.entrypoints=https"
+      - "traefik.http.routers.miniflux-rtr.rule=Host(`miniflux.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.miniflux-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.miniflux-rtr.service=miniflux-svc"
+      - "traefik.http.services.miniflux-svc.loadbalancer.server.port=8080"
