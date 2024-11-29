@@ -296,6 +296,7 @@ services:
       - HOMEPAGE_VAR_TAILSCALE_DEVICE_ID=$TAILSCALE_DEVICE_ID
       - HOMEPAGE_VAR_HOMESERVER_LOCAL_STATIC_IP=$HOMESERVER_LOCAL_STATIC_IP
       - HOMEPAGE_VAR_WATCHTOWER_HTTP_API_TOKEN=$WATCHTOWER_HTTP_API_TOKEN
+      - HOMEPAGE_VAR_LINKWARDEN_ACCESS_KEY=$LINKWARDEN_ACCESS_KEY
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
@@ -305,7 +306,7 @@ services:
       - "traefik.http.routers.homepage-rtr.middlewares=chain-no-auth@file" # NOTE: authelia rate-limits it
       ## HTTP Services
       - "traefik.http.routers.homepage-rtr.service=homepage-svc"
-      - "traefik.http.services.homepage-svc.loadbalancer.server.port=3000"    
+      - "traefik.http.services.homepage-svc.loadbalancer.server.port=3000"
 
   vaultwarden:
     container_name: vaultwarden
