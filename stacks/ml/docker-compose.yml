@@ -100,45 +100,43 @@ services:
       - "traefik.http.services.whisper-api-svc.loadbalancer.server.port=9000"
 
   ## NOTE: If you don't have ChatML-tuned models, you must use openapi-server
-  ## Models:
-  # "-m", "/models/tinyllma-1.1b-chat-v1.0.Q8_0.gguf" , "-ngl", "23"
-  # "-m", /models/openhermes-2.5-mistral-7b.Q4_K_M.gguf , "-ngl", "33"
-  # "-m", "/models/nous-hermes-2-mixtral-8x7b-dpo.Q4_K_M.gguf" , "-ngl", "7"
-  llama-cpp:
-    container_name: llama-cpp
-    # image: ghcr.io/ggerganov/llama.cpp:full-cuda # light - full - light-cuda - full-cuda
-    image: llama.cpp:lite-cuda12
-    build:
-      dockerfile: $DOCKERDIR/stacks/others/llmacpp_lite_cuda12.Dockerfile
-      context: $GITHUBREPOSDIR/llama.cpp
-      args:
-        - CUDA_VERSION=12.3.1
-        - CUDA_DOCKER_ARCH=all
-    command: ["--normal-server", "-c", "2048", "-m", "/models/tinyllma-1.1b-chat-v1.0.Q8_0.gguf", "-ngl", "23"] # "--openapi-server"
+  llama-cpp-server:
+    image: ghcr.io/ggerganov/llama.cpp:server-cuda
+    container_name: llama-cpp-server
     restart: $ML_RESTART_POLICY
     <<: *gpu-deploy
     networks:
       - t2_proxy
-    ports:
-      - "5001:5000" # for llma_server
-    #   - "8081:8080" # for openapi_server
+    environment:
+      LLAMA_ARG_HOST: 0.0.0.0
+      LLAMA_ARG_PORT: 8000
+      LLAMA_ARG_MODEL: /models/tinyllma-1.1b-chat-v1.0.Q8_0.gguf
+      LLAMA_ARG_ALIAS: tinyllma-1.1b-chat-v1.0.Q8_0.gguf
+      LLAMA_ARG_CTX_SIZE: 4096
+      LLAMA_ARG_N_GPU_LAYERS: 10
+      LLAMA_ARG_FLASH_ATTN: 1
+      LLAMA_ARG_N_PREDICT: -1 # infinity
+      LLAMA_ARG_NO_WEBUI: 0
+      # LLAMA_ARG_ENDPOINT_METRICS: 1
+      # HF_TOKEN: $HF_TOKEN
     volumes:
      - "$MLMODELSDIR/LLM:/models:ro"
+    healthcheck:
+      test: "curl -f http://llama-cpp:8000/health"
+      interval: 10s
+      timeout: 5s
+      retries: 3
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.llama-cpp-normal-rtr.entrypoints=https"
-      - "traefik.http.routers.llama-cpp-normal-rtr.rule=Host(`llmapi.$DOMAINNAME`)"
-      - "traefik.http.routers.llama-cpp-openapi-rtr.entrypoints=https"
-      - "traefik.http.routers.llama-cpp-openapi-rtr.rule=Host(`llmopenapi.$DOMAINNAME`)"
+      - "traefik.http.routers.llama-cpp-server-rtr.entrypoints=https"
+      - "traefik.http.routers.llama-cpp-server-rtr.rule=Host(`llamapi.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.llama-cpp-normal-rtr.middlewares=chain-no-auth@file"
-      - "traefik.http.routers.llama-cpp-openapi-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.llama-cpp-server-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.llama-cpp-server-openapi-rtr.middlewares=chain-no-auth@file"
       ## HTTP Services
-      - "traefik.http.routers.llama-cpp-normal-rtr.service=llama-cpp-normal-svc"
-      - "traefik.http.services.llama-cpp-normal-svc.loadbalancer.server.port=5000"
-      - "traefik.http.routers.llama-cpp-openapi-rtr.service=llama-cpp-openapi-svc"
-      - "traefik.http.services.llama-cpp-openapi-svc.loadbalancer.server.port=8080"
+      - "traefik.http.routers.llama-cpp-server-rtr.service=llama-cpp-server-svc"
+      - "traefik.http.services.llama-cpp-server-svc.loadbalancer.server.port=8000"
 
   # FIXME: No API key found error when using inside open-webui
   searxng:
@@ -212,59 +210,3 @@ services:
       ## HTTP Services
       - "traefik.http.routers.open-webui-betus-rtr.service=open-webui-betus-svc"
       - "traefik.http.services.open-webui-betus-svc.loadbalancer.server.port=8080"
-
-  langfuse-db:
-    image: postgres:latest
-    container_name: langfuse-db
-    restart: $ML_RESTART_POLICY
-    # user: "$PUID:$PGID"
-    networks:
-      - t2_proxy
-    # ports:
-    #   - 5432:5432
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=postgres
-      # - PGDATA=/pgdata
-    volumes:
-      - $DOCKERDIR/appdata/langfuse-db:/var/lib/postgresql/data # /pgdata
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-
-  langfuse-server:
-    image: ghcr.io/langfuse/langfuse:2
-    container_name: langfuse-server
-    restart: $ML_RESTART_POLICY
-    depends_on:
-      langfuse-db:
-        condition: service_healthy
-    networks:
-      - t2_proxy
-    environment:
-      - DATABASE_URL=postgresql://postgres:postgres@langfuse-db:5432/postgres
-      - NEXTAUTH_SECRET=mysecret
-      - SALT=mysalt
-      - HOSTNAME=0.0.0.0
-      - PORT=3000
-      - NEXTAUTH_URL=http://localhost:3000
-      - TELEMETRY_ENABLED=false
-      - NEXT_PUBLIC_SIGN_UP_DISABLED=false
-      - LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES=true
-      # - LANGFUSE_DEFAULT_PROJECT_ID=1
-      # - LANGFUSE_DEFAULT_PROJECT_ROLE=ADMIN
-      # - AUTH_DISABLE_SIGNUP=true
-      # - AUTH_DISABLE_USERNAME_PASSWORD=true
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers
-      - "traefik.http.routers.langfuse-server-rtr.entrypoints=https"
-      - "traefik.http.routers.langfuse-server-rtr.rule=Host(`langfuse.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.langfuse-server-rtr.middlewares=chain-authelia@file"
-      ## HTTP Services
-      - "traefik.http.routers.langfuse-server-rtr.service=langfuse-server-svc"
-      - "traefik.http.services.langfuse-server-svc.loadbalancer.server.port=3000"
