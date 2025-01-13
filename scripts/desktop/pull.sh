@@ -7,8 +7,8 @@ cd $STACKS_ROOT/base
 docker compose --env-file ~/docker/configs/.env pull
 docker compose --env-file ~/docker/configs/.env up -d
 cd $STACKS_ROOT/media
-docker compose --env-file ~/docker/configs/.env pull transmission jellyfin feishin # ytdl-sub deemix beets
-docker compose --env-file ~/docker/configs/.env up -d transmission jellyfin feishin # ytdl-sub deemix beets
+docker compose --env-file ~/docker/configs/.env pull transmission jellyfin jellysearch feishin # ytdl-sub deemix beets
+docker compose --env-file ~/docker/configs/.env up -d transmission jellyfin jellysearch feishin # ytdl-sub deemix beets
 # cd $STACKS_ROOT/others
 # docker compose --env-file ~/docker/configs/.env pull stable-diffusion
 # docker compose --env-file ~/docker/configs/.env up -d stable-diffusion

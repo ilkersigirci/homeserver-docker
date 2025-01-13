@@ -29,7 +29,7 @@ cd $STACKS_ROOT/base
 # docker compose --env-file ~/docker/configs/.env up -d traefik docker-socket-proxy authelia filebrowser
 docker compose --env-file ~/docker/configs/.env up -d
 cd $STACKS_ROOT/media
-docker compose --env-file ~/docker/configs/.env up -d transmission jellyfin feishin # ytdl-sub deemix beets
+docker compose --env-file ~/docker/configs/.env up -d transmission jellyfin jellysearch feishin # ytdl-sub deemix beets
 cd $STACKS_ROOT/maintenance
 docker compose --env-file ~/docker/configs/.env up -d dozzle code-server stirlingpdf it-tools convertx # rustic czkawka sshwifty watchtower
 cd $STACKS_ROOT/monitoring
