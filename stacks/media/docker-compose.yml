@@ -106,8 +106,9 @@ services:
       - "traefik.http.routers.jellysearch-rtr.service=jellysearch-svc"
       - "traefik.http.services.jellysearch-svc.loadbalancer.server.port=5000"
     
+  # TODO: Add postgres as db instead of sqlite
   jellyseerr:
-    image: fallenbagel/jellyseerr:latest  # TODO: ghcr.io
+    image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
     restart: $MEDIA_RESTART_POLICY
     depends_on:
@@ -119,10 +120,9 @@ services:
     volumes:
       - $DOCKERDIR/appdata/jellyseerr:/app/config
     environment:
-      # - PUID=$PUID
-      # - PGID=$PGID
       - TZ=$TZ
       - LOG_LEVEL=debug
+      - PORT=5055
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
