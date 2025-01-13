@@ -1,7 +1,7 @@
 name: monitoring
 
 networks:
-  t2_proxy:
+  t3_proxy:
     external: true
   socket_proxy:
     external: true
@@ -21,7 +21,7 @@ services:
     container_name: beszel
     restart: $MAINTENANCE_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     volumes:
       - $DOCKERDIR/appdata/beszel:/beszel_data
     environment:
@@ -29,7 +29,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.beszel-rtr.entrypoints=https"
+      - "traefik.http.routers.beszel-rtr.entrypoints=websecure"
       - "traefik.http.routers.beszel-rtr.rule=Host(`beszel.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.beszel-rtr.middlewares=chain-authelia@file"
@@ -43,7 +43,7 @@ services:
     restart: $MAINTENANCE_RESTART_POLICY
     # network_mode: host
     networks:
-      - t2_proxy
+      - t3_proxy
     ports:
       - "45876:45876"
     volumes:
@@ -83,7 +83,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers
-  #     - "traefik.http.routers.watchyourlan-rtr.entrypoints=https"
+  #     - "traefik.http.routers.watchyourlan-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.watchyourlan-rtr.rule=Host(`watchyourlan.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.watchyourlan-rtr.middlewares=chain-authelia@file"
@@ -101,7 +101,7 @@ services:
     restart: $MAINTENANCE_RESTART_POLICY
     # network_mode: host
     networks:
-      - t2_proxy
+      - t3_proxy
     #   - socket_proxy
     #   - monitoring
       # - hostnet
@@ -129,7 +129,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.glances-rtr.entrypoints=https"
+      - "traefik.http.routers.glances-rtr.entrypoints=websecure"
       - "traefik.http.routers.glances-rtr.rule=Host(`glances.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.glances-rtr.middlewares=chain-authelia@file"
@@ -143,7 +143,7 @@ services:
     restart: $MAINTENANCE_RESTART_POLICY
     pid: host
     networks:
-      - t2_proxy
+      - t3_proxy
     hostname: $DOMAINNAME # set to fqdn of host
     cap_add:
       - SYS_PTRACE
@@ -164,7 +164,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.netdata-rtr.entrypoints=https"
+      - "traefik.http.routers.netdata-rtr.entrypoints=websecure"
       - "traefik.http.routers.netdata-rtr.rule=Host(`netdata.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.netdata-rtr.middlewares=chain-no-auth@file"
@@ -177,7 +177,7 @@ services:
     container_name: node-exporter
     restart: $MAINTENANCE_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
       - monitoring
     # Expose ports within stack without publishing them to the host machine
     expose:
@@ -200,7 +200,7 @@ services:
   #   container_name: alertmanager
   #   restart: $MAINTENANCE_RESTART_POLICY
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #     - monitoring
   #   expose:
   #     - 9093
@@ -216,7 +216,7 @@ services:
   #   # labels:
   #   #   - "traefik.enable=true"
   #   #   ## HTTP Routers
-  #   #   - "traefik.http.routers.alertmanager-rtr.entrypoints=https"
+  #   #   - "traefik.http.routers.alertmanager-rtr.entrypoints=websecure"
   #   #   - "traefik.http.routers.alertmanager-rtr.rule=Host(`alertmanager.$DOMAINNAME`)"
   #   #   ## Middlewares
   #   #   - "traefik.http.routers.alertmanager-rtr.middlewares=chain-no-auth@file"
@@ -233,7 +233,7 @@ services:
     restart: $MAINTENANCE_RESTART_POLICY
     user: 65534:65534
     networks:
-      - t2_proxy
+      - t3_proxy
       - monitoring
     expose:
       - 9090
@@ -259,7 +259,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.prometheus-rtr.entrypoints=https"
+      - "traefik.http.routers.prometheus-rtr.entrypoints=websecure"
       - "traefik.http.routers.prometheus-rtr.rule=Host(`prometheus.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.prometheus-rtr.middlewares=chain-no-auth@file"
@@ -274,7 +274,7 @@ services:
       - prometheus
     restart: $MAINTENANCE_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
       - monitoring
     security_opt:
       - no-new-privileges:true
@@ -298,7 +298,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.grafana-rtr.entrypoints=https"
+      - "traefik.http.routers.grafana-rtr.entrypoints=websecure"
       - "traefik.http.routers.grafana-rtr.rule=Host(`grafana.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.grafana-rtr.middlewares=chain-authelia@file"
@@ -311,7 +311,7 @@ services:
     container_name: uptime-kuma
     restart: $MAINTENANCE_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
       # - monitoring
     security_opt:
       - no-new-privileges:true
@@ -320,7 +320,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.uptime-kuma-rtr.entrypoints=https"
+      - "traefik.http.routers.uptime-kuma-rtr.entrypoints=websecure"
       - "traefik.http.routers.uptime-kuma-rtr.rule=Host(`uptimekuma.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.uptime-kuma-rtr.middlewares=chain-authelia@file"
@@ -333,7 +333,7 @@ services:
   #   container_name: sunshine
   #   restart: $MAINTENANCE_RESTART_POLICY
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #   ports:
   #     # - "48010:48010"
   #     - "47984-47990:47984-47990/tcp"
@@ -356,7 +356,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers
-  #     - "traefik.http.routers.sunshine-rtr.entrypoints=https"
+  #     - "traefik.http.routers.sunshine-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.sunshine-rtr.rule=Host(`sunshine.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.sunshine-rtr.middlewares=chain-authelia@file"

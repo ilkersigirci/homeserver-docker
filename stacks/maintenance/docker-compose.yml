@@ -1,7 +1,7 @@
 name: maintenance
 
 networks:
-  t2_proxy:
+  t3_proxy:
     external: true
   socket_proxy:
     external: true
@@ -27,7 +27,7 @@ services:
     # labels:
     #   - "traefik.enable=true"
     #   ## HTTP Routers
-    #   - "traefik.http.routers.wumps-rtr.entrypoints=https"
+    #   - "traefik.http.routers.wumps-rtr.entrypoints=websecure"
     #   - "traefik.http.routers.wumps-rtr.rule=Host(`wol.$DOMAINNAME`)"
     #   ## Middlewares
     #   - "traefik.http.routers.wumps-rtr.middlewares=chain-authelia@file"
@@ -41,7 +41,7 @@ services:
     restart: $MAINTENANCE_RESTART_POLICY
     # privileged: true
     networks:
-      - t2_proxy
+      - t3_proxy
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
@@ -84,7 +84,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.watchtower-rtr.entrypoints=https"
+      - "traefik.http.routers.watchtower-rtr.entrypoints=websecure"
       - "traefik.http.routers.watchtower-rtr.rule=Host(`watchtower.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.watchtower-rtr.middlewares=chain-authelia@file"
@@ -93,19 +93,23 @@ services:
       - "traefik.http.services.watchtower-svc.loadbalancer.server.port=8080"
 
   dozzle:
-    container_name: dozzle
     image: amir20/dozzle:latest
+    container_name: dozzle
     restart: $MAINTENANCE_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      DOZZLE_LEVEL: info
+      DOZZLE_TAILSIZE: 300
+      DOZZLE_FILTER: "status=running" # limits logs displayed to containers with this label
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.dozzle-rtr.entrypoints=https"
+      - "traefik.http.routers.dozzle-rtr.entrypoints=websecure"
       - "traefik.http.routers.dozzle-rtr.rule=Host(`dozzle.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.dozzle-rtr.middlewares=chain-authelia@file"
@@ -119,7 +123,7 @@ services:
   #   image: selfhostedpro/yacht:latest #devel, latest
   #   restart: $BASE_RESTART_POLICY
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #   security_opt:
   #     - no-new-privileges:true
   #   volumes:
@@ -133,7 +137,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers
-  #     - "traefik.http.routers.yacht-rtr.entrypoints=https"
+  #     - "traefik.http.routers.yacht-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.yacht-rtr.rule=Host(`yacht.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.yacht-rtr.middlewares=chain-authelia@file"
@@ -155,7 +159,7 @@ services:
   #   command: -H unix:///var/run/docker.sock # Use Docker Socket Proxy and comment this line out, for improved security.
   #   # command: -H tcp://docker-socket-proxy:2375 # Use this instead, if you have Socket Proxy enabled.
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #     - socket_proxy
   #   #ports:
   #   #  - 9000
@@ -169,7 +173,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers
-  #     - "traefik.http.routers.portainer-rtr.entrypoints=https"
+  #     - "traefik.http.routers.portainer-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.portainer-rtr.rule=Host(`portainer.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.portainer-rtr.middlewares=chain-authelia@file"
@@ -182,7 +186,7 @@ services:
     container_name: code-server
     restart: $MAINTENANCE_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     volumes:
       - $DOCKERDIR/appdata/code-server:/config
       - $DOCKERDIR:/config/workspace/docker
@@ -202,7 +206,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.code-server-rtr.entrypoints=https"
+      - "traefik.http.routers.code-server-rtr.entrypoints=websecure"
       - "traefik.http.routers.code-server-rtr.rule=Host(`code.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.code-server-rtr.middlewares=chain-authelia@file"
@@ -220,7 +224,7 @@ services:
   #   #   - IPC_LOCK
   #   # shm_size: "1gb"
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #   volumes:
   #     - $DOCKERDIR/appdata/vscodium:/config
   #     - $DOCKERDIR:/config/workspace/docker
@@ -232,7 +236,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers
-  #     - "traefik.http.routers.vscodium-rtr.entrypoints=https"
+  #     - "traefik.http.routers.vscodium-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.vscodium-rtr.rule=Host(`vscodium.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.vscodium-rtr.middlewares=chain-authelia@file"
@@ -246,7 +250,7 @@ services:
     image: linuxserver/syncthing:latest
     restart: $MAINTENANCE_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     # NOTE: Enable them. Probably needed for connecting to phone (RESEARCH)
     # ports:
     #   - 22000:22000/tcp
@@ -265,7 +269,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.syncthing-rtr.entrypoints=https"
+      - "traefik.http.routers.syncthing-rtr.entrypoints=websecure"
       - "traefik.http.routers.syncthing-rtr.rule=Host(`syncthing.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.syncthing-rtr.middlewares=chain-authelia@file"
@@ -278,7 +282,7 @@ services:
     image: jlesage/czkawka:latest
     restart: $MAINTENANCE_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -292,7 +296,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.czkawka-rtr.entrypoints=https"
+      - "traefik.http.routers.czkawka-rtr.entrypoints=websecure"
       - "traefik.http.routers.czkawka-rtr.rule=Host(`czkawka.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.czkawka-rtr.middlewares=chain-authelia@file"
@@ -305,7 +309,7 @@ services:
   #   image: niruix/sshwifty:latest
   #   restart: $MAINTENANCE_RESTART_POLICY
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #   security_opt:
   #     - no-new-privileges:true
   #   # volumes:
@@ -317,7 +321,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers
-  #     - "traefik.http.routers.sshwifty-rtr.entrypoints=https"
+  #     - "traefik.http.routers.sshwifty-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.sshwifty-rtr.rule=Host(`ssh.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.sshwifty-rtr.middlewares=chain-authelia@file"
@@ -342,7 +346,7 @@ services:
       dockerfile: $DOCKERDIR/stacks/maintenance/Rustic/Dockerfile
     restart: $MAINTENANCE_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -364,7 +368,7 @@ services:
     image: garethgeorge/backrest:latest-alpine
     restart: $MAINTENANCE_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     hostname: backrest
@@ -384,7 +388,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.backrest-rtr.entrypoints=https"
+      - "traefik.http.routers.backrest-rtr.entrypoints=websecure"
       - "traefik.http.routers.backrest-rtr.rule=Host(`backrest.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.backrest-rtr.middlewares=chain-authelia@file"
@@ -397,7 +401,7 @@ services:
     container_name: stirlingpdf
     restart: $MAINTENANCE_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -413,7 +417,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.stirlingpdf-rtr.entrypoints=https"
+      - "traefik.http.routers.stirlingpdf-rtr.entrypoints=websecure"
       - "traefik.http.routers.stirlingpdf-rtr.rule=Host(`stirlingpdf.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.stirlingpdf-rtr.middlewares=chain-authelia@file"
@@ -426,13 +430,13 @@ services:
     container_name: it-tools
     restart: $MAINTENANCE_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.it-tools-rtr.entrypoints=https"
+      - "traefik.http.routers.it-tools-rtr.entrypoints=websecure"
       - "traefik.http.routers.it-tools-rtr.rule=Host(`it-tools.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.it-tools-rtr.middlewares=chain-authelia@file"
@@ -445,7 +449,7 @@ services:
     container_name: convertx
     restart: $MAINTENANCE_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     environment: # Defaults are listed below. All are optional.
@@ -458,7 +462,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.convertx-rtr.entrypoints=https"
+      - "traefik.http.routers.convertx-rtr.entrypoints=websecure"
       - "traefik.http.routers.convertx-rtr.rule=Host(`convertx.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.convertx-rtr.middlewares=chain-authelia@file"
@@ -471,7 +475,7 @@ services:
   #   container_name: duplicati
   #   restart: $MAINTENANCE_RESTART_POLICY
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #   volumes:
   #     - $DOCKERDIR/appdata/duplicati:/config
   #     - $BACKUPDIR:/backups
@@ -484,7 +488,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers
-  #     - "traefik.http.routers.duplicati-rtr.entrypoints=https"
+  #     - "traefik.http.routers.duplicati-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.duplicati-rtr.rule=Host(`duplicati.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.duplicati-rtr.middlewares=chain-no-auth@file"
@@ -493,7 +497,7 @@ services:
   #     - "traefik.http.services.duplicati-svc.loadbalancer.server.port=8200"
   ############################### BACKUP #######################################
 
-  # # Traefik Certs Dumper - Extract LetsEncrypt Certificates - Traefik2 Compatible
+  # # Traefik Certs Dumper - Extract LetsEncrypt Certificates - traefik3 Compatible
   # certdumper:
   #   container_name: traefik_certdumper
   #   image: humenius/traefik-certs-dumper:latest
@@ -504,7 +508,7 @@ services:
   #     - no-new-privileges:true
   #   # command: --restart-containers container1,container2,container3
   #   volumes:
-  #     - $DOCKERDIR/appdata/traefik2/acme:/traefik:ro
+  #     - $DOCKERDIR/appdata/traefik3/acme:/traefik:ro
   #     - $DOCKERDIR/shared/certs:/output:rw
   #     # - /var/run/docker.sock:/var/run/docker.sock:ro # Only needed if restarting containers (use Docker Socket Proxy instead)
   #   environment:
@@ -547,7 +551,7 @@ services:
   #   container_name: guacamole
   #   restart: $MAINTENANCE_RESTART_POLICY
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #   security_opt:
   #     - no-new-privileges:true
   #   volumes:
@@ -555,7 +559,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers
-  #     - "traefik.http.routers.guacamole-rtr.entrypoints=https"
+  #     - "traefik.http.routers.guacamole-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.guacamole-rtr.rule=Host(`guacamole.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.guacamole-rtr.middlewares=chain-no-auth@file"
@@ -568,7 +572,7 @@ services:
   #   container_name: remmina
   #   restart: $MAINTENANCE_RESTART_POLICY
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #   security_opt:
   #     - no-new-privileges:true
   #   volumes:
@@ -580,7 +584,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers
-  #     - "traefik.http.routers.remmina-rtr.entrypoints=https"
+  #     - "traefik.http.routers.remmina-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.remmina-rtr.rule=Host(`remmina.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.remmina-rtr.middlewares=chain-no-auth@file"

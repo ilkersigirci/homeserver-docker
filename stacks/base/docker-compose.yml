@@ -1,8 +1,8 @@
 name: base
 
 networks:
-  t2_proxy:
-    name: t2_proxy
+  t3_proxy:
+    name: t3_proxy
     driver: bridge
     ipam:
       config:
@@ -40,37 +40,39 @@ secrets:
 
 ########################### SERVICES
 services:
-
-  # Traefik 2 - Reverse Proxy
+  # Traefik 3 - Reverse Proxy
   # Touch (create empty files) traefik.log and acme/acme.json. Set acme.json permissions to 600.
-  # touch $DOCKERDIR/appdata/traefik2/acme/acme.json
-  # chmod 600 $DOCKERDIR/appdata/traefik2/acme/acme.json
-  # touch $DOCKERDIR/appdata/traefik2/traefik.log
+  # touch $DOCKERDIR/appdata/traefik3/acme/acme.json
+  # chmod 600 $DOCKERDIR/appdata/traefik3/acme/acme.json
+  # touch $DOCKERDIR/appdata/traefik3/traefik.log
   traefik:
     container_name: traefik
-    image: traefik:2.9  # TODO: ghcr.io/
+    image: traefik:3.3.1
     restart: $BASE_RESTART_POLICY
     # profiles:
     # - core
     command: # CLI arguments
       - --global.checkNewVersion=true
-      - --global.sendAnonymousUsage=true
-      - --entryPoints.http.address=:80
-      - --entryPoints.https.address=:443
-      # - --entrypoints.websecure.address=:443 # TODO: Learn difference with https
+      - --global.sendAnonymousUsage=false
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.traefik.address=:8080
+      # - --entrypoints.ping.address=:8081
+      - --entrypoints.websecure.http.tls=true
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --entrypoints.web.http.redirections.entrypoint.permanent=true
       # Allow these IPs to set the X-Forwarded-* headers - Cloudflare IPs: https://www.cloudflare.com/ips/
-      - --entrypoints.https.forwardedHeaders.trustedIPs=$CLOUDFLARE_IPS,$LOCAL_IPS
-      - --entryPoints.traefik.address=:8080
-      # - --entryPoints.ping.address=:8081
+      - --entrypoints.websecure.forwardedHeaders.trustedIPs=$CLOUDFLARE_IPS,$LOCAL_IPS
       - --api=true
-      # - --api.insecure=true
       - --api.dashboard=true
+      - --api.insecure=false
       #- --ping=true
       # - --serversTransport.insecureSkipVerify=true
       - --log=true
-      - --log.level=INFO # (Default: error) DEBUG, INFO, WARN, ERROR, FATAL, PANIC
+      - --log.level=DEBUG # (Default: error) DEBUG, INFO, WARN, ERROR, FATAL, PANIC
       - --accessLog=true
-      - --accessLog.filePath=/logs/traefik.log
+      - --accessLog.filePath=/logs/access.log
       - --accessLog.bufferingSize=100 # Configuring a buffer of 100 lines
       - --accessLog.filters.statusCodes=204-299,400-499,500-599
       - --providers.docker=true
@@ -79,16 +81,16 @@ services:
       # Automatically set Host rule for services
       # - --providers.docker.defaultrule=Host(`{{ index .Labels "com.docker.compose.service" }}.$DOMAINNAME`)
       - --providers.docker.exposedByDefault=false
-      # - --entrypoints.https.http.middlewares=chain-oauth@file
-      - --entrypoints.https.http.tls.options=tls-opts@file
+      # - --entrypoints.websecure.http.middlewares=chain-oauth@file
+      - --entrypoints.websecure.http.tls.options=tls-opts@file
       # Add dns-cloudflare as default certresolver for all services. Also enables TLS and no need to specify on individual services
-      - --entrypoints.https.http.tls.certresolver=dns-cloudflare
-      - --entrypoints.https.http.tls.domains[0].main=$DOMAINNAME
-      - --entrypoints.https.http.tls.domains[0].sans=*.$DOMAINNAME
-      # - --entrypoints.https.http.tls.domains[1].main=$DOMAINNAME1 # Pulls main cert for second domain
-      # - --entrypoints.https.http.tls.domains[1].sans=*.$DOMAINNAME1 # Pulls wildcard cert for second domain
-      - --providers.docker.network=t2_proxy
-      - --providers.docker.swarmMode=false
+      - --entrypoints.websecure.http.tls.certresolver=dns-cloudflare
+      - --entrypoints.websecure.http.tls.domains[0].main=$DOMAINNAME
+      - --entrypoints.websecure.http.tls.domains[0].sans=*.$DOMAINNAME
+      # - --entrypoints.websecure.http.tls.domains[1].main=$DOMAINNAME1 # Pulls main cert for second domain
+      # - --entrypoints.websecure.http.tls.domains[1].sans=*.$DOMAINNAME1 # Pulls wildcard cert for second domain
+      - --providers.docker.network=t3_proxy
+      # - --providers.swarm.endpoint=tcp://127.0.0.1:2377 # Traefik v3 Swarm
       - --providers.file.directory=/rules # Load dynamic configuration from one or more .toml or .yml files in a directory
       # - --providers.file.filename=/path/to/file # Load dynamic configuration from a file
       - --providers.file.watch=true # Only works on top level files in the rules folder
@@ -100,12 +102,12 @@ services:
       - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.delayBeforeCheck=90 # To delay DNS check and reduce LE hitrate
       # - --metrics.prometheus=true
       # - --metrics.prometheus.buckets=0.1,0.3,1.2,5.0
-      # Enable Hub communication (open the port 9900 and 9901 by default)
-      - --experimental.hub=true
-      - --hub.tls.insecure=true
-      - --metrics.prometheus.addrouterslabels=true
+      ## Enable Hub communication (open the port 9900 and 9901 by default)
+      # - --experimental.hub=true
+      # - --hub.tls.insecure=true
+      # - --metrics.prometheus.addrouterslabels=true
     networks:
-      t2_proxy:
+      t3_proxy:
         ipv4_address: 192.168.90.254 # You can specify a static IP
       socket_proxy:
     # NOTE: To Access Docker Containers that run on Host Network. Is this working?
@@ -126,19 +128,21 @@ services:
         published: 443
         protocol: tcp
         mode: host
-      # - target: 8080  # insecure api wont work
-      #   published: 8080
+      # - target: 8080  # need to enable --api.insecure=true
+      #   published: 8085
       #   protocol: tcp
       #   mode: host
     volumes:
       # - /var/run/docker.sock:/var/run/docker.sock:ro # Use Docker Socket Proxy instead for improved security
-      - $CONFIGDIR/traefik2/rules:/rules # file provider directory
-      - $CONFIGDIR/traefik2/acme/acme.json:/acme.json # cert location - you must touch this file and change permissions to 600
+      - $CONFIGDIR/traefik3/rules:/rules # file provider directory
+      - $CONFIGDIR/traefik3/acme/acme.json:/acme.json # cert location - you must touch this file and change permissions to 600
       - $DOCKERDIR/logs/traefik:/logs # for fail2ban or crowdsec - make sure to touch file before starting container
     environment:
       - TZ=$TZ
       - CF_API_EMAIL_FILE=/run/secrets/cloudflare_email
       - CF_API_KEY_FILE=/run/secrets/cloudflare_api_key
+      # TODO: Change CF_API_EMAIL_FILE and CF_API_KEY_FILE to CF_DNS_API_TOKEN_FILE
+      # - CF_DNS_API_TOKEN_FILE=/run/secrets/cf_dns_api_token
       - DOMAINNAME # Passing the domain name to traefik container to be able to use the variable in rules.
     secrets:
       - cloudflare_email
@@ -146,17 +150,9 @@ services:
     labels:
       #- "autoheal=true"
       - "traefik.enable=true"
-      # HTTP-to-HTTPS Redirect
-      - "traefik.http.routers.http-catchall.entrypoints=http"
-      - "traefik.http.routers.http-catchall.rule=HostRegexp(`{host:.+}`)"
-      - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
       # HTTP Routers
-      - "traefik.http.routers.traefik-rtr.entrypoints=https"
+      - "traefik.http.routers.traefik-rtr.entrypoints=websecure"
       - "traefik.http.routers.traefik-rtr.rule=Host(`traefik.$DOMAINNAME`)"
-      - "traefik.http.routers.traefik-rtr.tls=true" # Some people had 404s without this
-      - "traefik.http.routers.traefik-rtr.tls.domains[0].main=$DOMAINNAME"
-      - "traefik.http.routers.traefik-rtr.tls.domains[0].sans=*.$DOMAINNAME"
       # - "traefik.http.routers.traefik-rtr.tls.certresolver=dns-cloudflare" # Comment out this line after first run of traefik to force the use of wildcard certs
       ## Services - API
       - "traefik.http.routers.traefik-rtr.service=api@internal"
@@ -244,7 +240,7 @@ services:
     # profiles:
     # - core
     networks:
-      - t2_proxy
+      - t3_proxy
       - default
     volumes:
       - $CONFIGDIR/authelia/configuration.yml:/config/configuration.yml
@@ -267,7 +263,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.authelia-rtr.entrypoints=https"
+      - "traefik.http.routers.authelia-rtr.entrypoints=websecure"
       - "traefik.http.routers.authelia-rtr.rule=Host(`authelia.$DOMAINNAME`)"
       - "traefik.http.routers.authelia-rtr.tls=true"  # TODO: This shouldn't be needed. might remove?
       ## Middlewares
@@ -281,7 +277,7 @@ services:
     container_name: homepage
     restart: $BASE_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
       - socket_proxy
     volumes:
       - $CONFIGDIR/homepage:/app/config
@@ -301,7 +297,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.homepage-rtr.entrypoints=https"
+      - "traefik.http.routers.homepage-rtr.entrypoints=websecure"
       - "traefik.http.routers.homepage-rtr.rule=Host(`homepage.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.homepage-rtr.middlewares=chain-no-auth@file" # NOTE: authelia rate-limits it
@@ -316,7 +312,7 @@ services:
       - traefik
     restart: $BASE_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -324,7 +320,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.vaultwarden-rtr.entrypoints=https"
+      - "traefik.http.routers.vaultwarden-rtr.entrypoints=websecure"
       - "traefik.http.routers.vaultwarden-rtr.rule=Host(`vaultwarden.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.vaultwarden-rtr.middlewares=chain-authelia@file"
@@ -341,7 +337,7 @@ services:
       - traefik
     restart: $BASE_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -357,7 +353,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.filebrowser-rtr.entrypoints=https"
+      - "traefik.http.routers.filebrowser-rtr.entrypoints=websecure"
       - "traefik.http.routers.filebrowser-rtr.rule=Host(`filebrowser.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.filebrowser-rtr.middlewares=chain-authelia@file"
@@ -371,7 +367,7 @@ services:
     restart: $BASE_RESTART_POLICY
     command: /data -A
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -382,7 +378,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.dufs-rtr.entrypoints=https"
+      - "traefik.http.routers.dufs-rtr.entrypoints=websecure"
       - "traefik.http.routers.dufs-rtr.rule=Host(`dufs.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.dufs-rtr.middlewares=chain-authelia@file"
@@ -397,7 +393,7 @@ services:
   #   restart: $PHOTO_RESTART_POLICY
   #   hostname: filerun_db
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #   security_opt:
   #     - no-new-privileges:true
   #   volumes:
@@ -420,7 +416,7 @@ services:
   #   image: filerun/filerun
   #   container_name: filerun
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #   security_opt:
   #     - no-new-privileges:true
   #   # user: $PGID:$PUID
@@ -445,7 +441,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers
-  #     - "traefik.http.routers.filerun-rtr.entrypoints=https"
+  #     - "traefik.http.routers.filerun-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.filerun-rtr.rule=Host(`filerun.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.filerun-rtr.middlewares=chain-authelia@file"

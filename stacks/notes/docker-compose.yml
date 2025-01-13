@@ -1,7 +1,7 @@
 name: notes
 
 networks:
-  t2_proxy:
+  t3_proxy:
     external: true
 
 services:
@@ -10,7 +10,7 @@ services:
     image: linuxserver/syncthing:latest
     restart: $OTHERS_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     # TODO: Probably needed for connecting to phone
     ports:
       - 22000:22000/tcp
@@ -29,7 +29,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.syncthing-rtr.entrypoints=https"
+      - "traefik.http.routers.syncthing-rtr.entrypoints=websecure"
       - "traefik.http.routers.syncthing-rtr.rule=Host(`syncthing.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.syncthing-rtr.middlewares=chain-authelia@file"
@@ -45,7 +45,7 @@ services:
     image: couchdb:latest  # TODO: ghcr.io/
     restart: $OTHERS_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -57,7 +57,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.couchdb-rtr.entrypoints=https"
+      - "traefik.http.routers.couchdb-rtr.entrypoints=websecure"
       - "traefik.http.routers.couchdb-rtr.rule=Host(`couchdb.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.couchdb-rtr.middlewares=chain-couchdb@file" # NOTE: chain-authelia not working
@@ -76,7 +76,7 @@ services:
     image: ghcr.io/logseq/logseq-webapp:latest
     restart: $OTHERS_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
       # volumes:
@@ -84,7 +84,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.logseq-rtr.entrypoints=https"
+      - "traefik.http.routers.logseq-rtr.entrypoints=websecure"
       - "traefik.http.routers.logseq-rtr.rule=Host(`logseq.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.logseq-rtr.middlewares=chain-authelia@file"
@@ -98,7 +98,7 @@ services:
     image: dullage/flatnotes:v3.0.0-rc.3
     restart: $OTHERS_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -114,7 +114,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.notes-rtr.entrypoints=https"
+      - "traefik.http.routers.notes-rtr.entrypoints=websecure"
       - "traefik.http.routers.notes-rtr.rule=Host(`notes.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.notes-rtr.middlewares=chain-authelia@file"
@@ -134,7 +134,7 @@ services:
     # image: ghcr.io/kareadita/kavita:latest
     restart: $OTHERS_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -148,7 +148,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.kavita-rtr.entrypoints=https"
+      - "traefik.http.routers.kavita-rtr.entrypoints=websecure"
       - "traefik.http.routers.kavita-rtr.rule=Host(`kavita.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.kavita-rtr.middlewares=chain-authelia@file"
@@ -162,7 +162,7 @@ services:
     restart: $OTHERS_RESTART_POLICY
     shm_size: "1gb"
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -179,7 +179,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.obsidian-rtr.entrypoints=https"
+      - "traefik.http.routers.obsidian-rtr.entrypoints=websecure"
       - "traefik.http.routers.obsidian-rtr.rule=Host(`obsidian.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.obsidian-rtr.middlewares=chain-authelia@file"
@@ -206,7 +206,7 @@ services:
       #   - OBSIDIAN_VERSION=1.5.12
     restart: $OTHERS_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -221,7 +221,7 @@ services:
       - "com.centurylinklabs.watchtower.enable=false" # For watchtower
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.obsidian-custom-rtr.entrypoints=https"
+      - "traefik.http.routers.obsidian-custom-rtr.entrypoints=websecure"
       - "traefik.http.routers.obsidian-custom-rtr.rule=Host(`obsidiancustom.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.obsidian-custom-rtr.middlewares=chain-authelia@file"
@@ -242,7 +242,7 @@ services:
     depends_on:
       - librum_db
     networks:
-      - t2_proxy
+      - t3_proxy
     # ports:
     #   - "5000:5000"
     security_opt:
@@ -262,7 +262,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.librum-rtr.entrypoints=https"
+      - "traefik.http.routers.librum-rtr.entrypoints=websecure"
       - "traefik.http.routers.librum-rtr.rule=Host(`librum.$DOMAINNAME`)"
       ## Middlewares
       # - "traefik.http.routers.librum-rtr.middlewares=chain-authelia@file"
@@ -276,7 +276,7 @@ services:
     hostname: librum_db
     restart: $OTHERS_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     volumes:
       - $DOCKERDIR/appdata/librum_db:/var/lib/mysql
     environment:
@@ -291,7 +291,7 @@ services:
     restart: $OTHERS_RESTART_POLICY
     command: serve --dev-addr=0.0.0.0:8000 --no-livereload
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -304,7 +304,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.mkdocs-material-rtr.entrypoints=https"
+      - "traefik.http.routers.mkdocs-material-rtr.entrypoints=websecure"
       - "traefik.http.routers.mkdocs-material-rtr.rule=Host(`mkdocs.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.mkdocs-material-rtr.middlewares=chain-authelia@file"
@@ -317,7 +317,7 @@ services:
     image: postgres:16-alpine
     restart: $OTHERS_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -338,7 +338,7 @@ services:
       linkwarden-db:
         condition: service_healthy
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -353,7 +353,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.linkwarden-rtr.entrypoints=https"
+      - "traefik.http.routers.linkwarden-rtr.entrypoints=websecure"
       - "traefik.http.routers.linkwarden-rtr.rule=Host(`linkwarden.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.linkwarden-rtr.middlewares=chain-authelia@file"
@@ -372,7 +372,7 @@ services:
   #     dockerfile: $DOCKERDIR/stacks/notes/Dockerfile_volglass
   #   restart: $OTHERS_RESTART_POLICY
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #   security_opt:
   #     - no-new-privileges:true
   #   volumes:
@@ -385,7 +385,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers
-  #     - "traefik.http.routers.volglass-rtr.entrypoints=https"
+  #     - "traefik.http.routers.volglass-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.volglass-rtr.rule=Host(`volglass.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.volglass-rtr.middlewares=chain-authelia@file"
@@ -400,7 +400,7 @@ services:
   #   image: lscr.io/linuxserver/freshrss
   #   restart: $OTHERS_RESTART_POLICY
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #   security_opt:
   #     - no-new-privileges:true
   #   volumes:
@@ -412,7 +412,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers
-  #     - "traefik.http.routers.freshrss-rtr.entrypoints=https"
+  #     - "traefik.http.routers.freshrss-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.freshrss-rtr.rule=Host(`freshrss.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.freshrss-rtr.middlewares=chain-authelia@file"
@@ -445,7 +445,7 @@ services:
     depends_on:
       - miniflux-db
     networks:
-      - t2_proxy
+      - t3_proxy
       # - internal
     security_opt:
       - no-new-privileges:true
@@ -462,7 +462,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.miniflux-rtr.entrypoints=https"
+      - "traefik.http.routers.miniflux-rtr.entrypoints=websecure"
       - "traefik.http.routers.miniflux-rtr.rule=Host(`miniflux.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.miniflux-rtr.middlewares=chain-authelia@file"

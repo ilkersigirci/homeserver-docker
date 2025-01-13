@@ -6,7 +6,7 @@
   #   container_name: n8n
   #   restart: "no"
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #   security_opt:
   #     - no-new-privileges:true
   #   ports:
@@ -29,7 +29,7 @@
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers
-  #     - "traefik.http.routers.n8n-rtr.entrypoints=https"
+  #     - "traefik.http.routers.n8n-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.n8n-rtr.rule=Host(`n8n.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.n8n-rtr.middlewares=chain-no-auth@file"

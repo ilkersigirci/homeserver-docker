@@ -1,7 +1,7 @@
 name: ml
 
 networks:
-  t2_proxy:
+  t3_proxy:
     external: true
 
 x-deploy: &gpu-deploy
@@ -25,7 +25,7 @@ services:
     stop_signal: SIGINT
     tty: true
     networks:
-      - t2_proxy
+      - t3_proxy
     volumes:
       - $GITHUBREPOSDIR/stable-diffusion-webui-docker/data:/data
       - $GITHUBREPOSDIR/stable-diffusion-webui-docker/output:/output
@@ -36,7 +36,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.stablediffusion-rtr.entrypoints=https"
+      - "traefik.http.routers.stablediffusion-rtr.entrypoints=websecure"
       - "traefik.http.routers.stablediffusion-rtr.rule=Host(`stablediffusion.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.stablediffusion-rtr.middlewares=chain-authelia@file"
@@ -51,7 +51,7 @@ services:
     <<: *gpu-deploy
     # runtime: nvidia # NOTE: Not working
     networks:
-      - t2_proxy
+      - t3_proxy
     ports:
       - "9999:9000/tcp"
     volumes:
@@ -67,7 +67,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.sdnext-rtr.entrypoints=https"
+      - "traefik.http.routers.sdnext-rtr.entrypoints=websecure"
       - "traefik.http.routers.sdnext-rtr.rule=Host(`sdnext.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.sdnext-rtr.middlewares=chain-authelia@file"
@@ -81,7 +81,7 @@ services:
     restart: $ML_RESTART_POLICY
     <<: *gpu-deploy
     networks:
-      - t2_proxy
+      - t3_proxy
     # ports:
     #   - "9000:9000"
     volumes:
@@ -91,7 +91,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.whisper-api-rtr.entrypoints=https"
+      - "traefik.http.routers.whisper-api-rtr.entrypoints=websecure"
       - "traefik.http.routers.whisper-api-rtr.rule=Host(`whisperapi.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.whisper-api-rtr.middlewares=chain-authelia@file"
@@ -106,7 +106,7 @@ services:
     restart: $ML_RESTART_POLICY
     <<: *gpu-deploy
     networks:
-      - t2_proxy
+      - t3_proxy
     environment:
       LLAMA_ARG_HOST: 0.0.0.0
       LLAMA_ARG_PORT: 8000
@@ -129,7 +129,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.llama-cpp-server-rtr.entrypoints=https"
+      - "traefik.http.routers.llama-cpp-server-rtr.entrypoints=websecure"
       - "traefik.http.routers.llama-cpp-server-rtr.rule=Host(`llamapi.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.llama-cpp-server-rtr.middlewares=chain-no-auth@file"
@@ -144,7 +144,7 @@ services:
     image: searxng/searxng:latest
     restart: $ML_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     # ports:
     #   - "8080:8080"
     volumes:
@@ -158,7 +158,7 @@ services:
     #   - searxng
     # <<: *gpu-deploy
     networks:
-      - t2_proxy
+      - t3_proxy
     # ports:
     #   - "9000:9000"
     volumes:
@@ -177,7 +177,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.open-webui-rtr.entrypoints=https"
+      - "traefik.http.routers.open-webui-rtr.entrypoints=websecure"
       - "traefik.http.routers.open-webui-rtr.rule=Host(`chat.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.open-webui-rtr.middlewares=chain-authelia@file"
@@ -193,7 +193,7 @@ services:
     #   - searxng
     # <<: *gpu-deploy
     networks:
-      - t2_proxy
+      - t3_proxy
     volumes:
       - $DOCKERDIR/appdata/open-webui-betus:/app/backend/data
       # - ollama:/root/.ollama
@@ -203,7 +203,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.open-webui-betus-rtr.entrypoints=https"
+      - "traefik.http.routers.open-webui-betus-rtr.entrypoints=websecure"
       - "traefik.http.routers.open-webui-betus-rtr.rule=Host(`betus.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.open-webui-betus-rtr.middlewares=chain-authelia@file"

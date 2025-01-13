@@ -1,7 +1,7 @@
 name: photo
 
 networks:
-  t2_proxy:
+  t3_proxy:
     external: true
 
 services:
@@ -10,7 +10,7 @@ services:
     image: docker.io/redis:6.2-alpine@sha256:2ba50e1ac3a0ea17b736ce9db2b0a9f6f8b85d4c27d5f5accc6a416d8f42c6d5
     restart: $MEDIA_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     healthcheck:
       test: redis-cli ping || exit 1
 
@@ -34,7 +34,7 @@ services:
         'wal_compression=on',
       ]
     networks:
-      - t2_proxy
+      - t3_proxy
     volumes:
       - $DOCKERDIR/appdata/immich-db:/var/lib/postgresql/data
     env_file:
@@ -58,19 +58,21 @@ services:
       - immich-redis
       - immich-database
     networks:
-      - t2_proxy
+      - t3_proxy
     volumes:
       - ${GENERATED_UPLOAD_LOCATION}:/usr/src/app/upload
       - ${ORIGINAL_UPLOAD_LOCATION}/library:/usr/src/app/upload/library
       - ${ORIGINAL_UPLOAD_LOCATION}/upload:/usr/src/app/upload/upload
-      - ${MEDIADIR}/Photos/Pictures:/mnt/media/Photos/Pictures:ro
-      - ${MEDIADIR}/Photos/Videos:/mnt/media/Photos/Videos:ro
+      # - ${MEDIADIR}/Photos/Pictures:/mnt/media/Photos/Pictures:ro
+      # - ${MEDIADIR}/Photos/Videos:/mnt/media/Photos/Videos:ro
+      - ${MEDIADIR}/Photos/Pictures:/mnt/media/Photos/Pictures
+      - ${MEDIADIR}/Photos/Videos:/mnt/media/Photos/Videos
     env_file:
       - .env
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.immich-server-rtr.entrypoints=https"
+      - "traefik.http.routers.immich-server-rtr.entrypoints=websecure"
       - "traefik.http.routers.immich-server-rtr.rule=Host(`photos.$DOMAINNAME`)"
       # - "traefik.http.routers.immich-server-rtr.rule=Host(`photos.$DOMAINNAME`) && Pathprefix(`/api`)"
       ## Middlewares
@@ -86,7 +88,7 @@ services:
     image: ghcr.io/immich-app/immich-machine-learning:release-cuda
     restart: $MEDIA_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     volumes:
       - $DOCKERDIR/appdata/immich-ml/model-cache:/cache
     env_file:
@@ -107,7 +109,7 @@ services:
     restart: "no"
     # command: ["/script/immich_auto_album.sh"] # NOTE: Manually run
     networks:
-      - t2_proxy
+      - t3_proxy
     environment:
       API_URL: http://immich-server:2283/api
       API_KEY: $IMMICH_API_KEY

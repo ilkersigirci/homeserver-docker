@@ -2,7 +2,7 @@ version: "3.9"
 name: dagster
 
 networks:
-  t2_proxy:
+  t3_proxy:
     external: true
 
 x-app-vars:
@@ -21,7 +21,7 @@ services:
     image: postgres:11
     restart: $DAGSTER_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     environment:
       POSTGRES_DB: postgres_db
       POSTGRES_USER: postgres_user
@@ -43,7 +43,7 @@ services:
   #   volumes:
   #     - ./scripts/local_stack.sh:/docker-entrypoint-initaws.d/create_localstack_infra.sh
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
 
   # This service runs the gRPC server that loads your user code, in both dagit
   # and dagster-daemon. By setting DAGSTER_CURRENT_IMAGE to its own image, we tell the
@@ -61,7 +61,7 @@ services:
       # - localstack
       - postgresql  # TODO: Is needed?
     networks:
-      - t2_proxy
+      - t3_proxy
     expose:
       - 4000
     # profiles:
@@ -96,7 +96,7 @@ services:
       - postgresql
       - user-code
     networks:
-      - t2_proxy
+      - t3_proxy
     # ports:
     #   - "3000:3000"
     # profiles:
@@ -111,7 +111,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.dagster-rtr.entrypoints=https"
+      - "traefik.http.routers.dagster-rtr.entrypoints=websecure"
       - "traefik.http.routers.dagster-rtr.rule=Host(`dagster.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.dagster-rtr.middlewares=chain-authelia@file"
@@ -136,7 +136,7 @@ services:
       - postgresql
       - user-code
     networks:
-      - t2_proxy
+      - t3_proxy
     # profiles:
     #   - dagster
     environment:

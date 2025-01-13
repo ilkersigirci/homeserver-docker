@@ -1,7 +1,7 @@
 name: android
 
 networks:
-  t2_proxy:
+  t3_proxy:
     external: true
   internal:
     name: internal
@@ -16,7 +16,7 @@ services:
     restart: $DESKTOP_IMAGES_RESTART_POLICY
     privileged: true
     networks:
-      - t2_proxy
+      - t3_proxy
     ports:
       - 5555:5555
     # security_opt:
@@ -30,7 +30,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.redroid-rtr.entrypoints=https"
+      - "traefik.http.routers.redroid-rtr.entrypoints=websecure"
       - "traefik.http.routers.redroid-rtr.rule=Host(`redroid.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.redroid-rtr.middlewares=chain-authelia@file"

@@ -1,7 +1,7 @@
 name: media
 
 networks:
-  t2_proxy:
+  t3_proxy:
     external: true
 
 services:
@@ -15,7 +15,7 @@ services:
   #   # mem_limit: "4096M"
   #   restart: $MEDIA_RESTART_POLICY
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #   security_opt:
   #     - no-new-privileges:true
   #   volumes:
@@ -44,7 +44,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers
-  #     - "traefik.http.routers.immich-rtr.entrypoints=https"
+  #     - "traefik.http.routers.immich-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.immich-rtr.rule=Host(`immich.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.immich-rtr.middlewares=chain-authelia@file"
@@ -79,7 +79,7 @@ services:
   #   # profiles:
   #   # - media
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #   ports:
   #     - "8096:8096"
   #   # devices:
@@ -109,7 +109,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers
-  #     - "traefik.http.routers.jellyfin-rtr.entrypoints=https"
+  #     - "traefik.http.routers.jellyfin-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.jellyfin-rtr.rule=Host(`jellyfin.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.jellyfin-rtr.middlewares=chain-authelia@file"
@@ -127,7 +127,7 @@ services:
     mem_limit: "4096M"
     restart: $MEDIA_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     ports:
       - "8096:8096"
     security_opt:
@@ -144,7 +144,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.jellyfin-rtr.entrypoints=https"
+      - "traefik.http.routers.jellyfin-rtr.entrypoints=websecure"
       - "traefik.http.routers.jellyfin-rtr.rule=Host(`jellyfin.$DOMAINNAME`)"
       ## Middlewares
       # - "traefik.http.routers.jellyfin-rtr.middlewares=chain-authelia@file"
@@ -161,13 +161,13 @@ services:
     # depends_on:
     #   - jellyfin
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.jellyfin-vue-rtr.entrypoints=https"
+      - "traefik.http.routers.jellyfin-vue-rtr.entrypoints=websecure"
       - "traefik.http.routers.jellyfin-vue-rtr.rule=Host(`jellyfin_vue.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.jellyfin-vue-rtr.middlewares=chain-authelia@file"
@@ -183,7 +183,7 @@ services:
     depends_on:
       - jellyfin
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -196,7 +196,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.jellyseerr-rtr.entrypoints=https"
+      - "traefik.http.routers.jellyseerr-rtr.entrypoints=websecure"
       - "traefik.http.routers.jellyseerr-rtr.rule=Host(`jellyseerr.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.jellyseerr-rtr.middlewares=chain-authelia@file"
@@ -211,7 +211,7 @@ services:
     depends_on:
       - jellyfin
     networks:
-      - t2_proxy
+      - t3_proxy
     # ports:
     #   - "9180:9180"
     security_opt:
@@ -219,7 +219,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.feishin-rtr.entrypoints=https"
+      - "traefik.http.routers.feishin-rtr.entrypoints=websecure"
       - "traefik.http.routers.feishin-rtr.rule=Host(`music.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.feishin-rtr.middlewares=chain-authelia@file"
@@ -235,11 +235,11 @@ services:
     # image: ghcr.io/movie-web/movie-web # NOTE: There is no pushed docker image
     restart: $MEDIA_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.movieweb-rtr.entrypoints=https"
+      - "traefik.http.routers.movieweb-rtr.entrypoints=websecure"
       - "traefik.http.routers.movieweb-rtr.rule=Host(`movieweb.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.movieweb-rtr.middlewares=chain-authelia@file"
@@ -286,7 +286,7 @@ services:
   #   # depends_on:
   #   #   - gluetun
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #   security_opt:
   #     - no-new-privileges:true
   #   volumes:
@@ -300,7 +300,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers Auth
-  #     - "traefik.http.routers.qbittorrent-lscr-rtr.entrypoints=https"
+  #     - "traefik.http.routers.qbittorrent-lscr-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.qbittorrent-lscr-rtr.rule=Host(`qtorrent.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.qbittorrent-lscr-rtr.middlewares=chain-authelia@file"
@@ -319,7 +319,7 @@ services:
   #   mem_limit: "4096M"
   #   restart: $MEDIA_RESTART_POLICY
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #   security_opt:
   #     - no-new-privileges:true
   #   volumes:
@@ -333,7 +333,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers Auth
-  #     - "traefik.http.routers.qbittorrent-rtr.entrypoints=https"
+  #     - "traefik.http.routers.qbittorrent-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.qbittorrent-rtr.rule=Host(`qtorrent.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.qbittorrent-rtr.middlewares=chain-authelia@file"
@@ -346,7 +346,7 @@ services:
     container_name: jdownloader
     restart: $MEDIA_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -365,7 +365,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.jdownloader-rtr.entrypoints=https"
+      - "traefik.http.routers.jdownloader-rtr.entrypoints=websecure"
       - "traefik.http.routers.jdownloader-rtr.rule=Host(`download.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.jdownloader-rtr.middlewares=chain-authelia@file"
@@ -379,7 +379,7 @@ services:
   #   container_name: aria2
   #   restart: $MEDIA_RESTART_POLICY
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #   security_opt:
   #     - no-new-privileges:true
   # #  expose:
@@ -397,7 +397,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers
-  #     - "traefik.http.routers.aria2-rtr.entrypoints=https"
+  #     - "traefik.http.routers.aria2-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.aria2-rtr.rule=Host(`aria2.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.aria2-rtr.middlewares=chain-authelia@file"
@@ -415,8 +415,8 @@ services:
     mem_limit: "4096M"
     restart: $MEDIA_RESTART_POLICY
     networks:
-      - t2_proxy
-#      t2_proxy:
+      - t3_proxy
+#      t3_proxy:
 #        ipv4_address: 192.168.90.160
     ports:
       - "487:487"
@@ -439,7 +439,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.transmission-rtr.entrypoints=https"
+      - "traefik.http.routers.transmission-rtr.entrypoints=websecure"
       - "traefik.http.routers.transmission-rtr.rule=Host(`torrent.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.transmission-rtr.middlewares=chain-authelia@file"
@@ -457,8 +457,8 @@ services:
       - transmission
     restart: $MEDIA_RESTART_POLICY
     networks:
-      - t2_proxy
-    #  t2_proxy:
+      - t3_proxy
+    #  t3_proxy:
     #    ipv4_address: 192.168.90.161
     ports:
       - "9696:9696"
@@ -475,7 +475,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.prowlarr-rtr.entrypoints=https"
+      - "traefik.http.routers.prowlarr-rtr.entrypoints=websecure"
       - "traefik.http.routers.prowlarr-rtr.rule=Host(`prowlarr.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.prowlarr-rtr.middlewares=chain-authelia@file"
@@ -491,7 +491,7 @@ services:
   #   # profiles:
   #   # - media
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #   security_opt:
   #     - no-new-privileges:true
   #   # ports:
@@ -506,7 +506,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers
-  #     - "traefik.http.routers.hydra-rtr.entrypoints=https"
+  #     - "traefik.http.routers.hydra-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.hydra-rtr.rule=Host(`hydra.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.hydra-rtr.middlewares=chain-oauth@file"
@@ -525,7 +525,7 @@ services:
       - radarr
       # - sonarr
     networks:
-      - t2_proxy
+      - t3_proxy
     volumes:
       - $CONFIGDIR/buildarr:/config
     environment:
@@ -544,7 +544,7 @@ services:
   #   # profiles:
   #   # - media
   #   networks:
-  #     t2_proxy:
+  #     t3_proxy:
   #       ipv4_address: 192.168.90.163
   #   security_opt:
   #     - no-new-privileges:true
@@ -565,10 +565,10 @@ services:
   #     - "traefik.enable=true"
   #     ## HTTP Routers Auth Bypass
   #     - "traefik.http.routers.lidarr-rtr-bypass.entrypoints=https"
-  #     - "traefik.http.routers.lidarr-rtr-bypass.rule=Host(`lidarr.$DOMAINNAME`) && (Headers(`X-Api-Key`, `$LIDARR_API_KEY`) || Query(`apikey`, `$LIDARR_API_KEY`))"
+  #     - "traefik.http.routers.lidarr-rtr-bypass.rule=Host(`lidarr.$DOMAINNAME`) && (Header(`X-Api-Key`, `$LIDARR_API_KEY`) || Query(`apikey`, `$LIDARR_API_KEY`))"
   #     - "traefik.http.routers.lidarr-rtr-bypass.priority=100"
   #     ## HTTP Routers Auth
-  #     - "traefik.http.routers.lidarr-rtr.entrypoints=https"
+  #     - "traefik.http.routers.lidarr-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.lidarr-rtr.rule=Host(`lidarr.$DOMAINNAME`)"
   #     - "traefik.http.routers.lidarr-rtr.priority=99"
   #     ## Middlewares
@@ -588,8 +588,8 @@ services:
       # - prowlarr
     restart: $MEDIA_RESTART_POLICY
     networks:
-      - t2_proxy
-    #  t2_proxy:
+      - t3_proxy
+    #  t3_proxy:
     #    ipv4_address: 192.168.90.162
     ports:
       - "7878:7878"
@@ -610,10 +610,10 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers Auth Bypass
       #- "traefik.http.routers.radarr-rtr-bypass.entrypoints=https"
-      #- "traefik.http.routers.radarr-rtr-bypass.rule=Host(`radarr.$DOMAINNAME`) && (Headers(`X-Api-Key`, `$RADARR_API_KEY`) || Query(`apikey`, `$RADARR_API_KEY`))"
+      #- "traefik.http.routers.radarr-rtr-bypass.rule=Host(`radarr.$DOMAINNAME`) && (Header(`X-Api-Key`, `$RADARR_API_KEY`) || Query(`apikey`, `$RADARR_API_KEY`))"
       #- "traefik.http.routers.radarr-rtr-bypass.priority=100"
       ## HTTP Routers Auth
-      - "traefik.http.routers.radarr-rtr.entrypoints=https"
+      - "traefik.http.routers.radarr-rtr.entrypoints=websecure"
       - "traefik.http.routers.radarr-rtr.rule=Host(`radarr.$DOMAINNAME`)"
       #- "traefik.http.routers.radarr-rtr.priority=99"
       ## Middlewares
@@ -633,7 +633,7 @@ services:
   #   # profiles:
   #   # - media
   #   networks:
-  #     t2_proxy:
+  #     t3_proxy:
   #       ipv4_address: 192.168.90.167
   #   security_opt:
   #     - no-new-privileges:true
@@ -654,10 +654,10 @@ services:
   #     - "traefik.enable=true"
   #     ## HTTP Routers Auth Bypass
   #     - "traefik.http.routers.sonarr-rtr-bypass.entrypoints=https"
-  #     - "traefik.http.routers.sonarr-rtr-bypass.rule=Host(`sonarr.$DOMAINNAME`) && (Headers(`X-Api-Key`, `$SONARR_API_KEY`) || Query(`apikey`, `$SONARR_API_KEY`))"
+  #     - "traefik.http.routers.sonarr-rtr-bypass.rule=Host(`sonarr.$DOMAINNAME`) && (Header(`X-Api-Key`, `$SONARR_API_KEY`) || Query(`apikey`, `$SONARR_API_KEY`))"
   #     - "traefik.http.routers.sonarr-rtr-bypass.priority=100"
   #     ## HTTP Routers Auth
-  #     - "traefik.http.routers.sonarr-rtr.entrypoints=https"
+  #     - "traefik.http.routers.sonarr-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.sonarr-rtr.rule=Host(`sonarr.$DOMAINNAME`)"
   #     - "traefik.http.routers.sonarr-rtr.priority=99"
   #     ## Middlewares
@@ -675,7 +675,7 @@ services:
   #   container_name: readarr
   #   restart: $MEDIA_RESTART_POLICY
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #   security_opt:
   #     - no-new-privileges:true
   #   volumes:
@@ -690,7 +690,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers Auth
-  #     - "traefik.http.routers.readarr-rtr.entrypoints=https"
+  #     - "traefik.http.routers.readarr-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.readarr-rtr.rule=Host(`readarr.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.readarr-rtr.middlewares=chain-authelia@file"
@@ -706,7 +706,7 @@ services:
   #   # profiles:
   #   # - media
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #   security_opt:
   #     - no-new-privileges:true
   #   # ports:
@@ -724,7 +724,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers Auth
-  #     - "traefik.http.routers.lazylibrarian-rtr.entrypoints=https"
+  #     - "traefik.http.routers.lazylibrarian-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.lazylibrarian-rtr.rule=Host(`lazy.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.lazylibrarian-rtr.middlewares=chain-oauth@file"
@@ -738,7 +738,7 @@ services:
 #     container_name: metube
 #     restart: $MEDIA_RESTART_POLICY
 #     networks:
-#       - t2_proxy
+#       - t3_proxy
 #     security_opt:
 #       - no-new-privileges:true
 #     volumes:
@@ -751,7 +751,7 @@ services:
 #     labels:
 #       - "traefik.enable=true"
 #       ## HTTP Routers Auth
-#       - "traefik.http.routers.metube-rtr.entrypoints=https"
+#       - "traefik.http.routers.metube-rtr.entrypoints=websecure"
 #       - "traefik.http.routers.metube-rtr.rule=Host(`metube.$DOMAINNAME`)"
 #       ## Middlewares
 #       - "traefik.http.routers.metube-rtr.middlewares=chain-authelia@file"
@@ -765,7 +765,7 @@ services:
     container_name: ytdl-sub
     restart: $MEDIA_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -784,7 +784,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.ytdl-rtr.entrypoints=https"
+      - "traefik.http.routers.ytdl-rtr.entrypoints=websecure"
       - "traefik.http.routers.ytdl-rtr.rule=Host(`ytdl.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.ytdl-rtr.middlewares=chain-authelia@file"
@@ -797,7 +797,7 @@ services:
   #   container_name: tubearchivist
   #   restart: $MEDIA_RESTART_POLICY
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #   security_opt:
   #     - no-new-privileges:true
   #   volumes:
@@ -812,7 +812,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers Auth
-  #     - "traefik.http.routers.tubearchivist-rtr.entrypoints=https"
+  #     - "traefik.http.routers.tubearchivist-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.tubearchivist-rtr.rule=Host(`tubearch.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.tubearchivist-rtr.middlewares=chain-authelia@file"
@@ -826,7 +826,7 @@ services:
   #   container_name: tubesync
   #   restart: $MEDIA_RESTART_POLICY
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #   security_opt:
   #     - no-new-privileges:true
   #   volumes:
@@ -841,7 +841,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers Auth
-  #     - "traefik.http.routers.tubesync-rtr.entrypoints=https"
+  #     - "traefik.http.routers.tubesync-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.tubesync-rtr.rule=Host(`tubesync.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.tubesync-rtr.middlewares=chain-authelia@file"
@@ -857,7 +857,7 @@ services:
     container_name: podgrab
     restart: $MEDIA_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -868,7 +868,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.podgrab-rtr.entrypoints=https"
+      - "traefik.http.routers.podgrab-rtr.entrypoints=websecure"
       - "traefik.http.routers.podgrab-rtr.rule=Host(`podgrab.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.podgrab-rtr.middlewares=chain-authelia@file"
@@ -881,7 +881,7 @@ services:
     container_name: deemix
     restart: $MEDIA_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -895,7 +895,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.deemix-rtr.entrypoints=https"
+      - "traefik.http.routers.deemix-rtr.entrypoints=websecure"
       - "traefik.http.routers.deemix-rtr.rule=Host(`deemix.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.deemix-rtr.middlewares=chain-authelia@file"
@@ -908,7 +908,7 @@ services:
     container_name: beets
     restart: $MEDIA_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -923,7 +923,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.beets-rtr.entrypoints=https"
+      - "traefik.http.routers.beets-rtr.entrypoints=websecure"
       - "traefik.http.routers.beets-rtr.rule=Host(`beets.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.beets-rtr.middlewares=chain-authelia@file"
@@ -937,7 +937,7 @@ services:
     container_name: stremio
     restart: $MEDIA_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     # ports:
     #   - "11470:11470"
     security_opt:
@@ -947,7 +947,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.stremio-rtr.entrypoints=https"
+      - "traefik.http.routers.stremio-rtr.entrypoints=websecure"
       - "traefik.http.routers.stremio-rtr.rule=Host(`stremio.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.stremio-rtr.middlewares=chain-authelia@file"
@@ -987,7 +987,7 @@ services:
   #   restart: $MEDIA_RESTART_POLICY
   #   # network_mode: bridge
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #   ports:
   #     # - 8265:8265 # webUI port
   #     - 8266:8266 # server port
@@ -1015,7 +1015,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers
-  #     - "traefik.http.routers.tdarr-rtr.entrypoints=https"
+  #     - "traefik.http.routers.tdarr-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.tdarr-rtr.rule=Host(`tdarr.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.tdarr-rtr.middlewares=chain-authelia@file"
@@ -1030,7 +1030,7 @@ services:
   #   restart: $MEDIA_RESTART_POLICY
   #   network_mode: service:tdarr
   #   # networks:
-  #   #   - t2_proxy
+  #   #   - t3_proxy
   #   security_opt:
   #     - no-new-privileges:true
   #   volumes:

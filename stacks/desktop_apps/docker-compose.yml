@@ -1,7 +1,7 @@
 name: dekstop_apps
 
 networks:
-  t2_proxy:
+  t3_proxy:
     external: true
   internal:
     name: internal
@@ -15,7 +15,7 @@ services:
     restart: $DESKTOP_IMAGES_RESTART_POLICY
     privileged: true
     networks:
-      - t2_proxy
+      - t3_proxy
     volumes:
       - $DOCKERDIR/appdata/kasm/opt:/opt
     #   - /path/to/profiles:/profiles #optional
@@ -32,7 +32,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.kasm-rtr.entrypoints=https"
+      - "traefik.http.routers.kasm-rtr.entrypoints=websecure"
       - "traefik.http.routers.kasm-rtr.rule=Host(`kasm.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.kasm-rtr.middlewares=chain-no-auth@file"
@@ -53,7 +53,7 @@ services:
   #   restart: $DESKTOP_IMAGES_RESTART_POLICY
   #   shm_size: 512m
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #   # volumes:
   #     # - $DOCKERDIR/appdata/kasmvnc:/TODO
   #   environment:
@@ -62,7 +62,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers
-  #     - "traefik.http.routers.kasmvnc-rtr.entrypoints=https"
+  #     - "traefik.http.routers.kasmvnc-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.kasmvnc-rtr.rule=Host(`kasmvnc.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.kasmvnc-rtr.middlewares=chain-no-auth@file"
@@ -86,7 +86,7 @@ services:
     # security_opt:
     #   - seccomp:unconfined #optional
     networks:
-      - t2_proxy
+      - t3_proxy
     volumes:
       - $DOCKERDIR/appdata/webtop:/config
       # - /var/run/docker.sock:/var/run/docker.sock #optional
@@ -98,7 +98,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.webtop-rtr.entrypoints=https"
+      - "traefik.http.routers.webtop-rtr.entrypoints=websecure"
       - "traefik.http.routers.webtop-rtr.rule=Host(`webtop.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.webtop-rtr.middlewares=chain-no-auth@file"
@@ -111,7 +111,7 @@ services:
     image: lscr.io/linuxserver/darktable:latest
     restart: $DESKTOP_IMAGES_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -123,7 +123,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.darktable-rtr.entrypoints=https"
+      - "traefik.http.routers.darktable-rtr.entrypoints=websecure"
       - "traefik.http.routers.darktable-rtr.rule=Host(`darktable.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.darktable-rtr.middlewares=chain-authelia@file"
@@ -142,7 +142,7 @@ services:
     devices:  #optional
       - /dev/dri:/dev/dri
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -155,7 +155,7 @@ services:
       - "com.centurylinklabs.watchtower.enable=false" # For watchtower
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.firefox-rtr.entrypoints=https"
+      - "traefik.http.routers.firefox-rtr.entrypoints=websecure"
       - "traefik.http.routers.firefox-rtr.rule=Host(`firefox.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.firefox-rtr.middlewares=chain-authelia@file"
@@ -172,7 +172,7 @@ services:
       dockerfile: $DESKTOPAPPDOCKERFILES/Okular/Dockerfile
     restart: $DESKTOP_IMAGES_RESTART_POLICY
     networks:
-      - t2_proxy
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -187,7 +187,7 @@ services:
       - "com.centurylinklabs.watchtower.enable=false" # For watchtower
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.okular-rtr.entrypoints=https"
+      - "traefik.http.routers.okular-rtr.entrypoints=websecure"
       - "traefik.http.routers.okular-rtr.rule=Host(`okular.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.okular-rtr.middlewares=chain-authelia@file"

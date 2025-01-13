@@ -1,7 +1,7 @@
 name: cloud
 
 networks:
-  t2_proxy:
+  t3_proxy:
     external: true
 
 ######################################### NEXTCLOUD ##########################################
@@ -14,7 +14,7 @@ services:
     restart: unless-stopped
     hostname: mariadb
     networks:
-      # t2_proxy:
+      # t3_proxy:
       #   ipv4_address: 192.168.90.250
       - nextcloud
     security_opt:
@@ -65,7 +65,7 @@ services:
   #   # profiles:
   #   # - apps
   #   networks:
-  #     - t2_proxy
+  #     - t3_proxy
   #     - default
   #   security_opt:
   #     - no-new-privileges:true
@@ -75,7 +75,7 @@ services:
   #   labels:
   #     - "traefik.enable=true"
   #     ## HTTP Routers
-  #     - "traefik.http.routers.rediscommander-rtr.entrypoints=https"
+  #     - "traefik.http.routers.rediscommander-rtr.entrypoints=websecure"
   #     - "traefik.http.routers.rediscommander-rtr.rule=Host(`redis.$DOMAINNAME`)"
   #     ## Middlewares
   #     - "traefik.http.routers.rediscommander-rtr.middlewares=chain-no-auth@file"
@@ -92,7 +92,7 @@ services:
     restart: unless-stopped
     networks:
       - nextcloud
-      - t2_proxy
+      - t3_proxy
     ports:
       - 777:80
     # Persistent volumes with bind mounts to easily move/backup data
