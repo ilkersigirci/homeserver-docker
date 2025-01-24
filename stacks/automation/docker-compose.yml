@@ -1,38 +1,38 @@
-################## AUTOMATION
+name: automation
 
-  # # n8n automation tool
-  # n8n:
-  #   image: n8nio/n8n
-  #   container_name: n8n
-  #   restart: "no"
-  #   networks:
-  #     - t3_proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   ports:
-  #     - "5678:5678"
-  #   environment:
-  #     - PUID=$PUID
-  #     - PGID=$PGID
-  #     - TZ=$TZ
-  #     - N8N_BASIC_AUTH_ACTIVE=true
-  #     - N8N_BASIC_AUTH_USER
-  #     - N8N_BASIC_AUTH_PASSWORD
-  #     - N8N_HOST=${DOMAINNAME}
-  #     - N8N_PORT=5678
-  #     - N8N_PROTOCOL=https
-  #     - NODE_ENV=production
-  #     - N8N_PATH
-  #     - WEBHOOK_URL=https://${DOMAINNAME}${N8N_PATH}
-  #   volumes:
-  #     - ${DATA_FOLDER}/.n8n:/home/node/.n8n
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.n8n-rtr.entrypoints=websecure"
-  #     - "traefik.http.routers.n8n-rtr.rule=Host(`n8n.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.n8n-rtr.middlewares=chain-no-auth@file"
-  #     ## HTTP Services
-  #     # - "traefik.http.routers.jellyfin-rtr.service=jellyfin-svc"
-  #     # - "traefik.http.services.jellyfin-svc.loadbalancer.server.port=8096"
+networks:
+  t3_proxy:
+    external: true
+
+services:
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: n8n
+    restart: "no"
+    mem_limit: 1g
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - GENERIC_TIMEZONE=$TZ
+      - N8N_PROTOCOL=https
+      - NODE_ENV=production
+      - N8N_HOST=n8n.${DOMAINNAME}
+      - N8N_PORT=5678
+      - WEBHOOK_URL=https://n8n.${DOMAINNAME}/
+    volumes:
+      - $DOCKERDIR/appdata/n8n:/home/node/.n8n
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.n8n-rtr.entrypoints=websecure"
+      - "traefik.http.routers.n8n-rtr.rule=Host(`n8n.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.n8n-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.n8n-rtr.service=n8n-svc"
+      - "traefik.http.services.n8n-svc.loadbalancer.server.port=5678"
