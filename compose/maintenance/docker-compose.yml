@@ -342,8 +342,8 @@ services:
     hostname: ${HOSTNAME}
     image: rustic:latest
     build:
-      context: $DOCKERDIR/stacks/maintenance/Rustic
-      dockerfile: $DOCKERDIR/stacks/maintenance/Rustic/Dockerfile
+      context: $DOCKERDIR/compose/maintenance/Rustic
+      dockerfile: $DOCKERDIR/compose/maintenance/Rustic/Dockerfile
     restart: $MAINTENANCE_RESTART_POLICY
     networks:
       - t3_proxy

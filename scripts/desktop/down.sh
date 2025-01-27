@@ -1,15 +1,15 @@
 #! /usr/bin/zsh
 
-STACKS_ROOT=~/docker/stacks
+COMPOSE_ROOT=~/docker/compose
 
-stacks=("base" "notes" "media" "others" "desktop_apps" "maintenance" "monitoring" "ml")
+compose=("base" "notes" "media" "others" "desktop_apps" "maintenance" "monitoring" "ml")
 
-for stack in "${stacks[@]}"
+for stack in "${compose[@]}"
 do
-    cd "$STACKS_ROOT/$stack"
+    cd "$COMPOSE_ROOT/$stack"
     docker compose --env-file ~/docker/configs/.env down --volumes --remove-orphans
 done
 
 # Photo dir
-cd "$STACKS_ROOT/photo"
+cd "$COMPOSE_ROOT/photo"
 docker compose down --volumes --remove-orphans

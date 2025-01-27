@@ -3,5 +3,5 @@ configs
 data
 logs
 secrets
-stacks/photo/.env
+compose/photo/.env
 .idea

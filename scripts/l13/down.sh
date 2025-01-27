@@ -1,11 +1,11 @@
 #! /usr/bin/zsh
 
-STACKS_ROOT=~/docker/stacks
+COMPOSE_ROOT=~/docker/compose
 
-stacks=("base" "notes" "others" "desktop_apps" "maintenance" "monitoring")
+compose=("base" "notes" "others" "desktop_apps" "maintenance" "monitoring")
 
-for stack in "${stacks[@]}"
+for stack in "${compose[@]}"
 do
-    cd "$STACKS_ROOT/$stack"
+    cd "$COMPOSE_ROOT/$stack"
     docker compose --env-file ~/docker/configs/.env down --volumes --remove-orphans
 done

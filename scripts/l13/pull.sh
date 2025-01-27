@@ -1,21 +1,21 @@
 #! /usr/bin/zsh
 
-STACKS_ROOT=~/docker/stacks
+COMPOSE_ROOT=~/docker/compose
 
-cd $STACKS_ROOT/base
+cd $COMPOSE_ROOT/base
 docker compose --env-file ~/docker/configs/.env pull
 docker compose --env-file ~/docker/configs/.env up -d
-# cd $STACKS_ROOT/others
+# cd $COMPOSE_ROOT/others
 # docker compose --env-file ~/docker/configs/.env pull stable-diffusion
 # docker compose --env-file ~/docker/configs/.env up -d stable-diffusion
-cd $STACKS_ROOT/maintenance
+cd $COMPOSE_ROOT/maintenance
 # docker compose --env-file ~/docker/configs/.env build rustic
 docker compose --env-file ~/docker/configs/.env pull dozzle wumps
 docker compose --env-file ~/docker/configs/.env up -d dozzle wumps # rustic
-cd $STACKS_ROOT/monitoring
+cd $COMPOSE_ROOT/monitoring
 docker compose --env-file ~/docker/configs/.env pull glances netdata
 docker compose --env-file ~/docker/configs/.env up -d glances netdata
-cd $STACKS_ROOT/notes
+cd $COMPOSE_ROOT/notes
 # docker pull ghcr.io/linuxserver/baseimage-kasmvnc:alpine318
 # docker pull ghcr.io/linuxserver/baseimage-kasmvnc:debianbookworm
 # docker compose --env-file ~/docker/configs/.env build obsidian

@@ -368,8 +368,8 @@ services:
   #   build:
   #     # context: $GITHUBREPOSDIR/volglass
   #     # dockerfile: $GITHUBREPOSDIR/volglass/Dockerfile
-  #     context: $DOCKERDIR/stacks/notes
-  #     dockerfile: $DOCKERDIR/stacks/notes/Dockerfile_volglass
+  #     context: $DOCKERDIR/compose/notes
+  #     dockerfile: $DOCKERDIR/compose/notes/Dockerfile_volglass
   #   restart: $OTHERS_RESTART_POLICY
   #   networks:
   #     - t3_proxy
