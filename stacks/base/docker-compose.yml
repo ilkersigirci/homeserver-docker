@@ -342,15 +342,15 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/filebrowser/database.db:/database.db
+      - $CONFIGDIR/filebrowser/filebrowser.json:/filebrowser.json
       - $CONFIGDIR/filebrowser/custom.css:/custom/custom.css
-      - $USERDIR:/srv/Home  # NOTE: When downing container, provide .env file, otherwise gives error
-      - $HARDDISKROOTDIR:/srv/Harddisk  # NOTE: When downing container, provide .env file, otherwise gives error
+      - $DOCKERDIR/appdata/filebrowser/database.db:/database.db
+      - $USERDIR:/srv/Home
+      - $HARDDISKROOTDIR:/srv/Harddisk
     environment:
       - PUID=$PUID
       - PGID=$PGID
       - TZ=$TZ
-      - FB_NOAUTH=1
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
@@ -374,8 +374,16 @@ services:
     volumes:
       - $DOCKERDIR/appdata/dufs:/data
       # - $DOCKERDIR/appdata/dufs/Apps/Books:/data/Apps/Books # NOTE: For syncing MoonReader with webdav
-    # environment:
-      # - NONE
+      - $USERDIR:/data/Home
+      - $HARDDISKROOTDIR:/data/Harddisk
+    # healthcheck:
+    #   test: "curl http://127.0.0.1:5000/__dufs__/health" # NOTE: Not working since there is no curl
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 3
+    environment:
+      - DUFS_BIND=0.0.0.0
+      - DUFS_PORT=5000
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

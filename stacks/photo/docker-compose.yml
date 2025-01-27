@@ -63,10 +63,10 @@ services:
       - ${GENERATED_UPLOAD_LOCATION}:/usr/src/app/upload
       - ${ORIGINAL_UPLOAD_LOCATION}/library:/usr/src/app/upload/library
       - ${ORIGINAL_UPLOAD_LOCATION}/upload:/usr/src/app/upload/upload
-      # - ${MEDIADIR}/Photos/Pictures:/mnt/media/Photos/Pictures:ro
-      # - ${MEDIADIR}/Photos/Videos:/mnt/media/Photos/Videos:ro
-      - ${MEDIADIR}/Photos/Pictures:/mnt/media/Photos/Pictures
-      - ${MEDIADIR}/Photos/Videos:/mnt/media/Photos/Videos
+      - ${MEDIADIR}/Photos/Pictures:/mnt/media/Photos/Pictures:ro
+      - ${MEDIADIR}/Photos/Videos:/mnt/media/Photos/Videos:ro
+      # - ${MEDIADIR}/Photos/Pictures:/mnt/media/Photos/Pictures
+      # - ${MEDIADIR}/Photos/Videos:/mnt/media/Photos/Videos
     env_file:
       - .env
     labels:
