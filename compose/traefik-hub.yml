@@ -1,0 +1,18 @@
+services:
+  traefik-hub-agent:
+    image: ghcr.io/traefik/hub-agent-traefik:v0.8.0
+    container_name: hub-agent
+    profiles:
+      - core
+    depends_on:
+      - traefik
+    # pull_policy: always
+    restart: $BASE_RESTART_POLICY
+    command:
+      - run
+      - --hub.token=586b63fb-3e4a-409d-9452-1de2bda1a2b7
+      - --auth-server.advertise-url=http://hub-agent
+      - --traefik.host=traefik
+      - --traefik.tls.insecure=true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

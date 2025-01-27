@@ -1,0 +1,59 @@
+services:
+  watchtower:
+    image: ghcr.io/containrrr/watchtower:latest
+    container_name: watchtower
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - maintenance
+    # privileged: true
+    networks:
+      - t3_proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      TZ: $TZ
+      # WATCHTOWER_RUN_ONCE: "true"  # NOTE: For one-time testing
+      # DOCKER_HOST: tcp://socket-proxy:2375 # FIXME: Server misbehaving
+      DOCKER_API_VERSION: "1.43"
+      WATCHTOWER_SCHEDULE: 0 0 2 * * *
+      WATCHTOWER_CLEANUP: "true"
+      WATCHTOWER_LABEL_ENABLE: "true"
+      WATCHTOWER_REMOVE_VOLUMES: "true"
+      WATCHTOWER_INCLUDE_STOPPED: "true"
+      WATCHTOWER_NO_STARTUP_MESSAGE: "true"
+      WATCHTOWER_HTTP_API_TOKEN: $WATCHTOWER_HTTP_API_TOKEN
+      WATCHTOWER_HTTP_API_METRICS: "true"
+      WATCHTOWER_NOTIFICATIONS: "shoutrrr"
+      WATCHTOWER_NOTIFICATION_URL: "telegram://$TELEGRAM_BOT_TOKEN@telegram/?channels=$TELEGRAM_CHAT_ID"
+      WATCHTOWER_NOTIFICATION_REPORT: "true"
+      WATCHTOWER_NOTIFICATIONS_LEVEL: info
+      WATCHTOWER_NOTIFICATION_TEMPLATE: |
+        {{- if .Report -}}
+          {{- with .Report -}}
+        {{len .Scanned}} Scanned, {{len .Updated}} Updated, {{len .Failed}} Failed
+              {{- range .Updated}}
+        - {{.Name}} ({{.ImageName}}): {{.CurrentImageID.ShortID}} updated to {{.LatestImageID.ShortID}}
+              {{- end -}}
+              {{- range .Fresh}}
+        - {{.Name}} ({{.ImageName}}): {{.State}}
+            {{- end -}}
+            {{- range .Skipped}}
+        - {{.Name}} ({{.ImageName}}): {{.State}}: {{.Error}}
+            {{- end -}}
+            {{- range .Failed}}
+        - {{.Name}} ({{.ImageName}}): {{.State}}: {{.Error}}
+            {{- end -}}
+          {{- end -}}
+        {{- else -}}
+          {{range .Entries -}}{{.Message}}{{"\n"}}{{- end -}}
+        {{- end -}}
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.watchtower-rtr.entrypoints=websecure"
+      - "traefik.http.routers.watchtower-rtr.rule=Host(`watchtower.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.watchtower-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.watchtower-rtr.service=watchtower-svc"
+      - "traefik.http.services.watchtower-svc.loadbalancer.server.port=8080"

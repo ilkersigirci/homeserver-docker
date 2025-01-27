@@ -1,0 +1,35 @@
+services:
+  code-server:
+    image: lscr.io/linuxserver/code-server
+    container_name: code-server
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - maintenance
+    networks:
+      - t3_proxy
+    volumes:
+      - $DOCKERDIR/appdata/code-server:/config
+      - $DOCKERDIR:/config/workspace/docker
+      - $NOTESDIR:/config/workspace/notes
+      - $MYREPOSDIR:/config/workspace/MyRepos
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      DEFAULT_WORKSPACE: /config/workspace
+      # DOCKER_HOST: tcp://docker-socket-proxy:2375
+      # PASSWORD: password
+      # HASHED_PASSWORD: 
+      SUDO_PASSWORD: ilker
+      # SUDO_PASSWORD_HASH: 
+      # PROXY_DOMAIN: code-server-ls.my.domain
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.code-server-rtr.entrypoints=websecure"
+      - "traefik.http.routers.code-server-rtr.rule=Host(`code.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.code-server-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.code-server-rtr.service=code-server-svc"
+      - "traefik.http.services.code-server-svc.loadbalancer.server.port=8443"

@@ -1,0 +1,36 @@
+services:
+  # FIXME: docker-socket-proxy NOT WORKING !
+  # TODO: Authelia integration
+  # https://www.authelia.com/integration/openid-connect/portainer/
+  portainer:
+    container_name: portainer
+    image: portainer/portainer-ce:latest # TODO: ghcr.io/
+    depends_on:
+      - traefik
+    restart: $BASE_RESTART_POLICY
+    profiles:
+      - maintenance
+    command: -H unix:///var/run/docker.sock # Use Docker Socket Proxy and comment this line out, for improved security.
+    # command: -H tcp://docker-socket-proxy:2375 # Use this instead, if you have Socket Proxy enabled.
+    networks:
+      - t3_proxy
+      - socket_proxy
+    #ports:
+    #  - 9000
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro # # Use Docker Socket Proxy instead for improved security
+      - $DOCKERDIR/appdata/portainer/data:/data # Change to local directory if you want to save/transfer config locally
+    environment:
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.portainer-rtr.entrypoints=websecure"
+      - "traefik.http.routers.portainer-rtr.rule=Host(`portainer.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.portainer-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.portainer-rtr.service=portainer-svc"
+      - "traefik.http.services.portainer-svc.loadbalancer.server.port=9000"

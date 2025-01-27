@@ -1,0 +1,21 @@
+services:
+  it-tools:
+    image: ghcr.io/corentinth/it-tools:latest
+    container_name: it-tools
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - maintenance
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.it-tools-rtr.entrypoints=websecure"
+      - "traefik.http.routers.it-tools-rtr.rule=Host(`it-tools.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.it-tools-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.it-tools-rtr.service=it-tools-svc"
+      - "traefik.http.services.it-tools-svc.loadbalancer.server.port=80"

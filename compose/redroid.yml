@@ -1,19 +1,12 @@
-name: android
-
-networks:
-  t3_proxy:
-    external: true
-  internal:
-    name: internal
-    driver: bridge
-
 services:
   # adb connect localhost:5555
   # scrcpy -s localhost:5555
   redroid:
     container_name: redroid
     image: redroid/redroid:13.0.0-latest
-    restart: $DESKTOP_IMAGES_RESTART_POLICY
+    restart: unless-stopped
+    profiles:
+      - android
     privileged: true
     networks:
       - t3_proxy

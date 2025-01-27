@@ -1,0 +1,31 @@
+services:
+  stirlingpdf:
+    image: frooodle/s-pdf:latest
+    container_name: stirlingpdf
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - maintenance
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $CONFIGDIR/stirlingpdf/ocr_train_data:/usr/share/tesseract-ocr/4.00/tessdata #Required for extra OCR languages
+      - $DOCKERDIR/appdata/stirlingpdf:/configs
+    environment:
+      - APP_LOCALE=en_GB
+      - APP_HOME_NAME=Stirling PDF
+      # - APP_HOME_DESCRIPTION=Your locally hosted one-stop-shop for all your PDF needs.
+      # - APP_NAVBAR_NAME=Stirling PDF
+      # - APP_ROOT_PATH=/
+      # - ALLOW_GOOGLE_VISIBILITY=true
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.stirlingpdf-rtr.entrypoints=websecure"
+      - "traefik.http.routers.stirlingpdf-rtr.rule=Host(`stirlingpdf.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.stirlingpdf-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.stirlingpdf-rtr.service=stirlingpdf-svc"
+      - "traefik.http.services.stirlingpdf-svc.loadbalancer.server.port=8080"

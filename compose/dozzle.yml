@@ -1,0 +1,27 @@
+services:
+  dozzle:
+    image: amir20/dozzle:latest
+    container_name: dozzle
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - maintenance
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      DOZZLE_LEVEL: info
+      DOZZLE_TAILSIZE: 300
+      DOZZLE_FILTER: "status=running" # limits logs displayed to containers with this label
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.dozzle-rtr.entrypoints=websecure"
+      - "traefik.http.routers.dozzle-rtr.rule=Host(`dozzle.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.dozzle-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.dozzle-rtr.service=dozzle-svc"
+      - "traefik.http.services.dozzle-svc.loadbalancer.server.port=8080"

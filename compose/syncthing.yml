@@ -1,0 +1,34 @@
+services:
+  syncthing:
+    container_name: syncthing
+    image: linuxserver/syncthing:latest
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - maintenance
+    networks:
+      - t3_proxy
+    # NOTE: Enable them. Probably needed for connecting to phone (RESEARCH)
+    # ports:
+    #   - 22000:22000/tcp
+    #   - 22000:22000/udp
+    #   - 21027:21027/udp
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/syncthing:/config
+      # - $APKDIR:/apk
+      # - $NOTESDIR:/notes
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.syncthing-rtr.entrypoints=websecure"
+      - "traefik.http.routers.syncthing-rtr.rule=Host(`syncthing.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.syncthing-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.syncthing-rtr.service=syncthing-svc"
+      - "traefik.http.services.syncthing-svc.loadbalancer.server.port=8384"
