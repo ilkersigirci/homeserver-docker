@@ -3,6 +3,5 @@ configs
 data
 logs
 secrets
-.vscode
 stacks/photo/.env
 .idea

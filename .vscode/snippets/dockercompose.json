@@ -1,0 +1,36 @@
+{
+    "Docker Service Template": {
+        "prefix": "dockerservice",
+        "description": "Create a new Docker service configuration with Traefik labels",
+        "body": [
+            "${1:servicename}:",
+            "  image: ${2:image}:${3:latest}",
+            "  container_name: ${1:servicename}",
+            "  depends_on:",
+            "    - traefik",
+            "  restart: unless-stopped",
+            "  networks:",
+            "    - t3_proxy",
+            "  ports:",
+            "    - \"${6:8080}:${5:80}\"",
+            "  security_opt:",
+            "    - no-new-privileges:true",
+            "  volumes:",
+            "    - \\$DATADIR/${1:servicename}:${4:/data/}",
+            "  environment:",
+            "    - PUID=\\$PUID",
+            "    - PGID=\\$PGID",
+            "    - TZ=\\$TZ",
+            "  labels:",
+            "    - \"traefik.enable=true\"",
+            "    ## HTTP Routers",
+            "    - \"traefik.http.routers.${1:servicename}-rtr.entrypoints=websecure\"",
+            "    - \"traefik.http.routers.${1:servicename}-rtr.rule=Host(\\`${1:servicename}.\\$DOMAINNAME\\`)\"",
+            "    ## Middlewares",
+            "    - \"traefik.http.routers.${1:servicename}-rtr.middlewares=chain-authelia@file\"",
+            "    ## HTTP Services",
+            "    - \"traefik.http.routers.${1:servicename}-rtr.service=${1:servicename}-svc\"",
+            "    - \"traefik.http.services.${1:servicename}-svc.loadbalancer.server.port=${5:80}\""
+        ]
+    }
+}
