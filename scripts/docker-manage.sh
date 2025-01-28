@@ -3,7 +3,7 @@
 set -e  # Exit on error
 
 # Configuration
-PROFILES="core,ml,maintenance,media,monitoring,reading"
+PROFILES="core,ml,maintenance,media,monitoring,photo,reading"
 COMPOSE_CMD="docker compose --env-file $HOME/docker/.env"
 
 # Function to display usage

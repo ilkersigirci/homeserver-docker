@@ -67,6 +67,8 @@ include:
   - compose/beszel.yml
   # - compose/netdata.yml
   # - compose/watchyourlan.yml
+  #### PHOTO ####
+  - compose/immich.yml
   #### READING ####
   - compose/flatnotes.yml
   - compose/linkwarden.yml
