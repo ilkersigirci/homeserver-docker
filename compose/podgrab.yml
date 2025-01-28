@@ -1,0 +1,26 @@
+services:
+  podgrab:
+    image: akhilrex/podgrab:latest
+    container_name: podgrab
+    restart: $MEDIA_RESTART_POLICY
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/podgrab:/config
+      - $MEDIADIR/Podcasts:/assets
+    environment:
+      - CHECK_FREQUENCY=240
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.podgrab-rtr.entrypoints=websecure"
+      - "traefik.http.routers.podgrab-rtr.rule=Host(`podgrab.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.podgrab-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.podgrab-rtr.service=podgrab-svc"
+      - "traefik.http.services.podgrab-svc.loadbalancer.server.port=8080"
+    profiles:
+      - media

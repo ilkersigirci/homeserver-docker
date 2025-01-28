@@ -1,0 +1,23 @@
+services:
+  logseq:
+    container_name: logseq
+    image: ghcr.io/logseq/logseq-webapp:latest
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+      # volumes:
+      # - $NOTESDIR:/notes
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.logseq-rtr.entrypoints=websecure"
+      - "traefik.http.routers.logseq-rtr.rule=Host(`logseq.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.logseq-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.logseq-rtr.service=logseq-svc"
+      - "traefik.http.services.logseq-svc.loadbalancer.server.port=80"
+    profiles:
+      - reading

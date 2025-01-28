@@ -1,0 +1,30 @@
+services:
+  beets:
+    image: lscr.io/linuxserver/beets:latest
+    container_name: beets
+    restart: $MEDIA_RESTART_POLICY
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      # - $CONFIGDIR/beets/config.yaml:/config/config.yaml # FIXME: not working
+      - $DOCKERDIR/appdata/beets:/config
+      - $MEDIADIR/Music/Beets_TEST/Music:/music
+      - $MEDIADIR/Music/Beets_TEST/Downloads:/downloads
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.beets-rtr.entrypoints=websecure"
+      - "traefik.http.routers.beets-rtr.rule=Host(`beets.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.beets-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.beets-rtr.service=beets-svc"
+      - "traefik.http.services.beets-svc.loadbalancer.server.port=8337"
+    profiles:
+      - media

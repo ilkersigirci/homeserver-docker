@@ -1,0 +1,46 @@
+services:
+  # Diffent GUIs in web home:
+  # /combustion-release/ -- /transmission-web-control/ -- /kettu/ -- /flood-for-transmission/
+  transmission:
+    image: lscr.io/linuxserver/transmission
+    container_name: transmission
+    # cpus: "0.5"
+    mem_reservation: "4096M"
+    mem_limit: "4096M"
+    restart: $MEDIA_RESTART_POLICY
+    networks:
+      - t3_proxy
+      #      t3_proxy:
+      #        ipv4_address: 192.168.90.160
+    ports:
+      - "487:487"
+      # - "51413:51413"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/transmission:/config
+      - $MEDIADIR/Downloads:/data/downloads
+      # - $MEDIADIR/Downloads/test:/downloads
+      # If not set, tranmission creates reduntant volumes
+      - $MEDIADIR/Downloads/torrent_files:/watch
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      # TRANSMISSION_WEB_HOME: /flood-for-transmission (Not working > 4.0.0)
+    #      USER: username
+    #      PASS: password
+
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.transmission-rtr.entrypoints=websecure"
+      - "traefik.http.routers.transmission-rtr.rule=Host(`torrent.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.transmission-rtr.middlewares=chain-authelia@file"
+      #      - "traefik.http.routers.transmission-rtr.middlewares=middlewares-rate-limit@file"
+      ## HTTP Services
+      - "traefik.http.routers.transmission-rtr.service=transmission-svc"
+      - "traefik.http.services.transmission-svc.loadbalancer.server.port=9091"
+    profiles:
+      - media

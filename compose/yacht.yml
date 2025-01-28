@@ -1,0 +1,30 @@
+services:
+  # Default email:password = admin@yacht.local:pass
+  yacht:
+    container_name: yacht
+    image: selfhostedpro/yacht:latest #devel, latest
+    restart: $BASE_RESTART_POLICY
+    profiles:
+      - maintenance
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro # # Use Docker Socket Proxy instead for improved security
+      # - $DOCKERDIR/appdata/yacht:/config # Change to local directory if you want to save/transfer config locally
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - DISABLE_AUTH=True
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.yacht-rtr.entrypoints=websecure"
+      - "traefik.http.routers.yacht-rtr.rule=Host(`yacht.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.yacht-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.yacht-rtr.service=yacht-svc"
+      - "traefik.http.services.yacht-svc.loadbalancer.server.port=8000"

@@ -1,0 +1,76 @@
+services:
+  # searxng:
+  #   container_name: searxng
+  #   image: searxng/searxng:latest
+  #   restart: $ML_RESTART_POLICY
+  #   networks:
+  #     - t3_proxy
+  #   # ports:
+  #   #   - "8080:8080"
+  #   volumes:
+  #     - $DOCKERDIR/appdata/searxng:/etc/searxng
+  #   profiles:
+  #     - ml
+
+  open-webui:
+    container_name: open-webui
+    image: ghcr.io/open-webui/open-webui:latest # :ollama
+    restart: $ML_RESTART_POLICY
+    # depends_on:
+    #   - searxng
+    networks:
+      - t3_proxy
+    # ports:
+    #   - "9000:9000"
+    volumes:
+      - $DOCKERDIR/appdata/open-webui:/app/backend/data
+      # - ollama:/root/.ollama
+    environment:
+      # - WEBUI_AUTH=False
+      - OPENAI_API_KEY=$OPENAI_API_KEY
+      # - OPENAI_API_BASE_URLS="https://api.openai.com/v1;URL2"
+      # - OPENAI_API_KEYS="KEY1;KEY2"
+      # - ENABLE_RAG_WEB_SEARCH=True
+      # - RAG_WEB_SEARCH_ENGINE="searxng"
+      # - RAG_WEB_SEARCH_RESULT_COUNT=3
+      # - RAG_WEB_SEARCH_CONCURRENT_REQUESTS=10
+      # - SEARXNG_QUERY_URL="http://searxng:8080/search?q=<query>"
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.open-webui-rtr.entrypoints=websecure"
+      - "traefik.http.routers.open-webui-rtr.rule=Host(`chat.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.open-webui-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.open-webui-rtr.service=open-webui-svc"
+      - "traefik.http.services.open-webui-svc.loadbalancer.server.port=8080"
+    profiles:
+      - ml
+
+  open-webui-betus:
+    container_name: open-webui-betus
+    image: ghcr.io/open-webui/open-webui:latest # :ollama
+    restart: $ML_RESTART_POLICY
+    # depends_on:
+    #   - searxng
+    networks:
+      - t3_proxy
+    volumes:
+      - $DOCKERDIR/appdata/open-webui-betus:/app/backend/data
+      # - ollama:/root/.ollama
+    environment:
+      - WEBUI_AUTH=False
+      - OPENAI_API_KEY=$OPENAI_API_KEY
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.open-webui-betus-rtr.entrypoints=websecure"
+      - "traefik.http.routers.open-webui-betus-rtr.rule=Host(`betus.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.open-webui-betus-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.open-webui-betus-rtr.service=open-webui-betus-svc"
+      - "traefik.http.services.open-webui-betus-svc.loadbalancer.server.port=8080"
+    profiles:
+      - ml

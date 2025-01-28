@@ -1,0 +1,29 @@
+services:
+  czkawka:
+    container_name: czkawka
+    image: jlesage/czkawka:latest
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - maintenance
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/czkawka:/config:rw
+      - $MEDIADIR/Photos/Pictures:/storage:rw
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - DARK_MODE=1
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.czkawka-rtr.entrypoints=websecure"
+      - "traefik.http.routers.czkawka-rtr.rule=Host(`czkawka.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.czkawka-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.czkawka-rtr.service=czkawka-svc"
+      - "traefik.http.services.czkawka-svc.loadbalancer.server.port=5800"

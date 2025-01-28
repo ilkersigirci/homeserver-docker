@@ -1,0 +1,38 @@
+services:
+  sunshine:
+    image: ghcr.io/lizardbyte/sunshine:latest-ubuntu-22.04
+    container_name: sunshine
+    restart: $MAINTENANCE_RESTART_POLICY
+    networks:
+      - t3_proxy
+    ports:
+      # - "48010:48010"
+      - "47984-47990:47984-47990/tcp"
+      - "47998-48000:47998-48000/udp"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $CONFIGDIR/sunshine:/config
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.sunshine-rtr.entrypoints=websecure"
+      - "traefik.http.routers.sunshine-rtr.rule=Host(`sunshine.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.sunshine-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.sunshine-rtr.service=sunshine-svc"
+      - "traefik.http.services.sunshine-svc.loadbalancer.server.port=47990"
+    profiles:
+      - monitoring

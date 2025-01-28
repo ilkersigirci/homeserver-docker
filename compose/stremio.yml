@@ -1,0 +1,27 @@
+services:
+  # In the url, change streamingServer=http to streamingServer=https
+  stremio:
+    image: stremio/server:latest
+    container_name: stremio
+    restart: $MEDIA_RESTART_POLICY
+    networks:
+      - t3_proxy
+    # ports:
+    #   - "11470:11470"
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - NO_CORS=1
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.stremio-rtr.entrypoints=websecure"
+      - "traefik.http.routers.stremio-rtr.rule=Host(`stremio.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.stremio-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.stremio-rtr.service=stremio-svc"
+      - "traefik.http.services.stremio-svc.loadbalancer.server.port=11470"
+    profiles:
+      - media
+      - arr

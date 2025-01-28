@@ -1,0 +1,27 @@
+services:
+  remmina:
+    image: lscr.io/linuxserver/remmina
+    container_name: remmina
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - maintenance
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/remmina:/config
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.remmina-rtr.entrypoints=websecure"
+      - "traefik.http.routers.remmina-rtr.rule=Host(`remmina.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.remmina-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.remmina-rtr.service=remmina-svc"
+      - "traefik.http.services.remmina-svc.loadbalancer.server.port=3000"

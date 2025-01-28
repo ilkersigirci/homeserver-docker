@@ -1,0 +1,46 @@
+services:
+  # FIXME: To show wifi network usage, we need `network_mode: host`. But this way, we can't use traefik.
+  # FIXME: Find a way to show GPU stats
+  glances:
+    # image: nicolargo/glances:ubuntu-latest-full
+    image: nicolargo/glances:dev
+    container_name: glances
+    restart: $MAINTENANCE_RESTART_POLICY
+    # network_mode: host
+    networks:
+      - t3_proxy
+    #   - socket_proxy
+    # - hostnet
+    privileged: true
+    # security_opt:
+    #   - no-new-privileges:true
+    pid: host
+    volumes:
+      # - /var/run/docker.sock:/var/run/docker.sock:ro # FIXME: Use Docker Socket Proxy instead for improved security
+      # - $CONFIGDIR/glances/glances.conf:/glances/conf/glances.conf # Use this if you want to add a glances.conf file
+      - $USERDIR:/data/home:ro
+    environment:
+      TZ: "${TZ}"
+      # DOCKER_HOST: /var/run/docker.sock:/var/run/docker.sock:ro
+      # DOCKER_HOST: tcp://socket-proxy:2375
+      # GLANCES_OPT: "-w" # "-C /glances/conf/glances.conf --export influxdb"
+      GLANCES_OPT: "-C /glances/conf/glances.conf -w"
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.glances-rtr.entrypoints=websecure"
+      - "traefik.http.routers.glances-rtr.rule=Host(`glances.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.glances-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.glances-rtr.service=glances-svc"
+      - "traefik.http.services.glances-svc.loadbalancer.server.port=61208"
+    profiles:
+      - monitoring

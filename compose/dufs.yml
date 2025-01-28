@@ -1,0 +1,35 @@
+services:
+  dufs:
+    container_name: dufs
+    image: sigoden/dufs:latest
+    restart: $BASE_RESTART_POLICY
+    command: /data -A
+    profiles:
+      - core
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/dufs:/data
+      # - $DOCKERDIR/appdata/dufs/Apps/Books:/data/Apps/Books # NOTE: For syncing MoonReader with webdav
+      - $USERDIR:/data/Home
+      - $HARDDISKROOTDIR:/data/Harddisk
+    # healthcheck:
+    #   test: "curl http://127.0.0.1:5000/__dufs__/health" # NOTE: Not working since there is no curl
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 3
+    environment:
+      - DUFS_BIND=0.0.0.0
+      - DUFS_PORT=5000
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.dufs-rtr.entrypoints=websecure"
+      - "traefik.http.routers.dufs-rtr.rule=Host(`dufs.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.dufs-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.dufs-rtr.service=dufs-svc"
+      - "traefik.http.services.dufs-svc.loadbalancer.server.port=5000"

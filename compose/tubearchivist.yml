@@ -1,0 +1,31 @@
+services:
+  tubearchivist:
+    image: bbilly1/tubearchivist:latest
+    container_name: tubearchivist
+    restart: $MEDIA_RESTART_POLICY
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $MEDIADIR/Youtube:/youtube
+    environment:
+      - TA_USERNAME=admin
+      - TA_PASSWORD=admin
+      - HOST_UID=$PUID
+      - HOST_GID=$PGID
+      - TZ=$TZ
+      - ELASTIC_PASSWORD=admin
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.tubearchivist-rtr.entrypoints=websecure"
+      - "traefik.http.routers.tubearchivist-rtr.rule=Host(`tubearch.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.tubearchivist-rtr.middlewares=chain-authelia@file"
+      #  - "traefik.http.routers.transmission-rtr.middlewares=middlewares-rate-limit@file"
+      ## HTTP Services
+      - "traefik.http.routers.tubearchivist-rtr.service=tubearchivist-svc"
+      - "traefik.http.services.tubearchivist-svc.loadbalancer.server.port=8000"
+    profiles:
+      - media

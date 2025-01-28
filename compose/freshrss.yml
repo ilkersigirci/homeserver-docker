@@ -1,0 +1,27 @@
+services:
+  freshrss:
+    container_name: freshrss
+    image: lscr.io/linuxserver/freshrss
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/freshrss:/config
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.freshrss-rtr.entrypoints=websecure"
+      - "traefik.http.routers.freshrss-rtr.rule=Host(`freshrss.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.freshrss-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.freshrss-rtr.service=freshrss-svc"
+      - "traefik.http.services.freshrss-svc.loadbalancer.server.port=80"
+    profiles:
+      - reading

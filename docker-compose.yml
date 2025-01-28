@@ -1,0 +1,74 @@
+name: homeserver
+
+networks:
+  t3_proxy:
+    name: t3_proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.90.0/24
+  default:
+    driver: bridge
+  socket_proxy:
+    name: socket_proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.91.0/24
+
+########################### SECRETS
+secrets:
+  cloudflare_email:
+    file: $DOCKERDIR/secrets/cloudflare_email
+  cloudflare_api_key:
+    file: $DOCKERDIR/secrets/cloudflare_api_key
+  authelia_jwt_secret:
+    file: $DOCKERDIR/secrets/authelia_jwt_secret
+  authelia_session_secret:
+    file: $DOCKERDIR/secrets/authelia_session_secret
+#  authelia_duo_api_secret_key:
+#    file: $DOCKERDIR/secrets/authelia_duo_api_secret_key
+  authelia_storage_encryption_key:
+    file: $DOCKERDIR/secrets/authelia_storage_encryption_key
+  mysql_root_password:
+    file: $DOCKERDIR/secrets/mysql_root_password
+  mysql_password:
+    file: $DOCKERDIR/secrets/mysql_password
+  rustic_password:
+    file: $DOCKERDIR/secrets/rustic_password
+  # firefly_app_key:
+  #   file: $DOCKERDIR/secrets/firefly_app_key
+
+include:
+  ########################### SERVICES
+  #### CORE ####
+  - compose/authelia.yml
+  - compose/dufs.yml
+  - compose/filebrowser.yml
+  - compose/homepage.yml
+  - compose/socket-proxy.yml
+  - compose/traefik.yml
+  - compose/vaultwarden.yml
+  #### MACHINE LEARNING ####
+  - compose/open-webui.yml
+  ###### MAINTENANCE ####
+  - compose/code-server.yml
+  - compose/convertx.yml
+  - compose/dozzle.yml
+  - compose/it-tools.yml
+  # - compose/watchtower.yml
+  #### MEDIA ####
+  - compose/feishin.yml
+  - compose/jellyfin.yml
+  - compose/jellysearch.yml
+  - compose/jellyseerr.yml
+  - compose/transmission.yml
+  #### MONITORING ####
+  - compose/beszel.yml
+  # - compose/netdata.yml
+  # - compose/watchyourlan.yml
+  #### READING ####
+  - compose/flatnotes.yml
+  - compose/linkwarden.yml
+  # - compose/miniflux.yml
+  - compose/obsidian.yml

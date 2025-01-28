@@ -1,0 +1,25 @@
+services:
+  feishin:
+    image: ghcr.io/jeffvli/feishin:latest
+    container_name: feishin
+    restart: $MEDIA_RESTART_POLICY
+    depends_on:
+      - jellyfin
+    networks:
+      - t3_proxy
+    # ports:
+    #   - "9180:9180"
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.feishin-rtr.entrypoints=websecure"
+      - "traefik.http.routers.feishin-rtr.rule=Host(`music.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.feishin-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.feishin-rtr.service=feishin-svc"
+      - "traefik.http.services.feishin-svc.loadbalancer.server.port=9180"
+    profiles:
+      - media

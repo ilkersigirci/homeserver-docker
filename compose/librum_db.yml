@@ -1,0 +1,17 @@
+services:
+  librum_db:
+    image: mariadb:latest
+    container_name: librum_db
+    hostname: librum_db
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t3_proxy
+    volumes:
+      - $DOCKERDIR/appdata/librum_db:/var/lib/mysql
+    environment:
+      - MARIADB_USER=librum
+      - MARIADB_PASSWORD=mariadb
+      - MARIADB_DATABASE=librum
+      - MARIADB_ROOT_PASSWORD=mariadb
+    profiles:
+      - reading

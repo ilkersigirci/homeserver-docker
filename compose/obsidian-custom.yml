@@ -1,0 +1,36 @@
+services:
+  obsidian-custom:
+    container_name: obsidian-custom
+    image: obsidian-custom:latest
+    build:
+      context: $DOCKERDIR/Dockerfiles/DesktopApps/Obsidian
+      dockerfile: $DOCKERDIR/Dockerfiles/DesktopApps/Obsidian/Dockerfile
+      # dockerfile: $DOCKERDIR/Dockerfiles/DesktopApps/Obsidian/Dockerfile_Appimage
+      # args:
+      #   - OBSIDIAN_VERSION=1.5.12
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $NOTESDIR/Markdown:/vaults
+      # - /path/to/config:/config
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      # - DOCKER_MODS=linuxserver/mods:universal-git
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false" # For watchtower
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.obsidian-custom-rtr.entrypoints=websecure"
+      - "traefik.http.routers.obsidian-custom-rtr.rule=Host(`obsidiancustom.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.obsidian-custom-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.obsidian-custom-rtr.service=obsidian-custom-svc"
+      - "traefik.http.services.obsidian-custom-svc.loadbalancer.server.port=3000"
+    profiles:
+      - reading

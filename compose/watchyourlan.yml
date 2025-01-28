@@ -1,0 +1,41 @@
+services:
+  wyl-node-bootstrap:
+    image: aceberg/node-bootstrap
+    container_name: node-bootstrap
+    restart: $MAINTENANCE_RESTART_POLICY
+    ports:
+      - 8850:8850
+    profiles:
+      - monitoring
+
+  watchyourlan:
+    image: aceberg/watchyourlan
+    container_name: watchyourlan
+    network_mode: "host"
+    restart: $MAINTENANCE_RESTART_POLICY
+    command: "-n http://YOUR_IP:8850" # put your server IP or DNS name here
+    depends_on:
+      - wyl-node-bootstrap
+    volumes:
+      - $DOCKERDIR/appdata/beszel:/data/WatchYourLAN
+    environment:
+      TZ: "${TZ}" # required: needs your TZ for correct time
+      IFACES: "enp18s0 wlp16s0" # required: 1 or more interface
+      HOST: "0.0.0.0" # optional, default: 0.0.0.0
+      PORT: "8840" # optional, default: 8840
+      TIMEOUT: "120" # optional, time in seconds, default: 120
+      SHOUTRRR_URL: "" # optional, set url to notify
+      THEME: "sand" # optional
+      COLOR: "dark" # optional
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.watchyourlan-rtr.entrypoints=websecure"
+      - "traefik.http.routers.watchyourlan-rtr.rule=Host(`watchyourlan.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.watchyourlan-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.watchyourlan-rtr.service=watchyourlan-svc"
+      - "traefik.http.services.beszel-svc.loadbalancer.server.port=8840"
+    profiles:
+      - monitoring

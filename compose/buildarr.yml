@@ -1,0 +1,22 @@
+services:
+  buildarr:
+    image: callum027/buildarr:latest
+    container_name: buildarr
+    restart: $MEDIA_RESTART_POLICY
+    depends_on:
+      - prowlarr
+      - radarr
+      # - sonarr
+    networks:
+      - t3_proxy
+    volumes:
+      - $CONFIGDIR/buildarr:/config
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      BUILDARR_LOG_LEVEL: INFO
+      BUILDARR_INSTALL_PACKAGES: "buildarr-prowlarr buildarr-radarr"
+    profiles:
+      - media
+      - arr

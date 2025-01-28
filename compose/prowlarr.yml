@@ -1,0 +1,36 @@
+services:
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    depends_on:
+      - transmission
+    restart: $MEDIA_RESTART_POLICY
+    networks:
+      - t3_proxy
+    #  t3_proxy:
+    #    ipv4_address: 192.168.90.161
+    ports:
+      - "9696:9696"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/prowlarr:/config
+      - $MEDIADIR/Downloads:/data/downloads
+      - "/etc/localtime:/etc/localtime:ro"
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.prowlarr-rtr.entrypoints=websecure"
+      - "traefik.http.routers.prowlarr-rtr.rule=Host(`prowlarr.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.prowlarr-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.prowlarr-rtr.service=prowlarr-svc"
+      - "traefik.http.services.prowlarr-svc.loadbalancer.server.port=9696"
+    profiles:
+      - media
+      - arr

@@ -1,0 +1,35 @@
+services:
+  # docker exec -u abc -it ytdl-sub /bin/bash
+  ytdl-sub:
+    image: ghcr.io/jmbannon/ytdl-sub:latest
+    container_name: ytdl-sub
+    restart: $MEDIA_RESTART_POLICY
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      # - $CONFIGDIR/ytdl-sub/config:/config
+      - $CONFIGDIR/ytdl-sub/config.yaml:/config/config.yaml
+      - $CONFIGDIR/ytdl-sub/subscriptions.yaml:/config/subscriptions.yaml
+      - $CONFIGDIR/ytdl-sub/download_yt.sh:/config/download_yt.sh
+      - $MEDIADIR/Youtube_Sub:/tv_shows
+      # - MEDIADIR/Movies:/movies # optional
+      # - <path/to/music_videos>:/music_videos # optional
+      # - MEDIADIR/Music:/music # optional
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.ytdl-rtr.entrypoints=websecure"
+      - "traefik.http.routers.ytdl-rtr.rule=Host(`ytdl.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.ytdl-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      # - "traefik.http.routers.ytdl-rtr.service=ytdl-svc"
+      # - "traefik.http.services.ytdl-svc.loadbalancer.server.port=8081"
+    profiles:
+      - media

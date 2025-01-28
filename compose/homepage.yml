@@ -1,0 +1,36 @@
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    restart: $BASE_RESTART_POLICY
+    profiles:
+      - core
+    networks:
+      - t3_proxy
+      - socket_proxy
+    volumes:
+      - $CONFIGDIR/homepage:/app/config
+      - $CONFIGDIR/homepage/icons:/app/public/icons
+      # - /mnt/d:/mnt/d  # NOTE: Need for Disk usage widget
+    environment:
+      - HOMEPAGE_VAR_DOMAINNAME=$DOMAINNAME
+      - HOMEPAGE_VAR_JELLYFIN_API_KEY=$JELLYFIN_API_KEY
+      - HOMEPAGE_VAR_JELLYSEERR_API_KEY=$JELLYSEERR_API_KEY
+      - HOMEPAGE_VAR_IMMICH_API_KEY=$IMMICH_API_KEY
+      - HOMEPAGE_VAR_TAILSCALE_KEY=$TAILSCALE_KEY
+      - HOMEPAGE_VAR_TAILSCALE_DEVICE_IP=$TAILSCALE_DEVICE_IP
+      - HOMEPAGE_VAR_TAILSCALE_DEVICE_ID=$TAILSCALE_DEVICE_ID
+      - HOMEPAGE_VAR_HOMESERVER_LOCAL_STATIC_IP=$HOMESERVER_LOCAL_STATIC_IP
+      - HOMEPAGE_VAR_WATCHTOWER_HTTP_API_TOKEN=$WATCHTOWER_HTTP_API_TOKEN
+      - HOMEPAGE_VAR_LINKWARDEN_ACCESS_KEY=$LINKWARDEN_ACCESS_KEY
+      - HOMEPAGE_VAR_CALENDAR_GMAIL_ICAL_SECRET_ADDRESS=$CALENDAR_GMAIL_ICAL_SECRET_ADDRESS
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.homepage-rtr.entrypoints=websecure"
+      - "traefik.http.routers.homepage-rtr.rule=Host(`homepage.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.homepage-rtr.middlewares=chain-no-auth@file" # NOTE: authelia rate-limits it
+      ## HTTP Services
+      - "traefik.http.routers.homepage-rtr.service=homepage-svc"
+      - "traefik.http.services.homepage-svc.loadbalancer.server.port=3000"

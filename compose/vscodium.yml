@@ -1,0 +1,32 @@
+services:
+  vscodium:
+    image: lscr.io/linuxserver/vscodium:latest
+    container_name: vscodium
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - maintenance
+    security_opt:
+      - no-new-privileges:true
+    # cap_add:
+    #   - IPC_LOCK
+    # shm_size: "1gb"
+    networks:
+      - t3_proxy
+    volumes:
+      - $DOCKERDIR/appdata/vscodium:/config
+      - $DOCKERDIR:/config/workspace/docker
+      - $NOTESDIR:/config/workspace/notes
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.vscodium-rtr.entrypoints=websecure"
+      - "traefik.http.routers.vscodium-rtr.rule=Host(`vscodium.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.vscodium-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.vscodium-rtr.service=vscodium-svc"
+      - "traefik.http.services.vscodium-svc.loadbalancer.server.port=3000"

@@ -1,0 +1,31 @@
+services:
+  firefly:
+    container_name: firefly
+    image: fireflyiii/core:latest
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/freshrss:/config
+    environment:
+      - TZ=$TZ
+      - APP_KEY_FILE=/run/secrets/firefly_app_key
+      - AUTHENTICATION_GUARD="web" # remote_user_guard
+      #  - AUTHENTICATION_GUARD_HEADER=REMOTE_USER # HTTP_REMOTE_USER
+      - DB_CONNECTION=sqlite # Options: pgsql, mysql
+    secrets:
+      - firefly_app_key
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.firefly-rtr.entrypoints=websecure"
+      - "traefik.http.routers.firefly-rtr.rule=Host(`firefly.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.firefly-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.firefly-rtr.service=firefly-svc"
+      - "traefik.http.services.firefly-svc.loadbalancer.server.port=8080"
+    profiles:
+      - others

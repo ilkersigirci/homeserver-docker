@@ -1,0 +1,77 @@
+services:
+  # TODO: Add local.ini
+  # https://github.com/vrtmrz/obsidian-livesync/blob/main/docs/setup_own_server.md#setup-couchdb-to-your-server
+  # passphase: obsidian
+  obsidian-couchdb:
+    container_name: obsidian-couchdb
+    image: couchdb:latest # TODO: ghcr.io/
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/couchdb:/opt/couchdb/data
+      - $CONFIGDIR/couchdb/local.ini:/opt/couchdb/etc/local.ini
+    environment:
+      - COUCHDB_USER=admin
+      - COUCHDB_PASSWORD=admin
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.couchdb-rtr.entrypoints=websecure"
+      - "traefik.http.routers.couchdb-rtr.rule=Host(`couchdb.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.couchdb-rtr.middlewares=chain-couchdb@file" # NOTE: chain-authelia not working
+      ## HTTP Services
+      - "traefik.http.routers.couchdb-rtr.service=couchdb-svc"
+      - "traefik.http.services.couchdb-svc.loadbalancer.server.port=5984"
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail -u admin:admin -s http://localhost:5984/_up | grep -Eo '\"status\":\"ok\"' || exit 1"]
+      start_period: 15s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    profiles:
+      - reading
+
+  obsidian:
+    container_name: obsidian
+    image: lscr.io/linuxserver/obsidian:latest
+    restart: $OTHERS_RESTART_POLICY
+    shm_size: "1gb"
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $NOTESDIR/Markdown:/vaults
+      # - /path/to/config:/config
+    depends_on:
+      obsidian-couchdb:
+        condition: service_healthy
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - TITLE=Obsidian
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.obsidian-rtr.entrypoints=websecure"
+      - "traefik.http.routers.obsidian-rtr.rule=Host(`obsidian.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.obsidian-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.obsidian-rtr.service=obsidian-svc"
+      - "traefik.http.services.obsidian-svc.loadbalancer.server.port=3000"
+    # devices:
+    #   - /dev/dri:/dev/dri #optional
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail -s http://localhost:3000 || exit 1"]
+      start_period: 15s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    profiles:
+      - reading

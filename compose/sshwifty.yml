@@ -1,0 +1,27 @@
+services:
+  sshwifty:
+    container_name: sshwifty
+    image: niruix/sshwifty:latest
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - maintenance
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    # volumes:
+    #   - $DOCKERDIR/appdata/czkawka:/config:rw
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.sshwifty-rtr.entrypoints=websecure"
+      - "traefik.http.routers.sshwifty-rtr.rule=Host(`ssh.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.sshwifty-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.sshwifty-rtr.service=sshwifty-svc"
+      - "traefik.http.services.sshwifty-svc.loadbalancer.server.port=8182"

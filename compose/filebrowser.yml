@@ -1,0 +1,34 @@
+services:
+  # For custom.css: change Global Settings->branding path to "custom"
+  filebrowser:
+    container_name: filebrowser
+    image: filebrowser/filebrowser:latest # TODO: ghcr.io/
+    profiles:
+      - core
+    depends_on:
+      - traefik
+    restart: $BASE_RESTART_POLICY
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $CONFIGDIR/filebrowser/filebrowser.json:/filebrowser.json
+      - $CONFIGDIR/filebrowser/custom.css:/custom/custom.css
+      - $DOCKERDIR/appdata/filebrowser/database.db:/database.db
+      - $USERDIR:/srv/Home
+      - $HARDDISKROOTDIR:/srv/Harddisk
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.filebrowser-rtr.entrypoints=websecure"
+      - "traefik.http.routers.filebrowser-rtr.rule=Host(`filebrowser.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.filebrowser-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.filebrowser-rtr.service=filebrowser-svc"
+      - "traefik.http.services.filebrowser-svc.loadbalancer.server.port=80"

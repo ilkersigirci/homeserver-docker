@@ -1,0 +1,25 @@
+services:
+  # NOTE: Because of network_mode: host, we can't use traefik for reverse proxying by docker labels
+  wumps:
+    # image: kaistarkk/wumps # NOTE: Not working because of werkzeug url_quote
+    image: wumps_fixed
+    container_name: wumps
+    build:
+      context: $GITHUBREPOSDIR/wumps
+      dockerfile: $GITHUBREPOSDIR/wumps/Dockerfile
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - maintenance
+    network_mode: host
+    volumes:
+      - $DOCKERDIR/configs/wumps/config.ini:/app/config.ini
+    # labels:
+    #   - "traefik.enable=true"
+    #   ## HTTP Routers
+    #   - "traefik.http.routers.wumps-rtr.entrypoints=websecure"
+    #   - "traefik.http.routers.wumps-rtr.rule=Host(`wol.$DOMAINNAME`)"
+    #   ## Middlewares
+    #   - "traefik.http.routers.wumps-rtr.middlewares=chain-authelia@file"
+    #   ## HTTP Services
+    #   - "traefik.http.routers.wumps-rtr.service=wumps-svc"
+    #   - "traefik.http.services.wumps-svc.loadbalancer.server.port=9008"

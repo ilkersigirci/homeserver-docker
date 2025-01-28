@@ -1,0 +1,40 @@
+services:
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    depends_on:
+      - prometheus
+    restart: $MAINTENANCE_RESTART_POLICY
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    # ports:
+    #   - "$GRAFANA_PORT:3000"
+    user: "0"
+    volumes:
+      - $DOCKERDIR/appdata/grafana:/var/lib/grafana
+      - $CONFIGDIR/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - $CONFIGDIR/grafana/provisioning/:/etc/grafana/provisioning/
+    environment:
+      GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource,grafana-worldmap-panel,grafana-piechart-panel"
+      GF_SECURITY_ADMIN_USER: 'admin'
+      GF_SECURITY_ADMIN_PASSWORD: 'admin'
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+      GF_LOG_LEVEL: 'debug'
+    # deploy:
+    #   placement:
+    #     constraints:
+    #       - node.role==manager
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.grafana-rtr.entrypoints=websecure"
+      - "traefik.http.routers.grafana-rtr.rule=Host(`grafana.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.grafana-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.grafana-rtr.service=grafana-svc"
+      - "traefik.http.services.grafana-svc.loadbalancer.server.port=3000"
+    profiles:
+      - monitoring

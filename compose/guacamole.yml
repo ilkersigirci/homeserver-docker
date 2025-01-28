@@ -1,0 +1,25 @@
+services:
+  # Contains guacamole web client, the guacd server and a postgres database
+  # Default user/pass: guacadmin/guacadmin
+  guacamole:
+    image: oznu/guacamole
+    container_name: guacamole
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - maintenance
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/guacamole:/config
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.guacamole-rtr.entrypoints=websecure"
+      - "traefik.http.routers.guacamole-rtr.rule=Host(`guacamole.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.guacamole-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.guacamole-rtr.service=guacamole-svc"
+      - "traefik.http.services.guacamole-svc.loadbalancer.server.port=8080"

@@ -1,0 +1,36 @@
+x-deploy: &gpu-deploy
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu, compute, utility]
+            # capabilities: [compute, utility]
+
+services:
+  whisper-api:
+    container_name: whisper-api
+    image: onerahmet/openai-whisper-asr-webservice:latest-gpu
+    restart: $ML_RESTART_POLICY
+    <<: *gpu-deploy
+    networks:
+      - t3_proxy
+    # ports:
+    #   - "9000:9000"
+    volumes:
+      - $DOCKERDIR/appdata/whisper-api:/app
+    environment:
+      - ASR_MODEL=base
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.whisper-api-rtr.entrypoints=websecure"
+      - "traefik.http.routers.whisper-api-rtr.rule=Host(`whisperapi.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.whisper-api-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.whisper-api-rtr.service=whisper-api-svc"
+      - "traefik.http.services.whisper-api-svc.loadbalancer.server.port=9000"
+    profiles:
+      - ml

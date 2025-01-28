@@ -1,0 +1,31 @@
+services:
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: alertmanager
+    restart: $MAINTENANCE_RESTART_POLICY
+    networks:
+      - t3_proxy
+    expose:
+      - 9093
+    volumes:
+      - $CONFIGDIR/alertmanager/config.yml:/etc/alertmanager/config.yml
+    command:
+      - '--config.file=/etc/alertmanager/config.yml'
+      - '--storage.path=/alertmanager'
+    # deploy:
+    #   placement:
+    #     constraints:
+    #       - node.role==manager
+    # labels:
+    #   - "traefik.enable=true"
+    #   ## HTTP Routers
+    #   - "traefik.http.routers.alertmanager-rtr.entrypoints=websecure"
+    #   - "traefik.http.routers.alertmanager-rtr.rule=Host(`alertmanager.$DOMAINNAME`)"
+    #   ## Middlewares
+    #   - "traefik.http.routers.alertmanager-rtr.middlewares=chain-no-auth@file"
+    #   ## HTTP Services
+    #   - "traefik.http.routers.alertmanager-rtr.service=alertmanager-svc"
+    #   - "traefik.http.services.alertmanager-svc.loadbalancer.server.port=9093"
+
+    profiles:
+      - monitoring

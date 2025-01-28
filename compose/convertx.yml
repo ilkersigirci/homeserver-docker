@@ -1,0 +1,28 @@
+services:
+  convertx: 
+    image: ghcr.io/c4illin/convertx
+    container_name: convertx
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - maintenance
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment: # Defaults are listed below. All are optional.
+      - ACCOUNT_REGISTRATION=false # true or false, doesn't matter for the first account (e.g. keep this to false if you only want one account)
+      - JWT_SECRET=aLongAndSecretStringUsedToSignTheJSONWebToken1234 # will use randomUUID() by default
+      - HTTP_ALLOWED=true # setting this to true is unsafe, only set this to true locally
+      - ALLOW_UNAUTHENTICATED=true # allows anyone to use the service without logging in, only set this to true locally
+    volumes:
+      - $DOCKERDIR/appdata/convertx:/app/data
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.convertx-rtr.entrypoints=websecure"
+      - "traefik.http.routers.convertx-rtr.rule=Host(`convertx.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.convertx-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.convertx-rtr.service=convertx-svc"
+      - "traefik.http.services.convertx-svc.loadbalancer.server.port=3000"

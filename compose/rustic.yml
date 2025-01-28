@@ -1,0 +1,35 @@
+services:
+  # Alternative: https://github.com/garethgeorge/backrest
+  # TODO: Send notifications to Telegram after backup
+  # FIXME: When new files added to vaultwarden db, does it overwrites the file permissions?
+  # Init remote repo: rustic -r rclone:onedrive-remote:Backups init
+  # Backup: rustic backup
+  # Restore: rustic -r rclone:onedrive-remote:Backups restore latest /tmp/restore-test
+  rustic:
+    container_name: rustic
+    hostname: ${HOSTNAME}
+    image: rustic:latest
+    build:
+      context: $DOCKERDIR/compose/maintenance/Rustic
+      dockerfile: $DOCKERDIR/compose/maintenance/Rustic/Dockerfile
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - maintenance
+      - backup
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $CONFIGDIR/rclone:/root/.config/rclone:rw
+      - $CONFIGDIR/rustic/rustic.toml:/root/rustic.toml:ro
+      - $BACKUPDIR:/root/backups/Backup:ro
+      - $CONFIGDIR:/root/backups/docker_configs:ro
+      - $NOTESDIR/Markdown:/root/backups/Markdown:ro
+      - $DATADIR/vaultwarden:/root/vaultwarden_backup:ro
+    environment:
+      - TZ=$TZ
+      - RUSTIC_PASSWORD=/run/secrets/rustic_password
+      # - RCLONE_CONFIG=/root/.config/rclone/rclone.conf
+    secrets:
+      - rustic_password
