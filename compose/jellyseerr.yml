@@ -4,8 +4,8 @@ services:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
     restart: $MEDIA_RESTART_POLICY
-    depends_on:
-      - jellyfin
+    # depends_on:
+    #   - jellyfin
     networks:
       - t3_proxy
     security_opt:
