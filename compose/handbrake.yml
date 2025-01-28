@@ -1,0 +1,23 @@
+services:
+  handbrake:
+    container_name: handbrake
+    image: jlesage/handbrake:latest
+    ports:
+      - "5801:5800"
+    volumes:
+      - $DATADIR/downloads:/data/downloads
+      - $DOCKERDIR/appdata/handbrake/config:/config
+      - $DOCKERDIR/appdata/handbrake/watch:/watch
+    environment:
+      USER_ID: $PUID
+      GROUP_ID: $PGID
+      UMASK: 002
+      TZ: $TZ
+      KEEP_APP_RUNNING: 1
+      CLEAN_TMP_DIR: 1
+      DISPLAY_WIDTH: 1600
+      DISPLAY_HEIGHT: 960
+      AUTOMATED_CONVERSION_KEEP_SOURCE: 1
+      VNC_PASSWORD: $HANDBRAKE_VNC_PASSWD
+    profiles:
+      - media

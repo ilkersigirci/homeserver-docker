@@ -1,4 +1,4 @@
-STACK_NAME=notes
+STACK_NAME=media
 cd /home/ilker/docker/compose/${STACK_NAME}
 
 # For each service in docker-compose.yml

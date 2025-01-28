@@ -1,0 +1,29 @@
+services:
+  deemix:
+    image: registry.gitlab.com/bockiii/deemix-docker
+    container_name: deemix
+    restart: $MEDIA_RESTART_POLICY
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/deemix:/config # TODO: Move to config folder
+      - $MEDIADIR/Music/Deemix:/downloads
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - UMASK_SET=022
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.deemix-rtr.entrypoints=websecure"
+      - "traefik.http.routers.deemix-rtr.rule=Host(`deemix.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.deemix-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.deemix-rtr.service=deemix-svc"
+      - "traefik.http.services.deemix-svc.loadbalancer.server.port=6595"
+    profiles:
+      - media
