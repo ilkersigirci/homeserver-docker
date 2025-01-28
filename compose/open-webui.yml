@@ -1,16 +1,16 @@
 services:
-  searxng:
-    container_name: searxng
-    image: searxng/searxng:latest
-    restart: $ML_RESTART_POLICY
-    networks:
-      - t3_proxy
-    # ports:
-    #   - "8080:8080"
-    volumes:
-      - $DOCKERDIR/appdata/searxng:/etc/searxng
-    profiles:
-      - ml
+  # searxng:
+  #   container_name: searxng
+  #   image: searxng/searxng:latest
+  #   restart: $ML_RESTART_POLICY
+  #   networks:
+  #     - t3_proxy
+  #   # ports:
+  #   #   - "8080:8080"
+  #   volumes:
+  #     - $DOCKERDIR/appdata/searxng:/etc/searxng
+  #   profiles:
+  #     - ml
 
   open-webui:
     container_name: open-webui

@@ -39,17 +39,6 @@ secrets:
   # firefly_app_key:
   #   file: $DOCKERDIR/secrets/firefly_app_key
 
-############ GPU
-x-deploy: &gpu-deploy
-  deploy:
-    resources:
-      reservations:
-        devices:
-          - driver: nvidia
-            count: all
-            capabilities: [gpu, compute, utility]
-            # capabilities: [compute, utility]
-
 include:
   ########################### SERVICES
   #### CORE ####
@@ -62,7 +51,6 @@ include:
   - compose/vaultwarden.yml
   #### MACHINE LEARNING ####
   - compose/open-webui.yml
-  - compose/open-webui-betus.yml
   ###### MAINTENANCE ####
   - compose/code-server.yml
   - compose/convertx.yml
@@ -81,6 +69,6 @@ include:
   # - compose/watchyourlan.yml
   #### READING ####
   - compose/flatnotes.yml
-  - compose/linkwarded.yml
+  - compose/linkwarden.yml
   # - compose/miniflux.yml
   - compose/obsidian.yml
