@@ -7,14 +7,13 @@ services:
       - maintenance
     networks:
       - t3_proxy
+      - socket_proxy
     security_opt:
       - no-new-privileges:true
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       DOZZLE_LEVEL: info
-      DOZZLE_TAILSIZE: 300
-      DOZZLE_FILTER: "status=running" # limits logs displayed to containers with this label
+      DOZZLE_FILTER: "status=running"
+      DOZZLE_REMOTE_HOST: tcp://docker-socket-proxy:2375
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
