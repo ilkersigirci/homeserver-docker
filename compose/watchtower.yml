@@ -13,7 +13,7 @@ services:
     environment:
       TZ: $TZ
       # WATCHTOWER_RUN_ONCE: "true"  # NOTE: For one-time testing
-      # DOCKER_HOST: tcp://socket-proxy:2375 # FIXME: Server misbehaving
+      DOCKER_HOST: tcp://docker-socket-proxy:2375
       DOCKER_API_VERSION: "1.43"
       WATCHTOWER_SCHEDULE: 0 0 2 * * *
       WATCHTOWER_CLEANUP: "true"
