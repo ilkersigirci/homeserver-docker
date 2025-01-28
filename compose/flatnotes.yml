@@ -1,0 +1,32 @@
+services:
+  flatnotes:
+    container_name: flatnotes
+    # image: dullage/flatnotes:latest
+    image: dullage/flatnotes:v3.0.0-rc.3
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $NOTESDIR/Markdown:/data
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - FLATNOTES_AUTH_TYPE=none
+      # - FLATNOTES_USERNAME="user"
+      # - FLATNOTES_PASSWORD="changeMe!"
+      - FLATNOTES_SECRET_KEY="change-stability-pushchair"
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.notes-rtr.entrypoints=websecure"
+      - "traefik.http.routers.notes-rtr.rule=Host(`notes.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.notes-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.notes-rtr.service=notes-svc"
+      - "traefik.http.services.notes-svc.loadbalancer.server.port=8080"
+    profiles:
+      - reading

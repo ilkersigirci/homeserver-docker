@@ -1,0 +1,33 @@
+services:
+  volglass:
+    image: volglass:latest
+    container_name: volglass
+    build:
+      # context: $GITHUBREPOSDIR/volglass
+      # dockerfile: $GITHUBREPOSDIR/volglass/Dockerfile
+      context: $DOCKERDIR/compose/notes
+      dockerfile: $DOCKERDIR/compose/notes/Dockerfile_volglass
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $NOTESDIR/Markdown:/app/posts:ro
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      # - DOCKER_MODS=linuxserver/mods:universal-git
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.volglass-rtr.entrypoints=websecure"
+      - "traefik.http.routers.volglass-rtr.rule=Host(`volglass.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.volglass-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.volglass-rtr.service=volglass-svc"
+      - "traefik.http.services.volglass-svc.loadbalancer.server.port=3000"
+    profiles:
+      - reading

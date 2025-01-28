@@ -1,0 +1,29 @@
+services:
+  mkdocs-material:
+    container_name: mkdocs-material
+    image: squidfunk/mkdocs-material
+    restart: $OTHERS_RESTART_POLICY
+    command: serve --dev-addr=0.0.0.0:8000 --no-livereload
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $NOTESDIR/Markdown/Programming/Interview:/docs/docs/blog/posts:ro
+      - $CONFIGDIR/mkdocs-material/mkdocs.yml:/docs/mkdocs.yml
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.mkdocs-material-rtr.entrypoints=websecure"
+      - "traefik.http.routers.mkdocs-material-rtr.rule=Host(`mkdocs.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.mkdocs-material-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.mkdocs-material-rtr.service=mkdocs-material-svc"
+      - "traefik.http.services.mkdocs-material-svc.loadbalancer.server.port=8000"
+    profiles:
+      - reading

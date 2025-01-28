@@ -1,0 +1,51 @@
+services:
+  miniflux-db:
+    container_name: miniflux-db
+    image: postgres:latest
+    restart: $OTHERS_RESTART_POLICY
+    profiles:
+      - reading
+    environment:
+      - POSTGRES_DB=miniflux
+      - POSTGRES_USER=miniflux
+      - POSTGRES_PASSWORD=miniflux
+    volumes:
+      - $DOCKERDIR/appdata/miniflux-db:/var/lib/postgresql/data
+    # healthcheck:
+    #   test: ["CMD", "pg_isready", "-U", "miniflux"]
+    #   interval: 10s
+    #   start_period: 30s
+
+    # Fever api endpoint: fever/?api
+  miniflux:
+    container_name: miniflux
+    image: miniflux/miniflux:latest
+    restart: $OTHERS_RESTART_POLICY
+    profiles:
+      - reading
+    depends_on:
+      - miniflux-db
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    # volumes:
+    #   - $DOCKERDIR/appdata/miniflux:/config
+    environment:
+      - DATABASE_URL=postgres://miniflux:miniflux@miniflux-db/miniflux?sslmode=disable
+      - RUN_MIGRATIONS=1
+      - CREATE_ADMIN=1
+      - ADMIN_USERNAME=miniflux
+      - ADMIN_PASSWORD=miniflux
+      - BASE_URL=https://miniflux.$DOMAINNAME
+      # - "POCKET_CONSUMER_KEY=YOUR_POCKET_CONSUMER_KEY"
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.miniflux-rtr.entrypoints=websecure"
+      - "traefik.http.routers.miniflux-rtr.rule=Host(`miniflux.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.miniflux-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.miniflux-rtr.service=miniflux-svc"
+      - "traefik.http.services.miniflux-svc.loadbalancer.server.port=8080"

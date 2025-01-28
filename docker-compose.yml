@@ -39,11 +39,35 @@ secrets:
 
 include:
   ########################### SERVICES
-  # CORE
-  - compose/traefik.yml
-  - compose/socket-proxy.yml
+  #### CORE ####
   - compose/authelia.yml
-  - compose/vaultwarden.yml
-  - compose/homepage.yml
-  - compose/filebrowser.yml
   - compose/dufs.yml
+  - compose/filebrowser.yml
+  - compose/homepage.yml
+  - compose/socket-proxy.yml
+  - compose/traefik.yml
+  - compose/vaultwarden.yml
+  #### MACHINE LEARNING ####
+  - compose/open-webui.yml
+  - compose/open-webui-betus.yml
+  ###### MAINTENANCE ####
+  - compose/code-server.yml
+  - compose/convertx.yml
+  - compose/dozzle.yml
+  - compose/it-tools.yml
+  # - compose/watchtower.yml
+  #### MEDIA ####
+  - compose/feishin.yml
+  - compose/jellyfin.yml
+  - compose/jellysearch.yml
+  - compose/jellyseerr.yml
+  - compose/transmission.yml
+  #### MONITORING ####
+  - compose/beszel.yml
+  # - compose/netdata.yml
+  - compose/watchyourlan.yml
+  #### READING ####
+  - compose/flatnotes.yml
+  - compose/linkwarded.yml
+  # - compose/miniflux.yml
+  - compose/obsidian.yml

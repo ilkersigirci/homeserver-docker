@@ -1,0 +1,20 @@
+services:
+  linkwarden-db:
+    container_name: linkwarden-db
+    image: postgres:16-alpine
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t3_proxy
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    volumes:
+      - $DOCKERDIR/appdata/linkwarden-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    profiles:
+      - reading
