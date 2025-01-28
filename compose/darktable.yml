@@ -1,0 +1,27 @@
+services:
+  darktable:
+    container_name: darktable
+    image: lscr.io/linuxserver/darktable:latest
+    restart: $DESKTOP_IMAGES_RESTART_POLICY
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $MEDIADIR/Photos:/photos
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.darktable-rtr.entrypoints=websecure"
+      - "traefik.http.routers.darktable-rtr.rule=Host(`darktable.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.darktable-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.darktable-rtr.service=darktable-svc"
+      - "traefik.http.services.darktable-svc.loadbalancer.server.port=3000"
+    profiles:
+      - desktop_apps

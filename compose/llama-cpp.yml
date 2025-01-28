@@ -1,0 +1,40 @@
+services:
+  llama-cpp:
+    image: ghcr.io/ggerganov/llama.cpp:server-cuda
+    container_name: llama-cpp
+    restart: $ML_RESTART_POLICY
+    <<: *gpu-deploy
+    networks:
+      - t3_proxy
+    environment:
+      LLAMA_ARG_HOST: 0.0.0.0
+      LLAMA_ARG_PORT: 8000
+      LLAMA_ARG_MODEL: /models/tinyllma-1.1b-chat-v1.0.Q8_0.gguf
+      LLAMA_ARG_ALIAS: tinyllma-1.1b-chat-v1.0.Q8_0.gguf
+      LLAMA_ARG_CTX_SIZE: 4096
+      LLAMA_ARG_N_GPU_LAYERS: 10
+      LLAMA_ARG_FLASH_ATTN: 1
+      LLAMA_ARG_N_PREDICT: -1 # infinity
+      LLAMA_ARG_NO_WEBUI: 0
+      # LLAMA_ARG_ENDPOINT_METRICS: 1
+      # HF_TOKEN: $HF_TOKEN
+    volumes:
+      - "$MLMODELSDIR/LLM:/models:ro"
+    healthcheck:
+      test: "curl -f http://llama-cpp:8000/health"
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.llama-cpp-rtr.entrypoints=websecure"
+      - "traefik.http.routers.llama-cpp-rtr.rule=Host(`llamapi.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.llama-cpp-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.llama-cpp-openapi-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.llama-cpp-rtr.service=llama-cpp-svc"
+      - "traefik.http.services.llama-cpp-svc.loadbalancer.server.port=8000"
+    profiles:
+      - ml

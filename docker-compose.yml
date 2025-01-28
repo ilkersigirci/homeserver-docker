@@ -36,6 +36,19 @@ secrets:
     file: $DOCKERDIR/secrets/mysql_password
   rustic_password:
     file: $DOCKERDIR/secrets/rustic_password
+  # firefly_app_key:
+  #   file: $DOCKERDIR/secrets/firefly_app_key
+
+############ GPU
+x-deploy: &gpu-deploy
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu, compute, utility]
+            # capabilities: [compute, utility]
 
 include:
   ########################### SERVICES
@@ -65,7 +78,7 @@ include:
   #### MONITORING ####
   - compose/beszel.yml
   # - compose/netdata.yml
-  - compose/watchyourlan.yml
+  # - compose/watchyourlan.yml
   #### READING ####
   - compose/flatnotes.yml
   - compose/linkwarded.yml

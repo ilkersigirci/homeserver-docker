@@ -1,0 +1,21 @@
+services:
+  enclosed:
+    container_name: enclosed
+    image: corentinth/enclosed:latest
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.enclosed.entrypoints=https"
+      - "traefik.http.routers.enclosed.rule=Host(`enclosed.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.enclosed.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.enclosed.service=logseq-svc"
+      - "traefik.http.services.logseq-svc.loadbalancer.server.port=8787"
+    profiles:
+      - others

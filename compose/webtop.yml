@@ -1,0 +1,33 @@
+services:
+  webtop:
+    container_name: webtop
+    image: lscr.io/linuxserver/webtop:latest
+    restart: $DESKTOP_IMAGES_RESTART_POLICY
+    shm_size: "1gb" #optional
+    devices: #optional
+      - /dev/dri:/dev/dri
+    # privileged: true
+    # security_opt:
+    #   - seccomp:unconfined #optional
+    networks:
+      - t3_proxy
+    volumes:
+      - $DOCKERDIR/appdata/webtop:/config
+      # - /var/run/docker.sock:/var/run/docker.sock #optional
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - TITLE=Debian on the Browser
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.webtop-rtr.entrypoints=websecure"
+      - "traefik.http.routers.webtop-rtr.rule=Host(`webtop.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.webtop-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.webtop-rtr.service=webtop-svc"
+      - "traefik.http.services.webtop-svc.loadbalancer.server.port=3000"
+    profiles:
+      - desktop_apps

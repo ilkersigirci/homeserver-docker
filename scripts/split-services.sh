@@ -1,5 +1,5 @@
-STACK_NAME=media
-cd /home/ilker/docker/compose/${STACK_NAME}
+STACK_NAME=desktop_apps
+cd /home/ilker/docker/stacks/${STACK_NAME}
 
 # For each service in docker-compose.yml
 for service in $(yq '.services | keys | .[]' docker-compose.yml); do

@@ -3,9 +3,9 @@ services:
     container_name: obsidian-custom
     image: obsidian-custom:latest
     build:
-      context: $DESKTOPAPPDOCKERFILES/Obsidian
-      dockerfile: $DESKTOPAPPDOCKERFILES/Obsidian/Dockerfile
-      # dockerfile: $DESKTOPAPPDOCKERFILES/Obsidian/Dockerfile_Appimage
+      context: $DOCKERDIR/Dockerfiles/DesktopApps/Obsidian
+      dockerfile: $DOCKERDIR/Dockerfiles/DesktopApps/Obsidian/Dockerfile
+      # dockerfile: $DOCKERDIR/Dockerfiles/DesktopApps/Obsidian/Dockerfile_Appimage
       # args:
       #   - OBSIDIAN_VERSION=1.5.12
     restart: $OTHERS_RESTART_POLICY
