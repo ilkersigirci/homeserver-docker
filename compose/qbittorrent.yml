@@ -1,8 +1,8 @@
 services:
   # Default user-pass: admin / adminadmin
-  qbittorrent-lscr:
+  qbittorrent:
     image: lscr.io/linuxserver/qbittorrent
-    container_name: qbittorrent-lscr
+    container_name: qbittorrent
     restart: $MEDIA_RESTART_POLICY
     # network_mode: "service:gluetun"
     # depends_on:
@@ -22,13 +22,13 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.qbittorrent-lscr-rtr.entrypoints=websecure"
-      - "traefik.http.routers.qbittorrent-lscr-rtr.rule=Host(`qtorrent.$DOMAINNAME`)"
+      - "traefik.http.routers.qbittorrent-rtr.entrypoints=websecure"
+      - "traefik.http.routers.qbittorrent-rtr.rule=Host(`qtorrent.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.qbittorrent-lscr-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.qbittorrent-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
-      - "traefik.http.routers.qbittorrent-lscr-rtr.service=qbittorrent-lscr-svc"
-      - "traefik.http.services.qbittorrent-lscr-svc.loadbalancer.server.port=8080"
-      # - traefik.http.services.qbittorrent-lscr-svc.loadbalancer.passhostheader=false # Not needed
+      - "traefik.http.routers.qbittorrent-rtr.service=qbittorrent-svc"
+      - "traefik.http.services.qbittorrent-svc.loadbalancer.server.port=8080"
+      # - traefik.http.services.qbittorrent-svc.loadbalancer.passhostheader=false # Not needed
     profiles:
       - media

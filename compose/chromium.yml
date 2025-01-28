@@ -1,0 +1,35 @@
+services: 
+  chromium:
+    container_name: chromium
+    image: lscr.io/linuxserver/ungoogled-chromium:latest
+    restart: $DESKTOP_IMAGES_RESTART_POLICY
+    shm_size: "1gb"
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - TITLE=chromium
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.chromium-rtr.entrypoints=websecure"
+      - "traefik.http.routers.chromium-rtr.rule=Host(`chromium.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.chromium-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.chromium-rtr.service=chromium-svc"
+      - "traefik.http.services.chromium-svc.loadbalancer.server.port=3000"
+    # devices:
+    #   - /dev/dri:/dev/dri #optional
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail -s http://localhost:3000 || exit 1"]
+      start_period: 15s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    profiles:
+      - desktop_apps

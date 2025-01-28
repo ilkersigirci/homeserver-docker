@@ -1,26 +1,29 @@
+x-deploy: &gpu-deploy
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: all
+            capabilities: [compute,video,graphics,utility]
+
 services:
   firefox:
     container_name: firefox
-    image: firefox:latest
-    build:
-      context: $DOCKERDIR/Dockerfiles/DesktopApps/Firefox
-      dockerfile: $DOCKERDIR/Dockerfiles/DesktopApps/Firefox/Dockerfile
+    image: lscr.io/linuxserver/firefox:latest
     restart: $DESKTOP_IMAGES_RESTART_POLICY
-    shm_size: "1gb" #optional
-    devices: #optional
-      - /dev/dri:/dev/dri
+    <<: *gpu-deploy
+    shm_size: "1gb"
     networks:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
-    volumes:
-      - $DOCKERDIR/appdata/firefox:/config
     environment:
       - PUID=$PUID
       - PGID=$PGID
       - TZ=$TZ
+      - TITLE=Firefox
     labels:
-      - "com.centurylinklabs.watchtower.enable=false" # For watchtower
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.firefox-rtr.entrypoints=websecure"
@@ -30,5 +33,13 @@ services:
       ## HTTP Services
       - "traefik.http.routers.firefox-rtr.service=firefox-svc"
       - "traefik.http.services.firefox-svc.loadbalancer.server.port=3000"
+    # devices:
+    #   - /dev/dri:/dev/dri #optional
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail -s http://localhost:3000 || exit 1"]
+      start_period: 15s
+      interval: 10s
+      timeout: 5s
+      retries: 3
     profiles:
       - desktop_apps
