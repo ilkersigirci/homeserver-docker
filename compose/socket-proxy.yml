@@ -28,7 +28,7 @@ services:
       - BUILD=0
       - COMMIT=0
       - CONFIGS=0
-      - CONTAINERS=1 # For Dozzle
+      - CONTAINERS=1 # For Homepage, Dozzle
       - DISABLE_IPV6=0
       - DISTRIBUTION=0
       - EVENTS=1
