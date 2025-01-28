@@ -8,11 +8,11 @@ services:
       - maintenance
     networks:
       - t3_proxy
+      - socket_proxy
     security_opt:
       - no-new-privileges:true
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro # # Use Docker Socket Proxy instead for improved security
-      # - $DOCKERDIR/appdata/yacht:/config # Change to local directory if you want to save/transfer config locally
+    # volumes:
+    #   - $DOCKERDIR/appdata/yacht:/config # Change to local directory if you want to save/transfer config locally
     environment:
       - PUID=$PUID
       - PGID=$PGID

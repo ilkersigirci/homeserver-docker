@@ -1,5 +1,4 @@
 services:
-  # Docker Socket Proxy - Security Enchanced Proxy for Docker Socket
   docker-socket-proxy:
     container_name: docker-socket-proxy
     image: ghcr.io/tecnativa/docker-socket-proxy:latest
@@ -11,18 +10,17 @@ services:
         ipv4_address: 192.168.91.254 # You can specify a static IP
     privileged: true
     ports:
-    # - "127.0.0.1:2375:2375" # Port 2375 should only ever get exposed to the internal network. When possible use this line.
-    # I use the next line instead, as I want portainer to manage multiple docker endpoints within my home network.
-      - "2375:2375"
+      - "127.0.0.1:2375:2375"
+      # - "2375:2375" # NOTE: Use this if you want portainer to manage multiple docker endpoints within my home network.
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
+      - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - LOG_LEVEL=info # debug,info,notice,warning,err,crit,alert,emerg
       ## Variables match the URL prefix (i.e. AUTH blocks access to /auth/* parts of the API, etc.).
       # 0 to revoke access.
       # 1 to grant access.
       ## Granted by Default
-      - EVENTS=1
+      - EVENTS=1 # Dozzle
       - PING=1
       - VERSION=1
       ## Revoked by Default
@@ -34,11 +32,11 @@ services:
       - BUILD=0
       - COMMIT=0
       - CONFIGS=0
-      - CONTAINERS=3 # Traefik, portainer, etc.
+      - CONTAINERS=1 # Traefik, Dozzle, Beszel, Watchtower
       - DISTRIBUTION=0
       - EXEC=0
       - IMAGES=1 # Portainer
-      - INFO=1 # Portainer
+      - INFO=1 # Portainer, Dozzle
       - NETWORKS=1 # Portainer
       - NODES=0
       - PLUGINS=0

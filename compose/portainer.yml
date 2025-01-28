@@ -10,17 +10,13 @@ services:
     restart: $BASE_RESTART_POLICY
     profiles:
       - maintenance
-    command: -H unix:///var/run/docker.sock # Use Docker Socket Proxy and comment this line out, for improved security.
-    # command: -H tcp://docker-socket-proxy:2375 # Use this instead, if you have Socket Proxy enabled.
+    command: -H tcp://docker-socket-proxy:2375 # Use this instead, if you have Socket Proxy enabled.
     networks:
       - t3_proxy
       - socket_proxy
-    #ports:
-    #  - 9000
     security_opt:
       - no-new-privileges:true
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro # # Use Docker Socket Proxy instead for improved security
       - $DOCKERDIR/appdata/portainer/data:/data # Change to local directory if you want to save/transfer config locally
     environment:
       - TZ=$TZ

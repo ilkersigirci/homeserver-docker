@@ -13,7 +13,6 @@ services:
       - t3_proxy
     volumes:
       - $DOCKERDIR/appdata/webtop:/config
-      # - /var/run/docker.sock:/var/run/docker.sock #optional
     environment:
       - PUID=$PUID
       - PGID=$PGID

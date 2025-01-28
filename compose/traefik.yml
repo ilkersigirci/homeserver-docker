@@ -92,7 +92,6 @@ services:
       #   protocol: tcp
       #   mode: host
     volumes:
-      # - /var/run/docker.sock:/var/run/docker.sock:ro # Use Docker Socket Proxy instead for improved security
       - $CONFIGDIR/traefik3/rules:/rules # file provider directory
       - $CONFIGDIR/traefik3/acme/acme.json:/acme.json # cert location - you must touch this file and change permissions to 600
       - $DOCKERDIR/logs/traefik:/logs # for fail2ban or crowdsec - make sure to touch file before starting container

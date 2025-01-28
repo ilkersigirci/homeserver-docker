@@ -13,7 +13,6 @@ services:
     security_opt:
       - apparmor:unconfined
     volumes:
-      # - /var/run/docker.sock:/var/run/docker.sock:ro
       - $DOCKERDIR/appdata/netdata/netdataconfig:/etc/netdata
       - $DOCKERDIR/appdata/netdata/netdatalib:/var/lib/netdata
       - $DOCKERDIR/appdata/netdata/netdatacache:/var/cache/netdata
