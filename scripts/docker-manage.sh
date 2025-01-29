@@ -20,6 +20,9 @@ if [ $# -eq 0 ]; then
     usage
 fi
 
+# Change directory to  docker folder
+cd $HOME/docker
+
 # Handle commands
 case "$1" in
     "up")
