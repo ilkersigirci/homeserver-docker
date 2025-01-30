@@ -1,14 +1,52 @@
 services:
+  # NOTE: Revisit this when uptime-kuma v2 is released officially
+  autokuma:
+    image: ghcr.io/bigboot/autokuma:latest
+    container_name: autokuma
+    restart: $MAINTENANCE_RESTART_POLICY
+    networks:
+      - t3_proxy
+      - socket_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/autokuma:/data
+    environment:
+      - AUTOKUMA__KUMA__URL=http://uptime-kuma:3001
+      - AUTOKUMA__DOCKER__HOSTS=tcp://docker-socket-proxy:2375
+      - AUTOKUMA__DOCKER__LABEL_PREFIX=kuma
+      - AUTOKUMA__DOCKER__SOURCE=Containers
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.autokuma-rtr.entrypoints=websecure"
+      - "traefik.http.routers.autokuma-rtr.rule=Host(`autokuma.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.autokuma-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.autokuma-rtr.service=autokuma-svc"
+      - "traefik.http.services.autokuma-svc.loadbalancer.server.port=3001"
+    profiles:
+      - monitoring
+      
+  # Add tcp docker host: tcp://docker-socket-proxy:2375 in the UI
+  # After user creation, disable auth: Settings -> Security -> Disable Auth
   uptime-kuma:
-    image: louislam/uptime-kuma:latest
+    image: louislam/uptime-kuma:beta
     container_name: uptime-kuma
     restart: $MAINTENANCE_RESTART_POLICY
     networks:
       - t3_proxy
+      - socket_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
       - $DOCKERDIR/appdata/uptime-kuma:/app/data
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - UPTIME_KUMA_PORT=3001
+      - DATA_DIR=/app/data
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
