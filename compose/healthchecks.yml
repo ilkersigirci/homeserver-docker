@@ -1,0 +1,44 @@
+# docker exec healthchecks /opt/healthchecks/manage.py createsuperuser
+services:
+  healthchecks:
+    image: healthchecks/healthchecks:latest
+    container_name: healthchecks
+    # depends_on:
+    #   - traefik
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - maintenance
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/healthchecks:/data
+    environment:
+      - DB=sqlite
+      - DB_NAME=/data/hc.sqlite
+      - DEBUG=False
+      - DEFAULT_FROM_EMAIL=noreply@example.com
+      # - EMAIL_HOST=smtp.example.com
+      # - EMAIL_HOST_PASSWORD=password
+      # - EMAIL_HOST_USER=noreply@example.com
+      - EMAIL_USE_VERIFICATION=False
+      - REGISTRATION_OPEN=False
+      - SECRET_KEY=flsdfasdf=sadfadslfsadlfasdf=sdfasdfasd
+      - SITE_ROOT=http://localhost:8000
+      - SITE_NAME=Ilkerflix Healthchecks
+      # - ALLOWED_HOSTS=localhost
+      # - PROMETHEUS_ENABLED=True
+      - TELEGRAM_BOT_NAME=$TELEGRAM_AUTOMATION_BOT_NAME
+      - TELEGRAM_TOKEN=$TELEGRAM_AUTOMATION_BOT_TOKEN
+      - WEBHOOKS_ENABLED=True
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.healthchecks-rtr.entrypoints=websecure"
+      - "traefik.http.routers.healthchecks-rtr.rule=Host(`healthchecks.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.healthchecks-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.healthchecks-rtr.service=healthchecks-svc"
+      - "traefik.http.services.healthchecks-svc.loadbalancer.server.port=8000"

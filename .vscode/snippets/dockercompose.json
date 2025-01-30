@@ -25,7 +25,7 @@
             "    - \"traefik.enable=true\"",
             "    ## HTTP Routers",
             "    - \"traefik.http.routers.${1:servicename}-rtr.entrypoints=websecure\"",
-            "    - \"traefik.http.routers.${1:servicename}-rtr.rule=Host(\\`${1:servicename}.\\$DOMAINNAME\\`)\"",
+            "    - \"traefik.http.routers.${1:servicename}-rtr.rule=Host(`${1:servicename}.\\$DOMAINNAME`)\"",
             "    ## Middlewares",
             "    - \"traefik.http.routers.${1:servicename}-rtr.middlewares=chain-authelia@file\"",
             "    ## HTTP Services",
