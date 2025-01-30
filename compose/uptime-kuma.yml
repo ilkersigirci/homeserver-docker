@@ -1,7 +1,7 @@
 services:
   # NOTE: Revisit this when uptime-kuma v2 is released officially
   autokuma:
-    image: ghcr.io/bigboot/autokuma:latest
+    image: ghcr.io/bigboot/autokuma:uptime-kuma-v2-master
     container_name: autokuma
     restart: $MAINTENANCE_RESTART_POLICY
     networks:

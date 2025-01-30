@@ -117,7 +117,6 @@ services:
     container_name: immich_folder_album_creator
     image: salvoxia/immich-folder-album-creator:latest
     restart: "no"
-    # command: ["/script/immich_auto_album.sh"] # NOTE: Manually run
     networks:
       - t3_proxy
     environment:
@@ -129,5 +128,6 @@ services:
       ALBUM_LEVELS: 1
       LOG_LEVEL: INFO
       SYNC_MODE: "2" # Remove offline assets and delete empty albums after each run
+      # RUN_IMMEDIATELY: "true" # Run the script immediately after start
     profiles:
       - photo
