@@ -54,6 +54,7 @@ include:
   ###### MAINTENANCE ####
   - compose/code-server.yml
   - compose/convertx.yml
+  - compose/docker-gc.yml
   - compose/dozzle.yml
   - compose/it-tools.yml
   - compose/uptime-kuma.yml
@@ -64,6 +65,7 @@ include:
   - compose/jellyfin.yml
   - compose/jellysearch.yml
   - compose/jellyseerr.yml
+  - compose/mkvtoolnix.yml
   - compose/transmission.yml
   #### MONITORING ####
   - compose/beszel.yml

@@ -16,6 +16,8 @@ services:
       - $CONFIGDIR/authelia/configuration.yml:/config/configuration.yml
       - $CONFIGDIR/authelia/users_database.yml:/config/users_database.yml
     environment:
+      - PUID=$PUID
+      - PGID=$PGID
       - TZ=$TZ
       - AUTHELIA_JWT_SECRET_FILE=/run/secrets/authelia_jwt_secret
       - AUTHELIA_SESSION_SECRET_FILE=/run/secrets/authelia_session_secret
@@ -37,7 +39,7 @@ services:
       - "traefik.http.routers.authelia-rtr.rule=Host(`authelia.$DOMAINNAME`)"
       - "traefik.http.routers.authelia-rtr.tls=true"  # TODO: This shouldn't be needed. might remove?
       ## Middlewares
-      - "traefik.http.routers.authelia-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.authelia-rtr.middlewares=chain-no-auth@file"
       ## HTTP Services
       - "traefik.http.routers.authelia-rtr.service=authelia-svc"
       - "traefik.http.services.authelia-svc.loadbalancer.server.port=9091"
