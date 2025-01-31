@@ -1,0 +1,21 @@
+services:
+  whoami:
+    image: traefik/whoami
+    container_name: whoami
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - maintenance
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.whoami-rtr.entrypoints=websecure"
+      - "traefik.http.routers.whoami-rtr.rule=Host(`whoami.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.whoami-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.whoami-rtr.service=whoami-svc"
+      - "traefik.http.services.whoami-svc.loadbalancer.server.port=80"

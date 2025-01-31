@@ -57,6 +57,7 @@ include:
   - compose/dozzle.yml
   - compose/it-tools.yml
   - compose/uptime-kuma.yml
+  - compose/whoami.yml
   # - compose/watchtower.yml
   #### MEDIA ####
   - compose/feishin.yml
