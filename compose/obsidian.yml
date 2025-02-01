@@ -1,10 +1,8 @@
 services:
-  # TODO: Add local.ini
   # https://github.com/vrtmrz/obsidian-livesync/blob/main/docs/setup_own_server.md#setup-couchdb-to-your-server
-  # passphase: obsidian
   obsidian-couchdb:
     container_name: obsidian-couchdb
-    image: couchdb:latest # TODO: ghcr.io/
+    image: couchdb:latest
     restart: $OTHERS_RESTART_POLICY
     networks:
       - t3_proxy
@@ -12,7 +10,6 @@ services:
       - no-new-privileges:true
     volumes:
       - $DOCKERDIR/appdata/couchdb:/opt/couchdb/data
-      - $CONFIGDIR/couchdb/local.ini:/opt/couchdb/etc/local.ini
     environment:
       - COUCHDB_USER=admin
       - COUCHDB_PASSWORD=admin
@@ -22,7 +19,13 @@ services:
       - "traefik.http.routers.couchdb-rtr.entrypoints=websecure"
       - "traefik.http.routers.couchdb-rtr.rule=Host(`couchdb.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.couchdb-rtr.middlewares=chain-couchdb@file" # NOTE: chain-authelia not working
+      - "traefik.http.routers.couchdb-rtr.middlewares=obsidiancors" # NOTE: chain-no-auth and chain-authelia not working
+      - "traefik.http.middlewares.obsidiancors.headers.accesscontrolallowmethods=GET,PUT,POST,HEAD,DELETE"
+      - "traefik.http.middlewares.obsidiancors.headers.accesscontrolallowheaders=accept,authorization,content-type,origin,referer"
+      - "traefik.http.middlewares.obsidiancors.headers.accesscontrolalloworiginlist=app://obsidian.md,capacitor://localhost,http://localhost,https://couchdb.$DOMAINNAME"
+      - "traefik.http.middlewares.obsidiancors.headers.accesscontrolmaxage=3600"
+      - "traefik.http.middlewares.obsidiancors.headers.addvaryheader=true"
+      - "traefik.http.middlewares.obsidiancors.headers.accessControlAllowCredentials=true"
       ## HTTP Services
       - "traefik.http.routers.couchdb-rtr.service=couchdb-svc"
       - "traefik.http.services.couchdb-svc.loadbalancer.server.port=5984"

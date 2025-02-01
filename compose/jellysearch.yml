@@ -38,7 +38,7 @@ services:
       - "traefik.http.routers.jellysearch-rtr.entrypoints=websecure"
       - "traefik.http.routers.jellysearch-rtr.rule=Host(`jellyfin.$DOMAINNAME`) && (QueryRegexp(`searchTerm`, `(.*?)`) || QueryRegexp(`SearchTerm`, `(.*?)`))"
       ## Middlewares
-      - "traefik.http.routers.jellysearch-rtr.middlewares=chain-couchdb@file"
+      - "traefik.http.routers.jellysearch-rtr.middlewares=chain-no-auth@file"
       ## HTTP Services
       - "traefik.http.routers.jellysearch-rtr.service=jellysearch-svc"
       - "traefik.http.services.jellysearch-svc.loadbalancer.server.port=5000"
