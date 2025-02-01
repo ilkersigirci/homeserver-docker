@@ -16,7 +16,6 @@ services:
       - "traefik.http.routers.jellyfin-vue-rtr.rule=Host(`jellyfin_vue.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.jellyfin-vue-rtr.middlewares=chain-authelia@file"
-      # - "traefik.http.routers.jellyfin-vue-rtr.middlewares=chain-no-auth@file"
       ## HTTP Services
       - "traefik.http.routers.jellyfin-vue-rtr.service=jellyfin-vue-svc"
       - "traefik.http.services.jellyfin-vue-svc.loadbalancer.server.port=80"

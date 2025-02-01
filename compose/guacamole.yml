@@ -19,7 +19,7 @@ services:
       - "traefik.http.routers.guacamole-rtr.entrypoints=websecure"
       - "traefik.http.routers.guacamole-rtr.rule=Host(`guacamole.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.guacamole-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.guacamole-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
       - "traefik.http.routers.guacamole-rtr.service=guacamole-svc"
       - "traefik.http.services.guacamole-svc.loadbalancer.server.port=8080"

@@ -25,7 +25,7 @@ services:
       - "traefik.http.routers.kasm-rtr.entrypoints=websecure"
       - "traefik.http.routers.kasm-rtr.rule=Host(`kasm.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.kasm-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.kasm-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
       - "traefik.http.routers.kasm-rtr.service=kasm-svc"
       - "traefik.http.services.kasm-svc.loadbalancer.server.port=4443"
