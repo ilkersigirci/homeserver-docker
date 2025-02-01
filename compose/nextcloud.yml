@@ -108,7 +108,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.nextcloud.entrypoints=https"
+      - "traefik.http.routers.nextcloud.entrypoints=websecure"
       - "traefik.http.routers.nextcloud.rule=Host(`$NEXTCLOUD_DOMAIN_NAME`)"
       - "traefik.http.routers.nextcloud.tls=true"
       ## Middlewares
@@ -119,7 +119,7 @@ services:
       ######################################################################################
       ## NOT_WORKING
       # ## TCP Routers
-      # - "traefik.tcp.routers.nextcloud-tcp.entrypoints=https"
+      # - "traefik.tcp.routers.nextcloud-tcp.entrypoints=websecure"
       # - "traefik.tcp.routers.nextcloud-tcp.rule=HostSNI(`nextcloud.$DOMAINNAME`)"
       # - "traefik.tcp.routers.nextcloud-tcp.tls=true"
       # # - "traefik.tcp.routers.nextcloud-tcp.tls.certresolver=dns-cloudflare"

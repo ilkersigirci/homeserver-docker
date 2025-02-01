@@ -10,7 +10,7 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.enclosed.entrypoints=https"
+      - "traefik.http.routers.enclosed.entrypoints=websecure"
       - "traefik.http.routers.enclosed.rule=Host(`enclosed.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.enclosed.middlewares=chain-authelia@file"
