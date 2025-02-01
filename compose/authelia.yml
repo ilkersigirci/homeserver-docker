@@ -15,6 +15,8 @@ services:
     volumes:
       - $CONFIGDIR/authelia/configuration.yml:/config/configuration.yml
       - $CONFIGDIR/authelia/users_database.yml:/config/users_database.yml
+      - $DOCKERDIR/appdata/authelia:/config
+      - $DOCKERDIR/appdata/authelia/tmp:/tmp/authelia
     environment:
       - PUID=$PUID
       - PGID=$PGID
