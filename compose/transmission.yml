@@ -27,10 +27,6 @@ services:
       PUID: $PUID
       PGID: $PGID
       TZ: $TZ
-      # TRANSMISSION_WEB_HOME: /flood-for-transmission (Not working > 4.0.0)
-    #      USER: username
-    #      PASS: password
-
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth

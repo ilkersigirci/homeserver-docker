@@ -22,6 +22,7 @@ services:
       - PUID=$PUID
       - PGID=$PGID
       - TZ=$TZ
+      - FB_NOAUTH=true # NOTE: If you change it, remove and re-create database.db
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
