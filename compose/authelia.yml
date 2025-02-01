@@ -10,7 +10,6 @@ services:
       - core
     networks:
       - t3_proxy
-      - default
     volumes:
       - $DOCKERDIR/appdata/authelia:/config
       - $CONFIGDIR/authelia/configuration.yml:/config/configuration.yml
