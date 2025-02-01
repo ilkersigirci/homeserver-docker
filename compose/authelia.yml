@@ -1,9 +1,8 @@
 services:
-  # Authelia (Lite) - Self-Hosted Single Sign-On and Two-Factor Authentication
+  # Self-Hosted Single Sign-On and Two-Factor Authentication
   authelia:
     container_name: authelia
-    # Check this before upgrading: https://github.com/authelia/authelia/blob/master/BREAKING.md
-    image: ghcr.io/authelia/authelia:latest
+    image: ghcr.io/authelia/authelia:4.38.18
     depends_on:
       - traefik
     restart: $BASE_RESTART_POLICY
@@ -13,35 +12,29 @@ services:
       - t3_proxy
       - default
     volumes:
-      - $CONFIGDIR/authelia/configuration.yml:/config/configuration.yml
-      - $CONFIGDIR/authelia/users_database.yml:/config/users_database.yml
       - $DOCKERDIR/appdata/authelia:/config
-      - $DOCKERDIR/appdata/authelia/tmp:/tmp/authelia
+      - $CONFIGDIR/authelia/configuration.yml:/config/configuration.yml
+      - $CONFIGDIR/authelia/users.yml:/config/users.yml
     environment:
       - PUID=$PUID
       - PGID=$PGID
       - TZ=$TZ
-      - AUTHELIA_JWT_SECRET_FILE=/run/secrets/authelia_jwt_secret
+      - AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE=/run/secrets/authelia_jwt_secret
       - AUTHELIA_SESSION_SECRET_FILE=/run/secrets/authelia_session_secret
       - AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE=/run/secrets/authelia_storage_encryption_key
-#      - AUTHELIA_STORAGE_MYSQL_PASSWORD_FILE=/run/secrets/authelia_storage_mysql_password
-#      - AUTHELIA_NOTIFIER_SMTP_PASSWORD_FILE=/run/secrets/authelia_notifier_smtp_password
-#      - AUTHELIA_DUO_API_SECRET_KEY_FILE=/run/secrets/authelia_duo_api_secret_key
+    #  - AUTHELIA_DUO_API_SECRET_KEY_FILE=/run/secrets/authelia_duo_api_secret_key
     secrets:
       - authelia_jwt_secret
       - authelia_session_secret
       - authelia_storage_encryption_key
-#      - authelia_storage_mysql_password
-#      - authelia_notifier_smtp_password
-#      - authelia_duo_api_secret_key
+    #  - authelia_duo_api_secret_key
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.authelia-rtr.entrypoints=websecure"
       - "traefik.http.routers.authelia-rtr.rule=Host(`authelia.$DOMAINNAME`)"
-      - "traefik.http.routers.authelia-rtr.tls=true"  # TODO: This shouldn't be needed. might remove?
       ## Middlewares
-      - "traefik.http.routers.authelia-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.authelia-rtr.middlewares=chain-no-auth@file" # IMPORTANT
       ## HTTP Services
       - "traefik.http.routers.authelia-rtr.service=authelia-svc"
       - "traefik.http.services.authelia-svc.loadbalancer.server.port=9091"
