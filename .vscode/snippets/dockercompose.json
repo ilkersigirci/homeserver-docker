@@ -6,9 +6,9 @@
             "${1:servicename}:",
             "  image: ${2:image}:${3:latest}",
             "  container_name: ${1:servicename}",
-            "  depends_on:",
-            "    - traefik",
             "  restart: unless-stopped",
+            "  profiles:",
+            "    - ${7:group}",
             "  networks:",
             "    - t3_proxy",
             "  ports:",
@@ -30,7 +30,14 @@
             "    - \"traefik.http.routers.${1:servicename}-rtr.middlewares=chain-authelia@file\"",
             "    ## HTTP Services",
             "    - \"traefik.http.routers.${1:servicename}-rtr.service=${1:servicename}-svc\"",
-            "    - \"traefik.http.services.${1:servicename}-svc.loadbalancer.server.port=${5:80}\""
+            "    - \"traefik.http.services.${1:servicename}-svc.loadbalancer.server.port=${5:80}\"",
+            "    ## Homepage",
+            "    - homepage.group=${7:group}",
+            "    - homepage.name=${1:servicename}",
+            "    - homepage.icon=${1:servicename}.png",
+            "    - homepage.href=https://${1:servicename}.\\$DOMAINNAME",
+            "    - homepage.target=_blank",
+            "    - homepage.description=${8:description}"
         ]
     }
 }
