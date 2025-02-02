@@ -49,6 +49,9 @@ include:
   - compose/socket-proxy.yml
   - compose/traefik.yml
   - compose/vaultwarden.yml
+  #### DESKTOP APPS ####
+  # - compose/firefox.yml
+  - compose/gimp.yml
   #### MACHINE LEARNING ####
   - compose/open-webui.yml
   ###### MAINTENANCE ####

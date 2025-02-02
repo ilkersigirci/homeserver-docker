@@ -1,0 +1,39 @@
+services:
+  gimp:
+    container_name: gimp
+    image: lscr.io/linuxserver/gimp:latest
+    restart: $DESKTOP_IMAGES_RESTART_POLICY
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - TITLE=Gimp
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.gimp-rtr.entrypoints=websecure"
+      - "traefik.http.routers.gimp-rtr.rule=Host(`gimp.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.gimp-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.gimp-rtr.service=gimp-svc"
+      - "traefik.http.services.gimp-svc.loadbalancer.server.port=3000"
+      ####### HOMEPAGE #######
+      - homepage.group=DesktopApps
+      - homepage.name=Gimp
+      - homepage.icon=/icons/gimp.png
+      - homepage.href=https://gimp.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Image Manipulation Program
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail -s http://localhost:3000 || exit 1"]
+      start_period: 15s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    profiles:
+      - desktop_apps
