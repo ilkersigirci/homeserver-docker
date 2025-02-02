@@ -2,8 +2,6 @@ services:
   handbrake:
     container_name: handbrake
     image: jlesage/handbrake:latest
-    ports:
-      - "5801:5800"
     volumes:
       - $DATADIR/downloads:/data/downloads
       - $DOCKERDIR/appdata/handbrake/config:/config
@@ -19,5 +17,22 @@ services:
       DISPLAY_HEIGHT: 960
       AUTOMATED_CONVERSION_KEEP_SOURCE: 1
       VNC_PASSWORD: $HANDBRAKE_VNC_PASSWD
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.handbrake-rtr.entrypoints=websecure"
+      - "traefik.http.routers.handbrake-rtr.rule=Host(`handbrake.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.handbrake-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.handbrake-rtr.service=handbrake-svc"
+      - "traefik.http.services.handbrake-svc.loadbalancer.server.port=5800"
+        ####### HOMEPAGE #######
+      - homepage.group=Media
+      - homepage.name=handbrake
+      - homepage.icon=handbrake.png
+      - homepage.href=https://handbrake.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Converting Video Platform
     profiles:
       - media

@@ -64,3 +64,10 @@ services:
       ## HTTP Services
       - "traefik.http.routers.filerun-rtr.service=filerun-svc"
       - "traefik.http.services.filerun-svc.loadbalancer.server.port=80"
+      ####### HOMEPAGE #######
+      - homepage.group=Core
+      - homepage.name=Filerun
+      - homepage.icon=filerun.png
+      - homepage.href=https://filerun.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=File Manager

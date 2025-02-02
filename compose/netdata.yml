@@ -32,5 +32,12 @@ services:
       ## HTTP Services
       - "traefik.http.routers.netdata-rtr.service=netdata-svc"
       - "traefik.http.services.netdata-svc.loadbalancer.server.port=19999"
+      ####### HOMEPAGE #######
+      - homepage.group=Monitoring
+      - homepage.name=Netdata
+      - homepage.icon=netdata.png
+      - homepage.href=https://netdata.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Monitoring and troubleshooting, transformed
     profiles:
       - monitoring

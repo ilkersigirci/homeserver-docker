@@ -1,6 +1,6 @@
 services:
   jellyfin-vue:
-    image: ghcr.io/jellyfin/jellyfin-vue:unstable.2023-11-30.5ff058d
+    image: ghcr.io/jellyfin/jellyfin-vue:unstable
     container_name: jellyfin-vue
     restart: $MEDIA_RESTART_POLICY
     # depends_on:
@@ -9,15 +9,25 @@ services:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
+    # environment:
+    #   - DEFAULT_SERVERS=demo.jellyfin.org,jellyfin:8096
+    #   - DISABLE_SERVER_SELECTION=0
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.jellyfin-vue-rtr.entrypoints=websecure"
       - "traefik.http.routers.jellyfin-vue-rtr.rule=Host(`jellyfin_vue.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.jellyfin-vue-rtr.middlewares=chain-authelia@file"
+      # - "traefik.http.routers.jellyfin-vue-rtr.middlewares=chain-no-auth@file"
       ## HTTP Services
       - "traefik.http.routers.jellyfin-vue-rtr.service=jellyfin-vue-svc"
       - "traefik.http.services.jellyfin-vue-svc.loadbalancer.server.port=80"
+      ####### HOMEPAGE #######
+      - homepage.group=Media
+      - homepage.name=Jellyfin Vue
+      - homepage.icon=jellyfin.png
+      - homepage.href=https://jellyfin_vue.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Jellyfin with Vue UI
     profiles:
       - media

@@ -33,3 +33,10 @@ services:
       ## HTTP Services
       - "traefik.http.routers.dufs-rtr.service=dufs-svc"
       - "traefik.http.services.dufs-svc.loadbalancer.server.port=5000"
+      ####### HOMEPAGE #######
+      - homepage.group=Core
+      - homepage.name=Dufs
+      - homepage.icon=dufs.png
+      - homepage.href=https://dufs.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=A file server that supports static serving, WEBDAV

@@ -51,7 +51,7 @@ services:
       - "traefik.http.services.linkwarden-svc.loadbalancer.server.port=3000"
       ####### HOMEPAGE #######
       - homepage.group=Reading
-      - homepage.name=linkwarden
+      - homepage.name=Linkwarden
       - homepage.icon=linkwarden.png
       - homepage.href=https://linkwarden.$DOMAINNAME
       - homepage.target=_blank

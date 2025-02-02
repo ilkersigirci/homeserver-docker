@@ -30,5 +30,12 @@ services:
       ## HTTP Services
       - "traefik.http.routers.jdownloader-rtr.service=jdownloader-svc"
       - "traefik.http.services.jdownloader-svc.loadbalancer.server.port=5800"
+      ####### HOMEPAGE #######
+      - homepage.group=Media
+      - homepage.name=Jdownloader
+      - homepage.icon=jdownloader.png
+      - homepage.href=https://jdownloader.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Download Management Tool
     profiles:
       - media

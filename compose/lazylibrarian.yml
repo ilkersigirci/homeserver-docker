@@ -31,5 +31,12 @@ services:
       ## HTTP Services
       - "traefik.http.routers.lazylibrarian-rtr.service=lazylibrarian-svc"
       - "traefik.http.services.lazylibrarian-svc.loadbalancer.server.port=5299"
+      ####### HOMEPAGE #######
+      - homepage.group=Reading
+      - homepage.name=LazyLibrarian
+      - homepage.icon=lazylibrarian.png
+      - homepage.href=https://lazylibrarian.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Follow Authors and Grab Metadata for All Your Digital Reading Needs
     profiles:
-      - media
+      - reading

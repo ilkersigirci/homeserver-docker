@@ -1,3 +1,4 @@
+# NOTE: Not completed
 # docker exec healthchecks /opt/healthchecks/manage.py createsuperuser
 services:
   healthchecks:
@@ -42,3 +43,10 @@ services:
       ## HTTP Services
       - "traefik.http.routers.healthchecks-rtr.service=healthchecks-svc"
       - "traefik.http.services.healthchecks-svc.loadbalancer.server.port=8000"
+      ####### HOMEPAGE #######
+      - homepage.group=Maintenance
+      - homepage.name=Healthchecks
+      - homepage.icon=healthchecks.png
+      - homepage.href=https://healthchecks.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Cron job and Background Task Monitoring

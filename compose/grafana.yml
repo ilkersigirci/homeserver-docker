@@ -36,5 +36,12 @@ services:
       ## HTTP Services
       - "traefik.http.routers.grafana-rtr.service=grafana-svc"
       - "traefik.http.services.grafana-svc.loadbalancer.server.port=3000"
+      ####### HOMEPAGE #######
+      - homepage.group=Monitoring
+      - homepage.name=Grafana
+      - homepage.icon=grafana.png
+      - homepage.href=https://grafana.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Observability and Data Visualization Platform
     profiles:
       - monitoring

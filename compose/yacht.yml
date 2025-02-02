@@ -28,3 +28,10 @@ services:
       ## HTTP Services
       - "traefik.http.routers.yacht-rtr.service=yacht-svc"
       - "traefik.http.services.yacht-svc.loadbalancer.server.port=8000"
+      ####### HOMEPAGE #######
+      - homepage.group=Maintenance
+      - homepage.name=Yacht
+      - homepage.icon=yacht.png
+      - homepage.href=https://yacht.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Docker Web Interface

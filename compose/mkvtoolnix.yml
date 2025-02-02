@@ -32,3 +32,10 @@ services:
       ## HTTP Services
       - "traefik.http.routers.mkvtoolnix-rtr.service=mkvtoolnix-svc"
       - "traefik.http.services.mkvtoolnix-svc.loadbalancer.server.port=5800"
+      ####### HOMEPAGE #######
+      - homepage.group=Media
+      - homepage.name=Mkvtoolnix
+      - homepage.icon=mkvtoolnix.png
+      - homepage.href=https://mkvtoolnix.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Ultimate Tool for Editing and Merging MKV Files

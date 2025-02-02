@@ -17,5 +17,12 @@ services:
       ## HTTP Services
       - "traefik.http.routers.enclosed.service=logseq-svc"
       - "traefik.http.services.logseq-svc.loadbalancer.server.port=8787"
+      ####### HOMEPAGE #######
+      - homepage.group=Others
+      - homepage.name=Enclosed
+      - homepage.icon=enclosed.png
+      - homepage.href=https://enclosed.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Minimalistic web app designed for sending private and secure notes.
     profiles:
       - others

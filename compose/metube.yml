@@ -24,5 +24,12 @@ services:
       ## HTTP Services
       - "traefik.http.routers.metube-rtr.service=metube-svc"
       - "traefik.http.services.metube-svc.loadbalancer.server.port=8081"
+      ####### HOMEPAGE #######
+      - homepage.group=Media
+      - homepage.name=metube
+      - homepage.icon=metube.png
+      - homepage.href=https://metube.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Self-hosted YouTube downloader
     profiles:
       - media

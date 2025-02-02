@@ -23,6 +23,13 @@ services:
       ## HTTP Services
       - "traefik.http.routers.chromium-rtr.service=chromium-svc"
       - "traefik.http.services.chromium-svc.loadbalancer.server.port=3000"
+      ####### HOMEPAGE #######
+      - homepage.group=DesktopApps
+      - homepage.name=Ungoogled Chromium
+      - homepage.icon=chromium.png
+      - homepage.href=https://chromium.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Ungoogled Chromium Browser
     # devices:
     #   - /dev/dri:/dev/dri #optional
     healthcheck:

@@ -46,5 +46,12 @@ services:
       ## HTTP Services
       - "traefik.http.routers.llama-cpp-rtr.service=llama-cpp-svc"
       - "traefik.http.services.llama-cpp-svc.loadbalancer.server.port=8000"
+      ####### HOMEPAGE #######
+      - homepage.group=ML
+      - homepage.name=Llama-cpp
+      - homepage.icon=llama-cpp.png
+      - homepage.href=https://llamapi.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=LLM inference in C/C++
     profiles:
       - ml

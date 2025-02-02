@@ -26,5 +26,12 @@ services:
       ## HTTP Services
       - "traefik.http.routers.kavita-rtr.service=kavita-svc"
       - "traefik.http.services.kavita-svc.loadbalancer.server.port=5000"
+      ####### HOMEPAGE #######
+      - homepage.group=Reading
+      - homepage.name=Kavita
+      - homepage.icon=kavita.png
+      - homepage.href=https://kavita.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Fast, feature rich, cross platform reading server
     profiles:
       - reading

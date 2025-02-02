@@ -26,3 +26,10 @@ services:
       ## HTTP Services
       - "traefik.http.routers.duplicati-rtr.service=duplicati-svc"
       - "traefik.http.services.duplicati-svc.loadbalancer.server.port=8200"
+      ####### HOMEPAGE #######
+      - homepage.group=Maintenance
+      - homepage.name=Duplicati
+      - homepage.icon=duplicati.png
+      - homepage.href=https://duplicati.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Store securely encrypted backups in the cloud! 

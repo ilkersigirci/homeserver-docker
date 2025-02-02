@@ -31,11 +31,11 @@ services:
       - "traefik.http.routers.syncthing-rtr.service=syncthing-svc"
       - "traefik.http.services.syncthing-svc.loadbalancer.server.port=8384"
       ####### HOMEPAGE #######
-      - homepage.group=Reading
+      - homepage.group=Maintenance
       - homepage.name=Syncthing
       - homepage.icon=syncthing.png
       - homepage.href=https://syncthing.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=File Synchronization
     profiles:
-      - reading
+      - maintenance

@@ -44,5 +44,12 @@ services:
       ## HTTP Services
       - "traefik.http.routers.glances-rtr.service=glances-svc"
       - "traefik.http.services.glances-svc.loadbalancer.server.port=61208"
+      ####### HOMEPAGE #######
+      - homepage.group=Monitoring
+      - homepage.name=Glances
+      - homepage.icon=glances.png
+      - homepage.href=https://glances.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=System Monitor
     profiles:
       - monitoring

@@ -41,6 +41,13 @@ services:
       - "traefik.http.routers.lidarr-rtr.service=lidarr-svc"
       - "traefik.http.routers.lidarr-rtr-bypass.service=lidarr-svc"
       - "traefik.http.services.lidarr-svc.loadbalancer.server.port=8686"
+      ####### HOMEPAGE #######
+      - homepage.group=Media
+      - homepage.name=Lidarr
+      - homepage.icon=lidarr.png
+      - homepage.href=https://lidarr.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=*rr for Music
     profiles:
       - media
       - arr
