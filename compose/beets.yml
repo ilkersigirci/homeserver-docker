@@ -26,5 +26,12 @@ services:
       ## HTTP Services
       - "traefik.http.routers.beets-rtr.service=beets-svc"
       - "traefik.http.services.beets-svc.loadbalancer.server.port=8337"
+      ####### HOMEPAGE #######
+      - homepage.group=Media
+      - homepage.name=Beets
+      - homepage.icon=beets.png
+      - homepage.href=https://beets.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=General Purpose Music Manager
     profiles:
       - media

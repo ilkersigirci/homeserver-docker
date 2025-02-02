@@ -108,6 +108,17 @@ services:
       ## HTTP Services
       - "traefik.http.routers.immich-server-rtr.service=immich-server-svc"
       - "traefik.http.services.immich-server-svc.loadbalancer.server.port=2283"
+      ####### HOMEPAGE #######
+      - homepage.group=Media
+      - homepage.name=Immich
+      - homepage.icon=immich.png
+      - homepage.href=https://photos.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Selfhosted Photo App
+      - homepage.widget.type=immich
+      - homepage.widget.url=http://immich-server:2283
+      - homepage.widget.key=$IMMICH_API_KEY
+      - homepage.widget.version=2
     profiles:
       - photo
 

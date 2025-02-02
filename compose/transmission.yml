@@ -45,5 +45,7 @@ services:
       - homepage.href=https://torrent.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Torrent Client
+      - homepage.widget.type=transmission
+      - homepage.widget.url=http://transmission:9091
     profiles:
       - media

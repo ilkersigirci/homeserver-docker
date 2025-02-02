@@ -39,5 +39,10 @@ services:
       - homepage.href=https://jellyfin.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Media Server
+      - homepage.widget.type=jellyfin
+      - homepage.widget.url=http://jellyfin:8096
+      - homepage.widget.key=$JELLYFIN_API_KEY
+      - homepage.widget.enableBlocks=true
+      - homepage.widget.enableNowPlaying=false
     profiles:
       - media

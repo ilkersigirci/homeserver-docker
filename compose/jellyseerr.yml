@@ -26,5 +26,15 @@ services:
       ## HTTP Services
       - "traefik.http.routers.jellyseerr-rtr.service=jellyseerr-svc"
       - "traefik.http.services.jellyseerr-svc.loadbalancer.server.port=5055"
+      ####### HOMEPAGE #######
+      - homepage.group=Media
+      - homepage.name=Jellyseerr
+      - homepage.icon=jellyseerr.png
+      - homepage.href=https://jellyseerr.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Media Request Manager for Jellyfin
+      - homepage.widget.type=jellyseerr
+      - homepage.widget.url=http://jellyseerr:5055
+      - homepage.widget.key=$JELLYSEERR_API_KEY
     profiles:
       - media
