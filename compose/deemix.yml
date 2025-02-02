@@ -1,6 +1,6 @@
 services:
   deemix:
-    image: registry.gitlab.com/bockiii/deemix-docker
+    image: ghcr.io/bambanah/deemix:latest
     container_name: deemix
     restart: $MEDIA_RESTART_POLICY
     networks:
@@ -8,13 +8,15 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/deemix:/config # TODO: Move to config folder
+      - $DOCKERDIR/appdata/deemix:/config
+      - $CONFIGDIR/deemix/config.json:/config/config.json
+      - $CONFIGDIR/deemix/login.json:/config/login.json
       - $MEDIADIR/Music/Deemix:/downloads
     environment:
       - PUID=$PUID
       - PGID=$PGID
-      - TZ=$TZ
       - UMASK_SET=022
+      - DEEMIX_SINGLE_USER=true
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth
