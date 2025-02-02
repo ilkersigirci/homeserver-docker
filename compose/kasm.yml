@@ -32,5 +32,12 @@ services:
       # NOTE: https://docs.linuxserver.io/faq#strict-proxy
       - traefik.http.services.kasm-svc.loadbalancer.serverstransport=ignorecert@file
       - traefik.http.services.kasm-svc.loadbalancer.server.scheme=https
+      ####### HOMEPAGE #######
+      - homepage.group=DesktopApps
+      - homepage.name=Kasm Workspaces
+      - homepage.icon=kasm.png
+      - homepage.href=https://kasm.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Workspaces for delivering browser-based access to desktop applications
     profiles:
       - desktop_apps
