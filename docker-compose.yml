@@ -57,6 +57,7 @@ include:
   - compose/docker-gc.yml
   - compose/dozzle.yml
   - compose/it-tools.yml
+  - compose/localstack-s3.yml
   - compose/uptime-kuma.yml
   - compose/whoami.yml
   # - compose/watchtower.yml

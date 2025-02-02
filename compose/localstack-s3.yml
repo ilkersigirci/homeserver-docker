@@ -1,0 +1,35 @@
+services:
+  localstack-s3:
+    image: gresau/localstack-persist:3
+    container_name: localstack-s3
+    restart: $MAINTENANCE_RESTART_POLICY
+    networks:
+      - t3_proxy
+      # - socket_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/localstack-s3:/persisted-data
+      - $CONFIGDIR/localstack-s3/create_s3_bucket.sh:/etc/localstack/init/ready.d/script.sh
+    environment:
+      - DEBUG=0
+      - SERVICES=s3
+      - CREATED_BUCKET_NAME=ilkerflix
+      - APP_AWS_REGION=eu-central-1
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.localstack-s3-rtr.entrypoints=websecure"
+      - "traefik.http.routers.localstack-s3-rtr.rule=Host(`s3.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.localstack-s3-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.localstack-s3-rtr.service=localstack-s3-svc"
+      - "traefik.http.services.localstack-s3-svc.loadbalancer.server.port=4566"
+      ####### HOMEPAGE #######
+      - homepage.group=Maintenance
+      - homepage.name=S3
+      - homepage.icon=s3.png
+      - homepage.href=https://s3.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Localstack S3
