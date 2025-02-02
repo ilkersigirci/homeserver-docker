@@ -34,3 +34,10 @@ services:
       ## HTTP Services
       - "traefik.http.routers.backrest-rtr.service=backrest-svc"
       - "traefik.http.services.backrest-svc.loadbalancer.server.port=9898"
+      ####### HOMEPAGE #######
+      - homepage.group=Maintenance
+      - homepage.name=Backrest
+      - homepage.icon=backrest.png
+      - homepage.href=https://backrest.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=GUI for restic backup

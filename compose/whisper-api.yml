@@ -32,5 +32,12 @@ services:
       ## HTTP Services
       - "traefik.http.routers.whisper-api-rtr.service=whisper-api-svc"
       - "traefik.http.services.whisper-api-svc.loadbalancer.server.port=9000"
+      ####### HOMEPAGE #######
+      - homepage.group=ML
+      - homepage.name=Whisper API
+      - homepage.icon=whisper.png
+      - homepage.href=https://whisperapi.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Speech to Text API
     profiles:
       - ml

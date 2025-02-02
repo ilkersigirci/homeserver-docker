@@ -43,6 +43,13 @@ services:
       - "traefik.http.routers.radarr-rtr.service=radarr-svc"
       - "traefik.http.routers.radarr-rtr-bypass.service=radarr-svc"
       - "traefik.http.services.radarr-svc.loadbalancer.server.port=7878"
+      ####### HOMEPAGE #######
+      - homepage.group=Media
+      - homepage.name=Radarr
+      - homepage.icon=radarr.png
+      - homepage.href=https://radarr.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Movie Manager
     profiles:
       - media
       - arr

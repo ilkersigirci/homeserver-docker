@@ -57,3 +57,10 @@ services:
       ## HTTP Services
       - "traefik.http.routers.watchtower-rtr.service=watchtower-svc"
       - "traefik.http.services.watchtower-svc.loadbalancer.server.port=8080"
+      ####### HOMEPAGE #######
+      - homepage.group=Maintenance
+      - homepage.name=Watchtower
+      - homepage.icon=watchtower.png
+      - homepage.href=https://watchtower.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Container Auto-Updates

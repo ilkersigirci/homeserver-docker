@@ -14,7 +14,7 @@ services:
     environment:
       - AUTOKUMA__KUMA__URL=http://uptime-kuma:3001
       - AUTOKUMA__DOCKER__HOSTS=tcp://docker-socket-proxy:2375
-      - AUTOKUMA__DOCKER__LABEL_PREFIX=kuma
+      - AUTOKUMA__DOCKER__LABEL_PREFIX=traefik
       - AUTOKUMA__DOCKER__SOURCE=Containers
     labels:
       - "traefik.enable=true"

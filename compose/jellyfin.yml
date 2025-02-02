@@ -32,5 +32,12 @@ services:
       ## HTTP Services
       - "traefik.http.routers.jellyfin-rtr.service=jellyfin-svc"
       - "traefik.http.services.jellyfin-svc.loadbalancer.server.port=8096"
+      ####### HOMEPAGE #######
+      - homepage.group=Media
+      - homepage.name=Jellyfin
+      - homepage.icon=jellyfin.png
+      - homepage.href=https://jellyfin.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Media Server
     profiles:
       - media

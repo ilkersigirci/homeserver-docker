@@ -7,10 +7,6 @@ services:
     restart: $MEDIA_RESTART_POLICY
     networks:
       - t3_proxy
-    #  t3_proxy:
-    #    ipv4_address: 192.168.90.161
-    ports:
-      - "9696:9696"
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -31,6 +27,13 @@ services:
       ## HTTP Services
       - "traefik.http.routers.prowlarr-rtr.service=prowlarr-svc"
       - "traefik.http.services.prowlarr-svc.loadbalancer.server.port=9696"
+      ####### HOMEPAGE #######
+      - homepage.group=Media
+      - homepage.name=Prowlarr
+      - homepage.icon=prowlarr.png
+      - homepage.href=https://prowlarr.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Indexer Manager
     profiles:
       - media
       - arr

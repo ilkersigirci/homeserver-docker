@@ -1,5 +1,4 @@
 services:
-  # Self-Hosted Single Sign-On and Two-Factor Authentication
   authelia:
     container_name: authelia
     image: ghcr.io/authelia/authelia:4.38.18
@@ -37,3 +36,10 @@ services:
       ## HTTP Services
       - "traefik.http.routers.authelia-rtr.service=authelia-svc"
       - "traefik.http.services.authelia-svc.loadbalancer.server.port=9091"
+      ####### HOMEPAGE #######
+      - homepage.group=Core
+      - homepage.name=Authelia
+      - homepage.icon=authelia.png
+      - homepage.href=https://authelia.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Secure Single Sign On

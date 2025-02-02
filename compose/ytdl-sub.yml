@@ -31,5 +31,12 @@ services:
       ## HTTP Services
       # - "traefik.http.routers.ytdl-rtr.service=ytdl-svc"
       # - "traefik.http.services.ytdl-svc.loadbalancer.server.port=8081"
+      ####### HOMEPAGE #######
+      - homepage.group=Media
+      - homepage.name=YtdlSub
+      - homepage.icon=ytdl.png
+      - homepage.href=https://ytdl.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Youtube Downloader
     profiles:
       - media

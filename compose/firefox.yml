@@ -33,6 +33,13 @@ services:
       ## HTTP Services
       - "traefik.http.routers.firefox-rtr.service=firefox-svc"
       - "traefik.http.services.firefox-svc.loadbalancer.server.port=3000"
+      ####### HOMEPAGE #######
+      - homepage.group=DesktopApps
+      - homepage.name=Firefox
+      - homepage.icon=/icons/firefox.png
+      - homepage.href=https://firefox.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Firefox - Containerized
     # devices:
     #   - /dev/dri:/dev/dri #optional
     healthcheck:

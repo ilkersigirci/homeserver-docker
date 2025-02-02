@@ -29,3 +29,10 @@ services:
       ## HTTP Services
       - "traefik.http.routers.stirlingpdf-rtr.service=stirlingpdf-svc"
       - "traefik.http.services.stirlingpdf-svc.loadbalancer.server.port=8080"
+      ####### HOMEPAGE #######
+      - homepage.group=Maintenance
+      - homepage.name=StirlingPDF
+      - homepage.icon=pdf.png
+      - homepage.href=https://stirlingpdf.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=PDF Editor

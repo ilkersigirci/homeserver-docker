@@ -35,5 +35,12 @@ services:
       ## HTTP Services
       - "traefik.http.routers.wg-easy-rtr.service=wg-easy-svc"
       - "traefik.http.services.wg-easy-svc.loadbalancer.server.port=51821"
+      ####### HOMEPAGE #######
+      - homepage.group=Others
+      - homepage.name=Wireguard
+      - homepage.icon=wireguard.png
+      - homepage.href=https://wireguard.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=VPN Server
     profiles:
       - others

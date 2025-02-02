@@ -120,3 +120,13 @@ services:
       #- "traefik.http.routers.ping.service=ping@internal"
       ## Middlewares
       - "traefik.http.routers.traefik-rtr.middlewares=chain-authelia@file"
+      ####### HOMEPAGE #######
+      - homepage.group=Core
+      - homepage.name=Traefik
+      - homepage.icon=traefik.png
+      - homepage.href=https://traefik.$DOMAINNAME
+      - homepage.target=_blank # _blank: New tab --- _self: Same tab --- _top: New window
+      - homepage.description=Reverse Proxy Manager
+      - homepage.widget.type=traefik
+      - homepage.widget.url=https://traefik.$DOMAINNAME # NOTE: docker service name not working
+      - homepage.widget.fields=['routers', 'services', 'middleware']

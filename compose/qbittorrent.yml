@@ -30,5 +30,12 @@ services:
       - "traefik.http.routers.qbittorrent-rtr.service=qbittorrent-svc"
       - "traefik.http.services.qbittorrent-svc.loadbalancer.server.port=8080"
       # - traefik.http.services.qbittorrent-svc.loadbalancer.passhostheader=false # Not needed
+      ####### HOMEPAGE #######
+      - homepage.group=Media
+      - homepage.name=qBittorrent
+      - homepage.icon=qbittorrent.png
+      - homepage.href=https://qtorrent.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Download Client
     profiles:
       - media

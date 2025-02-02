@@ -30,3 +30,10 @@ services:
       ## HTTP Services
       - "traefik.http.routers.vscodium-rtr.service=vscodium-svc"
       - "traefik.http.services.vscodium-svc.loadbalancer.server.port=3000"
+      ####### HOMEPAGE #######
+      - homepage.group=Maintenance
+      - homepage.name=VSCodium
+      - homepage.icon=vscodium.png
+      - homepage.href=https://vscodium.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Code Editor

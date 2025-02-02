@@ -30,3 +30,10 @@ services:
       ## HTTP Services
       - "traefik.http.routers.portainer-rtr.service=portainer-svc"
       - "traefik.http.services.portainer-svc.loadbalancer.server.port=9000"
+      ####### HOMEPAGE #######
+      - homepage.group=Maintenance
+      - homepage.name=Portainer
+      - homepage.icon=portainer.png
+      - homepage.href=https://portainer.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Container Management

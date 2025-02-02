@@ -28,5 +28,12 @@ services:
       ## HTTP Services
       - "traefik.http.routers.webtop-rtr.service=webtop-svc"
       - "traefik.http.services.webtop-svc.loadbalancer.server.port=3000"
+      ####### HOMEPAGE #######
+      - homepage.group=DesktopApps
+      - homepage.name=Webtop
+      - homepage.icon=webtop.png
+      - homepage.href=https://webtop.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Debian Desktop in Browser
     profiles:
       - desktop_apps

@@ -23,5 +23,12 @@ services:
       ## HTTP Services
       - "traefik.http.routers.darktable-rtr.service=darktable-svc"
       - "traefik.http.services.darktable-svc.loadbalancer.server.port=3000"
+      ####### HOMEPAGE #######
+      - homepage.group=DesktopApps
+      - homepage.name=Darktable
+      - homepage.icon=darktable.png
+      - homepage.href=https://darktable.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Photo Editing App
     profiles:
       - desktop_apps

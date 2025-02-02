@@ -38,5 +38,12 @@ services:
       ## HTTP Services
       - "traefik.http.routers.transmission-rtr.service=transmission-svc"
       - "traefik.http.services.transmission-svc.loadbalancer.server.port=9091"
+      ####### HOMEPAGE #######
+      - homepage.group=Media
+      - homepage.name=Transmission
+      - homepage.icon=transmission.png
+      - homepage.href=https://torrent.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Torrent Client
     profiles:
       - media

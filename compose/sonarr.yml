@@ -42,6 +42,13 @@ services:
       - "traefik.http.routers.sonarr-rtr.service=sonarr-svc"
       - "traefik.http.routers.sonarr-rtr-bypass.service=sonarr-svc"
       - "traefik.http.services.sonarr-svc.loadbalancer.server.port=8989"
+      ####### HOMEPAGE #######
+      - homepage.group=Media
+      - homepage.name=Sonarr
+      - homepage.icon=sonarr.png
+      - homepage.href=https://sonarr.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=TV Show Manager
     profiles:
       - media
       - arr
