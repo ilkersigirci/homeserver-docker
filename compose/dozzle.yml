@@ -24,3 +24,10 @@ services:
       ## HTTP Services
       - "traefik.http.routers.dozzle-rtr.service=dozzle-svc"
       - "traefik.http.services.dozzle-svc.loadbalancer.server.port=8080"
+      ####### HOMEPAGE #######
+      - homepage.group=Maintenance
+      - homepage.name=Dozzle
+      - homepage.icon=dozzle.png
+      - homepage.href=https://dozzle.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Realtime log viewer for docker containers

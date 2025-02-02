@@ -36,5 +36,12 @@ services:
       ## HTTP Services
       - "traefik.http.routers.stablediffusion-rtr.service=stablediffusion-svc"
       - "traefik.http.services.stablediffusion-svc.loadbalancer.server.port=7860"
+      ####### HOMEPAGE #######
+      - homepage.group=ML
+      - homepage.name=Stable Diffusion
+      - homepage.icon=/icons/stable-diffusion.png
+      - homepage.href=https://stablediffusion.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Web Based Stable Diffusion
     profiles:
       - ml

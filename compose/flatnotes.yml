@@ -28,5 +28,12 @@ services:
       ## HTTP Services
       - "traefik.http.routers.notes-rtr.service=notes-svc"
       - "traefik.http.services.notes-svc.loadbalancer.server.port=8080"
+      ####### HOMEPAGE #######
+      - homepage.group=Reading
+      - homepage.name=Flatnotes
+      - homepage.icon=flatnotes.png
+      - homepage.href=https://flatnotes.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=No Directory Markdown Viewer/Editor
     profiles:
       - reading

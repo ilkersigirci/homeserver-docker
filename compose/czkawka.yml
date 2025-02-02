@@ -27,3 +27,10 @@ services:
       ## HTTP Services
       - "traefik.http.routers.czkawka-rtr.service=czkawka-svc"
       - "traefik.http.services.czkawka-svc.loadbalancer.server.port=5800"
+      ####### HOMEPAGE #######
+      - homepage.group=Maintenance
+      - homepage.name=Czkawka
+      - homepage.icon=czkawka.png
+      - homepage.href=https://czkawka.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Multi functional app to find duplicates, empty folders, similar images etc.

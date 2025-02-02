@@ -25,5 +25,12 @@ services:
       ## HTTP Services
       - "traefik.http.routers.mkdocs-material-rtr.service=mkdocs-material-svc"
       - "traefik.http.services.mkdocs-material-svc.loadbalancer.server.port=8000"
+      ####### HOMEPAGE #######
+      - homepage.group=Reading
+      - homepage.name=mkdocs-material
+      - homepage.icon=mkdocs.png
+      - homepage.href=https://mkdocs.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Mkdocs-Material
     profiles:
       - reading

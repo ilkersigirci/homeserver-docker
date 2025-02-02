@@ -37,3 +37,7 @@ services:
       - homepage.href=https://portainer.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Container Management
+      # - homepage.widget.type=portainer
+      # - homepage.widget.url=http://portainer:9000
+      # - homepage.widget.env=1
+      # - homepage.widget.key=DUMMY # https://docs.portainer.io/api/access

@@ -57,5 +57,15 @@ services:
       ## HTTP Services
       - "traefik.http.routers.uptime-kuma-rtr.service=uptime-kuma-svc"
       - "traefik.http.services.uptime-kuma-svc.loadbalancer.server.port=3001"
+      ####### HOMEPAGE #######
+      - homepage.group=Monitoring
+      - homepage.name=Uptimekuma
+      - homepage.icon=uptimekuma.png
+      - homepage.href=https://uptimekuma.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Healthcheck for Http Apps
+      # - homepage.widget.type=uptimekuma
+      # - homepage.widget.url=http://uptime-kuma:3001
+      # - homepage.widget.slug=statuspageslug
     profiles:
       - monitoring
