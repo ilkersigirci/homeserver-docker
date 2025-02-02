@@ -31,4 +31,4 @@ services:
       - homepage.icon=sshwifty.png
       - homepage.href=https://sshwifty.$DOMAINNAME
       - homepage.target=_blank
-      - homepage.description=Web SSH & Telnet
+      - homepage.description=Web SSH - Telnet
