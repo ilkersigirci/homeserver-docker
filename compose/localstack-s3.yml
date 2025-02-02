@@ -10,7 +10,7 @@ services:
       - no-new-privileges:true
     volumes:
       - $DOCKERDIR/appdata/localstack-s3:/persisted-data
-      - $CONFIGDIR/localstack-s3/create_s3_bucket.sh:/etc/localstack/init/ready.d/script.sh
+      - $DOCKERDIR/scripts/create_s3_bucket.sh:/etc/localstack/init/ready.d/script.sh
     environment:
       - DEBUG=0
       - SERVICES=s3
