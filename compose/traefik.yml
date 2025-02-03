@@ -129,4 +129,4 @@ services:
       - homepage.description=Reverse Proxy Manager
       - homepage.widget.type=traefik
       - homepage.widget.url=https://traefik.$DOMAINNAME # NOTE: docker service name not working
-      - homepage.widget.fields=['routers', 'services', 'middleware']
+      - homepage.widget.fields=["routers","services","middleware"]

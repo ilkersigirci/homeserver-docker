@@ -27,7 +27,7 @@ services:
       - "traefik.http.routers.homepage-rtr.entrypoints=websecure"
       - "traefik.http.routers.homepage-rtr.rule=Host(`homepage.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.homepage-rtr.middlewares=chain-no-auth@file" # NOTE: authelia rate-limits it
+      - "traefik.http.routers.homepage-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
       - "traefik.http.routers.homepage-rtr.service=homepage-svc"
       - "traefik.http.services.homepage-svc.loadbalancer.server.port=3000"

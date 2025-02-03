@@ -3,6 +3,8 @@ services:
     image: gresau/localstack-persist:3
     container_name: localstack-s3
     restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - maintenance
     networks:
       - t3_proxy
       # - socket_proxy
