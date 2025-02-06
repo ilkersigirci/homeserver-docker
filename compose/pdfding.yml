@@ -1,0 +1,70 @@
+services:
+  # pdfding-db:
+  #   image: postgres:15
+  #   container_name: pdfding-db
+  #   profiles:
+  #     - media
+  #   networks:
+  #     - t3_proxy
+  #   volumes:
+  #     - $DOCKERDIR/appdata/sqlite_data:/var/lib/postgresql/data/
+  #   environment:
+  #     - POSTGRES_DB=pdfding
+  #     - POSTGRES_USER=pdfding
+  #     - POSTGRES_PASSWORD=pdfding
+  #     - POSTGRES_PORT=5432
+
+  # FIXME: OIDC NOT WORKING
+  pdfding:
+    image: mrmn/pdfding:latest
+    container_name: pdfding
+    restart: $MEDIA_RESTART_POLICY
+    profiles:
+      - media
+    networks:
+      - t3_proxy
+    # depends_on:
+    #   - pdfding-db
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/pdfding-db:/home/nonroot/pdfding/db
+      - $MEDIADIR/Books:/home/nonroot/pdfding/media
+    environment:
+        - DEFAULT_THEME=dark
+        - DEFAULT_THEME_COLOR=blue
+        - SECRET_KEY=DUMMY_SECRET_KEY
+        - HOST_NAME=pdfding.$DOMAINNAME
+        - LOG_LEVEL=INFO
+        - DATABASE_TYPE=SQLITE
+        - ACCOUNT_EMAIL_VERIFICATION="FALSE"
+        - DISABLE_USER_SIGNUP="TRUE"
+        - BACKUP_ENABLE="FALSE"
+        ## For Postgres
+        # - DATABASE_TYPE=POSTGRES
+        # - POSTGRES_PASSWORD=pdfding
+        # - POSTGRES_HOST=pdfding-db
+        ## For OIDC
+        - OIDC_ENABLE="TRUE"
+        - OIDC_ONLY="TRUE"
+        - OIDC_PROVIDER_NAME="Authelia"
+        - OIDC_CLIENT_ID="pdfding"
+        - OIDC_CLIENT_SECRET=$OIDC_PDFDING_CLIENT_SECRET
+        - OIDC_AUTH_URL="https://authelia.$DOMAINNAME/.well-known/openid-configuration"
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.pdfding-rtr.entrypoints=websecure"
+      - "traefik.http.routers.pdfding-rtr.rule=Host(`pdfding.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.pdfding-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.pdfding-rtr.service=pdfding-svc"
+      - "traefik.http.services.pdfding-svc.loadbalancer.server.port=8000"
+      ## Homepage
+      - homepage.group=Media
+      - homepage.name=pdfding
+      - homepage.icon=pdfding.png
+      - homepage.href=https://pdfding.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=description
