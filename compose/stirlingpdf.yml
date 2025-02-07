@@ -32,7 +32,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Maintenance
       - homepage.name=StirlingPDF
-      - homepage.icon=pdf.png
+      - homepage.icon=stirling-pdf.svg
       - homepage.href=https://stirlingpdf.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=PDF Editor

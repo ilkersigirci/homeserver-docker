@@ -29,7 +29,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Maintenance
       - homepage.name=Duplicati
-      - homepage.icon=duplicati.png
+      - homepage.icon=duplicati.svg
       - homepage.href=https://duplicati.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Store securely encrypted backups in the cloud! 

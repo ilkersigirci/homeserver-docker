@@ -29,7 +29,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Media
       - homepage.name=Jellyseerr
-      - homepage.icon=jellyseerr.png
+      - homepage.icon=jellyseerr.svg
       - homepage.href=https://jellyseerr.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Media Request Manager for Jellyfin

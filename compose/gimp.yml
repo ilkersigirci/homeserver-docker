@@ -25,7 +25,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=DesktopApps
       - homepage.name=Gimp
-      - homepage.icon=/icons/gimp.png
+      - homepage.icon=gimp.svg
       - homepage.href=https://gimp.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Image Manipulation Program

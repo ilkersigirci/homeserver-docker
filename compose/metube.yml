@@ -27,7 +27,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Media
       - homepage.name=metube
-      - homepage.icon=metube.png
+      - homepage.icon=metube.svg
       - homepage.href=https://metube.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Self-hosted YouTube downloader

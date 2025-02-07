@@ -20,7 +20,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Others
       - homepage.name=Enclosed
-      - homepage.icon=enclosed.png
+      - homepage.icon=enclosed.svg
       - homepage.href=https://enclosed.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Minimalistic web app designed for sending private and secure notes.

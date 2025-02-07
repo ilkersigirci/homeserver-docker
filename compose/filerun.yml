@@ -67,7 +67,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Core
       - homepage.name=Filerun
-      - homepage.icon=filerun.png
+      - homepage.icon=filerun.svg
       - homepage.href=https://filerun.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=File Manager

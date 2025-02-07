@@ -25,7 +25,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Media
       - homepage.name=Stremio
-      - homepage.icon=stremio.png
+      - homepage.icon=stremio.svg
       - homepage.href=https://stremio.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Online Streaming Platform

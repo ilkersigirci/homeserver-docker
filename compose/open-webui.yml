@@ -48,7 +48,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=ML
       - homepage.name=Open WebUI
-      - homepage.icon=openwebui.png
+      - homepage.icon=open-webui-light.webp
       - homepage.href=https://chat.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Selfhosted Chatgpt like App
@@ -82,7 +82,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=ML
       - homepage.name=Open WebUI
-      - homepage.icon=openwebui.png
+      - homepage.icon=open-webui-light.webp
       - homepage.href=https://betus.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Selfhosted Chatgpt like App for my Betus

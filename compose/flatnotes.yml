@@ -31,7 +31,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Reading
       - homepage.name=Flatnotes
-      - homepage.icon=flatnotes.png
+      - homepage.icon=flatnotes.svg
       - homepage.href=https://flatnotes.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=No Directory Markdown Viewer/Editor

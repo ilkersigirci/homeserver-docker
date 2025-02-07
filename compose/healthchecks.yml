@@ -46,7 +46,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Maintenance
       - homepage.name=Healthchecks
-      - homepage.icon=healthchecks.png
+      - homepage.icon=healthchecks.svg
       - homepage.href=https://healthchecks.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Cron job and Background Task Monitoring

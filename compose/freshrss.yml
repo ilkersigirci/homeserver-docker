@@ -26,7 +26,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Reading
       - homepage.name=FreshRSS
-      - homepage.icon=freshrss.png
+      - homepage.icon=freshrss.svg
       - homepage.href=https://freshrss.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=RSS Reader

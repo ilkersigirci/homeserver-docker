@@ -29,7 +29,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Media
       - homepage.name=Beets
-      - homepage.icon=beets.png
+      - homepage.icon=beets.svg
       - homepage.href=https://beets.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=General Purpose Music Manager

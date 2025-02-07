@@ -111,7 +111,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Media
       - homepage.name=Immich
-      - homepage.icon=immich.png
+      - homepage.icon=immich.svg
       - homepage.href=https://photos.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Selfhosted Photo App

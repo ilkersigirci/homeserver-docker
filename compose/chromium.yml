@@ -26,7 +26,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=DesktopApps
       - homepage.name=Ungoogled Chromium
-      - homepage.icon=chromium.png
+      - homepage.icon=chromium.svg
       - homepage.href=https://chromium.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Ungoogled Chromium Browser

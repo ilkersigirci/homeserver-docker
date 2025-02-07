@@ -25,7 +25,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Media
       - homepage.name=Jellyfin Vue
-      - homepage.icon=jellyfin.png
+      - homepage.icon=jellyfin.svg
       - homepage.href=https://jellyfin_vue.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Jellyfin with Vue UI

@@ -35,7 +35,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=ML
       - homepage.name=Whisper API
-      - homepage.icon=whisper.png
+      - homepage.icon=whisper.svg
       - homepage.href=https://whisperapi.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Speech to Text API

@@ -31,7 +31,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=DesktopApps
       - homepage.name=Webtop
-      - homepage.icon=webtop.png
+      - homepage.icon=webtop.svg
       - homepage.href=https://webtop.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Debian Desktop in Browser

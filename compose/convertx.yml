@@ -29,7 +29,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Maintenance
       - homepage.name=ConvertX
-      - homepage.icon=convertx.png
+      - homepage.icon=sh-convertx.webp
       - homepage.href=https://convertx.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Online PDF Editor

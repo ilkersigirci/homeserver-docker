@@ -31,7 +31,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Maintenance
       - homepage.name=S3
-      - homepage.icon=s3.png
+      - homepage.icon=s3.svg
       - homepage.href=https://s3.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Localstack S3

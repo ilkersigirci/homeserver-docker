@@ -30,7 +30,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Others
       - homepage.name=Firefly III
-      - homepage.icon=firefly.png
+      - homepage.icon=firefly.svg
       - homepage.href=https://firefly.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=A personal finances manager

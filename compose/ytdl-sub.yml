@@ -34,7 +34,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Media
       - homepage.name=YtdlSub
-      - homepage.icon=ytdl.png
+      - homepage.icon=youtube-dl.svg
       - homepage.href=https://ytdl.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Youtube Downloader

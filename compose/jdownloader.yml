@@ -33,7 +33,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Media
       - homepage.name=Jdownloader
-      - homepage.icon=jdownloader.png
+      - homepage.icon=jdownloader.svg
       - homepage.href=https://jdownloader.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Download Management Tool

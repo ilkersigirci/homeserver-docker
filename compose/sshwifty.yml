@@ -28,7 +28,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Maintenance
       - homepage.name=Sshwifty
-      - homepage.icon=sshwifty.png
+      - homepage.icon=sshwifty.svg
       - homepage.href=https://sshwifty.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Web SSH - Telnet

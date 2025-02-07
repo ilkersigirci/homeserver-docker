@@ -28,7 +28,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Reading
       - homepage.name=mkdocs-material
-      - homepage.icon=mkdocs.png
+      - homepage.icon=mkdocs.svg
       - homepage.href=https://mkdocs.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Mkdocs-Material

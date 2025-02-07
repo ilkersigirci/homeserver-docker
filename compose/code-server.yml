@@ -36,7 +36,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Maintenance
       - homepage.name=Vscode
-      - homepage.icon=vscode.png
+      - homepage.icon=vscode.svg
       - homepage.href=https://code.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Vscode Open Source Editor

@@ -41,7 +41,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Media
       - homepage.name=Transmission
-      - homepage.icon=transmission.png
+      - homepage.icon=transmission.svg
       - homepage.href=https://torrent.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Torrent Client

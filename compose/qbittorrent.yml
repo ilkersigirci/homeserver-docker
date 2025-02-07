@@ -33,7 +33,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Media
       - homepage.name=qBittorrent
-      - homepage.icon=qbittorrent.png
+      - homepage.icon=qbittorrent.svg
       - homepage.href=https://qtorrent.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Download Client

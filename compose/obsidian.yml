@@ -81,7 +81,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Reading
       - homepage.name=Obsidian
-      - homepage.icon=obsidian.png
+      - homepage.icon=obsidian.svg
       - homepage.href=https://obsidian.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Note Taking with Markdown

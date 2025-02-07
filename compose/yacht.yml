@@ -31,7 +31,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Maintenance
       - homepage.name=Yacht
-      - homepage.icon=yacht.png
+      - homepage.icon=yacht.svg
       - homepage.href=https://yacht.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Docker Web Interface

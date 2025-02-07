@@ -30,7 +30,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Media
       - homepage.name=Deemix
-      - homepage.icon=deemix.png
+      - homepage.icon=deemix.svg
       - homepage.href=https://deemix.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Deezer Music Downloader

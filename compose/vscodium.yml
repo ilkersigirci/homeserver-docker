@@ -33,7 +33,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Maintenance
       - homepage.name=VSCodium
-      - homepage.icon=vscodium.png
+      - homepage.icon=vscode.svg
       - homepage.href=https://vscodium.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Code Editor

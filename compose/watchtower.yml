@@ -60,7 +60,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Maintenance
       - homepage.name=Watchtower
-      - homepage.icon=watchtower.png
+      - homepage.icon=watchtower.svg
       - homepage.href=https://watchtower.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Container Auto-Updates

@@ -22,7 +22,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Reading
       - homepage.name=Logseq
-      - homepage.icon=logseq.png
+      - homepage.icon=logseq.svg
       - homepage.href=https://logseq.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=A privacy-first, open-source platform for knowledge management

@@ -52,7 +52,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Reading
       - homepage.name=Linkwarden
-      - homepage.icon=linkwarden.png
+      - homepage.icon=linkwarden.webp
       - homepage.href=https://linkwarden.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Bookmark Manager

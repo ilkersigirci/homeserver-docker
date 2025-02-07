@@ -46,7 +46,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Media
       - homepage.name=Radarr
-      - homepage.icon=radarr.png
+      - homepage.icon=radarr.svg
       - homepage.href=https://radarr.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Movie Manager

@@ -123,7 +123,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Core
       - homepage.name=Traefik
-      - homepage.icon=traefik.png
+      - homepage.icon=traefik.svg
       - homepage.href=https://traefik.$DOMAINNAME
       - homepage.target=_blank # _blank: New tab --- _self: Same tab --- _top: New window
       - homepage.description=Reverse Proxy Manager

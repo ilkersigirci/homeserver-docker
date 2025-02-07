@@ -32,7 +32,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Reading
       - homepage.name=Volglass
-      - homepage.icon=volglass.png
+      - homepage.icon=volglass.svg
       - homepage.href=https://volglass.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Publishing Your Digital Garden

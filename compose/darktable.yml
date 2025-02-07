@@ -26,7 +26,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=DesktopApps
       - homepage.name=Darktable
-      - homepage.icon=darktable.png
+      - homepage.icon=darktable.svg
       - homepage.href=https://darktable.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Photo Editing App

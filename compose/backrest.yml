@@ -37,7 +37,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Maintenance
       - homepage.name=Backrest
-      - homepage.icon=backrest.png
+      - homepage.icon=backrest.svg
       - homepage.href=https://backrest.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=GUI for restic backup

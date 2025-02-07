@@ -45,7 +45,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Media
       - homepage.name=Sonarr
-      - homepage.icon=sonarr.png
+      - homepage.icon=sonarr.svg
       - homepage.href=https://sonarr.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=TV Show Manager

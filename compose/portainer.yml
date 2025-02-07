@@ -33,7 +33,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Maintenance
       - homepage.name=Portainer
-      - homepage.icon=portainer.png
+      - homepage.icon=portainer.svg
       - homepage.href=https://portainer.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Container Management

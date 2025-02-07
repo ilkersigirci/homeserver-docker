@@ -27,7 +27,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Maintenance
       - homepage.name=Dozzle
-      - homepage.icon=dozzle.png
+      - homepage.icon=dozzle.svg
       - homepage.href=https://dozzle.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Realtime log viewer for docker containers

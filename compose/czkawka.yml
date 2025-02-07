@@ -30,7 +30,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Maintenance
       - homepage.name=Czkawka
-      - homepage.icon=czkawka.png
+      - homepage.icon=czkawka.svg
       - homepage.href=https://czkawka.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Multi functional app to find duplicates, empty folders, similar images etc.

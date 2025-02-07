@@ -60,7 +60,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Monitoring
       - homepage.name=Uptimekuma
-      - homepage.icon=uptimekuma.png
+      - homepage.icon=uptime-kuma.svg
       - homepage.href=https://uptimekuma.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Healthcheck for Http Apps

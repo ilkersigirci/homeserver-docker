@@ -35,7 +35,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=DesktopApps
       - homepage.name=Kasm Workspaces
-      - homepage.icon=kasm.png
+      - homepage.icon=kasm.svg
       - homepage.href=https://kasm.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Workspaces for delivering browser-based access to desktop applications

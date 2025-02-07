@@ -22,7 +22,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Maintenance
       - homepage.name=It-Tools
-      - homepage.icon=it-tools.png
+      - homepage.icon=it-tools.svg
       - homepage.href=https://it-tools.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=It Tools

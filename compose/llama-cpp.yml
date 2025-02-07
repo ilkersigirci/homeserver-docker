@@ -49,7 +49,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=ML
       - homepage.name=Llama-cpp
-      - homepage.icon=llama-cpp.png
+      - homepage.icon=llama-cpp.svg
       - homepage.href=https://llamapi.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=LLM inference in C/C++

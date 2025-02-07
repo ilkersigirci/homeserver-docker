@@ -34,7 +34,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Reading
       - homepage.name=LazyLibrarian
-      - homepage.icon=lazylibrarian.png
+      - homepage.icon=lazylibrarian.svg
       - homepage.href=https://lazylibrarian.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Follow Authors and Grab Metadata for All Your Digital Reading Needs

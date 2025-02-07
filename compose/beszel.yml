@@ -43,7 +43,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Monitoring
       - homepage.name=Beszel
-      - homepage.icon=beszel.png
+      - homepage.icon=beszel.svg
       - homepage.href=https://beszel.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Lightweight server monitoring hub with historical data, docker stats, and alerts

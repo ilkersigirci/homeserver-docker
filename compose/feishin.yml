@@ -24,7 +24,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Media
       - homepage.name=Feishin
-      - homepage.icon=feishin.png
+      - homepage.icon=feishin.webp
       - homepage.href=https://feishin.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Music Streaming using Jellyfin

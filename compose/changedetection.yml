@@ -31,7 +31,7 @@ services:
       ## Homepage
       - homepage.group=Monitoring
       - homepage.name=changedetection
-      - homepage.icon=changedetection.png
+      - homepage.icon=changedetection.svg
       - homepage.href=https://changedetection.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Website Change Detection

@@ -30,7 +30,7 @@ services:
         ####### HOMEPAGE #######
       - homepage.group=Media
       - homepage.name=handbrake
-      - homepage.icon=handbrake.png
+      - homepage.icon=handbrake.svg
       - homepage.href=https://handbrake.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Converting Video Platform

@@ -36,7 +36,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=DesktopApps
       - homepage.name=Firefox
-      - homepage.icon=/icons/firefox.png
+      - homepage.icon=firefox.svg
       - homepage.href=https://firefox.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Firefox - Containerized

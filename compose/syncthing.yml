@@ -33,7 +33,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Maintenance
       - homepage.name=Syncthing
-      - homepage.icon=syncthing.png
+      - homepage.icon=syncthing.svg
       - homepage.href=https://syncthing.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=File Synchronization

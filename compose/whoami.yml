@@ -22,7 +22,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Maintenance
       - homepage.name=Whoami
-      - homepage.icon=whoami.png
+      - homepage.icon=whoami.svg
       - homepage.href=https://whoami.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Tiny Go webserver that prints OS information and HTTP request to output

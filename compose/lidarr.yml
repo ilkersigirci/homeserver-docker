@@ -44,7 +44,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Media
       - homepage.name=Lidarr
-      - homepage.icon=lidarr.png
+      - homepage.icon=lidarr.svg
       - homepage.href=https://lidarr.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=*rr for Music

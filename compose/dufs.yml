@@ -36,7 +36,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Core
       - homepage.name=Dufs
-      - homepage.icon=dufs.png
+      - homepage.icon=files.svg
       - homepage.href=https://dufs.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=A file server that supports static serving, WEBDAV

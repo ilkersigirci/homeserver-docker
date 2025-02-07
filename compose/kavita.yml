@@ -29,7 +29,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Reading
       - homepage.name=Kavita
-      - homepage.icon=kavita.png
+      - homepage.icon=kavita.svg
       - homepage.href=https://kavita.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Fast, feature rich, cross platform reading server

@@ -38,7 +38,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Others
       - homepage.name=Wireguard
-      - homepage.icon=wireguard.png
+      - homepage.icon=wireguard.svg
       - homepage.href=https://wireguard.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=VPN Server

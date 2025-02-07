@@ -30,7 +30,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Media
       - homepage.name=Prowlarr
-      - homepage.icon=prowlarr.png
+      - homepage.icon=prowlarr.svg
       - homepage.href=https://prowlarr.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Indexer Manager

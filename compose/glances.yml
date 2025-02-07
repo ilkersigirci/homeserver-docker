@@ -47,7 +47,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Monitoring
       - homepage.name=Glances
-      - homepage.icon=glances.png
+      - homepage.icon=glances.svg
       - homepage.href=https://glances.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=System Monitor

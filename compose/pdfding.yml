@@ -64,7 +64,7 @@ services:
       ## Homepage
       - homepage.group=Media
       - homepage.name=pdfding
-      - homepage.icon=pdfding.png
+      - homepage.icon=pdfding.svg
       - homepage.href=https://pdfding.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=description

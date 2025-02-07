@@ -35,7 +35,7 @@ services:
       ####### HOMEPAGE #######
       - homepage.group=Media
       - homepage.name=Mkvtoolnix
-      - homepage.icon=mkvtoolnix.png
+      - homepage.icon=mkvtoolnix.webp
       - homepage.href=https://mkvtoolnix.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Ultimate Tool for Editing and Merging MKV Files
