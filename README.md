@@ -40,3 +40,16 @@ Comment=
 ```bash
 tr -cd '[:alnum:]' </dev/urandom | fold -w "64" | head -n 1 | tr -d '\n' | sudo tee $HOME/docker/secrets/example_secret
 ```
+
+## Beszel
+
+- For telegram notifications: telegram://token@telegram?chats=channel-id
+
+- [Authelia OIDC Setup](https://www.beszel.dev/guide/oauth)
+    - Toggle off the "Hide collection create and edit controls" switch on `<your-beszel-url>/_/#/settings`
+    - Edit users collection
+    - In the "Options" tab, enable OAuth2 and add your provider.
+    - Add provider with following urls:
+        - Auth url: `<your_authelia_url>/api/oidc/authorization`
+        - Token url: `<your_authelia_url>/api/oidc/token`
+        - User info url: `<your_authelia_url>/api/oidc/userinfo`

@@ -11,6 +11,7 @@ services:
     #   # monitor other disks / partitions by mounting a folder in /extra-filesystems
     #   # - /mnt/d:/extra-filesystems/sda1:ro
     environment:
+      DOCKER_HOST: "tcp://docker-socket-proxy:2375"
       PORT: 45876
       KEY: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICbYjtH7YvUc+kTFonrxuYC9B6UteA8ktzCsOTJWeUK1'
     profiles:
@@ -30,6 +31,7 @@ services:
       - $DOCKERDIR/appdata/beszel:/beszel_data
     environment:
       TZ: "${TZ}"
+      USER_CREATION: "false"
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
