@@ -11,8 +11,9 @@ services:
       - t3_proxy
     volumes:
       - $DOCKERDIR/appdata/authelia:/config
-      - $CONFIGDIR/authelia/configuration.yml:/config/configuration.yml
-      - $CONFIGDIR/authelia/users.yml:/config/users.yml
+      - $CONFIGDIR/authelia/config/configuration.yml:/config/configuration.yml
+      - $CONFIGDIR/authelia/config/users.yml:/config/users.yml
+      - $CONFIGDIR/authelia/secrets:/secrets
     environment:
       - PUID=$PUID
       - PGID=$PGID
