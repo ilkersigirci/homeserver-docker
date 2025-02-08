@@ -18,9 +18,9 @@ services:
   pdfding:
     image: mrmn/pdfding:latest
     container_name: pdfding
-    restart: $MEDIA_RESTART_POLICY
+    restart: $OTHERS_RESTART_POLICY
     profiles:
-      - media
+      - reading
     networks:
       - t3_proxy
     # depends_on:
@@ -29,7 +29,7 @@ services:
       - no-new-privileges:true
     volumes:
       - $DOCKERDIR/appdata/pdfding-db:/home/nonroot/pdfding/db
-      - $MEDIADIR/Books:/home/nonroot/pdfding/media
+      - $MEDIADIR/PDFs/pdfding:/home/nonroot/pdfding/media
     environment:
         - DEFAULT_THEME=dark
         - DEFAULT_THEME_COLOR=blue
@@ -62,7 +62,7 @@ services:
       - "traefik.http.routers.pdfding-rtr.service=pdfding-svc"
       - "traefik.http.services.pdfding-svc.loadbalancer.server.port=8000"
       ## Homepage
-      - homepage.group=Media
+      - homepage.group=Reading
       - homepage.name=pdfding
       - homepage.icon=pdfding.svg
       - homepage.href=https://pdfding.$DOMAINNAME

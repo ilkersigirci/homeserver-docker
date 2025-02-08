@@ -71,7 +71,6 @@ include:
   - compose/jellysearch.yml
   - compose/jellyseerr.yml
   - compose/mkvtoolnix.yml
-  - compose/pdfding.yml
   - compose/transmission.yml
   #### MONITORING ####
   - compose/beszel.yml
@@ -85,3 +84,4 @@ include:
   - compose/linkwarden.yml
   # - compose/miniflux.yml
   - compose/obsidian.yml
+  - compose/pdfding.yml
