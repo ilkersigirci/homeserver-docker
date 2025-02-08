@@ -37,20 +37,20 @@ services:
         - HOST_NAME=pdfding.$DOMAINNAME
         - LOG_LEVEL=INFO
         - DATABASE_TYPE=SQLITE
-        - ACCOUNT_EMAIL_VERIFICATION="FALSE"
-        - DISABLE_USER_SIGNUP="TRUE"
-        - BACKUP_ENABLE="FALSE"
+        - ACCOUNT_EMAIL_VERIFICATION=FALSE
+        - DISABLE_USER_SIGNUP=FALSE
+        - BACKUP_ENABLE=FALSE
         ## For Postgres
         # - DATABASE_TYPE=POSTGRES
         # - POSTGRES_PASSWORD=pdfding
         # - POSTGRES_HOST=pdfding-db
         ## For OIDC
-        - OIDC_ENABLE="TRUE"
-        - OIDC_ONLY="TRUE"
-        - OIDC_PROVIDER_NAME="Authelia"
-        - OIDC_CLIENT_ID="pdfding"
+        - OIDC_ENABLE=TRUE
+        - OIDC_ONLY=TRUE
+        - OIDC_PROVIDER_NAME=Authelia
+        - OIDC_CLIENT_ID=pdfding
         - OIDC_CLIENT_SECRET=$OIDC_PDFDING_CLIENT_SECRET
-        - OIDC_AUTH_URL="https://authelia.$DOMAINNAME/.well-known/openid-configuration"
+        - OIDC_AUTH_URL=https://authelia.$DOMAINNAME/.well-known/openid-configuration
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
