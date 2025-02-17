@@ -1,0 +1,34 @@
+services:
+  glance:
+    image: glanceapp/glance:latest
+    container_name: glance
+    restart: $BASE_RESTART_POLICY
+    profiles:
+      - core
+    networks:
+      - t3_proxy
+      - socket_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $CONFIGDIR/glance/config:/app/config
+      - $CONFIGDIR/glance/assets:/app/assets
+    environment:
+      MY_SECRET_TOKEN: "glance_secret_token"
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.glance-rtr.entrypoints=websecure"
+      - "traefik.http.routers.glance-rtr.rule=Host(`glance.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.glance-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.glance-rtr.service=glance-svc"
+      - "traefik.http.services.glance-svc.loadbalancer.server.port=8080"
+      ## Homepage
+      - homepage.group=Core
+      - homepage.name=glance
+      - homepage.icon=glance.png
+      - homepage.href=https://glance.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=A self-hosted dashboard that puts all your feeds in one place
