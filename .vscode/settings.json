@@ -7,5 +7,7 @@
         "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": [
             "compose/prometheus.yml"
         ]
-    }
+    },
+    "remote.autoForwardPorts": false,
+    "remote.restoreForwardedPorts": false,
 }

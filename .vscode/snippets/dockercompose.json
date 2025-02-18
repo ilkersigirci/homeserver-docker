@@ -31,7 +31,7 @@
             "    ## HTTP Services",
             "    - \"traefik.http.routers.${1:servicename}-rtr.service=${1:servicename}-svc\"",
             "    - \"traefik.http.services.${1:servicename}-svc.loadbalancer.server.port=${5:80}\"",
-            "    ## Homepage",
+            "    ####### HOMEPAGE #######",
             "    - homepage.group=${7:group}",
             "    - homepage.name=${1:servicename}",
             "    - homepage.icon=${1:servicename}.png",

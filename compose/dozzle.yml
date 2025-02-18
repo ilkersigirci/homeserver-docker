@@ -32,7 +32,7 @@ services:
       - homepage.target=_blank
       - homepage.description=Realtime log viewer for docker containers
       ####### GLANCE #######
-      - glance.name=Dozzle
-      - glance.icon=si:dozzle
+      - glance.name=dozzle
+      - glance.icon=sh:dozzle
       - glance.url=https://dozzle.$DOMAINNAME
       - glance.description=Realtime log viewer for docker containers

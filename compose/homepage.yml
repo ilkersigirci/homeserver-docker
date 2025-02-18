@@ -32,3 +32,8 @@ services:
       ## HTTP Services
       - "traefik.http.routers.homepage-rtr.service=homepage-svc"
       - "traefik.http.services.homepage-svc.loadbalancer.server.port=3000"
+      ####### GLANCE #######
+      - glance.name=homepage
+      - glance.icon=si:homepage
+      - glance.url=https://homepage.$DOMAINNAME
+      - glance.description=Alternative homepage
