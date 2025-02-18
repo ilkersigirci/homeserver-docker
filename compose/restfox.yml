@@ -1,0 +1,33 @@
+services:
+  restfox:
+    image: flawiddsouza/restfox:0.14.1
+    container_name: restfox
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - maintenance
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.restfox-rtr.entrypoints=websecure"
+      - "traefik.http.routers.restfox-rtr.rule=Host(`restfox.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.restfox-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.restfox-rtr.service=restfox-svc"
+      - "traefik.http.services.restfox-svc.loadbalancer.server.port=4004"
+      ####### HOMEPAGE #######
+      - homepage.group=Maintenance
+      - homepage.name=restfox
+      - homepage.icon=restfox.png
+      - homepage.href=https://restfox.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Offline-First Minimalistic HTTP Client
+      ####### GLANCE #######
+      - glance.name=restfox
+      - glance.icon=sh:restfox
+      - glance.url=https://restfox.$DOMAINNAME
+      - glance.description=Offline-First Minimalistic HTTP Client
