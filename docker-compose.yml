@@ -87,3 +87,4 @@ include:
   # - compose/miniflux.yml
   - compose/obsidian.yml
   - compose/pdfding.yml
+  - compose/rsshub.yml

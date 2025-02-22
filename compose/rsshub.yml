@@ -1,0 +1,90 @@
+services:
+  rsshub-browserless:
+      image: browserless/chrome
+      container_name: rsshub-browserless
+      restart: $OTHERS_RESTART_POLICY
+      profiles:
+        - Reading
+      networks:
+        - t3_proxy
+      ulimits:
+          core:
+              hard: 0
+              soft: 0
+      healthcheck:
+          test: ["CMD", "curl", "-f", "http://localhost:3000/pressure"]
+          interval: 30s
+          timeout: 10s
+          retries: 3
+      labels:
+        ####### GLANCE #######
+        - glance.name=rsshub-browserless
+        - glance.parent=rsshub
+
+  rsshub-redis:
+      image: redis:alpine
+      container_name: rsshub-redis
+      restart: $OTHERS_RESTART_POLICY
+      profiles:
+        - Reading
+      networks:
+        - t3_proxy
+      volumes:
+          - $DOCKERDIR/appdata/rsshub-redis:/data
+      healthcheck:
+          test: ["CMD", "redis-cli", "ping"]
+          interval: 30s
+          timeout: 10s
+          retries: 5
+          start_period: 5s
+      labels:
+        ####### GLANCE #######
+        - glance.name=rsshub-redis
+        - glance.parent=rsshub
+
+  rsshub:
+    image: ghcr.io/diygod/rsshub:latest
+    container_name: rsshub
+    restart: $OTHERS_RESTART_POLICY
+    profiles:
+      - Reading
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+        - rsshub-redis
+        - rsshub-browserless
+    environment:
+      NODE_ENV: production
+      CACHE_TYPE: redis
+      REDIS_URL: "redis://rsshub-redis:6379/"
+      PUPPETEER_WS_ENDPOINT: "ws://rsshub-browserless:3000"
+    healthcheck:
+          test: ["CMD", "curl", "-f", "http://localhost:1200/healthz"]
+          interval: 30s
+          timeout: 10s
+          retries: 3
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.rsshub-rtr.entrypoints=websecure"
+      - "traefik.http.routers.rsshub-rtr.rule=Host(`rsshub.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.rsshub-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.rsshub-rtr.service=rsshub-svc"
+      - "traefik.http.services.rsshub-svc.loadbalancer.server.port=1200"
+      ####### HOMEPAGE #######
+      - homepage.group=Reading
+      - homepage.name=rsshub
+      - homepage.icon=rsshub.png
+      - homepage.href=https://rsshub.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Everything is RSSible
+      ####### GLANCE #######
+      - glance.name=rsshub
+      - glance.icon=sh:rsshub
+      - glance.url=https://rsshub.$DOMAINNAME
+      - glance.description=Everything is RSSible
+      - glance.id=rsshub
