@@ -37,7 +37,12 @@
             "    - homepage.icon=${1:servicename}.png",
             "    - homepage.href=https://${1:servicename}.\\$DOMAINNAME",
             "    - homepage.target=_blank",
-            "    - homepage.description=${8:description}"
+            "    - homepage.description=${8:description}",
+            "    ####### GLANCE #######",
+            "    - glance.name=${1:servicename}",
+            "    - glance.icon=sh:${1:servicename}",
+            "    - glance.url=https://${1:servicename}.\\$DOMAINNAME",
+            "    - glance.description=${8:description}"
         ]
     }
 }

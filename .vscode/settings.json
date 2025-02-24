@@ -8,6 +8,10 @@
             "compose/prometheus.yml"
         ]
     },
+    "files.watcherExclude": {
+        "**/appdata/**": true,
+        "**/data/**": true
+    },
     "remote.autoForwardPorts": false,
-    "remote.restoreForwardedPorts": false,
+    "remote.restoreForwardedPorts": false
 }
