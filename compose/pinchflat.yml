@@ -1,0 +1,38 @@
+services:
+  pinchflat:
+    image: ghcr.io/kieraneglin/pinchflat:latest
+    container_name: pinchflat
+    restart: $MEDIA_RESTART_POLICY
+    profiles:
+      - media
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $CONFIGDIR/pinchflat:/config
+      - $MEDIADIR/Youtube:/downloads
+    environment:
+      - TZ=$TZ
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.pinchflat-rtr.entrypoints=websecure"
+      - "traefik.http.routers.pinchflat-rtr.rule=Host(`pinchflat.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.pinchflat-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.pinchflat-rtr.service=pinchflat-svc"
+      - "traefik.http.services.pinchflat-svc.loadbalancer.server.port=8945"
+      ####### HOMEPAGE #######
+      - homepage.group=Media
+      - homepage.name=pinchflat
+      - homepage.icon=pinchflat.png
+      - homepage.href=https://pinchflat.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Your next YouTube media manager
+      ####### GLANCE #######
+      - glance.name=pinchflat
+      - glance.icon=sh:pinchflat
+      - glance.url=https://pinchflat.$DOMAINNAME
+      - glance.description=Your next YouTube media manager
