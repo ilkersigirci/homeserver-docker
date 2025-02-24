@@ -1,20 +1,30 @@
 name: homeserver
 
 networks:
+  default:
+    driver: bridge
   t3_proxy:
     name: t3_proxy
     driver: bridge
     ipam:
       config:
         - subnet: 192.168.90.0/24
-  default:
-    driver: bridge
   socket_proxy:
     name: socket_proxy
     driver: bridge
     ipam:
       config:
         - subnet: 192.168.91.0/24
+  dockervlan:
+    name: dockervlan
+    driver: macvlan
+    driver_opts:
+      parent: enp18s0
+    ipam:
+      config:
+        - subnet: "192.168.1.0/24"
+          ip_range: "192.168.1.19/32"
+          gateway: "192.168.1.1"
 
 ########################### SECRETS
 secrets:
@@ -42,6 +52,7 @@ secrets:
 include:
   ########################### SERVICES
   #### CORE ####
+  # - compose/adguardhome.yml
   - compose/authelia.yml
   - compose/dufs.yml
   - compose/filebrowser.yml
@@ -73,6 +84,7 @@ include:
   - compose/jellysearch.yml
   - compose/jellyseerr.yml
   - compose/mkvtoolnix.yml
+  - compose/pinchflat.yml
   - compose/transmission.yml
   #### MONITORING ####
   - compose/beszel.yml

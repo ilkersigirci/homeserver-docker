@@ -1,0 +1,47 @@
+# FIXME: Not accessible over the network
+services:
+  adguardhome:
+    image: adguard/adguardhome:latest
+    container_name: adguardhome
+    restart: unless-stopped
+    profiles:
+      - core
+    networks:
+      dockervlan:
+        ipv4_address: 192.168.1.19 # IP address inside defined range
+    ports:
+      - 53/udp
+      - 67/udp
+      - 68/tcp
+      - 68/udp
+      - 80/tcp
+      - 443/tcp
+      - 853/tcp
+      - 3000/tcp
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/adguard/conf:/opt/adguardhome/conf 
+      - $DOCKERDIR/appdata/adguard/work:/opt/adguardhome/work 
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.adguardhome-rtr.entrypoints=websecure"
+      - "traefik.http.routers.adguardhome-rtr.rule=Host(`adguardhome.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.adguardhome-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.adguardhome-rtr.service=adguardhome-svc"
+      - "traefik.http.services.adguardhome-svc.loadbalancer.server.port=3000"
+      ####### HOMEPAGE #######
+      - homepage.group=Core
+      - homepage.name=adguardhome
+      - homepage.icon=adguardhome.png
+      - homepage.href=https://adguardhome.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Network-wide ads & trackers blocking DNS server
+      ####### GLANCE #######
+      - glance.name=adguardhome
+      - glance.icon=sh:adguardhome
+      - glance.url=https://adguardhome.$DOMAINNAME
+      - glance.description=Network-wide ads & trackers blocking DNS server
