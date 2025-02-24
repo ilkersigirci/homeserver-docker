@@ -36,5 +36,8 @@ services:
       - homepage.widget.type=jellyseerr
       - homepage.widget.url=http://jellyseerr:5055
       - homepage.widget.key=$JELLYSEERR_API_KEY
+      ####### GLANCE #######
+      - glance.name=jellyseerr
+      - glance.parent=jellyfin
     profiles:
       - media

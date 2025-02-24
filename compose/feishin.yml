@@ -28,5 +28,9 @@ services:
       - homepage.href=https://feishin.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Music Streaming using Jellyfin
+      ####### GLANCE #######
+      - glance.name=feishin
+      - glance.description=Music Streaming using Jellyfin
+      - glance.parent=jellyfin
     profiles:
       - media

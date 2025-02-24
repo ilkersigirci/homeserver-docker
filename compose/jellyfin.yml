@@ -4,8 +4,8 @@ services:
     image: jellyfin/jellyfin:latest # TODO: ghcr.io
     container_name: jellyfin
     # cpus: "0.5"
-    mem_reservation: "4096M"
-    mem_limit: "4096M"
+    mem_reservation: "2048M"
+    mem_limit: "2048M"
     restart: $MEDIA_RESTART_POLICY
     networks:
       - t3_proxy
@@ -44,5 +44,11 @@ services:
       - homepage.widget.key=$JELLYFIN_API_KEY
       - homepage.widget.enableBlocks=true
       - homepage.widget.enableNowPlaying=false
+      ####### GLANCE #######
+      - glance.name=jellyfin
+      - glance.icon=sh:jellyfin
+      - glance.url=https://jellyfin.$DOMAINNAME
+      - glance.description=Media Server
+      - glance.id=jellyfin
     profiles:
       - media

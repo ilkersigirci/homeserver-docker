@@ -13,6 +13,11 @@ services:
       MEILI_MASTER_KEY: "1234"
     profiles:
       - media
+    labels:
+      ####### GLANCE #######
+      - glance.name=jellysearch-meilisearch
+      - glance.parent=jellyfin
+
 
   jellysearch:
     image: domistyle/jellysearch
@@ -21,6 +26,8 @@ services:
     depends_on:
       # - jellyfin
       - jellysearch-meilisearch
+    profiles:
+      - media
     networks:
       - t3_proxy
     security_opt:
@@ -42,5 +49,11 @@ services:
       ## HTTP Services
       - "traefik.http.routers.jellysearch-rtr.service=jellysearch-svc"
       - "traefik.http.services.jellysearch-svc.loadbalancer.server.port=5000"
-    profiles:
-      - media
+      ####### HOMEPAGE #######
+      - homepage.group=Media
+      - homepage.name=jellysearch
+      - homepage.icon=jellysearch.png
+      - homepage.description=A fast full-text search proxy for Jellyfin
+      ####### GLANCE #######
+      - glance.name=jellysearch
+      - glance.parent=jellyfin
