@@ -1,0 +1,39 @@
+services:
+  krita:
+    container_name: krita
+    image: lscr.io/linuxserver/krita:latest
+    restart: $DESKTOP_IMAGES_RESTART_POLICY
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - TITLE=Krita
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.krita-rtr.entrypoints=websecure"
+      - "traefik.http.routers.krita-rtr.rule=Host(`krita.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.krita-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.krita-rtr.service=krita-svc"
+      - "traefik.http.services.krita-svc.loadbalancer.server.port=3000"
+      ####### HOMEPAGE #######
+      - homepage.group=DesktopApps
+      - homepage.name=Krita
+      - homepage.icon=krita.svg
+      - homepage.href=https://krita.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Image Manipulation Program
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail -s http://localhost:3000 || exit 1"]
+      start_period: 15s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    profiles:
+      - desktop_apps

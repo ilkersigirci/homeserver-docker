@@ -62,6 +62,7 @@ include:
   - compose/traefik.yml
   - compose/vaultwarden.yml
   #### DESKTOP APPS ####
+  - compose/krita.yml
   # - compose/firefox.yml
   - compose/gimp.yml
   #### MACHINE LEARNING ####
