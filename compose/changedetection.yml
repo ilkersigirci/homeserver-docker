@@ -5,7 +5,7 @@ services:
     container_name: changedetection
     restart: $MAINTENANCE_RESTART_POLICY
     profiles:
-      - Monitoring
+      - monitoring
     networks:
       - t3_proxy
     security_opt:

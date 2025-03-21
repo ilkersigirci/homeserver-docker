@@ -4,7 +4,7 @@ services:
       container_name: rsshub-browserless
       restart: $OTHERS_RESTART_POLICY
       profiles:
-        - Reading
+        - reading
       networks:
         - t3_proxy
       ulimits:
@@ -26,7 +26,7 @@ services:
       container_name: rsshub-redis
       restart: $OTHERS_RESTART_POLICY
       profiles:
-        - Reading
+        - reading
       networks:
         - t3_proxy
       volumes:

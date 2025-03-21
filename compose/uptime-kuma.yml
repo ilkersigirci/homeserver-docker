@@ -53,7 +53,7 @@ services:
       - "traefik.http.routers.uptime-kuma-rtr.entrypoints=websecure"
       - "traefik.http.routers.uptime-kuma-rtr.rule=Host(`uptimekuma.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.uptime-kuma-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.uptime-kuma-rtr.middlewares=chain-authelia-iframe@file" # NOTE: Iframe is neeeded for Glance
       ## HTTP Services
       - "traefik.http.routers.uptime-kuma-rtr.service=uptime-kuma-svc"
       - "traefik.http.services.uptime-kuma-svc.loadbalancer.server.port=3001"

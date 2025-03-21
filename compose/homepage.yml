@@ -13,6 +13,9 @@ services:
       - $CONFIGDIR/homepage/icons:/app/public/icons
       # - /mnt/d:/mnt/d  # NOTE: Need for Disk usage widget
     environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - HOMEPAGE_ALLOWED_HOSTS=homepage.$DOMAINNAME
       - HOMEPAGE_VAR_DOMAINNAME=$DOMAINNAME
       - HOMEPAGE_VAR_TAILSCALE_KEY=$TAILSCALE_KEY
       - HOMEPAGE_VAR_TAILSCALE_DEVICE_IP=$TAILSCALE_DEVICE_IP
@@ -28,7 +31,7 @@ services:
       - "traefik.http.routers.homepage-rtr.entrypoints=websecure"
       - "traefik.http.routers.homepage-rtr.rule=Host(`homepage.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.homepage-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.homepage-rtr.middlewares=chain-authelia-iframe@file" # NOTE: Iframe is neeeded for Glance
       ## HTTP Services
       - "traefik.http.routers.homepage-rtr.service=homepage-svc"
       - "traefik.http.services.homepage-svc.loadbalancer.server.port=3000"
