@@ -11,24 +11,14 @@ x-deploy: &gpu-deploy
 services:
   sd-next:
     container_name: sd-next
-    image: holaflenain/stable-diffusion:latest
+    image: vladmandic/sdnext-cuda:latest
     restart: $ML_RESTART_POLICY
     <<: *gpu-deploy
-    # runtime: nvidia # NOTE: Not working
     networks:
       - t3_proxy
-    ports:
-      - "9999:9000/tcp"
     volumes:
-      - $DOCKERDIR/appdata/sd-next:/config:rw
-      - $MLMODELSDIR:/config/models/stable-diffusion:ro
-    environment:
-      - WEBUI_VERSION=04
-      - NVIDIA_VISIBLE_DEVICES=all
-      - TZ=$TZ
-      - PUID=$PUID
-      - PGID=$PGID
-      # - CLEAN_ENV=true
+      - $DOCKERDIR/appdata/sd-next:/mnt/data:rw
+      - $MLMODELSDIR/sdnext:/mnt/models:ro
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
@@ -38,6 +28,6 @@ services:
       - "traefik.http.routers.sdnext-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
       - "traefik.http.routers.sdnext-rtr.service=sdnext-svc"
-      - "traefik.http.services.sdnext-svc.loadbalancer.server.port=9000"
+      - "traefik.http.services.sdnext-svc.loadbalancer.server.port=7860"
     profiles:
       - ml

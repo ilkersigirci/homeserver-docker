@@ -1,0 +1,59 @@
+services:
+  windows:
+    image: dockurr/windows:latest
+    container_name: windows
+    restart: $MAINTENANCE_RESTART_POLICY
+    stop_grace_period: 2m
+    cap_add:
+        - NET_ADMIN
+    devices:
+        - /dev/kvm
+        - /dev/net/tun
+        # - /dev/sda:/disk2
+        # - /dev/bus/usb
+    profiles:
+      - maintenance
+    networks:
+      - t3_proxy
+    ports:
+      - 8006:8006
+      - 3389:3389/tcp
+      - 3389:3389/udp
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/windows:/storage
+      # - /mnt/d/Archive/FORMAT/Windows/WIN11.PRO.23H2.U8.X64.(NORMAL).ISO:/custom.iso
+    environment:
+      VERSION: "11"
+      DISK_SIZE: "24G"
+      RAM_SIZE: "4G"
+      CPU_CORES: "2"
+      USERNAME: "ilker"
+      PASSWORD: "ilker"
+      LANGUAGE: "English"
+      REGION: "en-US"
+      KEYBOARD: "en-US"
+      # ARGUMENTS: "-device usb-host,vendorid=0x1234,productid=0x1234" # NOTE: For usb device
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.windows-rtr.entrypoints=websecure"
+      - "traefik.http.routers.windows-rtr.rule=Host(`windows.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.windows-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.windows-rtr.service=windows-svc"
+      - "traefik.http.services.windows-svc.loadbalancer.server.port=8006"
+      ####### HOMEPAGE #######
+      - homepage.group=maintenance
+      - homepage.name=windows
+      - homepage.icon=windows.png
+      - homepage.href=https://windows.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Windows inside a Docker container
+      ####### GLANCE #######
+      - glance.name=windows
+      - glance.icon=sh:windows
+      - glance.url=https://windows.$DOMAINNAME
+      - glance.description=Windows inside a Docker container

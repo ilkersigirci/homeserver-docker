@@ -77,6 +77,7 @@ include:
   - compose/restfox.yml
   - compose/uptime-kuma.yml
   - compose/whoami.yml
+  - compose/windows.yml
   # - compose/watchtower.yml
   #### MEDIA ####
   - compose/feishin.yml
@@ -87,6 +88,8 @@ include:
   - compose/mkvtoolnix.yml
   - compose/pinchflat.yml
   - compose/transmission.yml
+  #### ML ####
+  # - compose/sd-next.yml
   #### MONITORING ####
   - compose/beszel.yml
   - compose/changedetection.yml

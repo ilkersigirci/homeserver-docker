@@ -6,7 +6,7 @@ services:
     # cpus: "0.5"
     mem_reservation: "2048M"
     mem_limit: "2048M"
-    restart: $MEDIA_RESTART_POLICY
+    restart: "unless-stopped"
     networks:
       - t3_proxy
     ports:
