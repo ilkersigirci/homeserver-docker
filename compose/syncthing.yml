@@ -1,25 +1,31 @@
+# NOTE: Disable Local, Global Announce, Relays and NATS in the Syncthing GUI
 services:
   syncthing:
     container_name: syncthing
-    image: linuxserver/syncthing:latest
+    image: lscr.io/linuxserver/syncthing:latest
     restart: $OTHERS_RESTART_POLICY
     networks:
       - t3_proxy
     # TODO: Probably needed for connecting to phone
-    ports:
-      - 22000:22000/tcp
-      - 22000:22000/udp
-      - 21027:21027/udp
+    # ports:
+    #   - 8384:8384 # Web UI
+    #   - 22000:22000/tcp # TCP file transfers
+    #   - 22000:22000/udp # QUIC file transfers
+    #   - 21027:21027/udp # Receive local discovery broadcasts
     security_opt:
       - no-new-privileges:true
     volumes:
       - $DOCKERDIR/appdata/syncthing:/config
-      # - $APKDIR:/apk
-      - $NOTESDIR:/notes
+      - $NOTESDIR/Markdown:/notes
     environment:
       - PUID=$PUID
       - PGID=$PGID
       - TZ=$TZ
+    healthcheck:
+      test: curl -fkLsS -m 2 127.0.0.1:8384/rest/noauth/health | grep -o --color=never OK || exit 1
+      interval: 2m
+      timeout: 10s
+      retries: 3
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
