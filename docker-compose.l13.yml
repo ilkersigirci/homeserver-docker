@@ -56,10 +56,10 @@ include:
   - compose/dufs.yml
   - compose/filebrowser.yml
   - compose/homepage.yml
-  - compose/glance.yml
+  # - compose/glance.yml
   - compose/socket-proxy.yml
   - compose/traefik.yml
-  - compose/vaultwarden.yml
+  # - compose/vaultwarden.yml
   #### DESKTOP APPS ####
   #### MACHINE LEARNING ####
   ###### MAINTENANCE ####

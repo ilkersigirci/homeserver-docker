@@ -13,7 +13,7 @@ services:
     environment:
       DOCKER_HOST: "tcp://docker-socket-proxy:2375"
       PORT: 45876
-      KEY: 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICbYjtH7YvUc+kTFonrxuYC9B6UteA8ktzCsOTJWeUK1'
+      KEY: $BESZEL_KEY
     profiles:
       - monitoring
 
