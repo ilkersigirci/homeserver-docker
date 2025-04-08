@@ -46,7 +46,7 @@ services:
       - "traefik.http.routers.windows-rtr.service=windows-svc"
       - "traefik.http.services.windows-svc.loadbalancer.server.port=8006"
       ####### HOMEPAGE #######
-      - homepage.group=maintenance
+      - homepage.group=Maintenance
       - homepage.name=windows
       - homepage.icon=windows.png
       - homepage.href=https://windows.$DOMAINNAME

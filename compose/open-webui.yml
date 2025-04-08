@@ -20,21 +20,25 @@ services:
     #   - searxng
     networks:
       - t3_proxy
-    # ports:
-    #   - "9000:9000"
     volumes:
       - $DOCKERDIR/appdata/open-webui:/app/backend/data
       # - ollama:/root/.ollama
     environment:
       # - WEBUI_AUTH=False
-      - OPENAI_API_KEY=$OPENAI_API_KEY
-      # - OPENAI_API_BASE_URLS="https://api.openai.com/v1;URL2"
-      # - OPENAI_API_KEYS="KEY1;KEY2"
+      - ENABLE_OLLAMA_API=false
+      - USE_OLLAMA_DOCKER=false
+      - ENABLE_IMAGE_GENERATION=true
+      - IMAGE_SIZE=1024x1024
       # - ENABLE_RAG_WEB_SEARCH=True
       # - RAG_WEB_SEARCH_ENGINE="searxng"
       # - RAG_WEB_SEARCH_RESULT_COUNT=3
       # - RAG_WEB_SEARCH_CONCURRENT_REQUESTS=10
       # - SEARXNG_QUERY_URL="http://searxng:8080/search?q=<query>"
+      #### OPENAI API ####
+      # - OPENAI_API_BASE_URL=$CUSTOM_OPENAI_BASE_URL
+      # - OPENAI_API_KEY=DUMMY
+      - OPENAI_API_BASE_URLS=https://api.openai.com/v1;$CUSTOM_OPENAI_BASE_URL
+      - OPENAI_API_KEYS=$OPENAI_API_KEY;DUMMY
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
@@ -69,6 +73,7 @@ services:
     environment:
       - WEBUI_AUTH=False
       - OPENAI_API_KEY=$OPENAI_API_KEY
+      - WEBUI_NAME=BetusGPT
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

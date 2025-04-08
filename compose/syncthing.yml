@@ -1,4 +1,6 @@
 # NOTE: Disable Local, Global Announce, Relays and NATS in the Syncthing GUI
+# NOTE: 22000:22000/tcp port is probably needed for other devices to see this device.
+#  `remoteserver` needs this but somehow, homeserver does not. TEST IT
 services:
   syncthing:
     container_name: syncthing
@@ -6,7 +8,6 @@ services:
     restart: $OTHERS_RESTART_POLICY
     networks:
       - t3_proxy
-    # TODO: Probably needed for connecting to phone
     # ports:
     #   - 8384:8384 # Web UI
     #   - 22000:22000/tcp # TCP file transfers
