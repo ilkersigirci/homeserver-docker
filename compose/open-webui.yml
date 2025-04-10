@@ -80,7 +80,7 @@ services:
       - "traefik.http.routers.open-webui-betus-rtr.entrypoints=websecure"
       - "traefik.http.routers.open-webui-betus-rtr.rule=Host(`betus.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.open-webui-betus-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.open-webui-betus-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
       - "traefik.http.routers.open-webui-betus-rtr.service=open-webui-betus-svc"
       - "traefik.http.services.open-webui-betus-svc.loadbalancer.server.port=8080"
