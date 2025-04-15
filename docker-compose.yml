@@ -76,7 +76,7 @@ include:
   - compose/localstack-s3.yml
   - compose/restfox.yml
   - compose/syncthing.yml
-  - compose/uptime-kuma.yml
+  # - compose/uptime-kuma.yml
   - compose/whoami.yml
   # - compose/windows.yml
   # - compose/watchtower.yml
