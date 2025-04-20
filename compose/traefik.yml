@@ -1,9 +1,8 @@
 services:
   # Traefik 3 - Reverse Proxy
-  # Touch (create empty files) traefik.log and acme/acme.json. Set acme.json permissions to 600.
+  # Touch (create empty files) acme/acme.json. Set acme.json permissions to 600.
   # touch $DOCKERDIR/appdata/traefik3/acme/acme.json
   # chmod 600 $DOCKERDIR/appdata/traefik3/acme/acme.json
-  # touch $DOCKERDIR/appdata/traefik3/traefik.log
   traefik:
     container_name: traefik
     image: traefik:3.3.1
@@ -29,7 +28,10 @@ services:
       #- --ping=true
       # - --serversTransport.insecureSkipVerify=true
       - --log=true
+      - --log.filePath=/logs/traefik.log
       - --log.level=INFO # (Default: error) DEBUG, INFO, WARN, ERROR, FATAL, PANIC
+      - --log.maxsize=1 # Max size in MB of the log file
+      - --log.maxbackups=10 # Max number of old log files to keep
       - --accessLog=true
       - --accessLog.filePath=/logs/access.log
       - --accessLog.bufferingSize=100 # Configuring a buffer of 100 lines
