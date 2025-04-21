@@ -1,0 +1,54 @@
+services:
+  crowdsec:
+    image: crowdsecurity/crowdsec:latest
+    container_name: crowdsec
+    restart: $BASE_RESTART_POLICY
+    profiles:
+      - core
+    networks:
+      - t3_proxy
+    ports:
+      - "127.0.0.1:9876:8080"  # port mapping for local firewall bouncers
+    expose:
+      - 8080 # http api for bouncers
+      - 6060 # metrics endpoint for prometheus
+      - 7422 # appsec waf endpoint
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/crowdsec:/var/lib/crowdsec/data
+      - $CONFIGDIR/crowdsec/config:/etc/crowdsec
+      - /var/log/auth.log:/var/log/auth.log:ro
+      - /var/log/syslog:/var/log/syslog:ro
+      - $DOCKERDIR/logs/traefik:/var/log/traefik:ro
+    environment:
+        GID: $PGID
+        COLLECTIONS: "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/base-http-scenarios crowdsecurity/whitelist-good-actors crowdsecurity/iptables crowdsecurity/linux crowdsecurity/sshd"
+        CUSTOM_HOSTNAME: $HOSTNAME
+        # DISABLE_LOCAL_API: "true" # Only after successfully registering and validating remote agent below.
+        # # For the following, check local_api_credentials.yaml after cscli lapi register (secondary machine) and cscli machine validate (on primary machine)
+        # AGENT_USERNAME: $CROWDSEC_AGENT_USERNAME 
+        # AGENT_PASSWORD: $CROWDSEC_AGENT_PASSWORD 
+        # LOCAL_API_URL: $CROWDSEC_LOCAL_API_URL 
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.crowdsec-rtr.entrypoints=websecure"
+      - "traefik.http.routers.crowdsec-rtr.rule=Host(`crowdsec.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.crowdsec-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.crowdsec-rtr.service=crowdsec-svc"
+      - "traefik.http.services.crowdsec-svc.loadbalancer.server.port=8080"
+      ####### HOMEPAGE #######
+      - homepage.group=Core
+      - homepage.name=crowdsec
+      - homepage.icon=crowdsec.png
+      - homepage.href=https://crowdsec.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Open-source & collaborative security IPS
+      ####### GLANCE #######
+      - glance.name=crowdsec
+      - glance.icon=sh:crowdsec
+      - glance.url=https://crowdsec.$DOMAINNAME
+      - glance.description=Open-source & collaborative security IPS
