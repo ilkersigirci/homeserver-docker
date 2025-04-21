@@ -7,7 +7,7 @@ services:
   # Restore: rustic -r rclone:onedrive-remote:Backups restore latest /tmp/restore-test
   rustic:
     container_name: rustic
-    hostname: ${HOSTNAME}
+    hostname: ${MY_HOSTNAME}
     image: rustic:latest
     build:
       context: $DOCKERDIR/compose/maintenance/Rustic

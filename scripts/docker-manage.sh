@@ -2,9 +2,14 @@
 
 set -e  # Exit on error
 
+if [ -z "$MY_HOSTNAME" ]; then
+    echo "⚠️  MY_HOSTNAME is not set. Please export it in your or .bashrc .zshrc file"
+    exit 1
+fi
+
 # Configuration
 PROFILES="core,desktop_apps,ml,maintenance,media,monitoring,photo,reading"
-COMPOSE_CMD="docker compose --env-file $HOME/docker/.env"
+COMPOSE_CMD="docker compose -f docker-compose.$MY_HOSTNAME.yml --env-file $HOME/docker/.env"
 
 # Function to display usage
 usage() {
