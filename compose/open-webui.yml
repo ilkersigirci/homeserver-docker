@@ -37,8 +37,8 @@ services:
       #### OPENAI API ####
       # - OPENAI_API_BASE_URL=$CUSTOM_OPENAI_BASE_URL
       # - OPENAI_API_KEY=DUMMY
-      - OPENAI_API_BASE_URLS=https://api.openai.com/v1;$CUSTOM_OPENAI_BASE_URL
-      - OPENAI_API_KEYS=$OPENAI_API_KEY;DUMMY
+      - OPENAI_API_BASE_URLS=https://api.openai.com/v1;$OPENROUTER_API_BASE_URL
+      - OPENAI_API_KEYS=$OPENAI_API_KEY;$OPENROUTER_API_KEY
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
