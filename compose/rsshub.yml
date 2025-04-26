@@ -13,7 +13,7 @@ services:
               soft: 0
       healthcheck:
           test: ["CMD", "curl", "-f", "http://localhost:3000/pressure"]
-          interval: 30s
+          interval: 2m
           timeout: 10s
           retries: 3
       labels:
@@ -33,7 +33,7 @@ services:
           - $DOCKERDIR/appdata/rsshub-redis:/data
       healthcheck:
           test: ["CMD", "redis-cli", "ping"]
-          interval: 30s
+          interval: 2m
           timeout: 10s
           retries: 5
           start_period: 5s
@@ -65,7 +65,7 @@ services:
       # TWITTER_PASSWORD: $TWITTER_PASSWORD
     healthcheck:
           test: ["CMD", "curl", "-f", "http://localhost:1200/healthz"]
-          interval: 30s
+          interval: 2m
           timeout: 10s
           retries: 3
     labels:

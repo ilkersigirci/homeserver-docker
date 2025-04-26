@@ -16,6 +16,10 @@ services:
       KEY: $BESZEL_KEY
     profiles:
       - monitoring
+    healthcheck:
+      test: ['CMD', '/agent', 'health']
+      start_period: 5s
+      interval: 2m
 
   # NOTE: When adding the local agent on the same docker network, use its name: `beszel-agent` not the IP address.
   # That way, the agent doesn't need to expose the port.
@@ -32,6 +36,12 @@ services:
     environment:
       TZ: "${TZ}"
       USER_CREATION: "false"
+    profiles:
+      - monitoring
+    healthcheck:
+      test: ['CMD', '/beszel', 'health', '--url', 'http://localhost:8090']
+      start_period: 5s
+      interval: 2m
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
@@ -55,5 +65,3 @@ services:
       - homepage.widget.password=$BESZEL_PASSWORD
       # - homepage.widget.systemId=homeserver
       - homepage.widget.version=2
-    profiles:
-      - monitoring

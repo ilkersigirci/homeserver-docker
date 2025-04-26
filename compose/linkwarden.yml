@@ -13,7 +13,7 @@ services:
       - $DOCKERDIR/appdata/linkwarden-db:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
+      interval: 2m
       timeout: 5s
       retries: 3
     profiles:

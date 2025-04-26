@@ -78,7 +78,7 @@ services:
       - no-new-privileges:true
     #healthcheck:
     #  test: ["CMD", "traefik", "healthcheck", "--ping"]
-    #  interval: 5s
+    #  interval: 2m
     #  retries: 3
     ports:
       - target: 80
