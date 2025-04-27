@@ -67,6 +67,11 @@ services:
       # - --experimental.hub=true
       # - --hub.tls.insecure=true
       # - --metrics.prometheus.addrouterslabels=true
+      ## Plugins
+      - --experimental.plugins.cloudflarewarp.modulename=github.com/BetterCorp/cloudflarewarp
+      - --experimental.plugins.cloudflarewarp.version=v1.3.0
+      - --experimental.plugins.crowdsec-bouncer.modulename=github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
+      - --experimental.plugins.crowdsec-bouncer.version=v1.2.1
     networks:
       t3_proxy:
         ipv4_address: 192.168.90.254 # You can specify a static IP
@@ -103,7 +108,8 @@ services:
       - CF_API_KEY_FILE=/run/secrets/cloudflare_api_key
       # TODO: Change CF_API_EMAIL_FILE and CF_API_KEY_FILE to CF_DNS_API_TOKEN_FILE
       # - CF_DNS_API_TOKEN_FILE=/run/secrets/cf_dns_api_token
-      - DOMAINNAME # Passing the domain name to traefik container to be able to use the variable in rules.
+      - DOMAINNAME=$DOMAINNAME # Passing the domain name to traefik container to be able to use the variable in rules.
+      - CROWDSEC_TRAEFIK_BOUNCER_API_KEY=$CROWDSEC_TRAEFIK_BOUNCER_API_KEY
     secrets:
       - cloudflare_email
       - cloudflare_api_key
