@@ -18,9 +18,8 @@ services:
     volumes:
       - $DOCKERDIR/appdata/crowdsec:/var/lib/crowdsec/data
       - $CONFIGDIR/crowdsec/config:/etc/crowdsec
-      - /var/log/auth.log:/var/log/auth.log:ro
-      - /var/log/syslog:/var/log/syslog:ro
-      - $DOCKERDIR/logs/traefik:/var/log/traefik:ro
+      - /var/log:/var/log:ro
+      - $DOCKERDIR/logs/traefik:/logs/traefik:ro
     environment:
         GID: $PGID
         COLLECTIONS: "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/base-http-scenarios crowdsecurity/whitelist-good-actors crowdsecurity/iptables crowdsecurity/linux crowdsecurity/sshd"
