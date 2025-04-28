@@ -27,7 +27,8 @@ services:
       - "traefik.http.routers.autokuma-rtr.service=autokuma-svc"
       - "traefik.http.services.autokuma-svc.loadbalancer.server.port=3001"
     profiles:
-      - monitoring
+      # - monitoring
+      - not-used
       
   # Add tcp docker host: tcp://docker-socket-proxy:2375 in the UI
   # After user creation, disable auth: Settings -> Security -> Disable Auth
