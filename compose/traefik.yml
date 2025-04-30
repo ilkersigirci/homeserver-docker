@@ -69,14 +69,12 @@ services:
       # - --hub.tls.insecure=true
       # - --metrics.prometheus.addrouterslabels=true
       ## Plugins
+      # - --experimental.plugins.cf-real-ip.modulename=github.com/fma965/cloudflarewarp
+      # - --experimental.plugins.cf-real-ip.version=v1.0.0
+      - --experimental.plugins.cf-real-ip.modulename=github.com/jramsgz/traefik-real-ip
+      - --experimental.plugins.cf-real-ip.version=v1.0.6
       - --experimental.plugins.crowdsec-bouncer.modulename=github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
       - --experimental.plugins.crowdsec-bouncer.version=v1.2.1
-      # - --experimental.plugins.cloudflarewarp.modulename=github.com/BetterCorp/cloudflarewarp
-      # - --experimental.plugins.cloudflarewarp.version=v1.3.3
-      - --experimental.plugins.cloudflarewarp.modulename=github.com/fma965/cloudflarewarp
-      - --experimental.plugins.cloudflarewarp.version=v1.0.0
-      # - --experimental.plugins.cloudflarewarp.modulename=github.com/jramsgz/traefik-real-ip
-      # - --experimental.plugins.cloudflarewarp.version=v1.0.6
     networks:
       t3_proxy:
         ipv4_address: 192.168.90.254 # You can specify a static IP
