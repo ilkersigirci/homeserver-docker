@@ -5,7 +5,7 @@ services:
   # chmod 600 $DOCKERDIR/appdata/traefik3/acme/acme.json
   traefik:
     container_name: traefik
-    image: traefik:3.3.1
+    image: traefik:3.3
     restart: $BASE_RESTART_POLICY
     profiles:
       - core
@@ -16,6 +16,7 @@ services:
       - --entrypoints.websecure.address=:443
       - --entrypoints.traefik.address=:8080
       # - --entrypoints.ping.address=:8081
+      - --entrypoints.websecure.asDefault=true
       - --entrypoints.websecure.http.tls=true
       - --entrypoints.web.http.redirections.entrypoint.to=websecure
       - --entrypoints.web.http.redirections.entrypoint.scheme=https
@@ -68,10 +69,14 @@ services:
       # - --hub.tls.insecure=true
       # - --metrics.prometheus.addrouterslabels=true
       ## Plugins
-      - --experimental.plugins.cloudflarewarp.modulename=github.com/BetterCorp/cloudflarewarp
-      - --experimental.plugins.cloudflarewarp.version=v1.3.0
       - --experimental.plugins.crowdsec-bouncer.modulename=github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
       - --experimental.plugins.crowdsec-bouncer.version=v1.2.1
+      # - --experimental.plugins.cloudflarewarp.modulename=github.com/BetterCorp/cloudflarewarp
+      # - --experimental.plugins.cloudflarewarp.version=v1.3.3
+      - --experimental.plugins.cloudflarewarp.modulename=github.com/fma965/cloudflarewarp
+      - --experimental.plugins.cloudflarewarp.version=v1.0.0
+      # - --experimental.plugins.cloudflarewarp.modulename=github.com/jramsgz/traefik-real-ip
+      # - --experimental.plugins.cloudflarewarp.version=v1.0.6
     networks:
       t3_proxy:
         ipv4_address: 192.168.90.254 # You can specify a static IP
