@@ -19,7 +19,7 @@ networks:
     name: dockervlan
     driver: macvlan
     driver_opts:
-      parent: enp18s0
+      parent: enp0s3
     ipam:
       config:
         - subnet: "192.168.1.0/24"
@@ -28,10 +28,8 @@ networks:
 
 ########################### SECRETS
 secrets:
-  cloudflare_email:
-    file: $DOCKERDIR/secrets/cloudflare_email
-  cloudflare_api_key:
-    file: $DOCKERDIR/secrets/cloudflare_api_key
+  cf_dns_api_token:
+    file: $DOCKERDIR/secrets/cf_dns_api_token
   authelia_jwt_secret:
     file: $DOCKERDIR/secrets/authelia_jwt_secret
   authelia_session_secret:
@@ -52,6 +50,7 @@ secrets:
 include:
   ########################### SERVICES
   #### CORE ####
+  # - compose/adguardhome.yml
   - compose/authelia.yml
   - compose/crowdsec.yml
   - compose/dufs.yml

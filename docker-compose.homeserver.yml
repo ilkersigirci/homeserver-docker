@@ -28,10 +28,8 @@ networks:
 
 ########################### SECRETS
 secrets:
-  cloudflare_email:
-    file: $DOCKERDIR/secrets/cloudflare_email
-  cloudflare_api_key:
-    file: $DOCKERDIR/secrets/cloudflare_api_key
+  cf_dns_api_token:
+    file: $DOCKERDIR/secrets/cf_dns_api_token
   authelia_jwt_secret:
     file: $DOCKERDIR/secrets/authelia_jwt_secret
   authelia_session_secret:

@@ -69,10 +69,10 @@ services:
       # - --hub.tls.insecure=true
       # - --metrics.prometheus.addrouterslabels=true
       ## Plugins
-      # - --experimental.plugins.cf-real-ip.modulename=github.com/fma965/cloudflarewarp
-      # - --experimental.plugins.cf-real-ip.version=v1.0.0
-      - --experimental.plugins.cf-real-ip.modulename=github.com/jramsgz/traefik-real-ip
-      - --experimental.plugins.cf-real-ip.version=v1.0.6
+      - --experimental.plugins.cf-real-ip.modulename=github.com/fma965/cloudflarewarp
+      - --experimental.plugins.cf-real-ip.version=v1.0.0
+      # - --experimental.plugins.cf-real-ip.modulename=github.com/jramsgz/traefik-real-ip
+      # - --experimental.plugins.cf-real-ip.version=v1.0.6
       - --experimental.plugins.crowdsec-bouncer.modulename=github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
       - --experimental.plugins.crowdsec-bouncer.version=v1.2.1
     networks:
@@ -102,20 +102,17 @@ services:
       #   protocol: tcp
       #   mode: host
     volumes:
+      # - /etc/localtime:/etc/localtime:ro # Set timezone
       - $CONFIGDIR/traefik3/rules:/rules # file provider directory
       - $CONFIGDIR/traefik3/acme/acme.json:/acme.json # cert location - you must touch this file and change permissions to 600
       - $DOCKERDIR/logs/traefik:/logs # for fail2ban or crowdsec - make sure to touch file before starting container
     environment:
       - TZ=$TZ
-      - CF_API_EMAIL_FILE=/run/secrets/cloudflare_email
-      - CF_API_KEY_FILE=/run/secrets/cloudflare_api_key
-      # TODO: Change CF_API_EMAIL_FILE and CF_API_KEY_FILE to CF_DNS_API_TOKEN_FILE
-      # - CF_DNS_API_TOKEN_FILE=/run/secrets/cf_dns_api_token
+      - CF_DNS_API_TOKEN_FILE=/run/secrets/cf_dns_api_token
       - DOMAINNAME=$DOMAINNAME # Passing the domain name to traefik container to be able to use the variable in rules.
       - CROWDSEC_TRAEFIK_BOUNCER_API_KEY=$CROWDSEC_TRAEFIK_BOUNCER_API_KEY
     secrets:
-      - cloudflare_email
-      - cloudflare_api_key
+      - cf_dns_api_token
     labels:
       #- "autoheal=true"
       - "traefik.enable=true"
