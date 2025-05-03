@@ -1,0 +1,49 @@
+services:
+  pocketid:
+    image: ghcr.io/pocket-id/pocket-id:latest
+    container_name: pocketid
+    restart: $BASE_RESTART_POLICY
+    profiles:
+      - core
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/pocketid:/app/backend/data
+    environment:
+      - PUID=$PUID
+      - PGID=$PGID
+      - PUBLIC_APP_URL=https://pocketid.$DOMAINNAME
+      - TRUST_PROXY=yes
+      # - HOST=0.0.0.0
+      # - PORT=3000
+      # - BACKEND_PORT=8080
+    healthcheck:
+        test: "curl -f http://localhost/health"
+        interval: 1m30s
+        timeout: 5s
+        start_period: 10s
+        retries: 2
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.pocketid-rtr.entrypoints=websecure"
+      - "traefik.http.routers.pocketid-rtr.rule=Host(`pocketid.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.pocketid-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.pocketid-rtr.service=pocketid-svc"
+      - "traefik.http.services.pocketid-svc.loadbalancer.server.port=80"
+      ####### HOMEPAGE #######
+      - homepage.group=Core
+      - homepage.name=pocketid
+      - homepage.icon=pocketid.png
+      - homepage.href=https://pocketid.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=OIDC provider that allows users to authenticate with their passkeys
+      ####### GLANCE #######
+      - glance.name=pocketid
+      - glance.icon=sh:pocketid
+      - glance.url=https://pocketid.$DOMAINNAME
+      - glance.description=OIDC provider that allows users to authenticate with their passkeys

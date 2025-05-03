@@ -1,0 +1,45 @@
+services:
+  tinyauth:
+    image: ghcr.io/steveiliop56/tinyauth:v3
+    container_name: tinyauth
+    restart: $BASE_RESTART_POLICY
+    profiles:
+      - core
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      APP_URL: https://tinyauth.$DOMAINNAME
+      SECRET: F5oMKYuP87]:W8h/utv{4Uwpja4{XYMX
+      COOKIE_SECURE: "true"
+      DISABLE_CONTINUE: "true"
+      USERS: user:$$2a$$10$$UdLYoJ5lgPsC0RKqYH/jMua7zIn0g9kPqWmhYayJYLaZQ/FTmH2/u # user:password
+      GENERIC_CLIENT_ID: client id from pocket-id
+      GENERIC_CLIENT_SECRET: secret from pocket-id
+      GENERIC_AUTH_URL: https://pocketid.$DOMAINNAME.com/authorize
+      GENERIC_TOKEN_URL: https://pocketid.$DOMAINNAME.com/api/oidc/token
+      GENERIC_USER_URL: https://pocketid.$DOMAINNAME.com/api/oidc/userinfo
+      GENERIC_SCOPES: "openid email profile"
+      GENERIC_NAME: PocketID
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.tinyauth-rtr.entrypoints=websecure"
+      - "traefik.http.routers.tinyauth-rtr.rule=Host(`tinyauth.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.tinyauth-rtr.middlewares=chain-no-auth@file"
+      ## Forward Auth
+      - "traefik.http.middlewares.tinyauth.forwardauth.address=http://tinyauth:3000/api/auth/traefik"
+      ####### HOMEPAGE #######
+      - homepage.group=Core
+      - homepage.name=tinyauth
+      - homepage.icon=tinyauth.png
+      - homepage.href=https://tinyauth.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=The simplest way to protect your apps with a login screen
+      ####### GLANCE #######
+      - glance.name=tinyauth
+      - glance.icon=sh:tinyauth
+      - glance.url=https://tinyauth.$DOMAINNAME
+      - glance.description=The simplest way to protect your apps with a login screen

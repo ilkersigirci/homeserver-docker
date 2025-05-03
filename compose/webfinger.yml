@@ -1,0 +1,35 @@
+services:
+  webfinger:
+    image: nginx:latest
+    container_name: webfinger
+    restart: $BASE_RESTART_POLICY
+    profiles:
+      - core
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $CONFIGDIR/webfinger:/usr/share/nginx/html:ro
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.webfinger-rtr.entrypoints=websecure"
+      - "traefik.http.routers.webfinger-rtr.rule=Host(`$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.webfinger-rtr.middlewares=chain-no-auth@file"
+      ## HTTP Services
+      - "traefik.http.routers.webfinger-rtr.service=webfinger-svc"
+      - "traefik.http.services.webfinger-svc.loadbalancer.server.port=80"
+      ####### HOMEPAGE #######
+      - homepage.group=Core
+      - homepage.name=webfinger
+      - homepage.icon=webfinger.png
+      - homepage.href=https://$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Webfinger OIDC provider
+      ####### GLANCE #######
+      - glance.name=webfinger
+      - glance.icon=sh:webfinger
+      - glance.url=https://$DOMAINNAME
+      - glance.description=Webfinger OIDC provider
