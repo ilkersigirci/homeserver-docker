@@ -1,28 +1,42 @@
-# FIXME: Not accessible over the network
 services:
   adguardhome:
     image: adguard/adguardhome:latest
     container_name: adguardhome
-    restart: unless-stopped
+    restart: $BASE_RESTART_POLICY
     profiles:
       - core
+    # network_mode: host
+    # networks:
+    #   dockervlan:
+    #      ipv4_address: 192.168.1.19 # IP address inside defined range
+    # ports:
+    #   ## For dockervlan
+    #   - 53/udp
+    #   - 53/tcp
+    #   - 67/udp
+    #   - 68/tcp
+    #   - 68/udp
+    #   - 80/tcp
+    #   - 443/tcp
+    #   - 853/tcp
+    #   - 3000/tcp
     networks:
-      dockervlan:
-        ipv4_address: 192.168.1.19 # IP address inside defined range
+      t3_proxy:
+        ipv4_address: 192.168.90.90
+    expose:
+      - "80"
+      - "53"
+      - "853"
     ports:
-      - 53/udp
-      - 67/udp
-      - 68/tcp
-      - 68/udp
-      - 80/tcp
-      - 443/tcp
-      - 853/tcp
-      - 3000/tcp
+      - "53:53/tcp"
+      - "53:53/udp"
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/adguard/conf:/opt/adguardhome/conf 
-      - $DOCKERDIR/appdata/adguard/work:/opt/adguardhome/work 
+      - $DOCKERDIR/appdata/adguardhome/conf:/opt/adguardhome/conf
+      - $DOCKERDIR/appdata/adguardhome/work:/opt/adguardhome/work
+    environment:
+      - TZ=$TZ
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
@@ -32,7 +46,15 @@ services:
       - "traefik.http.routers.adguardhome-rtr.middlewares=chain-authelia@file"
       ## HTTP Services
       - "traefik.http.routers.adguardhome-rtr.service=adguardhome-svc"
-      - "traefik.http.services.adguardhome-svc.loadbalancer.server.port=3000"
+      # - "traefik.http.services.adguardhome-svc.loadbalancer.server.port=3000" # Initial wizard port
+      - "traefik.http.services.adguardhome-svc.loadbalancer.server.port=80" # Admin UI port
+      # Dot - DNS over TLS
+      - "traefik.tcp.routers.adguard-tls.rule=HostSNI(`dns.$DOMAINNAME`)"
+      - "traefik.tcp.routers.adguard-tls.tls=true"
+      - "traefik.tcp.routers.adguard-tls.entrypoints=dot"
+      - "traefik.tcp.routers.adguard-tls.tls.certresolver=letsencrypt"
+      - "traefik.tcp.routers.adguard-tls.service=adguard-tls"
+      - "traefik.tcp.services.adguard-tls.loadbalancer.server.port=53"
       ####### HOMEPAGE #######
       - homepage.group=Core
       - homepage.name=adguardhome

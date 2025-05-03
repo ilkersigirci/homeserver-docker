@@ -14,6 +14,7 @@ services:
       - --global.sendAnonymousUsage=false
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
+      - --entrypoints.dot.address=:853
       - --entrypoints.traefik.address=:8080
       # - --entrypoints.ping.address=:8081
       - --entrypoints.websecure.asDefault=true
@@ -95,6 +96,10 @@ services:
         mode: host
       - target: 443
         published: 443
+        protocol: tcp
+        mode: host
+      - target: 853
+        published: 853
         protocol: tcp
         mode: host
       # - target: 8080  # need to enable --api.insecure=true
