@@ -57,7 +57,7 @@ include:
   - compose/filebrowser.yml
   - compose/homepage.yml
   # - compose/glance.yml
-  - compose/pocketid.yml
+  - compose/pocket-id.yml
   - compose/socket-proxy.yml
   - compose/traefik.yml
   # - compose/vaultwarden.yml

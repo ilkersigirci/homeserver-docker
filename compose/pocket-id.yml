@@ -1,8 +1,8 @@
 # In initial setup, go to /login/setup
 services:
-  pocketid:
+  pocket-id:
     image: ghcr.io/pocket-id/pocket-id:latest
-    container_name: pocketid
+    container_name: pocket-id
     restart: $BASE_RESTART_POLICY
     profiles:
       - core
@@ -11,7 +11,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/pocketid:/app/backend/data
+      - $DOCKERDIR/appdata/pocket-id:/app/backend/data
     environment:
       - PUID=$PUID
       - PGID=$PGID
@@ -29,22 +29,22 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.pocketid-rtr.entrypoints=websecure"
-      - "traefik.http.routers.pocketid-rtr.rule=Host(`pocketid.$DOMAINNAME`)"
+      - "traefik.http.routers.pocket-id-rtr.entrypoints=websecure"
+      - "traefik.http.routers.pocket-id-rtr.rule=Host(`pocketid.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.pocketid-rtr.middlewares=chain-no-auth@file"
+      - "traefik.http.routers.pocket-id-rtr.middlewares=chain-no-auth@file"
       ## HTTP Services
-      - "traefik.http.routers.pocketid-rtr.service=pocketid-svc"
-      - "traefik.http.services.pocketid-svc.loadbalancer.server.port=80"
+      - "traefik.http.routers.pocket-id-rtr.service=pocket-id-svc"
+      - "traefik.http.services.pocket-id-svc.loadbalancer.server.port=80"
       ####### HOMEPAGE #######
       - homepage.group=Core
-      - homepage.name=pocketid
-      - homepage.icon=pocketid.png
+      - homepage.name=pocket-id
+      - homepage.icon=pocket-id.svg
       - homepage.href=https://pocketid.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=OIDC provider that allows users to authenticate with their passkeys
       ####### GLANCE #######
-      - glance.name=pocketid
-      - glance.icon=sh:pocketid
+      - glance.name=pocket-id
+      - glance.icon=sh:pocket-id-dark
       - glance.url=https://pocketid.$DOMAINNAME
       - glance.description=OIDC provider that allows users to authenticate with their passkeys
