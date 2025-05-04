@@ -1,3 +1,4 @@
+# In initial setup, go to /login/setup
 services:
   pocketid:
     image: ghcr.io/pocket-id/pocket-id:latest
@@ -31,7 +32,7 @@ services:
       - "traefik.http.routers.pocketid-rtr.entrypoints=websecure"
       - "traefik.http.routers.pocketid-rtr.rule=Host(`pocketid.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.pocketid-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.pocketid-rtr.middlewares=chain-no-auth@file"
       ## HTTP Services
       - "traefik.http.routers.pocketid-rtr.service=pocketid-svc"
       - "traefik.http.services.pocketid-svc.loadbalancer.server.port=80"
