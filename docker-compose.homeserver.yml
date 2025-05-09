@@ -106,3 +106,4 @@ include:
   # - compose/obsidian.yml
   - compose/pdfding.yml
   - compose/rsshub.yml
+  - compose/quartz.yml

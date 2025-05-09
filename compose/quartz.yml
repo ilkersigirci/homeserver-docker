@@ -1,0 +1,40 @@
+# NOTE: To rebuild: NOT WORKING
+# https://digitalgarden.$DOMAINNAME/rebuild/{REBUILD_WEBHOOK_SECRET}
+services:
+  quartz:
+    container_name: quartz
+    image: shommey/dockerized-quartz
+    restart: $OTHERS_RESTART_POLICY
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $NOTESDIR/Markdown:/vault:ro
+      # - /path/on/host:/usr/src/app/quartz # Optional: Mount existing Quartz repo
+    environment:
+      BUILD_UPDATE_DELAY: 300
+      AUTO_REBUILD: false
+      REBUILD_WEBHOOK_SECRET: $QUARTZ_REBUILD_WEBHOOK_SECRET
+      NOTIFY_TARGET: tgram://$TELEGRAM_BOT_TOKEN/$TELEGRAM_CHAT_ID/
+      # GIT_REPO: "https://github.com/yourusername/your-quartz-site.git" # Use your custom Quartz repo or leave blank for the default Quartz repo
+      # GIT_BRANCH: "v4" # Optional: specify a branch to checkout
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.quartz-rtr.entrypoints=websecure"
+      - "traefik.http.routers.quartz-rtr.rule=Host(`digitalgarden.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.quartz-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.quartz-rtr.service=quartz-svc"
+      - "traefik.http.services.quartz-svc.loadbalancer.server.port=80"
+      ####### HOMEPAGE #######
+      - homepage.group=Reading
+      - homepage.name=Quartz.DigitalGarden
+      - homepage.icon=obsidian.svg
+      - homepage.href=https://digitalgarden.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Static-site generator that transforms Markdown content into fully functional websites 
+    profiles:
+      - reading
