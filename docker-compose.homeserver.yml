@@ -104,6 +104,7 @@ include:
   - compose/linkwarden.yml
   # - compose/miniflux.yml
   # - compose/obsidian.yml
+  - compose/perlite.yml
   - compose/pdfding.yml
   - compose/rsshub.yml
   - compose/quartz.yml

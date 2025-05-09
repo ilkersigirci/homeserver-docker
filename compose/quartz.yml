@@ -32,7 +32,7 @@ services:
       - "traefik.http.services.quartz-svc.loadbalancer.server.port=80"
       ####### HOMEPAGE #######
       - homepage.group=Reading
-      - homepage.name=Quartz.DigitalGarden
+      - homepage.name=Quartz
       - homepage.icon=obsidian.svg
       - homepage.href=https://digitalgarden.$DOMAINNAME
       - homepage.target=_blank
