@@ -1,5 +1,6 @@
 # NOTE: To rebuild: NOT WORKING
 # https://digitalgarden.$DOMAINNAME/rebuild/{REBUILD_WEBHOOK_SECRET}
+# Add to crontab: 0 1 * * * docker exec quartz /usr/src/app/scripts/build-quartz.sh
 services:
   quartz:
     container_name: quartz
