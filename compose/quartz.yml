@@ -12,7 +12,9 @@ services:
       - no-new-privileges:true
     volumes:
       - $NOTESDIR/Markdown:/vault:ro
-      # - /path/on/host:/usr/src/app/quartz # Optional: Mount existing Quartz repo
+      - $CONFIGDIR/quartz/repo:/usr/src/app/quartz # Optional: Mount existing Quartz repo
+      - $CONFIGDIR/quartz/quartz.config.ts:/usr/src/app/quartz/quartz.config.ts:ro
+      - $CONFIGDIR/quartz/quartz.layout.ts:/usr/src/app/quartz/quartz.layout.ts:ro
     environment:
       BUILD_UPDATE_DELAY: 300
       AUTO_REBUILD: false
