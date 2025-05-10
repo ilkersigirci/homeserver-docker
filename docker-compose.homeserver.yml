@@ -102,8 +102,7 @@ include:
   #### READING ####
   - compose/flatnotes.yml
   - compose/linkwarden.yml
-  # - compose/miniflux.yml
   # - compose/obsidian.yml
   - compose/pdfding.yml
   - compose/rsshub.yml
-  - compose/quartz.yml
+  # - compose/quartz.yml
