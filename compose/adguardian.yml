@@ -1,0 +1,19 @@
+# NOTE: Not working
+services:
+  adguardian:
+    image: ghcr.io/lissy93/adguardian:latest
+    container_name: adguardian
+    restart: $BASE_RESTART_POLICY
+    profiles:
+      - core
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - ADGUARD_IP=adguardhome
+      - ADGUARD_PORT=80
+      - ADGUARD_USERNAME=$ADGUARD_USERNAME
+      - ADGUARD_PASSWORD=$ADGUARD_PASSWORD
+      - ADGUARD_PROTOCOL=http
+      - ADGUARD_UPDATE_INTERVAL=2

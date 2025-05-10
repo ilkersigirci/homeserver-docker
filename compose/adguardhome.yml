@@ -62,6 +62,10 @@ services:
       - homepage.href=https://adguardhome.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Network-wide ads & trackers blocking DNS server
+      - homepage.widget.type=adguard
+      - homepage.widget.url=http://adguardhome:80
+      - homepage.widget.username=$ADGUARD_USERNAME
+      - homepage.widget.password=$ADGUARD_PASSWORD
       ####### GLANCE #######
       - glance.name=adguardhome
       - glance.icon=sh:adguard-home
