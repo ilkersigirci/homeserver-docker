@@ -1,11 +1,7 @@
-# NOTE: Not completed
-# docker exec healthchecks /opt/healthchecks/manage.py createsuperuser
 services:
   healthchecks:
-    image: healthchecks/healthchecks:latest
+    image: lscr.io/linuxserver/healthchecks:latest
     container_name: healthchecks
-    # depends_on:
-    #   - traefik
     restart: $MAINTENANCE_RESTART_POLICY
     profiles:
       - maintenance
@@ -14,25 +10,19 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/healthchecks:/data
+      - $DOCKERDIR/appdata/healthchecks/config:/config
     environment:
-      - DB=sqlite
-      - DB_NAME=/data/hc.sqlite
-      - DEBUG=False
-      - DEFAULT_FROM_EMAIL=noreply@example.com
-      # - EMAIL_HOST=smtp.example.com
-      # - EMAIL_HOST_PASSWORD=password
-      # - EMAIL_HOST_USER=noreply@example.com
-      - EMAIL_USE_VERIFICATION=False
-      - REGISTRATION_OPEN=False
-      - SECRET_KEY=flsdfasdf=sadfadslfsadlfasdf=sdfasdfasd
+      - PUID=$PUID
+      - PGID=$PGID
+      - TZ=$TZ
+      - SITE_NAME=Healthchecks
+      # - SITE_LOGO_URL=https://s3.ilkerflix.com/IS.jpeg
       - SITE_ROOT=http://localhost:8000
-      - SITE_NAME=Ilkerflix Healthchecks
-      # - ALLOWED_HOSTS=localhost
-      # - PROMETHEUS_ENABLED=True
-      - TELEGRAM_BOT_NAME=$TELEGRAM_AUTOMATION_BOT_NAME
-      - TELEGRAM_TOKEN=$TELEGRAM_AUTOMATION_BOT_TOKEN
-      - WEBHOOKS_ENABLED=True
+      - SUPERUSER_EMAIL=admin@$BASE_DOMAINNAME
+      - SUPERUSER_PASSWORD=admin
+      - APPRISE_ENABLED=True
+      - DEBUG=False
+      - ALLOWED_HOSTS=localhost,healthchecks.$DOMAINNAME
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
