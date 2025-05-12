@@ -72,5 +72,5 @@ include:
   - compose/beszel.yml
   #### PHOTO ####
   #### READING ####
-  - compose/obsidian.yml
+  # - compose/obsidian.yml
   - compose/quartz.yml
