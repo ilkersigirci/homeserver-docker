@@ -6,8 +6,6 @@ services:
     restart: $MEDIA_RESTART_POLICY
     networks:
       - t3_proxy
-    # ports:
-    #   - "11470:11470"
     security_opt:
       - no-new-privileges:true
     environment:
@@ -16,9 +14,10 @@ services:
       - "traefik.enable=true"
       ## HTTP Routers Auth
       - "traefik.http.routers.stremio-rtr.entrypoints=websecure"
-      - "traefik.http.routers.stremio-rtr.rule=Host(`stremio.$DOMAINNAME`)"
+      - "traefik.http.routers.stremio-rtr.rule=Host(`media.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.stremio-rtr.middlewares=chain-authelia@file"
+      # - "traefik.http.routers.stremio-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.stremio-rtr.middlewares=tinyauth"
       ## HTTP Services
       - "traefik.http.routers.stremio-rtr.service=stremio-svc"
       - "traefik.http.services.stremio-svc.loadbalancer.server.port=11470"
@@ -26,7 +25,7 @@ services:
       - homepage.group=Media
       - homepage.name=Stremio
       - homepage.icon=stremio.svg
-      - homepage.href=https://stremio.$DOMAINNAME
+      - homepage.href=https://media.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Online Streaming Platform
     profiles:

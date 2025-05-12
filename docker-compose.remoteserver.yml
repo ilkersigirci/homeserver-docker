@@ -74,6 +74,7 @@ include:
   - compose/whoami.yml
   #### MEDIA ####
   # - compose/transmission.yml
+  - compose/stremio.yml
   #### ML ####
   - compose/open-webui.yml
   #### MONITORING ####
