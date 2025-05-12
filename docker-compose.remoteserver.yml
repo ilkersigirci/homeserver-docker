@@ -59,6 +59,7 @@ include:
   # - compose/glance.yml
   - compose/pocket-id.yml
   - compose/socket-proxy.yml
+  - compose/tinyauth.yml
   - compose/traefik.yml
   # - compose/vaultwarden.yml
   - compose/webfinger.yml

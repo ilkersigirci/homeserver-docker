@@ -10,17 +10,18 @@ services:
     security_opt:
       - no-new-privileges:true
     environment:
+      APP_TITLE: Ilkerfix Auth
       APP_URL: https://tinyauth.$DOMAINNAME
-      SECRET: F5oMKYuP87]:W8h/utv{4Uwpja4{XYMX
+      SECRET: $TINYAUTH_SECRET
       COOKIE_SECURE: "true"
       DISABLE_CONTINUE: "true"
-      USERS: user:$$2a$$10$$UdLYoJ5lgPsC0RKqYH/jMua7zIn0g9kPqWmhYayJYLaZQ/FTmH2/u # user:password
-      GENERIC_CLIENT_ID: client id from pocket-id
-      GENERIC_CLIENT_SECRET: secret from pocket-id
-      GENERIC_AUTH_URL: https://pocketid.$DOMAINNAME.com/authorize
-      GENERIC_TOKEN_URL: https://pocketid.$DOMAINNAME.com/api/oidc/token
-      GENERIC_USER_URL: https://pocketid.$DOMAINNAME.com/api/oidc/userinfo
-      GENERIC_SCOPES: "openid email profile"
+      # USERS: $TINYAUTH_USERS
+      GENERIC_CLIENT_ID: $TINYAUTH_GENERIC_CLIENT_ID
+      GENERIC_CLIENT_SECRET: $TINYAUTH_GENERIC_CLIENT_SECRET
+      GENERIC_AUTH_URL: https://pocketid.$DOMAINNAME/authorize
+      GENERIC_TOKEN_URL: https://pocketid.$DOMAINNAME/api/oidc/token
+      GENERIC_USER_URL: https://pocketid.$DOMAINNAME/api/oidc/userinfo
+      GENERIC_SCOPES: "openid email profile groups"
       GENERIC_NAME: PocketID
     labels:
       - "traefik.enable=true"
