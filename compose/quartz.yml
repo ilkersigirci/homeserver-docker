@@ -17,10 +17,10 @@ services:
       - $CONFIGDIR/quartz/quartz.config.ts:/usr/src/app/quartz/quartz.config.ts:ro
       - $CONFIGDIR/quartz/quartz.layout.ts:/usr/src/app/quartz/quartz.layout.ts:ro
     environment:
-      BUILD_UPDATE_DELAY: 300
       AUTO_REBUILD: false
       REBUILD_WEBHOOK_SECRET: $QUARTZ_REBUILD_WEBHOOK_SECRET
-      NOTIFY_TARGET: tgram://$TELEGRAM_BOT_TOKEN/$TELEGRAM_CHAT_ID/
+      # BUILD_UPDATE_DELAY: 300
+      # NOTIFY_TARGET: $TELEGRAM_APPRISE_FORMAT
       # GIT_REPO: "https://github.com/yourusername/your-quartz-site.git" # Use your custom Quartz repo or leave blank for the default Quartz repo
       # GIT_BRANCH: "v4" # Optional: specify a branch to checkout
     labels:
