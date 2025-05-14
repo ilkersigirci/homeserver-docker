@@ -1,0 +1,41 @@
+services:
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    profiles:
+      - maintenance
+    networks:
+      - t3_proxy
+    # expose:
+    #   - 9000
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/minio:/data
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=password
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.minio-rtr.entrypoints=websecure"
+      - "traefik.http.routers.minio-rtr.rule=Host(`minio.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.minio-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.minio-rtr.service=minio-svc"
+      - "traefik.http.services.minio-svc.loadbalancer.server.port=9001"
+      ####### HOMEPAGE #######
+      - homepage.group=Maintenance
+      - homepage.name=minio
+      - homepage.icon=minio.png
+      - homepage.href=https://minio.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=MinIO is a high-performance, S3 compatible object store, open sourced under GNU AGPLv3 license.
+      ####### GLANCE #######
+      - glance.name=minio
+      - glance.icon=sh:minio
+      - glance.url=https://minio.$DOMAINNAME
+      - glance.description=MinIO is a high-performance, S3 compatible object store, open sourced under GNU AGPLv3 license.

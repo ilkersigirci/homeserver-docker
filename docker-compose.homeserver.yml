@@ -74,7 +74,7 @@ include:
   - compose/docker-gc.yml
   - compose/dozzle.yml
   - compose/it-tools.yml
-  - compose/localstack-s3.yml
+  - compose/minio.yml
   - compose/restfox.yml
   - compose/syncthing.yml
   # - compose/uptime-kuma.yml
