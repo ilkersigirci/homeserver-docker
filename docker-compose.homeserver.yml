@@ -63,9 +63,9 @@ include:
   - compose/vaultwarden.yml
   # - compose/webfinger.yml
   #### DESKTOP APPS ####
-  - compose/krita.yml
+  # - compose/krita.yml
   # - compose/firefox.yml
-  - compose/gimp.yml
+  # - compose/gimp.yml
   #### MACHINE LEARNING ####
   # - compose/open-webui.yml
   ###### MAINTENANCE ####
@@ -73,6 +73,7 @@ include:
   - compose/convertx.yml
   - compose/docker-gc.yml
   - compose/dozzle.yml
+  - compose/healthchecks.yml
   - compose/it-tools.yml
   - compose/minio.yml
   - compose/restfox.yml
