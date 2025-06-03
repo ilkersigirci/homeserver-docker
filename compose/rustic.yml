@@ -1,10 +1,12 @@
+# Use with: drun rustic <COMMAND>
+# Commands:
+#  - init: Initialize a new remote repository
+#      init -r /repos/TestRepo
+#  - backup: Backup the local repository to the remote repository
+#  - restore: Restore the remote repository to a local directory
+#       restore -r /repos/TestRepo restore latest /restores/RestoreTest
+#  - snapshots: List all snapshots in the remote repository
 services:
-  # Alternative: https://github.com/garethgeorge/backrest
-  # TODO: Send notifications to Telegram after backup
-  # FIXME: When new files added to vaultwarden db, does it overwrites the file permissions?
-  # Init remote repo: rustic -r rclone:onedrive-remote:Backups init
-  # Backup: rustic backup
-  # Restore: rustic -r rclone:onedrive-remote:Backups restore latest /tmp/restore-test
   rustic:
     container_name: rustic
     hostname: ${MY_HOSTNAME}
@@ -17,8 +19,6 @@ services:
     # restart: $MAINTENANCE_RESTART_POLICY
     restart: "no"
     # command: init
-    # command: backup
-    command: -r /repos/TestRepo restore latest /restores/RestoreTest
     profiles:
       - maintenance
       - backup
