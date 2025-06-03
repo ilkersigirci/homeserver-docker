@@ -10,7 +10,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $CONFIGDIR/stirlingpdf/ocr_train_data:/usr/share/tesseract-ocr/4.00/tessdata #Required for extra OCR languages
+      - $DATADIR/stirlingpdf/ocr_train_data:/usr/share/tesseract-ocr/4.00/tessdata #Required for extra OCR languages
       - $DOCKERDIR/appdata/stirlingpdf:/configs
     environment:
       - APP_LOCALE=en_GB
