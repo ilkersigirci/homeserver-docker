@@ -11,6 +11,7 @@ services:
     volumes:
       - $CONFIGDIR/homepage:/app/config
       - $CONFIGDIR/homepage/icons:/app/public/icons
+      - $DOCKERDIR/logs/homepage:/app/config/logs
       # - /mnt/d:/mnt/d  # NOTE: Need for Disk usage widget
     environment:
       - PUID=$PUID
