@@ -1,0 +1,43 @@
+services:
+  ytptube:
+    image: ghcr.io/arabcoders/ytptube:latest
+    container_name: ytptube
+    restart: $MEDIA_RESTART_POLICY
+    user: $PUID:$PGID
+    profiles:
+      - media
+      - youtube
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $CONFIGDIR/ytptube:/config:rw
+      - $MEDIADIR/Youtube:/downloads:rw
+    tmpfs:
+      - /tmp
+    environment:
+      YTP_PORT: 8081
+      YTP_DOWNLOAD_PATH: "/downloads"
+      YTP_INSTANCE_TITLE: "Youtube Downloader"
+      YTP_OUTPUT_TEMPLATE: "%(title)s.%(ext)s"
+      YTP_LOG_LEVEL: "info"
+      YTP_BROWSER_ENABLED: "false"
+      YTP_YTDLP_AUTO_UPDATE: "true"
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.ytptube-rtr.entrypoints=websecure"
+      - "traefik.http.routers.ytptube-rtr.rule=Host(`ytptube.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.ytptube-rtr.middlewares=chain-authelia@file"
+      ## HTTP Services
+      - "traefik.http.routers.ytptube-rtr.service=ytptube-svc"
+      - "traefik.http.services.ytptube-svc.loadbalancer.server.port=8081"
+      ####### HOMEPAGE #######
+      - homepage.group=Media
+      - homepage.name=ytptube
+      - homepage.icon=ytptube.svg
+      - homepage.href=https://ytptube.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=A Web Frontend for yt-dlp with concurrent downloads support, presets and scheduled tasks and many more. It is a metube Fork

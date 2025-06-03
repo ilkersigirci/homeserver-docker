@@ -9,7 +9,16 @@ services:
     container_name: rustic
     hostname: ${MY_HOSTNAME}
     image: ghcr.io/rustic-rs/rustic:latest
-    restart: $MAINTENANCE_RESTART_POLICY
+    # user: $PUID:$PGID
+    # build:
+    #   context: $DOCKERDIR/Dockerfiles/Rustic
+    #   args:
+    #     RUSTIC_VERSION: v0.9.5
+    # restart: $MAINTENANCE_RESTART_POLICY
+    restart: "no"
+    # command: init
+    # command: backup
+    command: -r /repos/TestRepo restore latest /restores/RestoreTest
     profiles:
       - maintenance
       - backup
@@ -18,12 +27,15 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $CONFIGDIR/rclone:/root/.config/rclone:rw
-      - $CONFIGDIR/rustic/rustic.toml:/root/rustic.toml:ro
-      - $BACKUPDIR:/root/backups/Backup:ro
-      - $CONFIGDIR:/root/backups/docker_configs:ro
-      - $NOTESDIR/Markdown:/root/backups/Markdown:ro
-      - $DATADIR/vaultwarden:/root/vaultwarden_backup:ro
+      - $CONFIGDIR/rustic/rustic.toml:/etc/rustic/rustic.toml:ro
+      - $DOCKERDIR/logs/rustic:/logs:rw
+      # - $CONFIGDIR/rclone:/root/.config/rclone:rw
+      - $BACKUPDIR/RUSTIC/Repos/TestRepo:/repos/TestRepo:rw
+      - $BACKUPDIR/RUSTIC/BackupTest:/backups/BackupTest:ro
+      - $BACKUPDIR/RUSTIC/Restores:/restores:rw
+      # - $CONFIGDIR:/backups/docker_configs:ro
+      # - $NOTESDIR/Markdown:/backups/Markdown:ro
+      # - $DATADIR/vaultwarden:/vaultwarden_backup:ro
     environment:
       - TZ=$TZ
       - RUSTIC_PASSWORD=/run/secrets/rustic_password

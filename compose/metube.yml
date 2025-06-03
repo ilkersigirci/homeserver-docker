@@ -3,6 +3,9 @@ services:
     image: alexta69/metube:latest
     container_name: metube
     restart: $MEDIA_RESTART_POLICY
+    profiles:
+      - media
+      - youtube
     networks:
       - t3_proxy
     security_opt:
@@ -31,5 +34,3 @@ services:
       - homepage.href=https://metube.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Self-hosted YouTube downloader
-    profiles:
-      - media

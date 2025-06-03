@@ -5,12 +5,13 @@ services:
     restart: $MEDIA_RESTART_POLICY
     profiles:
       - media
+      - youtube
     networks:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $CONFIGDIR/pinchflat:/config
+      - $DOCKERDIR/appdata/pinchflat:/config
       - $MEDIADIR/Youtube:/downloads
     environment:
       - TZ=$TZ
