@@ -114,7 +114,9 @@ services:
     environment:
       - TZ=$TZ
       - CF_DNS_API_TOKEN_FILE=/run/secrets/cf_dns_api_token
-      - DOMAINNAME=$DOMAINNAME # Passing the domain name to traefik container to be able to use the variable in rules.
+      # Passing custom env variables to the container to be able to use this variables in the rules.
+      - DOMAINNAME=$DOMAINNAME
+      - BASE_DOMAINNAME=$BASE_DOMAINNAME
       - CROWDSEC_TRAEFIK_BOUNCER_API_KEY=$CROWDSEC_TRAEFIK_BOUNCER_API_KEY
     secrets:
       - cf_dns_api_token
