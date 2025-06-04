@@ -1,30 +1,32 @@
 services:
   wg-easy:
-    image: weejewel/wg-easy
+    image: ghcr.io/wg-easy/wg-easy:15
     container_name: wg-easy
-    restart: $OTHERS_RESTART_POLICY
+    restart: $BASE_RESTART_POLICY
+    profiles:
+      - core
     networks:
-      - t3_proxy
-    volumes:
-      - $DOCKERDIR/appdata/wg-easy:/etc/wireguard
-    environment:
-      - WG_HOST=$SERVER_IP
-      # - PASSWORD=ilker
-      # - WG_PORT=51820
-      # - WG_DEFAULT_ADDRESS=10.8.0.x
-      # - WG_DEFAULT_DNS=1.1.1.1
-      # - WG_ALLOWED_IPS=192.168.15.0/24, 10.0.1.0/24
+      t3_proxy:
+        ipv4_address: 192.168.90.91
+        ipv6_address: fdcc:ad94:bacf:61a3::2a
     ports:
       - "51820:51820/udp"
-      # - "51821:51821/tcp"
-    #    security_opt:
-    # - no-new-privileges:true
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
     sysctls:
       - net.ipv4.ip_forward=1
       - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.all.forwarding=1
+      - net.ipv6.conf.default.forwarding=1
+    volumes:
+      - $CONFIGDIR/wg-easy:/etc/wireguard
+      - /lib/modules:/lib/modules:ro
+    environment:
+      - PORT=51821
+      - HOST=0.0.0.0
+      # - INSECURE=false
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth
@@ -36,11 +38,9 @@ services:
       - "traefik.http.routers.wg-easy-rtr.service=wg-easy-svc"
       - "traefik.http.services.wg-easy-svc.loadbalancer.server.port=51821"
       ####### HOMEPAGE #######
-      - homepage.group=Others
+      - homepage.group=Core
       - homepage.name=Wireguard
       - homepage.icon=wireguard.svg
       - homepage.href=https://wireguard.$DOMAINNAME
       - homepage.target=_blank
-      - homepage.description=VPN Server
-    profiles:
-      - others
+      - homepage.description=The easiest way to run WireGuard VPN and UI

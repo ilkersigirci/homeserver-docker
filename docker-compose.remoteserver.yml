@@ -9,6 +9,7 @@ networks:
     ipam:
       config:
         - subnet: 192.168.90.0/24
+        - subnet: fdcc:ad94:bacf:61a3::/64
   socket_proxy:
     name: socket_proxy
     driver: bridge
@@ -63,6 +64,7 @@ include:
   - compose/traefik.yml
   # - compose/vaultwarden.yml
   - compose/webfinger.yml
+  - compose/wg-easy.yml
   #### DESKTOP APPS ####
   #### MACHINE LEARNING ####
   ###### MAINTENANCE ####
