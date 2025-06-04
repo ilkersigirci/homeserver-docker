@@ -51,8 +51,8 @@ http:
           # Cross-Origin-Embedder-Policy: "require-corp"
           # Cross-Origin-Opener-Policy: "same-origin"
           # Cross-Origin-Resource-Policy: "same-origin"
-          Content-Security-Policy: "default-src 'self'; frame-ancestors 'self' https://*.{{env "BASE_DOMAINNAME"}};"
-          # Content-Security-Policy: "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; media-src 'self'; object-src 'none'; child-src 'self'; frame-src 'self'; worker-src 'self'; frame-ancestors 'self' https://*.example.com; form-action 'self'; base-uri 'self'; manifest-src 'self';"
+          # Content-Security-Policy: "default-src 'self'; frame-src 'self' https://*.{{env "BASE_DOMAINNAME"}}; frame-ancestors 'self' https://*.{{env "BASE_DOMAINNAME"}};"
+          Content-Security-Policy: "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; media-src 'self'; object-src 'none'; child-src 'self'; frame-src 'self' https://*.{{env "BASE_DOMAINNAME"}}; worker-src 'self'; frame-ancestors 'self' https://*.{{env "BASE_DOMAINNAME"}}; form-action 'self'; base-uri 'self'; manifest-src 'self';"
         customRequestHeaders:
           X-Forwarded-Proto: https
 
