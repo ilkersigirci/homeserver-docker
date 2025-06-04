@@ -1,0 +1,28 @@
+http:
+  middlewares:
+    chain-authelia:
+      chain:
+        middlewares:
+          - middlewares-cf-real-ip
+          - middlewares-crowdsec-bouncer
+          - middlewares-rate-limit
+          - middlewares-secure-headers
+          - middlewares-authelia
+
+    chain-authelia-relaxed:
+      chain:
+        middlewares:
+          - middlewares-cf-real-ip
+          - middlewares-crowdsec-bouncer
+          - middlewares-rate-limit
+          - middlewares-secure-headers-relaxed
+          - middlewares-authelia
+
+    chain-authelia-iframe:
+      chain:
+        middlewares:
+          - middlewares-cf-real-ip
+          - middlewares-crowdsec-bouncer
+          - middlewares-rate-limit
+          - middlewares-secure-headers-iframe
+          - middlewares-authelia

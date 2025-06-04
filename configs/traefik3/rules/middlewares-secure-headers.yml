@@ -1,0 +1,123 @@
+http:
+  middlewares:
+    middlewares-secure-headers-iframe:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - OPTIONS
+          - PUT
+        accessControlMaxAge: 100
+        hostsProxyHeaders:
+          - "X-Forwarded-Host"
+        stsSeconds: 63072000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        # forceSTSHeader: true # This is a good thing but it can be tricky. Enable after everything works.
+        # customFrameOptionsValue: SAMEORIGIN
+        customFrameOptionsValue: ALLOWALL
+        contentTypeNosniff: true
+        browserXssFilter: true
+        referrerPolicy: "same-origin"
+        permissionsPolicy: "camera=(), microphone=(), geolocation=(), payment=(), usb=(), vr=()"
+        customResponseHeaders:
+          X-Robots-Tag: "none,noarchive,nosnippet,notranslate,noimageindex," # disable search engines from indexing home server
+          server: "" # hide server info from visitors
+
+    middlewares-secure-headers:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - OPTIONS
+          - PUT
+        accessControlMaxAge: 100
+        hostsProxyHeaders:
+          - "X-Forwarded-Host"
+        sslRedirect: true
+        sslForceHost: true
+        sslProxyHeaders:
+          X-Forwarded-Proto: https
+        stsSeconds: 63072000  # 2 years HSTS
+        stsIncludeSubdomains: true
+        stsPreload: true
+        forceSTSHeader: true  # Enable this for better security. This is a good thing but it can be tricky. Enable after everything works.
+        customFrameOptionsValue: SAMEORIGIN
+        contentTypeNosniff: true
+        browserXssFilter: true
+        referrerPolicy: "strict-origin-when-cross-origin"  # More secure referrer policy
+        permissionsPolicy: "camera=(), microphone=(), geolocation=(), payment=(), usb=(), vr=(), magnetometer=(), gyroscope=(), speaker=(self)"
+        customResponseHeaders:
+          X-Robots-Tag: "none,noarchive,nosnippet,notranslate,noimageindex"
+          server: ""  # Hide server info
+          # Additional security headers
+          Cross-Origin-Embedder-Policy: "require-corp"
+          Cross-Origin-Opener-Policy: "same-origin"
+          Cross-Origin-Resource-Policy: "same-origin"
+          # Strict Content Security Policy (adjust as needed for your apps)
+          Content-Security-Policy: "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; media-src 'self'; object-src 'none'; child-src 'self'; frame-src 'self'; worker-src 'self'; frame-ancestors 'self'; form-action 'self'; base-uri 'self'; manifest-src 'self';"
+        customRequestHeaders:
+          X-Forwarded-Proto: https
+          
+    middlewares-secure-headers-iframe-2:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - OPTIONS
+          - PUT
+        accessControlMaxAge: 100
+        hostsProxyHeaders:
+          - "X-Forwarded-Host"
+        sslRedirect: true
+        sslForceHost: true
+        sslProxyHeaders:
+          X-Forwarded-Proto: https
+        stsSeconds: 63072000  # 2 years HSTS
+        stsIncludeSubdomains: true
+        stsPreload: true
+        forceSTSHeader: true  # Enable this for better security. This is a good thing but it can be tricky. Enable after everything works.
+        # customFrameOptionsValue: SAMEORIGIN  # Disabled to allow iframe from base domain
+        contentTypeNosniff: true
+        browserXssFilter: true
+        referrerPolicy: "strict-origin-when-cross-origin"  # More secure referrer policy
+        permissionsPolicy: "camera=(), microphone=(), geolocation=(), payment=(), usb=(), vr=(), magnetometer=(), gyroscope=(), speaker=(self)"
+        customResponseHeaders:
+          X-Robots-Tag: "none,noarchive,nosnippet,notranslate,noimageindex"
+          server: ""  # Hide server info
+          # Additional security headers
+          Cross-Origin-Embedder-Policy: "require-corp"
+          Cross-Origin-Opener-Policy: "same-origin"
+          Cross-Origin-Resource-Policy: "same-origin"
+          Content-Security-Policy: "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; media-src 'self'; object-src 'none'; child-src 'self'; frame-src 'self'; worker-src 'self'; frame-ancestors 'self' *.example.com; form-action 'self'; base-uri 'self'; manifest-src 'self';"
+        customRequestHeaders:
+          X-Forwarded-Proto: https
+
+    # Alternative headers for applications that need more flexibility
+    middlewares-secure-headers-relaxed:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - OPTIONS
+          - PUT
+          - POST
+          - DELETE
+        accessControlMaxAge: 100
+        hostsProxyHeaders:
+          - "X-Forwarded-Host"
+        sslRedirect: true
+        sslForceHost: true
+        sslProxyHeaders:
+          X-Forwarded-Proto: https
+        stsSeconds: 31536000  # 1 year HSTS
+        stsIncludeSubdomains: true
+        stsPreload: true
+        forceSTSHeader: true
+        customFrameOptionsValue: SAMEORIGIN
+        contentTypeNosniff: true
+        browserXssFilter: true
+        referrerPolicy: "strict-origin-when-cross-origin"
+        permissionsPolicy: "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+        customResponseHeaders:
+          X-Robots-Tag: "none,noarchive,nosnippet,notranslate,noimageindex"
+          server: ""
+          Cross-Origin-Opener-Policy: "same-origin-allow-popups"
+        customRequestHeaders:
+          X-Forwarded-Proto: https

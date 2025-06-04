@@ -1,8 +1,12 @@
 appdata
-configss
 data
 logs
 secrets
 compose/photo/.env
 .idea
 .env
+
+# Configs
+acme.json
+configs/*
+!configs/traefik3

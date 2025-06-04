@@ -1,6 +1,6 @@
 {
     "files.associations": {
-        "*.yml": "dockercompose"
+        "**/compose/*.yml": "dockercompose"
     },
     "yaml.schemas": {
         "https://json.schemastore.org/traefik-v2.json": "file:///home/ilker/docker/configs/traefik2/rules/config.yml",

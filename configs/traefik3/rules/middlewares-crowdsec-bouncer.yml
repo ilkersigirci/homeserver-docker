@@ -1,0 +1,10 @@
+http:
+  middlewares:
+    middlewares-crowdsec-bouncer:
+      plugin:
+        crowdsec-bouncer:
+          enabled: true
+          crowdseclapikey: {{env "CROWDSEC_TRAEFIK_BOUNCER_API_KEY"}}
+          # crowdseclapikey: gBEM7VsnTOuN8ygNbzmeLFPGwQNOocmCJfqK0IiqWzk
+          crowdseclapischeme: http
+          crowdseclapihost: crowdsec:8080
