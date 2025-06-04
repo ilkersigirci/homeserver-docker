@@ -4,7 +4,7 @@
 #      init -r /repos/TestRepo
 #  - backup: Backup the local repository to the remote repository
 #  - restore: Restore the remote repository to a local directory
-#       restore -r /repos/TestRepo restore latest /restores/RestoreTest
+#       -r /repos/TestRepo restore latest /restores/RestoreTest
 #  - snapshots: List all snapshots in the remote repository
 services:
   rustic:
@@ -18,9 +18,9 @@ services:
     #     RUSTIC_VERSION: v0.9.5
     # restart: $MAINTENANCE_RESTART_POLICY
     restart: "no"
-    # command: init
+    command: help
     profiles:
-      - maintenance
+      # - maintenance # NOTE: Commented out so that docker-manage script excludes it
       - backup
     networks:
       - t3_proxy
@@ -31,11 +31,11 @@ services:
       - $DOCKERDIR/logs/rustic:/logs:rw
       # - $CONFIGDIR/rclone:/root/.config/rclone:rw
       - $BACKUPDIR/RUSTIC/Repos/TestRepo:/repos/TestRepo:rw
-      - $BACKUPDIR/RUSTIC/BackupTest:/backups/BackupTest:ro
       - $BACKUPDIR/RUSTIC/Restores:/restores:rw
+      - $BACKUPDIR/RUSTIC/BackupTest:/backups/BackupTest:ro
+      - $DATADIR/vaultwarden-backup:/backups/Vaultwarden:ro
       # - $CONFIGDIR:/backups/docker_configs:ro
       # - $NOTESDIR/Markdown:/backups/Markdown:ro
-      # - $DATADIR/vaultwarden:/vaultwarden_backup:ro
     environment:
       - TZ=$TZ
       - RUSTIC_PASSWORD=/run/secrets/rustic_password
