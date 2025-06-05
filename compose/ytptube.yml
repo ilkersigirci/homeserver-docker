@@ -1,3 +1,6 @@
+# NOTE: Create folders before starting the container
+# mkdir $DOCKERDIR/appdata/ytptube
+# mkdir $DOCKERDIR/logs/ytptube
 services:
   ytptube:
     image: ghcr.io/arabcoders/ytptube:latest
@@ -12,7 +15,8 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $CONFIGDIR/ytptube:/config:rw
+      - $DOCKERDIR/appdata/ytptube:/config:rw
+      - $DOCKERDIR/logs/ytptube:/config/logs:rw
       - $MEDIADIR/Youtube:/downloads:rw
     tmpfs:
       - /tmp
