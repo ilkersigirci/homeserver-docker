@@ -3,9 +3,10 @@
         "**/compose/*.yml": "dockercompose"
     },
     "yaml.schemas": {
-        "https://json.schemastore.org/traefik-v2.json": "file:///home/ilker/docker/configs/traefik2/rules/config.yml",
-        "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": [
-            "compose/prometheus.yml"
+        "https://json.schemastore.org/traefik-v3.json": "configs/traefik3/rules/dynamic_config.yml",
+        "https://json.schemastore.org/traefik-v3-file-provider.json": [
+            "configs/traefik3/rules/*.yml",
+            "configs/traefik3/rules/*.yaml"
         ]
     },
     "files.watcherExclude": {
