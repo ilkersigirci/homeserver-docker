@@ -15,6 +15,7 @@ services:
     environment:
       - PUID=$PUID
       - PGID=$PGID
+      - TZ=$TZ
       - APP_URL=https://pocketid.$DOMAINNAME
       - PORT=1411
     healthcheck:
@@ -39,9 +40,9 @@ services:
       - homepage.icon=pocket-id.svg
       - homepage.href=https://pocketid.$DOMAINNAME
       - homepage.target=_blank
-      - homepage.description=OIDC provider that allows users to authenticate with their passkeys
+      - homepage.description=OIDC provider using only passkeys
       ####### GLANCE #######
       - glance.name=pocket-id
       - glance.icon=sh:pocket-id-dark
       - glance.url=https://pocketid.$DOMAINNAME
-      - glance.description=OIDC provider that allows users to authenticate with their passkeys
+      - glance.description=OIDC provider using only passkeys

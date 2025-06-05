@@ -56,11 +56,12 @@ include:
   - compose/filebrowser.yml
   - compose/homepage.yml
   - compose/glance.yml
-  # - compose/pocket-id.yml
+  - compose/pocket-id.yml
   - compose/socket-proxy.yml
-  # - compose/tinyauth.yml
+  - compose/tinyauth.yml
   - compose/traefik.yml
   - compose/vaultwarden.yml
+  - compose/vaultwarden-backup.yml
   # - compose/webfinger.yml
   #### DESKTOP APPS ####
   # - compose/krita.yml
