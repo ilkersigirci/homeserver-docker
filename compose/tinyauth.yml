@@ -1,3 +1,6 @@
+# Create user: docker run -i -t --rm ghcr.io/steveiliop56/tinyauth:v3 user create --interactive
+# Create SECRET: openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | head -c 32
+# Create TOTP: docker run -i -t --rm ghcr.io/steveiliop56/tinyauth:v3 totp generate --interactive
 services:
   tinyauth:
     image: ghcr.io/steveiliop56/tinyauth:v3
@@ -16,9 +19,9 @@ services:
       COOKIE_SECURE: "true"
       DISABLE_CONTINUE: "true"
       # LOG_LEVEL: "5"
-      USERS: $TINYAUTH_USERS
+      # USERS: $TINYAUTH_USERS
+      USERS_FILE: users_file
       LOGIN_MAX_RETRIES: 5
-      # USERS_FILE: $SECRETDIR/tinyauth_users.txt
       ## OIDC CLIENT CONFIGURATION
       GENERIC_NAME: PocketID
       GENERIC_CLIENT_ID: $TINYAUTH_GENERIC_CLIENT_ID
@@ -30,6 +33,8 @@ services:
       GENERIC_SKIP_SSL: "true"
       # OAUTH_AUTO_REDIRECT: generic # To automatically redirected to Pocket ID
       # OAUTH_WHITELIST: $POCKETID_WHITELIST_USERS
+    volumes:
+      - $SECRETSDIR/tinyauth_users:/tinyauth/users_file
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

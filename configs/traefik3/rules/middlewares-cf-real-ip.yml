@@ -6,10 +6,11 @@ http:
           disableDefault: false
           trustip: # Trust IPS not required if disableDefault is false - we will allocate Cloud Flare IPs automatically, can be used to add additional CIDR's like LAN networks
             #### Local IPS ####
-            # - 127.0.0.1/32
-            # - 10.0.0.0/8
-            # - 192.168.0.0/16
-            # - 172.16.0.0/12
+            # Needed for tinyauth to work with pocket-id
+            - 127.0.0.1/32
+            - 10.0.0.0/8
+            - 192.168.0.0/16
+            - 172.16.0.0/12
             #### For tailscale ####
             - 100.0.0.0/8
 

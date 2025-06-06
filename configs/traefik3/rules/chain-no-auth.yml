@@ -3,7 +3,7 @@ http:
     chain-no-auth:
       chain:
         middlewares:
-          # - middlewares-cf-real-ip
+          - middlewares-cf-real-ip
           - middlewares-crowdsec-bouncer
           - middlewares-rate-limit
           - middlewares-secure-headers
@@ -11,7 +11,7 @@ http:
     chain-no-auth-relaxed:
       chain:
         middlewares:
-          # - middlewares-cf-real-ip
+          - middlewares-cf-real-ip
           - middlewares-crowdsec-bouncer
           - middlewares-rate-limit
           - middlewares-secure-headers-relaxed
