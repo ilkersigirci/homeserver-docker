@@ -29,24 +29,22 @@ networks:
 
 ########################### SECRETS
 secrets:
+  # authelia_jwt_secret:
+  #   file: $DOCKERDIR/secrets/authelia_jwt_secret
+  # authelia_session_secret:
+  #   file: $DOCKERDIR/secrets/authelia_session_secret
+  # authelia_storage_encryption_key:
+  #   file: $DOCKERDIR/secrets/authelia_storage_encryption_key
   cf_dns_api_token:
     file: $DOCKERDIR/secrets/cf_dns_api_token
-  authelia_jwt_secret:
-    file: $DOCKERDIR/secrets/authelia_jwt_secret
-  authelia_session_secret:
-    file: $DOCKERDIR/secrets/authelia_session_secret
-#  authelia_duo_api_secret_key:
-#    file: $DOCKERDIR/secrets/authelia_duo_api_secret_key
-  authelia_storage_encryption_key:
-    file: $DOCKERDIR/secrets/authelia_storage_encryption_key
-  mysql_root_password:
-    file: $DOCKERDIR/secrets/mysql_root_password
-  mysql_password:
-    file: $DOCKERDIR/secrets/mysql_password
-  rustic_password:
-    file: $DOCKERDIR/secrets/rustic_password
   # firefly_app_key:
   #   file: $DOCKERDIR/secrets/firefly_app_key
+  # mysql_root_password:
+  #   file: $DOCKERDIR/secrets/mysql_root_password
+  # mysql_password:
+  #   file: $DOCKERDIR/secrets/mysql_password
+  rustic_password:
+    file: $DOCKERDIR/secrets/rustic_password
 
 include:
   ########################### SERVICES
