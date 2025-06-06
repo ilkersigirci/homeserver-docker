@@ -52,7 +52,6 @@ include:
   ########################### SERVICES
   #### CORE ####
   - compose/adguardhome.yml
-  - compose/authelia.yml
   - compose/crowdsec.yml
   - compose/dufs.yml
   - compose/filebrowser.yml
