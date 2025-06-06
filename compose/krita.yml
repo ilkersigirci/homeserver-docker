@@ -18,7 +18,7 @@ services:
       - "traefik.http.routers.krita-rtr.entrypoints=websecure"
       - "traefik.http.routers.krita-rtr.rule=Host(`krita.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.krita-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.krita-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.krita-rtr.service=krita-svc"
       - "traefik.http.services.krita-svc.loadbalancer.server.port=3000"

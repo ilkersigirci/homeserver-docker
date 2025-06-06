@@ -24,7 +24,7 @@ services:
       - "traefik.http.routers.notes-rtr.entrypoints=websecure"
       - "traefik.http.routers.notes-rtr.rule=Host(`notes.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.notes-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.notes-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.notes-rtr.service=notes-svc"
       - "traefik.http.services.notes-svc.loadbalancer.server.port=8080"

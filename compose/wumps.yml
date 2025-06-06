@@ -19,7 +19,7 @@ services:
     #   - "traefik.http.routers.wumps-rtr.entrypoints=websecure"
     #   - "traefik.http.routers.wumps-rtr.rule=Host(`wol.$DOMAINNAME`)"
     #   ## Middlewares
-    #   - "traefik.http.routers.wumps-rtr.middlewares=chain-authelia@file"
+    #   - "traefik.http.routers.wumps-rtr.middlewares=chain-tinyauth@file"
     #   ## HTTP Services
     #   - "traefik.http.routers.wumps-rtr.service=wumps-svc"
     #   - "traefik.http.services.wumps-svc.loadbalancer.server.port=9008"

@@ -29,7 +29,7 @@ services:
       - "traefik.http.routers.firefox-rtr.entrypoints=websecure"
       - "traefik.http.routers.firefox-rtr.rule=Host(`firefox.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.firefox-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.firefox-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.firefox-rtr.service=firefox-svc"
       - "traefik.http.services.firefox-svc.loadbalancer.server.port=3000"

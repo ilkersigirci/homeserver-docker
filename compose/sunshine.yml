@@ -30,7 +30,7 @@ services:
       - "traefik.http.routers.sunshine-rtr.entrypoints=websecure"
       - "traefik.http.routers.sunshine-rtr.rule=Host(`sunshine.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.sunshine-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.sunshine-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.sunshine-rtr.service=sunshine-svc"
       - "traefik.http.services.sunshine-svc.loadbalancer.server.port=47990"

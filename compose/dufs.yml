@@ -29,7 +29,7 @@ services:
       - "traefik.http.routers.dufs-rtr.entrypoints=websecure"
       - "traefik.http.routers.dufs-rtr.rule=Host(`dufs.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.dufs-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.dufs-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.dufs-rtr.service=dufs-svc"
       - "traefik.http.services.dufs-svc.loadbalancer.server.port=5000"

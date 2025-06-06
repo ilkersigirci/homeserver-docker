@@ -29,7 +29,7 @@ services:
       - "traefik.http.routers.code-server-rtr.entrypoints=websecure"
       - "traefik.http.routers.code-server-rtr.rule=Host(`code.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.code-server-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.code-server-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.code-server-rtr.service=code-server-svc"
       - "traefik.http.services.code-server-svc.loadbalancer.server.port=8443"

@@ -25,7 +25,7 @@ services:
       - "traefik.http.routers.volglass-rtr.entrypoints=websecure"
       - "traefik.http.routers.volglass-rtr.rule=Host(`volglass.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.volglass-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.volglass-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.volglass-rtr.service=volglass-svc"
       - "traefik.http.services.volglass-svc.loadbalancer.server.port=3000"

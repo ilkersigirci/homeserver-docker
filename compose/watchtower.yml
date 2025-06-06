@@ -53,7 +53,7 @@ services:
       - "traefik.http.routers.watchtower-rtr.entrypoints=websecure"
       - "traefik.http.routers.watchtower-rtr.rule=Host(`watchtower.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.watchtower-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.watchtower-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.watchtower-rtr.service=watchtower-svc"
       - "traefik.http.services.watchtower-svc.loadbalancer.server.port=8080"

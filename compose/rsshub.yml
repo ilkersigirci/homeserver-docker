@@ -74,7 +74,7 @@ services:
       - "traefik.http.routers.rsshub-rtr.entrypoints=websecure"
       - "traefik.http.routers.rsshub-rtr.rule=Host(`rsshub.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.rsshub-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.rsshub-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.rsshub-rtr.service=rsshub-svc"
       - "traefik.http.services.rsshub-svc.loadbalancer.server.port=1200"

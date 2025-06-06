@@ -33,7 +33,7 @@ services:
       - "traefik.http.routers.transmission-rtr.entrypoints=websecure"
       - "traefik.http.routers.transmission-rtr.rule=Host(`torrent.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.transmission-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.transmission-rtr.middlewares=chain-tinyauth@file"
       #      - "traefik.http.routers.transmission-rtr.middlewares=middlewares-rate-limit@file"
       ## HTTP Services
       - "traefik.http.routers.transmission-rtr.service=transmission-svc"

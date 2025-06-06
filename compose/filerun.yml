@@ -60,7 +60,7 @@ services:
       - "traefik.http.routers.filerun-rtr.entrypoints=websecure"
       - "traefik.http.routers.filerun-rtr.rule=Host(`filerun.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.filerun-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.filerun-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.filerun-rtr.service=filerun-svc"
       - "traefik.http.services.filerun-svc.loadbalancer.server.port=80"

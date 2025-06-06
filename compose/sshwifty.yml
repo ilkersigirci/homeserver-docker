@@ -21,7 +21,7 @@ services:
       - "traefik.http.routers.sshwifty-rtr.entrypoints=websecure"
       - "traefik.http.routers.sshwifty-rtr.rule=Host(`ssh.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.sshwifty-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.sshwifty-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.sshwifty-rtr.service=sshwifty-svc"
       - "traefik.http.services.sshwifty-svc.loadbalancer.server.port=8182"

@@ -27,7 +27,7 @@ services:
       - "traefik.http.routers.ytdl-rtr.entrypoints=websecure"
       - "traefik.http.routers.ytdl-rtr.rule=Host(`ytdl.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.ytdl-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.ytdl-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       # - "traefik.http.routers.ytdl-rtr.service=ytdl-svc"
       # - "traefik.http.services.ytdl-svc.loadbalancer.server.port=8081"

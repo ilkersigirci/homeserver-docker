@@ -26,7 +26,7 @@ services:
       - "traefik.http.routers.vscodium-rtr.entrypoints=websecure"
       - "traefik.http.routers.vscodium-rtr.rule=Host(`vscodium.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.vscodium-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.vscodium-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.vscodium-rtr.service=vscodium-svc"
       - "traefik.http.services.vscodium-svc.loadbalancer.server.port=3000"

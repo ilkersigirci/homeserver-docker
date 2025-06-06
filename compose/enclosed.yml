@@ -13,7 +13,7 @@ services:
       - "traefik.http.routers.enclosed.entrypoints=websecure"
       - "traefik.http.routers.enclosed.rule=Host(`enclosed.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.enclosed.middlewares=chain-authelia@file"
+      - "traefik.http.routers.enclosed.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.enclosed.service=logseq-svc"
       - "traefik.http.services.logseq-svc.loadbalancer.server.port=8787"

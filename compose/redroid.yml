@@ -26,7 +26,7 @@ services:
       - "traefik.http.routers.redroid-rtr.entrypoints=websecure"
       - "traefik.http.routers.redroid-rtr.rule=Host(`redroid.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.redroid-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.redroid-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.redroid-rtr.service=redroid-svc"
       - "traefik.http.services.redroid-svc.loadbalancer.server.port=5555"

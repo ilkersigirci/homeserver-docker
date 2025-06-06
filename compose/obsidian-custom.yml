@@ -28,7 +28,7 @@ services:
       - "traefik.http.routers.obsidian-custom-rtr.entrypoints=websecure"
       - "traefik.http.routers.obsidian-custom-rtr.rule=Host(`obsidiancustom.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.obsidian-custom-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.obsidian-custom-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.obsidian-custom-rtr.service=obsidian-custom-svc"
       - "traefik.http.services.obsidian-custom-svc.loadbalancer.server.port=3000"

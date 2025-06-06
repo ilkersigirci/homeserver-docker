@@ -19,7 +19,7 @@ services:
       - "traefik.http.routers.chromium-rtr.entrypoints=websecure"
       - "traefik.http.routers.chromium-rtr.rule=Host(`chromium.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.chromium-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.chromium-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.chromium-rtr.service=chromium-svc"
       - "traefik.http.services.chromium-svc.loadbalancer.server.port=3000"

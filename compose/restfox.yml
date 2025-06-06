@@ -15,7 +15,7 @@ services:
       - "traefik.http.routers.restfox-rtr.entrypoints=websecure"
       - "traefik.http.routers.restfox-rtr.rule=Host(`restfox.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.restfox-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.restfox-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.restfox-rtr.service=restfox-svc"
       - "traefik.http.services.restfox-svc.loadbalancer.server.port=4004"

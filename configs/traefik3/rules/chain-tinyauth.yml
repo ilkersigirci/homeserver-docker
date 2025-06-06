@@ -1,0 +1,19 @@
+http:
+  middlewares:
+    chain-tinyauth:
+      chain:
+        middlewares:
+          - middlewares-cf-real-ip
+          - middlewares-crowdsec-bouncer
+          - middlewares-rate-limit
+          - middlewares-secure-headers
+          - middlewares-tinyauth
+
+    chain-tinyauth-relaxed:
+      chain:
+        middlewares:
+          - middlewares-cf-real-ip
+          - middlewares-crowdsec-bouncer
+          - middlewares-rate-limit
+          - middlewares-secure-headers-relaxed
+          - middlewares-tinyauth

@@ -36,7 +36,7 @@ services:
       - "traefik.http.routers.prometheus-rtr.entrypoints=websecure"
       - "traefik.http.routers.prometheus-rtr.rule=Host(`prometheus.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.prometheus-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.prometheus-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.prometheus-rtr.service=prometheus-svc"
       - "traefik.http.services.prometheus-svc.loadbalancer.server.port=9090"

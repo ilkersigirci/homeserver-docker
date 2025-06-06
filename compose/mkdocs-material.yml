@@ -21,7 +21,7 @@ services:
       - "traefik.http.routers.mkdocs-material-rtr.entrypoints=websecure"
       - "traefik.http.routers.mkdocs-material-rtr.rule=Host(`mkdocs.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.mkdocs-material-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.mkdocs-material-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.mkdocs-material-rtr.service=mkdocs-material-svc"
       - "traefik.http.services.mkdocs-material-svc.loadbalancer.server.port=8000"

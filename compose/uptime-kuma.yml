@@ -22,7 +22,7 @@ services:
       - "traefik.http.routers.autokuma-rtr.entrypoints=websecure"
       - "traefik.http.routers.autokuma-rtr.rule=Host(`autokuma.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.autokuma-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.autokuma-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.autokuma-rtr.service=autokuma-svc"
       - "traefik.http.services.autokuma-svc.loadbalancer.server.port=3001"
@@ -54,7 +54,7 @@ services:
       - "traefik.http.routers.uptime-kuma-rtr.entrypoints=websecure"
       - "traefik.http.routers.uptime-kuma-rtr.rule=Host(`uptimekuma.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.uptime-kuma-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.uptime-kuma-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.uptime-kuma-rtr.service=uptime-kuma-svc"
       - "traefik.http.services.uptime-kuma-svc.loadbalancer.server.port=3001"

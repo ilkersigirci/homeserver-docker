@@ -60,7 +60,7 @@ services:
       - "traefik.http.routers.perlite-rtr.entrypoints=websecure"
       - "traefik.http.routers.perlite-rtr.rule=Host(`perlite.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.perlite-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.perlite-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.perlite-rtr.service=perlite-svc"
       - "traefik.http.services.perlite-svc.loadbalancer.server.port=80"

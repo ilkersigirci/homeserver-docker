@@ -24,7 +24,7 @@ services:
       - "traefik.http.routers.webtop-rtr.entrypoints=websecure"
       - "traefik.http.routers.webtop-rtr.rule=Host(`webtop.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.webtop-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.webtop-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.webtop-rtr.service=webtop-svc"
       - "traefik.http.services.webtop-svc.loadbalancer.server.port=3000"

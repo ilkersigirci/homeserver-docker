@@ -21,7 +21,7 @@ services:
       - "traefik.http.routers.pinchflat-rtr.entrypoints=websecure"
       - "traefik.http.routers.pinchflat-rtr.rule=Host(`pinchflat.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.pinchflat-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.pinchflat-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.pinchflat-rtr.service=pinchflat-svc"
       - "traefik.http.services.pinchflat-svc.loadbalancer.server.port=8945"

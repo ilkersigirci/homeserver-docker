@@ -23,7 +23,7 @@ services:
       - "traefik.http.routers.handbrake-rtr.entrypoints=websecure"
       - "traefik.http.routers.handbrake-rtr.rule=Host(`handbrake.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.handbrake-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.handbrake-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.handbrake-rtr.service=handbrake-svc"
       - "traefik.http.services.handbrake-svc.loadbalancer.server.port=5800"

@@ -50,7 +50,7 @@ secrets:
 include:
   ########################### SERVICES
   #### CORE ####
-  - compose/authelia.yml
+  # - compose/authelia.yml
   - compose/crowdsec.yml
   - compose/dufs.yml
   - compose/filebrowser.yml

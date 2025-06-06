@@ -27,7 +27,7 @@
             "    - \"traefik.http.routers.${1:servicename}-rtr.entrypoints=websecure\"",
             "    - \"traefik.http.routers.${1:servicename}-rtr.rule=Host(`${1:servicename}.\\$DOMAINNAME`)\"",
             "    ## Middlewares",
-            "    - \"traefik.http.routers.${1:servicename}-rtr.middlewares=chain-authelia@file\"",
+            "    - \"traefik.http.routers.${1:servicename}-rtr.middlewares=chain-tinyauth@file\"",
             "    ## HTTP Services",
             "    - \"traefik.http.routers.${1:servicename}-rtr.service=${1:servicename}-svc\"",
             "    - \"traefik.http.services.${1:servicename}-svc.loadbalancer.server.port=${5:80}\"",

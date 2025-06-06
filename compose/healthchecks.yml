@@ -29,7 +29,7 @@ services:
       - "traefik.http.routers.healthchecks-rtr.entrypoints=websecure"
       - "traefik.http.routers.healthchecks-rtr.rule=Host(`healthchecks.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.healthchecks-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.healthchecks-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.healthchecks-rtr.service=healthchecks-svc"
       - "traefik.http.services.healthchecks-svc.loadbalancer.server.port=8000"

@@ -19,7 +19,7 @@ services:
       - "traefik.http.routers.freshrss-rtr.entrypoints=websecure"
       - "traefik.http.routers.freshrss-rtr.rule=Host(`freshrss.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.freshrss-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.freshrss-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.freshrss-rtr.service=freshrss-svc"
       - "traefik.http.services.freshrss-svc.loadbalancer.server.port=80"

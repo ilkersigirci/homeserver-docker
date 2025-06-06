@@ -26,7 +26,7 @@ services:
       - "traefik.http.routers.jdownloader-rtr.entrypoints=websecure"
       - "traefik.http.routers.jdownloader-rtr.rule=Host(`download.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.jdownloader-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.jdownloader-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.jdownloader-rtr.service=jdownloader-svc"
       - "traefik.http.services.jdownloader-svc.loadbalancer.server.port=5800"

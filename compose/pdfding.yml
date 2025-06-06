@@ -57,7 +57,7 @@ services:
       - "traefik.http.routers.pdfding-rtr.entrypoints=websecure"
       - "traefik.http.routers.pdfding-rtr.rule=Host(`pdfding.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.pdfding-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.pdfding-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.pdfding-rtr.service=pdfding-svc"
       - "traefik.http.services.pdfding-svc.loadbalancer.server.port=8000"

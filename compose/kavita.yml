@@ -22,7 +22,7 @@ services:
       - "traefik.http.routers.kavita-rtr.entrypoints=websecure"
       - "traefik.http.routers.kavita-rtr.rule=Host(`kavita.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.kavita-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.kavita-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.kavita-rtr.service=kavita-svc"
       - "traefik.http.services.kavita-svc.loadbalancer.server.port=5000"

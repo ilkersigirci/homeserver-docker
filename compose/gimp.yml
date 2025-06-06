@@ -18,7 +18,7 @@ services:
       - "traefik.http.routers.gimp-rtr.entrypoints=websecure"
       - "traefik.http.routers.gimp-rtr.rule=Host(`gimp.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.gimp-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.gimp-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.gimp-rtr.service=gimp-svc"
       - "traefik.http.services.gimp-svc.loadbalancer.server.port=3000"

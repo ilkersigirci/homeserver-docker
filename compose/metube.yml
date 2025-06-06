@@ -23,7 +23,7 @@ services:
       - "traefik.http.routers.metube-rtr.entrypoints=websecure"
       - "traefik.http.routers.metube-rtr.rule=Host(`metube.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.metube-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.metube-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.metube-rtr.service=metube-svc"
       - "traefik.http.services.metube-svc.loadbalancer.server.port=8081"

@@ -32,7 +32,7 @@ services:
       - "traefik.http.routers.grafana-rtr.entrypoints=websecure"
       - "traefik.http.routers.grafana-rtr.rule=Host(`grafana.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.grafana-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.grafana-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.grafana-rtr.service=grafana-svc"
       - "traefik.http.services.grafana-svc.loadbalancer.server.port=3000"

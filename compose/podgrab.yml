@@ -18,7 +18,7 @@ services:
       - "traefik.http.routers.podgrab-rtr.entrypoints=websecure"
       - "traefik.http.routers.podgrab-rtr.rule=Host(`podgrab.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.podgrab-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.podgrab-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.podgrab-rtr.service=podgrab-svc"
       - "traefik.http.services.podgrab-svc.loadbalancer.server.port=8080"

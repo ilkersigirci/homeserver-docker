@@ -17,7 +17,7 @@ services:
       - "traefik.http.routers.feishin-rtr.entrypoints=websecure"
       - "traefik.http.routers.feishin-rtr.rule=Host(`feishin.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.feishin-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.feishin-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.feishin-rtr.service=feishin-svc"
       - "traefik.http.services.feishin-svc.loadbalancer.server.port=9180"

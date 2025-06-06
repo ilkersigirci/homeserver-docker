@@ -24,7 +24,7 @@ services:
       - "traefik.http.routers.changedetection-rtr.entrypoints=websecure"
       - "traefik.http.routers.changedetection-rtr.rule=Host(`changedetection.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.changedetection-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.changedetection-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.changedetection-rtr.service=changedetection-svc"
       - "traefik.http.services.changedetection-svc.loadbalancer.server.port=5000"

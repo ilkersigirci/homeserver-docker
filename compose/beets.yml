@@ -22,7 +22,7 @@ services:
       - "traefik.http.routers.beets-rtr.entrypoints=websecure"
       - "traefik.http.routers.beets-rtr.rule=Host(`beets.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.beets-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.beets-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.beets-rtr.service=beets-svc"
       - "traefik.http.services.beets-svc.loadbalancer.server.port=8337"

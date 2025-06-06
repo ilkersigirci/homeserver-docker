@@ -42,8 +42,8 @@ services:
       - "traefik.http.routers.tinyauth-rtr.rule=Host(`tinyauth.$DOMAINNAME`)"
       ## Middlewares
       - "traefik.http.routers.tinyauth-rtr.middlewares=chain-no-auth@file"
-      ## Forward Auth
-      - "traefik.http.middlewares.tinyauth.forwardauth.address=http://tinyauth:3000/api/auth/traefik"
+      ## Forward Auth - Commented out because it is handled inside treafik middleware chain file
+      # - "traefik.http.middlewares.tinyauth.forwardauth.address=http://tinyauth:3000/api/auth/traefik"
       ####### HOMEPAGE #######
       - homepage.group=Core
       - homepage.name=tinyauth

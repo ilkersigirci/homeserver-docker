@@ -41,7 +41,7 @@ services:
       - "traefik.http.routers.windows-rtr.entrypoints=websecure"
       - "traefik.http.routers.windows-rtr.rule=Host(`windows.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.windows-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.windows-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.windows-rtr.service=windows-svc"
       - "traefik.http.services.windows-svc.loadbalancer.server.port=8006"

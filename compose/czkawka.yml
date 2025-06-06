@@ -23,7 +23,7 @@ services:
       - "traefik.http.routers.czkawka-rtr.entrypoints=websecure"
       - "traefik.http.routers.czkawka-rtr.rule=Host(`czkawka.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.czkawka-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.czkawka-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.czkawka-rtr.service=czkawka-svc"
       - "traefik.http.services.czkawka-svc.loadbalancer.server.port=5800"

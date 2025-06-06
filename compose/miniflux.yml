@@ -45,7 +45,7 @@ services:
       - "traefik.http.routers.miniflux-rtr.entrypoints=websecure"
       - "traefik.http.routers.miniflux-rtr.rule=Host(`miniflux.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.miniflux-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.miniflux-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.miniflux-rtr.service=miniflux-svc"
       - "traefik.http.services.miniflux-svc.loadbalancer.server.port=8080"

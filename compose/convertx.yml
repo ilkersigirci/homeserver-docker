@@ -22,7 +22,7 @@ services:
       - "traefik.http.routers.convertx-rtr.entrypoints=websecure"
       - "traefik.http.routers.convertx-rtr.rule=Host(`convertx.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.convertx-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.convertx-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.convertx-rtr.service=convertx-svc"
       - "traefik.http.services.convertx-svc.loadbalancer.server.port=3000"

@@ -40,7 +40,7 @@ services:
       - "traefik.http.routers.glances-rtr.entrypoints=websecure"
       - "traefik.http.routers.glances-rtr.rule=Host(`glances.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.glances-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.glances-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.glances-rtr.service=glances-svc"
       - "traefik.http.services.glances-svc.loadbalancer.server.port=61208"

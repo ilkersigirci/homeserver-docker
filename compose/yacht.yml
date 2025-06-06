@@ -24,7 +24,7 @@ services:
       - "traefik.http.routers.yacht-rtr.entrypoints=websecure"
       - "traefik.http.routers.yacht-rtr.rule=Host(`yacht.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.yacht-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.yacht-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.yacht-rtr.service=yacht-svc"
       - "traefik.http.services.yacht-svc.loadbalancer.server.port=8000"

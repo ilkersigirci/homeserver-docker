@@ -22,7 +22,7 @@ services:
       - "traefik.http.routers.jellyseerr-rtr.entrypoints=websecure"
       - "traefik.http.routers.jellyseerr-rtr.rule=Host(`jellyseerr.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.jellyseerr-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.jellyseerr-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.jellyseerr-rtr.service=jellyseerr-svc"
       - "traefik.http.services.jellyseerr-svc.loadbalancer.server.port=5055"

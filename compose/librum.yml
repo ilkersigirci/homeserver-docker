@@ -48,7 +48,7 @@ services:
       - "traefik.http.routers.librum-rtr.entrypoints=websecure"
       - "traefik.http.routers.librum-rtr.rule=Host(`librum.$DOMAINNAME`)"
       ## Middlewares
-      # - "traefik.http.routers.librum-rtr.middlewares=chain-authelia@file"
+      # - "traefik.http.routers.librum-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.librum-rtr.service=librum-svc"
       - "traefik.http.services.librum-svc.loadbalancer.server.port=5000"

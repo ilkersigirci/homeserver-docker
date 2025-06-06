@@ -15,7 +15,7 @@ services:
       - "traefik.http.routers.logseq-rtr.entrypoints=websecure"
       - "traefik.http.routers.logseq-rtr.rule=Host(`logseq.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.logseq-rtr.middlewares=chain-authelia@file"
+      - "traefik.http.routers.logseq-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.logseq-rtr.service=logseq-svc"
       - "traefik.http.services.logseq-svc.loadbalancer.server.port=80"
