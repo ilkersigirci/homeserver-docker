@@ -51,10 +51,9 @@ include:
   - compose/dufs.yml
   - compose/filebrowser.yml
   - compose/homepage.yml
-  # - compose/glance.yml
   - compose/socket-proxy.yml
+  - compose/tinyauth.yml
   - compose/traefik.yml
-  # - compose/vaultwarden.yml
   #### DESKTOP APPS ####
   #### MACHINE LEARNING ####
   ###### MAINTENANCE ####
@@ -64,10 +63,8 @@ include:
   - compose/syncthing.yml
   - compose/whoami.yml
   #### MEDIA ####
-  # - compose/transmission.yml
   #### ML ####
   #### MONITORING ####
   - compose/beszel.yml
   #### PHOTO ####
   #### READING ####
-  # - compose/obsidian.yml

@@ -52,6 +52,7 @@ include:
   - compose/homepage.yml
   # - compose/glance.yml
   - compose/socket-proxy.yml
+  - compose/tinyauth.yml
   - compose/traefik.yml
   # - compose/vaultwarden.yml
   #### DESKTOP APPS ####
