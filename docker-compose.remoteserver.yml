@@ -78,6 +78,7 @@ include:
   - compose/open-webui.yml
   #### MONITORING ####
   - compose/beszel.yml
+  - compose/rybbit.yml
   #### PHOTO ####
   #### READING ####
   # - compose/obsidian.yml
