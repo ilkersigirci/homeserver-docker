@@ -1,6 +1,4 @@
-# After first user creation, disable signup by
-# DISABLE_SIGNUP=true
-# NEXT_PUBLIC_DISABLE_SIGNUP=true
+# After first user creation, disable signup: RYBBIT_DISABLE_SIGNUP=true
 services:
   rybbit-clickhouse:
     image: clickhouse/clickhouse-server:25.4.2
@@ -18,9 +16,10 @@ services:
       - $DOCKERDIR/appdata/rybbit/clickhouse:/var/lib/clickhouse
       - $CONFIGDIR/rybbit/clickhouse:/etc/clickhouse-server/config.d:ro
     environment:
-      - CLICKHOUSE_DB=${CLICKHOUSE_DB:-analytics}
-      - CLICKHOUSE_USER=${CLICKHOUSE_USER:-default}
-      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD:-frog}
+      - TZ=$TZ
+      - CLICKHOUSE_DB=${RYBBIT_CLICKHOUSE_DB:-analytics}
+      - CLICKHOUSE_USER=${RYBBIT_CLICKHOUSE_USER:-default}
+      - CLICKHOUSE_PASSWORD=${RYBBIT_CLICKHOUSE_PASSWORD:-frog}
     healthcheck:
       test:
         [
@@ -50,9 +49,10 @@ services:
     volumes:
       - $DOCKERDIR/appdata/rybbit/postgres:/var/lib/postgresql/data
     environment:
-      - POSTGRES_USER=${POSTGRES_USER:-frog}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-frog}
-      - POSTGRES_DB=${POSTGRES_DB:-analytics}
+      # - TZ=$TZ # Doesn't work
+      - POSTGRES_USER=${RYBBIT_POSTGRES_USER:-frog}
+      - POSTGRES_PASSWORD=${RYBBIT_POSTGRES_PASSWORD:-frog}
+      - POSTGRES_DB=${RYBBIT_POSTGRES_DB:-analytics}
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 3s
@@ -61,7 +61,7 @@ services:
       start_period: 10s
 
   rybbit-backend:
-    image: ghcr.io/rybbit-io/rybbit-backend:latest
+    image: ghcr.io/rybbit-io/rybbit-backend:${RYBBIT_IMAGE_TAG:-latest}
     container_name: rybbit-backend
     restart: $MAINTENANCE_RESTART_POLICY
     depends_on:
@@ -75,18 +75,19 @@ services:
     networks:
       - t3_proxy
     environment:
+      - TZ=$TZ
       - NODE_ENV=production
       - CLICKHOUSE_HOST=http://rybbit-clickhouse:8123
-      - CLICKHOUSE_DB=${CLICKHOUSE_DB:-analytics}
-      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD:-frog}
+      - CLICKHOUSE_DB=${RYBBIT_CLICKHOUSE_DB:-analytics}
+      - CLICKHOUSE_PASSWORD=${RYBBIT_CLICKHOUSE_PASSWORD:-frog}
       - POSTGRES_HOST=rybbit-postgres
       - POSTGRES_PORT=5432
-      - POSTGRES_DB=${POSTGRES_DB:-analytics}
-      - POSTGRES_USER=${POSTGRES_USER:-frog}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-frog}
-      - BETTER_AUTH_SECRET=RANDOM_SECRET
+      - POSTGRES_DB=${RYBBIT_POSTGRES_DB:-analytics}
+      - POSTGRES_USER=${RYBBIT_POSTGRES_USER:-frog}
+      - POSTGRES_PASSWORD=${RYBBIT_POSTGRES_PASSWORD:-frog}
+      - BETTER_AUTH_SECRET=${RYBBIT_BETTER_AUTH_SECRET:-my_random_auth_secret}
       - BASE_URL=https://analytics.$DOMAINNAME
-      - DISABLE_SIGNUP=true
+      - DISABLE_SIGNUP=${RYBBIT_DISABLE_SIGNUP:-true}
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3001/api/health"]
       interval: 3s
@@ -102,6 +103,7 @@ services:
       - "traefik.http.routers.rybbit-api-rtr.middlewares=chain-no-auth@file"
       ## HTTP Services
       - "traefik.http.routers.rybbit-api-rtr.service=rybbit-api-svc"
+      - "traefik.http.routers.rybbit-api-rtr.priority=2"
       - "traefik.http.services.rybbit-api-svc.loadbalancer.server.port=3001"
       ####### HOMEPAGE #######
       - homepage.group=Monitoring
@@ -117,20 +119,21 @@ services:
       - glance.description=OSS alternative API to Google Analytics
 
   rybbit-client:
-    image: ghcr.io/rybbit-io/rybbit-client:latest
+    image: ghcr.io/rybbit-io/rybbit-client:${RYBBIT_IMAGE_TAG:-latest}
     container_name: rybbit-client
+    restart: $MAINTENANCE_RESTART_POLICY
+    depends_on:
+      - rybbit-backend
     profiles:
       - monitoring
       - rybbit
     networks:
       - t3_proxy
     environment:
+      - TZ=$TZ
       - NODE_ENV=production
       - NEXT_PUBLIC_BACKEND_URL=https://analytics.$DOMAINNAME
-      - NEXT_PUBLIC_DISABLE_SIGNUP=true
-    depends_on:
-      - rybbit-backend
-    restart: $MAINTENANCE_RESTART_POLICY
+      - NEXT_PUBLIC_DISABLE_SIGNUP=${RYBBIT_DISABLE_SIGNUP:-true}
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
@@ -140,6 +143,7 @@ services:
       - "traefik.http.routers.rybbit-rtr.middlewares=chain-no-auth@file"
       ## HTTP Services
       - "traefik.http.routers.rybbit-rtr.service=rybbit-svc"
+      - "traefik.http.routers.rybbit-rtr.priority=1"
       - "traefik.http.services.rybbit-svc.loadbalancer.server.port=3002"
       ####### HOMEPAGE #######
       - homepage.group=Monitoring
