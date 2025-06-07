@@ -16,8 +16,7 @@ services:
       - "traefik.http.routers.stremio-rtr.entrypoints=websecure"
       - "traefik.http.routers.stremio-rtr.rule=Host(`media.$DOMAINNAME`)"
       ## Middlewares
-      # - "traefik.http.routers.stremio-rtr.middlewares=chain-tinyauth@file"
-      - "traefik.http.routers.stremio-rtr.middlewares=tinyauth"
+      - "traefik.http.routers.stremio-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
       - "traefik.http.routers.stremio-rtr.service=stremio-svc"
       - "traefik.http.services.stremio-svc.loadbalancer.server.port=11470"
