@@ -4,7 +4,7 @@ services:
     container_name: upsnap
     restart: $MAINTENANCE_RESTART_POLICY
     # # you can change the listen ip:port inside the container like this:
-    # entrypoint: /bin/sh -c "./upsnap serve --http 0.0.0.0:5000"
+    entrypoint: /bin/sh -c "./upsnap serve --http 0.0.0.0:8090"
     # # To use a non-root user, create the mountpoint first (mkdir data) so that it has the right permission.
     user: $PUID:$PGID
     profiles:
@@ -21,7 +21,7 @@ services:
     volumes:
       - $DOCKERDIR/appdata/upsnap:/app/pb_data
     healthcheck:
-      test: curl -fs "http://localhost:5000/api/health" || exit 1
+      test: curl -fs "http://localhost:8090/api/health" || exit 1
       interval: 10s
     environment:
       - TZ=$TZ # Set container timezone for cron schedules
@@ -40,7 +40,7 @@ services:
     #   - "traefik.http.routers.upsnap-rtr.middlewares=chain-tinyauth@file"
     #   ## HTTP Services
     #   - "traefik.http.routers.upsnap-rtr.service=upsnap-svc"
-    #   - "traefik.http.services.upsnap-svc.loadbalancer.server.port=5000"
+    #   - "traefik.http.services.upsnap-svc.loadbalancer.server.port=8090"
     #   ####### HOMEPAGE #######
     #   - homepage.group=Maintenance
     #   - homepage.name=upsnap
