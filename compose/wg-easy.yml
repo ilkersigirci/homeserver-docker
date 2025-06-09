@@ -1,11 +1,58 @@
-# To get WG_DEVICE, run this inside the container: ip route get 8.8.8.8 | awk '{print $5}'
 services:
+  # NEEDS ipv6 to be enabled currently.
   wg-easy:
-    image: ghcr.io/wg-easy/wg-easy:14
+    image: ghcr.io/wg-easy/wg-easy:15
     container_name: wg-easy
     restart: $BASE_RESTART_POLICY
     profiles:
       - core
+    networks:
+      t3_proxy:
+        ipv4_address: 192.168.90.91
+        ipv6_address: fdcc:ad94:bacf:61a3::2a
+    ports:
+      - "51820:51820/udp"
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv6.conf.all.forwarding=1
+      - net.ipv6.conf.default.forwarding=1
+    volumes:
+      - $CONFIGDIR/wg-easy:/etc/wireguard
+      - /lib/modules:/lib/modules:ro
+    environment:
+      - PORT=51821
+      - HOST=0.0.0.0
+      # - INSECURE=false
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth
+      - "traefik.http.routers.wg-easy-rtr.entrypoints=websecure"
+      - "traefik.http.routers.wg-easy-rtr.rule=Host(`wireguard.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.wg-easy-rtr.middlewares=chain-tinyauth@file"
+      ## HTTP Services
+      - "traefik.http.routers.wg-easy-rtr.service=wg-easy-svc"
+      - "traefik.http.services.wg-easy-svc.loadbalancer.server.port=51821"
+      ####### HOMEPAGE #######
+      - homepage.group=Core
+      - homepage.name=Wireguard
+      - homepage.icon=wireguard.svg
+      - homepage.href=https://wireguard.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=The easiest way to run WireGuard VPN and UI
+
+  # To get WG_DEVICE, run this inside the container: ip route get 8.8.8.8 | awk '{print $5}'
+  wg-easy-14:
+    image: ghcr.io/wg-easy/wg-easy:14
+    container_name: wg-easy-14
+    restart: $BASE_RESTART_POLICY
+    profiles:
+      - not-used
     networks:
       t3_proxy:
         ipv4_address: 192.168.90.91
@@ -18,7 +65,7 @@ services:
       - net.ipv4.ip_forward=1
       - net.ipv4.conf.all.src_valid_mark=1
     volumes:
-      - $CONFIGDIR/wg-easy:/etc/wireguard
+      - $CONFIGDIR/wg-easy-14:/etc/wireguard
     environment:
       - WG_HOST=www.$DOMAINNAME # The public hostname of your VPN server. Shouldn't be proxied by Cloudflare.
       - WG_DEVICE=eth0 # Internal network interface inside docker. DO NOT use host device network name.
@@ -38,63 +85,13 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.wg-easy-rtr.entrypoints=websecure"
-      - "traefik.http.routers.wg-easy-rtr.rule=Host(`wireguard.$DOMAINNAME`)"
+      - "traefik.http.routers.wg-easy-14-rtr.entrypoints=websecure"
+      - "traefik.http.routers.wg-easy-14-rtr.rule=Host(`wireguard.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.wg-easy-rtr.middlewares=chain-tinyauth-relaxed@file" # NOTE: relaxed used for preventing CSP issues
+      - "traefik.http.routers.wg-easy-14-rtr.middlewares=chain-tinyauth-relaxed@file" # NOTE: relaxed used for preventing CSP issues
       ## HTTP Services
-      - "traefik.http.routers.wg-easy-rtr.service=wg-easy-svc"
-      - "traefik.http.services.wg-easy-svc.loadbalancer.server.port=51821"
-      ####### HOMEPAGE #######
-      - homepage.group=Core
-      - homepage.name=Wireguard
-      - homepage.icon=wireguard.svg
-      - homepage.href=https://wireguard.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=The easiest way to run WireGuard VPN and UI
-
-
-  # NOT WORKING
-  # NEEDS ipv6 to be enabled currently.
-  wg-easy-15:
-    image: ghcr.io/wg-easy/wg-easy:15
-    container_name: wg-easy-15
-    restart: $BASE_RESTART_POLICY
-    profiles:
-      # - core
-      - not-used
-    networks:
-      t3_proxy:
-        ipv4_address: 192.168.90.91
-        ipv6_address: fdcc:ad94:bacf:61a3::2a
-    ports:
-      - "51820:51820/udp"
-    cap_add:
-      - NET_ADMIN
-      - SYS_MODULE
-    sysctls:
-      - net.ipv4.ip_forward=1
-      - net.ipv4.conf.all.src_valid_mark=1
-      - net.ipv6.conf.all.disable_ipv6=0
-      - net.ipv6.conf.all.forwarding=1
-      - net.ipv6.conf.default.forwarding=1
-    volumes:
-      - $CONFIGDIR/wg-easy-15:/etc/wireguard
-      - /lib/modules:/lib/modules:ro
-    environment:
-      - PORT=51821
-      - HOST=0.0.0.0
-      # - INSECURE=false
-    labels:
-      - "traefik.enable=true"
-      ## HTTP Routers Auth
-      - "traefik.http.routers.wg-easy-15-rtr.entrypoints=websecure"
-      - "traefik.http.routers.wg-easy-15-rtr.rule=Host(`wireguard.$DOMAINNAME`)"
-      ## Middlewares
-      - "traefik.http.routers.wg-easy-15-rtr.middlewares=chain-no-auth@file"
-      ## HTTP Services
-      - "traefik.http.routers.wg-easy-15-rtr.service=wg-easy-15-svc"
-      - "traefik.http.services.wg-easy-15-svc.loadbalancer.server.port=51821"
+      - "traefik.http.routers.wg-easy-14-rtr.service=wg-easy-14-svc"
+      - "traefik.http.services.wg-easy-14-svc.loadbalancer.server.port=51821"
       ####### HOMEPAGE #######
       - homepage.group=Core
       - homepage.name=Wireguard
