@@ -23,10 +23,10 @@ services:
     #   ## HTTP Services
     #   - "traefik.http.routers.wumps-rtr.service=wumps-svc"
     #   - "traefik.http.services.wumps-svc.loadbalancer.server.port=9008"
-      ####### HOMEPAGE #######
-      - homepage.group=Maintenance
-      - homepage.name=WUMPS
-      - homepage.icon=wumps.svg 
-      - homepage.href=https://wol.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Wake On LAN Server
+    #   ###### HOMEPAGE #######
+    #   - homepage.group=Maintenance
+    #   - homepage.name=WUMPS
+    #   - homepage.icon=wumps.svg 
+    #   - homepage.href=https://wol.$DOMAINNAME
+    #   - homepage.target=_blank
+    #   - homepage.description=Wake On LAN Server

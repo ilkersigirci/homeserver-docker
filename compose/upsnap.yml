@@ -1,0 +1,55 @@
+services:
+  upsnap:
+    image: ghcr.io/seriousm4x/upsnap:5
+    container_name: upsnap
+    restart: $MAINTENANCE_RESTART_POLICY
+    # # you can change the listen ip:port inside the container like this:
+    # entrypoint: /bin/sh -c "./upsnap serve --http 0.0.0.0:5000"
+    # # To use a non-root user, create the mountpoint first (mkdir data) so that it has the right permission.
+    user: $PUID:$PGID
+    profiles:
+      -maintenance
+    network_mode: host
+    # # dns is used for name resolution during network scan
+    # dns:
+    #   - 192.18.0.1
+    #   - 192.18.0.2
+    # networks:
+    #   - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/upsnap:/app/pb_data
+    healthcheck:
+      test: curl -fs "http://localhost:5000/api/health" || exit 1
+      interval: 10s
+    environment:
+      - TZ=$TZ # Set container timezone for cron schedules
+    #   - UPSNAP_INTERVAL=*/10 * * * * * # Sets the interval in which the devices are pinged
+    #   - UPSNAP_SCAN_RANGE=192.168.1.0/24 # Scan range is used for device discovery on local network
+    #   - UPSNAP_SCAN_TIMEOUT=500ms # Scan timeout is nmap's --host-timeout value to wait for devices (https://nmap.org/book/man-performance.html)
+    #   - UPSNAP_PING_PRIVILEGED=true # Set to false if you don't have root user permissions
+    #   - UPSNAP_WEBSITE_TITLE=Custom name # Custom website title
+    ## NOT Used because of network_mode: host
+    # labels:
+    #   - "traefik.enable=true"
+    #   ## HTTP Routers
+    #   - "traefik.http.routers.upsnap-rtr.entrypoints=websecure"
+    #   - "traefik.http.routers.upsnap-rtr.rule=Host(`upsnap.$DOMAINNAME`)"
+    #   ## Middlewares
+    #   - "traefik.http.routers.upsnap-rtr.middlewares=chain-tinyauth@file"
+    #   ## HTTP Services
+    #   - "traefik.http.routers.upsnap-rtr.service=upsnap-svc"
+    #   - "traefik.http.services.upsnap-svc.loadbalancer.server.port=5000"
+    #   ####### HOMEPAGE #######
+    #   - homepage.group=Maintenance
+    #   - homepage.name=upsnap
+    #   - homepage.icon=upsnap.png
+    #   - homepage.href=https://upsnap.$DOMAINNAME
+    #   - homepage.target=_blank
+    #   - homepage.description=A simple wake on lan web app written with SvelteKit, Go and PocketBase. 
+    #   ####### GLANCE #######
+    #   - glance.name=upsnap
+    #   - glance.icon=sh:upsnap
+    #   - glance.url=https://upsnap.$DOMAINNAME
+    #   - glance.description=A simple wake on lan web app written with SvelteKit, Go and PocketBase. 
