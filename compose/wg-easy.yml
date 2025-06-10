@@ -66,7 +66,7 @@ services:
     volumes:
       - $CONFIGDIR/wg-easy-14:/etc/wireguard
     environment:
-      - WG_HOST=www.$DOMAINNAME # The public hostname of your VPN server. Shouldn't be proxied by Cloudflare.
+      - WG_HOST=$PUBLIC_IP # The public hostname of your VPN server. Shouldn't be proxied by Cloudflare.
       - WG_DEVICE=enp0s3
       # Optional:
       - WG_PERSISTENT_KEEPALIVE=25
@@ -123,7 +123,7 @@ services:
     volumes:
       - $CONFIGDIR/wg-easy-14-no-host:/etc/wireguard
     environment:
-      - WG_HOST=www.$DOMAINNAME # The public hostname of your VPN server. Shouldn't be proxied by Cloudflare.
+      - WG_HOST=$PUBLIC_IP # The public hostname of your VPN server. Shouldn't be proxied by Cloudflare.
       - WG_DEVICE=eth0 # Internal network interface inside docker. DO NOT use host device network name.
       # Optional:
       - WG_PERSISTENT_KEEPALIVE=25
