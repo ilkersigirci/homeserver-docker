@@ -5,7 +5,7 @@ services:
     container_name: wg-easy
     restart: $BASE_RESTART_POLICY
     profiles:
-      - core
+      - not-used
     networks:
       t3_proxy:
         ipv4_address: 192.168.90.91
@@ -38,6 +38,10 @@ services:
       ## HTTP Services
       - "traefik.http.routers.wg-easy-rtr.service=wg-easy-svc"
       - "traefik.http.services.wg-easy-svc.loadbalancer.server.port=51821"
+      # UDP Services
+      # - "traefik.udp.routers.wg-easy-rtr.entrypoints=wireguard"
+      # - "traefik.udp.routers.wg-easy-rtr.service-wg-easy-svc"
+      # - "traefik.udp.services.wg-easy-svc.loadbalancer.server.port=51820"
       ####### HOMEPAGE #######
       - homepage.group=Core
       - homepage.name=Wireguard
@@ -46,10 +50,61 @@ services:
       - homepage.target=_blank
       - homepage.description=The easiest way to run WireGuard VPN and UI
 
-  # To get WG_DEVICE, run this inside the container: ip route get 8.8.8.8 | awk '{print $5}'
+  # Don't use quotes around the IP address.
+  # Don't forget to set `net.ipv4.ip_forward=1` in your host machine.
+  # For WG_DEVICE, run the command on the host machine: ip route get 8.8.8.8 | awk '{print $5}'
   wg-easy-14:
     image: ghcr.io/wg-easy/wg-easy:14
     container_name: wg-easy-14
+    restart: $BASE_RESTART_POLICY
+    profiles:
+      - core
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    volumes:
+      - $CONFIGDIR/wg-easy-14:/etc/wireguard
+    environment:
+      - WG_HOST=www.$DOMAINNAME # The public hostname of your VPN server. Shouldn't be proxied by Cloudflare.
+      - WG_DEVICE=enp0s3
+      # Optional:
+      - WG_PERSISTENT_KEEPALIVE=25
+      - UI_TRAFFIC_STATS=true
+      - WG_PORT=51820 # The public UDP port of your VPN server. WireGuard will always listen on 51820 inside the Docker container.
+      # - PASSWORD_HASH=$WIREGUARD_PASSWORD # Comment out if don't want to use a password. Remember to add extra $ for the hash.
+      # - WG_DEFAULT_ADDRESS=10.8.0.x # Clients IP address range.
+      # - WG_DEFAULT_DNS=1.1.1.1 # DNS server clients will use.
+      # - WG_MTU=1420 # The MTU the clients will use. Server uses default WG MTU.
+      # - WG_ALLOWED_IPS=192.168.15.0/24, 10.0.1.0/24 # Allowed IPs clients will use.
+      # - WG_PRE_UP=echo "Pre Up" > /etc/wireguard/pre-up.txt
+      # - WG_POST_UP=echo "Post Up" > /etc/wireguard/post-up.txt
+      # - WG_PRE_DOWN=echo "Pre Down" > /etc/wireguard/pre-down.txt
+      # - WG_POST_DOWN=echo "Post Down" > /etc/wireguard/post-down.txt
+      ## Default
+      # - WG_POST_UP=iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE; iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT; iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; ip6tables -t nat -A POSTROUTING -s fdcc:ad94:bacf:61a4::cafe:0/112 -o eth0 -j MASQUERADE; ip6tables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT; ip6tables -A FORWARD -i wg0 -j ACCEPT; ip6tables -A FORWARD -o wg0 -j ACCEPT;
+      # - WG_POST_DOWN=iptables -t nat -D POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE; iptables -D INPUT -p udp -m udp --dport 51820 -j ACCEPT; iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; ip6tables -t nat -D POSTROUTING -s fdcc:ad94:bacf:61a4::cafe:0/112 -o eth0 -j MASQUERADE; ip6tables -D INPUT -p udp -m udp --dport 51820 -j ACCEPT; ip6tables -D FORWARD -i wg0 -j ACCEPT; ip6tables -D FORWARD -o wg0 -j ACCEPT;
+      ## Custom
+      - WG_PRE_UP=iptables -t nat -F; iptables -F;  # Flush all rules
+      - WG_POST_UP=iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o enp0s3 -j MASQUERADE;
+      - WG_POST_DOWN=iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o enp0s3 -j MASQUERADE;
+      - WG_DEFAULT_ADDRESS=10.8.0.x
+      # - WG_DEFAULT_DNS=192.168.1.200,1.1.1.1,8.8.8.8
+      # ## DNS servers should be allowed. You can use "0.0.0.0/0,::/0" instead
+      # - WG_ALLOWED_IPS=10.8.0.0/24,1.1.1.1,8.8.8.8,10.8.0.0/8,172.16.0.0/12,192.168.0.0/16
+      - WG_ALLOWED_IPS=10.8.0.0/24
+    healthcheck:
+      test: /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1"
+      interval: 1m
+      timeout: 5s
+      retries: 3
+
+  # To get WG_DEVICE, run this inside the container: ip route get 8.8.8.8 | awk '{print $5}'. Default is eth0.
+  # To access the machines in the host machine: ip route add 10.8.0.0/24 via 192.168.90.91
+  # and probably add this line to /etc/network/interfaces or rc.local
+  wg-easy-14-no-host:
+    image: ghcr.io/wg-easy/wg-easy:14
+    container_name: wg-easy-14-no-host
     restart: $BASE_RESTART_POLICY
     profiles:
       - not-used
@@ -65,37 +120,35 @@ services:
       - net.ipv4.ip_forward=1
       - net.ipv4.conf.all.src_valid_mark=1
     volumes:
-      - $CONFIGDIR/wg-easy-14:/etc/wireguard
+      - $CONFIGDIR/wg-easy-14-no-host:/etc/wireguard
     environment:
       - WG_HOST=www.$DOMAINNAME # The public hostname of your VPN server. Shouldn't be proxied by Cloudflare.
       - WG_DEVICE=eth0 # Internal network interface inside docker. DO NOT use host device network name.
       # Optional:
-      # - PASSWORD_HASH=$WIREGUARD_PASSWORD # Comment out if don't want to use a password. Remember to add extra $ for the hash.
-      - WG_PORT=51820 # The public UDP port of your VPN server. WireGuard will always listen on 51820 inside the Docker container.
-      # - WG_DEFAULT_ADDRESS=10.8.0.x # Clients IP address range.
-      # - WG_DEFAULT_DNS=1.1.1.1 # DNS server clients will use.
-      # - WG_MTU=1420 # The MTU the clients will use. Server uses default WG MTU.
-      # - WG_ALLOWED_IPS=192.168.15.0/24, 10.0.1.0/24 # Allowed IPs clients will use.
-      # - WG_PRE_UP=echo "Pre Up" > /etc/wireguard/pre-up.txt
-      # - WG_POST_UP=echo "Post Up" > /etc/wireguard/post-up.txt
-      # - WG_PRE_DOWN=echo "Pre Down" > /etc/wireguard/pre-down.txt
-      # - WG_POST_DOWN=echo "Post Down" > /etc/wireguard/post-down.txt
       - WG_PERSISTENT_KEEPALIVE=25
       - UI_TRAFFIC_STATS=true
+      - WG_PORT=51820 # The public UDP port of your VPN server. WireGuard will always listen on 51820 inside the Docker container.
+      - WG_DEFAULT_ADDRESS=10.8.0.x
+      - WG_ALLOWED_IPS=10.8.0.0/24
+    healthcheck:
+      test: /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1"
+      interval: 1m
+      timeout: 5s
+      retries: 3
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.wg-easy-14-rtr.entrypoints=websecure"
-      - "traefik.http.routers.wg-easy-14-rtr.rule=Host(`wireguard.$DOMAINNAME`)"
+      - "traefik.http.routers.wg-easy-14-no-host-rtr.entrypoints=websecure"
+      - "traefik.http.routers.wg-easy-14-no-host-rtr.rule=Host(`wg-no-host.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.wg-easy-14-rtr.middlewares=chain-tinyauth-relaxed@file" # NOTE: relaxed used for preventing CSP issues
+      - "traefik.http.routers.wg-easy-14-no-host-rtr.middlewares=chain-tinyauth-relaxed@file" # NOTE: relaxed used for preventing CSP issues
       ## HTTP Services
-      - "traefik.http.routers.wg-easy-14-rtr.service=wg-easy-14-svc"
-      - "traefik.http.services.wg-easy-14-svc.loadbalancer.server.port=51821"
+      - "traefik.http.routers.wg-easy-14-no-host-rtr.service=wg-easy-14-no-host-svc"
+      - "traefik.http.services.wg-easy-14-no-host-svc.loadbalancer.server.port=51821"
       ####### HOMEPAGE #######
       - homepage.group=Core
       - homepage.name=Wireguard
       - homepage.icon=wireguard.svg
-      - homepage.href=https://wireguard.$DOMAINNAME
+      - homepage.href=https://wg-no-host.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=The easiest way to run WireGuard VPN and UI
