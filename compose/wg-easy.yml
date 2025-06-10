@@ -89,9 +89,10 @@ services:
       - WG_POST_UP=iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o enp0s3 -j MASQUERADE;
       - WG_POST_DOWN=iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o enp0s3 -j MASQUERADE;
       - WG_DEFAULT_ADDRESS=10.8.0.x
-      # - WG_DEFAULT_DNS=192.168.1.200,1.1.1.1,8.8.8.8
+      # - WG_DEFAULT_DNS=10.8.0.1 # Use adguardhome as ONLY DNS server that is run on the host machine.
+      - WG_DEFAULT_DNS=10.8.0.1,9.9.9.9,1.1.1.1
       # ## DNS servers should be allowed. You can use "0.0.0.0/0,::/0" instead
-      # - WG_ALLOWED_IPS=10.8.0.0/24,1.1.1.1,8.8.8.8,10.8.0.0/8,172.16.0.0/12,192.168.0.0/16
+      # - WG_ALLOWED_IPS=10.8.0.0/24,9.9.9.9,1.1.1.1,10.8.0.0/8,172.16.0.0/12,192.168.0.0/16
       - WG_ALLOWED_IPS=10.8.0.0/24
     healthcheck:
       test: /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1"
