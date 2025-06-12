@@ -1,7 +1,7 @@
 services:
-  seaxng:
+  searxng:
     image: docker.io/searxng/searxng:latest
-    container_name: seaxng
+    container_name: searxng
     restart: $ML_RESTART_POLICY
     depends_on:
       - searxng-redis
@@ -13,7 +13,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $CONFIGDIR/seaxng:/etc/searxng:ro
+      - $CONFIGDIR/searxng:/etc/searxng:ro
     logging:
       driver: "json-file"
       options:
@@ -26,24 +26,24 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
-      - "traefik.http.routers.seaxng-rtr.entrypoints=websecure"
-      - "traefik.http.routers.seaxng-rtr.rule=Host(`seaxng.$DOMAINNAME`)"
+      - "traefik.http.routers.searxng-rtr.entrypoints=websecure"
+      - "traefik.http.routers.searxng-rtr.rule=Host(`searxng.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.seaxng-rtr.middlewares=chain-tinyauth@file"
+      - "traefik.http.routers.searxng-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.seaxng-rtr.service=seaxng-svc"
-      - "traefik.http.services.seaxng-svc.loadbalancer.server.port=8080"
+      - "traefik.http.routers.searxng-rtr.service=searxng-svc"
+      - "traefik.http.services.searxng-svc.loadbalancer.server.port=8080"
       ####### HOMEPAGE #######
       - homepage.group=ML
-      - homepage.name=seaxng
-      - homepage.icon=seaxng.png
-      - homepage.href=https://seaxng.$DOMAINNAME
+      - homepage.name=searxng
+      - homepage.icon=searxng.png
+      - homepage.href=https://searxng.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Free internet metasearch engine
       ####### GLANCE #######
-      - glance.name=seaxng
-      - glance.icon=sh:seaxng
-      - glance.url=https://seaxng.$DOMAINNAME
+      - glance.name=searxng
+      - glance.icon=sh:searxng
+      - glance.url=https://searxng.$DOMAINNAME
       - glance.description=Free internet metasearch engine
 
   searxng-redis:
