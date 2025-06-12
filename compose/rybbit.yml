@@ -100,7 +100,7 @@ services:
       - "traefik.http.routers.rybbit-api-rtr.entrypoints=websecure"
       - "traefik.http.routers.rybbit-api-rtr.rule=Host(`analytics.$DOMAINNAME`) && Pathprefix(`/api`)"
       ## Middlewares
-      - "traefik.http.routers.rybbit-api-rtr.middlewares=chain-no-auth@file"
+      # - "traefik.http.routers.rybbit-api-rtr.middlewares=chain-no-auth-relaxed@file"
       ## HTTP Services
       - "traefik.http.routers.rybbit-api-rtr.service=rybbit-api-svc"
       - "traefik.http.routers.rybbit-api-rtr.priority=2"
@@ -140,7 +140,7 @@ services:
       - "traefik.http.routers.rybbit-rtr.entrypoints=websecure"
       - "traefik.http.routers.rybbit-rtr.rule=Host(`analytics.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.rybbit-rtr.middlewares=chain-no-auth@file"
+      # - "traefik.http.routers.rybbit-rtr.middlewares=chain-no-auth-relaxed@file"
       ## HTTP Services
       - "traefik.http.routers.rybbit-rtr.service=rybbit-svc"
       - "traefik.http.routers.rybbit-rtr.priority=1"
