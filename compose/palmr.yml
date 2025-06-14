@@ -1,0 +1,49 @@
+services:
+  palmr:
+    image: kyantech/palmr:latest
+    container_name: palmr
+    restart: $MEDIA_RESTART_POLICY
+    profiles:
+      - media
+    networks:
+      - t3_proxy
+    # ports:
+    #   - "3333:3333" # API port (OPTIONAL EXPOSED - ONLY IF YOU WANT TO ACCESS THE API DIRECTLY)
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DATADIR/palmr:/app/server
+    environment:
+      - ENABLE_S3=false
+      - ENCRYPTION_KEY=lihLw6igalWeRkqwc7LlTQjPv8GFMy3I
+      # MinIO Configuration (only used when ENABLE_S3=true)
+      # - ENABLE_S3=true # Set to true to use S3 storage
+      # - S3_ENDPOINT=${S3_ENDPOINT} # S3 endpoint (you have to set this to the s3 endpoint of the s3 server) CHANGE THIS TO YOUR S3 ENDPOINT
+      # - S3_USE_SSL=${S3_USE_SSL:-true} # Use ssl for the s3 server always true for s3
+      # - S3_ACCESS_KEY=${S3_ACCESS_KEY} # S3 access key (you have to generate this key in s3 server)
+      # - S3_SECRET_KEY=${S3_SECRET_KEY} # S3 secret key (you have to generate this key in s3 server)
+      # - S3_REGION=${S3_REGION:-us-east-1} # S3 region (us-east-1 is the default region) but it depends on your s3 server region
+      # - S3_BUCKET_NAME=${S3_BUCKET_NAME:-palmr-files} # Bucket name for the S3 storage (here we are using palmr-files as the bucket name to understand that this is the bucket for palmr)
+      # - S3_FORCE_PATH_STYLE=true # For MinIO compatibility we have to set this to true
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.palmr-rtr.entrypoints=websecure"
+      - "traefik.http.routers.palmr-rtr.rule=Host(`palmr.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.palmr-rtr.middlewares=chain-tinyauth@file"
+      ## HTTP Services
+      - "traefik.http.routers.palmr-rtr.service=palmr-svc"
+      - "traefik.http.services.palmr-svc.loadbalancer.server.port=5487"
+      ####### HOMEPAGE #######
+      - homepage.group=Media
+      - homepage.name=palmr
+      - homepage.icon=palmr.png
+      - homepage.href=https://palmr.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=description
+      ####### GLANCE #######
+      - glance.name=palmr
+      - glance.icon=sh:palmr
+      - glance.url=https://palmr.$DOMAINNAME
+      - glance.description=description

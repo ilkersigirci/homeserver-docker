@@ -72,8 +72,9 @@ include:
   - compose/uptime-kuma.yml
   - compose/whoami.yml
   #### MEDIA ####
-  # - compose/transmission.yml
+  - compose/palmr.yml
   - compose/stremio.yml
+  # - compose/transmission.yml
   #### ML ####
   - compose/open-webui.yml
   - compose/searxng.yml
