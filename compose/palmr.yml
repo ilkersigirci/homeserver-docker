@@ -41,9 +41,9 @@ services:
       - homepage.icon=palmr.png
       - homepage.href=https://palmr.$DOMAINNAME
       - homepage.target=_blank
-      - homepage.description=description
+      - homepage.description=Open-source file-sharing platform
       ####### GLANCE #######
       - glance.name=palmr
       - glance.icon=sh:palmr
       - glance.url=https://palmr.$DOMAINNAME
-      - glance.description=description
+      - glance.description=Open-source file-sharing platform

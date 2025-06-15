@@ -17,3 +17,12 @@ http:
           - middlewares-rate-limit
           - middlewares-secure-headers-relaxed
           - middlewares-tinyauth
+
+    chain-tinyauth-original:
+      chain:
+        middlewares:
+          - middlewares-cf-real-ip
+          - middlewares-crowdsec-bouncer
+          - middlewares-rate-limit
+          - middlewares-secure-headers-original
+          - middlewares-tinyauth

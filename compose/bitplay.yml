@@ -1,0 +1,38 @@
+services:
+  bitplay:
+    image: ghcr.io/aculix/bitplay:main
+    container_name: bitplay
+    restart: $MEDIA_RESTART_POLICY
+    profiles:
+      - media
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      # NOTE: create the directory before running the container
+      - $CONFIGDIR/bitplay:/app/config
+    environment:
+      - ENABLE_S3=false
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers
+      - "traefik.http.routers.bitplay-rtr.entrypoints=websecure"
+      - "traefik.http.routers.bitplay-rtr.rule=Host(`bitplay.$DOMAINNAME`)"
+      ## Middlewares
+      - "traefik.http.routers.bitplay-rtr.middlewares=chain-tinyauth@file"
+      ## HTTP Services
+      - "traefik.http.routers.bitplay-rtr.service=bitplay-svc"
+      - "traefik.http.services.bitplay-svc.loadbalancer.server.port=3347"
+      ####### HOMEPAGE #######
+      - homepage.group=Media
+      - homepage.name=bitplay
+      - homepage.icon=bitplay.png
+      - homepage.href=https://bitplay.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Stream video torrents in your web browser with ease.
+      ####### GLANCE #######
+      - glance.name=bitplay
+      - glance.icon=sh:bitplay
+      - glance.url=https://bitplay.$DOMAINNAME
+      - glance.description=Stream video torrents in your web browser with ease.

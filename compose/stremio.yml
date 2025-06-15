@@ -1,8 +1,57 @@
 services:
-  # In the url, change streamingServer=http to streamingServer=https
+  # NOT WORKING YET
   stremio:
-    image: stremio/server:latest
+    image: tsaridas/stremio-docker:latest
     container_name: stremio
+    restart: $MEDIA_RESTART_POLICY
+    networks:
+      - t3_proxy
+    expose:
+      - "8080" # web
+      - "11470" # api
+    # ports:
+    #   - "8080" # web
+    #   - "11470" # api
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - NO_CORS=1
+    volumes:
+      - $CONFIGDIR/stremio:/root/.stremio-server
+    labels:
+      - "traefik.enable=true"
+      ## HTTP Routers Auth - Web UI
+      - "traefik.http.routers.stremio-rtr.entrypoints=websecure"
+      - "traefik.http.routers.stremio-rtr.rule=Host(`stremio.$DOMAINNAME`)"
+      ## Middlewares
+      # - "traefik.http.routers.stremio-rtr.middlewares=chain-tinyauth-original@file"
+      ## HTTP Services - Web UI
+      - "traefik.http.routers.stremio-rtr.service=stremio-svc"
+      - "traefik.http.services.stremio-svc.loadbalancer.server.port=8080"
+      # - "traefik.http.routers.stremio-rtr.priority=1"
+      ## HTTP Routers - API
+      # - "traefik.http.routers.stremio-api-rtr.entrypoints=websecure"
+      # - "traefik.http.routers.stremio-api-rtr.priority=2"
+      # - "traefik.http.routers.stremio-api-rtr.rule=Host(`stremio.$DOMAINNAME`) && PathPrefix(`/api`)"
+      ## HTTP Services - API
+      # - "traefik.http.routers.stremio-api-rtr.service=stremio-api-svc"
+      # - "traefik.http.services.stremio-api-svc.loadbalancer.server.port=11470"
+      ####### HOMEPAGE #######
+      - homepage.group=Media
+      - homepage.name=Stremio
+      - homepage.icon=stremio.svg
+      - homepage.href=https://stremio.$DOMAINNAME
+      - homepage.target=_blank
+      - homepage.description=Online Streaming Platform
+    profiles:
+      - media
+      - arr
+
+
+  # In the url, change streamingServer=http to streamingServer=https
+  stremio-server:
+    image: stremio/server:latest
+    container_name: stremio-server
     restart: $MEDIA_RESTART_POLICY
     networks:
       - t3_proxy
@@ -13,20 +62,21 @@ services:
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.stremio-rtr.entrypoints=websecure"
-      - "traefik.http.routers.stremio-rtr.rule=Host(`media.$DOMAINNAME`)"
+      - "traefik.http.routers.stremio-server-rtr.entrypoints=websecure"
+      - "traefik.http.routers.stremio-server-rtr.rule=Host(`stremio-server.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.stremio-rtr.middlewares=chain-tinyauth@file"
+      - "traefik.http.routers.stremio-server-rtr.middlewares=chain-tinyauth-relaxed@file" # NOTE: Not working currently
       ## HTTP Services
-      - "traefik.http.routers.stremio-rtr.service=stremio-svc"
-      - "traefik.http.services.stremio-svc.loadbalancer.server.port=11470"
+      - "traefik.http.routers.stremio-server-rtr.service=stremio-server-svc"
+      - "traefik.http.services.stremio-server-svc.loadbalancer.server.port=11470"
       ####### HOMEPAGE #######
       - homepage.group=Media
       - homepage.name=Stremio
       - homepage.icon=stremio.svg
-      - homepage.href=https://media.$DOMAINNAME
+      - homepage.href=https://stremio-server.$DOMAINNAME
       - homepage.target=_blank
       - homepage.description=Online Streaming Platform
     profiles:
-      - media
-      - arr
+      # - media
+      # - arr
+      - not-used
