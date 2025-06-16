@@ -1,4 +1,4 @@
-# NOTE: Not working currently
+# NOTE: Nothing is working on Firefox
 services:
   bitplay:
     image: ghcr.io/aculix/bitplay:main
