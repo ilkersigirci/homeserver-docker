@@ -1,3 +1,4 @@
+# NOTE: Not working currently
 services:
   bitplay:
     image: ghcr.io/aculix/bitplay:main
@@ -12,15 +13,13 @@ services:
     volumes:
       # NOTE: create the directory before running the container
       - $CONFIGDIR/bitplay:/app/config
-    environment:
-      - ENABLE_S3=false
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
       - "traefik.http.routers.bitplay-rtr.entrypoints=websecure"
       - "traefik.http.routers.bitplay-rtr.rule=Host(`bitplay.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.bitplay-rtr.middlewares=chain-tinyauth@file"
+      - "traefik.http.routers.bitplay-rtr.middlewares=chain-tinyauth-relaxed@file"
       ## HTTP Services
       - "traefik.http.routers.bitplay-rtr.service=bitplay-svc"
       - "traefik.http.services.bitplay-svc.loadbalancer.server.port=3347"
