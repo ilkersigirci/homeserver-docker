@@ -1,5 +1,6 @@
+# NOTE: Dashboard images not working on Firefox
+# TODO: If possible, serve api in port 11470 using PathPrefix(`/api/`) to avoid CORS workaround with the web app.
 services:
-  # NOT WORKING YET
   stremio:
     image: tsaridas/stremio-docker:latest
     container_name: stremio
@@ -9,9 +10,6 @@ services:
     expose:
       - "8080" # web
       - "11470" # api
-    # ports:
-    #   - "8080" # web
-    #   - "11470" # api
     security_opt:
       - no-new-privileges:true
     environment:
@@ -23,19 +21,26 @@ services:
       ## HTTP Routers Auth - Web UI
       - "traefik.http.routers.stremio-rtr.entrypoints=websecure"
       - "traefik.http.routers.stremio-rtr.rule=Host(`stremio.$DOMAINNAME`)"
-      ## Middlewares
-      # - "traefik.http.routers.stremio-rtr.middlewares=chain-tinyauth-original@file"
+      ## Middlewares - Web UI
+      - "traefik.http.routers.stremio-rtr.middlewares=chain-tinyauth-original@file"
       ## HTTP Services - Web UI
       - "traefik.http.routers.stremio-rtr.service=stremio-svc"
       - "traefik.http.services.stremio-svc.loadbalancer.server.port=8080"
-      # - "traefik.http.routers.stremio-rtr.priority=1"
       ## HTTP Routers - API
-      # - "traefik.http.routers.stremio-api-rtr.entrypoints=websecure"
-      # - "traefik.http.routers.stremio-api-rtr.priority=2"
-      # - "traefik.http.routers.stremio-api-rtr.rule=Host(`stremio.$DOMAINNAME`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.stremio-api-rtr.entrypoints=websecure"
+      - "traefik.http.routers.stremio-api-rtr.rule=Host(`stremio-api.$DOMAINNAME`)"
+      ## Middlewares - API
+      - "traefik.http.routers.stremio-api-rtr.middlewares=cors-stremio,chain-no-auth@file"
       ## HTTP Services - API
-      # - "traefik.http.routers.stremio-api-rtr.service=stremio-api-svc"
-      # - "traefik.http.services.stremio-api-svc.loadbalancer.server.port=11470"
+      - "traefik.http.routers.stremio-api-rtr.service=stremio-api-svc"
+      - "traefik.http.services.stremio-api-svc.loadbalancer.server.port=11470"
+      ## CORS Middleware Definition for API
+      - "traefik.http.middlewares.cors-stremio.headers.accessControlAllowCredentials=false"
+      - "traefik.http.middlewares.cors-stremio.headers.accessControlAllowHeaders=*"
+      - "traefik.http.middlewares.cors-stremio.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,OPTIONS"
+      - "traefik.http.middlewares.cors-stremio.headers.accessControlAllowOriginList=https://stremio.$DOMAINNAME"
+      - "traefik.http.middlewares.cors-stremio.headers.accessControlMaxAge=86400"
+      - "traefik.http.middlewares.cors-stremio.headers.addVaryHeader=true"
       ####### HOMEPAGE #######
       - homepage.group=Media
       - homepage.name=Stremio

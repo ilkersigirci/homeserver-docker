@@ -74,7 +74,7 @@ include:
   #### MEDIA ####
   - compose/bitplay.yml
   # - compose/palmr.yml
-  # - compose/stremio.yml
+  - compose/stremio.yml
   # - compose/transmission.yml
   #### ML ####
   - compose/open-webui.yml
