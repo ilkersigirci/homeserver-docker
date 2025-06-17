@@ -3,16 +3,18 @@ services:
     image: getmeili/meilisearch:v1.9
     container_name: jellysearch-meilisearch
     restart: $MEDIA_RESTART_POLICY
+    profiles:
+      - media
+      - jellyfin
     networks:
       - t3_proxy
+      - jellyfin
     security_opt:
       - no-new-privileges:true
     volumes:
       - $DOCKERDIR/appdata/meilisearch:/meili_data
     environment:
       MEILI_MASTER_KEY: "1234"
-    profiles:
-      - media
     labels:
       ####### GLANCE #######
       - glance.name=jellysearch-meilisearch
@@ -28,6 +30,7 @@ services:
       - jellysearch-meilisearch
     profiles:
       - media
+      - jellyfin
     networks:
       - t3_proxy
     security_opt:

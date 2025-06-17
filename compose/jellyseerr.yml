@@ -1,11 +1,15 @@
 services:
-  # TODO: Add postgres as db instead of sqlite
+  # Optional: You can also use postgres as db instead of sqlite, which is the default.
+  # NOTE: At the first setup, use jellyfin url as: http://jellyfin:8096
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
     restart: $MEDIA_RESTART_POLICY
     # depends_on:
     #   - jellyfin
+    profiles:
+      - media
+      - jellyfin
     networks:
       - t3_proxy
     security_opt:
@@ -39,5 +43,3 @@ services:
       ####### GLANCE #######
       - glance.name=jellyseerr
       - glance.parent=jellyfin
-    profiles:
-      - media
