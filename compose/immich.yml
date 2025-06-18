@@ -34,7 +34,7 @@ services:
     profiles:
       - photo
     environment:
-      - MACHINE_LEARNING_CACHE_FOLDER=/cache
+      MACHINE_LEARNING_CACHE_FOLDER: /cache
 
   immich-postgres:
     container_name: immich_postgres
@@ -73,12 +73,12 @@ services:
       # - ${MEDIADIR}/Photos/Pictures:/mnt/media/Photos/Pictures
       # - ${MEDIADIR}/Photos/Videos:/mnt/media/Photos/Videos
     environment:
-      - UPLOAD_LOCATION=${UPLOAD_LOCATION}
-      - IMMICH_LOG_LEVEL=${IMMICH_LOG_LEVEL}
-      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
-      - DB_HOSTNAME=${DB_HOSTNAME}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
+      UPLOAD_LOCATION: ${UPLOAD_LOCATION}
+      IMMICH_LOG_LEVEL: ${IMMICH_LOG_LEVEL}
+      REDIS_HOSTNAME: ${REDIS_HOSTNAME}
+      DB_HOSTNAME: ${DB_HOSTNAME}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

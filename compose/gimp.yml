@@ -8,10 +8,10 @@ services:
     security_opt:
       - no-new-privileges:true
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-      - TITLE=Gimp
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      TITLE: Gimp
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

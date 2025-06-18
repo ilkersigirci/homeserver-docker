@@ -12,9 +12,9 @@ services:
       - $NOTESDIR/Markdown/Programming/Interview:/docs/docs/blog/posts:ro
       - $CONFIGDIR/mkdocs-material/mkdocs.yml:/docs/mkdocs.yml
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

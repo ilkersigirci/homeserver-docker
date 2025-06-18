@@ -19,10 +19,10 @@ services:
       # - /MY-REPOS:/repos # [optional] mount repos if using local storage, not necessary for remotes e.g. B2, S3, etc.
       - $CONFIGDIR/rclone:/root/.config/rclone:rw
     environment:
-      - BACKREST_DATA=/data # path for backrest data. restic binary and the database are placed here.
-      - BACKREST_CONFIG=/config/config.json # path for the backrest config file.
-      - XDG_CACHE_HOME=/cache # path for the restic cache which greatly improves performance.
-      - TZ=$TZ
+      BACKREST_DATA: /data # path for backrest data. restic binary and the database are placed here.
+      BACKREST_CONFIG: /config/config.json # path for the backrest config file.
+      XDG_CACHE_HOME: /cache # path for the restic cache which greatly improves performance.
+      TZ: $TZ
       # - RCLONE_CONFIG=/root/.config/rclone/rclone.conf
     labels:
       - "traefik.enable=true"

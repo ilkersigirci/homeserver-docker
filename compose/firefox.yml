@@ -19,10 +19,10 @@ services:
     security_opt:
       - no-new-privileges:true
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-      - TITLE=Firefox
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      TITLE: Firefox
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

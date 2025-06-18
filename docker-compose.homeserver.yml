@@ -58,7 +58,7 @@ include:
   - compose/tinyauth.yml
   - compose/traefik.yml
   - compose/vaultwarden.yml
-  - compose/vaultwarden-backup.yml
+  # - compose/vaultwarden-backup.yml
   # - compose/webfinger.yml
   #### DESKTOP APPS ####
   # - compose/krita.yml

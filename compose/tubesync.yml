@@ -11,9 +11,9 @@ services:
       - $DOCKERDIR/appdata/tubesync:/config
       - $MEDIADIR/Youtube:/downloads
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
       # - HTTP_USER=admin
       # - HTTP_PASS=admin
     labels:

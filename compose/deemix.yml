@@ -13,10 +13,10 @@ services:
       - $CONFIGDIR/deemix/login.json:/config/login.json
       - $MEDIADIR/Music/Deemix:/downloads
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - UMASK_SET=022
-      - DEEMIX_SINGLE_USER=true
+      PUID: $PUID
+      PGID: $PGID
+      UMASK_SET: 022
+      DEEMIX_SINGLE_USER: true
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth

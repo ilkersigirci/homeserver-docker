@@ -15,9 +15,9 @@ services:
     volumes:
       - $NOTESDIR/Markdown:/app/posts:ro
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
       # - DOCKER_MODS=linuxserver/mods:universal-git
     labels:
       - "traefik.enable=true"

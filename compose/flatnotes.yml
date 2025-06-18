@@ -11,13 +11,13 @@ services:
     volumes:
       - $NOTESDIR/Markdown:/data
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-      - FLATNOTES_AUTH_TYPE=none
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      FLATNOTES_AUTH_TYPE: none
       # - FLATNOTES_USERNAME="user"
       # - FLATNOTES_PASSWORD="changeMe!"
-      - FLATNOTES_SECRET_KEY="change-stability-pushchair"
+      FLATNOTES_SECRET_KEY: "change-stability-pushchair"
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

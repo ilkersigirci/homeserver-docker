@@ -6,9 +6,9 @@ services:
     networks:
       - t3_proxy
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
     volumes:
       - $DOCKERDIR/appdata/linkwarden-db:/var/lib/postgresql/data
     healthcheck:
@@ -34,12 +34,12 @@ services:
     volumes:
       - $DOCKERDIR/appdata/linkwarden:/data/data
     environment:
-      - STORAGE_FOLDER=/data
-      - NEXTAUTH_URL=http://localhost:3000/api/v1/auth
-      - NEXTAUTH_SECRET=VERY_SENSITIVE_SECRET
-      - DATABASE_URL=postgresql://postgres:postgres@linkwarden-db:5432/postgres
-      - NEXT_PUBLIC_DISABLE_REGISTRATION=true
-      - NEXT_PUBLIC_CREDENTIALS_ENABLED=true
+      STORAGE_FOLDER: /data
+      NEXTAUTH_URL: http://localhost:3000/api/v1/auth
+      NEXTAUTH_SECRET: VERY_SENSITIVE_SECRET
+      DATABASE_URL: postgresql://postgres:postgres@linkwarden-db:5432/postgres
+      NEXT_PUBLIC_DISABLE_REGISTRATION: true
+      NEXT_PUBLIC_CREDENTIALS_ENABLED: true
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

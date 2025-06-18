@@ -9,10 +9,10 @@ services:
     security_opt:
       - no-new-privileges:true
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-      - TITLE=chromium
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      TITLE: chromium
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

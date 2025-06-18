@@ -13,9 +13,9 @@ services:
       - $MEDIADIR/Music/Beets_TEST/Music:/music
       - $MEDIADIR/Music/Beets_TEST/Downloads:/downloads
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth

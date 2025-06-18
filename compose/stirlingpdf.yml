@@ -13,8 +13,8 @@ services:
       - $DATADIR/stirlingpdf/ocr_train_data:/usr/share/tesseract-ocr/4.00/tessdata #Required for extra OCR languages
       - $DOCKERDIR/appdata/stirlingpdf:/configs
     environment:
-      - APP_LOCALE=en_GB
-      - APP_HOME_NAME=Stirling PDF
+      APP_LOCALE: en_GB
+      APP_HOME_NAME: Stirling PDF
       # - APP_HOME_DESCRIPTION=Your locally hosted one-stop-shop for all your PDF needs.
       # - APP_NAVBAR_NAME=Stirling PDF
       # - APP_ROOT_PATH=/

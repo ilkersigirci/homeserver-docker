@@ -14,10 +14,10 @@ services:
     # volumes:
     #   - $DOCKERDIR/appdata/yacht:/config # Change to local directory if you want to save/transfer config locally
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-      - DISABLE_AUTH=True
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      DISABLE_AUTH: True
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

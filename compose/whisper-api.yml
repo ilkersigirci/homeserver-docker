@@ -21,7 +21,7 @@ services:
     volumes:
       - $DOCKERDIR/appdata/whisper-api:/app
     environment:
-      - ASR_MODEL=base
+      ASR_MODEL: base
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

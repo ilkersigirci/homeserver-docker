@@ -16,9 +16,9 @@ services:
       - $MEDIADIR/Books:/books
       - $HARDDISKROOTDIR/School/Thesis/Papers:/thesis
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
     labels:
       - "com.centurylinklabs.watchtower.enable=false" # For watchtower
       - "traefik.enable=true"

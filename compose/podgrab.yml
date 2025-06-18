@@ -11,7 +11,7 @@ services:
       - $DOCKERDIR/appdata/podgrab:/config
       - $MEDIADIR/Podcasts:/assets
     environment:
-      - CHECK_FREQUENCY=240
+      CHECK_FREQUENCY: 240
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth

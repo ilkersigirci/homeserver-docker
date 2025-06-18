@@ -13,10 +13,10 @@ services:
       - $DOCKERDIR/appdata/czkawka:/config:rw
       - $MEDIADIR/Photos/Pictures:/storage:rw
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-      - DARK_MODE=1
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      DARK_MODE: 1
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

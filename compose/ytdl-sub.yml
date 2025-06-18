@@ -18,9 +18,9 @@ services:
       # - <path/to/music_videos>:/music_videos # optional
       # - MEDIADIR/Music:/music # optional
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth

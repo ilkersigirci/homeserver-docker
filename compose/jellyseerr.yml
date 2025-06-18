@@ -17,9 +17,9 @@ services:
     volumes:
       - $DOCKERDIR/appdata/jellyseerr:/app/config
     environment:
-      - TZ=$TZ
-      - LOG_LEVEL=debug
-      - PORT=5055
+      TZ: $TZ
+      LOG_LEVEL: debug
+      PORT: 5055
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

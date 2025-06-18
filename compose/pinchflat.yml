@@ -14,7 +14,7 @@ services:
       - $DOCKERDIR/appdata/pinchflat:/config
       - $MEDIADIR/Youtube:/downloads
     environment:
-      - TZ=$TZ
+      TZ: $TZ
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

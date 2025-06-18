@@ -13,11 +13,11 @@ services:
     volumes:
       - $DOCKERDIR/appdata/pocket-id:/app/data
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-      - APP_URL=https://pocketid.$DOMAINNAME
-      - PORT=1411
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      APP_URL: https://pocketid.$DOMAINNAME
+      PORT: 1411
     healthcheck:
         test: "curl -f http://localhost:1411/healthz"
         interval: 1m30s

@@ -9,10 +9,10 @@ services:
     volumes:
       - $DOCKERDIR/appdata/librum_db:/var/lib/mysql
     environment:
-      - MARIADB_USER=librum
-      - MARIADB_PASSWORD=mariadb
-      - MARIADB_DATABASE=librum
-      - MARIADB_ROOT_PASSWORD=mariadb
+      MARIADB_USER: librum
+      MARIADB_PASSWORD: mariadb
+      MARIADB_DATABASE: librum
+      MARIADB_ROOT_PASSWORD: mariadb
     profiles:
       - reading
 
@@ -33,15 +33,15 @@ services:
     volumes:
       - $MEDIADIR/Books/Librum:/var/lib/librum-server/librum_storage
     environment:
-      - JWTValidIssuer=exampleIssuer
-      - JWTKey=exampleOfALongSecretToken
-      - SMTPEndpoint=smtp.example.com
-      - SMTPUsername=mailuser123
-      - SMTPPassword=smtpUserPassword123
-      - SMTPMailFrom=mailuser123@example.com
-      - DBConnectionString=Server=librum_db;port=3306;Database=librum;Uid=librum;Pwd=mariadb;
-      - AdminEmail=admin@mail.com
-      - AdminPassword=strongPassword123
+      JWTValidIssuer: exampleIssuer
+      JWTKey: exampleOfALongSecretToken
+      SMTPEndpoint: smtp.example.com
+      SMTPUsername: mailuser123
+      SMTPPassword: smtpUserPassword123
+      SMTPMailFrom: mailuser123@example.com
+      DBConnectionString: Server=librum_db;port=3306;Database=librum;Uid=librum;Pwd=mariadb;
+      AdminEmail: admin@mail.com
+      AdminPassword: strongPassword123
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

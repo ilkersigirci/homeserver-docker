@@ -10,11 +10,11 @@ services:
     volumes:
       - $DOCKERDIR/appdata/freshrss:/config
     environment:
-      - TZ=$TZ
-      - APP_KEY_FILE=/run/secrets/firefly_app_key
-      - AUTHENTICATION_GUARD="web" # remote_user_guard
+      TZ: $TZ
+      APP_KEY_FILE: /run/secrets/firefly_app_key
+      AUTHENTICATION_GUARD: "web" # remote_user_guard
       #  - AUTHENTICATION_GUARD_HEADER=REMOTE_USER # HTTP_REMOTE_USER
-      - DB_CONNECTION=sqlite # Options: pgsql, mysql
+      DB_CONNECTION: sqlite # Options: pgsql, mysql
     secrets:
       - firefly_app_key
     labels:

@@ -53,10 +53,10 @@ services:
     #   obsidian-couchdb:
     #     condition: service_healthy
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-      - TITLE=Obsidian
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      TITLE: Obsidian
     # devices:
     #   - /dev/dri:/dev/dri #optional
     healthcheck:

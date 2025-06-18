@@ -12,10 +12,10 @@ services:
     volumes:
       - $DOCKERDIR/appdata/autokuma:/data
     environment:
-      - AUTOKUMA__KUMA__URL=http://uptime-kuma:3001
-      - AUTOKUMA__DOCKER__HOSTS=tcp://docker-socket-proxy:2375
-      - AUTOKUMA__DOCKER__LABEL_PREFIX=traefik
-      - AUTOKUMA__DOCKER__SOURCE=Containers
+      AUTOKUMA__KUMA__URL: http://uptime-kuma:3001
+      AUTOKUMA__DOCKER__HOSTS: tcp://docker-socket-proxy:2375
+      AUTOKUMA__DOCKER__LABEL_PREFIX: traefik
+      AUTOKUMA__DOCKER__SOURCE: Containers
     labels:
       - "traefik.enable=true"
       ## HTTP Routers
@@ -44,10 +44,10 @@ services:
     volumes:
       - $DOCKERDIR/appdata/uptime-kuma:/app/data
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - UPTIME_KUMA_PORT=3001
-      - DATA_DIR=/app/data
+      PUID: $PUID
+      PGID: $PGID
+      UPTIME_KUMA_PORT: 3001
+      DATA_DIR: /app/data
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

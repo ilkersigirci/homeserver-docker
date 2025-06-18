@@ -8,10 +8,10 @@ services:
     security_opt:
       - no-new-privileges:true
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-      - TITLE=Krita
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      TITLE: Krita
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

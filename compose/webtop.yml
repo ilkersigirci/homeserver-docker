@@ -14,10 +14,10 @@ services:
     volumes:
       - $DOCKERDIR/appdata/webtop:/config
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-      - TITLE=Debian on the Browser
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      TITLE: Debian on the Browser
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

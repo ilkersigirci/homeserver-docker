@@ -31,26 +31,26 @@ services:
       - $DOCKERDIR/appdata/pdfding-db:/home/nonroot/pdfding/db
       - $MEDIADIR/PDFs/pdfding:/home/nonroot/pdfding/media
     environment:
-        - DEFAULT_THEME=dark
-        - DEFAULT_THEME_COLOR=blue
-        - SECRET_KEY=DUMMY_SECRET_KEY
-        - HOST_NAME=pdfding.$DOMAINNAME
-        - LOG_LEVEL=INFO
-        - DATABASE_TYPE=SQLITE
-        - ACCOUNT_EMAIL_VERIFICATION=FALSE
-        - DISABLE_USER_SIGNUP=FALSE
-        - BACKUP_ENABLE=FALSE
-        ## For Postgres
-        # - DATABASE_TYPE=POSTGRES
-        # - POSTGRES_PASSWORD=pdfding
-        # - POSTGRES_HOST=pdfding-db
-        ## For OIDC
-        - OIDC_ENABLE=TRUE
-        - OIDC_ONLY=TRUE
-        - OIDC_PROVIDER_NAME=Authelia
-        - OIDC_CLIENT_ID=pdfding
-        - OIDC_CLIENT_SECRET=$OIDC_PDFDING_CLIENT_SECRET
-        - OIDC_AUTH_URL=https://authelia.$DOMAINNAME/.well-known/openid-configuration
+      DEFAULT_THEME: dark
+      DEFAULT_THEME_COLOR: blue
+      SECRET_KEY: DUMMY_SECRET_KEY
+      HOST_NAME: pdfding.$DOMAINNAME
+      LOG_LEVEL: INFO
+      DATABASE_TYPE: SQLITE
+      ACCOUNT_EMAIL_VERIFICATION: FALSE
+      DISABLE_USER_SIGNUP: FALSE
+      BACKUP_ENABLE: FALSE
+      ## For Postgres
+      # - DATABASE_TYPE=POSTGRES
+      # - POSTGRES_PASSWORD=pdfding
+      # - POSTGRES_HOST=pdfding-db
+      ## For OIDC
+      OIDC_ENABLE: TRUE
+      OIDC_ONLY: TRUE
+      OIDC_PROVIDER_NAME: Authelia
+      OIDC_CLIENT_ID: pdfding
+      OIDC_CLIENT_SECRET: $OIDC_PDFDING_CLIENT_SECRET
+      OIDC_AUTH_URL: https://authelia.$DOMAINNAME/.well-known/openid-configuration
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

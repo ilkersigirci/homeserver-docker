@@ -10,12 +10,12 @@ services:
     volumes:
       - $MEDIADIR/Youtube:/youtube
     environment:
-      - TA_USERNAME=admin
-      - TA_PASSWORD=admin
-      - HOST_UID=$PUID
-      - HOST_GID=$PGID
-      - TZ=$TZ
-      - ELASTIC_PASSWORD=admin
+      TA_USERNAME: admin
+      TA_PASSWORD: admin
+      HOST_UID: $PUID
+      HOST_GID: $PGID
+      TZ: $TZ
+      ELASTIC_PASSWORD: admin
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth

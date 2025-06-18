@@ -37,8 +37,8 @@ services:
       # - $CONFIGDIR:/backups/docker_configs:ro
       # - $NOTESDIR/Markdown:/backups/Markdown:ro
     environment:
-      - TZ=$TZ
-      - RUSTIC_PASSWORD=/run/secrets/rustic_password
+      TZ: $TZ
+      RUSTIC_PASSWORD: /run/secrets/rustic_password
       # - RCLONE_CONFIG=/root/.config/rclone/rclone.conf
     secrets:
       - rustic_password

@@ -10,9 +10,9 @@ services:
     volumes:
       - $DOCKERDIR/appdata/freshrss:/config
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

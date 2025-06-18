@@ -13,15 +13,15 @@ services:
     #depends_on:
     #  - socket-proxy
     environment:
-      - TIMEZONE=$TZ
-      - TRAEFIK_VERSION=2
+      TIMEZONE: $TZ
+      TRAEFIK_VERSION: 2
       #- CF_EMAIL=$CLOUDFLARE_EMAIL
       # - CF_TOKEN=$CLOUDFLARE_API_TOKEN
-      - TARGET_DOMAIN=$DOMAINNAME
-      - DOMAIN1=$DOMAINNAME
-      - DOMAIN1_ZONE_ID=$CLOUDFLARE_ZONEID # Copy from Cloudflare Overview page
-      - DOMAIN1_PROXIED=TRUE
-      - DOCKER_HOST=tcp://socket-proxy:2375
+      TARGET_DOMAIN: $DOMAINNAME
+      DOMAIN1: $DOMAINNAME
+      DOMAIN1_ZONE_ID: $CLOUDFLARE_ZONEID # Copy from Cloudflare Overview page
+      DOMAIN1_PROXIED: TRUE
+      DOCKER_HOST: tcp://socket-proxy:2375
     # secrets: # not working
     #   - cloudflare_api_token
     labels:

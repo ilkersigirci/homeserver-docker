@@ -12,17 +12,17 @@ services:
     volumes:
       - $DOCKERDIR/appdata/healthchecks/config:/config
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
-      - SITE_NAME=Healthchecks
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      SITE_NAME: Healthchecks
       # - SITE_LOGO_URL=https://s3.ilkerflix.com/IS.jpeg
-      - SITE_ROOT=http://localhost:8000
-      - SUPERUSER_EMAIL=admin@$BASE_DOMAINNAME
-      - SUPERUSER_PASSWORD=admin
-      - APPRISE_ENABLED=True
-      - DEBUG=False
-      - ALLOWED_HOSTS=localhost,healthchecks.$DOMAINNAME
+      SITE_ROOT: http://localhost:8000
+      SUPERUSER_EMAIL: admin@$BASE_DOMAINNAME
+      SUPERUSER_PASSWORD: admin
+      APPRISE_ENABLED: True
+      DEBUG: False
+      ALLOWED_HOSTS: localhost,healthchecks.$DOMAINNAME
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

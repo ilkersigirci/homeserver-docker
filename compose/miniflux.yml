@@ -6,9 +6,9 @@ services:
     profiles:
       - reading
     environment:
-      - POSTGRES_DB=miniflux
-      - POSTGRES_USER=miniflux
-      - POSTGRES_PASSWORD=miniflux
+      POSTGRES_DB: miniflux
+      POSTGRES_USER: miniflux
+      POSTGRES_PASSWORD: miniflux
     volumes:
       - $DOCKERDIR/appdata/miniflux-db:/var/lib/postgresql/data
     # healthcheck:
@@ -32,12 +32,12 @@ services:
     # volumes:
     #   - $DOCKERDIR/appdata/miniflux:/config
     environment:
-      - DATABASE_URL=postgres://miniflux:miniflux@miniflux-db/miniflux?sslmode=disable
-      - RUN_MIGRATIONS=1
-      - CREATE_ADMIN=1
-      - ADMIN_USERNAME=miniflux
-      - ADMIN_PASSWORD=miniflux
-      - BASE_URL=https://miniflux.$DOMAINNAME
+      DATABASE_URL: postgres://miniflux:miniflux@miniflux-db/miniflux?sslmode=disable
+      RUN_MIGRATIONS: 1
+      CREATE_ADMIN: 1
+      ADMIN_USERNAME: miniflux
+      ADMIN_PASSWORD: miniflux
+      BASE_URL: https://miniflux.$DOMAINNAME
       # - "POCKET_CONSUMER_KEY=YOUR_POCKET_CONSUMER_KEY"
     labels:
       - "traefik.enable=true"

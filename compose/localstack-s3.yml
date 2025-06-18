@@ -14,10 +14,10 @@ services:
       - $DOCKERDIR/appdata/localstack-s3:/persisted-data
       - $DOCKERDIR/scripts/localstack_create_s3_bucket.sh:/etc/localstack/init/ready.d/script.sh
     environment:
-      - DEBUG=0
-      - SERVICES=s3
-      - CREATED_BUCKET_NAME=ilkerflix
-      - APP_AWS_REGION=eu-central-1
+      DEBUG: 0
+      SERVICES: s3
+      CREATED_BUCKET_NAME: ilkerflix
+      APP_AWS_REGION: eu-central-1
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

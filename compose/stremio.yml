@@ -13,7 +13,7 @@ services:
     security_opt:
       - no-new-privileges:true
     environment:
-      - NO_CORS=1
+      NO_CORS: 1
     volumes:
       - $CONFIGDIR/stremio:/root/.stremio-server
     labels:
@@ -63,7 +63,7 @@ services:
     security_opt:
       - no-new-privileges:true
     environment:
-      - NO_CORS=1
+      NO_CORS: 1
     labels:
       - "traefik.enable=true"
       ## HTTP Routers Auth

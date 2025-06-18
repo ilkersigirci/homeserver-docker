@@ -15,12 +15,12 @@ services:
     volumes:
       - $CONFIGDIR/wg-easy-14:/etc/wireguard
     environment:
-      - WG_HOST=$PUBLIC_IP # The public hostname of your VPN server. Shouldn't be proxied by Cloudflare.
-      - WG_DEVICE=enp0s3
+      WG_HOST: $PUBLIC_IP # The public hostname of your VPN server. Shouldn't be proxied by Cloudflare.
+      WG_DEVICE: enp0s3
       # Optional:
-      - WG_PERSISTENT_KEEPALIVE=25
-      - UI_TRAFFIC_STATS=true
-      - WG_PORT=51820 # The public UDP port of your VPN server. WireGuard will always listen on 51820 inside the Docker container.
+      WG_PERSISTENT_KEEPALIVE: 25
+      UI_TRAFFIC_STATS: true
+      WG_PORT: 51820 # The public UDP port of your VPN server. WireGuard will always listen on 51820 inside the Docker container.
       # - PASSWORD_HASH=$WIREGUARD_PASSWORD # Comment out if don't want to use a password. Remember to add extra $ for the hash.
       # - WG_DEFAULT_ADDRESS=10.8.0.x # Clients IP address range.
       # - WG_DEFAULT_DNS=1.1.1.1 # DNS server clients will use.
@@ -34,15 +34,15 @@ services:
       # - WG_POST_UP=iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE; iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT; iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; ip6tables -t nat -A POSTROUTING -s fdcc:ad94:bacf:61a4::cafe:0/112 -o eth0 -j MASQUERADE; ip6tables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT; ip6tables -A FORWARD -i wg0 -j ACCEPT; ip6tables -A FORWARD -o wg0 -j ACCEPT;
       # - WG_POST_DOWN=iptables -t nat -D POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE; iptables -D INPUT -p udp -m udp --dport 51820 -j ACCEPT; iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; ip6tables -t nat -D POSTROUTING -s fdcc:ad94:bacf:61a4::cafe:0/112 -o eth0 -j MASQUERADE; ip6tables -D INPUT -p udp -m udp --dport 51820 -j ACCEPT; ip6tables -D FORWARD -i wg0 -j ACCEPT; ip6tables -D FORWARD -o wg0 -j ACCEPT;
       ## Custom
-      - WG_PRE_UP=iptables -t nat -F; iptables -F;  # Flush all rules
-      - WG_POST_UP=iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o enp0s3 -j MASQUERADE;
-      - WG_POST_DOWN=iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o enp0s3 -j MASQUERADE;
-      - WG_DEFAULT_ADDRESS=10.8.0.x
+      WG_PRE_UP: "iptables -t nat -F; iptables -F;"  # Flush all rules
+      WG_POST_UP: "iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o enp0s3 -j MASQUERADE;"
+      WG_POST_DOWN: "iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o enp0s3 -j MASQUERADE;"
+      WG_DEFAULT_ADDRESS: 10.8.0.x
       # - WG_DEFAULT_DNS=10.8.0.1 # Use adguardhome as ONLY DNS server that is run on the host machine.
-      - WG_DEFAULT_DNS=10.8.0.1,9.9.9.9,1.1.1.1
+      WG_DEFAULT_DNS: 10.8.0.1,9.9.9.9,1.1.1.1
       # ## DNS servers should be allowed. You can use "0.0.0.0/0,::/0" instead
       # - WG_ALLOWED_IPS=10.8.0.0/24,9.9.9.9/32,1.1.1.1/32,172.16.0.0/12,192.168.0.0/16
-      - WG_ALLOWED_IPS=10.8.0.0/24
+      WG_ALLOWED_IPS: 10.8.0.0/24
     healthcheck:
       test: /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1"
       interval: 1m
@@ -72,14 +72,14 @@ services:
     volumes:
       - $CONFIGDIR/wg-easy-14-no-host:/etc/wireguard
     environment:
-      - WG_HOST=$PUBLIC_IP # The public hostname of your VPN server. Shouldn't be proxied by Cloudflare.
-      - WG_DEVICE=eth0 # Internal network interface inside docker. DO NOT use host device network name.
+      WG_HOST: $PUBLIC_IP # The public hostname of your VPN server. Shouldn't be proxied by Cloudflare.
+      WG_DEVICE: eth0 # Internal network interface inside docker. DO NOT use host device network name.
       # Optional:
-      - WG_PERSISTENT_KEEPALIVE=25
-      - UI_TRAFFIC_STATS=true
-      - WG_PORT=51820 # The public UDP port of your VPN server. WireGuard will always listen on 51820 inside the Docker container.
-      - WG_DEFAULT_ADDRESS=10.8.0.x
-      - WG_ALLOWED_IPS=10.8.0.0/24
+      WG_PERSISTENT_KEEPALIVE: 25
+      UI_TRAFFIC_STATS: true
+      WG_PORT: 51820 # The public UDP port of your VPN server. WireGuard will always listen on 51820 inside the Docker container.
+      WG_DEFAULT_ADDRESS: 10.8.0.x
+      WG_ALLOWED_IPS: 10.8.0.0/24
     healthcheck:
       test: /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1"
       interval: 1m
@@ -129,8 +129,8 @@ services:
       - $CONFIGDIR/wg-easy:/etc/wireguard
       - /lib/modules:/lib/modules:ro
     environment:
-      - PORT=51821
-      - HOST=0.0.0.0
+      PORT: 51821
+      HOST: 0.0.0.0
       # - INSECURE=false
     labels:
       - "traefik.enable=true"

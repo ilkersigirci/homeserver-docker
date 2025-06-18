@@ -13,11 +13,11 @@ services:
     volumes:
       - $DOCKERDIR/appdata/changedetection:/datastore
     environment:
-      - TZ=$TZ
-      - PORT=5000
-      - LOGGER_LEVEL=INFO
-      - DISABLE_VERSION_CHECK=true
-      - BASE_URL=https://changedetection.$DOMAINNAME
+      TZ: $TZ
+      PORT: 5000
+      LOGGER_LEVEL: INFO
+      DISABLE_VERSION_CHECK: true
+      BASE_URL: https://changedetection.$DOMAINNAME
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

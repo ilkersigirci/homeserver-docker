@@ -17,8 +17,8 @@ services:
     # expose:
     #   - 4443
     environment:
-      - KASM_PORT=4433
-      - TZ=$TZ
+      KASM_PORT: 4433
+      TZ: $TZ
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

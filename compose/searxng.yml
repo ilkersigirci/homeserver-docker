@@ -20,9 +20,9 @@ services:
         max-size: "1m"
         max-file: "1"
     environment:
-      - SEARXNG_BASE_URL=https://searxng.$DOMAINNAME
-      - UWSGI_WORKERS=4
-      - UWSGI_THREADS=4
+      SEARXNG_BASE_URL: https://searxng.$DOMAINNAME
+      UWSGI_WORKERS: 4
+      UWSGI_THREADS: 4
     labels:
       - "traefik.enable=true"
       ## HTTP Routers

@@ -19,14 +19,14 @@ services:
     volumes:
       - $DOCKERDIR/appdata/mariadb/data:/config
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ      
-      - MYSQL_DATABASE=nextcloud
-      - MYSQL_USER=nextcloud
-      - FILE__MYSQL_PASSWORD=/run/secrets/mysql_password
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ      
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      FILE__MYSQL_PASSWORD: /run/secrets/mysql_password
       # Note FILE__ (double underscore) - Issue #127
-      - FILE__MYSQL_ROOT_PASSWORD=/run/secrets/mysql_root_password
+      FILE__MYSQL_ROOT_PASSWORD: /run/secrets/mysql_root_password
     secrets:
       - mysql_root_password
       - mysql_password

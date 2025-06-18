@@ -17,9 +17,9 @@ services:
       - $NOTESDIR/Markdown:/vaults
       # - /path/to/config:/config
     environment:
-      - PUID=$PUID
-      - PGID=$PGID
-      - TZ=$TZ
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
       # - DOCKER_MODS=linuxserver/mods:universal-git
     labels:
       - "com.centurylinklabs.watchtower.enable=false" # For disabling watchtower
