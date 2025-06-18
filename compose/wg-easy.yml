@@ -103,9 +103,8 @@ services:
       homepage.target: "_blank"
       homepage.description: "The easiest way to run WireGuard VPN and UI"
 
-  # NEEDS ipv6 to be enabled currently.
   wg-easy:
-    image: ghcr.io/wg-easy/wg-easy:15
+    image: ghcr.io/wg-easy/wg-easy:development
     container_name: wg-easy
     restart: $BASE_RESTART_POLICY
     profiles:
@@ -113,7 +112,7 @@ services:
     networks:
       t3_proxy:
         ipv4_address: 192.168.90.91
-        ipv6_address: fdcc:ad94:bacf:61a3::2a
+        # ipv6_address: fdcc:ad94:bacf:61a3::2a
     ports:
       - "51820:51820/udp"
     cap_add:
@@ -122,16 +121,17 @@ services:
     sysctls:
       - net.ipv4.ip_forward=1
       - net.ipv4.conf.all.src_valid_mark=1
-      - net.ipv6.conf.all.disable_ipv6=0
-      - net.ipv6.conf.all.forwarding=1
-      - net.ipv6.conf.default.forwarding=1
+      # - net.ipv6.conf.all.disable_ipv6=0
+      # - net.ipv6.conf.all.forwarding=1
+      # - net.ipv6.conf.default.forwarding=1
     volumes:
       - $CONFIGDIR/wg-easy:/etc/wireguard
       - /lib/modules:/lib/modules:ro
     environment:
       PORT: 51821
       HOST: 0.0.0.0
-      # - INSECURE=false
+      # INSECURE: false
+      DISABLE_IPV6: true
     labels:
       traefik.enable: "true"
       ## HTTP Routers Auth
