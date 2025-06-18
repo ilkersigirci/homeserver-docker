@@ -20,8 +20,8 @@ services:
       SITE_ROOT: http://localhost:8000
       SUPERUSER_EMAIL: admin@$BASE_DOMAINNAME
       SUPERUSER_PASSWORD: admin
-      APPRISE_ENABLED: True
-      DEBUG: False
+      APPRISE_ENABLED: "True"
+      DEBUG: "False"
       ALLOWED_HOSTS: localhost,healthchecks.$DOMAINNAME
     labels:
       traefik.enable: "true"
