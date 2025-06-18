@@ -11,7 +11,8 @@ services:
       - media
       - jellyfin
     networks:
-      - t3_proxy
+      t3_proxy:
+        ipv4_address: 192.168.90.161
     ports:
       - "8096:8096"
     security_opt:

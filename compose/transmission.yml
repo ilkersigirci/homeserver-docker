@@ -9,9 +9,8 @@ services:
     mem_limit: "4096M"
     restart: $MEDIA_RESTART_POLICY
     networks:
-      - t3_proxy
-      #      t3_proxy:
-      #        ipv4_address: 192.168.90.160
+      t3_proxy:
+        ipv4_address: 192.168.90.160
     ports:
       - "487:487"
       # - "51413:51413"
@@ -33,7 +32,7 @@ services:
       - "traefik.http.routers.transmission-rtr.entrypoints=websecure"
       - "traefik.http.routers.transmission-rtr.rule=Host(`torrent.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.transmission-rtr.middlewares=chain-tinyauth@file"
+      - "traefik.http.routers.transmission-rtr.middlewares=chain-no-auth@file"
       #      - "traefik.http.routers.transmission-rtr.middlewares=middlewares-rate-limit@file"
       ## HTTP Services
       - "traefik.http.routers.transmission-rtr.service=transmission-svc"
