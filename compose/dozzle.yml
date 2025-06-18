@@ -14,6 +14,7 @@ services:
       DOZZLE_LEVEL: info
       DOZZLE_FILTER: "status=running"
       DOZZLE_REMOTE_HOST: tcp://docker-socket-proxy:2375
+      # DOZZLE_ENABLE_SHELL: "true" # Enable shell access also in docker-socket-proxy
     labels:
       traefik.enable: "true"
       ## HTTP Routers

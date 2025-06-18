@@ -38,4 +38,4 @@ services:
       homepage.widget.type: "changedetectionio"
       homepage.widget.url: "http://changedetection:5000"
       homepage.widget.key: "$CHANGEDETECTION_API_KEY"
-      homepage.widget.fields: "[diffsDetected,totalObserved]"
+      # homepage.widget.fields: "[diffsDetected,totalObserved]" # NOTE: Gives Invalid fields list detected error
