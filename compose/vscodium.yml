@@ -21,19 +21,19 @@ services:
       PGID: $PGID
       TZ: $TZ
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.vscodium-rtr.entrypoints=websecure"
-      - "traefik.http.routers.vscodium-rtr.rule=Host(`vscodium.$DOMAINNAME`)"
+      traefik.http.routers.vscodium-rtr.entrypoints: "websecure"
+      traefik.http.routers.vscodium-rtr.rule: "Host(`vscodium.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.vscodium-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.vscodium-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.vscodium-rtr.service=vscodium-svc"
-      - "traefik.http.services.vscodium-svc.loadbalancer.server.port=3000"
+      traefik.http.routers.vscodium-rtr.service: "vscodium-svc"
+      traefik.http.services.vscodium-svc.loadbalancer.server.port: "3000"
       ####### HOMEPAGE #######
-      - homepage.group=Maintenance
-      - homepage.name=VSCodium
-      - homepage.icon=vscode.svg
-      - homepage.href=https://vscodium.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Code Editor
+      homepage.group: "Maintenance"
+      homepage.name: "VSCodium"
+      homepage.icon: "vscode.svg"
+      homepage.href: "https://vscodium.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Code Editor"

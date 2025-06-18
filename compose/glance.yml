@@ -24,24 +24,24 @@ services:
       JELLYFIN_USER_ID: $JELLYFIN_USER_ID
       JELLYFIN_KEY: $JELLYFIN_API_KEY
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.glance-rtr.entrypoints=websecure"
-      - "traefik.http.routers.glance-rtr.rule=Host(`glance.$DOMAINNAME`)"
+      traefik.http.routers.glance-rtr.entrypoints: "websecure"
+      traefik.http.routers.glance-rtr.rule: "Host(`glance.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.glance-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.glance-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.glance-rtr.service=glance-svc"
-      - "traefik.http.services.glance-svc.loadbalancer.server.port=8080"
+      traefik.http.routers.glance-rtr.service: "glance-svc"
+      traefik.http.services.glance-svc.loadbalancer.server.port: "8080"
       ####### HOMEPAGE #######
-      - homepage.group=Core
-      - homepage.name=glance
-      - homepage.icon=glance.png
-      - homepage.href=https://glance.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=A self-hosted dashboard that puts all your feeds in one place
+      homepage.group: "Core"
+      homepage.name: "glance"
+      homepage.icon: "glance.png"
+      homepage.href: "https://glance.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "A self-hosted dashboard that puts all your feeds in one place"
       ####### GLANCE #######
-      - glance.name=glance
-      - glance.icon=sh:glance
-      - glance.url=https://glance.$DOMAINNAME
-      - glance.description=A self-hosted dashboard that puts all your feeds in one place
+      glance.name: "glance"
+      glance.icon: "sh:glance"
+      glance.url: "https://glance.$DOMAINNAME"
+      glance.description: "A self-hosted dashboard that puts all your feeds in one place"

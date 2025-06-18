@@ -20,24 +20,24 @@ services:
       KASM_PORT: 4433
       TZ: $TZ
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.kasm-rtr.entrypoints=websecure"
-      - "traefik.http.routers.kasm-rtr.rule=Host(`kasm.$DOMAINNAME`)"
+      traefik.http.routers.kasm-rtr.entrypoints: "websecure"
+      traefik.http.routers.kasm-rtr.rule: "Host(`kasm.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.kasm-rtr.middlewares=chain-no-auth@file"
+      traefik.http.routers.kasm-rtr.middlewares: "chain-no-auth@file"
       ## HTTP Services
-      - "traefik.http.routers.kasm-rtr.service=kasm-svc"
-      - "traefik.http.services.kasm-svc.loadbalancer.server.port=4443"
+      traefik.http.routers.kasm-rtr.service: "kasm-svc"
+      traefik.http.services.kasm-svc.loadbalancer.server.port: "4443"
       # NOTE: https://docs.linuxserver.io/faq#strict-proxy
-      - traefik.http.services.kasm-svc.loadbalancer.serverstransport=ignorecert@file
-      - traefik.http.services.kasm-svc.loadbalancer.server.scheme=https
+      traefik.http.services.kasm-svc.loadbalancer.serverstransport: "ignorecert@file"
+      traefik.http.services.kasm-svc.loadbalancer.server.scheme: "https"
       ####### HOMEPAGE #######
-      - homepage.group=DesktopApps
-      - homepage.name=Kasm Workspaces
-      - homepage.icon=kasm.svg
-      - homepage.href=https://kasm.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Workspaces for delivering browser-based access to desktop applications
+      homepage.group: "DesktopApps"
+      homepage.name: "Kasm Workspaces"
+      homepage.icon: "kasm.svg"
+      homepage.href: "https://kasm.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Workspaces for delivering browser-based access to desktop applications"
     profiles:
       - desktop_apps

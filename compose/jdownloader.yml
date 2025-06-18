@@ -21,21 +21,21 @@ services:
       DISPLAY_HEIGHT: 1080
     #      VNC_PASSWORD: $JDOWN_VNC_PASSWD
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.jdownloader-rtr.entrypoints=websecure"
-      - "traefik.http.routers.jdownloader-rtr.rule=Host(`download.$DOMAINNAME`)"
+      traefik.http.routers.jdownloader-rtr.entrypoints: "websecure"
+      traefik.http.routers.jdownloader-rtr.rule: "Host(`download.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.jdownloader-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.jdownloader-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.jdownloader-rtr.service=jdownloader-svc"
-      - "traefik.http.services.jdownloader-svc.loadbalancer.server.port=5800"
+      traefik.http.routers.jdownloader-rtr.service: "jdownloader-svc"
+      traefik.http.services.jdownloader-svc.loadbalancer.server.port: "5800"
       ####### HOMEPAGE #######
-      - homepage.group=Media
-      - homepage.name=Jdownloader
-      - homepage.icon=jdownloader.svg
-      - homepage.href=https://jdownloader.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Download Management Tool
+      homepage.group: "Media"
+      homepage.name: "Jdownloader"
+      homepage.icon: "jdownloader.svg"
+      homepage.href: "https://jdownloader.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Download Management Tool"
     profiles:
       - media

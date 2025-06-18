@@ -28,21 +28,21 @@ services:
       THEME: "sand" # optional
       COLOR: "dark" # optional
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.watchyourlan-rtr.entrypoints=websecure"
-      - "traefik.http.routers.watchyourlan-rtr.rule=Host(`watchyourlan.$DOMAINNAME`)"
+      traefik.http.routers.watchyourlan-rtr.entrypoints: "websecure"
+      traefik.http.routers.watchyourlan-rtr.rule: "Host(`watchyourlan.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.watchyourlan-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.watchyourlan-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.watchyourlan-rtr.service=watchyourlan-svc"
-      - "traefik.http.services.beszel-svc.loadbalancer.server.port=8840"
+      traefik.http.routers.watchyourlan-rtr.service: "watchyourlan-svc"
+      traefik.http.services.beszel-svc.loadbalancer.server.port: "8840"
       ####### HOMEPAGE #######
-      - homepage.group=Monitoring
-      - homepage.name=WatchYourLAN
-      - homepage.icon=watchyourlan.svg
-      - homepage.href=https://watchyourlan.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Network Device Monitor
+      homepage.group: "Monitoring"
+      homepage.name: "WatchYourLAN"
+      homepage.icon: "watchyourlan.svg"
+      homepage.href: "https://watchyourlan.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Network Device Monitor"
     profiles:
       - monitoring

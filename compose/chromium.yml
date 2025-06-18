@@ -14,22 +14,22 @@ services:
       TZ: $TZ
       TITLE: chromium
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.chromium-rtr.entrypoints=websecure"
-      - "traefik.http.routers.chromium-rtr.rule=Host(`chromium.$DOMAINNAME`)"
+      traefik.http.routers.chromium-rtr.entrypoints: "websecure"
+      traefik.http.routers.chromium-rtr.rule: "Host(`chromium.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.chromium-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.chromium-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.chromium-rtr.service=chromium-svc"
-      - "traefik.http.services.chromium-svc.loadbalancer.server.port=3000"
+      traefik.http.routers.chromium-rtr.service: "chromium-svc"
+      traefik.http.services.chromium-svc.loadbalancer.server.port: "3000"
       ####### HOMEPAGE #######
-      - homepage.group=DesktopApps
-      - homepage.name=Ungoogled Chromium
-      - homepage.icon=chromium.svg
-      - homepage.href=https://chromium.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Ungoogled Chromium Browser
+      homepage.group: "DesktopApps"
+      homepage.name: "Ungoogled Chromium"
+      homepage.icon: "chromium.svg"
+      homepage.href: "https://chromium.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Ungoogled Chromium Browser"
     # devices:
     #   - /dev/dri:/dev/dri #optional
     healthcheck:

@@ -95,28 +95,28 @@ services:
       retries: 5
       start_period: 10s
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.rybbit-api-rtr.entrypoints=websecure"
-      - "traefik.http.routers.rybbit-api-rtr.rule=Host(`analytics.$DOMAINNAME`) && Pathprefix(`/api`)"
+      traefik.http.routers.rybbit-api-rtr.entrypoints: "websecure"
+      traefik.http.routers.rybbit-api-rtr.rule: "Host(`analytics.$DOMAINNAME`) && Pathprefix(`/api`)"
       ## Middlewares
       # - "traefik.http.routers.rybbit-api-rtr.middlewares=chain-no-auth-relaxed@file"
       ## HTTP Services
-      - "traefik.http.routers.rybbit-api-rtr.service=rybbit-api-svc"
-      - "traefik.http.routers.rybbit-api-rtr.priority=2"
-      - "traefik.http.services.rybbit-api-svc.loadbalancer.server.port=3001"
+      traefik.http.routers.rybbit-api-rtr.service: "rybbit-api-svc"
+      traefik.http.routers.rybbit-api-rtr.priority: "2"
+      traefik.http.services.rybbit-api-svc.loadbalancer.server.port: "3001"
       ####### HOMEPAGE #######
-      - homepage.group=Monitoring
-      - homepage.name=rybbit-api
-      - homepage.icon=rybbit.png
-      - homepage.href=https://analytics.$DOMAINNAME/api
-      - homepage.target=_blank
-      - homepage.description=OSS alternative API to Google Analytics
+      homepage.group: "Monitoring"
+      homepage.name: "rybbit-api"
+      homepage.icon: "rybbit.png"
+      homepage.href: "https://analytics.$DOMAINNAME/api"
+      homepage.target: "_blank"
+      homepage.description: "OSS alternative API to Google Analytics"
       ####### GLANCE #######
-      - glance.name=rybbit-api
-      - glance.icon=sh:rybbit
-      - glance.url=https://analytics.$DOMAINNAME/api
-      - glance.description=OSS alternative API to Google Analytics
+      glance.name: "rybbit-api"
+      glance.icon: "sh:rybbit"
+      glance.url: "https://analytics.$DOMAINNAME/api"
+      glance.description: "OSS alternative API to Google Analytics"
 
   rybbit-client:
     image: ghcr.io/rybbit-io/rybbit-client:${RYBBIT_IMAGE_TAG:-latest}
@@ -135,25 +135,25 @@ services:
       NEXT_PUBLIC_BACKEND_URL: https://analytics.$DOMAINNAME
       NEXT_PUBLIC_DISABLE_SIGNUP: ${RYBBIT_DISABLE_SIGNUP:-true}
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.rybbit-rtr.entrypoints=websecure"
-      - "traefik.http.routers.rybbit-rtr.rule=Host(`analytics.$DOMAINNAME`)"
+      traefik.http.routers.rybbit-rtr.entrypoints: "websecure"
+      traefik.http.routers.rybbit-rtr.rule: "Host(`analytics.$DOMAINNAME`)"
       ## Middlewares
       # - "traefik.http.routers.rybbit-rtr.middlewares=chain-no-auth-relaxed@file"
       ## HTTP Services
-      - "traefik.http.routers.rybbit-rtr.service=rybbit-svc"
-      - "traefik.http.routers.rybbit-rtr.priority=1"
-      - "traefik.http.services.rybbit-svc.loadbalancer.server.port=3002"
+      traefik.http.routers.rybbit-rtr.service: "rybbit-svc"
+      traefik.http.routers.rybbit-rtr.priority: "1"
+      traefik.http.services.rybbit-svc.loadbalancer.server.port: "3002"
       ####### HOMEPAGE #######
-      - homepage.group=Monitoring
-      - homepage.name=rybbit
-      - homepage.icon=rybbit.png
-      - homepage.href=https://analytics.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=OSS alternative to Google Analytics
+      homepage.group: "Monitoring"
+      homepage.name: "rybbit"
+      homepage.icon: "rybbit.png"
+      homepage.href: "https://analytics.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "OSS alternative to Google Analytics"
       ####### GLANCE #######
-      - glance.name=rybbit
-      - glance.icon=sh:rybbit
-      - glance.url=https://analytics.$DOMAINNAME
-      - glance.description=OSS alternative to Google Analytics
+      glance.name: "rybbit"
+      glance.icon: "sh:rybbit"
+      glance.url: "https://analytics.$DOMAINNAME"
+      glance.description: "OSS alternative to Google Analytics"

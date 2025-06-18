@@ -17,21 +17,21 @@ services:
       PGID: $PGID
       TZ: $TZ
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.beets-rtr.entrypoints=websecure"
-      - "traefik.http.routers.beets-rtr.rule=Host(`beets.$DOMAINNAME`)"
+      traefik.http.routers.beets-rtr.entrypoints: "websecure"
+      traefik.http.routers.beets-rtr.rule: "Host(`beets.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.beets-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.beets-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.beets-rtr.service=beets-svc"
-      - "traefik.http.services.beets-svc.loadbalancer.server.port=8337"
+      traefik.http.routers.beets-rtr.service: "beets-svc"
+      traefik.http.services.beets-svc.loadbalancer.server.port: "8337"
       ####### HOMEPAGE #######
-      - homepage.group=Media
-      - homepage.name=Beets
-      - homepage.icon=beets.svg
-      - homepage.href=https://beets.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=General Purpose Music Manager
+      homepage.group: "Media"
+      homepage.name: "Beets"
+      homepage.icon: "beets.svg"
+      homepage.href: "https://beets.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "General Purpose Music Manager"
     profiles:
       - media

@@ -55,19 +55,19 @@ services:
     volumes_from: 
       - perlite-build
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.perlite-rtr.entrypoints=websecure"
-      - "traefik.http.routers.perlite-rtr.rule=Host(`perlite.$DOMAINNAME`)"
+      traefik.http.routers.perlite-rtr.entrypoints: "websecure"
+      traefik.http.routers.perlite-rtr.rule: "Host(`perlite.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.perlite-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.perlite-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.perlite-rtr.service=perlite-svc"
-      - "traefik.http.services.perlite-svc.loadbalancer.server.port=80"
+      traefik.http.routers.perlite-rtr.service: "perlite-svc"
+      traefik.http.services.perlite-svc.loadbalancer.server.port: "80"
       ####### HOMEPAGE #######
-      - homepage.group=Reading
-      - homepage.name=Perlite
-      - homepage.icon=obsidian.svg
-      - homepage.href=https://perlite.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=A web-based markdown viewer optimized for Obsidian
+      homepage.group: "Reading"
+      homepage.name: "Perlite"
+      homepage.icon: "obsidian.svg"
+      homepage.href: "https://perlite.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "A web-based markdown viewer optimized for Obsidian"

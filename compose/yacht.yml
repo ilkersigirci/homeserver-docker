@@ -19,19 +19,19 @@ services:
       TZ: $TZ
       DISABLE_AUTH: True
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.yacht-rtr.entrypoints=websecure"
-      - "traefik.http.routers.yacht-rtr.rule=Host(`yacht.$DOMAINNAME`)"
+      traefik.http.routers.yacht-rtr.entrypoints: "websecure"
+      traefik.http.routers.yacht-rtr.rule: "Host(`yacht.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.yacht-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.yacht-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.yacht-rtr.service=yacht-svc"
-      - "traefik.http.services.yacht-svc.loadbalancer.server.port=8000"
+      traefik.http.routers.yacht-rtr.service: "yacht-svc"
+      traefik.http.services.yacht-svc.loadbalancer.server.port: "8000"
       ####### HOMEPAGE #######
-      - homepage.group=Maintenance
-      - homepage.name=Yacht
-      - homepage.icon=yacht.svg
-      - homepage.href=https://yacht.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Docker Web Interface
+      homepage.group: "Maintenance"
+      homepage.name: "Yacht"
+      homepage.icon: "yacht.svg"
+      homepage.href: "https://yacht.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Docker Web Interface"

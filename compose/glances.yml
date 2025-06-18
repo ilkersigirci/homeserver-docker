@@ -35,21 +35,21 @@ services:
       # GLANCES_OPT: "-w" # "-C /glances/conf/glances.conf --export influxdb"
       GLANCES_OPT: "-C /glances/conf/glances.conf -w"
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.glances-rtr.entrypoints=websecure"
-      - "traefik.http.routers.glances-rtr.rule=Host(`glances.$DOMAINNAME`)"
+      traefik.http.routers.glances-rtr.entrypoints: "websecure"
+      traefik.http.routers.glances-rtr.rule: "Host(`glances.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.glances-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.glances-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.glances-rtr.service=glances-svc"
-      - "traefik.http.services.glances-svc.loadbalancer.server.port=61208"
+      traefik.http.routers.glances-rtr.service: "glances-svc"
+      traefik.http.services.glances-svc.loadbalancer.server.port: "61208"
       ####### HOMEPAGE #######
-      - homepage.group=Monitoring
-      - homepage.name=Glances
-      - homepage.icon=glances.svg
-      - homepage.href=https://glances.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=System Monitor
+      homepage.group: "Monitoring"
+      homepage.name: "Glances"
+      homepage.icon: "glances.svg"
+      homepage.href: "https://glances.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "System Monitor"
     profiles:
       - monitoring

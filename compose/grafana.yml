@@ -27,21 +27,21 @@ services:
     #     constraints:
     #       - node.role==manager
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.grafana-rtr.entrypoints=websecure"
-      - "traefik.http.routers.grafana-rtr.rule=Host(`grafana.$DOMAINNAME`)"
+      traefik.http.routers.grafana-rtr.entrypoints: "websecure"
+      traefik.http.routers.grafana-rtr.rule: "Host(`grafana.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.grafana-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.grafana-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.grafana-rtr.service=grafana-svc"
-      - "traefik.http.services.grafana-svc.loadbalancer.server.port=3000"
+      traefik.http.routers.grafana-rtr.service: "grafana-svc"
+      traefik.http.services.grafana-svc.loadbalancer.server.port: "3000"
       ####### HOMEPAGE #######
-      - homepage.group=Monitoring
-      - homepage.name=Grafana
-      - homepage.icon=grafana.svg
-      - homepage.href=https://grafana.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Observability and Data Visualization Platform
+      homepage.group: "Monitoring"
+      homepage.name: "Grafana"
+      homepage.icon: "grafana.svg"
+      homepage.href: "https://grafana.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Observability and Data Visualization Platform"
     profiles:
       - monitoring

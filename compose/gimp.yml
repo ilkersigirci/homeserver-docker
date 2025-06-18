@@ -13,22 +13,22 @@ services:
       TZ: $TZ
       TITLE: Gimp
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.gimp-rtr.entrypoints=websecure"
-      - "traefik.http.routers.gimp-rtr.rule=Host(`gimp.$DOMAINNAME`)"
+      traefik.http.routers.gimp-rtr.entrypoints: "websecure"
+      traefik.http.routers.gimp-rtr.rule: "Host(`gimp.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.gimp-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.gimp-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.gimp-rtr.service=gimp-svc"
-      - "traefik.http.services.gimp-svc.loadbalancer.server.port=3000"
+      traefik.http.routers.gimp-rtr.service: "gimp-svc"
+      traefik.http.services.gimp-svc.loadbalancer.server.port: "3000"
       ####### HOMEPAGE #######
-      - homepage.group=DesktopApps
-      - homepage.name=Gimp
-      - homepage.icon=gimp.svg
-      - homepage.href=https://gimp.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Image Manipulation Program
+      homepage.group: "DesktopApps"
+      homepage.name: "Gimp"
+      homepage.icon: "gimp.svg"
+      homepage.href: "https://gimp.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Image Manipulation Program"
     healthcheck:
       test: ["CMD-SHELL", "curl --fail -s http://localhost:3000 || exit 1"]
       start_period: 15s

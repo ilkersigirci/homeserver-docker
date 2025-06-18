@@ -19,21 +19,21 @@ services:
       # - FLATNOTES_PASSWORD="changeMe!"
       FLATNOTES_SECRET_KEY: "change-stability-pushchair"
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.notes-rtr.entrypoints=websecure"
-      - "traefik.http.routers.notes-rtr.rule=Host(`notes.$DOMAINNAME`)"
+      traefik.http.routers.notes-rtr.entrypoints: "websecure"
+      traefik.http.routers.notes-rtr.rule: "Host(`notes.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.notes-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.notes-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.notes-rtr.service=notes-svc"
-      - "traefik.http.services.notes-svc.loadbalancer.server.port=8080"
+      traefik.http.routers.notes-rtr.service: "notes-svc"
+      traefik.http.services.notes-svc.loadbalancer.server.port: "8080"
       ####### HOMEPAGE #######
-      - homepage.group=Reading
-      - homepage.name=Flatnotes
-      - homepage.icon=flatnotes.svg
-      - homepage.href=https://flatnotes.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=No Directory Markdown Viewer/Editor
+      homepage.group: "Reading"
+      homepage.name: "Flatnotes"
+      homepage.icon: "flatnotes.svg"
+      homepage.href: "https://flatnotes.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "No Directory Markdown Viewer/Editor"
     profiles:
       - reading

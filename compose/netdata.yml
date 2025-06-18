@@ -23,21 +23,21 @@ services:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.netdata-rtr.entrypoints=websecure"
-      - "traefik.http.routers.netdata-rtr.rule=Host(`netdata.$DOMAINNAME`)"
+      traefik.http.routers.netdata-rtr.entrypoints: "websecure"
+      traefik.http.routers.netdata-rtr.rule: "Host(`netdata.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.netdata-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.netdata-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.netdata-rtr.service=netdata-svc"
-      - "traefik.http.services.netdata-svc.loadbalancer.server.port=19999"
+      traefik.http.routers.netdata-rtr.service: "netdata-svc"
+      traefik.http.services.netdata-svc.loadbalancer.server.port: "19999"
       ####### HOMEPAGE #######
-      - homepage.group=Monitoring
-      - homepage.name=Netdata
-      - homepage.icon=netdata.svg
-      - homepage.href=https://netdata.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Monitoring and troubleshooting, transformed
+      homepage.group: "Monitoring"
+      homepage.name: "Netdata"
+      homepage.icon: "netdata.svg"
+      homepage.href: "https://netdata.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Monitoring and troubleshooting, transformed"
     profiles:
       - monitoring

@@ -19,23 +19,23 @@ services:
       DISABLE_VERSION_CHECK: true
       BASE_URL: https://changedetection.$DOMAINNAME
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.changedetection-rtr.entrypoints=websecure"
-      - "traefik.http.routers.changedetection-rtr.rule=Host(`changedetection.$DOMAINNAME`)"
+      traefik.http.routers.changedetection-rtr.entrypoints: "websecure"
+      traefik.http.routers.changedetection-rtr.rule: "Host(`changedetection.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.changedetection-rtr.middlewares=chain-tinyauth@file" # NOTE: use chain-no-auth for https glance access
+      traefik.http.routers.changedetection-rtr.middlewares: "chain-tinyauth@file" # NOTE: use chain-no-auth for https glance access
       ## HTTP Services
-      - "traefik.http.routers.changedetection-rtr.service=changedetection-svc"
-      - "traefik.http.services.changedetection-svc.loadbalancer.server.port=5000"
+      traefik.http.routers.changedetection-rtr.service: "changedetection-svc"
+      traefik.http.services.changedetection-svc.loadbalancer.server.port: "5000"
       ## Homepage
-      - homepage.group=Monitoring
-      - homepage.name=changedetection
-      - homepage.icon=changedetection.svg
-      - homepage.href=https://changedetection.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Website Change Detection
-      - homepage.widget.type=changedetectionio
-      - homepage.widget.url=http://changedetection:5000
-      - homepage.widget.key=$CHANGEDETECTION_API_KEY
-      - homepage.widget.fields=["diffsDetected","totalObserved"]
+      homepage.group: "Monitoring"
+      homepage.name: "changedetection"
+      homepage.icon: "changedetection.svg"
+      homepage.href: "https://changedetection.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Website Change Detection"
+      homepage.widget.type: "changedetectionio"
+      homepage.widget.url: "http://changedetection:5000"
+      homepage.widget.key: "$CHANGEDETECTION_API_KEY"
+      homepage.widget.fields: "[diffsDetected,totalObserved]"

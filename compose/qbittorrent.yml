@@ -20,22 +20,22 @@ services:
       TZ: $TZ
       WEBUI_PORT: 8080
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.qbittorrent-rtr.entrypoints=websecure"
-      - "traefik.http.routers.qbittorrent-rtr.rule=Host(`qtorrent.$DOMAINNAME`)"
+      traefik.http.routers.qbittorrent-rtr.entrypoints: "websecure"
+      traefik.http.routers.qbittorrent-rtr.rule: "Host(`qtorrent.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.qbittorrent-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.qbittorrent-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.qbittorrent-rtr.service=qbittorrent-svc"
-      - "traefik.http.services.qbittorrent-svc.loadbalancer.server.port=8080"
+      traefik.http.routers.qbittorrent-rtr.service: "qbittorrent-svc"
+      traefik.http.services.qbittorrent-svc.loadbalancer.server.port: "8080"
       # - traefik.http.services.qbittorrent-svc.loadbalancer.passhostheader=false # Not needed
       ####### HOMEPAGE #######
-      - homepage.group=Media
-      - homepage.name=qBittorrent
-      - homepage.icon=qbittorrent.svg
-      - homepage.href=https://qtorrent.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Download Client
+      homepage.group: "Media"
+      homepage.name: "qBittorrent"
+      homepage.icon: "qbittorrent.svg"
+      homepage.href: "https://qtorrent.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Download Client"
     profiles:
       - media

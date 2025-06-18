@@ -33,19 +33,19 @@ services:
       - authelia_storage_encryption_key
     #  - authelia_duo_api_secret_key
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.authelia-rtr.entrypoints=websecure"
-      - "traefik.http.routers.authelia-rtr.rule=Host(`authelia.$DOMAINNAME`)"
+      traefik.http.routers.authelia-rtr.entrypoints: "websecure"
+      traefik.http.routers.authelia-rtr.rule: "Host(`authelia.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.authelia-rtr.middlewares=chain-no-auth@file" # IMPORTANT
+      traefik.http.routers.authelia-rtr.middlewares: "chain-no-auth@file" # IMPORTANT
       ## HTTP Services
-      - "traefik.http.routers.authelia-rtr.service=authelia-svc"
-      - "traefik.http.services.authelia-svc.loadbalancer.server.port=9091"
+      traefik.http.routers.authelia-rtr.service: "authelia-svc"
+      traefik.http.services.authelia-svc.loadbalancer.server.port: "9091"
       ####### HOMEPAGE #######
-      - homepage.group=Core
-      - homepage.name=Authelia
-      - homepage.icon=authelia.svg
-      - homepage.href=https://authelia.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Secure Single Sign On
+      homepage.group: "Core"
+      homepage.name: "Authelia"
+      homepage.icon: "authelia.svg"
+      homepage.href: "https://authelia.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Secure Single Sign On"

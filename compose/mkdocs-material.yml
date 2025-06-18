@@ -16,21 +16,21 @@ services:
       PGID: $PGID
       TZ: $TZ
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.mkdocs-material-rtr.entrypoints=websecure"
-      - "traefik.http.routers.mkdocs-material-rtr.rule=Host(`mkdocs.$DOMAINNAME`)"
+      traefik.http.routers.mkdocs-material-rtr.entrypoints: "websecure"
+      traefik.http.routers.mkdocs-material-rtr.rule: "Host(`mkdocs.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.mkdocs-material-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.mkdocs-material-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.mkdocs-material-rtr.service=mkdocs-material-svc"
-      - "traefik.http.services.mkdocs-material-svc.loadbalancer.server.port=8000"
+      traefik.http.routers.mkdocs-material-rtr.service: "mkdocs-material-svc"
+      traefik.http.services.mkdocs-material-svc.loadbalancer.server.port: "8000"
       ####### HOMEPAGE #######
-      - homepage.group=Reading
-      - homepage.name=mkdocs-material
-      - homepage.icon=mkdocs.svg
-      - homepage.href=https://mkdocs.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Mkdocs-Material
+      homepage.group: "Reading"
+      homepage.name: "mkdocs-material"
+      homepage.icon: "mkdocs.svg"
+      homepage.href: "https://mkdocs.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Mkdocs-Material"
     profiles:
       - reading

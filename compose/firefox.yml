@@ -24,22 +24,22 @@ services:
       TZ: $TZ
       TITLE: Firefox
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.firefox-rtr.entrypoints=websecure"
-      - "traefik.http.routers.firefox-rtr.rule=Host(`firefox.$DOMAINNAME`)"
+      traefik.http.routers.firefox-rtr.entrypoints: "websecure"
+      traefik.http.routers.firefox-rtr.rule: "Host(`firefox.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.firefox-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.firefox-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.firefox-rtr.service=firefox-svc"
-      - "traefik.http.services.firefox-svc.loadbalancer.server.port=3000"
+      traefik.http.routers.firefox-rtr.service: "firefox-svc"
+      traefik.http.services.firefox-svc.loadbalancer.server.port: "3000"
       ####### HOMEPAGE #######
-      - homepage.group=DesktopApps
-      - homepage.name=Firefox
-      - homepage.icon=firefox.svg
-      - homepage.href=https://firefox.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Firefox - Containerized
+      homepage.group: "DesktopApps"
+      homepage.name: "Firefox"
+      homepage.icon: "firefox.svg"
+      homepage.href: "https://firefox.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Firefox - Containerized"
     # devices:
     #   - /dev/dri:/dev/dri #optional
     healthcheck:

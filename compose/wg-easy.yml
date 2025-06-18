@@ -86,22 +86,22 @@ services:
       timeout: 5s
       retries: 3
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.wg-easy-14-no-host-rtr.entrypoints=websecure"
-      - "traefik.http.routers.wg-easy-14-no-host-rtr.rule=Host(`wg-no-host.$DOMAINNAME`)"
+      traefik.http.routers.wg-easy-14-no-host-rtr.entrypoints: "websecure"
+      traefik.http.routers.wg-easy-14-no-host-rtr.rule: "Host(`wg-no-host.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.wg-easy-14-no-host-rtr.middlewares=chain-tinyauth-relaxed@file" # NOTE: relaxed used for preventing CSP issues
+      traefik.http.routers.wg-easy-14-no-host-rtr.middlewares: "chain-tinyauth-relaxed@file" # NOTE: relaxed used for preventing CSP issues
       ## HTTP Services
-      - "traefik.http.routers.wg-easy-14-no-host-rtr.service=wg-easy-14-no-host-svc"
-      - "traefik.http.services.wg-easy-14-no-host-svc.loadbalancer.server.port=51821"
+      traefik.http.routers.wg-easy-14-no-host-rtr.service: "wg-easy-14-no-host-svc"
+      traefik.http.services.wg-easy-14-no-host-svc.loadbalancer.server.port: "51821"
       ####### HOMEPAGE #######
-      - homepage.group=Core
-      - homepage.name=Wireguard
-      - homepage.icon=wireguard.svg
-      - homepage.href=https://wg-no-host.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=The easiest way to run WireGuard VPN and UI
+      homepage.group: "Core"
+      homepage.name: "Wireguard"
+      homepage.icon: "wireguard.svg"
+      homepage.href: "https://wg-no-host.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "The easiest way to run WireGuard VPN and UI"
 
   # NEEDS ipv6 to be enabled currently.
   wg-easy:
@@ -133,23 +133,23 @@ services:
       HOST: 0.0.0.0
       # - INSECURE=false
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.wg-easy-rtr.entrypoints=websecure"
-      - "traefik.http.routers.wg-easy-rtr.rule=Host(`wireguard.$DOMAINNAME`)"
+      traefik.http.routers.wg-easy-rtr.entrypoints: "websecure"
+      traefik.http.routers.wg-easy-rtr.rule: "Host(`wireguard.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.wg-easy-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.wg-easy-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.wg-easy-rtr.service=wg-easy-svc"
-      - "traefik.http.services.wg-easy-svc.loadbalancer.server.port=51821"
+      traefik.http.routers.wg-easy-rtr.service: "wg-easy-svc"
+      traefik.http.services.wg-easy-svc.loadbalancer.server.port: "51821"
       # UDP Services
       # - "traefik.udp.routers.wg-easy-rtr.entrypoints=wireguard"
       # - "traefik.udp.routers.wg-easy-rtr.service-wg-easy-svc"
       # - "traefik.udp.services.wg-easy-svc.loadbalancer.server.port=51820"
       ####### HOMEPAGE #######
-      - homepage.group=Core
-      - homepage.name=Wireguard
-      - homepage.icon=wireguard.svg
-      - homepage.href=https://wireguard.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=The easiest way to run WireGuard VPN and UI
+      homepage.group: "Core"
+      homepage.name: "Wireguard"
+      homepage.icon: "wireguard.svg"
+      homepage.href: "https://wireguard.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "The easiest way to run WireGuard VPN and UI"

@@ -16,24 +16,24 @@ services:
     environment:
       TZ: $TZ
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.pinchflat-rtr.entrypoints=websecure"
-      - "traefik.http.routers.pinchflat-rtr.rule=Host(`pinchflat.$DOMAINNAME`)"
+      traefik.http.routers.pinchflat-rtr.entrypoints: "websecure"
+      traefik.http.routers.pinchflat-rtr.rule: "Host(`pinchflat.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.pinchflat-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.pinchflat-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.pinchflat-rtr.service=pinchflat-svc"
-      - "traefik.http.services.pinchflat-svc.loadbalancer.server.port=8945"
+      traefik.http.routers.pinchflat-rtr.service: "pinchflat-svc"
+      traefik.http.services.pinchflat-svc.loadbalancer.server.port: "8945"
       ####### HOMEPAGE #######
-      - homepage.group=Media
-      - homepage.name=pinchflat
-      - homepage.icon=pinchflat.png
-      - homepage.href=https://pinchflat.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Your next YouTube media manager
+      homepage.group: "Media"
+      homepage.name: "pinchflat"
+      homepage.icon: "pinchflat.png"
+      homepage.href: "https://pinchflat.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Your next YouTube media manager"
       ####### GLANCE #######
-      - glance.name=pinchflat
-      - glance.icon=sh:pinchflat
-      - glance.url=https://pinchflat.$DOMAINNAME
-      - glance.description=Your next YouTube media manager
+      glance.name: "pinchflat"
+      glance.icon: "sh:pinchflat"
+      glance.url: "https://pinchflat.$DOMAINNAME"
+      glance.description: "Your next YouTube media manager"

@@ -68,19 +68,19 @@ services:
     profiles:
       - reading
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.obsidian-rtr.entrypoints=websecure"
-      - "traefik.http.routers.obsidian-rtr.rule=Host(`obsidian.$DOMAINNAME`)"
+      traefik.http.routers.obsidian-rtr.entrypoints: "websecure"
+      traefik.http.routers.obsidian-rtr.rule: "Host(`obsidian.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.obsidian-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.obsidian-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.obsidian-rtr.service=obsidian-svc"
-      - "traefik.http.services.obsidian-svc.loadbalancer.server.port=3000"
+      traefik.http.routers.obsidian-rtr.service: "obsidian-svc"
+      traefik.http.services.obsidian-svc.loadbalancer.server.port: "3000"
       ####### HOMEPAGE #######
-      - homepage.group=Reading
-      - homepage.name=Obsidian
-      - homepage.icon=obsidian.svg
-      - homepage.href=https://obsidian.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Note Taking with Markdown
+      homepage.group: "Reading"
+      homepage.name: "Obsidian"
+      homepage.icon: "obsidian.svg"
+      homepage.href: "https://obsidian.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Note Taking with Markdown"

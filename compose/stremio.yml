@@ -17,37 +17,37 @@ services:
     volumes:
       - $CONFIGDIR/stremio:/root/.stremio-server
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers Auth - Web UI
-      - "traefik.http.routers.stremio-rtr.entrypoints=websecure"
-      - "traefik.http.routers.stremio-rtr.rule=Host(`stremio.$DOMAINNAME`)"
+      traefik.http.routers.stremio-rtr.entrypoints: "websecure"
+      traefik.http.routers.stremio-rtr.rule: "Host(`stremio.$DOMAINNAME`)"
       ## Middlewares - Web UI
-      - "traefik.http.routers.stremio-rtr.middlewares=chain-tinyauth-original@file"
+      traefik.http.routers.stremio-rtr.middlewares: "chain-tinyauth-original@file"
       ## HTTP Services - Web UI
-      - "traefik.http.routers.stremio-rtr.service=stremio-svc"
-      - "traefik.http.services.stremio-svc.loadbalancer.server.port=8080"
+      traefik.http.routers.stremio-rtr.service: "stremio-svc"
+      traefik.http.services.stremio-svc.loadbalancer.server.port: "8080"
       ## HTTP Routers - API
-      - "traefik.http.routers.stremio-api-rtr.entrypoints=websecure"
-      - "traefik.http.routers.stremio-api-rtr.rule=Host(`stremio-api.$DOMAINNAME`)"
+      traefik.http.routers.stremio-api-rtr.entrypoints: "websecure"
+      traefik.http.routers.stremio-api-rtr.rule: "Host(`stremio-api.$DOMAINNAME`)"
       ## Middlewares - API
-      - "traefik.http.routers.stremio-api-rtr.middlewares=cors-stremio,chain-no-auth@file"
+      traefik.http.routers.stremio-api-rtr.middlewares: "cors-stremio,chain-no-auth@file"
       ## HTTP Services - API
-      - "traefik.http.routers.stremio-api-rtr.service=stremio-api-svc"
-      - "traefik.http.services.stremio-api-svc.loadbalancer.server.port=11470"
+      traefik.http.routers.stremio-api-rtr.service: "stremio-api-svc"
+      traefik.http.services.stremio-api-svc.loadbalancer.server.port: "11470"
       ## CORS Middleware Definition for API
-      - "traefik.http.middlewares.cors-stremio.headers.accessControlAllowCredentials=false"
-      - "traefik.http.middlewares.cors-stremio.headers.accessControlAllowHeaders=*"
-      - "traefik.http.middlewares.cors-stremio.headers.accessControlAllowMethods=GET,POST,PUT,DELETE,OPTIONS"
-      - "traefik.http.middlewares.cors-stremio.headers.accessControlAllowOriginList=https://stremio.$DOMAINNAME"
-      - "traefik.http.middlewares.cors-stremio.headers.accessControlMaxAge=86400"
-      - "traefik.http.middlewares.cors-stremio.headers.addVaryHeader=true"
+      traefik.http.middlewares.cors-stremio.headers.accessControlAllowCredentials: "false"
+      traefik.http.middlewares.cors-stremio.headers.accessControlAllowHeaders: "*"
+      traefik.http.middlewares.cors-stremio.headers.accessControlAllowMethods: "GET,POST,PUT,DELETE,OPTIONS"
+      traefik.http.middlewares.cors-stremio.headers.accessControlAllowOriginList: "https://stremio.$DOMAINNAME"
+      traefik.http.middlewares.cors-stremio.headers.accessControlMaxAge: "86400"
+      traefik.http.middlewares.cors-stremio.headers.addVaryHeader: "true"
       ####### HOMEPAGE #######
-      - homepage.group=Media
-      - homepage.name=Stremio
-      - homepage.icon=stremio.svg
-      - homepage.href=https://stremio.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Online Streaming Platform
+      homepage.group: "Media"
+      homepage.name: "Stremio"
+      homepage.icon: "stremio.svg"
+      homepage.href: "https://stremio.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Online Streaming Platform"
     profiles:
       - media
       - arr
@@ -65,22 +65,22 @@ services:
     environment:
       NO_CORS: 1
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.stremio-server-rtr.entrypoints=websecure"
-      - "traefik.http.routers.stremio-server-rtr.rule=Host(`stremio-server.$DOMAINNAME`)"
+      traefik.http.routers.stremio-server-rtr.entrypoints: "websecure"
+      traefik.http.routers.stremio-server-rtr.rule: "Host(`stremio-server.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.stremio-server-rtr.middlewares=chain-tinyauth-relaxed@file" # NOTE: Not working currently
+      traefik.http.routers.stremio-server-rtr.middlewares: "chain-tinyauth-relaxed@file" # NOTE: Not working currently
       ## HTTP Services
-      - "traefik.http.routers.stremio-server-rtr.service=stremio-server-svc"
-      - "traefik.http.services.stremio-server-svc.loadbalancer.server.port=11470"
+      traefik.http.routers.stremio-server-rtr.service: "stremio-server-svc"
+      traefik.http.services.stremio-server-svc.loadbalancer.server.port: "11470"
       ####### HOMEPAGE #######
-      - homepage.group=Media
-      - homepage.name=Stremio
-      - homepage.icon=stremio.svg
-      - homepage.href=https://stremio-server.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Online Streaming Platform
+      homepage.group: "Media"
+      homepage.name: "Stremio"
+      homepage.icon: "stremio.svg"
+      homepage.href: "https://stremio-server.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Online Streaming Platform"
     profiles:
       # - media
       # - arr

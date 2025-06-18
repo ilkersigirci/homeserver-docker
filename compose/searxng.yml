@@ -24,27 +24,27 @@ services:
       UWSGI_WORKERS: 4
       UWSGI_THREADS: 4
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.searxng-rtr.entrypoints=websecure"
-      - "traefik.http.routers.searxng-rtr.rule=Host(`searxng.$DOMAINNAME`)"
+      traefik.http.routers.searxng-rtr.entrypoints: "websecure"
+      traefik.http.routers.searxng-rtr.rule: "Host(`searxng.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.searxng-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.searxng-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.searxng-rtr.service=searxng-svc"
-      - "traefik.http.services.searxng-svc.loadbalancer.server.port=8080"
+      traefik.http.routers.searxng-rtr.service: "searxng-svc"
+      traefik.http.services.searxng-svc.loadbalancer.server.port: "8080"
       ####### HOMEPAGE #######
-      - homepage.group=ML
-      - homepage.name=searxng
-      - homepage.icon=searxng.png
-      - homepage.href=https://searxng.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Free internet metasearch engine
+      homepage.group: "ML"
+      homepage.name: "searxng"
+      homepage.icon: "searxng.png"
+      homepage.href: "https://searxng.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Free internet metasearch engine"
       ####### GLANCE #######
-      - glance.name=searxng
-      - glance.icon=sh:searxng
-      - glance.url=https://searxng.$DOMAINNAME
-      - glance.description=Free internet metasearch engine
+      glance.name: "searxng"
+      glance.icon: "sh:searxng"
+      glance.url: "https://searxng.$DOMAINNAME"
+      glance.description: "Free internet metasearch engine"
 
   searxng-redis:
     image: docker.io/valkey/valkey:8-alpine

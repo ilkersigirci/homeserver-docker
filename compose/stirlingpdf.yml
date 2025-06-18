@@ -20,19 +20,19 @@ services:
       # - APP_ROOT_PATH=/
       # - ALLOW_GOOGLE_VISIBILITY=true
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.stirlingpdf-rtr.entrypoints=websecure"
-      - "traefik.http.routers.stirlingpdf-rtr.rule=Host(`stirlingpdf.$DOMAINNAME`)"
+      traefik.http.routers.stirlingpdf-rtr.entrypoints: "websecure"
+      traefik.http.routers.stirlingpdf-rtr.rule: "Host(`stirlingpdf.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.stirlingpdf-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.stirlingpdf-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.stirlingpdf-rtr.service=stirlingpdf-svc"
-      - "traefik.http.services.stirlingpdf-svc.loadbalancer.server.port=8080"
+      traefik.http.routers.stirlingpdf-rtr.service: "stirlingpdf-svc"
+      traefik.http.services.stirlingpdf-svc.loadbalancer.server.port: "8080"
       ####### HOMEPAGE #######
-      - homepage.group=Maintenance
-      - homepage.name=StirlingPDF
-      - homepage.icon=stirling-pdf.svg
-      - homepage.href=https://stirlingpdf.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=PDF Editor
+      homepage.group: "Maintenance"
+      homepage.name: "StirlingPDF"
+      homepage.icon: "stirling-pdf.svg"
+      homepage.href: "https://stirlingpdf.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "PDF Editor"

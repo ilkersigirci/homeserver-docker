@@ -26,24 +26,24 @@ services:
       # - S3_BUCKET_NAME=${S3_BUCKET_NAME:-palmr-files} # Bucket name for the S3 storage (here we are using palmr-files as the bucket name to understand that this is the bucket for palmr)
       # - S3_FORCE_PATH_STYLE=true # For MinIO compatibility we have to set this to true
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.palmr-rtr.entrypoints=websecure"
-      - "traefik.http.routers.palmr-rtr.rule=Host(`palmr.$DOMAINNAME`)"
+      traefik.http.routers.palmr-rtr.entrypoints: "websecure"
+      traefik.http.routers.palmr-rtr.rule: "Host(`palmr.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.palmr-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.palmr-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.palmr-rtr.service=palmr-svc"
-      - "traefik.http.services.palmr-svc.loadbalancer.server.port=5487"
+      traefik.http.routers.palmr-rtr.service: "palmr-svc"
+      traefik.http.services.palmr-svc.loadbalancer.server.port: "5487"
       ####### HOMEPAGE #######
-      - homepage.group=Media
-      - homepage.name=palmr
-      - homepage.icon=palmr.png
-      - homepage.href=https://palmr.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Open-source file-sharing platform
+      homepage.group: "Media"
+      homepage.name: "palmr"
+      homepage.icon: "palmr.png"
+      homepage.href: "https://palmr.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Open-source file-sharing platform"
       ####### GLANCE #######
-      - glance.name=palmr
-      - glance.icon=sh:palmr
-      - glance.url=https://palmr.$DOMAINNAME
-      - glance.description=Open-source file-sharing platform
+      glance.name: "palmr"
+      glance.icon: "sh:palmr"
+      glance.url: "https://palmr.$DOMAINNAME"
+      glance.description: "Open-source file-sharing platform"

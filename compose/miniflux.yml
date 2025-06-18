@@ -40,12 +40,12 @@ services:
       BASE_URL: https://miniflux.$DOMAINNAME
       # - "POCKET_CONSUMER_KEY=YOUR_POCKET_CONSUMER_KEY"
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.miniflux-rtr.entrypoints=websecure"
-      - "traefik.http.routers.miniflux-rtr.rule=Host(`miniflux.$DOMAINNAME`)"
+      traefik.http.routers.miniflux-rtr.entrypoints: "websecure"
+      traefik.http.routers.miniflux-rtr.rule: "Host(`miniflux.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.miniflux-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.miniflux-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.miniflux-rtr.service=miniflux-svc"
-      - "traefik.http.services.miniflux-svc.loadbalancer.server.port=8080"
+      traefik.http.routers.miniflux-rtr.service: "miniflux-svc"
+      traefik.http.services.miniflux-svc.loadbalancer.server.port: "8080"

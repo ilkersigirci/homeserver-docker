@@ -52,19 +52,19 @@ services:
       OIDC_CLIENT_SECRET: $OIDC_PDFDING_CLIENT_SECRET
       OIDC_AUTH_URL: https://authelia.$DOMAINNAME/.well-known/openid-configuration
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.pdfding-rtr.entrypoints=websecure"
-      - "traefik.http.routers.pdfding-rtr.rule=Host(`pdfding.$DOMAINNAME`)"
+      traefik.http.routers.pdfding-rtr.entrypoints: "websecure"
+      traefik.http.routers.pdfding-rtr.rule: "Host(`pdfding.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.pdfding-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.pdfding-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.pdfding-rtr.service=pdfding-svc"
-      - "traefik.http.services.pdfding-svc.loadbalancer.server.port=8000"
+      traefik.http.routers.pdfding-rtr.service: "pdfding-svc"
+      traefik.http.services.pdfding-svc.loadbalancer.server.port: "8000"
       ## Homepage
-      - homepage.group=Reading
-      - homepage.name=pdfding
-      - homepage.icon=pdfding.svg
-      - homepage.href=https://pdfding.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=description
+      homepage.group: "Reading"
+      homepage.name: "pdfding"
+      homepage.icon: "pdfding.svg"
+      homepage.href: "https://pdfding.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "description"

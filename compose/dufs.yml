@@ -24,19 +24,19 @@ services:
       DUFS_BIND: 0.0.0.0
       DUFS_PORT: 5000
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.dufs-rtr.entrypoints=websecure"
-      - "traefik.http.routers.dufs-rtr.rule=Host(`dufs.$DOMAINNAME`)"
+      traefik.http.routers.dufs-rtr.entrypoints: "websecure"
+      traefik.http.routers.dufs-rtr.rule: "Host(`dufs.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.dufs-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.dufs-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.dufs-rtr.service=dufs-svc"
-      - "traefik.http.services.dufs-svc.loadbalancer.server.port=5000"
+      traefik.http.routers.dufs-rtr.service: "dufs-svc"
+      traefik.http.services.dufs-svc.loadbalancer.server.port: "5000"
       ####### HOMEPAGE #######
-      - homepage.group=Core
-      - homepage.name=Dufs
-      - homepage.icon=files.svg
-      - homepage.href=https://dufs.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=A file server that supports static serving, WEBDAV
+      homepage.group: "Core"
+      homepage.name: "Dufs"
+      homepage.icon: "files.svg"
+      homepage.href: "https://dufs.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "A file server that supports static serving, WEBDAV"

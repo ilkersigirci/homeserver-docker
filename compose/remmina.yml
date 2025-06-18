@@ -16,12 +16,12 @@ services:
       PGID: $PGID
       TZ: $TZ
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.remmina-rtr.entrypoints=websecure"
-      - "traefik.http.routers.remmina-rtr.rule=Host(`remmina.$DOMAINNAME`)"
+      traefik.http.routers.remmina-rtr.entrypoints: "websecure"
+      traefik.http.routers.remmina-rtr.rule: "Host(`remmina.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.remmina-rtr.middlewares=chain-no-auth@file"
+      traefik.http.routers.remmina-rtr.middlewares: "chain-no-auth@file"
       ## HTTP Services
-      - "traefik.http.routers.remmina-rtr.service=remmina-svc"
-      - "traefik.http.services.remmina-svc.loadbalancer.server.port=3000"
+      traefik.http.routers.remmina-rtr.service: "remmina-svc"
+      traefik.http.services.remmina-svc.loadbalancer.server.port: "3000"

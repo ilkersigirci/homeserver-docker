@@ -9,14 +9,14 @@ services:
     networks:
       - t3_proxy
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.movieweb-rtr.entrypoints=websecure"
-      - "traefik.http.routers.movieweb-rtr.rule=Host(`movieweb.$DOMAINNAME`)"
+      traefik.http.routers.movieweb-rtr.entrypoints: "websecure"
+      traefik.http.routers.movieweb-rtr.rule: "Host(`movieweb.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.movieweb-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.movieweb-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.movieweb-rtr.service=movieweb-svc"
-      - "traefik.http.services.movieweb-svc.loadbalancer.server.port=80"
+      traefik.http.routers.movieweb-rtr.service: "movieweb-svc"
+      traefik.http.services.movieweb-svc.loadbalancer.server.port: "80"
     profiles:
       - media

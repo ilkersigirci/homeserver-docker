@@ -20,22 +20,22 @@ services:
       PGID: $PGID
       TZ: $TZ
     labels:
-      - "com.centurylinklabs.watchtower.enable=false" # For watchtower
-      - "traefik.enable=true"
+      com.centurylinklabs.watchtower.enable: "false" # For watchtower
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.okular-rtr.entrypoints=websecure"
-      - "traefik.http.routers.okular-rtr.rule=Host(`okular.$DOMAINNAME`)"
+      traefik.http.routers.okular-rtr.entrypoints: "websecure"
+      traefik.http.routers.okular-rtr.rule: "Host(`okular.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.okular-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.okular-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.okular-rtr.service=okular-svc"
-      - "traefik.http.services.okular-svc.loadbalancer.server.port=3000"
+      traefik.http.routers.okular-rtr.service: "okular-svc"
+      traefik.http.services.okular-svc.loadbalancer.server.port: "3000"
       ####### HOMEPAGE #######
-      - homepage.group=DesktopApps
-      - homepage.name=Okular
-      - homepage.icon=/icons/okular.png
-      - homepage.href=https://okular.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Pdf Viewing
+      homepage.group: "DesktopApps"
+      homepage.name: "Okular"
+      homepage.icon: "/icons/okular.png"
+      homepage.href: "https://okular.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Pdf Viewing"
     profiles:
       - desktop_apps

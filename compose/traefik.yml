@@ -122,26 +122,26 @@ services:
       - cf_dns_api_token
     labels:
       #- "autoheal=true"
-      - "traefik.enable=true"
+      traefik.enable: "true"
       # HTTP Routers
-      - "traefik.http.routers.traefik-rtr.entrypoints=websecure"
-      - "traefik.http.routers.traefik-rtr.rule=Host(`traefik.$DOMAINNAME`)"
+      traefik.http.routers.traefik-rtr.entrypoints: "websecure"
+      traefik.http.routers.traefik-rtr.rule: "Host(`traefik.$DOMAINNAME`)"
       # - "traefik.http.routers.traefik-rtr.tls.certresolver=dns-cloudflare" # Comment out this line after first run of traefik to force the use of wildcard certs
       ## Services - API
-      - "traefik.http.routers.traefik-rtr.service=api@internal"
+      traefik.http.routers.traefik-rtr.service: "api@internal"
       ## Healthcheck/ping
       # - "traefik.http.routers.ping.rule=Host(`traefik.$DOMAINNAME`) && Path(`/ping`)"
       #- "traefik.http.routers.ping.tls=true"
       #- "traefik.http.routers.ping.service=ping@internal"
       ## Middlewares
-      - "traefik.http.routers.traefik-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.traefik-rtr.middlewares: "chain-tinyauth@file"
       ####### HOMEPAGE #######
-      - homepage.group=Core
-      - homepage.name=Traefik
-      - homepage.icon=traefik.svg
-      - homepage.href=https://traefik.$DOMAINNAME
-      - homepage.target=_blank # _blank: New tab --- _self: Same tab --- _top: New window
-      - homepage.description=Reverse Proxy Manager
-      - homepage.widget.type=traefik
-      - homepage.widget.url=https://traefik.$DOMAINNAME # NOTE: docker service name not working
-      - homepage.widget.fields=["routers","services","middleware"]
+      homepage.group: "Core"
+      homepage.name: "Traefik"
+      homepage.icon: "traefik.svg"
+      homepage.href: "https://traefik.$DOMAINNAME"
+      homepage.target: "_blank" # _blank: New tab --- _self: Same tab --- _top: New window
+      homepage.description: "Reverse Proxy Manager"
+      homepage.widget.type: "traefik"
+      homepage.widget.url: "https://traefik.$DOMAINNAME" # NOTE: docker service name not working
+      homepage.widget.fields: "[routers,services,middleware]"

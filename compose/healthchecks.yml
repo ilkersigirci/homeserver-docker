@@ -24,19 +24,19 @@ services:
       DEBUG: False
       ALLOWED_HOSTS: localhost,healthchecks.$DOMAINNAME
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.healthchecks-rtr.entrypoints=websecure"
-      - "traefik.http.routers.healthchecks-rtr.rule=Host(`healthchecks.$DOMAINNAME`)"
+      traefik.http.routers.healthchecks-rtr.entrypoints: "websecure"
+      traefik.http.routers.healthchecks-rtr.rule: "Host(`healthchecks.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.healthchecks-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.healthchecks-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.healthchecks-rtr.service=healthchecks-svc"
-      - "traefik.http.services.healthchecks-svc.loadbalancer.server.port=8000"
+      traefik.http.routers.healthchecks-rtr.service: "healthchecks-svc"
+      traefik.http.services.healthchecks-svc.loadbalancer.server.port: "8000"
       ####### HOMEPAGE #######
-      - homepage.group=Maintenance
-      - homepage.name=Healthchecks
-      - homepage.icon=healthchecks.svg
-      - homepage.href=https://healthchecks.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Cron job and Background Task Monitoring
+      homepage.group: "Maintenance"
+      homepage.name: "Healthchecks"
+      homepage.icon: "healthchecks.svg"
+      homepage.href: "https://healthchecks.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Cron job and Background Task Monitoring"

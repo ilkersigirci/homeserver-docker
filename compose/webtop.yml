@@ -19,21 +19,21 @@ services:
       TZ: $TZ
       TITLE: Debian on the Browser
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.webtop-rtr.entrypoints=websecure"
-      - "traefik.http.routers.webtop-rtr.rule=Host(`webtop.$DOMAINNAME`)"
+      traefik.http.routers.webtop-rtr.entrypoints: "websecure"
+      traefik.http.routers.webtop-rtr.rule: "Host(`webtop.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.webtop-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.webtop-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.webtop-rtr.service=webtop-svc"
-      - "traefik.http.services.webtop-svc.loadbalancer.server.port=3000"
+      traefik.http.routers.webtop-rtr.service: "webtop-svc"
+      traefik.http.services.webtop-svc.loadbalancer.server.port: "3000"
       ####### HOMEPAGE #######
-      - homepage.group=DesktopApps
-      - homepage.name=Webtop
-      - homepage.icon=webtop.svg
-      - homepage.href=https://webtop.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Debian Desktop in Browser
+      homepage.group: "DesktopApps"
+      homepage.name: "Webtop"
+      homepage.icon: "webtop.svg"
+      homepage.href: "https://webtop.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Debian Desktop in Browser"
     profiles:
       - desktop_apps

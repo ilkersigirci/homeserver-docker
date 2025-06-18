@@ -36,23 +36,23 @@ services:
     volumes:
       - $SECRETSDIR/tinyauth_users:/tinyauth/users_file
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.tinyauth-rtr.entrypoints=websecure"
-      - "traefik.http.routers.tinyauth-rtr.rule=Host(`tinyauth.$DOMAINNAME`)"
+      traefik.http.routers.tinyauth-rtr.entrypoints: "websecure"
+      traefik.http.routers.tinyauth-rtr.rule: "Host(`tinyauth.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.tinyauth-rtr.middlewares=chain-no-auth@file"
+      traefik.http.routers.tinyauth-rtr.middlewares: "chain-no-auth@file"
       ## Forward Auth - Commented out because it is handled inside treafik middleware chain file
       # - "traefik.http.middlewares.tinyauth.forwardauth.address=http://tinyauth:3000/api/auth/traefik"
       ####### HOMEPAGE #######
-      - homepage.group=Core
-      - homepage.name=tinyauth
-      - homepage.icon=tinyauth.png
-      - homepage.href=https://tinyauth.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=The simplest way to protect your apps with a login screen
+      homepage.group: "Core"
+      homepage.name: "tinyauth"
+      homepage.icon: "tinyauth.png"
+      homepage.href: "https://tinyauth.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "The simplest way to protect your apps with a login screen"
       ####### GLANCE #######
-      - glance.name=tinyauth
-      - glance.icon=sh:tinyauth
-      - glance.url=https://tinyauth.$DOMAINNAME
-      - glance.description=The simplest way to protect your apps with a login screen
+      glance.name: "tinyauth"
+      glance.icon: "sh:tinyauth"
+      glance.url: "https://tinyauth.$DOMAINNAME"
+      glance.description: "The simplest way to protect your apps with a login screen"

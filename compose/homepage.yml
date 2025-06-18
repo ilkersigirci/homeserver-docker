@@ -28,17 +28,17 @@ services:
       HOMEPAGE_VAR_BESZEL_EMAIL: $BESZEL_EMAIL
       HOMEPAGE_VAR_BESZEL_PASSWORD: $BESZEL_PASSWORD
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.homepage-rtr.entrypoints=websecure"
-      - "traefik.http.routers.homepage-rtr.rule=Host(`homepage.$DOMAINNAME`)"
+      traefik.http.routers.homepage-rtr.entrypoints: "websecure"
+      traefik.http.routers.homepage-rtr.rule: "Host(`homepage.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.homepage-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.homepage-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.homepage-rtr.service=homepage-svc"
-      - "traefik.http.services.homepage-svc.loadbalancer.server.port=3000"
+      traefik.http.routers.homepage-rtr.service: "homepage-svc"
+      traefik.http.services.homepage-svc.loadbalancer.server.port: "3000"
       ####### GLANCE #######
-      - glance.name=homepage
-      - glance.icon=si:homepage
-      - glance.url=https://homepage.$DOMAINNAME
-      - glance.description=Alternative homepage
+      glance.name: "homepage"
+      glance.icon: "si:homepage"
+      glance.url: "https://homepage.$DOMAINNAME"
+      glance.description: "Alternative homepage"

@@ -17,15 +17,15 @@ services:
       AUTOKUMA__DOCKER__LABEL_PREFIX: traefik
       AUTOKUMA__DOCKER__SOURCE: Containers
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.autokuma-rtr.entrypoints=websecure"
-      - "traefik.http.routers.autokuma-rtr.rule=Host(`autokuma.$DOMAINNAME`)"
+      traefik.http.routers.autokuma-rtr.entrypoints: "websecure"
+      traefik.http.routers.autokuma-rtr.rule: "Host(`autokuma.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.autokuma-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.autokuma-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.autokuma-rtr.service=autokuma-svc"
-      - "traefik.http.services.autokuma-svc.loadbalancer.server.port=3001"
+      traefik.http.routers.autokuma-rtr.service: "autokuma-svc"
+      traefik.http.services.autokuma-svc.loadbalancer.server.port: "3001"
     profiles:
       # - monitoring
       - not-used
@@ -49,22 +49,22 @@ services:
       UPTIME_KUMA_PORT: 3001
       DATA_DIR: /app/data
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.uptime-kuma-rtr.entrypoints=websecure"
-      - "traefik.http.routers.uptime-kuma-rtr.rule=Host(`uptimekuma.$DOMAINNAME`)"
+      traefik.http.routers.uptime-kuma-rtr.entrypoints: "websecure"
+      traefik.http.routers.uptime-kuma-rtr.rule: "Host(`uptimekuma.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.uptime-kuma-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.uptime-kuma-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.uptime-kuma-rtr.service=uptime-kuma-svc"
-      - "traefik.http.services.uptime-kuma-svc.loadbalancer.server.port=3001"
+      traefik.http.routers.uptime-kuma-rtr.service: "uptime-kuma-svc"
+      traefik.http.services.uptime-kuma-svc.loadbalancer.server.port: "3001"
       ####### HOMEPAGE #######
-      - homepage.group=Monitoring
-      - homepage.name=Uptimekuma
-      - homepage.icon=uptime-kuma.svg
-      - homepage.href=https://uptimekuma.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Healthcheck for Http Apps
+      homepage.group: "Monitoring"
+      homepage.name: "Uptimekuma"
+      homepage.icon: "uptime-kuma.svg"
+      homepage.href: "https://uptimekuma.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Healthcheck for Http Apps"
       # - homepage.widget.type=uptimekuma
       # - homepage.widget.url=http://uptime-kuma:3001
       # - homepage.widget.slug=statuspageslug

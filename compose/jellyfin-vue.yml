@@ -13,21 +13,21 @@ services:
     #   - DEFAULT_SERVERS=demo.jellyfin.org,jellyfin:8096
     #   - DISABLE_SERVER_SELECTION=0
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.jellyfin-vue-rtr.entrypoints=websecure"
-      - "traefik.http.routers.jellyfin-vue-rtr.rule=Host(`jellyfin_vue.$DOMAINNAME`)"
+      traefik.http.routers.jellyfin-vue-rtr.entrypoints: "websecure"
+      traefik.http.routers.jellyfin-vue-rtr.rule: "Host(`jellyfin_vue.$DOMAINNAME`)"
       ## Middlewares
       # - "traefik.http.routers.jellyfin-vue-rtr.middlewares=chain-no-auth@file"
       ## HTTP Services
-      - "traefik.http.routers.jellyfin-vue-rtr.service=jellyfin-vue-svc"
-      - "traefik.http.services.jellyfin-vue-svc.loadbalancer.server.port=80"
+      traefik.http.routers.jellyfin-vue-rtr.service: "jellyfin-vue-svc"
+      traefik.http.services.jellyfin-vue-svc.loadbalancer.server.port: "80"
       ####### HOMEPAGE #######
-      - homepage.group=Media
-      - homepage.name=Jellyfin Vue
-      - homepage.icon=jellyfin.svg
-      - homepage.href=https://jellyfin_vue.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Jellyfin with Vue UI
+      homepage.group: "Media"
+      homepage.name: "Jellyfin Vue"
+      homepage.icon: "jellyfin.svg"
+      homepage.href: "https://jellyfin_vue.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Jellyfin with Vue UI"
     profiles:
       - media

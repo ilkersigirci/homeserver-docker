@@ -14,21 +14,21 @@ services:
       PGID: $PGID
       TZ: $TZ
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.darktable-rtr.entrypoints=websecure"
-      - "traefik.http.routers.darktable-rtr.rule=Host(`darktable.$DOMAINNAME`)"
+      traefik.http.routers.darktable-rtr.entrypoints: "websecure"
+      traefik.http.routers.darktable-rtr.rule: "Host(`darktable.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.darktable-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.darktable-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.darktable-rtr.service=darktable-svc"
-      - "traefik.http.services.darktable-svc.loadbalancer.server.port=3000"
+      traefik.http.routers.darktable-rtr.service: "darktable-svc"
+      traefik.http.services.darktable-svc.loadbalancer.server.port: "3000"
       ####### HOMEPAGE #######
-      - homepage.group=DesktopApps
-      - homepage.name=Darktable
-      - homepage.icon=darktable.svg
-      - homepage.href=https://darktable.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Photo Editing App
+      homepage.group: "DesktopApps"
+      homepage.name: "Darktable"
+      homepage.icon: "darktable.svg"
+      homepage.href: "https://darktable.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Photo Editing App"
     profiles:
       - desktop_apps

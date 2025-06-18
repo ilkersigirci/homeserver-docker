@@ -106,16 +106,16 @@ services:
       NEXTCLOUD_TRUSTED_DOMAIN: $NEXTCLOUD_DOMAIN_NAME
       TRUSTED_PROXIES: 192.168.90.0/24
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.nextcloud.entrypoints=websecure"
-      - "traefik.http.routers.nextcloud.rule=Host(`$NEXTCLOUD_DOMAIN_NAME`)"
-      - "traefik.http.routers.nextcloud.tls=true"
+      traefik.http.routers.nextcloud.entrypoints: "websecure"
+      traefik.http.routers.nextcloud.rule: "Host(`$NEXTCLOUD_DOMAIN_NAME`)"
+      traefik.http.routers.nextcloud.tls: "true"
       ## Middlewares
-      - "traefik.http.routers.nextcloud.middlewares=chain-nextcloud@file"
+      traefik.http.routers.nextcloud.middlewares: "chain-nextcloud@file"
       ## HTTP Services
-      - "traefik.http.routers.nextcloud.service=nextcloud"
-      - "traefik.http.services.nextcloud.loadbalancer.server.port=80"
+      traefik.http.routers.nextcloud.service: "nextcloud"
+      traefik.http.services.nextcloud.loadbalancer.server.port: "80"
       ######################################################################################
       ## NOT_WORKING
       # ## TCP Routers

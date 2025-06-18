@@ -13,14 +13,14 @@ services:
     environment:
       CHECK_FREQUENCY: 240
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.podgrab-rtr.entrypoints=websecure"
-      - "traefik.http.routers.podgrab-rtr.rule=Host(`podgrab.$DOMAINNAME`)"
+      traefik.http.routers.podgrab-rtr.entrypoints: "websecure"
+      traefik.http.routers.podgrab-rtr.rule: "Host(`podgrab.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.podgrab-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.podgrab-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.podgrab-rtr.service=podgrab-svc"
-      - "traefik.http.services.podgrab-svc.loadbalancer.server.port=8080"
+      traefik.http.routers.podgrab-rtr.service: "podgrab-svc"
+      traefik.http.services.podgrab-svc.loadbalancer.server.port: "8080"
     profiles:
       - media

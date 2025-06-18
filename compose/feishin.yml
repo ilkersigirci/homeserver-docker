@@ -12,25 +12,25 @@ services:
     security_opt:
       - no-new-privileges:true
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.feishin-rtr.entrypoints=websecure"
-      - "traefik.http.routers.feishin-rtr.rule=Host(`feishin.$DOMAINNAME`)"
+      traefik.http.routers.feishin-rtr.entrypoints: "websecure"
+      traefik.http.routers.feishin-rtr.rule: "Host(`feishin.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.feishin-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.feishin-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.feishin-rtr.service=feishin-svc"
-      - "traefik.http.services.feishin-svc.loadbalancer.server.port=9180"
+      traefik.http.routers.feishin-rtr.service: "feishin-svc"
+      traefik.http.services.feishin-svc.loadbalancer.server.port: "9180"
       ####### HOMEPAGE #######
-      - homepage.group=Media
-      - homepage.name=Feishin
-      - homepage.icon=feishin.webp
-      - homepage.href=https://feishin.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Music Streaming using Jellyfin
+      homepage.group: "Media"
+      homepage.name: "Feishin"
+      homepage.icon: "feishin.webp"
+      homepage.href: "https://feishin.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Music Streaming using Jellyfin"
       ####### GLANCE #######
-      - glance.name=feishin
-      - glance.description=Music Streaming using Jellyfin
-      - glance.parent=jellyfin
+      glance.name: "feishin"
+      glance.description: "Music Streaming using Jellyfin"
+      glance.parent: "jellyfin"
     profiles:
       - media

@@ -23,19 +23,19 @@ services:
       DISPLAY_WIDTH: 1600
       DISPLAY_HEIGHT: 960
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.mkvtoolnix-rtr.entrypoints=websecure"
-      - "traefik.http.routers.mkvtoolnix-rtr.rule=Host(`mkvtoolnix.$DOMAINNAME`)"
+      traefik.http.routers.mkvtoolnix-rtr.entrypoints: "websecure"
+      traefik.http.routers.mkvtoolnix-rtr.rule: "Host(`mkvtoolnix.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.mkvtoolnix-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.mkvtoolnix-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.mkvtoolnix-rtr.service=mkvtoolnix-svc"
-      - "traefik.http.services.mkvtoolnix-svc.loadbalancer.server.port=5800"
+      traefik.http.routers.mkvtoolnix-rtr.service: "mkvtoolnix-svc"
+      traefik.http.services.mkvtoolnix-svc.loadbalancer.server.port: "5800"
       ####### HOMEPAGE #######
-      - homepage.group=Media
-      - homepage.name=Mkvtoolnix
-      - homepage.icon=mkvtoolnix.webp
-      - homepage.href=https://mkvtoolnix.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Ultimate Tool for Editing and Merging MKV Files
+      homepage.group: "Media"
+      homepage.name: "Mkvtoolnix"
+      homepage.icon: "mkvtoolnix.webp"
+      homepage.href: "https://mkvtoolnix.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Ultimate Tool for Editing and Merging MKV Files"

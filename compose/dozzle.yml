@@ -15,24 +15,24 @@ services:
       DOZZLE_FILTER: "status=running"
       DOZZLE_REMOTE_HOST: tcp://docker-socket-proxy:2375
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.dozzle-rtr.entrypoints=websecure"
-      - "traefik.http.routers.dozzle-rtr.rule=Host(`dozzle.$DOMAINNAME`)"
+      traefik.http.routers.dozzle-rtr.entrypoints: "websecure"
+      traefik.http.routers.dozzle-rtr.rule: "Host(`dozzle.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.dozzle-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.dozzle-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.dozzle-rtr.service=dozzle-svc"
-      - "traefik.http.services.dozzle-svc.loadbalancer.server.port=8080"
+      traefik.http.routers.dozzle-rtr.service: "dozzle-svc"
+      traefik.http.services.dozzle-svc.loadbalancer.server.port: "8080"
       ####### HOMEPAGE #######
-      - homepage.group=Maintenance
-      - homepage.name=Dozzle
-      - homepage.icon=dozzle.svg
-      - homepage.href=https://dozzle.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Realtime log viewer for docker containers
+      homepage.group: "Maintenance"
+      homepage.name: "Dozzle"
+      homepage.icon: "dozzle.svg"
+      homepage.href: "https://dozzle.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Realtime log viewer for docker containers"
       ####### GLANCE #######
-      - glance.name=dozzle
-      - glance.icon=sh:dozzle
-      - glance.url=https://dozzle.$DOMAINNAME
-      - glance.description=Realtime log viewer for docker containers
+      glance.name: "dozzle"
+      glance.icon: "sh:dozzle"
+      glance.url: "https://dozzle.$DOMAINNAME"
+      glance.description: "Realtime log viewer for docker containers"

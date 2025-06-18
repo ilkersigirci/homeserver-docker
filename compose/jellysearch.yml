@@ -16,8 +16,8 @@ services:
       MEILI_MASTER_KEY: "1234"
     labels:
       ####### GLANCE #######
-      - glance.name=jellysearch-meilisearch
-      - glance.parent=jellyfin
+      glance.name: "jellysearch-meilisearch"
+      glance.parent: "jellyfin"
 
 
   jellysearch:
@@ -42,20 +42,20 @@ services:
       MEILI_MASTER_KEY: "1234"
       INDEX_CRON: "0 0 0/2 ? * * *"
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.jellysearch-rtr.entrypoints=websecure"
-      - "traefik.http.routers.jellysearch-rtr.rule=Host(`jellyfin.$DOMAINNAME`) && (QueryRegexp(`searchTerm`, `(.*?)`) || QueryRegexp(`SearchTerm`, `(.*?)`))"
+      traefik.http.routers.jellysearch-rtr.entrypoints: "websecure"
+      traefik.http.routers.jellysearch-rtr.rule: "Host(`jellyfin.$DOMAINNAME`) && (QueryRegexp(`searchTerm`, `(.*?)`) || QueryRegexp(`SearchTerm`, `(.*?)`))"
       ## Middlewares
-      - "traefik.http.routers.jellysearch-rtr.middlewares=chain-no-auth@file"
+      traefik.http.routers.jellysearch-rtr.middlewares: "chain-no-auth@file"
       ## HTTP Services
-      - "traefik.http.routers.jellysearch-rtr.service=jellysearch-svc"
-      - "traefik.http.services.jellysearch-svc.loadbalancer.server.port=5000"
+      traefik.http.routers.jellysearch-rtr.service: "jellysearch-svc"
+      traefik.http.services.jellysearch-svc.loadbalancer.server.port: "5000"
       ####### HOMEPAGE #######
-      - homepage.group=Media
-      - homepage.name=jellysearch
-      - homepage.icon=jellysearch.png
-      - homepage.description=A fast full-text search proxy for Jellyfin
+      homepage.group: "Media"
+      homepage.name: "jellysearch"
+      homepage.icon: "jellysearch.png"
+      homepage.description: "A fast full-text search proxy for Jellyfin"
       ####### GLANCE #######
-      - glance.name=jellysearch
-      - glance.parent=jellyfin
+      glance.name: "jellysearch"
+      glance.parent: "jellyfin"

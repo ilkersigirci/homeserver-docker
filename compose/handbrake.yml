@@ -18,21 +18,21 @@ services:
       AUTOMATED_CONVERSION_KEEP_SOURCE: 1
       VNC_PASSWORD: $HANDBRAKE_VNC_PASSWD
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.handbrake-rtr.entrypoints=websecure"
-      - "traefik.http.routers.handbrake-rtr.rule=Host(`handbrake.$DOMAINNAME`)"
+      traefik.http.routers.handbrake-rtr.entrypoints: "websecure"
+      traefik.http.routers.handbrake-rtr.rule: "Host(`handbrake.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.handbrake-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.handbrake-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.handbrake-rtr.service=handbrake-svc"
-      - "traefik.http.services.handbrake-svc.loadbalancer.server.port=5800"
+      traefik.http.routers.handbrake-rtr.service: "handbrake-svc"
+      traefik.http.services.handbrake-svc.loadbalancer.server.port: "5800"
         ####### HOMEPAGE #######
-      - homepage.group=Media
-      - homepage.name=handbrake
-      - homepage.icon=handbrake.svg
-      - homepage.href=https://handbrake.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Converting Video Platform
+      homepage.group: "Media"
+      homepage.name: "handbrake"
+      homepage.icon: "handbrake.svg"
+      homepage.href: "https://handbrake.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Converting Video Platform"
     profiles:
       - media

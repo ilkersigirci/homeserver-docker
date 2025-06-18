@@ -80,29 +80,29 @@ services:
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.immich-server-rtr.entrypoints=websecure"
-      - "traefik.http.routers.immich-server-rtr.rule=Host(`photos.$DOMAINNAME`)"
+      traefik.http.routers.immich-server-rtr.entrypoints: "websecure"
+      traefik.http.routers.immich-server-rtr.rule: "Host(`photos.$DOMAINNAME`)"
       # - "traefik.http.routers.immich-server-rtr.rule=Host(`photos.$DOMAINNAME`) && Pathprefix(`/api`)"
       ## Middlewares
-      - "traefik.http.routers.immich-server-rtr.middlewares=chain-no-auth-relaxed@file" # NOTE: relaxed needed for `Map` tab to work
+      traefik.http.routers.immich-server-rtr.middlewares: "chain-no-auth-relaxed@file" # NOTE: relaxed needed for `Map` tab to work
       # - "traefik.http.routers.immich-server-rtr.middlewares=add-api"
       # - "traefik.http.middlewares.add-api.stripprefix.prefixes=/api"
       ## HTTP Services
-      - "traefik.http.routers.immich-server-rtr.service=immich-server-svc"
-      - "traefik.http.services.immich-server-svc.loadbalancer.server.port=2283"
+      traefik.http.routers.immich-server-rtr.service: "immich-server-svc"
+      traefik.http.services.immich-server-svc.loadbalancer.server.port: "2283"
       ####### HOMEPAGE #######
-      - homepage.group=Media
-      - homepage.name=Immich
-      - homepage.icon=immich.svg
-      - homepage.href=https://photos.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Selfhosted Photo App
-      - homepage.widget.type=immich
-      - homepage.widget.url=http://immich-server:2283
-      - homepage.widget.key=$IMMICH_API_KEY
-      - homepage.widget.version=2
+      homepage.group: "Media"
+      homepage.name: "Immich"
+      homepage.icon: "immich.svg"
+      homepage.href: "https://photos.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Selfhosted Photo App"
+      homepage.widget.type: "immich"
+      homepage.widget.url: "http://immich-server:2283"
+      homepage.widget.key: "$IMMICH_API_KEY"
+      homepage.widget.version: "2"
     profiles:
       - photo
 

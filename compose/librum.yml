@@ -43,14 +43,14 @@ services:
       AdminEmail: admin@mail.com
       AdminPassword: strongPassword123
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.librum-rtr.entrypoints=websecure"
-      - "traefik.http.routers.librum-rtr.rule=Host(`librum.$DOMAINNAME`)"
+      traefik.http.routers.librum-rtr.entrypoints: "websecure"
+      traefik.http.routers.librum-rtr.rule: "Host(`librum.$DOMAINNAME`)"
       ## Middlewares
       # - "traefik.http.routers.librum-rtr.middlewares=chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.librum-rtr.service=librum-svc"
-      - "traefik.http.services.librum-svc.loadbalancer.server.port=5000"
+      traefik.http.routers.librum-rtr.service: "librum-svc"
+      traefik.http.services.librum-svc.loadbalancer.server.port: "5000"
     profiles:
       - reading

@@ -17,19 +17,19 @@ services:
     volumes:
       - $DOCKERDIR/appdata/convertx:/app/data
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.convertx-rtr.entrypoints=websecure"
-      - "traefik.http.routers.convertx-rtr.rule=Host(`convertx.$DOMAINNAME`)"
+      traefik.http.routers.convertx-rtr.entrypoints: "websecure"
+      traefik.http.routers.convertx-rtr.rule: "Host(`convertx.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.convertx-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.convertx-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.convertx-rtr.service=convertx-svc"
-      - "traefik.http.services.convertx-svc.loadbalancer.server.port=3000"
+      traefik.http.routers.convertx-rtr.service: "convertx-svc"
+      traefik.http.services.convertx-svc.loadbalancer.server.port: "3000"
       ####### HOMEPAGE #######
-      - homepage.group=Maintenance
-      - homepage.name=ConvertX
-      - homepage.icon=sh-convertx.webp
-      - homepage.href=https://convertx.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Online PDF Editor
+      homepage.group: "Maintenance"
+      homepage.name: "ConvertX"
+      homepage.icon: "sh-convertx.webp"
+      homepage.href: "https://convertx.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Online PDF Editor"

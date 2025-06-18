@@ -18,22 +18,22 @@ services:
       PGID: $PGID
       TZ: $TZ
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.prowlarr-rtr.entrypoints=websecure"
-      - "traefik.http.routers.prowlarr-rtr.rule=Host(`prowlarr.$DOMAINNAME`)"
+      traefik.http.routers.prowlarr-rtr.entrypoints: "websecure"
+      traefik.http.routers.prowlarr-rtr.rule: "Host(`prowlarr.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.prowlarr-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.prowlarr-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.prowlarr-rtr.service=prowlarr-svc"
-      - "traefik.http.services.prowlarr-svc.loadbalancer.server.port=9696"
+      traefik.http.routers.prowlarr-rtr.service: "prowlarr-svc"
+      traefik.http.services.prowlarr-svc.loadbalancer.server.port: "9696"
       ####### HOMEPAGE #######
-      - homepage.group=Media
-      - homepage.name=Prowlarr
-      - homepage.icon=prowlarr.svg
-      - homepage.href=https://prowlarr.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Indexer Manager
+      homepage.group: "Media"
+      homepage.name: "Prowlarr"
+      homepage.icon: "prowlarr.svg"
+      homepage.href: "https://prowlarr.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Indexer Manager"
     profiles:
       - media
       - arr

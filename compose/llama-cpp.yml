@@ -36,22 +36,22 @@ services:
       timeout: 5s
       retries: 3
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.llama-cpp-rtr.entrypoints=websecure"
-      - "traefik.http.routers.llama-cpp-rtr.rule=Host(`llamapi.$DOMAINNAME`)"
+      traefik.http.routers.llama-cpp-rtr.entrypoints: "websecure"
+      traefik.http.routers.llama-cpp-rtr.rule: "Host(`llamapi.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.llama-cpp-rtr.middlewares=chain-tinyauth@file"
-      - "traefik.http.routers.llama-cpp-openapi-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.llama-cpp-rtr.middlewares: "chain-tinyauth@file"
+      traefik.http.routers.llama-cpp-openapi-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.llama-cpp-rtr.service=llama-cpp-svc"
-      - "traefik.http.services.llama-cpp-svc.loadbalancer.server.port=8000"
+      traefik.http.routers.llama-cpp-rtr.service: "llama-cpp-svc"
+      traefik.http.services.llama-cpp-svc.loadbalancer.server.port: "8000"
       ####### HOMEPAGE #######
-      - homepage.group=ML
-      - homepage.name=Llama-cpp
-      - homepage.icon=llama-cpp.svg
-      - homepage.href=https://llamapi.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=LLM inference in C/C++
+      homepage.group: "ML"
+      homepage.name: "Llama-cpp"
+      homepage.icon: "llama-cpp.svg"
+      homepage.href: "https://llamapi.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "LLM inference in C/C++"
     profiles:
       - ml

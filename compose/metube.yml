@@ -18,19 +18,19 @@ services:
       YTDL_OPTIONS: '{"writethumbnail": true, "writeinfojson": true}' # "writeinfojson": true,
       # - YTDL_OPTIONS={"cookiefile":"/cookies/cookies.txt"}
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.metube-rtr.entrypoints=websecure"
-      - "traefik.http.routers.metube-rtr.rule=Host(`metube.$DOMAINNAME`)"
+      traefik.http.routers.metube-rtr.entrypoints: "websecure"
+      traefik.http.routers.metube-rtr.rule: "Host(`metube.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.metube-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.metube-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.metube-rtr.service=metube-svc"
-      - "traefik.http.services.metube-svc.loadbalancer.server.port=8081"
+      traefik.http.routers.metube-rtr.service: "metube-svc"
+      traefik.http.services.metube-svc.loadbalancer.server.port: "8081"
       ####### HOMEPAGE #######
-      - homepage.group=Media
-      - homepage.name=metube
-      - homepage.icon=metube.svg
-      - homepage.href=https://metube.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Self-hosted YouTube downloader
+      homepage.group: "Media"
+      homepage.name: "metube"
+      homepage.icon: "metube.svg"
+      homepage.href: "https://metube.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Self-hosted YouTube downloader"

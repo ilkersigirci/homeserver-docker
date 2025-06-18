@@ -20,14 +20,14 @@ services:
       - $DOCKERDIR/appdata/sd-next:/mnt/data:rw
       - $MLMODELSDIR/sdnext:/mnt/models:ro
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.sdnext-rtr.entrypoints=websecure"
-      - "traefik.http.routers.sdnext-rtr.rule=Host(`sdnext.$DOMAINNAME`)"
+      traefik.http.routers.sdnext-rtr.entrypoints: "websecure"
+      traefik.http.routers.sdnext-rtr.rule: "Host(`sdnext.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.sdnext-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.sdnext-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.sdnext-rtr.service=sdnext-svc"
-      - "traefik.http.services.sdnext-svc.loadbalancer.server.port=7860"
+      traefik.http.routers.sdnext-rtr.service: "sdnext-svc"
+      traefik.http.services.sdnext-svc.loadbalancer.server.port: "7860"
     profiles:
       - ml

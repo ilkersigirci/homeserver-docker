@@ -30,24 +30,24 @@ services:
         # AGENT_PASSWORD: $CROWDSEC_AGENT_PASSWORD 
         # LOCAL_API_URL: $CROWDSEC_LOCAL_API_URL 
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.crowdsec-rtr.entrypoints=websecure"
-      - "traefik.http.routers.crowdsec-rtr.rule=Host(`crowdsec.$DOMAINNAME`)"
+      traefik.http.routers.crowdsec-rtr.entrypoints: "websecure"
+      traefik.http.routers.crowdsec-rtr.rule: "Host(`crowdsec.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.crowdsec-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.crowdsec-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.crowdsec-rtr.service=crowdsec-svc"
-      - "traefik.http.services.crowdsec-svc.loadbalancer.server.port=8080"
+      traefik.http.routers.crowdsec-rtr.service: "crowdsec-svc"
+      traefik.http.services.crowdsec-svc.loadbalancer.server.port: "8080"
       ####### HOMEPAGE #######
-      - homepage.group=Core
-      - homepage.name=crowdsec
-      - homepage.icon=crowdsec.png
-      - homepage.href=https://crowdsec.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Open-source & collaborative security IPS
+      homepage.group: "Core"
+      homepage.name: "crowdsec"
+      homepage.icon: "crowdsec.png"
+      homepage.href: "https://crowdsec.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Open-source & collaborative security IPS"
       ####### GLANCE #######
-      - glance.name=crowdsec
-      - glance.icon=sh:crowdsec
-      - glance.url=https://crowdsec.$DOMAINNAME
-      - glance.description=Open-source & collaborative security IPS
+      glance.name: "crowdsec"
+      glance.icon: "sh:crowdsec"
+      glance.url: "https://crowdsec.$DOMAINNAME"
+      glance.description: "Open-source & collaborative security IPS"

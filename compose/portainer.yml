@@ -21,22 +21,22 @@ services:
     environment:
       TZ: $TZ
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.portainer-rtr.entrypoints=websecure"
-      - "traefik.http.routers.portainer-rtr.rule=Host(`portainer.$DOMAINNAME`)"
+      traefik.http.routers.portainer-rtr.entrypoints: "websecure"
+      traefik.http.routers.portainer-rtr.rule: "Host(`portainer.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.portainer-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.portainer-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.portainer-rtr.service=portainer-svc"
-      - "traefik.http.services.portainer-svc.loadbalancer.server.port=9000"
+      traefik.http.routers.portainer-rtr.service: "portainer-svc"
+      traefik.http.services.portainer-svc.loadbalancer.server.port: "9000"
       ####### HOMEPAGE #######
-      - homepage.group=Maintenance
-      - homepage.name=Portainer
-      - homepage.icon=portainer.svg
-      - homepage.href=https://portainer.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Container Management
+      homepage.group: "Maintenance"
+      homepage.name: "Portainer"
+      homepage.icon: "portainer.svg"
+      homepage.href: "https://portainer.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Container Management"
       # - homepage.widget.type=portainer
       # - homepage.widget.url=http://portainer:9000
       # - homepage.widget.env=1

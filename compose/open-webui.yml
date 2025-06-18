@@ -40,22 +40,22 @@ services:
       OPENAI_API_BASE_URLS: https://api.openai.com/v1;$OPENROUTER_API_BASE_URL
       OPENAI_API_KEYS: $OPENAI_API_KEY;$OPENROUTER_API_KEY
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.open-webui-rtr.entrypoints=websecure"
-      - "traefik.http.routers.open-webui-rtr.rule=Host(`chat.$DOMAINNAME`)"
+      traefik.http.routers.open-webui-rtr.entrypoints: "websecure"
+      traefik.http.routers.open-webui-rtr.rule: "Host(`chat.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.open-webui-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.open-webui-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.open-webui-rtr.service=open-webui-svc"
-      - "traefik.http.services.open-webui-svc.loadbalancer.server.port=8080"
+      traefik.http.routers.open-webui-rtr.service: "open-webui-svc"
+      traefik.http.services.open-webui-svc.loadbalancer.server.port: "8080"
       ####### HOMEPAGE #######
-      - homepage.group=ML
-      - homepage.name=Open WebUI
-      - homepage.icon=open-webui-light.webp
-      - homepage.href=https://chat.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Selfhosted Chatgpt like App
+      homepage.group: "ML"
+      homepage.name: "Open WebUI"
+      homepage.icon: "open-webui-light.webp"
+      homepage.href: "https://chat.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Selfhosted Chatgpt like App"
     profiles:
       - ml
 
@@ -75,21 +75,21 @@ services:
       OPENAI_API_KEY: $OPENAI_API_KEY
       WEBUI_NAME: BetusGPT
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.open-webui-betus-rtr.entrypoints=websecure"
-      - "traefik.http.routers.open-webui-betus-rtr.rule=Host(`betus.$DOMAINNAME`)"
+      traefik.http.routers.open-webui-betus-rtr.entrypoints: "websecure"
+      traefik.http.routers.open-webui-betus-rtr.rule: "Host(`betus.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.open-webui-betus-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.open-webui-betus-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.open-webui-betus-rtr.service=open-webui-betus-svc"
-      - "traefik.http.services.open-webui-betus-svc.loadbalancer.server.port=8080"
+      traefik.http.routers.open-webui-betus-rtr.service: "open-webui-betus-svc"
+      traefik.http.services.open-webui-betus-svc.loadbalancer.server.port: "8080"
       ####### HOMEPAGE #######
-      - homepage.group=ML
-      - homepage.name=Open WebUI
-      - homepage.icon=open-webui-light.webp
-      - homepage.href=https://betus.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Selfhosted Chatgpt like App for my Betus
+      homepage.group: "ML"
+      homepage.name: "Open WebUI"
+      homepage.icon: "open-webui-light.webp"
+      homepage.href: "https://betus.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Selfhosted Chatgpt like App for my Betus"
     profiles:
       - ml

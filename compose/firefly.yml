@@ -18,21 +18,21 @@ services:
     secrets:
       - firefly_app_key
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.firefly-rtr.entrypoints=websecure"
-      - "traefik.http.routers.firefly-rtr.rule=Host(`firefly.$DOMAINNAME`)"
+      traefik.http.routers.firefly-rtr.entrypoints: "websecure"
+      traefik.http.routers.firefly-rtr.rule: "Host(`firefly.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.firefly-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.firefly-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.firefly-rtr.service=firefly-svc"
-      - "traefik.http.services.firefly-svc.loadbalancer.server.port=8080"
+      traefik.http.routers.firefly-rtr.service: "firefly-svc"
+      traefik.http.services.firefly-svc.loadbalancer.server.port: "8080"
       ####### HOMEPAGE #######
-      - homepage.group=Others
-      - homepage.name=Firefly III
-      - homepage.icon=firefly.svg
-      - homepage.href=https://firefly.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=A personal finances manager
+      homepage.group: "Others"
+      homepage.name: "Firefly III"
+      homepage.icon: "firefly.svg"
+      homepage.href: "https://firefly.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "A personal finances manager"
     profiles:
       - others

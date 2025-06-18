@@ -24,19 +24,19 @@ services:
       TZ: $TZ
       FB_NOAUTH: true # NOTE: If you change it, remove and re-create database.db
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.filebrowser-rtr.entrypoints=websecure"
-      - "traefik.http.routers.filebrowser-rtr.rule=Host(`filebrowser.$DOMAINNAME`)"
+      traefik.http.routers.filebrowser-rtr.entrypoints: "websecure"
+      traefik.http.routers.filebrowser-rtr.rule: "Host(`filebrowser.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.filebrowser-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.filebrowser-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.filebrowser-rtr.service=filebrowser-svc"
-      - "traefik.http.services.filebrowser-svc.loadbalancer.server.port=80"
+      traefik.http.routers.filebrowser-rtr.service: "filebrowser-svc"
+      traefik.http.services.filebrowser-svc.loadbalancer.server.port: "80"
       ####### HOMEPAGE #######
-      - homepage.group=Core
-      - homepage.name=FileBrowser
-      - homepage.icon=filebrowser.svg
-      - homepage.href=https://filebrowser.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=File Browser
+      homepage.group: "Core"
+      homepage.name: "FileBrowser"
+      homepage.icon: "filebrowser.svg"
+      homepage.href: "https://filebrowser.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "File Browser"

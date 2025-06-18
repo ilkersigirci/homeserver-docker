@@ -17,15 +17,15 @@ services:
       # - HTTP_USER=admin
       # - HTTP_PASS=admin
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.tubesync-rtr.entrypoints=websecure"
-      - "traefik.http.routers.tubesync-rtr.rule=Host(`tubesync.$DOMAINNAME`)"
+      traefik.http.routers.tubesync-rtr.entrypoints: "websecure"
+      traefik.http.routers.tubesync-rtr.rule: "Host(`tubesync.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.tubesync-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.tubesync-rtr.middlewares: "chain-tinyauth@file"
       #      - "traefik.http.routers.transmission-rtr.middlewares=middlewares-rate-limit@file"
       ## HTTP Services
-      - "traefik.http.routers.tubesync-rtr.service=tubesync-svc"
-      - "traefik.http.services.tubesync-svc.loadbalancer.server.port=4848"
+      traefik.http.routers.tubesync-rtr.service: "tubesync-svc"
+      traefik.http.services.tubesync-svc.loadbalancer.server.port: "4848"
     profiles:
       - media

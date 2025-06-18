@@ -8,21 +8,21 @@ services:
     security_opt:
       - no-new-privileges:true
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.enclosed.entrypoints=websecure"
-      - "traefik.http.routers.enclosed.rule=Host(`enclosed.$DOMAINNAME`)"
+      traefik.http.routers.enclosed.entrypoints: "websecure"
+      traefik.http.routers.enclosed.rule: "Host(`enclosed.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.enclosed.middlewares=chain-tinyauth@file"
+      traefik.http.routers.enclosed.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.enclosed.service=logseq-svc"
-      - "traefik.http.services.logseq-svc.loadbalancer.server.port=8787"
+      traefik.http.routers.enclosed.service: "logseq-svc"
+      traefik.http.services.logseq-svc.loadbalancer.server.port: "8787"
       ####### HOMEPAGE #######
-      - homepage.group=Others
-      - homepage.name=Enclosed
-      - homepage.icon=enclosed.svg
-      - homepage.href=https://enclosed.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Minimalistic web app designed for sending private and secure notes.
+      homepage.group: "Others"
+      homepage.name: "Enclosed"
+      homepage.icon: "enclosed.svg"
+      homepage.href: "https://enclosed.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Minimalistic web app designed for sending private and secure notes."
     profiles:
       - others

@@ -48,19 +48,19 @@ services:
           {{range .Entries -}}{{.Message}}{{"\n"}}{{- end -}}
         {{- end -}}
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.watchtower-rtr.entrypoints=websecure"
-      - "traefik.http.routers.watchtower-rtr.rule=Host(`watchtower.$DOMAINNAME`)"
+      traefik.http.routers.watchtower-rtr.entrypoints: "websecure"
+      traefik.http.routers.watchtower-rtr.rule: "Host(`watchtower.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.watchtower-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.watchtower-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.watchtower-rtr.service=watchtower-svc"
-      - "traefik.http.services.watchtower-svc.loadbalancer.server.port=8080"
+      traefik.http.routers.watchtower-rtr.service: "watchtower-svc"
+      traefik.http.services.watchtower-svc.loadbalancer.server.port: "8080"
       ####### HOMEPAGE #######
-      - homepage.group=Maintenance
-      - homepage.name=Watchtower
-      - homepage.icon=watchtower.svg
-      - homepage.href=https://watchtower.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Container Auto-Updates
+      homepage.group: "Maintenance"
+      homepage.name: "Watchtower"
+      homepage.icon: "watchtower.svg"
+      homepage.href: "https://watchtower.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Container Auto-Updates"

@@ -21,12 +21,12 @@ services:
     #   - PGID=$PGID
     #   - TZ=$TZ
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.redroid-rtr.entrypoints=websecure"
-      - "traefik.http.routers.redroid-rtr.rule=Host(`redroid.$DOMAINNAME`)"
+      traefik.http.routers.redroid-rtr.entrypoints: "websecure"
+      traefik.http.routers.redroid-rtr.rule: "Host(`redroid.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.redroid-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.redroid-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.redroid-rtr.service=redroid-svc"
-      - "traefik.http.services.redroid-svc.loadbalancer.server.port=5555"
+      traefik.http.routers.redroid-rtr.service: "redroid-svc"
+      traefik.http.services.redroid-svc.loadbalancer.server.port: "5555"

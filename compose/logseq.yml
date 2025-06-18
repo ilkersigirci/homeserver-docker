@@ -10,21 +10,21 @@ services:
       # volumes:
       # - $NOTESDIR:/notes
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.logseq-rtr.entrypoints=websecure"
-      - "traefik.http.routers.logseq-rtr.rule=Host(`logseq.$DOMAINNAME`)"
+      traefik.http.routers.logseq-rtr.entrypoints: "websecure"
+      traefik.http.routers.logseq-rtr.rule: "Host(`logseq.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.logseq-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.logseq-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.logseq-rtr.service=logseq-svc"
-      - "traefik.http.services.logseq-svc.loadbalancer.server.port=80"
+      traefik.http.routers.logseq-rtr.service: "logseq-svc"
+      traefik.http.services.logseq-svc.loadbalancer.server.port: "80"
       ####### HOMEPAGE #######
-      - homepage.group=Reading
-      - homepage.name=Logseq
-      - homepage.icon=logseq.svg
-      - homepage.href=https://logseq.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=A privacy-first, open-source platform for knowledge management
+      homepage.group: "Reading"
+      homepage.name: "Logseq"
+      homepage.icon: "logseq.svg"
+      homepage.href: "https://logseq.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "A privacy-first, open-source platform for knowledge management"
     profiles:
       - reading

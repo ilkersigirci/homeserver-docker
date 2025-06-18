@@ -22,21 +22,21 @@ services:
       PGID: $PGID
       TZ: $TZ
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.ytdl-rtr.entrypoints=websecure"
-      - "traefik.http.routers.ytdl-rtr.rule=Host(`ytdl.$DOMAINNAME`)"
+      traefik.http.routers.ytdl-rtr.entrypoints: "websecure"
+      traefik.http.routers.ytdl-rtr.rule: "Host(`ytdl.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.ytdl-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.ytdl-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
       # - "traefik.http.routers.ytdl-rtr.service=ytdl-svc"
       # - "traefik.http.services.ytdl-svc.loadbalancer.server.port=8081"
       ####### HOMEPAGE #######
-      - homepage.group=Media
-      - homepage.name=YtdlSub
-      - homepage.icon=youtube-dl.svg
-      - homepage.href=https://ytdl.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Youtube Downloader
+      homepage.group: "Media"
+      homepage.name: "YtdlSub"
+      homepage.icon: "youtube-dl.svg"
+      homepage.href: "https://ytdl.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Youtube Downloader"
     profiles:
       - media

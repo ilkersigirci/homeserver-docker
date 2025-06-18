@@ -17,35 +17,35 @@ services:
       MINIO_ROOT_USER: admin
       MINIO_ROOT_PASSWORD: password
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ### API Labels ###
       ## HTTP Routers
-      - "traefik.http.routers.minio-api-rtr.entrypoints=websecure"
+      traefik.http.routers.minio-api-rtr.entrypoints: "websecure"
       # - "traefik.http.routers.minio-api-rtr.rule=Host(`minio.$DOMAINNAME`) && PathPrefix(`/api`)"
-      - "traefik.http.routers.minio-api-rtr.rule=Host(`minio.$DOMAINNAME`)"
+      traefik.http.routers.minio-api-rtr.rule: "Host(`minio.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.minio-api-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.minio-api-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.minio-api-rtr.service=minio-api-svc"
-      - "traefik.http.services.minio-api-svc.loadbalancer.server.port=9000"
+      traefik.http.routers.minio-api-rtr.service: "minio-api-svc"
+      traefik.http.services.minio-api-svc.loadbalancer.server.port: "9000"
       ### Web UI Labels ###
       ## HTTP Routers
-      - "traefik.http.routers.minio-ui-rtr.entrypoints=websecure"
-      - "traefik.http.routers.minio-ui-rtr.rule=Host(`minio-ui.$DOMAINNAME`)"
+      traefik.http.routers.minio-ui-rtr.entrypoints: "websecure"
+      traefik.http.routers.minio-ui-rtr.rule: "Host(`minio-ui.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.minio-ui-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.minio-ui-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.minio-ui-rtr.service=minio-ui-svc"
-      - "traefik.http.services.minio-ui-svc.loadbalancer.server.port=9001"
+      traefik.http.routers.minio-ui-rtr.service: "minio-ui-svc"
+      traefik.http.services.minio-ui-svc.loadbalancer.server.port: "9001"
       ####### HOMEPAGE #######
-      - homepage.group=Maintenance
-      - homepage.name=minio
-      - homepage.icon=minio.png
-      - homepage.href=https://minio.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=MinIO is a high-performance, S3 compatible object store, open sourced under GNU AGPLv3 license.
+      homepage.group: "Maintenance"
+      homepage.name: "minio"
+      homepage.icon: "minio.png"
+      homepage.href: "https://minio.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "MinIO is a high-performance, S3 compatible object store, open sourced under GNU AGPLv3 license."
       ####### GLANCE #######
-      - glance.name=minio
-      - glance.icon=sh:minio
-      - glance.url=https://minio.$DOMAINNAME
-      - glance.description=MinIO is a high-performance, S3 compatible object store, open sourced under GNU AGPLv3 license.
+      glance.name: "minio"
+      glance.icon: "sh:minio"
+      glance.url: "https://minio.$DOMAINNAME"
+      glance.description: "MinIO is a high-performance, S3 compatible object store, open sourced under GNU AGPLv3 license."

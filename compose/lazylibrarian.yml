@@ -22,21 +22,21 @@ services:
       TZ: $TZ
       DOCKER_MODS: linuxserver/calibre-web:calibre # set the path to converter tool to /app/calibre/ebook-convert
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers Auth
-      - "traefik.http.routers.lazylibrarian-rtr.entrypoints=websecure"
-      - "traefik.http.routers.lazylibrarian-rtr.rule=Host(`lazy.$DOMAINNAME`)"
+      traefik.http.routers.lazylibrarian-rtr.entrypoints: "websecure"
+      traefik.http.routers.lazylibrarian-rtr.rule: "Host(`lazy.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.lazylibrarian-rtr.middlewares=chain-oauth@file"
+      traefik.http.routers.lazylibrarian-rtr.middlewares: "chain-oauth@file"
       ## HTTP Services
-      - "traefik.http.routers.lazylibrarian-rtr.service=lazylibrarian-svc"
-      - "traefik.http.services.lazylibrarian-svc.loadbalancer.server.port=5299"
+      traefik.http.routers.lazylibrarian-rtr.service: "lazylibrarian-svc"
+      traefik.http.services.lazylibrarian-svc.loadbalancer.server.port: "5299"
       ####### HOMEPAGE #######
-      - homepage.group=Reading
-      - homepage.name=LazyLibrarian
-      - homepage.icon=lazylibrarian.svg
-      - homepage.href=https://lazylibrarian.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Follow Authors and Grab Metadata for All Your Digital Reading Needs
+      homepage.group: "Reading"
+      homepage.name: "LazyLibrarian"
+      homepage.icon: "lazylibrarian.svg"
+      homepage.href: "https://lazylibrarian.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Follow Authors and Grab Metadata for All Your Digital Reading Needs"
     profiles:
       - reading

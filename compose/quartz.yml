@@ -24,21 +24,21 @@ services:
       # GIT_REPO: "https://github.com/yourusername/your-quartz-site.git" # Use your custom Quartz repo or leave blank for the default Quartz repo
       # GIT_BRANCH: "v4" # Optional: specify a branch to checkout
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.quartz-rtr.entrypoints=websecure"
-      - "traefik.http.routers.quartz-rtr.rule=Host(`digitalgarden.$DOMAINNAME`)"
+      traefik.http.routers.quartz-rtr.entrypoints: "websecure"
+      traefik.http.routers.quartz-rtr.rule: "Host(`digitalgarden.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.quartz-rtr.middlewares=chain-tinyauth-relaxed@file"
+      traefik.http.routers.quartz-rtr.middlewares: "chain-tinyauth-relaxed@file"
       ## HTTP Services
-      - "traefik.http.routers.quartz-rtr.service=quartz-svc"
-      - "traefik.http.services.quartz-svc.loadbalancer.server.port=80"
+      traefik.http.routers.quartz-rtr.service: "quartz-svc"
+      traefik.http.services.quartz-svc.loadbalancer.server.port: "80"
       ####### HOMEPAGE #######
-      - homepage.group=Reading
-      - homepage.name=Quartz
-      - homepage.icon=obsidian.svg
-      - homepage.href=https://digitalgarden.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Static-site generator that transforms Markdown content into fully functional websites 
+      homepage.group: "Reading"
+      homepage.name: "Quartz"
+      homepage.icon: "obsidian.svg"
+      homepage.href: "https://digitalgarden.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Static-site generator that transforms Markdown content into fully functional websites"
     profiles:
       - reading

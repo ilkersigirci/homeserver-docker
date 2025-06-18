@@ -17,21 +17,21 @@ services:
       PGID: $PGID
       TZ: $TZ
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.kavita-rtr.entrypoints=websecure"
-      - "traefik.http.routers.kavita-rtr.rule=Host(`kavita.$DOMAINNAME`)"
+      traefik.http.routers.kavita-rtr.entrypoints: "websecure"
+      traefik.http.routers.kavita-rtr.rule: "Host(`kavita.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.kavita-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.kavita-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.kavita-rtr.service=kavita-svc"
-      - "traefik.http.services.kavita-svc.loadbalancer.server.port=5000"
+      traefik.http.routers.kavita-rtr.service: "kavita-svc"
+      traefik.http.services.kavita-svc.loadbalancer.server.port: "5000"
       ####### HOMEPAGE #######
-      - homepage.group=Reading
-      - homepage.name=Kavita
-      - homepage.icon=kavita.svg
-      - homepage.href=https://kavita.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Fast, feature rich, cross platform reading server
+      homepage.group: "Reading"
+      homepage.name: "Kavita"
+      homepage.icon: "kavita.svg"
+      homepage.href: "https://kavita.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Fast, feature rich, cross platform reading server"
     profiles:
       - reading

@@ -16,19 +16,19 @@ services:
       PGID: $PGID
       TZ: $TZ
     labels:
-      - "traefik.enable=true"
+      traefik.enable: "true"
       ## HTTP Routers
-      - "traefik.http.routers.sshwifty-rtr.entrypoints=websecure"
-      - "traefik.http.routers.sshwifty-rtr.rule=Host(`ssh.$DOMAINNAME`)"
+      traefik.http.routers.sshwifty-rtr.entrypoints: "websecure"
+      traefik.http.routers.sshwifty-rtr.rule: "Host(`ssh.$DOMAINNAME`)"
       ## Middlewares
-      - "traefik.http.routers.sshwifty-rtr.middlewares=chain-tinyauth@file"
+      traefik.http.routers.sshwifty-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      - "traefik.http.routers.sshwifty-rtr.service=sshwifty-svc"
-      - "traefik.http.services.sshwifty-svc.loadbalancer.server.port=8182"
+      traefik.http.routers.sshwifty-rtr.service: "sshwifty-svc"
+      traefik.http.services.sshwifty-svc.loadbalancer.server.port: "8182"
       ####### HOMEPAGE #######
-      - homepage.group=Maintenance
-      - homepage.name=Sshwifty
-      - homepage.icon=sshwifty.svg
-      - homepage.href=https://sshwifty.$DOMAINNAME
-      - homepage.target=_blank
-      - homepage.description=Web SSH - Telnet
+      homepage.group: "Maintenance"
+      homepage.name: "Sshwifty"
+      homepage.icon: "sshwifty.svg"
+      homepage.href: "https://sshwifty.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Web SSH - Telnet"
