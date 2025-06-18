@@ -26,7 +26,7 @@ services:
       - --entrypoints.websecure.forwardedHeaders.trustedIPs=$CLOUDFLARE_IPS,$LOCAL_IPS
       - --api=true
       - --api.dashboard=true
-      - --api.insecure=false
+      - --api.insecure=true
       #- --ping=true
       # - --serversTransport.insecureSkipVerify=true
       - --log=true
@@ -127,14 +127,16 @@ services:
       traefik.http.routers.traefik-rtr.entrypoints: "websecure"
       traefik.http.routers.traefik-rtr.rule: "Host(`traefik.$DOMAINNAME`)"
       # - "traefik.http.routers.traefik-rtr.tls.certresolver=dns-cloudflare" # Comment out this line after first run of traefik to force the use of wildcard certs
-      ## Services - API
-      traefik.http.routers.traefik-rtr.service: "api@internal"
+      ## Middlewares
+      traefik.http.routers.traefik-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      # traefik.http.routers.traefik-rtr.service: "api@internal" # NOTE: For api.insecure=false
+      traefik.http.routers.traefik-rtr.service: "traefik-svc"  # NOTE: For api.insecure=true
+      traefik.http.services.traefik-svc.loadbalancer.server.port: "8080" # NOTE: For api.insecure=true
       ## Healthcheck/ping
       # - "traefik.http.routers.ping.rule=Host(`traefik.$DOMAINNAME`) && Path(`/ping`)"
       #- "traefik.http.routers.ping.tls=true"
       #- "traefik.http.routers.ping.service=ping@internal"
-      ## Middlewares
-      traefik.http.routers.traefik-rtr.middlewares: "chain-tinyauth@file"
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "Traefik"
@@ -143,5 +145,5 @@ services:
       homepage.target: "_blank" # _blank: New tab --- _self: Same tab --- _top: New window
       homepage.description: "Reverse Proxy Manager"
       homepage.widget.type: "traefik"
-      homepage.widget.url: "https://traefik.$DOMAINNAME" # NOTE: docker service name not working
+      homepage.widget.url: "http://traefik:8080" # NOTE: This doesn't work when using api.insecure=false
       homepage.widget.fields: "[routers,services,middleware]"
