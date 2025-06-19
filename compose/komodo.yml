@@ -1,0 +1,142 @@
+###################################
+# 🦎 KOMODO COMPOSE - FERRETDB 🦎 #
+###################################
+
+## This compose file will deploy:
+##   1. Postgres + FerretDB Mongo adapter (https://www.ferretdb.com)
+##   2. Komodo Core
+##   3. Komodo Periphery
+
+services:
+  komodo-postgres:
+    # Recommended: Pin to a specific version
+    # https://github.com/FerretDB/documentdb/pkgs/container/postgres-documentdb
+    image: ghcr.io/ferretdb/postgres-documentdb:latest
+    container_name: komodo-postgres
+    restart: "no"
+    profiles:
+      - core
+      - komodo
+    networks:
+      - t3_proxy
+    expose:
+      - 5432
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/komodo/postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${KOMODO_DB_USERNAME}
+      POSTGRES_PASSWORD: ${KOMODO_DB_PASSWORD}
+      POSTGRES_DB: postgres
+    labels:
+      komodo.skip: # Prevent Komodo from stopping with StopAllContainers
+
+  # NOTE: First create the FerretDB state directory
+  # mkdir -p $DOCKERDIR/appdata/komodo/ferretdb
+  komodo-ferretdb:
+    # Recommended: Pin to a specific version
+    # https://github.com/FerretDB/FerretDB/pkgs/container/ferretdb
+    image: ghcr.io/ferretdb/ferretdb:latest
+    container_name: komodo-ferretdb
+    restart: "no"
+    profiles:
+      - core
+      - komodo
+    depends_on:
+      - komodo-postgres
+    networks:
+      - t3_proxy
+    expose:
+      - 27017
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/komodo/ferretdb:/state
+    environment:
+      FERRETDB_POSTGRESQL_URL: postgres://${KOMODO_DB_USERNAME}:${KOMODO_DB_PASSWORD}@komodo-postgres:5432/postgres
+    labels:
+      komodo.skip: # Prevent Komodo from stopping with StopAllContainers
+  
+  komodo-core:
+    image: ghcr.io/moghtech/komodo-core:${COMPOSE_KOMODO_IMAGE_TAG:-latest}
+    container_name: komodo-core
+    restart: "no"
+    profiles:
+      - core
+      - komodo
+    depends_on:
+      - komodo-ferretdb
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    env_file: $DOCKERDIR/.env.komodo
+    environment:
+      KOMODO_DATABASE_ADDRESS: komodo-ferretdb:27017
+      KOMODO_DATABASE_USERNAME: ${KOMODO_DB_USERNAME}
+      KOMODO_DATABASE_PASSWORD: ${KOMODO_DB_PASSWORD}
+    volumes:
+      ## Core cache for repos for latest commit hash / contents
+      - $DOCKERDIR/appdata/komodo/core/repo-cache:/repo-cache
+      ## Store sync files on server
+      # - /path/to/syncs:/syncs
+      ## Optionally mount a custom core.config.toml
+      # - /path/to/core.config.toml:/config/config.toml
+    ## Allows for systemd Periphery connection at 
+    ## "http://host.docker.internal:8120"
+    # extra_hosts:
+    #   - host.docker.internal:host-gateway
+    labels:
+      komodo.skip: # Prevent Komodo from stopping with StopAllContainers
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.komodo-core-rtr.entrypoints: "websecure"
+      traefik.http.routers.komodo-core-rtr.rule: "Host(`komodo.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.komodo-core-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.komodo-core-rtr.service: "komodo-core-svc"
+      traefik.http.services.komodo-core-svc.loadbalancer.server.port: "9120"
+      ####### HOMEPAGE #######
+      homepage.group: "Core"
+      homepage.name: "komodo"
+      homepage.icon: "komodo.png"
+      homepage.href: "https://komodo.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "A tool to build and deploy software on many servers"
+      ####### GLANCE #######
+      glance.name: "komodo"
+      glance.icon: "sh:komodo"
+      glance.url: "https://komodo.$DOMAINNAME"
+      glance.description: "A tool to build and deploy software on many servers"
+
+  ## Deploy Periphery container using this block,
+  ## or deploy the Periphery binary with systemd using 
+  ## https://github.com/moghtech/komodo/tree/main/scripts
+  komodo-periphery:
+    image: ghcr.io/moghtech/komodo-periphery:${COMPOSE_KOMODO_IMAGE_TAG:-latest}
+    container_name: komodo-periphery
+    restart: "no"
+    profiles:
+      - core
+      - komodo
+    networks:
+      - t3_proxy
+    expose:
+      - 8120
+    security_opt:
+      - no-new-privileges:true
+    env_file: $DOCKERDIR/.env.komodo
+    volumes:
+      ## Mount external docker socket
+      - /var/run/docker.sock:/var/run/docker.sock
+      ## Allow Periphery to see processes outside of container
+      - /proc:/proc
+      ## Specify the Periphery agent root directory.
+      ## Must be the same inside and outside the container,
+      ## or docker will get confused. See https://github.com/moghtech/komodo/discussions/180.
+      ## Default: /etc/komodo.
+      - ${PERIPHERY_ROOT_DIRECTORY:-/etc/komodo}:${PERIPHERY_ROOT_DIRECTORY:-/etc/komodo}
+    labels:
+      komodo.skip: # Prevent Komodo from stopping with StopAllContainers

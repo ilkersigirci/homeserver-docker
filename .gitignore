@@ -4,7 +4,7 @@ logs
 secrets
 compose/photo/.env
 .idea
-.env
+.env*
 
 # Configs
 acme.json
