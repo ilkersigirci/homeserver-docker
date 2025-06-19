@@ -1,0 +1,31 @@
+# Link: https://sr.ht/~phw/scotty/
+# Use with: drun scotty <COMMAND>
+# Commands:
+#  - service add: Add a service to Scotty
+#  - beam: Sync listens and favorites between Music services
+services:
+  scotty:
+    container_name: scotty
+    hostname: ${MY_HOSTNAME}
+    image: scotty:latest
+    # user: $PUID:$PGID
+    mem_reservation: "4096M" # NOTE: Probably has a memory leak on veresion 0.6.0
+    mem_limit: "4096M" # NOTE: Probably has a memory leak on veresion 0.6.0
+    build:
+      context: $DOCKERDIR/Dockerfiles/Scotty
+    # restart: $MEDIA_RESTART_POLICY
+    restart: "no"
+    command: --help
+    profiles:
+      # - media # NOTE: Commented out so that docker-manage script excludes it
+      - custom-tool
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $CONFIGDIR/scotty:/config:rw
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      SCOTTY_CONFIG_FILE: /config/scotty.toml

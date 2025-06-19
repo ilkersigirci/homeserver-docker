@@ -21,7 +21,7 @@ services:
     command: help
     profiles:
       # - maintenance # NOTE: Commented out so that docker-manage script excludes it
-      - backup
+      - custom-tool
     networks:
       - t3_proxy
     security_opt:

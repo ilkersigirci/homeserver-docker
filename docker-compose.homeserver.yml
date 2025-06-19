@@ -88,6 +88,7 @@ include:
   - compose/jellysearch.yml
   - compose/jellyseerr.yml
   - compose/mkvtoolnix.yml
+  - compose/scotty.yml
   - compose/ytptube.yml
   - compose/transmission.yml
   #### ML ####
