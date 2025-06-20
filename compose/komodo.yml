@@ -111,9 +111,7 @@ services:
       glance.url: "https://komodo.$DOMAINNAME"
       glance.description: "A tool to build and deploy software on many servers"
 
-  ## Deploy Periphery container using this block,
-  ## or deploy the Periphery binary with systemd using 
-  ## https://github.com/moghtech/komodo/tree/main/scripts
+  # Systemd or not explanation: https://github.com/moghtech/komodo/discussions/220#discussioncomment-11551625
   # NOTE: For stacks
   #  - Set Run Directory: $DOCKERDIR
   #  - File Paths: docker-compose.$MY_HOSTNAME.yml
