@@ -114,11 +114,17 @@ services:
   ## Deploy Periphery container using this block,
   ## or deploy the Periphery binary with systemd using 
   ## https://github.com/moghtech/komodo/tree/main/scripts
-  # TODO: To make stacks work, I think I need to change my .env file paths
+  # NOTE: For stacks
+  #  - Set Run Directory: $DOCKERDIR
+  #  - File Paths: docker-compose.$MY_HOSTNAME.yml
+  #  - env file path: EMPTY
+  #  - Additional Env Files: .env
+  # FIXME: `core` compose profile is not working.
   komodo-periphery-main:
     image: ghcr.io/moghtech/komodo-periphery:${COMPOSE_KOMODO_IMAGE_TAG:-latest}
     container_name: komodo-periphery-main
     restart: "no"
+    # user: $PUID:$PGID # NOTE:Get permission denied error when using this
     profiles:
       - core
       - komodo
@@ -131,14 +137,11 @@ services:
     env_file: $DOCKERDIR/.env.komodo
     environment:
       PORT: 8120
-      PERIPHERY_STACK_DIR: /etc/komodo/stacks
+      PERIPHERY_STACK_DIR: $DOCKERDIR # NOTE: It should be same as the host. Default /etc/komodo/stacks.
       ## CUSTOM
-      DOCKERDIR: /etc/komodo/stacks/$MY_HOSTNAME
-      DATADIR: /etc/komodo/stacks/$MY_HOSTNAME/data
-      SECRETSDIR: /etc/komodo/stacks/$MY_HOSTNAME/secrets
-      CONFIGDIR: /etc/komodo/stacks/$MY_HOSTNAME/configs
       MY_HOSTNAME: $MY_HOSTNAME
-      COMPOSE_PROFILES: core,desktop_apps,ml,maintenance,media,monitoring,photo,reading
+      COMPOSE_PROFILES: desktop_apps,ml,maintenance,media,monitoring,photo,reading
+      # COMPOSE_PROFILES: core,desktop_apps,ml,maintenance,media,monitoring,photo,reading
     volumes:
       ## Mount external docker socket
       - /var/run/docker.sock:/var/run/docker.sock
@@ -149,7 +152,8 @@ services:
       ## or docker will get confused. See https://github.com/moghtech/komodo/discussions/180.
       ## Default: /etc/komodo.
       - ${PERIPHERY_ROOT_DIRECTORY:-/etc/komodo}:${PERIPHERY_ROOT_DIRECTORY:-/etc/komodo}
-      ## CUSTOM: Docker Compose Stack on the host machine
-      - $DOCKERDIR:/etc/komodo/stacks/$MY_HOSTNAME:ro
+      ## CUSTOM: Docker Compose Stack on the host machine. Match the exact path.
+      - $DOCKERDIR:$DOCKERDIR:ro
+      - $HARDDISKROOTDIR:$HARDDISKROOTDIR:ro
     labels:
       komodo.skip: # Prevent Komodo from stopping with StopAllContainers

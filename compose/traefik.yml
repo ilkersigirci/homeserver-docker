@@ -121,6 +121,7 @@ services:
     secrets:
       - cf_dns_api_token
     labels:
+      komodo.skip: # Prevents from stopping with StopAllContainers on Komodo
       #- "autoheal=true"
       traefik.enable: "true"
       # HTTP Routers

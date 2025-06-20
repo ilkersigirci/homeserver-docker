@@ -36,6 +36,7 @@ services:
     volumes:
       - $SECRETSDIR/tinyauth_users:/tinyauth/users_file
     labels:
+      komodo.skip: # Prevents from stopping with StopAllContainers on Komodo
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.tinyauth-rtr.entrypoints: "websecure"

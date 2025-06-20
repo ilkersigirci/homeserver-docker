@@ -49,3 +49,5 @@ services:
       TASKS: 0 # For Portainer
       VERSION: 1
       VOLUMES: 0 # For Portainer
+    labels:
+      komodo.skip: # Prevents from stopping with StopAllContainers on Komodo

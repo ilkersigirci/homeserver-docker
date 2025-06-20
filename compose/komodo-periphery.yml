@@ -1,4 +1,10 @@
-# NOTE: Create custom config file and give allowed_ips = ["x.y.z.t"] etc.
+# TODO: Create custom config file and give allowed_ips = ["x.y.z.t"] etc.
+# NOTE: For stacks
+#  - Set Run Directory: $DOCKERDIR
+#  - File Paths: docker-compose.$MY_HOSTNAME.yml
+#  - env file path: EMPTY
+#  - Additional Env Files: .env
+# FIXME: `core` compose profile is not working.
 services:
   komodo-periphery:
     image: ghcr.io/moghtech/komodo-periphery:${COMPOSE_KOMODO_IMAGE_TAG:-latest}
@@ -34,6 +40,10 @@ services:
       ## Usually whitelisting just /etc/hostname gives correct size for single root disk.
       PERIPHERY_INCLUDE_DISK_MOUNTS: /etc/hostname
       # PERIPHERY_EXCLUDE_DISK_MOUNTS: /snap,/etc/repos
+      ## CUSTOM
+      MY_HOSTNAME: $MY_HOSTNAME
+      COMPOSE_PROFILES: desktop_apps,ml,maintenance,media,monitoring,photo,reading
+      # COMPOSE_PROFILES: core,desktop_apps,ml,maintenance,media,monitoring,photo,reading
     volumes:
       ## Mount external docker socket
       - /var/run/docker.sock:/var/run/docker.sock
@@ -44,3 +54,6 @@ services:
       ## or docker will get confused. See https://github.com/moghtech/komodo/discussions/180.
       ## Default: /etc/komodo.
       - ${PERIPHERY_ROOT_DIRECTORY:-/etc/komodo}:${PERIPHERY_ROOT_DIRECTORY:-/etc/komodo}
+      ## CUSTOM: Docker Compose Stack on the host machine. Match the EXACT path.
+      - $DOCKERDIR:$DOCKERDIR:ro
+      - $HARDDISKROOTDIR:$HARDDISKROOTDIR:ro
