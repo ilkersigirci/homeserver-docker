@@ -1,3 +1,4 @@
+# NOTE: Create custom config file and give allowed_ips = ["x.y.z.t"] etc.
 services:
   komodo-periphery:
     image: ghcr.io/moghtech/komodo-periphery:${COMPOSE_KOMODO_IMAGE_TAG:-latest}

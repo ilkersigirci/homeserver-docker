@@ -25,7 +25,7 @@ services:
       - $DATADIR/jellyfin/metadata:/config/metadata
       - $DATADIR/downloads:/media/downloads:ro
       - $MEDIADIR:/media/local:ro
-      - $ONEDRIVEDIR:/media/onedrive:ro
+      # - $ONEDRIVEDIR:/media/onedrive:ro
     labels:
       traefik.enable: "true"
       ## HTTP Routers

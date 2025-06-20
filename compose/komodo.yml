@@ -132,6 +132,13 @@ services:
     environment:
       PORT: 8120
       PERIPHERY_STACK_DIR: /etc/komodo/stacks
+      ## CUSTOM
+      DOCKERDIR: /etc/komodo/stacks/$MY_HOSTNAME
+      DATADIR: /etc/komodo/stacks/$MY_HOSTNAME/data
+      SECRETSDIR: /etc/komodo/stacks/$MY_HOSTNAME/secrets
+      CONFIGDIR: /etc/komodo/stacks/$MY_HOSTNAME/configs
+      MY_HOSTNAME: $MY_HOSTNAME
+      COMPOSE_PROFILES: core,desktop_apps,ml,maintenance,media,monitoring,photo,reading
     volumes:
       ## Mount external docker socket
       - /var/run/docker.sock:/var/run/docker.sock
@@ -142,9 +149,7 @@ services:
       ## or docker will get confused. See https://github.com/moghtech/komodo/discussions/180.
       ## Default: /etc/komodo.
       - ${PERIPHERY_ROOT_DIRECTORY:-/etc/komodo}:${PERIPHERY_ROOT_DIRECTORY:-/etc/komodo}
-      ## CUSTOM
-      - $DOCKERDIR/compose:/etc/komodo/stacks/custom:ro
-      - $DOCKERDIR/docker-compose.$MY_HOSTNAME.yml:/etc/komodo/stacks/custom/compose.yaml:ro
-      - $DOCKERDIR/.env:/etc/komodo/stacks/custom/.env:ro
+      ## CUSTOM: Docker Compose Stack on the host machine
+      - $DOCKERDIR:/etc/komodo/stacks/$MY_HOSTNAME:ro
     labels:
       komodo.skip: # Prevent Komodo from stopping with StopAllContainers
