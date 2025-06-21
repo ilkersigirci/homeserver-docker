@@ -8,6 +8,8 @@ services:
       - core
     networks:
       - t3_proxy
+    ports:
+      - "1411:1411"
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -16,7 +18,7 @@ services:
       PUID: $PUID
       PGID: $PGID
       TZ: $TZ
-      APP_URL: https://pocketid.$DOMAINNAME
+      APP_URL: https://pocketid.$BASE_DOMAINNAME
       PORT: 1411
     healthcheck:
         test: "curl -f http://localhost:1411/healthz"
@@ -25,24 +27,24 @@ services:
         start_period: 10s
         retries: 2
     labels:
-      traefik.enable: "true"
-      ## HTTP Routers
-      traefik.http.routers.pocket-id-rtr.entrypoints: "websecure"
-      traefik.http.routers.pocket-id-rtr.rule: "Host(`pocketid.$DOMAINNAME`)"
-      ## Middlewares
-      traefik.http.routers.pocket-id-rtr.middlewares: "chain-no-auth@file"
-      ## HTTP Services
-      traefik.http.routers.pocket-id-rtr.service: "pocket-id-svc"
-      traefik.http.services.pocket-id-svc.loadbalancer.server.port: "1411"
+      # traefik.enable: "true"
+      # ## HTTP Routers
+      # traefik.http.routers.pocket-id-rtr.entrypoints: "websecure"
+      # traefik.http.routers.pocket-id-rtr.rule: "Host(`pocketid.$DOMAINNAME`)"
+      # ## Middlewares
+      # traefik.http.routers.pocket-id-rtr.middlewares: "chain-no-auth@file"
+      # ## HTTP Services
+      # traefik.http.routers.pocket-id-rtr.service: "pocket-id-svc"
+      # traefik.http.services.pocket-id-svc.loadbalancer.server.port: "1411"
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "pocket-id"
       homepage.icon: "pocket-id.svg"
-      homepage.href: "https://pocketid.$DOMAINNAME"
+      homepage.href: "https://pocketid.$BASE_DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "OIDC provider using only passkeys"
       ####### GLANCE #######
       glance.name: "pocket-id"
       glance.icon: "sh:pocket-id-dark"
-      glance.url: "https://pocketid.$DOMAINNAME"
+      glance.url: "https://pocketid.$BASE_DOMAINNAME"
       glance.description: "OIDC provider using only passkeys"

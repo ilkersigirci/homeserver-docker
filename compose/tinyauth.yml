@@ -26,9 +26,9 @@ services:
       GENERIC_NAME: PocketID
       GENERIC_CLIENT_ID: $TINYAUTH_GENERIC_CLIENT_ID
       GENERIC_CLIENT_SECRET: $TINYAUTH_GENERIC_CLIENT_SECRET
-      GENERIC_AUTH_URL: https://pocketid.$DOMAINNAME/authorize
-      GENERIC_TOKEN_URL: https://pocketid.$DOMAINNAME/api/oidc/token
-      GENERIC_USER_URL: https://pocketid.$DOMAINNAME/api/oidc/userinfo
+      GENERIC_AUTH_URL: https://pocketid.$BASE_DOMAINNAME/authorize
+      GENERIC_TOKEN_URL: https://pocketid.$BASE_DOMAINNAME/api/oidc/token
+      GENERIC_USER_URL: https://pocketid.$BASE_DOMAINNAME/api/oidc/userinfo
       GENERIC_SCOPES: openid email profile groups
       GENERIC_SKIP_SSL: "true"
       # OAUTH_AUTO_REDIRECT: generic # To automatically redirected to Pocket ID
