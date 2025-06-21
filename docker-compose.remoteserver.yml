@@ -81,7 +81,7 @@ include:
   - compose/open-webui.yml
   - compose/searxng.yml
   #### MONITORING ####
-  - compose/beszel.yml
+  # - compose/beszel.yml
   - compose/rybbit.yml
   #### PHOTO ####
   #### READING ####
