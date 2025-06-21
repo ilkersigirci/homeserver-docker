@@ -51,6 +51,7 @@ include:
   - compose/dufs.yml
   - compose/filebrowser.yml
   - compose/homepage.yml
+  - compose/komodo-periphery.yml
   - compose/socket-proxy.yml
   - compose/tinyauth.yml
   - compose/traefik.yml
