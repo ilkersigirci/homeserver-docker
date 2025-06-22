@@ -108,7 +108,8 @@ services:
       #   mode: host
     volumes:
       # - /etc/localtime:/etc/localtime:ro # Set timezone
-      - $CONFIGDIR/traefik3/rules:/rules # file provider directory
+      - $CONFIGDIR/traefik3/rules:/rules:ro # file provider directory
+      - $CONFIGDIR/traefik3/rules.specific/$MY_HOSTNAME.yml:/rules/dummy_specific.yml:ro # file provider directory
       - $CONFIGDIR/traefik3/acme/acme.json:/acme.json # cert location - you must touch this file and change permissions to 600
       - $DOCKERDIR/logs/traefik:/logs # for fail2ban or crowdsec - make sure to touch file before starting container
     environment:

@@ -1,0 +1,61 @@
+http:
+  routers:
+    jellyfin-redirect-rtr:
+      rule: "Host(`jellyfin.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - jellyfin-redirect
+      service: noop@internal
+
+    # jellyfin-rtr:
+    #   rule: "Host(`jellyfin.gpu.{{env "DOMAINNAME"}}`)"
+    #   entryPoints:
+    #     - websecure
+    #   middlewares:
+    #     # - chain-no-auth-relaxed
+    #   service: jellyfin-svc
+
+    wg-easy-14-rtr:
+      rule: "Host(`wireguard.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      # middlewares:
+      #   - chain-tinyauth-relaxed
+
+      service: wg-easy-14-svc
+
+    pocket-id-rtr:
+      rule: "Host(`pocketid.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth
+      service: pocket-id-svc
+  
+  middlewares:
+    jellyfin-redirect:
+      redirectRegex:
+        regex: "^https://jellyfin\\.(.+)"
+        replacement: "https://jellyfin.gpu.${1}"
+        permanent: true
+  
+  services:
+    # jellyfin-svc:
+    #   loadBalancer:
+    #     servers:
+    #       # - url: "http://10.8.0.3:8096" # Wiregurd
+
+    wg-easy-14-svc:
+      loadBalancer:
+        servers:
+          - url: "http://10.0.0.201:51821" # IP of the host machine
+
+    pocket-id-svc:
+      loadBalancer:
+        servers:
+          - url: "http://10.8.0.3:1411"
+        # healthCheck:
+        #   path: "/healthz"
+        #   interval: "30s"
+        #   timeout: "5s"
