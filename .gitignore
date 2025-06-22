@@ -10,3 +10,4 @@ compose/photo/.env
 acme.json
 configs/*
 !configs/traefik3
+!configs/quartz

@@ -13,7 +13,7 @@ services:
       - no-new-privileges:true
     volumes:
       - $NOTESDIR/Markdown:/vault:ro
-      - $CONFIGDIR/quartz/repo:/usr/src/app/quartz # Optional: Mount existing Quartz repo
+      - $DATADIR/quartz/repo:/usr/src/app/quartz # Optional: Mount existing Quartz repo
       - $CONFIGDIR/quartz/quartz.config.ts:/usr/src/app/quartz/quartz.config.ts:ro
       - $CONFIGDIR/quartz/quartz.layout.ts:/usr/src/app/quartz/quartz.layout.ts:ro
     environment:
