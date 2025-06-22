@@ -1,0 +1,7 @@
+---
+# For configuration options and examples, please see:
+# https://github.com/benphelps/homepage/wiki/Docker-Integration
+
+my-docker:
+  host: docker-socket-proxy
+  port: 2375

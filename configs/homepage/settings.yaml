@@ -1,0 +1,68 @@
+---
+# For configuration options and examples, please see:
+# https://github.com/benphelps/homepage/wiki/Settings
+
+title: Home - {{HOMEPAGE_VAR_DOMAINNAME}}
+headerStyle: clean # underlined boxed clean boxedWidgets
+hideVersion: true
+# showStats: true # show all docker stats expanded
+statusStyle: dot # basic, dot
+# favicon: https://www.google.com/favicon.ico
+# theme: dark # or light
+# color: slate # gray, zinc, neutral, stone, amber, yellow, lime, green, emerald, teal, cyan, sky, blue, indigo, violet, purple, fuchsia, pink, rose, red, white
+# language: en
+# target: _blank # Possible options include _blank, _self, and _top
+# base: https://{{HOMEPAGE_VAR_DOMAINNAME}}
+
+# background: 
+#   image: https://images.pexels.com/photos/6985260/pexels-photo-6985260.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&dpr=1
+#   # image: /images/custom_background.png
+#   blur: sm # sm, "", md... see https://tailwindcss.com/docs/backdrop-blur
+#   # saturate: 50 # 0, 50, 100... see https://tailwindcss.com/docs/backdrop-saturate
+#   brightness: 100 # 0, 50, 75... see https://tailwindcss.com/docs/backdrop-brightness
+#   opacity: 50 # 0-100
+
+# providers:
+#   openweathermap: openweathermapapikey
+#   weatherapi: weatherapiapikey
+
+# providers:
+#   finnhub: {{HOMEPAGE_VAR_FINNHUB_API_KEY}}
+
+quicklaunch:
+  searchDescriptions: true
+  hideInternetSearch: true
+  showSearchSuggestions: true
+  hideVisitURL: true
+  provider: google
+
+# NOTE: `columns` field is only useful when `style` is set to row
+layout:
+  # Graphs:
+  #   # tab: First # NOTE: Displays in all tabs
+  #   style: row
+  #   columns: 4
+  #   initiallyCollapsed: true
+  Core:
+    tab: First
+    style: column
+    # columns: 2
+  Maintenance:
+    tab: First
+    style: column
+  Monitoring:
+    tab: First
+    style: column
+  Media:
+    tab: Second
+    style: row
+    columns: 2
+  Reading:
+    tab: Second
+    style: column
+  DesktopApps:
+    tab: Second
+    style: row
+  ML:
+    tab: Second
+    style: row

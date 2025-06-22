@@ -1,0 +1,98 @@
+---
+# For configuration options and examples, please see:
+# https://github.com/benphelps/homepage/wiki/Services
+
+# - General:
+#     - My Event Calendar:
+#         widget:
+#             type: calendar
+#             firstDayInWeek: monday # optional - defaults to monday
+#             view: monthly # optional - possible values monthly, agenda
+#             maxEvents: 30 # optional - defaults to 10
+#             showTime: true # optional - show time for event happening today - defaults to false
+#             integrations: # optional
+#                 - type: ical # Show calendar events from another service
+#                   url: {{HOMEPAGE_VAR_CALENDAR_GMAIL_ICAL_SECRET_ADDRESS}} # URL with calendar events
+#                   name: My Events # required - name for these calendar events
+#                   color: zinc # optional - defaults to pre-defined color for the service (zinc for ical)
+#                   params: # optional - additional params for the service
+#                     showName: true # optional - show name before event title in event line - defaults to false
+#     - Finnhub:
+#         widget:
+#             type: stocks
+#             provider: finnhub
+#             showUSMarketStatus: true # optional, defaults to true
+#             watchlist:
+#             # - BTC
+#             - NVDA
+#             - AMD
+#             - TSM
+#             - MSFT
+#             - AAPL
+#             - TSLA
+
+# - Docker Service Example:
+#     - Traefik:
+#         icon: traefik.png
+#         href: 'https://traefik.{{HOMEPAGE_VAR_DOMAINNAME}}'
+#         description: Reverse Proxy Manager
+#         server: my-docker
+#         container: traefik
+#         target: _blank # _blank: New tab --- _self: Same tab --- _top: New window
+#         widget:
+#           type: traefik
+#           url: https://traefik.{{HOMEPAGE_VAR_DOMAINNAME}} # NOTE: docker service name not working
+#           fields: ['routers', 'services', 'middleware']
+
+- Maintenance:
+    - Tailscale:
+        icon: tailscale.png
+        href: 'https://login.tailscale.com/admin/machines/{{HOMEPAGE_VAR_TAILSCALE_DEVICE_IP}}'
+        description: Tailscale Device Status
+        widget:
+            type: tailscale
+            key: {{HOMEPAGE_VAR_TAILSCALE_KEY}}
+            deviceid: {{HOMEPAGE_VAR_TAILSCALE_DEVICE_ID}}
+            # hideErrors: true
+
+# - Graphs:
+#     - CPU:
+#         widget:
+#             type: beszel
+#             # url: https://beszel.{{HOMEPAGE_VAR_DOMAINNAME}}
+#             url: http://beszel:8090
+#             username: {{HOMEPAGE_VAR_BESZEL_EMAIL}}
+#             password: {{HOMEPAGE_VAR_BESZEL_PASSWORD}}
+#             systemId: {{HOMEPAGE_VAR_MY_HOSTNAME}}
+#             version: 2
+#             fields: ['cpu']
+#     - Memory:
+#         widget:
+#             type: beszel
+#             # url: https://beszel.{{HOMEPAGE_VAR_DOMAINNAME}}
+#             url: http://beszel:8090
+#             username: {{HOMEPAGE_VAR_BESZEL_EMAIL}}
+#             password: {{HOMEPAGE_VAR_BESZEL_PASSWORD}}
+#             systemId: {{HOMEPAGE_VAR_MY_HOSTNAME}}
+#             version: 2
+#             fields: ['memory']
+#     - Network:
+#         widget:
+#             type: beszel
+#             # url: https://beszel.{{HOMEPAGE_VAR_DOMAINNAME}}
+#             url: http://beszel:8090
+#             username: {{HOMEPAGE_VAR_BESZEL_EMAIL}}
+#             password: {{HOMEPAGE_VAR_BESZEL_PASSWORD}}
+#             systemId: {{HOMEPAGE_VAR_MY_HOSTNAME}}
+#             version: 2
+#             fields: ['network']
+#     - Disk:
+#         widget:
+#             type: beszel
+#             # url: https://beszel.{{HOMEPAGE_VAR_DOMAINNAME}}
+#             url: http://beszel:8090
+#             username: {{HOMEPAGE_VAR_BESZEL_EMAIL}}
+#             password: {{HOMEPAGE_VAR_BESZEL_PASSWORD}}
+#             systemId: {{HOMEPAGE_VAR_MY_HOSTNAME}}
+#             version: 2
+#             fields: ['disk']
