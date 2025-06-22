@@ -16,7 +16,7 @@ const config: QuartzConfig = {
       provider: "plausible",
     },
     locale: "en-US",
-    baseUrl: "digitalgarden.gpu.ilkerflix.com",
+    baseUrl: "digitalgarden.rpi.ilkerflix.com",
     ignorePatterns: ["private", "templates", ".obsidian", "Templates"],
     defaultDateType: "modified",
     theme: {
@@ -51,7 +51,8 @@ const config: QuartzConfig = {
           textHighlight: "#fff23688",
         },
         darkMode: {
-          light: "#282c34", // Atom One Dark background
+          // light: "#282c34", // Atom One Dark background
+          light: "#1f1f28", // Custom background color
           lightgray: "#3e4451", // Atom One Dark selection color
           gray: "#5c6370", // Atom One Dark comment color
           darkgray: "#abb2bf", // Atom One Dark text color
