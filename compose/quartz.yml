@@ -29,7 +29,7 @@ services:
       traefik.http.routers.quartz-rtr.entrypoints: "websecure"
       traefik.http.routers.quartz-rtr.rule: "Host(`digitalgarden.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.quartz-rtr.middlewares: "chain-tinyauth-relaxed@file"
+      traefik.http.routers.quartz-rtr.middlewares: "chain-tinyauth-relaxed@file" # NOTE: `relaxed` is needed for index page to show all pages
       ## HTTP Services
       traefik.http.routers.quartz-rtr.service: "quartz-svc"
       traefik.http.services.quartz-svc.loadbalancer.server.port: "80"
