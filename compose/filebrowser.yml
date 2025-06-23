@@ -1,5 +1,5 @@
 services:
-  # For custom.css: change Global Settings->branding path to "custom"
+  # For custom.css: change Global Settings->branding path to "config"
   filebrowser:
     container_name: filebrowser
     image: filebrowser/filebrowser:latest # TODO: ghcr.io/
@@ -13,9 +13,8 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $CONFIGDIR/filebrowser/filebrowser.json:/filebrowser.json
-      - $CONFIGDIR/filebrowser/custom.css:/custom/custom.css
-      - $DOCKERDIR/appdata/filebrowser/database.db:/database.db
+      - $CONFIGDIR/filebrowser:/config
+      - $DOCKERDIR/appdata/filebrowser:/database
       - $USERDIR:/srv/Home
       - $HARDDISKROOTDIR:/srv/Harddisk
     environment:
