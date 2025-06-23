@@ -11,34 +11,36 @@ x-deploy: &gpu-deploy
 services:
   immich-redis:
     container_name: immich_redis
-    image: docker.io/redis:6.2-alpine@sha256:905c4ee67b8e0aa955331960d2aa745781e6bd89afc44a8584bfd13bc890f0ae
+    image: docker.io/valkey/valkey:8-bookworm@sha256:fec42f399876eb6faf9e008570597741c87ff7662a54185593e74b09ce83d177
     restart: $MEDIA_RESTART_POLICY
+    profiles:
+      - photo
     networks:
       - t3_proxy
     healthcheck:
       test: redis-cli ping || exit 1
-    profiles:
-      - photo
 
   immich-machine-learning:
     container_name: immich_machine_learning
     image: ghcr.io/immich-app/immich-machine-learning:release-cuda
     restart: $MEDIA_RESTART_POLICY
     <<: *gpu-deploy
+    profiles:
+      - photo
     networks:
       - t3_proxy
     healthcheck:
       disable: false
     volumes:
       - $DOCKERDIR/appdata/immich-ml/model-cache:/cache
-    profiles:
-      - photo
     environment:
       MACHINE_LEARNING_CACHE_FOLDER: /cache
 
   immich-postgres:
     container_name: immich_postgres
-    image: ghcr.io/immich-app/postgres:14-vectorchord0.3.0-pgvectors0.2.0
+    image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0
+    profiles:
+      - photo
     networks:
       - t3_proxy
     volumes:
@@ -51,8 +53,6 @@ services:
       PG_DATA: /var/lib/postgresql/data
       # Uncomment the DB_STORAGE_TYPE: 'HDD' var if your database isn't stored on SSDs
       # DB_STORAGE_TYPE: 'HDD'
-    profiles:
-      - photo
 
   immich-server:
     container_name: immich_server
@@ -62,6 +62,8 @@ services:
     depends_on:
       - immich-redis
       - immich-postgres
+    profiles:
+      - photo
     networks:
       - t3_proxy
     healthcheck:
@@ -103,15 +105,17 @@ services:
       homepage.widget.url: "http://immich-server:2283"
       homepage.widget.key: "$IMMICH_API_KEY"
       homepage.widget.version: "2"
-    profiles:
-      - photo
 
   ##############################################
   # https://github.com/Salvoxia/immich-folder-album-creator
   immich-folder-album-creator:
-    container_name: immich_folder_album_creator
+    container_name: immich-folder-album-creator
     image: salvoxia/immich-folder-album-creator:latest
     restart: "no"
+    depends_on:
+      - immich-server
+    profiles:
+      - photo
     networks:
       - t3_proxy
     environment:
@@ -124,5 +128,36 @@ services:
       LOG_LEVEL: INFO
       SYNC_MODE: "2" # Remove offline assets and delete empty albums after each run
       # RUN_IMMEDIATELY: "true" # Run the script immediately after start
+
+
+  immich-public-proxy:
+    container_name: immich-public-proxy
+    image: alangrainger/immich-public-proxy:latest
+    restart: $MEDIA_RESTART_POLICY
+    depends_on:
+      - immich-server
     profiles:
       - photo
+    networks:
+      - t3_proxy
+    environment:
+      IMMICH_URL: http://immich-server:2283
+    # healthcheck:
+    #   test: curl -s http://localhost:3000/share/healthcheck -o /dev/null || exit 1
+    #   start_period: 10s
+    #   timeout: 5s
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.immich-public-proxy-rtr.entrypoints: "websecure"
+      traefik.http.routers.immich-public-proxy-rtr.rule: "Host(`photos-share.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.immich-public-proxy-rtr.middlewares: "chain-no-auth@file"
+      ## HTTP Services
+      traefik.http.routers.immich-public-proxy-rtr.service: "immich-public-proxy-svc"
+      traefik.http.services.immich-public-proxy-svc.loadbalancer.server.port: "3000"
+      ####### HOMEPAGE #######
+      homepage.group: "Media"
+      homepage.name: "Immich-Public-Proxy"
+      homepage.icon: "immich.svg"
+      homepage.href: "https://photos-share.$DOMAINNAME"
