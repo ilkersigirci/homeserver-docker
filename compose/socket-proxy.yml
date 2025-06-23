@@ -13,8 +13,8 @@ services:
         ipv4_address: 192.168.91.254 # You can specify a static IP
     privileged: true
     ports:
-      - "127.0.0.1:2375:2375"
-      # - "2375:2375" # NOTE: Use this if you want portainer to manage multiple docker endpoints within my home network.
+      # - "127.0.0.1:2375:2375"
+      - "2375:2375" # NOTE: Use this if you want portainer to manage multiple docker endpoints within my home network.
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
