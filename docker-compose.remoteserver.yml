@@ -68,7 +68,7 @@ include:
   ###### MAINTENANCE ####
   # - compose/code-server.yml
   # - compose/docker-gc.yml
-  - compose/dozzle.yml
+  # - compose/dozzle.yml
   - compose/syncthing.yml
   - compose/uptime-kuma.yml
   - compose/whoami.yml
