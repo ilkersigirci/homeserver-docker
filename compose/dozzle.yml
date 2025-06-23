@@ -15,6 +15,12 @@ services:
       DOZZLE_FILTER: "status=running"
       # DOZZLE_ENABLE_SHELL: "true" # Enable shell access also in docker-socket-proxy
       DOZZLE_REMOTE_HOST: ${DOZZLE_REMOTE_HOST:-"tcp://docker-socket-proxy:2375"}
+    healthcheck:
+      test: ["CMD", "/dozzle", "healthcheck"]
+      start_period: 45s
+      interval: 1m
+      timeout: 5s
+      retries: 3
     labels:
       traefik.enable: "true"
       ## HTTP Routers

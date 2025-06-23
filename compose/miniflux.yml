@@ -13,7 +13,7 @@ services:
       - $DOCKERDIR/appdata/miniflux-db:/var/lib/postgresql/data
     # healthcheck:
     #   test: ["CMD", "pg_isready", "-U", "miniflux"]
-    #   interval: 2m
+    #   interval: 1m
     #   start_period: 30s
 
     # Fever api endpoint: fever/?api

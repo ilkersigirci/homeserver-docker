@@ -32,7 +32,7 @@ services:
       - "$MLMODELSDIR/LLM:/models:ro"
     healthcheck:
       test: "curl -f http://llama-cpp:8000/health"
-      interval: 2m
+      interval: 1m
       timeout: 5s
       retries: 3
     labels:
