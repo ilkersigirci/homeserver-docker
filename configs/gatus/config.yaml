@@ -86,17 +86,19 @@ endpoints:
       - "[BODY] == 10.8.0.3"
       - "[DNS_RCODE] == NOERROR"
 
-  - name: Homepage-GPU
-    <<: *https-defaults
-    # group: GPU
-    url: "https://jellyfin.gpu.$DOMAINNAME"
+  # Gives 401 because of tinyauth
+  # - name: Homepage-GPU
+  #   <<: *https-defaults
+  #   # group: GPU
+  #   url: "https://homepage.gpu.$DOMAINNAME"
 
   - name: Jellyfin-GPU
     <<: *https-defaults
     # group: GPU
     url: "https://jellyfin.gpu.$DOMAINNAME"
 
-  - name: DigitalGarden-RPI
-    <<: *https-defaults
-    # group: RPI
-    url: "https://digitalgarden.rpi.$DOMAINNAME"
+  # Gives 401 because of tinyauth
+  # - name: DigitalGarden-RPI
+  #   <<: *https-defaults
+  #   # group: RPI
+  #   url: "https://digitalgarden.rpi.$DOMAINNAME"
