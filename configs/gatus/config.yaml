@@ -32,6 +32,124 @@ alerting:
     token: $TELEGRAM_BOT_TOKEN
     id: $TELEGRAM_CHAT_ID
 
+ui:
+  custom-css: |
+    /* Apply Catppuccin Frappe theme to match Homepage */
+    :root {
+      --background-color: hsl(240, 13%, 14%);
+      --primary-color: hsl(222, 74%, 74%);
+      --positive-color: hsl(96, 44%, 68%);
+      --negative-color: hsl(358, 100%, 68%);
+    }
+    
+    /* Main background */
+    body {
+      background-color: var(--background-color) !important;
+      color: var(--primary-color) !important;
+      font-family: 'JetBrains Mono', monospace !important;
+    }
+    
+    /* Container background */
+    .dark\:bg-gray-800 {
+      background-color: var(--background-color) !important;
+    }
+    
+    /* Main container */
+    .container {
+      background-color: var(--background-color) !important;
+      border-color: hsl(240, 13%, 20%) !important;
+    }
+    
+    /* Success status color */
+    .bg-success {
+      background-color: var(--positive-color) !important;
+    }
+    
+    /* Endpoint groups */
+    .endpoint-group {
+      background-color: hsl(240, 13%, 18%) !important;
+      border-color: hsl(240, 13%, 25%) !important;
+    }
+    
+    /* Individual endpoints */
+    .endpoint {
+      background-color: hsl(240, 13%, 16%) !important;
+      border-color: hsl(240, 13%, 25%) !important;
+      color: var(--primary-color) !important;
+    }
+    
+    /* Endpoint hover effect */
+    .endpoint:hover {
+      background-color: hsl(240, 13%, 20%) !important;
+    }
+    
+    /* Links */
+    .endpoint a {
+      color: var(--primary-color) !important;
+    }
+    
+    .endpoint a:hover {
+      color: hsl(222, 74%, 80%) !important;
+    }
+    
+    /* Text colors */
+    .text-gray-500 {
+      color: hsl(222, 74%, 65%) !important;
+    }
+    
+    .dark\:text-gray-200 {
+      color: var(--primary-color) !important;
+    }
+    
+    /* Settings panel */
+    #settings {
+      background-color: hsl(240, 13%, 18%) !important;
+      border-color: hsl(240, 13%, 25%) !important;
+    }
+    
+    /* Settings select */
+    #settings select {
+      background-color: hsl(240, 13%, 16%) !important;
+      color: var(--primary-color) !important;
+      border-color: hsl(240, 13%, 25%) !important;
+    }
+    
+    /* Buttons */
+    button {
+      background-color: hsl(240, 13%, 18%) !important;
+      color: var(--primary-color) !important;
+      border-color: hsl(240, 13%, 25%) !important;
+    }
+    
+    button:hover {
+      background-color: hsl(240, 13%, 22%) !important;
+    }
+    
+    /* Status indicators - keep success green */
+    .status-success {
+      background-color: var(--positive-color) !important;
+    }
+    
+    /* Error status */
+    .status-failure {
+      background-color: var(--negative-color) !important;
+    }
+    
+    /* Green operational indicator */
+    .text-green-600 {
+      color: var(--positive-color) !important;
+    }
+    
+    /* Hide scrollbars to match Homepage */
+    html {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    
+    ::-webkit-scrollbar {
+      display: none;
+    }
+
 endpoints:
   # - name: front-end
   #   group: core
