@@ -47,6 +47,9 @@ services:
       POSTGRES_DB: postgres
       DB_HOST: gatus-db
       DB_PORT: 5432
+      DOMAINNAME: $DOMAINNAME
+      TELEGRAM_BOT_TOKEN: $TELEGRAM_BOT_TOKEN
+      TELEGRAM_CHAT_ID: $TELEGRAM_CHAT_ID
     labels:
       traefik.enable: "true"
       ## HTTP Routers

@@ -1,57 +1,102 @@
-storage:
-  type: postgres
-  path: "postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$DB_HOST:$DB_PORT/$POSTGRES_DB?sslmode=disable"
+# storage:
+#   type: postgres
+#   path: "postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$DB_HOST:$DB_PORT/$POSTGRES_DB?sslmode=disable"
+
+alerting:
+  telegram:
+    token: $TELEGRAM_BOT_TOKEN
+    id: $TELEGRAM_CHAT_ID
+
+https-defaults: &https-defaults
+  group: External
+  interval: 30s
+  client:
+    timeout: 10s
+  conditions:
+    - "[STATUS] == 200"
+    - "[CERTIFICATE_EXPIRATION] > 48h"
+  alerts:
+    - type: telegram
+      send-on-resolved: true
 
 endpoints:
-  - name: front-end
-    group: core
-    url: "https://twin.sh/health"
-    interval: 5m
-    conditions:
-      - "[STATUS] == 200"
-      - "[BODY].status == UP"
-      - "[RESPONSE_TIME] < 150"
+  # - name: front-end
+  #   group: core
+  #   url: "https://twin.sh/health"
+  #   interval: 5m
+  #   conditions:
+  #     - "[STATUS] == 200"
+  #     - "[BODY].status == UP"
+  #     - "[RESPONSE_TIME] < 150"
 
-  - name: back-end
-    group: core
-    url: "https://example.org/"
-    interval: 5m
+  ################# INTERNAL SERVICES #################
+  - name: Postgres
+    group: Internal
+    url: "tcp://gatus-db:5432"
+    interval: 30s
     conditions:
-      - "[STATUS] == 200"
-      - "[CERTIFICATE_EXPIRATION] > 48h"
+      - "[CONNECTED] == true"
 
-  - name: monitoring
-    group: internal
-    url: "https://example.org/"
-    interval: 5m
-    conditions:
-      - "[STATUS] == 200"
-
-  - name: nas
-    group: internal
-    url: "https://example.org/"
-    interval: 5m
-    conditions:
-      - "[STATUS] == 200"
-
-  - name: example-dns-query
-    url: "8.8.8.8" # Address of the DNS server to use
-    interval: 5m
+  - name: AdguardHome-DNS
+    group: Internal
+    url: "10.8.0.1" # Address of the DNS server to use
+    interval: 30s
     dns:
-      query-name: "example.com"
+      query-name: "wghomeserver"
       query-type: "A"
     conditions:
-      - "[BODY] == 93.184.215.14"
+      - "[BODY] == 10.8.0.3"
       - "[DNS_RCODE] == NOERROR"
 
+  - name: $DOMAINNAME-DNS
+    group: Internal
+    url: "1.1.1.1" # Address of the DNS server to use
+    interval: 30s
+    dns:
+      query-name: "homepage.$DOMAINNAME"
+      query-type: "A"
+    conditions:
+      - "[BODY] == 10.8.0.1"
+      - "[DNS_RCODE] == NOERROR"
+
+  ################# EXTERNAL SERVICES #################
+
   - name: icmp-ping
+    group: External
     url: "icmp://example.org"
     interval: 1m
     conditions:
       - "[CONNECTED] == true"
 
   - name: check-domain-expiration
-    url: "https://example.org/"
+    group: External
+    url: "https://$DOMAINNAME/"
     interval: 1h
     conditions:
       - "[DOMAIN_EXPIRATION] > 720h"
+
+  - name: gpu.$DOMAINNAME-DNS
+    group: External
+    url: "1.1.1.1" # Address of the DNS server to use
+    interval: 30s
+    dns:
+      query-name: "homepage.gpu.$DOMAINNAME"
+      query-type: "A"
+    conditions:
+      - "[BODY] == 10.8.0.3"
+      - "[DNS_RCODE] == NOERROR"
+
+  - name: Homepage-GPU
+    <<: *https-defaults
+    # group: GPU
+    url: "https://jellyfin.gpu.$DOMAINNAME"
+
+  - name: Jellyfin-GPU
+    <<: *https-defaults
+    # group: GPU
+    url: "https://jellyfin.gpu.$DOMAINNAME"
+
+  - name: DigitalGarden-RPI
+    <<: *https-defaults
+    # group: RPI
+    url: "https://digitalgarden.rpi.$DOMAINNAME"
