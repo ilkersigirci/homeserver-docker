@@ -9,6 +9,7 @@ compose/photo/.env
 # Configs
 acme.json
 configs/*
+!configs/gatus
 !configs/homepage
 !configs/filebrowser
 !configs/traefik3

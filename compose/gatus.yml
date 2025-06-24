@@ -1,0 +1,71 @@
+services:
+
+  gatus-db:
+    image: postgres:16.4
+    container_name: gatus-db
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - monitoring
+      - gatus
+    environment:
+      PGDATA: /pgdata
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    networks:
+      - t3_proxy
+    expose:
+      - "5432"
+    volumes:
+      - $DATADIR/gatus-db:/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  gatus:
+    image: ghcr.io/twin/gatus:stable
+    container_name: gatus
+    restart: $MAINTENANCE_RESTART_POLICY
+    depends_on:
+      gatus-db:
+        condition: service_healthy
+    profiles:
+      - monitoring
+      - gatus
+    networks:
+      - t3_proxy
+      # - socket_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $CONFIGDIR/gatus:/config
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+      DB_HOST: gatus-db
+      DB_PORT: 5432
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.gatus-rtr.entrypoints: "websecure"
+      traefik.http.routers.gatus-rtr.rule: "Host(`gatus.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.gatus-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.gatus-rtr.service: "gatus-svc"
+      traefik.http.services.gatus-svc.loadbalancer.server.port: "8080"
+      ####### HOMEPAGE #######
+      homepage.group: "Monitoring"
+      homepage.name: "Gatus"
+      homepage.icon: "gatus.svg"
+      homepage.href: "https://gatus.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Automated developer-oriented status page"
+      ####### GLANCE #######
+      glance.name: "gatus"
+      glance.icon: "sh:gatus"
+      glance.url: "https://gatus.$DOMAINNAME"
+      glance.description: "Automated developer-oriented status page"

@@ -4,6 +4,9 @@ services:
     image: ghcr.io/bigboot/autokuma:uptime-kuma-v2-master
     container_name: autokuma
     restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      # - monitoring
+      - not-used
     networks:
       - t3_proxy
       - socket_proxy
@@ -26,9 +29,6 @@ services:
       ## HTTP Services
       traefik.http.routers.autokuma-rtr.service: "autokuma-svc"
       traefik.http.services.autokuma-svc.loadbalancer.server.port: "3001"
-    profiles:
-      # - monitoring
-      - not-used
       
   # Add tcp docker host: tcp://docker-socket-proxy:2375 in the UI
   # After user creation, disable auth: Settings -> Security -> Disable Auth
@@ -36,6 +36,8 @@ services:
     image: louislam/uptime-kuma:beta
     container_name: uptime-kuma
     restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - monitoring
     networks:
       - t3_proxy
       - socket_proxy
@@ -68,5 +70,8 @@ services:
       # - homepage.widget.type=uptimekuma
       # - homepage.widget.url=http://uptime-kuma:3001
       # - homepage.widget.slug=statuspageslug
-    profiles:
-      - monitoring
+      ####### GLANCE #######
+      glance.name: "uptime-kuma"
+      glance.icon: "sh:uptime-kuma"
+      glance.url: "https://uptimekuma.$DOMAINNAME"
+      glance.description: "Healthcheck for Http Apps"

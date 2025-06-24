@@ -69,8 +69,9 @@ include:
   # - compose/code-server.yml
   # - compose/docker-gc.yml
   # - compose/dozzle.yml
+  - compose/gatus.yml
   - compose/syncthing.yml
-  - compose/uptime-kuma.yml
+  # - compose/uptime-kuma.yml
   - compose/whoami.yml
   #### MEDIA ####
   - compose/bitplay.yml
