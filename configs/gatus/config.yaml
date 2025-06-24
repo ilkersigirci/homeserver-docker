@@ -1,13 +1,6 @@
-# storage:
-#   type: postgres
-#   path: "postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$DB_HOST:$DB_PORT/$POSTGRES_DB?sslmode=disable"
+######### Default Configurations #################
 
-alerting:
-  telegram:
-    token: $TELEGRAM_BOT_TOKEN
-    id: $TELEGRAM_CHAT_ID
-
-https-defaults: &https-defaults
+https-default: &https-default
   group: External
   interval: 30s
   client:
@@ -18,6 +11,26 @@ https-defaults: &https-defaults
   alerts:
     - type: telegram
       send-on-resolved: true
+
+ping-default: &ping-default
+  group: External
+  interval: 30s
+  conditions:
+    - "[CONNECTED] == true"
+  alerts:
+    - type: telegram
+      send-on-resolved: true
+
+###################################################
+
+# storage:
+#   type: postgres
+#   path: "postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$DB_HOST:$DB_PORT/$POSTGRES_DB?sslmode=disable"
+
+alerting:
+  telegram:
+    token: $TELEGRAM_BOT_TOKEN
+    id: $TELEGRAM_CHAT_ID
 
 endpoints:
   # - name: front-end
@@ -60,14 +73,6 @@ endpoints:
       - "[DNS_RCODE] == NOERROR"
 
   ################# EXTERNAL SERVICES #################
-
-  - name: icmp-ping
-    group: External
-    url: "icmp://example.org"
-    interval: 1m
-    conditions:
-      - "[CONNECTED] == true"
-
   - name: check-domain-expiration
     group: External
     url: "https://$DOMAINNAME/"
@@ -86,19 +91,31 @@ endpoints:
       - "[BODY] == 10.8.0.3"
       - "[DNS_RCODE] == NOERROR"
 
+  - name: Homepage-GPU-PING
+    <<: *ping-default
+    url: "icmp://homepage.gpu.$DOMAINNAME"
+
   # Gives 401 because of tinyauth
   # - name: Homepage-GPU
-  #   <<: *https-defaults
+  #   <<: *https-default
   #   # group: GPU
   #   url: "https://homepage.gpu.$DOMAINNAME"
 
+  - name: Jellyfin-GPU-PING
+    <<: *ping-default
+    url: "icmp://homepage.gpu.$DOMAINNAME"
+
   - name: Jellyfin-GPU
-    <<: *https-defaults
+    <<: *https-default
     # group: GPU
     url: "https://jellyfin.gpu.$DOMAINNAME"
 
+  - name: DigitalGarden-RPI-PING
+    <<: *ping-default
+    url: "icmp://digitalgarden.rpi.$DOMAINNAME"
+
   # Gives 401 because of tinyauth
   # - name: DigitalGarden-RPI
-  #   <<: *https-defaults
+  #   <<: *https-default
   #   # group: RPI
   #   url: "https://digitalgarden.rpi.$DOMAINNAME"
