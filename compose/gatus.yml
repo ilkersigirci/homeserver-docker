@@ -67,6 +67,8 @@ services:
       homepage.href: "https://gatus.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Automated developer-oriented status page"
+      homepage.widget.type: "gatus"
+      homepage.widget.url: "http://gatus:8080"
       ####### GLANCE #######
       glance.name: "gatus"
       glance.icon: "sh:gatus"
