@@ -49,7 +49,7 @@ http:
     wg-easy-14-svc:
       loadBalancer:
         servers:
-          - url: "http://10.0.0.201:51821" # IP of the host machine
+          - url: "http://{{env "REMOTE_SERVER_PRIVATE_IP"}}:51821" # IP of the host machine
 
     pocket-id-svc:
       loadBalancer:

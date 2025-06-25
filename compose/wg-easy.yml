@@ -15,7 +15,7 @@ services:
     volumes:
       - $CONFIGDIR/wg-easy-14:/etc/wireguard
     environment:
-      WG_HOST: $PUBLIC_IP # The public hostname of your VPN server. Shouldn't be proxied by Cloudflare.
+      WG_HOST: $REMOTE_SERVER_PUBLIC_IP # The public hostname of your VPN server. Shouldn't be proxied by Cloudflare.
       WG_DEVICE: enp0s3
       # Optional:
       WG_PERSISTENT_KEEPALIVE: 25
@@ -50,6 +50,12 @@ services:
       retries: 3
     labels:
       komodo.skip: # Prevents from stopping with StopAllContainers on Komodo
+      homepage.widget.type: "wgeasy"
+      homepage.widget.url: "http://$REMOTE_SERVER_PRIVATE_IP:51821"
+      homepage.widget.version: "1" # optional, default is 1
+      # homepage.widget.username: "yourwgusername" # required for v15 and above
+      # homepage.widget.password: "yourwgeasypassword"
+      homepage.widget.threshold: "2"
 
   # To get WG_DEVICE, run this inside the container: ip route get 8.8.8.8 | awk '{print $5}'. Default is eth0.
   # To access the machines in the host machine: ip route add 10.8.0.0/24 via 192.168.90.91
@@ -74,7 +80,7 @@ services:
     volumes:
       - $CONFIGDIR/wg-easy-14-no-host:/etc/wireguard
     environment:
-      WG_HOST: $PUBLIC_IP # The public hostname of your VPN server. Shouldn't be proxied by Cloudflare.
+      WG_HOST: $REMOTE_SERVER_PUBLIC_IP # The public hostname of your VPN server. Shouldn't be proxied by Cloudflare.
       WG_DEVICE: eth0 # Internal network interface inside docker. DO NOT use host device network name.
       # Optional:
       WG_PERSISTENT_KEEPALIVE: 25
