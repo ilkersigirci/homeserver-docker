@@ -23,6 +23,9 @@ services:
       JELLYFIN_URL: http://jellyfin:8096
       JELLYFIN_USER_ID: $JELLYFIN_USER_ID
       JELLYFIN_KEY: $JELLYFIN_API_KEY
+      WG_EASY_URL: https://wireguard.$BASE_DOMAINNAME
+      WG_EASY_USERNAME: ${WG_EASY_USERNAME:-DUMMY} # NOTE: Not needed for wg-easy-14
+      WG_EASY_PASSWORD: ${WG_EASY_PASSWORD:-DUMMY} # NOTE: Not needed for wg-easy-14
     labels:
       traefik.enable: "true"
       ## HTTP Routers
