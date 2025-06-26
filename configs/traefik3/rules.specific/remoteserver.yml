@@ -20,8 +20,8 @@ http:
       rule: "Host(`wireguard.{{env "DOMAINNAME"}}`)"
       entryPoints:
         - websecure
-      # middlewares:
-      #   - chain-tinyauth-relaxed
+      middlewares:
+        - chain-no-auth-relaxed
 
       service: wg-easy-14-svc
 
