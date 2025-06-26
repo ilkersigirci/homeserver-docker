@@ -45,16 +45,23 @@ services:
       WG_ALLOWED_IPS: 10.8.0.0/24
     healthcheck:
       test: /usr/bin/timeout 5s /bin/sh -c "/usr/bin/wg show | /bin/grep -q interface || exit 1"
-      interval: 1m
+      interval: 30s
       timeout: 5s
       retries: 3
     labels:
       komodo.skip: # Prevents from stopping with StopAllContainers on Komodo
+      ####### HOMEPAGE #######
+      homepage.group: "Core"
+      homepage.name: "Wg-Easy"
+      homepage.icon: "wireguard.svg"
+      homepage.href: "https://wireguard.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "The easiest way to run WireGuard VPN and UI"
       homepage.widget.type: "wgeasy"
       homepage.widget.url: "http://$REMOTE_SERVER_PRIVATE_IP:51821"
       homepage.widget.version: "1" # optional, default is 1
       # homepage.widget.username: "yourwgusername" # required for v15 and above
-      # homepage.widget.password: "yourwgeasypassword"
+      homepage.widget.password: "DUMMY"
       homepage.widget.threshold: "2"
 
   # To get WG_DEVICE, run this inside the container: ip route get 8.8.8.8 | awk '{print $5}'. Default is eth0.
