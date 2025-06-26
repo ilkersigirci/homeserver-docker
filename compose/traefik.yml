@@ -76,6 +76,8 @@ services:
       # - --experimental.plugins.cf-real-ip.version=v1.0.6
       - --experimental.plugins.crowdsec-bouncer.modulename=github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
       - --experimental.plugins.crowdsec-bouncer.version=v1.2.1
+      - --experimental.plugins.webfinger.modulename=github.com/NX211/traefik-webfinger
+      - --experimental.plugins.webfinger.version=v0.3.5
     networks:
       t3_proxy:
         ipv4_address: 192.168.90.254 # You can specify a static IP
@@ -120,6 +122,8 @@ services:
       BASE_DOMAINNAME: $BASE_DOMAINNAME
       CROWDSEC_TRAEFIK_BOUNCER_API_KEY: $CROWDSEC_TRAEFIK_BOUNCER_API_KEY
       REMOTE_SERVER_PRIVATE_IP: ${REMOTE_SERVER_PRIVATE_IP:-dummy}
+      WEBFINGER_USERNAME: $WEBFINGER_USERNAME
+      WEBFINGER_HREF: https://pocketid.$BASE_DOMAINNAME
     secrets:
       - cf_dns_api_token
     labels:

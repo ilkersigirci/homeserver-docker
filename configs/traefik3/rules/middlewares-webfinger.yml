@@ -1,0 +1,22 @@
+http:
+  middlewares:
+    middlewares-webfinger:
+      plugin:
+        webfinger:
+          domain: {{env "BASE_DOMAINNAME"}}
+          resources:
+            "acct:{{env "WEBFINGER_USERNAME"}}@{{env "BASE_DOMAINNAME"}}":
+              subject: "acct:{{env "WEBFINGER_USERNAME"}}@{{env "BASE_DOMAINNAME"}}"
+              # aliases:
+              #   - "https://example.com/user"
+              links:
+                ## For tailscale custom OIDC Sign Up
+                - rel: "http://openid.net/specs/connect/1.0/issuer"
+                  href: {{env "WEBFINGER_HREF"}}
+                # - rel: "http://webfinger.net/rel/profile-page"
+                #   type: "text/html"
+                #   href: "https://example.com/user"
+                # - rel: "self"
+                #   type: "application/activity+json"
+                #   href: "https://example.com/users/user"
+          passthrough: false

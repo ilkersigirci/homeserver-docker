@@ -1,5 +1,13 @@
 http:
   routers:
+    webfinger-rtr:
+      rule: "Host(`{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - middlewares-webfinger
+      service: webfinger-svc
+
     jellyfin-redirect-rtr:
       rule: "Host(`jellyfin.{{env "DOMAINNAME"}}`)"
       entryPoints:
@@ -41,6 +49,11 @@ http:
         permanent: true
   
   services:
+    webfinger-svc:
+      loadBalancer:
+        servers:
+          - url: "http://DUMMY"
+
     # jellyfin-svc:
     #   loadBalancer:
     #     servers:
