@@ -1,5 +1,5 @@
 # NOTE: To rebuild: NOT WORKING
-# https://digitalgarden.$DOMAINNAME/rebuild/{REBUILD_WEBHOOK_SECRET}
+# https://notes.$DOMAINNAME/rebuild/{REBUILD_WEBHOOK_SECRET}
 # Add to crontab: 0 1 * * * docker exec quartz /usr/src/app/scripts/build-quartz.sh
 services:
   quartz:
@@ -27,7 +27,7 @@ services:
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.quartz-rtr.entrypoints: "websecure"
-      traefik.http.routers.quartz-rtr.rule: "Host(`digitalgarden.$DOMAINNAME`)"
+      traefik.http.routers.quartz-rtr.rule: "Host(`notes.$DOMAINNAME`)"
       ## Middlewares
       traefik.http.routers.quartz-rtr.middlewares: "chain-tinyauth-relaxed@file" # NOTE: `relaxed` is needed for index page to show all pages
       ## HTTP Services
@@ -37,7 +37,7 @@ services:
       homepage.group: "Reading"
       homepage.name: "Quartz"
       homepage.icon: "obsidian.svg"
-      homepage.href: "https://digitalgarden.$DOMAINNAME"
+      homepage.href: "https://notes.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Static-site generator that transforms Markdown content into fully functional websites"
     profiles:
