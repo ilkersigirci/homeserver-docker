@@ -102,8 +102,9 @@ include:
   #### PHOTO ####
   - compose/immich.yml
   #### READING ####
-  - compose/flatnotes.yml
+  # - compose/flatnotes.yml
   - compose/linkwarden.yml
+  # - compose/many-notes.yml
   - compose/obsidian.yml
   - compose/pdfding.yml
   - compose/rsshub.yml

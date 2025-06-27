@@ -1,0 +1,43 @@
+services:
+  # NOTE: sudo chown -R 33:33 $DOCKERDIR/appdata/many-notes
+  many-notes:
+    container_name: many-notes
+    image: brufdev/many-notes:latest
+    # restart: $OTHERS_RESTART_POLICY
+    restart: "no"
+    profiles:
+      - reading
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/many-notes/db:/var/www/html/database/sqlite
+      - $DOCKERDIR/appdata/many-notes/typesense:/var/www/html/typesense
+      - $DOCKERDIR/logs/many-notes:/var/www/html/storage/logs
+      - $DOCKERDIR/appdata/many-notes/private:/var/www/html/storage/app/private
+      # FIXME: Not working
+      - $NOTESDIR/Markdown:/var/www/html/storage/app/private/vaults/2/my-vault:ro
+    environment:
+      APP_URL: https://many-notes.$DOMAINNAME
+      APP_TIMEZONE: $TZ
+      PHP_POST_MAX_SIZE: 500M
+      PHP_UPLOAD_MAX_FILE_SIZE: 500M
+      SETTINGS_REGISTRATION_ENABLED: true
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.many-notes-rtr.entrypoints: "websecure"
+      traefik.http.routers.many-notes-rtr.rule: "Host(`many-notes.$DOMAINNAME`)"
+      ## Middlewares
+      # traefik.http.routers.many-notes-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.many-notes-rtr.service: "many-notes-svc"
+      traefik.http.services.many-notes-svc.loadbalancer.server.port: "8080"
+      ####### HOMEPAGE #######
+      homepage.group: "Reading"
+      homepage.name: "many-notes"
+      homepage.icon: "many-notes.svg"
+      homepage.href: "https://many-notes.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Markdown note-taking web application designed for simplicity"

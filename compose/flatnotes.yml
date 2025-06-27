@@ -1,9 +1,10 @@
 services:
   flatnotes:
     container_name: flatnotes
-    # image: dullage/flatnotes:latest
-    image: dullage/flatnotes:v3.0.0-rc.3
+    image: dullage/flatnotes:latest
     restart: $OTHERS_RESTART_POLICY
+    profiles:
+      - reading
     networks:
       - t3_proxy
     security_opt:
@@ -21,13 +22,13 @@ services:
     labels:
       traefik.enable: "true"
       ## HTTP Routers
-      traefik.http.routers.notes-rtr.entrypoints: "websecure"
-      traefik.http.routers.notes-rtr.rule: "Host(`notes.$DOMAINNAME`)"
+      traefik.http.routers.flatnotes-rtr.entrypoints: "websecure"
+      traefik.http.routers.flatnotes-rtr.rule: "Host(`flatnotes.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.notes-rtr.middlewares: "chain-tinyauth@file"
+      traefik.http.routers.flatnotes-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      traefik.http.routers.notes-rtr.service: "notes-svc"
-      traefik.http.services.notes-svc.loadbalancer.server.port: "8080"
+      traefik.http.routers.flatnotes-rtr.service: "flatnotes-svc"
+      traefik.http.services.flatnotes-svc.loadbalancer.server.port: "8080"
       ####### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "Flatnotes"
@@ -35,5 +36,3 @@ services:
       homepage.href: "https://flatnotes.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "No Directory Markdown Viewer/Editor"
-    profiles:
-      - reading
