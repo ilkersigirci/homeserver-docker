@@ -1,0 +1,71 @@
+services:
+  splitpro-db:
+    image: postgres:16.4
+    container_name: splitpro-db
+    restart: $MEDIA_RESTART_POLICY
+    profiles:
+      - media
+      - splitpro
+    environment:
+      PGDATA: /pgdata
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    networks:
+      - t3_proxy
+    expose:
+      - "5432"
+    volumes:
+      - $DATADIR/splitpro-db:/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  splitpro:
+    image: ghcr.io/oss-apps/splitpro:latest
+    container_name: splitpro
+    restart: $MEDIA_RESTART_POLICY
+    depends_on:
+      splitpro-db:
+        condition: service_healthy
+    profiles:
+      - media
+      - splitpro
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgresql://postgres:postgres@splitpro-db:5432/postgres
+      NEXTAUTH_URL: https://splitpro.$DOMAINNAME
+      NEXTAUTH_SECRET: $SPLITPRO_NEXTAUTH_SECRET
+      ENABLE_SENDING_INVITES: false
+      # OIDC Setup - Don't mind the `Authentik` part, it works with Pocket ID
+      AUTHENTIK_ID: $SPLITPRO_CLIENT_ID
+      AUTHENTIK_SECRET: $SPLITPRO_CLIENT_SECRET
+      AUTHENTIK_ISSUER: https://pocketid.$BASE_DOMAINNAME
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.splitpro-rtr.entrypoints: websecure
+      traefik.http.routers.splitpro-rtr.rule: Host(`splitpro.$DOMAINNAME`)
+      ## Middlewares
+      traefik.http.routers.splitpro-rtr.middlewares: chain-no-auth-relaxed@file
+      ## HTTP Services
+      traefik.http.routers.splitpro-rtr.service: splitpro-svc
+      traefik.http.services.splitpro-svc.loadbalancer.server.port: "3000"
+      ####### HOMEPAGE #######
+      homepage.group: Media
+      homepage.name: splitpro
+      homepage.icon: splitpro.png
+      homepage.href: https://splitpro.$DOMAINNAME
+      homepage.target: _blank
+      homepage.description: Open source alternative to Splitwise
+      ####### GLANCE #######
+      glance.name: splitpro
+      glance.icon: sh:splitpro
+      glance.url: https://splitpro.$DOMAINNAME
+      glance.description: Open source alternative to Splitwise
