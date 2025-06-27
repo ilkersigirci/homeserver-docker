@@ -63,6 +63,7 @@ include:
   # - compose/vaultwarden.yml
   - compose/wg-easy.yml
   #### DESKTOP APPS ####
+  - compose/firefox.yml
   #### MACHINE LEARNING ####
   ###### MAINTENANCE ####
   # - compose/code-server.yml

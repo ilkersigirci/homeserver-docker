@@ -12,8 +12,10 @@ services:
     container_name: firefox
     image: lscr.io/linuxserver/firefox:latest
     restart: $DESKTOP_IMAGES_RESTART_POLICY
-    <<: *gpu-deploy
+    # <<: *gpu-deploy
     shm_size: "1gb"
+    profiles:
+      - desktop_apps
     networks:
       - t3_proxy
     security_opt:
@@ -48,5 +50,3 @@ services:
       interval: 1m
       timeout: 5s
       retries: 3
-    profiles:
-      - desktop_apps
