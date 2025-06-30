@@ -1,0 +1,55 @@
+## Import strava data:
+# docker exec strava-statistics bin/console app:strava:import-data
+## Build static files:
+# docker exec strava-statistics bin/console app:strava:build-files
+## NOTE: Everytime you import data, you need to rebuild the HTML files to see the changes. 
+services:
+  strava-statistics:
+    image: robiningelbrecht/strava-statistics:latest
+    container_name: strava-statistics
+    restart: $MEDIA_RESTART_POLICY
+    profiles:
+      - media
+    networks:
+      - t3_proxy
+    ports:
+      - "8080:80"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $CONFIGDIR/strava-statistics:/var/www/config/app:ro
+      - $DOCKERDIR/appdata/strava-statistics/build:/var/www/build
+      - $DOCKERDIR/appdata/strava-statistics/storage/database:/var/www/storage/database
+      - $DOCKERDIR/appdata/strava-statistics/storage/files:/var/www/storage/files
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      STRAVA_CLIENT_ID: $STRAVA_CLIENT_ID
+      STRAVA_CLIENT_SECRET: $STRAVA_CLIENT_SECRET
+      # You will need to obtain this token the first time you launch the app. 
+      # Leave this unchanged for now until the app tells you otherwise.
+      # Do not use the refresh token displayed on your Strava API settings page, it will not work.
+      STRAVA_REFRESH_TOKEN: $STRAVA_REFRESH_TOKEN
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.strava-statistics-rtr.entrypoints: websecure
+      traefik.http.routers.strava-statistics-rtr.rule: Host(`strava.$DOMAINNAME`)
+      ## Middlewares
+      traefik.http.routers.strava-statistics-rtr.middlewares: chain-tinyauth@file
+      ## HTTP Services
+      traefik.http.routers.strava-statistics-rtr.service: strava-statistics-svc
+      traefik.http.services.strava-statistics-svc.loadbalancer.server.port: "8080"
+      ####### HOMEPAGE #######
+      homepage.group: Media
+      homepage.name: strava-statistics
+      homepage.icon: strava-statistics.png
+      homepage.href: https://strava.$DOMAINNAME
+      homepage.target: _blank
+      homepage.description: Dashboard for your Strava data
+      ####### GLANCE #######
+      glance.name: strava-statistics
+      glance.icon: sh:strava-statistics
+      glance.url: https://strava.$DOMAINNAME
+      glance.description: Dashboard for your Strava data

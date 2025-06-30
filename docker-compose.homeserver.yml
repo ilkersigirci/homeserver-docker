@@ -91,6 +91,7 @@ include:
   - compose/mkvtoolnix.yml
   - compose/scotty.yml
   - compose/splitpro.yml
+  - compose/strava-statistics.yml
   - compose/ytptube.yml
   - compose/transmission.yml
   #### ML ####

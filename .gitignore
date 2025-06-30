@@ -12,5 +12,6 @@ configs/*
 !configs/gatus
 !configs/homepage
 !configs/filebrowser
+!configs/strava-statistics
 !configs/traefik3
 !configs/quartz
