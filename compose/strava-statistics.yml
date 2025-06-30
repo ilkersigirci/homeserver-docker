@@ -37,7 +37,7 @@ services:
       traefik.http.routers.strava-statistics-rtr.entrypoints: websecure
       traefik.http.routers.strava-statistics-rtr.rule: Host(`strava.$DOMAINNAME`)
       ## Middlewares
-      traefik.http.routers.strava-statistics-rtr.middlewares: chain-tinyauth@file
+      traefik.http.routers.strava-statistics-rtr.middlewares: chain-tinyauth-relaxed@file
       ## HTTP Services
       traefik.http.routers.strava-statistics-rtr.service: strava-statistics-svc
       traefik.http.services.strava-statistics-svc.loadbalancer.server.port: "8080"
