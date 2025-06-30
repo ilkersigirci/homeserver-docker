@@ -34,10 +34,11 @@ services:
       - --log.level=INFO # (Default: error) DEBUG, INFO, WARN, ERROR, FATAL, PANIC
       - --log.maxsize=1 # Max size in MB of the log file
       - --log.maxbackups=10 # Max number of old log files to keep
-      - --accessLog=true
-      - --accessLog.filePath=/logs/access.log
-      - --accessLog.bufferingSize=100 # Configuring a buffer of 100 lines
-      - --accessLog.filters.statusCodes=204-299,400-499,500-599
+      - --accesslog=true
+      - --accesslog.filePath=/logs/access.log
+      - --accesslog.bufferingSize=100 # Configuring a buffer of 100 lines
+      - --accesslog.filters.statusCodes=204-299,400-499,500-599
+      - --accesslog.fields.names.StartUTC=drop
       - --providers.docker=true
       # - --providers.docker.endpoint=unix:///var/run/docker.sock # Use Docker Socket Proxy instead for improved security
       - --providers.docker.endpoint=tcp://docker-socket-proxy:2375
