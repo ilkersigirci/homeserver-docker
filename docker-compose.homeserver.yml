@@ -88,6 +88,7 @@ include:
   # - compose/jellyfin-vue.yml
   - compose/jellysearch.yml
   - compose/jellyseerr.yml
+  - compose/metadata-remote.yml
   - compose/mkvtoolnix.yml
   - compose/scotty.yml
   - compose/splitpro.yml

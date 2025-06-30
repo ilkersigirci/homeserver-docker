@@ -12,8 +12,6 @@ services:
       - media
     networks:
       - t3_proxy
-    ports:
-      - "8080:80"
     security_opt:
       - no-new-privileges:true
     volumes:
