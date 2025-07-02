@@ -53,6 +53,7 @@ include:
   - compose/crowdsec.yml
   - compose/dufs.yml
   - compose/filebrowser.yml
+  - compose/gotify.yml
   - compose/homepage.yml
   # - compose/glance.yml
   - compose/komodo-periphery.yml

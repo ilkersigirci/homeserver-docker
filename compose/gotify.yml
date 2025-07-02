@@ -1,0 +1,39 @@
+# NOTE: Defeault username is `admin`
+services:
+  gotify:
+    image: ghcr.io/gotify/server:latest
+    container_name: gotify
+    restart: $BASE_RESTART_POLICY
+    profiles:
+      - core
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/gotify:/app/data
+    environment:
+      TZ: $TZ
+      GOTIFY_DEFAULTUSER_PASS: $GOTIFY_DEFAULTUSER_PASS
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.gotify-rtr.entrypoints: websecure
+      traefik.http.routers.gotify-rtr.rule: Host(`gotify.$DOMAINNAME`)
+      ## Middlewares
+      traefik.http.routers.gotify-rtr.middlewares: chain-no-auth-relaxed@file
+      ## HTTP Services
+      traefik.http.routers.gotify-rtr.service: gotify-svc
+      traefik.http.services.gotify-svc.loadbalancer.server.port: "80"
+      ####### HOMEPAGE #######
+      homepage.group: Core
+      homepage.name: gotify
+      homepage.icon: gotify.png
+      homepage.href: https://gotify.$DOMAINNAME
+      homepage.target: _blank
+      homepage.description: A simple server for sending and receiving messages
+      ####### GLANCE #######
+      glance.name: gotify
+      glance.icon: sh:gotify
+      glance.url: https://gotify.$DOMAINNAME
+      glance.description: A simple server for sending and receiving messages
