@@ -76,6 +76,7 @@ include:
   - compose/whoami.yml
   #### MEDIA ####
   - compose/bitplay.yml
+  - compose/mazanoke.yml
   # - compose/palmr.yml
   - compose/stremio.yml
   # - compose/transmission.yml

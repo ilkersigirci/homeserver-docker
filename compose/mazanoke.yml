@@ -1,0 +1,33 @@
+services:
+  mazanoke:
+    image: ghcr.io/civilblur/mazanoke:latest
+    container_name: mazanoke
+    restart: $MEDIA_RESTART_POLICY
+    profiles:
+      - media
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.mazanoke-rtr.entrypoints: websecure
+      traefik.http.routers.mazanoke-rtr.rule: Host(`mazanoke.$DOMAINNAME`)
+      ## Middlewares
+      traefik.http.routers.mazanoke-rtr.middlewares: chain-tinyauth@file
+      ## HTTP Services
+      traefik.http.routers.mazanoke-rtr.service: mazanoke-svc
+      traefik.http.services.mazanoke-svc.loadbalancer.server.port: "80"
+      ####### HOMEPAGE #######
+      homepage.group: Media
+      homepage.name: mazanoke
+      homepage.icon: mazanoke.png
+      homepage.href: https://mazanoke.$DOMAINNAME
+      homepage.target: _blank
+      homepage.description: A local image optimizer that runs in your browser
+      ####### GLANCE #######
+      glance.name: mazanoke
+      glance.icon: sh:mazanoke
+      glance.url: https://mazanoke.$DOMAINNAME
+      glance.description: A local image optimizer that runs in your browser
