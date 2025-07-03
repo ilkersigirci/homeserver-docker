@@ -32,6 +32,9 @@ services:
       homepage.href: https://gotify.$DOMAINNAME
       homepage.target: _blank
       homepage.description: A simple server for sending and receiving messages
+      homepage.widget.type: gotify
+      homepage.widget.url: "http://gotify:80"
+      homepage.widget.key: "$GOTIFY_HOMEPAGE_CLIENT_TOKEN"
       ####### GLANCE #######
       glance.name: gotify
       glance.icon: sh:gotify
