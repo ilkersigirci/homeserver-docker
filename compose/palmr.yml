@@ -13,11 +13,18 @@ services:
       - no-new-privileges:true
     volumes:
       - $DATADIR/palmr:/app/server
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:5487/api/health"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 1m
     environment:
       PALMR_UID: $PUID
       PALMR_GID: $PGID
+      SECURE_SITE: true
       ENABLE_S3: false
-      ENCRYPTION_KEY: lihLw6igalWeRkqwc7LlTQjPv8GFMy3I
+      ENCRYPTION_KEY: $PALMR_ENCRYPTION_KEY
       # MinIO Configuration (only used when ENABLE_S3=true)
       # - ENABLE_S3=true # Set to true to use S3 storage
       # - S3_ENDPOINT=${S3_ENDPOINT} # S3 endpoint (you have to set this to the s3 endpoint of the s3 server) CHANGE THIS TO YOUR S3 ENDPOINT
