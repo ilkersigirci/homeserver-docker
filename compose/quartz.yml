@@ -20,7 +20,7 @@ services:
       AUTO_REBUILD: false
       REBUILD_WEBHOOK_SECRET: $QUARTZ_REBUILD_WEBHOOK_SECRET
       # BUILD_UPDATE_DELAY: 300
-      # NOTIFY_TARGET: $TELEGRAM_APPRISE_FORMAT
+      # NOTIFY_TARGET: $APPRISE_TELEGRAM_URL
       # GIT_REPO: "https://github.com/yourusername/your-quartz-site.git" # Use your custom Quartz repo or leave blank for the default Quartz repo
       # GIT_BRANCH: "v4" # Optional: specify a branch to checkout
     labels:

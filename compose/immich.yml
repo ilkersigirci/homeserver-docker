@@ -129,7 +129,7 @@ services:
       SYNC_MODE: "2" # Remove offline assets and delete empty albums after each run
       # RUN_IMMEDIATELY: "true" # Run the script immediately after start
 
-
+  # NOTE: On Immich -> Admin -> Settings -> Server Settings -> External Domain
   immich-public-proxy:
     container_name: immich-public-proxy
     image: alangrainger/immich-public-proxy:latest
@@ -140,24 +140,18 @@ services:
       - photo
     networks:
       - t3_proxy
+    ports:
+      - "8097:3000"
     environment:
       IMMICH_URL: http://immich-server:2283
     # healthcheck:
     #   test: curl -s http://localhost:3000/share/healthcheck -o /dev/null || exit 1
     #   start_period: 10s
     #   timeout: 5s
+    volumes:
+      - $CONFIGDIR/immich-public-proxy/config.json:/app/config.json:ro
     labels:
-      traefik.enable: "true"
-      ## HTTP Routers
-      traefik.http.routers.immich-public-proxy-rtr.entrypoints: "websecure"
-      traefik.http.routers.immich-public-proxy-rtr.rule: "Host(`photos-share.$DOMAINNAME`)"
-      ## Middlewares
-      traefik.http.routers.immich-public-proxy-rtr.middlewares: "chain-no-auth@file"
-      ## HTTP Services
-      traefik.http.routers.immich-public-proxy-rtr.service: "immich-public-proxy-svc"
-      traefik.http.services.immich-public-proxy-svc.loadbalancer.server.port: "3000"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "Immich-Public-Proxy"
       homepage.icon: "immich.svg"
-      homepage.href: "https://photos-share.$DOMAINNAME"

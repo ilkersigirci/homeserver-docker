@@ -74,6 +74,7 @@ include:
   - compose/dozzle.yml
   - compose/healthchecks.yml
   - compose/it-tools.yml
+  - compose/loggifly.yml
   - compose/minio.yml
   - compose/restfox.yml
   - compose/rustic.yml

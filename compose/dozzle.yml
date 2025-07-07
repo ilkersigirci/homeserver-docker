@@ -14,7 +14,7 @@ services:
       DOZZLE_LEVEL: info
       DOZZLE_FILTER: "status=running"
       # DOZZLE_ENABLE_SHELL: "true" # Enable shell access also in docker-socket-proxy
-      DOZZLE_REMOTE_HOST: ${DOZZLE_REMOTE_HOST:-"tcp://docker-socket-proxy:2375"}
+      DOZZLE_REMOTE_HOST: ${DOCKER_REMOTE_HOSTS:-"tcp://docker-socket-proxy:2375"}
     healthcheck:
       test: ["CMD", "/dozzle", "healthcheck"]
       start_period: 45s

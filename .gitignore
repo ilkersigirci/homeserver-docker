@@ -15,3 +15,4 @@ configs/*
 !configs/strava-statistics
 !configs/traefik3
 !configs/quartz
+!configs/immich-public-proxy

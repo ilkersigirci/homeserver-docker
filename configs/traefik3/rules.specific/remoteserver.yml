@@ -40,6 +40,14 @@ http:
       middlewares:
         - chain-no-auth
       service: pocket-id-svc
+
+    immich-public-proxy-rtr:
+      rule: "Host(`photoshare.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: immich-public-proxy-svc
   
   middlewares:
     jellyfin-redirect:
@@ -72,3 +80,8 @@ http:
         #   path: "/healthz"
         #   interval: "30s"
         #   timeout: "5s"
+
+    immich-public-proxy-svc:
+      loadBalancer:
+        servers:
+          - url: "http://10.8.0.3:8097"

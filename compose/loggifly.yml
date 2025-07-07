@@ -1,0 +1,33 @@
+services:
+  loggifly:
+    image: ghcr.io/clemcer/loggifly:latest
+    container_name: loggifly
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - maintanance
+    networks:
+      - t3_proxy
+      - socket_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $CONFIGDIR/loggifly:/config
+    environment:
+      DOCKER_HOST: $DOCKER_REMOTE_HOSTS
+      TZ: $TZ
+      APPRISE_URL: $APPRISE_GOTIFY_URL
+      CONTAINERS: "traefik,vaultwarden,pocket-id,tinyauth"
+      GLOBAL_KEYWORDS: "error,failed login,password"
+      GLOBAL_KEYWORDS_WITH_ATTACHMENT: "critical"
+      LOG_LEVEL: "INFO"
+    labels:
+      ####### HOMEPAGE #######
+      homepage.group: Maintenance
+      homepage.name: loggifly
+      homepage.icon: loggifly.png
+      homepage.target: _blank
+      homepage.description: Get Alerts from your Docker Container Logs
+      ####### GLANCE #######
+      glance.name: loggifly
+      glance.icon: sh:loggifly
+      glance.description: Get Alerts from your Docker Container Logs
