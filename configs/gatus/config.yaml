@@ -9,7 +9,7 @@ https-default: &https-default
     - "[STATUS] == 200"
     - "[CERTIFICATE_EXPIRATION] > 48h"
   alerts:
-    - type: telegram
+    - type: gotify
       send-on-resolved: true
 
 ping-default: &ping-default
@@ -18,7 +18,7 @@ ping-default: &ping-default
   conditions:
     - "[CONNECTED] == true"
   alerts:
-    - type: telegram
+    - type: gotify
       send-on-resolved: true
 
 ###################################################
@@ -28,9 +28,13 @@ ping-default: &ping-default
 #   path: "postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$DB_HOST:$DB_PORT/$POSTGRES_DB?sslmode=disable"
 
 alerting:
-  telegram:
-    token: $TELEGRAM_BOT_TOKEN
-    id: $TELEGRAM_CHAT_ID
+  # telegram:
+  #   token: $TELEGRAM_BOT_TOKEN
+  #   id: $TELEGRAM_CHAT_ID
+  gotify:
+    server-url: https://gotify.$DOMAINNAME
+    token: $GOTIFY_NOTIFICATION_TOKEN
+    priority: 10
 
 ui:
   custom-css: |
