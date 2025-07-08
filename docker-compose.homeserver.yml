@@ -94,6 +94,7 @@ include:
   - compose/scotty.yml
   - compose/splitpro.yml
   - compose/strava-statistics.yml
+  - compose/yamtrack.yml
   - compose/ytptube.yml
   - compose/transmission.yml
   #### ML ####

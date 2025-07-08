@@ -1,0 +1,93 @@
+services:
+  yamtrack-redis:
+    image: redis:7-alpine
+    container_name: yamtrack-redis
+    restart: $MEDIA_RESTART_POLICY
+    profiles:
+      - media
+      - yamtrack
+    networks:
+      - t3_proxy
+    expose:
+      - "6379"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/yamtrack/redis:/data
+
+  # NOTE: Optional, yamtrack uses Sqlite by default
+  yamtrack-postgres-db:
+    image: postgres:16-alpine
+    container_name: yamtrack-postgres-db
+    restart: $MEDIA_RESTART_POLICY
+    profiles:
+      - not-used
+      - yamtrack
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      POSTGRES_DB: yamtrack
+      POSTGRES_USER: yamtrack
+      POSTGRES_PASSWORD: yamtrack
+    volumes:
+      - $DATADIR/yamtrack:/var/lib/postgresql/data
+
+  # NOTE: First REGISTRATION=True, create account using OIDC and REGISTRATION=False
+  yamtrack:
+    image: ghcr.io/fuzzygrim/yamtrack
+    container_name: yamtrack
+    restart: $MEDIA_RESTART_POLICY
+    depends_on:
+      - yamtrack-redis
+    profiles:
+      - media
+      - yamtrack
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DATADIR/yamtrack:/yamtrack/db
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      URLS: https://mediatrack.$DOMAINNAME
+      SECRET: $YAMTRACK_SECRET
+      REDIS_URL: redis://yamtrack-redis:6379
+      ADMIN_ENABLED: True
+      REGISTRATION: False
+      REDIRECT_LOGIN_TO_SSO: True
+      # ACCOUNT_DEFAULT_HTTP_PROTOCOL: https
+      SOCIAL_PROVIDERS: allauth.socialaccount.providers.openid_connect
+      SOCIALACCOUNT_PROVIDERS: '{"openid_connect":{"OAUTH_PKCE_ENABLED":true,"APPS":[{"provider_id":"pocketid","name":"Pocket-ID","client_id":"$YAMTRACK_CLIENT_ID","secret":"$YAMTRACK_CLIENT_SECRET","settings":{"server_url":"https://pocketid.$BASE_DOMAINNAME/.well-known/openid-configuration"}}]}}'
+      # (Optional) For Postgres
+      # DB_HOST: db
+      # DB_NAME: yamtrack
+      # DB_USER: yamtrack
+      # DB_PASSWORD: yamtrack
+      # DB_PORT: 5432
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.yamtrack-rtr.entrypoints: websecure
+      traefik.http.routers.yamtrack-rtr.rule: Host(`mediatrack.$DOMAINNAME`)
+      ## Middlewares
+      traefik.http.routers.yamtrack-rtr.middlewares: chain-no-auth-relaxed@file
+      ## HTTP Services
+      traefik.http.routers.yamtrack-rtr.service: yamtrack-svc
+      traefik.http.services.yamtrack-svc.loadbalancer.server.port: "8000"
+      ####### HOMEPAGE #######
+      homepage.group: Media
+      homepage.name: yamtrack
+      homepage.icon: yamtrack.png
+      homepage.href: https://mediatrack.$DOMAINNAME
+      homepage.target: _blank
+      homepage.description: A self hosted media tracker.
+      ####### GLANCE #######
+      glance.name: yamtrack
+      glance.icon: sh:yamtrack
+      glance.url: https://mediatrack.$DOMAINNAME
+      glance.description: A self hosted media tracker. 
