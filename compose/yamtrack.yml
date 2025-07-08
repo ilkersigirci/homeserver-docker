@@ -90,4 +90,4 @@ services:
       glance.name: yamtrack
       glance.icon: sh:yamtrack
       glance.url: https://mediatrack.$DOMAINNAME
-      glance.description: A self hosted media tracker. 
+      glance.description: A self hosted media tracker.
