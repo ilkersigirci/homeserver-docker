@@ -89,8 +89,8 @@ services:
       traefik.http.routers.immich-server-rtr.rule: "Host(`photos.$DOMAINNAME`)"
       # - "traefik.http.routers.immich-server-rtr.rule=Host(`photos.$DOMAINNAME`) && Pathprefix(`/api`)"
       ## Middlewares
-      # traefik.http.routers.immich-server-rtr.middlewares: "chain-no-auth-relaxed@file" # NOTE: relaxed needed for `Map` tab to work
       traefik.http.routers.immich-server-rtr.middlewares: "chain-tinyauth-relaxed@file" # NOTE: relaxed needed for `Map` tab to work
+      # traefik.http.routers.immich-server-rtr.middlewares: "chain-no-auth-relaxed@file" # NOTE: relaxed needed for `Map` tab to work
       # - "traefik.http.routers.immich-server-rtr.middlewares=add-api"
       # - "traefik.http.middlewares.add-api.stripprefix.prefixes=/api"
       ## HTTP Services

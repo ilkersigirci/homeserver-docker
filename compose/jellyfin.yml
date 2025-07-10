@@ -33,7 +33,8 @@ services:
       traefik.http.routers.jellyfin-rtr.entrypoints: "websecure"
       traefik.http.routers.jellyfin-rtr.rule: "Host(`jellyfin.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.jellyfin-rtr.middlewares: "chain-no-auth-relaxed@file"
+      traefik.http.routers.jellyfin-rtr.middlewares: "chain-tinyauth-relaxed@file"
+      # traefik.http.routers.jellyfin-rtr.middlewares: "chain-no-auth-relaxed@file"
       ## HTTP Services
       traefik.http.routers.jellyfin-rtr.service: "jellyfin-svc"
       traefik.http.services.jellyfin-svc.loadbalancer.server.port: "8096"

@@ -22,7 +22,8 @@ services:
       traefik.http.routers.gotify-rtr.entrypoints: websecure
       traefik.http.routers.gotify-rtr.rule: Host(`gotify.$DOMAINNAME`)
       ## Middlewares
-      traefik.http.routers.gotify-rtr.middlewares: chain-no-auth-relaxed@file
+      traefik.http.routers.gotify-rtr.middlewares: chain-tinyauth-relaxed@file
+      # traefik.http.routers.gotify-rtr.middlewares: chain-no-auth-relaxed@file
       ## HTTP Services
       traefik.http.routers.gotify-rtr.service: gotify-svc
       traefik.http.services.gotify-svc.loadbalancer.server.port: "80"

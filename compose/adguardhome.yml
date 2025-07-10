@@ -44,8 +44,8 @@ services:
       traefik.http.routers.adguardhome-rtr.entrypoints: "websecure"
       traefik.http.routers.adguardhome-rtr.rule: "Host(`adguardhome.$DOMAINNAME`)" # Also used for DoH
       ## Middlewares
-      # traefik.http.routers.adguardhome-rtr.middlewares: "chain-tinyauth@file" # NOTE: Probably gives error when using DoH
-      traefik.http.routers.adguardhome-rtr.middlewares: "chain-no-auth@file" # NOTE: Needed for AdGuard Home Manager Android app
+      traefik.http.routers.adguardhome-rtr.middlewares: "chain-tinyauth@file"
+      # traefik.http.routers.adguardhome-rtr.middlewares: "chain-no-auth@file" # NOTE: Needed for AdGuard Home Manager Android app
       ## HTTP Services
       traefik.http.routers.adguardhome-rtr.service: "adguardhome-svc"
       # - "traefik.http.services.adguardhome-svc.loadbalancer.server.port=3000" # Initial wizard port

@@ -54,7 +54,8 @@ services:
       traefik.http.routers.splitpro-rtr.entrypoints: websecure
       traefik.http.routers.splitpro-rtr.rule: Host(`splitpro.$DOMAINNAME`)
       ## Middlewares
-      traefik.http.routers.splitpro-rtr.middlewares: chain-no-auth-relaxed@file
+      traefik.http.routers.jellyseerr-rtr.middlewares: "chain-tinyauth-relaxed@file"
+      # traefik.http.routers.splitpro-rtr.middlewares: chain-no-auth-relaxed@file
       ## HTTP Services
       traefik.http.routers.splitpro-rtr.service: splitpro-svc
       traefik.http.services.splitpro-svc.loadbalancer.server.port: "3000"

@@ -36,7 +36,8 @@ services:
       traefik.http.routers.lidarr-rtr.rule: "Host(`lidarr.$DOMAINNAME`)"
       traefik.http.routers.lidarr-rtr.priority: "99"
       # Middlewares
-      traefik.http.routers.lidarr-rtr-bypass.middlewares: "chain-no-auth@file"
+      traefik.http.routers.jellyseerr-rtr.middlewares: "chain-tinyauth@file"
+      # traefik.http.routers.lidarr-rtr-bypass.middlewares: "chain-no-auth@file"
       traefik.http.routers.lidarr-rtr.middlewares: "chain-tinyauth@file"
       # HTTP Services
       traefik.http.routers.lidarr-rtr.service: "lidarr-svc"
