@@ -20,7 +20,7 @@ services:
       SECRET: $TINYAUTH_SECRET
       COOKIE_SECURE: "true"
       DISABLE_CONTINUE: "true"
-      LOG_LEVEL: "0"
+      LOG_LEVEL: "5"
       # USERS: $TINYAUTH_USERS
       USERS_FILE: users_file
       LOGIN_MAX_RETRIES: 5

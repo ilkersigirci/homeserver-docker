@@ -89,6 +89,7 @@ services:
     #   - host.docker.internal:host-gateway
     labels:
       komodo.skip: # Prevent Komodo from stopping with StopAllContainers
+      tinyauth.domain: komodo.$DOMAINNAME
       tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
