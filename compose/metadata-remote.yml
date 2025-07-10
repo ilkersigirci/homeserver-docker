@@ -17,6 +17,7 @@ services:
       PUID: $PUID
       PGID: $PGID
     labels:
+      tinyauth.domain: music-metadata.$DOMAINNAME
       tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers

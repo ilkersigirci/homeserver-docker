@@ -24,6 +24,7 @@ services:
       # GIT_REPO: "https://github.com/yourusername/your-quartz-site.git" # Use your custom Quartz repo or leave blank for the default Quartz repo
       # GIT_BRANCH: "v4" # Optional: specify a branch to checkout
     labels:
+      tinyauth.domain: notes.$DOMAINNAME
       tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
