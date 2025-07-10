@@ -51,6 +51,7 @@ include:
   - compose/crowdsec.yml
   - compose/dufs.yml
   - compose/filebrowser.yml
+  - compose/home-assistant.yml
   - compose/homepage.yml
   - compose/glance.yml
   - compose/komodo.yml

@@ -1,0 +1,72 @@
+services:
+  home-assistant-db:
+    image: postgres:16.4
+    container_name: home-assistant-db
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - monitoring
+      - home-assistant
+    environment:
+      PGDATA: /pgdata
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    networks:
+      - t3_proxy
+    expose:
+      - "5432"
+    volumes:
+      - $DATADIR/home-assistant-db:/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  home-assistant:
+    image: ghcr.io/home-assistant/home-assistant:stable
+    # image: lscr.io/linuxserver/homeassistant:latest
+    container_name: home-assistant
+    restart: $MAINTENANCE_RESTART_POLICY
+    depends_on:
+      home-assistant-db:
+        condition: service_healthy
+    profiles:
+      - monitoring
+      - home-assistant
+    networks:
+      - t3_proxy
+    # cap_add:
+    #   - NET_ADMIN
+    #   - NET_RAW
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $CONFIGDIR/home-assistant:/config
+      - /etc/localtime:/etc/localtime:ro
+      # - /run/dbus:/run/dbus:ro
+    environment:
+      TZ: $TZ
+    labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.home-assistant-rtr.entrypoints: websecure
+      traefik.http.routers.home-assistant-rtr.rule: Host(`home-assistant.$DOMAINNAME`)
+      ## Middlewares
+      traefik.http.routers.home-assistant-rtr.middlewares: chain-tinyauth-relaxed@file
+      ## HTTP Services
+      traefik.http.routers.home-assistant-rtr.service: home-assistant-svc
+      traefik.http.services.home-assistant-svc.loadbalancer.server.port: "8123"
+      ####### HOMEPAGE #######
+      homepage.group: Monitoring
+      homepage.name: home-assistant
+      homepage.icon: home-assistant.png
+      homepage.href: https://home-assistant.$DOMAINNAME
+      homepage.target: _blank
+      homepage.description: Home automation
+      ####### GLANCE #######
+      glance.name: home-assistant
+      glance.icon: sh:home-assistant
+      glance.url: https://home-assistant.$DOMAINNAME
+      glance.description: Home automation
