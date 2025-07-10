@@ -70,6 +70,7 @@ services:
       # DB_PASSWORD: yamtrack
       # DB_PORT: 5432
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.yamtrack-rtr.entrypoints: websecure

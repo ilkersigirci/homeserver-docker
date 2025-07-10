@@ -28,6 +28,7 @@ services:
       HOMEPAGE_VAR_BESZEL_EMAIL: $BESZEL_EMAIL
       HOMEPAGE_VAR_BESZEL_PASSWORD: $BESZEL_PASSWORD
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.homepage-rtr.entrypoints: "websecure"

@@ -14,6 +14,7 @@ services:
     volumes:
       - $DATADIR/vaultwarden:/data/
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.vaultwarden-rtr.entrypoints: "websecure"

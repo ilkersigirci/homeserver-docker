@@ -13,6 +13,7 @@ services:
       TZ: $TZ
       TITLE: Krita
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.krita-rtr.entrypoints: "websecure"

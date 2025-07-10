@@ -40,6 +40,7 @@ services:
       OPENAI_API_BASE_URLS: https://api.openai.com/v1;$OPENROUTER_API_BASE_URL
       OPENAI_API_KEYS: $OPENAI_API_KEY;$OPENROUTER_API_KEY
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.open-webui-rtr.entrypoints: "websecure"
@@ -75,6 +76,7 @@ services:
       OPENAI_API_KEY: $OPENAI_API_KEY
       WEBUI_NAME: BetusGPT
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.open-webui-betus-rtr.entrypoints: "websecure"

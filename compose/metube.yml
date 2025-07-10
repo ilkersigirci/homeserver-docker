@@ -18,6 +18,7 @@ services:
       YTDL_OPTIONS: '{"writethumbnail": true, "writeinfojson": true}' # "writeinfojson": true,
       # - YTDL_OPTIONS={"cookiefile":"/cookies/cookies.txt"}
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers Auth
       traefik.http.routers.metube-rtr.entrypoints: "websecure"

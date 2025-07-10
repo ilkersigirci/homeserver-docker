@@ -19,8 +19,9 @@ services:
       CLEAN_TMP_DIR: 1
       DISPLAY_WIDTH: 1920
       DISPLAY_HEIGHT: 1080
-    #      VNC_PASSWORD: $JDOWN_VNC_PASSWD
+      # VNC_PASSWORD: $JDOWN_VNC_PASSWD
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.jdownloader-rtr.entrypoints: "websecure"

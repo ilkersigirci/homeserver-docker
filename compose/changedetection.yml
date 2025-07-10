@@ -19,6 +19,7 @@ services:
       DISABLE_VERSION_CHECK: true
       BASE_URL: https://changedetection.$DOMAINNAME
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.changedetection-rtr.entrypoints: "websecure"

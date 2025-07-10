@@ -50,6 +50,7 @@ services:
       DOMAINNAME: $DOMAINNAME
       GOTIFY_NOTIFICATION_TOKEN: $GOTIFY_NOTIFICATION_TOKEN
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.gatus-rtr.entrypoints: "websecure"

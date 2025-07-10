@@ -26,6 +26,7 @@ services:
       TZ: $TZ
       TITLE: Firefox
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.firefox-rtr.entrypoints: "websecure"

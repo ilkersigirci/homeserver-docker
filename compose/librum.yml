@@ -43,6 +43,7 @@ services:
       AdminEmail: admin@mail.com
       AdminPassword: strongPassword123
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.librum-rtr.entrypoints: "websecure"

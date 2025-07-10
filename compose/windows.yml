@@ -36,6 +36,7 @@ services:
       KEYBOARD: "en-US"
       # ARGUMENTS: "-device usb-host,vendorid=0x1234,productid=0x1234" # NOTE: For usb device
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.windows-rtr.entrypoints: "websecure"

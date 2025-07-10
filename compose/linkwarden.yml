@@ -41,6 +41,7 @@ services:
       NEXT_PUBLIC_DISABLE_REGISTRATION: true
       NEXT_PUBLIC_CREDENTIALS_ENABLED: true
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.linkwarden-rtr.entrypoints: "websecure"

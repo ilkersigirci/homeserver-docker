@@ -48,6 +48,7 @@ services:
       AUTHENTIK_SECRET: $SPLITPRO_CLIENT_SECRET
       AUTHENTIK_ISSUER: https://pocketid.$BASE_DOMAINNAME
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.splitpro-rtr.entrypoints: websecure

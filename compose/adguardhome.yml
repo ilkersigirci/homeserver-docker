@@ -38,6 +38,7 @@ services:
     environment:
       TZ: $TZ
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.adguardhome-rtr.entrypoints: "websecure"

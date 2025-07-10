@@ -20,6 +20,7 @@ services:
       KASM_PORT: 4433
       TZ: $TZ
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.kasm-rtr.entrypoints: "websecure"

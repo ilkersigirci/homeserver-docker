@@ -21,6 +21,7 @@ services:
       LOG_LEVEL: debug
       PORT: 5055
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.jellyseerr-rtr.entrypoints: "websecure"

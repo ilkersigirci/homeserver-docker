@@ -22,7 +22,7 @@ services:
       TZ: $TZ
       # - DOCKER_MODS=linuxserver/mods:universal-git
     labels:
-      com.centurylinklabs.watchtower.enable: "false" # For disabling watchtower
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.obsidian-custom-rtr.entrypoints: "websecure"

@@ -10,6 +10,7 @@ services:
       # volumes:
       # - $NOTESDIR:/notes
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.logseq-rtr.entrypoints: "websecure"

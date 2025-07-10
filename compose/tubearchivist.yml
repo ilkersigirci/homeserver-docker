@@ -17,6 +17,7 @@ services:
       TZ: $TZ
       ELASTIC_PASSWORD: admin
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers Auth
       traefik.http.routers.tubearchivist-rtr.entrypoints: "websecure"

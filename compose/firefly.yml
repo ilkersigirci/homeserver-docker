@@ -18,6 +18,7 @@ services:
     secrets:
       - firefly_app_key
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.firefly-rtr.entrypoints: "websecure"

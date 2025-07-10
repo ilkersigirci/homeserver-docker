@@ -12,6 +12,7 @@ services:
     volumes:
       - $CONFIGDIR/webfinger:/usr/share/nginx/html:ro
     labels:
+      # tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.webfinger-rtr.entrypoints: "websecure"

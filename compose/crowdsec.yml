@@ -28,6 +28,7 @@ services:
         # AGENT_PASSWORD: $CROWDSEC_AGENT_PASSWORD 
         # LOCAL_API_URL: $CROWDSEC_LOCAL_API_URL 
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       komodo.skip: # Prevents from stopping with StopAllContainers on Komodo
       ####### HOMEPAGE #######
       homepage.group: "Core"

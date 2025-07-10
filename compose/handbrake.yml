@@ -18,6 +18,7 @@ services:
       AUTOMATED_CONVERSION_KEEP_SOURCE: 1
       VNC_PASSWORD: $HANDBRAKE_VNC_PASSWD
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.handbrake-rtr.entrypoints: "websecure"

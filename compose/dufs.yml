@@ -24,6 +24,7 @@ services:
       DUFS_BIND: 0.0.0.0
       DUFS_PORT: 5000
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.dufs-rtr.entrypoints: "websecure"

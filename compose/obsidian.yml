@@ -68,6 +68,7 @@ services:
     profiles:
       - reading
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.obsidian-rtr.entrypoints: "websecure"

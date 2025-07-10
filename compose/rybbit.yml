@@ -95,6 +95,7 @@ services:
       retries: 5
       start_period: 10s
     labels:
+      # tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.rybbit-api-rtr.entrypoints: "websecure"
@@ -135,6 +136,7 @@ services:
       NEXT_PUBLIC_BACKEND_URL: https://analytics.$DOMAINNAME
       NEXT_PUBLIC_DISABLE_SIGNUP: ${RYBBIT_DISABLE_SIGNUP:-true}
     labels:
+      # tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.rybbit-rtr.entrypoints: "websecure"

@@ -23,8 +23,12 @@ services:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
+    # FIXME: NOT WORKING, gives
+    # [error] failed to initialize database, got error unable to open database file: out of memory (14)
+    # Error: unable to open database file: out of memory (14)
     volumes:
-      - $CONFIGDIR/scotty:/config:rw
+      - $CONFIGDIR/scotty.toml:/config/scotty.toml:rw
+      - $CONFIGDIR/scotty.sqlite3:/root/.config/scotty/scotty.sqlite3:rw
     environment:
       PUID: $PUID
       PGID: $PGID

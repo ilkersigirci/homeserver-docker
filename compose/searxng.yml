@@ -24,6 +24,7 @@ services:
       UWSGI_WORKERS: 4
       UWSGI_THREADS: 4
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.searxng-rtr.entrypoints: "websecure"

@@ -20,6 +20,7 @@ services:
       # - APP_ROOT_PATH=/
       # - ALLOW_GOOGLE_VISIBILITY=true
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers Auth
       traefik.http.routers.stirlingpdf-rtr.entrypoints: "websecure"

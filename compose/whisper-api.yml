@@ -23,6 +23,7 @@ services:
     environment:
       ASR_MODEL: base
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.whisper-api-rtr.entrypoints: "websecure"

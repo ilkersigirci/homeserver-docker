@@ -20,6 +20,7 @@ services:
       - $DOCKERDIR/appdata/sd-next:/mnt/data:rw
       - $MLMODELSDIR/sdnext:/mnt/models:ro
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.sdnext-rtr.entrypoints: "websecure"

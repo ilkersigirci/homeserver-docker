@@ -19,6 +19,7 @@ services:
       TZ: $TZ
       TITLE: Debian on the Browser
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.webtop-rtr.entrypoints: "websecure"

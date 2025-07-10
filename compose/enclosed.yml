@@ -8,6 +8,7 @@ services:
     security_opt:
       - no-new-privileges:true
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.enclosed.entrypoints: "websecure"

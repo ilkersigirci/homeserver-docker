@@ -14,6 +14,7 @@ services:
       # NOTE: create the directory before running the container
       - $CONFIGDIR/bitplay:/app/config
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.bitplay-rtr.entrypoints: "websecure"

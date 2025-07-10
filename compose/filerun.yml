@@ -55,6 +55,7 @@ services:
       APACHE_RUN_GROUP: www-data
       APACHE_RUN_GROUP_ID: 33
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.filerun-rtr.entrypoints: "websecure"

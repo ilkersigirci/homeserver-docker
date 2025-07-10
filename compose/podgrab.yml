@@ -13,6 +13,7 @@ services:
     environment:
       CHECK_FREQUENCY: 240
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers Auth
       traefik.http.routers.podgrab-rtr.entrypoints: "websecure"

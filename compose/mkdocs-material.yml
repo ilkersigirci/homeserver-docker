@@ -16,6 +16,7 @@ services:
       PGID: $PGID
       TZ: $TZ
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.mkdocs-material-rtr.entrypoints: "websecure"

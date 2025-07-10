@@ -17,6 +17,7 @@ services:
       # - HTTP_USER=admin
       # - HTTP_PASS=admin
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers Auth
       traefik.http.routers.tubesync-rtr.entrypoints: "websecure"

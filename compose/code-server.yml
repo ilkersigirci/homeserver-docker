@@ -24,6 +24,7 @@ services:
       # SUDO_PASSWORD_HASH: 
       # PROXY_DOMAIN: code-server-ls.my.domain
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.code-server-rtr.entrypoints: "websecure"

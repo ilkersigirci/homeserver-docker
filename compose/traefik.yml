@@ -128,8 +128,9 @@ services:
     secrets:
       - cf_dns_api_token
     labels:
-      komodo.skip: # Prevents from stopping with StopAllContainers on Komodo
       #- "autoheal=true"
+      komodo.skip: # Prevents from stopping with StopAllContainers on Komodo
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       # HTTP Routers
       traefik.http.routers.traefik-rtr.entrypoints: "websecure"

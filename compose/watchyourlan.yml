@@ -28,6 +28,7 @@ services:
       THEME: "sand" # optional
       COLOR: "dark" # optional
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.watchyourlan-rtr.entrypoints: "websecure"

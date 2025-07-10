@@ -27,6 +27,7 @@ services:
       - $MEDIADIR:/media/local:ro
       # - $ONEDRIVEDIR:/media/onedrive:ro
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.jellyfin-rtr.entrypoints: "websecure"

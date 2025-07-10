@@ -10,15 +10,17 @@ services:
       - core
     networks:
       - t3_proxy
+      - socket_proxy
     security_opt:
       - no-new-privileges:true
     environment:
+      DOCKER_HOST: "tcp://docker-socket-proxy:2375"
       APP_TITLE: Single Sign-On
       APP_URL: https://tinyauth.$DOMAINNAME
       SECRET: $TINYAUTH_SECRET
       COOKIE_SECURE: "true"
       DISABLE_CONTINUE: "true"
-      # LOG_LEVEL: "5"
+      LOG_LEVEL: "0"
       # USERS: $TINYAUTH_USERS
       USERS_FILE: users_file
       LOGIN_MAX_RETRIES: 5

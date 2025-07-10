@@ -35,6 +35,7 @@ services:
       # GLANCES_OPT: "-w" # "-C /glances/conf/glances.conf --export influxdb"
       GLANCES_OPT: "-C /glances/conf/glances.conf -w"
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.glances-rtr.entrypoints: "websecure"

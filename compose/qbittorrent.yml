@@ -20,6 +20,7 @@ services:
       TZ: $TZ
       WEBUI_PORT: 8080
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers Auth
       traefik.http.routers.qbittorrent-rtr.entrypoints: "websecure"

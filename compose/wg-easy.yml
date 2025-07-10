@@ -50,6 +50,7 @@ services:
       retries: 3
     labels:
       komodo.skip: # Prevents from stopping with StopAllContainers on Komodo
+      # tinyauth.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "Wg-Easy"

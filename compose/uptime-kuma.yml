@@ -20,6 +20,7 @@ services:
       AUTOKUMA__DOCKER__LABEL_PREFIX: traefik
       AUTOKUMA__DOCKER__SOURCE: Containers
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.autokuma-rtr.entrypoints: "websecure"
@@ -51,6 +52,7 @@ services:
       UPTIME_KUMA_PORT: 3001
       DATA_DIR: /app/data
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.uptime-kuma-rtr.entrypoints: "websecure"

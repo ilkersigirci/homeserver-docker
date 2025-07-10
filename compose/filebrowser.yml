@@ -24,6 +24,7 @@ services:
       TZ: $TZ
       FB_NOAUTH: true # NOTE: If you change it, remove and re-create database.db
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.filebrowser-rtr.entrypoints: "websecure"

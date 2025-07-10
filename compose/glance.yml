@@ -19,7 +19,6 @@ services:
       CHANGEDETECTION_API_KEY: $CHANGEDETECTION_API_KEY
       TMDB_API_READ_ACCESS_TOKEN: $TMDB_API_READ_ACCESS_TOKEN
       TAILSCALE_API_KEY: $TAILSCALE_KEY
-      # JELLYFIN_URL: https://jellyfin.$DOMAINNAME
       JELLYFIN_URL: http://jellyfin:8096
       JELLYFIN_USER_ID: $JELLYFIN_USER_ID
       JELLYFIN_KEY: $JELLYFIN_API_KEY
@@ -27,6 +26,7 @@ services:
       WG_EASY_USERNAME: ${WG_EASY_USERNAME:-DUMMY} # NOTE: Not needed for wg-easy-14
       WG_EASY_PASSWORD: ${WG_EASY_PASSWORD:-DUMMY} # NOTE: Not needed for wg-easy-14
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.glance-rtr.entrypoints: "websecure"

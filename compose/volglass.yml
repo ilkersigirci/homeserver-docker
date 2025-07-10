@@ -20,6 +20,7 @@ services:
       TZ: $TZ
       # - DOCKER_MODS=linuxserver/mods:universal-git
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.volglass-rtr.entrypoints: "websecure"

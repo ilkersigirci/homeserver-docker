@@ -9,6 +9,7 @@ services:
     networks:
       - t3_proxy
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.movieweb-rtr.entrypoints: "websecure"

@@ -18,6 +18,7 @@ services:
       UMASK_SET: 022
       DEEMIX_SINGLE_USER: true
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers Auth
       traefik.http.routers.deemix-rtr.entrypoints: "websecure"

@@ -24,6 +24,7 @@ services:
       DEBUG: "False"
       ALLOWED_HOSTS: localhost,healthchecks.$DOMAINNAME
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.healthchecks-rtr.entrypoints: "websecure"

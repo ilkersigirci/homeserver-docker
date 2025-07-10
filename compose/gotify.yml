@@ -16,6 +16,7 @@ services:
       TZ: $TZ
       GOTIFY_DEFAULTUSER_PASS: $GOTIFY_DEFAULTUSER_PASS
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.gotify-rtr.entrypoints: websecure

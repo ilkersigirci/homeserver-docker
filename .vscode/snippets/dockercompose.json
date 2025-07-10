@@ -22,6 +22,7 @@
             "    PGID: \\$PGID",
             "    TZ: \\$TZ",
             "  labels:",
+            "    tinyauth.ip.bypass: \\$LOCAL_IPS",
             "    traefik.enable: \"true\"",
             "    ## HTTP Routers",
             "    traefik.http.routers.${1:servicename}-rtr.entrypoints: websecure",

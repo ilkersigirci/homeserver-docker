@@ -22,6 +22,7 @@ services:
       timeout: 5s
       retries: 3
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.dozzle-rtr.entrypoints: "websecure"

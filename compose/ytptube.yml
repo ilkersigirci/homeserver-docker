@@ -29,6 +29,7 @@ services:
       YTP_BROWSER_ENABLED: "false"
       YTP_YTDLP_AUTO_UPDATE: "true"
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers Auth
       traefik.http.routers.ytptube-rtr.entrypoints: "websecure"

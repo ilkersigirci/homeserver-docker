@@ -17,6 +17,7 @@ services:
       PUID: $PUID
       PGID: $PGID
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.metadata-remote-rtr.entrypoints: websecure

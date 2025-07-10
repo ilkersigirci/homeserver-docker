@@ -17,6 +17,7 @@ services:
     volumes:
       - $CONFIGDIR/stremio:/root/.stremio-server
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers Auth - Web UI
       traefik.http.routers.stremio-rtr.entrypoints: "websecure"
@@ -65,6 +66,7 @@ services:
     environment:
       NO_CORS: 1
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers Auth
       traefik.http.routers.stremio-server-rtr.entrypoints: "websecure"

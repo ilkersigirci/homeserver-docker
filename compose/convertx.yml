@@ -17,6 +17,7 @@ services:
     volumes:
       - $DOCKERDIR/appdata/convertx:/app/data
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers Auth
       traefik.http.routers.convertx-rtr.entrypoints: "websecure"

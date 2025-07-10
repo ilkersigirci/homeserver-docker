@@ -25,6 +25,7 @@ services:
       PHP_UPLOAD_MAX_FILE_SIZE: 500M
       SETTINGS_REGISTRATION_ENABLED: true
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.many-notes-rtr.entrypoints: "websecure"

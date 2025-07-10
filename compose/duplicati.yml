@@ -17,6 +17,7 @@ services:
       TZ: $TZ
       # CLI_ARGS:
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.duplicati-rtr.entrypoints: "websecure"

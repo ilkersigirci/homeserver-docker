@@ -25,6 +25,7 @@ services:
       TZ: $TZ
       # - RCLONE_CONFIG=/root/.config/rclone/rclone.conf
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.backrest-rtr.entrypoints: "websecure"

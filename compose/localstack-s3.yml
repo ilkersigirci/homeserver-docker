@@ -19,6 +19,7 @@ services:
       CREATED_BUCKET_NAME: ilkerflix
       APP_AWS_REGION: eu-central-1
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.localstack-s3-rtr.entrypoints: "websecure"

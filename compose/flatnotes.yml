@@ -20,6 +20,7 @@ services:
       # - FLATNOTES_PASSWORD="changeMe!"
       FLATNOTES_SECRET_KEY: "change-stability-pushchair"
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.flatnotes-rtr.entrypoints: "websecure"

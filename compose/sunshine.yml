@@ -17,14 +17,8 @@ services:
       PUID: $PUID
       PGID: $PGID
       TZ: $TZ
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
     labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.sunshine-rtr.entrypoints: "websecure"
