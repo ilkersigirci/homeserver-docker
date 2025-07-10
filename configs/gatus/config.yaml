@@ -227,17 +227,22 @@ endpoints:
     <<: *ping-default
     url: "icmp://homepage.gpu.$DOMAINNAME"
 
-  - name: Jellyfin-GPU
-    <<: *https-default
-    # group: GPU
-    url: "https://jellyfin.gpu.$DOMAINNAME"
+  # - name: Jellyfin-GPU
+  #   <<: *https-default
+  #   # group: GPU
+  #   url: "https://jellyfin.gpu.$DOMAINNAME"
 
-  - name: DigitalGarden-RPI-PING
+  - name: Immich-GPU-PING
     <<: *ping-default
-    url: "icmp://digitalgarden.rpi.$DOMAINNAME"
+    url: "icmp://photos.gpu.$DOMAINNAME"
+  
+
+  - name: Notes-RPI-PING
+    <<: *ping-default
+    url: "icmp://notes.rpi.$DOMAINNAME"
 
   # Gives 401 because of tinyauth
-  # - name: DigitalGarden-RPI
+  # - name: Notes-RPI
   #   <<: *https-default
   #   # group: RPI
-  #   url: "https://digitalgarden.rpi.$DOMAINNAME"
+  #   url: "https://notes.rpi.$DOMAINNAME"
