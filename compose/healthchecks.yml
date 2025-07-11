@@ -23,6 +23,7 @@ services:
       APPRISE_ENABLED: "True"
       DEBUG: "False"
       ALLOWED_HOSTS: localhost,healthchecks.$DOMAINNAME
+      INTEGRATIONS_ALLOW_PRIVATE_IPS: "True"
     labels:
       tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
