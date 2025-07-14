@@ -54,12 +54,12 @@ services:
       timeout: 5s
       retries: 3
     labels:
-      tinyauth.domain: fileshare.$DOMAINNAME
+      tinyauth.domain: share.$DOMAINNAME
       tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.zipline-rtr.entrypoints: websecure
-      traefik.http.routers.zipline-rtr.rule: Host(`fileshare.$DOMAINNAME`)
+      traefik.http.routers.zipline-rtr.rule: Host(`share.$DOMAINNAME`)
       ## Middlewares
       traefik.http.routers.zipline-rtr.middlewares: chain-no-auth@file
       ## HTTP Services
@@ -69,11 +69,11 @@ services:
       homepage.group: Media
       homepage.name: zipline
       homepage.icon: zipline.png
-      homepage.href: https://fileshare.$DOMAINNAME
+      homepage.href: https://share.$DOMAINNAME
       homepage.target: _blank
-      homepage.description: description
+      homepage.description: A ShareX/file upload server and link shortener
       ####### GLANCE #######
       glance.name: zipline
       glance.icon: sh:zipline
-      glance.url: https://fileshare.$DOMAINNAME
-      glance.description: description
+      glance.url: https://share.$DOMAINNAME
+      glance.description: A ShareX/file upload server and link shortener
