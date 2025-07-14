@@ -13,10 +13,11 @@ COMPOSE_CMD="docker compose -f docker-compose.$MY_HOSTNAME.yml --env-file $HOME/
 
 # Function to display usage
 usage() {
-    echo "Usage: $0 [up|down|pull]"
-    echo "  up    - Start containers"
-    echo "  down  - Stop containers"
-    echo "  pull  - Update containers"
+    echo "Usage: $0 [up|down|pull|restart]"
+    echo "  up      - Start containers"
+    echo "  down    - Stop containers"
+    echo "  pull    - Update containers"
+    echo "  restart - Restart containers"
     exit 1
 }
 
@@ -49,6 +50,13 @@ case "$1" in
         echo "🧹 Cleaning up dangling images..."
         docker image prune -f || echo "⚠️  Warning: Image cleanup failed"
         echo "✅ Update complete!"
+        ;;
+    
+    "restart")
+        echo "🔄 Restarting containers..."
+        COMPOSE_PROFILES=$PROFILES $COMPOSE_CMD down --remove-orphans
+        COMPOSE_PROFILES=$PROFILES $COMPOSE_CMD up -d
+        echo "✅ Containers restarted successfully!"
         ;;
     
     *)
