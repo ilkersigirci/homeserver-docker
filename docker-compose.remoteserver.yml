@@ -78,7 +78,8 @@ include:
   #### MEDIA ####
   - compose/bitplay.yml
   - compose/mazanoke.yml
-  - compose/palmr.yml
+  # - compose/palmr.yml
+  - compose/pingvin-share.yml
   - compose/stremio.yml
   # - compose/transmission.yml
   #### ML ####
