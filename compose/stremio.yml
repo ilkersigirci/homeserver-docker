@@ -31,7 +31,7 @@ services:
       traefik.http.routers.stremio-api-rtr.entrypoints: "websecure"
       traefik.http.routers.stremio-api-rtr.rule: "Host(`stremio-api.$DOMAINNAME`)"
       ## Middlewares - API
-      traefik.http.routers.stremio-rtr.middlewares: "cors-stremio,chain-tinyauth@file"
+      traefik.http.routers.stremio-api-rtr.middlewares: "cors-stremio,chain-tinyauth@file"
       # traefik.http.routers.stremio-api-rtr.middlewares: "cors-stremio,chain-no-auth@file"
       ## HTTP Services - API
       traefik.http.routers.stremio-api-rtr.service: "stremio-api-svc"
