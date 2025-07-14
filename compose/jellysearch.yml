@@ -48,7 +48,7 @@ services:
       traefik.http.routers.jellysearch-rtr.entrypoints: "websecure"
       traefik.http.routers.jellysearch-rtr.rule: "Host(`jellyfin.$DOMAINNAME`) && (QueryRegexp(`searchTerm`, `(.*?)`) || QueryRegexp(`SearchTerm`, `(.*?)`))"
       ## Middlewares
-      traefik.http.routers.jellyfin-rtr.middlewares: "chain-tinyauth@file"
+      traefik.http.routers.jellysearch-rtr.middlewares: "chain-tinyauth@file"
       # traefik.http.routers.jellysearch-rtr.middlewares: "chain-no-auth@file"
       ## HTTP Services
       traefik.http.routers.jellysearch-rtr.service: "jellysearch-svc"

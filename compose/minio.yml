@@ -25,7 +25,7 @@ services:
       # - "traefik.http.routers.minio-api-rtr.rule=Host(`minio.$DOMAINNAME`) && PathPrefix(`/api`)"
       traefik.http.routers.minio-api-rtr.rule: "Host(`minio.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.jellyseerr-rtr.middlewares: "chain-tinyauth@file"
+      traefik.http.routers.minio-api-rtr.middlewares: "chain-tinyauth@file"
       # traefik.http.routers.minio-api-rtr.middlewares: "chain-no-auth@file"
       ## HTTP Services
       traefik.http.routers.minio-api-rtr.service: "minio-api-svc"

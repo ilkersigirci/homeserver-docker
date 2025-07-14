@@ -77,7 +77,7 @@ services:
       traefik.http.routers.yamtrack-rtr.entrypoints: websecure
       traefik.http.routers.yamtrack-rtr.rule: Host(`mediatrack.$DOMAINNAME`)
       ## Middlewares
-      traefik.http.routers.jellyseerr-rtr.middlewares: "chain-tinyauth-relaxed@file"
+      traefik.http.routers.yamtrack-rtr.middlewares: "chain-tinyauth-relaxed@file"
       # traefik.http.routers.yamtrack-rtr.middlewares: chain-no-auth-relaxed@file
       ## HTTP Services
       traefik.http.routers.yamtrack-rtr.service: yamtrack-svc
