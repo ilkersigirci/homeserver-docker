@@ -18,12 +18,11 @@ services:
       PGID: $PGID
       TRUST_PROXY: true
     labels:
-      tinyauth.domain: fileshare.$DOMAINNAME
       tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.pingvin-share-rtr.entrypoints: websecure
-      traefik.http.routers.pingvin-share-rtr.rule: Host(`fileshare.$DOMAINNAME`)
+      traefik.http.routers.pingvin-share-rtr.rule: Host(`pingvin-share.$DOMAINNAME`)
       ## Middlewares
       traefik.http.routers.pingvin-share-rtr.middlewares: chain-no-auth@file
       ## HTTP Services
@@ -33,11 +32,11 @@ services:
       homepage.group: Media
       homepage.name: pingvin-share
       homepage.icon: pingvin-share.png
-      homepage.href: https://fileshare.$DOMAINNAME
+      homepage.href: https://pingvin-share.$DOMAINNAME
       homepage.target: _blank
       homepage.description: A self-hosted file sharing platform
       ####### GLANCE #######
       glance.name: pingvin-share
       glance.icon: sh:pingvin-share
-      glance.url: https://fileshare.$DOMAINNAME
+      glance.url: https://pingvin-share.$DOMAINNAME
       glance.description: A self-hosted file sharing platform

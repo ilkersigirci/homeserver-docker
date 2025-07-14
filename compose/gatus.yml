@@ -1,5 +1,4 @@
 services:
-
   gatus-db:
     image: postgres:16.4
     container_name: gatus-db

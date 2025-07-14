@@ -1,0 +1,79 @@
+# NOTE: In Settings -> Admin -> Core -> Enable Return HTTPS URLs
+# NOTE: After creating initial admin account, go to Settings -> OAuth -> Link it with OIDC Account
+services:
+  zipline-db:
+    image: postgres:16.4
+    container_name: zipline-db
+    restart: $MEDIA_RESTART_POLICY
+    profiles:
+      - media
+      - zipline
+    environment:
+      PGDATA: /pgdata
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    networks:
+      - t3_proxy
+    expose:
+      - "5432"
+    volumes:
+      - $DATADIR/zipline-db:/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  zipline:
+    image: ghcr.io/diced/zipline:latest
+    container_name: zipline
+    restart: $MEDIA_RESTART_POLICY
+    depends_on:
+      zipline-db:
+        condition: service_healthy
+    profiles:
+      - media
+      - zipline
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - "$DATADIR/zipline/uploads:/zipline/uploads"
+      - "$DATADIR/zipline/public:/zipline/public"
+      - "$DATADIR/zipline/themes:/zipline/themes"
+    environment:
+      DATASOURCE_TYPE: "local"
+      # DATASOURCE_LOCAL_DIRECTORY: "/path/to/your/local/files"
+      CORE_SECRET: $ZIPLINE_CORE_SECRET
+      DATABASE_URL: postgres://postgres:postgres@zipline-db:5432/postgres
+    healthcheck:
+      test: ['CMD', 'wget', '-q', '--spider', 'http://0.0.0.0:3000/api/healthcheck']
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    labels:
+      tinyauth.domain: fileshare.$DOMAINNAME
+      tinyauth.ip.bypass: $LOCAL_IPS
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.zipline-rtr.entrypoints: websecure
+      traefik.http.routers.zipline-rtr.rule: Host(`fileshare.$DOMAINNAME`)
+      ## Middlewares
+      traefik.http.routers.zipline-rtr.middlewares: chain-no-auth@file
+      ## HTTP Services
+      traefik.http.routers.zipline-rtr.service: zipline-svc
+      traefik.http.services.zipline-svc.loadbalancer.server.port: "3000"
+      ####### HOMEPAGE #######
+      homepage.group: Media
+      homepage.name: zipline
+      homepage.icon: zipline.png
+      homepage.href: https://fileshare.$DOMAINNAME
+      homepage.target: _blank
+      homepage.description: description
+      ####### GLANCE #######
+      glance.name: zipline
+      glance.icon: sh:zipline
+      glance.url: https://fileshare.$DOMAINNAME
+      glance.description: description
