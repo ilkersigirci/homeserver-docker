@@ -25,7 +25,7 @@ services:
       traefik.http.routers.pingvin-share-rtr.entrypoints: websecure
       traefik.http.routers.pingvin-share-rtr.rule: Host(`fileshare.$DOMAINNAME`)
       ## Middlewares
-      traefik.http.routers.pingvin-share-rtr.middlewares: chain-tinyauth@file
+      traefik.http.routers.pingvin-share-rtr.middlewares: chain-no-auth@file
       ## HTTP Services
       traefik.http.routers.pingvin-share-rtr.service: pingvin-share-svc
       traefik.http.services.pingvin-share-svc.loadbalancer.server.port: "3000"
