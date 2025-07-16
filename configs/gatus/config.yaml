@@ -202,6 +202,8 @@ endpoints:
     conditions:
       - "[DOMAIN_EXPIRATION] > 720h"
 
+  #### GPU ####
+
   - name: gpu.$DOMAINNAME-DNS
     group: External
     url: "1.1.1.1" # Address of the DNS server to use
@@ -217,32 +219,39 @@ endpoints:
     <<: *ping-default
     url: "icmp://homepage.gpu.$DOMAINNAME"
 
-  # Gives 401 because of tinyauth
-  # - name: Homepage-GPU
-  #   <<: *https-default
-  #   # group: GPU
-  #   url: "https://homepage.gpu.$DOMAINNAME"
+  - name: Homepage-GPU
+    <<: *https-default
+    # group: GPU
+    url: "https://homepage.gpu.$DOMAINNAME"
 
-  - name: Jellyfin-GPU-PING
+  - name: Jellyfin-GPU
+    <<: *https-default
+    # group: GPU
+    url: "https://jellyfin.gpu.$DOMAINNAME"
+
+  - name: Immich-GPU
+    <<: *https-default
+    # group: GPU
+    url: "https://photos.gpu.$DOMAINNAME"
+
+  #### RPI ####
+
+  - name: rpi.$DOMAINNAME-DNS
+    group: External
+    url: "1.1.1.1" # Address of the DNS server to use
+    interval: 30s
+    dns:
+      query-name: "homepage.rpi.$DOMAINNAME"
+      query-type: "A"
+    conditions:
+      - "[BODY] == 10.8.0.7"
+      - "[DNS_RCODE] == NOERROR"
+
+  - name: Homepage-RPI-PING
     <<: *ping-default
-    url: "icmp://homepage.gpu.$DOMAINNAME"
+    url: "icmp://homepage.rpi.$DOMAINNAME"
 
-  # - name: Jellyfin-GPU
-  #   <<: *https-default
-  #   # group: GPU
-  #   url: "https://jellyfin.gpu.$DOMAINNAME"
-
-  - name: Immich-GPU-PING
-    <<: *ping-default
-    url: "icmp://photos.gpu.$DOMAINNAME"
-  
-
-  - name: Notes-RPI-PING
-    <<: *ping-default
-    url: "icmp://notes.rpi.$DOMAINNAME"
-
-  # Gives 401 because of tinyauth
-  # - name: Notes-RPI
-  #   <<: *https-default
-  #   # group: RPI
-  #   url: "https://notes.rpi.$DOMAINNAME"
+  - name: Notes-RPI
+    <<: *https-default
+    # group: RPI
+    url: "https://notes.rpi.$DOMAINNAME"
