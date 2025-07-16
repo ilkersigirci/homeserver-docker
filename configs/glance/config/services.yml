@@ -1,0 +1,73 @@
+- name: Services
+  columns:
+    # - size: small
+    #   widgets:
+    #     - $include: custom-widgets/tailscale.yml
+
+    - size: full
+      widgets:
+        
+        # - type: server-stats
+        #   servers:
+        #     - type: local
+        #       name: Homeserver
+        #       # optionally override the sensor used to determine CPU temperature
+        #       # cpu-temp-sensor: thermal_zone0
+        #       hide-swap: true
+        #       # optionally hide or rename mountpoints
+        #       # mountpoints:
+        #       #   "/boot/efi":
+        #       #     hide: true
+        #       #     name: EFI
+
+        # - type: docker-containers
+        #   hide-by-default: false
+        #   # providers:
+        #   #   - type: proxy
+        #   #     host: tcp://docker-socket-proxy:2375
+
+        - type: group
+          widgets:
+          - type: iframe
+            title: HOMESERVER
+            source: https://homepage.gpu.${BASE_DOMAINNAME}
+            # source: http://homepage:3000
+            height: 1000
+
+          - type: iframe
+            title: RPI
+            source: https://homepage.rpi.${BASE_DOMAINNAME}
+            height: 1000
+
+          - type: iframe
+            title: REMOTESERVER
+            source: https://homepage.${BASE_DOMAINNAME}
+            height: 1000
+
+          - type: iframe
+            title: L13
+            source: https://homepage.l13.${BASE_DOMAINNAME}
+            height: 1000
+
+          - type: iframe
+            title: DOZZLE
+            source: https://dozzle.gpu.${BASE_DOMAINNAME}
+            # source: http://dozzle:8080
+            height: 1000
+
+          - type: iframe
+            title: UPTIME
+            source: https://gatus.${BASE_DOMAINNAME}
+            height: 1000
+
+    - size: small
+      widgets:
+        - type: group
+          widgets:
+          # - type: iframe
+          #   title: Wireguard
+          #   source: https://wireguard.${BASE_DOMAINNAME}
+          #   height: 1000
+
+          - $include: custom-widgets/wg-easy.yml
+          - $include: custom-widgets/tailscale.yml

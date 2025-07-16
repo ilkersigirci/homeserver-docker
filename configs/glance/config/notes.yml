@@ -1,0 +1,8 @@
+- name: Notes
+  columns:
+    - size: full
+      widgets:
+        - type: iframe
+          hide-header: true
+          source: https://notes.rpi.${BASE_DOMAINNAME}
+          height: 1000

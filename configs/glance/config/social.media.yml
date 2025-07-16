@@ -1,0 +1,77 @@
+- name: Social
+  columns:
+    - size: small
+      widgets:
+        - type: releases
+          cache: 1d
+          # Without authentication the Github API allows for up to 60 requests per hour. You can create a
+          # read-only token from your Github account settings and use it here to increase the limit.
+          # token: ...
+          repositories:
+            - glanceapp/glance
+            - go-gitea/gitea
+            - immich-app/immich
+            - syncthing/syncthing
+
+        - type: change-detection
+          instance-url: https://changedetection.${DOMAINNAME}/
+          token: ${CHANGEDETECTION_API_KEY}
+
+        - type: rss
+          title: Github Dashboard
+          limit: 20
+          collapse-after: 6
+          cache: 1h
+          feeds:
+            - url: https://github.com/ilkersigirci.private.atom?token=${GITHUB_DASHBOARD_TOKEN}
+              title: Github Feed
+
+    - size: full
+      widgets:
+        - type: videos
+          style: horizontal-cards # horizontal-cards, grid-cards
+          title: YouTube
+          channels:
+            - UCHnyfMqiRRG1u-2MsSQLbXA # Veritasium
+            - UCbfYPyITQ-7l4upoX8nvctg # Two Minute Papers
+            - UCsXVk37bltHxD1rDPwtNM8Q # Kurzgesagt
+            - UCsBjURrPoezykLs9EqgamOA # Fireship
+            # - UCBJycsmduvYEL83R_U4JriQ # Marques Brownlee
+            # - UCXuqSBlHAE6Xw-yeJA0Tunw # Linus Tech Tips
+        
+        - type: group
+          widgets:
+            - type: reddit
+              subreddit: technology
+              show-thumbnails: true
+            - type: reddit
+              subreddit: Piracy
+              show-thumbnails: true
+            - type: reddit
+              subreddit: interestingasfuck
+              show-thumbnails: true
+            - type: reddit
+              subreddit: Turkey
+              show-thumbnails: true
+            - type: reddit
+              subreddit: TurkeyJerky
+              show-thumbnails: true
+            - type: reddit
+              subreddit: svihs
+              show-thumbnails: true
+            - type: reddit
+              subreddit: europe
+              show-thumbnails: true
+
+        - type: rss
+          limit: 20
+          title: Twitter
+          collapse-after: 4
+          cache: 6h
+          feeds:
+            - url: http://rsshub:1200/twitter/user/karpathy/readable=1&authorNameBold=1&showAuthorInTitle=1&showAuthorInDesc=1&showQuotedAuthorAvatarInDesc=1&showAuthorAvatarInDesc=1&showEmojiForRetweetAndReply=1&showRetweetTextInTitle=0&addLinkForPics=1&showTimestampInDescription=1&showQuotedInTitle=1&heightOfPics=150  
+              title: karpathy
+            - url: http://rsshub:1200/twitter/user/AndrewYNg/readable=1&authorNameBold=1&showAuthorInTitle=1&showAuthorInDesc=1&showQuotedAuthorAvatarInDesc=1&showAuthorAvatarInDesc=1&showEmojiForRetweetAndReply=1&showRetweetTextInTitle=0&addLinkForPics=1&showTimestampInDescription=1&showQuotedInTitle=1&heightOfPics=150  
+              title: AndrewYNg
+            - url: http://rsshub:1200/twitter/user/charliermarsh/readable=1&authorNameBold=1&showAuthorInTitle=1&showAuthorInDesc=1&showQuotedAuthorAvatarInDesc=1&showAuthorAvatarInDesc=1&showEmojiForRetweetAndReply=1&showRetweetTextInTitle=0&addLinkForPics=1&showTimestampInDescription=1&showQuotedInTitle=1&heightOfPics=150  
+              title: charliermarsh

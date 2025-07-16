@@ -1,0 +1,36 @@
+- name: Cinema
+  columns:
+    - size: full
+      widgets:
+        # - type: search
+        #   search-engine: google
+        #   new-tab: true
+        #   # FIXME: Not working because of the API key
+        #   bangs:
+        #     - title: TMDB Movie
+        #       shortcut: "!movie"
+        #       url: https://api.themoviedb.org/3/search/movie?query={QUERY}
+        #       headers:
+        #         Authorization: Bearer ${TMDB_API_READ_ACCESS_TOKEN}
+
+        # - type: rss
+        #   title: T/trending_tv
+        #   limit: 20
+        #   collapse-after: 6
+        #   cache: 2h
+        #   feeds:
+        #     - url: http://rsshub:1200/themoviedb/trending/tv/day/en-US
+        #       title: trending_tv
+
+        - type: split-column
+          widgets:
+            - $include: custom-widgets/tmdb-popular-movies.yml
+            - $include: custom-widgets/tmdb-popular-tvshows.yml
+
+    - size: small
+      widgets:
+        - type: calendar
+          first-day-of-week: monday
+
+        - $include: custom-widgets/jellyfin-history.yml
+        # - $include: custom-widgets/jellyfin-now-playing.yml

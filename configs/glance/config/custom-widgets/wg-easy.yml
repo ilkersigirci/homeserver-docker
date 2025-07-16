@@ -1,0 +1,135 @@
+- type: custom-api
+  title: Wireguard
+  title-url: ${WG_EASY_URL}
+  url: ${WG_EASY_URL}/api/wireguard/client
+  headers:
+    Authorization: Basic ${WG_EASY_USERNAME}:${WG_EASY_PASSWORD}
+  cache: 5m
+  template: |
+    {{/* User Variables */}}
+    {{/* Set to true if you'd like an indicator for connected devices */}}
+    {{ $enableOnlineIndicator := true }}
+    {{/* Set to true if you'd like to show data transfer information */}}
+    {{ $showDataTransfer := true }}
+
+    <style>
+      .device-info-container {
+        position: relative;
+        overflow: hidden;
+        height: 1.5em;
+      }
+
+      .device-info {
+        display: flex;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+      }
+
+      .device-transfer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform: translateY(-100%);
+        opacity: 0;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+      }
+
+      .device-info-container:hover .device-info {
+        transform: translateY(100%);
+        opacity: 0;
+      }
+
+      .device-info-container:hover .device-transfer {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      .connected-indicator {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: var(--color-positive);
+        display: inline-block;
+        margin-left: 4px;
+        vertical-align: middle;
+      }
+
+      .disconnected-indicator {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: var(--color-negative);
+        display: inline-block;
+        margin-left: 4px;
+        vertical-align: middle;
+      }
+
+      .disabled-indicator {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: var(--color-neutral);
+        display: inline-block;
+        margin-left: 4px;
+        vertical-align: middle;
+      }
+
+      .device-name-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .indicators-container {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+    </style>
+    <ul class="list list-gap-10 collapsible-container" data-collapse-after="6">
+      {{ range .JSON.Array "" }}
+      <li>
+        <div class="flex items-center gap-10">
+          <div class="device-name-container grow">
+            <span class="size-h4 block text-truncate color-primary">
+              {{ .String "name" }}
+            </span>
+            <div class="indicators-container">
+              {{ if not (.Bool "enabled") }}
+              <span class="disabled-indicator" data-popover-type="text" data-popover-text="Disabled"></span>
+              {{ else if (.String "latestHandshakeAt") }}
+                {{ $lastHandshake := .String "latestHandshakeAt" | parseTime "rfc3339" }}
+                {{ if $lastHandshake.After (offsetNow "-5m") }}
+                  {{ if $enableOnlineIndicator }}
+                  <span class="connected-indicator" data-popover-type="text" data-popover-text="Connected"></span>
+                  {{ end }}
+                {{ else }}
+                  {{ $lastHandshakeTimezoned := $lastHandshake.In now.Location }}
+                  <span class="disconnected-indicator" data-popover-type="text"
+                    data-popover-text="Disconnected - Last handshake {{ $lastHandshakeTimezoned.Format "Jan 2 3:04pm" }}"></span>
+                {{ end }}
+              {{ else }}
+                <span class="disconnected-indicator" data-popover-type="text" data-popover-text="Never connected"></span>
+              {{ end }}
+            </div>
+          </div>
+        </div>
+        <div class="device-info-container">
+          <ul class="list-horizontal-text device-info">
+            <li>{{ .String "address" }}</li>
+            {{ if (.String "latestHandshakeAt") }}
+              {{ $lastHandshake := .String "latestHandshakeAt" | parseTime "rfc3339" }}
+              <li {{ $lastHandshake | toRelativeTime }}></li>
+            {{ else }}
+              <li>Never connected</li>
+            {{ end }}
+          </ul>
+          {{ if $showDataTransfer }}
+          <div class="device-transfer">
+            <span class="color-positive">↓{{ div (.Int "transferRx" | toFloat) 1048576 | printf "%.1f" }}MB</span>
+            <span class="color-highlight margin-left-10">↑{{ div (.Int "transferTx" | toFloat) 1048576 | printf "%.1f" }}MB</span>
+          </div>
+          {{ end }}
+        </div>
+      </li>
+      {{ end }}
+    </ul>

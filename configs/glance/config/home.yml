@@ -1,0 +1,174 @@
+- name: Home
+  # Optionally, if you only have a single page you can hide the desktop navigation for a cleaner look
+  # hide-desktop-navigation: true
+
+  head-widgets:
+    - type: search
+      search-engine: google
+      new-tab: true
+      hide-header: true
+      bangs:
+        - title: YouTube
+          shortcut: "!yt"
+          url: https://www.youtube.com/results?search_query={QUERY}
+
+  columns:
+    - size: small
+      widgets:
+        - type: custom-api
+          title: Random Fact
+          cache: 6h
+          url: https://uselessfacts.jsph.pl/api/v2/facts/random
+          template: |
+            <p class="size-h4 color-paragraph">{{ .JSON.String "text" }}</p>
+
+        - type: to-do
+          title: ToDo
+          id: general
+
+        # - type: to-do
+        #   title: Work ToDo
+        #   id: work
+
+        - type: rss
+          limit: 10
+          collapse-after: 3
+          cache: 12h
+          feeds:
+            - url: https://selfh.st/rss/
+              title: selfh.st
+            - url: https://samwho.dev/rss.xml
+              title: SamWho
+            - url: https://obsidian.md/changelog.xml
+              title: Obsidian Changelog
+            # - url: http://rsshub:1200/telegram/channel/awesomeRSSHub
+            #   title: awesomeRSSHub
+
+        - type: videos
+          style: vertical-list # horizontal-cards, grid-cards
+          title: YouTube
+          channels:
+            - UCHnyfMqiRRG1u-2MsSQLbXA # Veritasium
+            - UCbfYPyITQ-7l4upoX8nvctg # Two Minute Papers
+            - UCsXVk37bltHxD1rDPwtNM8Q # Kurzgesagt
+            - UCsBjURrPoezykLs9EqgamOA # Fireship
+            # - UCBJycsmduvYEL83R_U4JriQ # Marques Brownlee
+            # - UCXuqSBlHAE6Xw-yeJA0Tunw # Linus Tech Tips
+
+        - type: bookmarks
+          groups:
+            - title: General
+              links:
+                - title: My Blog
+                  url: https://blog.$BASE_DOMAINNAME
+                - title: Reddit Selfhosted
+                  url: https://reddit.com/r/selfhosted
+            - title: Development
+              links:
+                - title: My Github
+                  url: https://github.com/ilkersigirci
+                - title: Python Template
+                  url: https://github.com/ilkersigirci/python-template
+                - title: Runpod Playground
+                  url: https://github.com/ilkersigirci/runpod-playground
+            - title: Social.Media
+              links:
+                - title: Eksi
+                  url: https://eksisozluk.com/basliklar/gundem
+                - title: Twitter Trends
+                  url: https://x.com/explore/tabs/trending
+
+    - size: full
+      widgets:
+        - type: split-column
+          widgets:
+            - type: hacker-news
+              collapse-after: 6
+            - type: lobsters
+              collapse-after: 6
+
+        # - type: group
+        #   widgets:
+        #   - type: custom-api
+        #     title: T/MHA Haber
+        #     cache: 1h
+        #     url: https://api.${DOMAINNAME}/telegram/messages/habermha?limit=20
+        #     # allow-insecure: true # NOTE: Not yet supported in the 0.7.3 release
+        #     template: |
+        #       <ul class="list list-gap-10 collapsible-container" data-collapse-after="5">
+        #       {{ range .JSON.Array "messages" }}
+        #         <li>
+        #           <p class="size-h4 color-primary">{{ .String "text" }}</p>
+        #         </li>
+        #       {{ end }}
+        
+        - type: group
+          widgets:
+          - type: rss
+            title: T/habermha
+            # style: detailed-list
+            limit: 30
+            collapse-after: 5
+            cache: 1h
+            feeds:
+              # - url: https://rsshub.${DOMAINNAME}/telegram/channel/habermha?limit=30 # &mode=fulltext
+              - url: http://rsshub:1200/telegram/channel/habermha?limit=30 # &mode=fulltext
+                title: habermha
+          - type: rss
+            title: X/pusholder
+            limit: 30
+            collapse-after: 5
+            cache: 1h
+            feeds:
+              - url: http://rsshub:1200/twitter/user/pusholder/readable=1&limit=30&authorNameBold=1&showAuthorInTitle=1&showAuthorInDesc=1&showQuotedAuthorAvatarInDesc=1&showAuthorAvatarInDesc=1&showEmojiForRetweetAndReply=1&showRetweetTextInTitle=0&addLinkForPics=1&showTimestampInDescription=1&showQuotedInTitle=1&heightOfPics=150
+                title: pusholder
+
+        - type: rss
+          title: News
+          hide-header: true
+          style: horizontal-cards # vertical-list, detailed-list, horizontal-cards, horizontal-cards-2
+          feeds:
+            - url: https://feeds.bloomberg.com/markets/news.rss
+              title: Bloomberg
+            - url: https://moxie.foxbusiness.com/google-publisher/markets.xml
+              title: Fox Business
+            - url: https://moxie.foxbusiness.com/google-publisher/technology.xml
+              title: Fox Business
+
+    - size: small
+      widgets:
+        - type: calendar
+          hide-header: true
+          first-day-of-week: monday
+
+        - type: weather
+          hide-header: true
+          location: Ankara
+          units: metric # alternatively "imperial"
+          hour-format: 12h # alternatively "24h"
+          # Optionally hide the location from being displayed in the widget
+          # hide-location: true
+
+
+        - type: markets
+          hide-header: true
+          chart-link-template: https://www.tradingview.com/chart/?symbol={SYMBOL}
+          symbol-link-template: https://www.tradingview.com/symbols/{SYMBOL}/news
+          markets:
+            - symbol: SPY
+              name: S&P 500
+            - symbol: BTC-USD
+              name: Bitcoin
+            - symbol: NVDA
+              name: NVIDIA
+            - symbol: AAPL
+              name: Apple
+            - symbol: MSFT
+              name: Microsoft
+            # NOTE: Not working
+            # - symbol: XAUTRYG
+            #   name: Gold-TRY
+              # chart-link: https://www.tradingview.com/chart/?symbol=INDEX:XAUTRYG
+            # - symbol: FX%3AUSDTRY
+            #   name: USD-TRY
+            #   chart-link: https://www.tradingview.com/chart/?symbol=FX%3AUSDTRY

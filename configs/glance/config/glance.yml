@@ -1,0 +1,42 @@
+server:
+  port: 8080
+  assets-path: /app/assets
+  base-url: https://glance.${DOMAINNAME}
+
+branding:
+  # logo-text: I
+  logo-url: https://avatars.githubusercontent.com/u/39417966?s=96&v=4
+  favicon-url: https://avatars.githubusercontent.com/u/39417966?s=96&v=4
+  custom-footer: |
+    <p>Ilkerflix</p>
+
+theme:
+  # Note: assets are cached by the browser, changes to the CSS file
+  # will not be reflected until the browser cache is cleared (Ctrl+F5)
+  custom-css-file: /app/assets/user.css
+  background-color: 240 13 14
+  primary-color: 222 74 74
+  negative-color: 358 100 68
+  contrast-multiplier: 1.4
+
+# define:
+#   - &shared-bookmarks
+#     type: bookmarks
+#     groups:
+#       - title: General
+#         links:
+#           - title: Github
+#             url: https://github.com/
+
+pages:
+  - $include: home.yml
+  - $include: notes.yml
+  - $include: developer.yml
+  - $include: services.yml
+  - $include: social.media.yml
+  - $include: cinema.yml
+  # - name: Test
+  #   columns:
+  #     - size: full
+  #       widgets:
+  #         - *shared-bookmarks

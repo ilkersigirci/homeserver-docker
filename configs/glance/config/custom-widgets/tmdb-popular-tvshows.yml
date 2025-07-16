@@ -1,0 +1,31 @@
+- type: custom-api
+  title: Popular TV Shows
+  cache: 6h
+  url: https://api.themoviedb.org/3/discover/tv?include_adult=false&language=en-US&page=1&sort_by=popularity.desc
+  # url: https://api.themoviedb.org/3/discover/tv?include_adult=false&language=en-US&page=1&sort_by=vote_average.desc&vote_count.gte=200
+  headers:
+    Authorization: Bearer ${TMDB_API_READ_ACCESS_TOKEN}
+    Accept: application/json
+  template: |
+    <style>
+      .rating-positive { color: #4caf50; }
+      .rating-neutral { color: #ff9800; }
+      .rating-negative { color: #f44336; }
+    </style>
+    <ul class="list list-gap-10 collapsible-container" data-collapse-after="5">
+    {{ range .JSON.Array "results" }}
+      <li>
+        <a href="https://www.themoviedb.org/tv/{{ .Int "id" }}" class="block hover:opacity-75 transition-opacity">
+          <div class="size-h4 color-primary mb-2">{{ .String "name" }}</div>
+          <div class="color-warning mb-2">{{ .String "first_air_date" }}</div>
+          <p class="color-paragraph">{{ .String "overview" }}</p>
+          <ul class="list-horizontal-text mt-2">
+            <li class="{{ if ge (.Float "vote_average") 7.0 }}rating-positive{{ else if ge (.Float "vote_average") 5.0 }}rating-neutral{{ else }}rating-negative{{ end }}">
+              Rating: {{ .Float "vote_average" | printf "%.1f" }}/10
+            </li>
+            <li class="color-info">Votes: {{ .Int "vote_count" | formatNumber }}</li>
+          </ul>
+        </a>
+      </li>
+    {{ end }}
+    </ul>

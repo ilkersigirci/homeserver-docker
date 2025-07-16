@@ -16,3 +16,5 @@ configs/*
 !configs/traefik3
 !configs/quartz
 !configs/immich-public-proxy
+!configs/glance
+configs/glance/docs

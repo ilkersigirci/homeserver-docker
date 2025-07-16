@@ -1,0 +1,92 @@
+- name: Developer
+  columns:
+    - size: small
+      widgets:
+        - type: releases
+          cache: 1d
+          # Without authentication the Github API allows for up to 60 requests per hour. You can create a
+          # read-only token from your Github account settings and use it here to increase the limit.
+          # token: ...
+          repositories:
+            - glanceapp/glance
+            - go-gitea/gitea
+            - immich-app/immich
+            - syncthing/syncthing
+
+        - type: rss
+          title: SmolAI.AI.News
+          limit: 10
+          collapse-after: 3
+          cache: 12h
+          feeds:
+            - url: https://news.smol.ai/rss.xml
+              title: " "
+
+        - type: change-detection
+          instance-url: http://changedetection:5000
+          # instance-url: https://changedetection.${DOMAINNAME}/
+          token: ${CHANGEDETECTION_API_KEY}
+
+    - size: full
+      widgets:
+        # - type: server-stats
+        #   servers:
+        #     - type: local
+        #       name: Homeserver
+        #       # optionally override the sensor used to determine CPU temperature
+        #       # cpu-temp-sensor: thermal_zone0
+        #       hide-swap: true
+        #       # optionally hide or rename mountpoints
+        #       # mountpoints:
+        #       #   "/boot/efi":
+        #       #     hide: true
+        #       #     name: EFI
+
+        # - type: docker-containers
+        #   hide-by-default: false
+        #   # providers:
+        #   #   - type: proxy
+        #   #     host: tcp://docker-socket-proxy:2375
+        
+        - type: group
+          widgets:
+            - type: reddit
+              subreddit: selfhosted
+              show-thumbnails: true
+              collapse-after: 10
+            - type: reddit
+              subreddit: Python
+              show-thumbnails: true
+              collapse-after: 10
+            - type: reddit
+              subreddit: LocalLLaMA
+              show-thumbnails: true
+              collapse-after: 10
+            - type: reddit
+              subreddit: ObsidianMD
+              show-thumbnails: true
+              collapse-after: 10
+            - type: reddit
+              subreddit: mlops
+              show-thumbnails: true
+              collapse-after: 10
+            - type: reddit
+              subreddit: StableDiffusion
+              show-thumbnails: true
+              collapse-after: 10
+            - type: reddit
+              subreddit: comfyui
+              show-thumbnails: true
+              collapse-after: 10
+
+    - size: small
+      widgets:
+        - type: rss
+          title: Github Dashboard
+          limit: 50
+          collapse-after: 7
+          style: vertical-list # vertical-list, detailed-list, horizontal-cards, horizontal-cards-2
+          cache: 1h
+          feeds:
+            - url: https://github.com/ilkersigirci.private.atom?token=${GITHUB_DASHBOARD_TOKEN}
+              title: Github Feed

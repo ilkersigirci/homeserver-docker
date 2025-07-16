@@ -44,16 +44,16 @@
 #           url: https://traefik.{{HOMEPAGE_VAR_DOMAINNAME}} # NOTE: docker service name not working
 #           fields: ['routers', 'services', 'middleware']
 
-- Maintenance:
-    - Tailscale:
-        icon: tailscale.png
-        href: 'https://login.tailscale.com/admin/machines/{{HOMEPAGE_VAR_TAILSCALE_DEVICE_IP}}'
-        description: Tailscale Device Status
-        widget:
-            type: tailscale
-            key: {{HOMEPAGE_VAR_TAILSCALE_KEY}}
-            deviceid: {{HOMEPAGE_VAR_TAILSCALE_DEVICE_ID}}
-            # hideErrors: true
+# - Maintenance:
+#     - Tailscale:
+#         icon: tailscale.png
+#         href: 'https://login.tailscale.com/admin/machines/{{HOMEPAGE_VAR_TAILSCALE_DEVICE_IP}}'
+#         description: Tailscale Device Status
+#         widget:
+#             type: tailscale
+#             key: {{HOMEPAGE_VAR_TAILSCALE_KEY}}
+#             deviceid: {{HOMEPAGE_VAR_TAILSCALE_DEVICE_ID}}
+#             hideErrors: true
 
 # - Graphs:
 #     - CPU:
