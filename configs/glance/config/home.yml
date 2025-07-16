@@ -105,6 +105,14 @@
         - type: group
           widgets:
           - type: rss
+            title: X/pusholder
+            limit: 30
+            collapse-after: 5
+            cache: 1h
+            feeds:
+              - url: http://rsshub:1200/twitter/user/pusholder/readable=1&limit=30&authorNameBold=1&showAuthorInTitle=1&showAuthorInDesc=1&showQuotedAuthorAvatarInDesc=1&showAuthorAvatarInDesc=1&showEmojiForRetweetAndReply=1&showRetweetTextInTitle=0&addLinkForPics=1&showTimestampInDescription=1&showQuotedInTitle=1&heightOfPics=150
+                title: " "
+          - type: rss
             title: T/habermha
             # style: detailed-list
             limit: 30
@@ -112,16 +120,18 @@
             cache: 1h
             feeds:
               # - url: https://rsshub.${DOMAINNAME}/telegram/channel/habermha?limit=30 # &mode=fulltext
+              # - url: http://homeserver-api-head:8000/api/v1/telegram/messages/habermha/rss?limit=10&feed_title=MHA&output_format=rss
               - url: http://rsshub:1200/telegram/channel/habermha?limit=30 # &mode=fulltext
-                title: habermha
+                title: " "
           - type: rss
-            title: X/pusholder
+            title: E/gundem
+            # style: detailed-list
             limit: 30
             collapse-after: 5
             cache: 1h
             feeds:
-              - url: http://rsshub:1200/twitter/user/pusholder/readable=1&limit=30&authorNameBold=1&showAuthorInTitle=1&showAuthorInDesc=1&showQuotedAuthorAvatarInDesc=1&showAuthorAvatarInDesc=1&showEmojiForRetweetAndReply=1&showRetweetTextInTitle=0&addLinkForPics=1&showTimestampInDescription=1&showQuotedInTitle=1&heightOfPics=150
-                title: pusholder
+              - url: http://homeserver-api-head:8000/api/v1/eksi/gundem/rss
+                title: " "
 
         - type: rss
           title: News

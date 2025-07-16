@@ -1,0 +1,160 @@
+services:
+  homeserver-api-redis:
+    image: bitnami/redis:latest
+    container_name: homeserver-api-redis
+    restart: $OTHERS_RESTART_POLICY
+    hostname: "homeserver-api-redis"
+    profiles:
+      - others
+      - homeserver-api
+    networks:
+      - t3_proxy
+    expose:
+      - "6379"
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      # REDIS_PASSWORD: $HOMESERVER_API_REDIS_PASSWORD
+    healthcheck:
+      test: redis-cli ping
+      interval: 1s
+      timeout: 3s
+      retries: 50
+
+  homeserver-api-rabbitmq:
+    image: bitnami/rabbitmq:latest
+    container_name: homeserver-api-rabbitmq
+    restart: $OTHERS_RESTART_POLICY
+    hostname: "homeserver-api-rabbitmq"
+    profiles:
+      - others
+      - homeserver-api
+    networks:
+      - t3_proxy
+    expose:
+      - "5672" # RabbitMQ AMQP port
+      - "15672" # RabbitMQ Management UI port
+    environment:
+      RABBITMQ_USERNAME: $HOMESERVER_API_RABBITMQ_USERNAME
+      RABBITMQ_PASSWORD: $HOMESERVER_API_RABBITMQ_PASSWORD
+      RABBITMQ_VHOST: "/"
+      RABBITMQ_MANAGEMENT_ALLOW_WEB_ACCESS: "true"
+      RABBITMQ_DISK_FREE_ABSOLUTE_LIMIT: "2GB"
+    labels:
+      tinyauth.domain: api.$DOMAINNAME
+      tinyauth.ip.bypass: $LOCAL_IPS
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.homeserver-api-rabbitmq-rtr.entrypoints: "websecure"
+      traefik.http.routers.homeserver-api-rabbitmq-rtr.rule: "Host(`api-rabbitmq.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.homeserver-api-rabbitmq-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.homeserver-api-rabbitmq-rtr.service: "homeserver-api-rabbitmq-svc"
+      traefik.http.services.homeserver-api-rabbitmq-svc.loadbalancer.server.port: "15672"
+      ####### HOMEPAGE #######
+      homepage.group: Others
+      homepage.name: homeserver-api-rabbitmq
+      homepage.icon: rabbitmq.png
+      homepage.href: https://api-rabbitmq.$DOMAINNAME
+      homepage.target: _blank
+      homepage.description: Homeserver API RabbitMQ
+
+  homeserver-api-head:
+    image: homeserver-api:latest
+    container_name: homeserver-api-head
+    restart: $OTHERS_RESTART_POLICY
+    tty: true
+    depends_on:
+      - homeserver-api-redis
+      - homeserver-api-rabbitmq
+    build:
+      context: $MYREPOSDIR/homeserver-api
+      dockerfile: $MYREPOSDIR/homeserver-api/docker/Dockerfile
+      target: development
+    profiles:
+      - others
+      - homeserver-api
+    networks:
+      - t3_proxy
+    expose:
+      - "8000" # API port
+    # command: ["tail", "-f", "/dev/null"] # NOTE: For testing the container
+    command: ["uv", "run", "--module", "app.__main__"]
+    env_file:
+      - $MYREPOSDIR/homeserver-api/.env
+    environment:
+      - INSTANCE_TYPE=API
+      - HOST=0.0.0.0
+      - PORT=8000
+      - RABBITMQ_HOST=homeserver-api-rabbitmq
+      - RABBITMQ_PORT=5672
+      - REDIS_HOST=homeserver-api-redis
+      - REDIS_PORT=6379
+    labels:
+      tinyauth.domain: api.$DOMAINNAME
+      tinyauth.ip.bypass: $LOCAL_IPS
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.homeserver-api-head-rtr.entrypoints: "websecure"
+      traefik.http.routers.homeserver-api-head-rtr.rule: "Host(`api.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.homeserver-api-head-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.homeserver-api-head-rtr.service: "homeserver-api-head-svc"
+      traefik.http.services.homeserver-api-head-svc.loadbalancer.server.port: "8000"
+      ####### HOMEPAGE #######
+      homepage.group: Others
+      homepage.name: homeserver-api-head
+      homepage.icon: homeserver-api.png
+      homepage.href: https://api.$DOMAINNAME
+      homepage.target: _blank
+      homepage.description: Homeserver API Head
+
+  homeserver-api-worker:
+    image: homeserver-api:latest
+    container_name: homeserver-api-worker
+    restart: $OTHERS_RESTART_POLICY
+    tty: true
+    depends_on:
+      - homeserver-api-redis
+      - homeserver-api-rabbitmq
+    build:
+      context: $MYREPOSDIR/homeserver-api
+      dockerfile: $MYREPOSDIR/homeserver-api/docker/Dockerfile
+      target: development
+    profiles:
+      - others
+      - homeserver-api
+    networks:
+      - t3_proxy
+    # command: ["tail", "-f", "/dev/null"] # NOTE: For testing the container
+    command:
+      - "uv"
+      - "run"
+      - "--module"
+      - "taskiq"
+      - "worker"
+      - "app.worker.broker:broker"
+      - "--use-process-pool"
+      - "--workers"
+      - "5"
+      - "-fsd"
+      - "-tp"
+      - "[app/worker/tasks/*.py]"
+    # <<: *gpu-all-deploy
+    env_file:
+      - $MYREPOSDIR/homeserver-api/.env
+    environment:
+      - INSTANCE_TYPE=WORKER
+      - RABBITMQ_HOST=homeserver-api-rabbitmq
+      - RABBITMQ_PORT=5672
+      - REDIS_HOST=homeserver-api-redis
+      - REDIS_PORT=6379
+    labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
+      ####### HOMEPAGE #######
+      homepage.group: Others
+      homepage.name: homeserver-api-worker
+      homepage.icon: homeserver-api.png
+      homepage.target: _blank
+      homepage.description: Homeserver API Worker

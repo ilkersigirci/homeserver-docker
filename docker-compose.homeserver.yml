@@ -115,3 +115,5 @@ include:
   - compose/pdfding.yml
   - compose/rsshub.yml
   # - compose/quartz.yml
+  #### OTHERS ####
+  - compose/homeserver-api.yml

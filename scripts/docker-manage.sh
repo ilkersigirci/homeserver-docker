@@ -8,7 +8,7 @@ if [ -z "$MY_HOSTNAME" ]; then
 fi
 
 # Configuration
-PROFILES="core,desktop_apps,ml,maintenance,media,monitoring,photo,reading"
+PROFILES="core,desktop_apps,ml,maintenance,media,monitoring,photo,reading,others"
 COMPOSE_CMD="docker compose -f docker-compose.$MY_HOSTNAME.yml --env-file $HOME/docker/.env"
 
 # Function to display usage
