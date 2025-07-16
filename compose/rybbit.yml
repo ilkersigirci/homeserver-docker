@@ -136,6 +136,7 @@ services:
       NEXT_PUBLIC_BACKEND_URL: https://analytics.$DOMAINNAME
       NEXT_PUBLIC_DISABLE_SIGNUP: ${RYBBIT_DISABLE_SIGNUP:-true}
     labels:
+      tinyauth.domain: analytics.$DOMAINNAME
       # tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers

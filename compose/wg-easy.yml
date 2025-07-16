@@ -50,7 +50,8 @@ services:
       retries: 3
     labels:
       komodo.skip: # Prevents from stopping with StopAllContainers on Komodo
-      # tinyauth.ip.bypass: $LOCAL_IPS
+      tinyauth.domain: wireguard.$DOMAINNAME
+      tinyauth.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "Wg-Easy"
@@ -102,6 +103,9 @@ services:
       timeout: 5s
       retries: 3
     labels:
+      komodo.skip: # Prevents from stopping with StopAllContainers on Komodo
+      tinyauth.domain: wireguard.$DOMAINNAME
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers Auth
       traefik.http.routers.wg-easy-14-no-host-rtr.entrypoints: "websecure"
@@ -149,6 +153,9 @@ services:
       # INSECURE: false
       DISABLE_IPV6: true
     labels:
+      komodo.skip: # Prevents from stopping with StopAllContainers on Komodo
+      tinyauth.domain: wireguard.$DOMAINNAME
+      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers Auth
       traefik.http.routers.wg-easy-rtr.entrypoints: "websecure"
