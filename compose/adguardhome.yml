@@ -48,7 +48,7 @@ services:
       # traefik.http.routers.adguardhome-rtr.middlewares: "chain-no-auth@file" # NOTE: Needed for AdGuard Home Manager Android app
       ## HTTP Services
       traefik.http.routers.adguardhome-rtr.service: "adguardhome-svc"
-      # - "traefik.http.services.adguardhome-svc.loadbalancer.server.port=3000" # Initial wizard port
+      # traefik.http.services.adguardhome-svc.loadbalancer.server.port: "3000" # Initial wizard port
       traefik.http.services.adguardhome-svc.loadbalancer.server.port: "80" # Admin UI port
       # Dot - DNS over TLS
       traefik.tcp.routers.adguard-tls.rule: "HostSNI(`dns.$DOMAINNAME`)" # Used for DoT

@@ -48,6 +48,7 @@ secrets:
 include:
   ########################### SERVICES
   #### CORE ####
+  - compose/adguardhome.yml
   - compose/filebrowser.yml
   - compose/homepage.yml
   # - compose/glance.yml
