@@ -80,6 +80,8 @@ services:
       - "8000" # API port
     # command: ["tail", "-f", "/dev/null"] # NOTE: For testing the container
     command: ["uv", "run", "--module", "app.__main__"]
+    volumes:
+      - $MYREPOSDIR/homeserver-api/app:/app/app
     env_file:
       - $MYREPOSDIR/homeserver-api/.env
     environment:
@@ -142,6 +144,8 @@ services:
       - "-tp"
       - "[app/worker/tasks/*.py]"
     # <<: *gpu-all-deploy
+    volumes:
+      - $MYREPOSDIR/homeserver-api/app:/app/app
     env_file:
       - $MYREPOSDIR/homeserver-api/.env
     environment:
