@@ -1,0 +1,40 @@
+services:
+  # Initial login: admin / admin
+  # NOTE: If you import wg.conf
+  ## chmod 700 wg0.conf
+  ## sudo chown root:root wg0.conf
+  # NOTE: Don't forget to set `net.ipv4.ip_forward=1` in your host machine.
+  # Default: PostUp = iptables -t nat -I POSTROUTING 1 -s 10.8.0.1/24 -o enp0s3 -j MASQUERADE; iptables -I FORWARD -i wg0 -o wg0 -j DROP
+  # Default: PreDown = iptables -t nat -D POSTROUTING -s 10.8.0.1/24 -o enp0s3 -j MASQUERADE; iptables -D FORWARD -i wg0 -o wg0 -j DROP
+  wgdashboard:
+    image: docker.io/donaldzou/wgdashboard:latest
+    container_name: wgdashboard
+    restart: $BASE_RESTART_POLICY
+    profiles:
+      - core
+    network_mode: host
+    expose:
+      - "51820/udp" # WireGuard port
+      - "51821/tcp" # Web UI port
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    volumes:
+      - $CONFIGDIR/wgdashboard:/etc/wireguard
+      - $DATADIR/wgdashboard:/data
+    environment:
+      tz: $TZ
+      global_dns: 10.8.0.1
+      public_ip: $REMOTE_SERVER_PUBLIC_IP
+      wgd_port: 51821
+    labels:
+      komodo.skip: # Prevents from stopping with StopAllContainers on Komodo
+      tinyauth.domain: wgdashboard.$DOMAINNAME
+      tinyauth.ip.bypass: $LOCAL_IPS
+      ####### HOMEPAGE #######
+      homepage.group: "Core"
+      homepage.name: "Wg-Dashboard"
+      homepage.icon: "wireguard.svg"
+      homepage.href: "https://wireguard.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Simple dashboard for WireGuard VPN written in Python & Vue.js"

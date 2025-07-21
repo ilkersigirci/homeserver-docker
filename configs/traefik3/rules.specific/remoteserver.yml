@@ -24,14 +24,13 @@ http:
     #     # - chain-no-auth-relaxed
     #   service: jellyfin-svc
 
-    wg-easy-14-rtr:
+    wireguard-rtr:
       rule: "Host(`wireguard.{{env "DOMAINNAME"}}`)"
       entryPoints:
         - websecure
       middlewares:
         - chain-no-auth-relaxed
-
-      service: wg-easy-14-svc
+      service: wireguard-svc
 
     pocket-id-rtr:
       rule: "Host(`pocketid.{{env "DOMAINNAME"}}`)"
@@ -67,7 +66,7 @@ http:
     #     servers:
     #       # - url: "http://10.8.0.3:8096" # Wiregurd
 
-    wg-easy-14-svc:
+    wireguard-svc:
       loadBalancer:
         servers:
           - url: "http://{{env "REMOTE_SERVER_PRIVATE_IP"}}:51821" # IP of the host machine
