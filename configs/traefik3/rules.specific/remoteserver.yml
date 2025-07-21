@@ -29,7 +29,8 @@ http:
       entryPoints:
         - websecure
       middlewares:
-        - chain-no-auth-relaxed
+        # - chain-no-auth-relaxed
+        - chain-tinyauth
       service: wireguard-svc
 
     pocket-id-rtr:

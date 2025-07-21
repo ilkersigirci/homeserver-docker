@@ -29,7 +29,7 @@ services:
       wgd_port: 51821
     labels:
       komodo.skip: # Prevents from stopping with StopAllContainers on Komodo
-      tinyauth.domain: wgdashboard.$DOMAINNAME
+      tinyauth.domain: wireguard.$DOMAINNAME
       tinyauth.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Core"
