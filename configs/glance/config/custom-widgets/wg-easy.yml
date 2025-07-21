@@ -1,5 +1,5 @@
 - type: custom-api
-  title: Wireguard
+  title: Wg-Easy
   title-url: ${WG_EASY_URL}
   url: ${WG_EASY_URL}/api/wireguard/client
   headers:

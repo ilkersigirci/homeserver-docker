@@ -1,0 +1,194 @@
+- type: custom-api
+  title: WG.Dashboard
+  title-url: ${WGDASHBOARD_URL}
+  url: ${WGDASHBOARD_URL}/api/getWireguardConfigurationInfo?configurationName=${WGDASHBOARD_CONFIG_NAME}
+  headers:
+    Content-Type: application/json
+    wg-dashboard-apikey: ${WGDASHBOARD_API_KEY}
+  cache: 5m
+  template: |
+    {{/* User Variables */}}
+    {{/* Set to true if you'd like an indicator for connected devices */}}
+    {{ $enableOnlineIndicator := true }}
+    {{/* Set to true if you'd like to show data transfer information */}}
+    {{ $showDataTransfer := true }}
+
+    <style>
+      .device-info-container {
+        position: relative;
+        overflow: hidden;
+        height: 1.5em;
+      }
+
+      .device-info {
+        display: flex;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+      }
+
+      .device-transfer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform: translateY(-100%);
+        opacity: 0;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+      }
+
+      .device-info-container:hover .device-info {
+        transform: translateY(100%);
+        opacity: 0;
+      }
+
+      .device-info-container:hover .device-transfer {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      .connected-indicator {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: var(--color-positive);
+        display: inline-block;
+        margin-left: 4px;
+        vertical-align: middle;
+      }
+
+      .disconnected-indicator {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: var(--color-negative);
+        display: inline-block;
+        margin-left: 4px;
+        vertical-align: middle;
+      }
+
+      .never-connected-indicator {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: var(--color-neutral);
+        display: inline-block;
+        margin-left: 4px;
+        vertical-align: middle;
+      }
+
+      .device-name-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .indicators-container {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .server-info {
+        margin-bottom: 16px;
+        padding: 12px;
+        background-color: var(--color-widget-background);
+        border-radius: 8px;
+        border: 1px solid var(--color-separator);
+      }
+
+      .server-stats {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      .stat-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+
+      .stat-value {
+        font-size: 1.2em;
+        font-weight: bold;
+        color: var(--color-primary);
+      }
+
+      .stat-label {
+        font-size: 0.8em;
+        color: var(--color-text-secondary);
+        margin-top: 2px;
+      }
+    </style>
+
+    {{ if .JSON.Bool "status" }}
+      <!-- Server Information -->
+      <div class="server-info">
+        <div class="server-stats">
+          <div class="stat-item">
+            <div class="stat-value">{{ .JSON.Int "data.configurationInfo.ConnectedPeers" }}</div>
+            <div class="stat-label">Connected</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">{{ .JSON.Int "data.configurationInfo.TotalPeers" }}</div>
+            <div class="stat-label">Total Peers</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value">{{ printf "%.1f" (.JSON.Float "data.configurationInfo.DataUsage.Total") }}GB</div>
+            <div class="stat-label">Total Data</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Peers List -->
+      <ul class="list list-gap-10 collapsible-container" data-collapse-after="6">
+        {{ range .JSON.Array "data.configurationPeers" }}
+        <li>
+          <div class="flex items-center gap-10">
+            <div class="device-name-container grow">
+              <span class="size-h4 block text-truncate color-primary">
+                {{ if .String "name" }}
+                  {{ .String "name" }}
+                {{ else }}
+                  {{ .String "allowed_ip" }}
+                {{ end }}
+              </span>
+              <div class="indicators-container">
+                {{ if eq (.String "status") "running" }}
+                  {{ if $enableOnlineIndicator }}
+                  <span class="connected-indicator" data-popover-type="text" data-popover-text="Connected"></span>
+                  {{ end }}
+                {{ else if eq (.String "status") "stopped" }}
+                  {{ if eq (.String "latest_handshake") "No Handshake" }}
+                    <span class="never-connected-indicator" data-popover-type="text" data-popover-text="Never connected"></span>
+                  {{ else }}
+                    <span class="disconnected-indicator" data-popover-type="text" data-popover-text="Disconnected - Last handshake {{ .String "latest_handshake" }}"></span>
+                  {{ end }}
+                {{ end }}
+              </div>
+            </div>
+          </div>
+          <div class="device-info-container">
+            <ul class="list-horizontal-text device-info">
+              <li>{{ .String "allowed_ip" }}</li>
+              {{ if ne (.String "endpoint") "(none)" }}
+                <li>{{ .String "endpoint" }}</li>
+              {{ end }}
+              {{ if ne (.String "latest_handshake") "No Handshake" }}
+                <li>{{ .String "latest_handshake" }} ago</li>
+              {{ else }}
+                <li>Never connected</li>
+              {{ end }}
+            </ul>
+            {{ if $showDataTransfer }}
+            <div class="device-transfer">
+              <span class="color-positive">↓{{ printf "%.1f" (.Float "total_receive" | mul 1024) }}MB</span>
+              <span class="color-highlight margin-left-10">↑{{ printf "%.1f" (.Float "total_sent" | mul 1024) }}MB</span>
+            </div>
+            {{ end }}
+          </div>
+        </li>
+        {{ end }}
+      </ul>
+    {{ else }}
+      <div class="color-negative">Failed to fetch WireGuard data</div>
+    {{ end }}
