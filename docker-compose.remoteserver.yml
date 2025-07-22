@@ -54,6 +54,7 @@ include:
   - compose/dufs.yml
   - compose/filebrowser.yml
   - compose/gotify.yml
+  - compose/headscale.yml
   - compose/homepage.yml
   # - compose/glance.yml
   - compose/komodo-periphery.yml
@@ -62,7 +63,6 @@ include:
   - compose/tinyauth.yml
   - compose/traefik.yml
   # - compose/vaultwarden.yml
-  # - compose/wg-easy.yml
   - compose/wgdashboard.yml
   #### DESKTOP APPS ####
   - compose/firefox.yml

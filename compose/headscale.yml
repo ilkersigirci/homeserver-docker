@@ -1,0 +1,136 @@
+services:
+  # docker exec headscale headscale apikey create
+  headscale:
+    image: headscale/headscale:0.26.1
+    container_name: headscale
+    command: serve
+    # restart: $BASE_RESTART_POLICY
+    restart: "no"
+    profiles:
+      - core
+    networks:
+      - t3_proxy
+    expose:
+      - "8080"
+      - "9090"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $CONFIGDIR/headscale:/etc/headscale:ro
+      - $DATADIR/headscale:/var/lib/headscale
+    environment:
+      TZ: $TZ
+    labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.headscale-rtr.entrypoints: websecure
+      traefik.http.routers.headscale-rtr.rule: Host(`headscale.$DOMAINNAME`)
+      ## Middlewares
+      # traefik.http.routers.headscale-rtr.middlewares: chain-tinyauth@file
+      ## CORS Middleware
+      traefik.http.middlewares.headscale-cors.headers.accessControlAllowMethods: "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+      traefik.http.middlewares.headscale-cors.headers.accessControlAllowHeaders: "Authorization,Content-Type"
+      traefik.http.middlewares.headscale-cors.headers.accessControlAllowOriginList: "https://headscale.$DOMAINNAME"
+      traefik.http.middlewares.headscale-cors.headers.accessControlMaxAge: 100
+      traefik.http.middlewares.headscale-cors.headers.addVaryHeader: true
+      # Attach Middleware to Router
+      traefik.http.routers.headscale-rtr.middlewares: headscale-cors
+      ## HTTP Services
+      traefik.http.routers.headscale-rtr.service: headscale-svc
+      traefik.http.services.headscale-svc.loadbalancer.server.port: "8080"
+      ####### HOMEPAGE #######
+      homepage.group: Core
+      homepage.name: headscale
+      homepage.icon: headscale.png
+      homepage.href: https://headscale.$DOMAINNAME/admin
+      homepage.target: _blank
+      homepage.description: An open source, self-hosted implementation of the Tailscale control server
+      ####### GLANCE #######
+      glance.name: headscale
+      glance.icon: sh:headscale
+      glance.url: https://headscale.$DOMAINNAME/admin
+      glance.description: An open source, self-hosted implementation of the Tailscale control server
+
+  headscale-admin:
+    image: goodieshq/headscale-admin:0.26.0
+    container_name: headscale-admin
+    restart: $BASE_RESTART_POLICY
+    depends_on:
+      - headscale
+    profiles:
+      - core
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      ENDPOINT: "/admin"
+    labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.headscale-admin-rtr.entrypoints: websecure
+      traefik.http.routers.headscale-admin-rtr.rule: Host(`headscale.$DOMAINNAME`) && PathPrefix(`/admin`)
+      ## Middlewares
+      # traefik.http.routers.headscale-admin-rtr.middlewares: chain-tinyauth@file
+      ## HTTP Services
+      traefik.http.routers.headscale-admin-rtr.service: headscale-admin-svc
+      traefik.http.services.headscale-admin-svc.loadbalancer.server.port: "80"
+      ####### HOMEPAGE #######
+      homepage.group: Core
+      homepage.name: headscale-admin
+      homepage.icon: headscale-admin.png
+      homepage.href: https://headscale.$DOMAINNAME/admin
+      homepage.target: _blank
+      homepage.description: Admin Web Interface for headscale
+      ####### GLANCE #######
+      glance.name: headscale-admin
+      glance.icon: sh:headscale-admin
+      glance.url: https://headscale.$DOMAINNAME/admin
+      glance.description: Admin Web Interface for headscale
+
+
+  headplane:
+    image: ghcr.io/tale/headplane:0.6.0
+    container_name: headplane
+    restart: $BASE_RESTART_POLICY
+    depends_on:
+      - headscale
+    profiles:
+      - not-used
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      # - $CONFIGDIR/headplane/config.yaml:/etc/headplane/config.yaml
+      - $CONFIGDIR/headscale/config.yaml:/etc/headplane/config.yaml
+      - $DATADIR/headplane:/var/lib/headplane
+      - $CONFIGDIR/headscale/config.yaml:/etc/headscale/config.yaml
+      # If using dns.extra_records in Headscale (recommended), this should
+      # match the headscale.dns_records_path in your config.yaml
+      # - $CONFIGDIR/headscale/dns_records.json:/etc/headscale/dns_records.json
+    labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.headplane-rtr.entrypoints: websecure
+      traefik.http.routers.headplane-rtr.rule: Host(`headscale.$DOMAINNAME`) && PathPrefix(`/admin`)
+      ## Middlewares
+      traefik.http.routers.headplane-rtr.middlewares: chain-tinyauth@file
+      ## HTTP Services
+      traefik.http.routers.headplane-rtr.service: headplane-svc
+      traefik.http.services.headplane-svc.loadbalancer.server.port: "3000"
+      ####### HOMEPAGE #######
+      homepage.group: Core
+      homepage.name: headplane
+      homepage.icon: headplane.png
+      homepage.href: https://headscale.$DOMAINNAME/admin
+      homepage.target: _blank
+      homepage.description: A feature-complete Web UI for Headscale
+      ####### GLANCE #######
+      glance.name: headplane
+      glance.icon: sh:headplane
+      glance.url: https://headscale.$DOMAINNAME/admin
+      glance.description: A feature-complete Web UI for Headscale
