@@ -69,6 +69,4 @@
           #   source: https://wireguard.${BASE_DOMAINNAME}
           #   height: 1000
 
-          # - $include: custom-widgets/wg-easy.yml
-          - $include: custom-widgets/wgdashboard.yml
           - $include: custom-widgets/tailscale.yml
