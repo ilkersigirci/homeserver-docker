@@ -69,4 +69,4 @@
           #   source: https://wireguard.${BASE_DOMAINNAME}
           #   height: 1000
 
-          - $include: custom-widgets/tailscale.yml
+          - $include: custom-widgets/headscale.yml
