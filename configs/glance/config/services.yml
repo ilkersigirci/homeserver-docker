@@ -64,9 +64,4 @@
       widgets:
         - type: group
           widgets:
-          # - type: iframe
-          #   title: Wireguard
-          #   source: https://wireguard.${BASE_DOMAINNAME}
-          #   height: 1000
-
           - $include: custom-widgets/headscale.yml
