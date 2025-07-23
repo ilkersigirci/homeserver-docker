@@ -66,7 +66,7 @@ http:
     #   loadBalancer:
     #     servers:
     #       # - url: "http://10.8.0.3:8096" # Wiregurd
-
+    #       # - url: "http://100.64.0.3:8096" # Tailscale
     wireguard-svc:
       loadBalancer:
         servers:
@@ -75,7 +75,8 @@ http:
     pocket-id-svc:
       loadBalancer:
         servers:
-          - url: "http://10.8.0.3:1411"
+          # - url: "http://10.8.0.3:1411"
+          - url: "http://100.64.0.3:1411"
         # healthCheck:
         #   path: "/healthz"
         #   interval: "30s"
@@ -84,4 +85,5 @@ http:
     immich-public-proxy-svc:
       loadBalancer:
         servers:
-          - url: "http://10.8.0.3:8097"
+          # - url: "http://10.8.0.3:8097"
+          - url: "http://100.64.0.3:8097"
