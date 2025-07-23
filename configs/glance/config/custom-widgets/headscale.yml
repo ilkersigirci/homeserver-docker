@@ -17,27 +17,10 @@
         height: 1.5em;
       }
 
-      .device-info {
-        display: flex;
-        transition: transform 0.2s ease, opacity 0.2s ease;
-      }
-
       .device-ip {
-        position: absolute;
+        position: static;
         top: 0;
         left: 0;
-        transform: translateY(-100%);
-        opacity: 0;
-        transition: transform 0.2s ease, opacity 0.2s ease;
-      }
-
-      .device-info-container:hover .device-info {
-        transform: translateY(100%);
-        opacity: 0;
-      }
-
-      .device-info-container:hover .device-ip {
-        transform: translateY(0);
         opacity: 1;
       }
 
@@ -106,10 +89,6 @@
           </div>
         </div>
         <div class="device-info-container">
-          <ul class="list-horizontal-text device-info">
-            <li>{{ .String "name" }}</li>
-            <li>{{ .String "user.name" }}</li>
-          </ul>
           <div class="device-ip">
             {{ .String "ipAddresses.0"}}
           </div>
