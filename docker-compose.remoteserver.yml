@@ -63,7 +63,6 @@ include:
   - compose/tinyauth.yml
   - compose/traefik.yml
   # - compose/vaultwarden.yml
-  - compose/wgdashboard.yml
   #### DESKTOP APPS ####
   - compose/firefox.yml
   #### MACHINE LEARNING ####
