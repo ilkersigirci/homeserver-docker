@@ -12,6 +12,9 @@ services:
       - maintenance
     networks:
       - t3_proxy
+    expose:
+      - 9000 # API
+      - 9001 # Web UI
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -26,6 +29,11 @@ services:
       MINIO_IDENTITY_OPENID_CLIENT_SECRET: $MINIO_CLIENT_SECRET
       MINIO_IDENTITY_OPENID_SCOPES: "openid,email,profile"
       MINIO_IDENTITY_OPENID_CLAIM_NAME: policy
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
     labels:
       tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
