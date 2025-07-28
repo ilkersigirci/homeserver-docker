@@ -13,24 +13,67 @@
         #       headers:
         #         Authorization: Bearer ${TMDB_API_READ_ACCESS_TOKEN}
 
-        # - type: rss
-        #   title: T/trending_tv
-        #   limit: 20
-        #   collapse-after: 6
-        #   cache: 2h
-        #   feeds:
-        #     - url: http://rsshub:1200/themoviedb/trending/tv/day/en-US
-        #       title: trending_tv
-
-        - type: split-column
+        # NOTE: https://docs.rsshub.app/routes/multimedia#the-movie-database
+        - type: group
+          title: MOVIES
           widgets:
-            - $include: custom-widgets/tmdb-popular-movies.yml
-            - $include: custom-widgets/tmdb-popular-tvshows.yml
+          - type: rss
+            title: TRENDING
+            style: horizontal-cards-2
+            limit: 20
+            cache: 2h
+            feeds:
+              - url: http://rsshub:1200/themoviedb/trending/movie/day/en-US
+                title: " "
+          
+          - type: rss
+            title: UPCOMING
+            style: horizontal-cards-2
+            limit: 20
+            cache: 2h
+            feeds:
+              - url: http://rsshub:1200/themoviedb/movie/upcoming/en-US
+                title: " "
+
+          - type: rss
+            title: TOP.RATED
+            style: horizontal-cards-2
+            limit: 20
+            cache: 2h
+            feeds:
+              - url: http://rsshub:1200/themoviedb/movie/top-rated/en-US
+                title: " "
+
+        - type: group
+          title: TVSHOWS
+          widgets:
+          - type: rss
+            title: TRENDING
+            style: horizontal-cards-2
+            limit: 20
+            cache: 2h
+            feeds:
+              - url: http://rsshub:1200/themoviedb/trending/tv/day/en-US
+                title: " "
+          
+          - type: rss
+            title: TOP.RATED
+            style: horizontal-cards-2
+            limit: 20
+            cache: 2h
+            feeds:
+              - url: http://rsshub:1200/themoviedb/tv/top-rated/en-US
+                title: " "
+
+        # - type: split-column
+        #   widgets:
+        #     - $include: custom-widgets/tmdb-popular-movies.yml
+        #     - $include: custom-widgets/tmdb-popular-tvshows.yml
 
     - size: small
       widgets:
         - type: calendar
           first-day-of-week: monday
 
-        - $include: custom-widgets/jellyfin-history.yml
-        # - $include: custom-widgets/jellyfin-now-playing.yml
+        - $include: custom-widgets/trakt-history.yml
+        # - $include: custom-widgets/jellyfin-history.yml
