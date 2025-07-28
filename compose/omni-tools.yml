@@ -16,7 +16,7 @@ services:
       traefik.http.routers.omni-tools-rtr.entrypoints: websecure
       traefik.http.routers.omni-tools-rtr.rule: Host(`omni-tools.$DOMAINNAME`)
       ## Middlewares
-      traefik.http.routers.omni-tools-rtr.middlewares: chain-tinyauth@file
+      traefik.http.routers.omni-tools-rtr.middlewares: chain-tinyauth-relaxed@file
       ## HTTP Services
       traefik.http.routers.omni-tools-rtr.service: omni-tools-svc
       traefik.http.services.omni-tools-svc.loadbalancer.server.port: "80"
