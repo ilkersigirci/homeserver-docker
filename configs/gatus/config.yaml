@@ -177,7 +177,7 @@ endpoints:
     url: "100.64.0.4" # Address of the DNS server to use
     interval: 30s
     dns:
-      query-name: "wghomeserver"
+      query-name: "homeserver"
       query-type: "A"
     conditions:
       - "[BODY] == 100.64.0.3"
