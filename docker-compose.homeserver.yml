@@ -101,7 +101,8 @@ include:
   # - compose/sd-next.yml
   - compose/langfuse.yml
   #### MONITORING ####
-  # - compose/beszel.yml
+  - compose/beszel.yml
+  - compose/beszel-agent.yml
   - compose/changedetection.yml
   # - compose/netdata.yml
   # - compose/watchyourlan.yml

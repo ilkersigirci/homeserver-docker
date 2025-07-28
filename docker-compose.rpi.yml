@@ -70,7 +70,7 @@ include:
   # - compose/transmission.yml
   #### ML ####
   #### MONITORING ####
-  # - compose/beszel.yml
+  - compose/beszel-agent.yml
   #### PHOTO ####
   #### READING ####
   # - compose/obsidian.yml
