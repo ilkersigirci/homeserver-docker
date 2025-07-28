@@ -80,13 +80,13 @@ services:
       ####### HOMEPAGE #######
       homepage.group: Core
       homepage.name: headscale-admin
-      homepage.icon: headscale-admin.png
+      homepage.icon: headscale.png
       homepage.href: https://headscale.$DOMAINNAME/admin
       homepage.target: _blank
       homepage.description: Admin Web Interface for headscale
       ####### GLANCE #######
       glance.name: headscale-admin
-      glance.icon: sh:headscale-admin
+      glance.icon: sh:headscale
       glance.url: https://headscale.$DOMAINNAME/admin
       glance.description: Admin Web Interface for headscale
 
