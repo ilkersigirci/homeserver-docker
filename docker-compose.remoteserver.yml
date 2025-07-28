@@ -71,6 +71,7 @@ include:
   # - compose/docker-gc.yml
   # - compose/dozzle.yml
   - compose/gatus.yml
+  - compose/it-tools.yml
   - compose/omni-tools.yml
   - compose/syncthing.yml
   # - compose/uptime-kuma.yml
