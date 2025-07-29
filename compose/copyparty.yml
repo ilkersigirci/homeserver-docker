@@ -1,0 +1,51 @@
+services:
+  copyparty:
+    image: ghcr.io/9001/copyparty-ac:latest
+    container_name: copyparty
+    user: $PUID:$PGID
+    restart: $BASE_RESTART_POLICY
+    profiles:
+      - core
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $CONFIGDIR/copyparty:/cfg
+      - $USERDIR/docker/configs:/w/docker/configs:rw
+      - $USERDIR/docker/compose:/w/docker/compose:rw
+      # - $HARDDISKROOTDIR:/w/Harddisk:ro
+    # environment:
+    #   # Makes download-as-zip 3x as fast, filesystem-indexing 1.5x as fast, etc. (Uses x2 RAM)
+    #   LD_PRELOAD: /usr/lib/libmimalloc-secure.so.2
+    stop_grace_period: 15s  # thumbnailer is allowed to continue finishing up for 10s after the shutdown signal
+    healthcheck:
+      # hide it from logs with "/._" so it matches the default --lf-url filter 
+      test: ["CMD-SHELL", "wget --spider -q 127.0.0.1:8000/?reset=/._"]
+      interval: 1m
+      timeout: 2s
+      retries: 5
+      start_period: 15s
+    labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.copyparty-rtr.entrypoints: websecure
+      traefik.http.routers.copyparty-rtr.rule: Host(`copyparty.$DOMAINNAME`)
+      ## Middlewares
+      traefik.http.routers.copyparty-rtr.middlewares: chain-tinyauth@file
+      ## HTTP Services
+      traefik.http.routers.copyparty-rtr.service: copyparty-svc
+      traefik.http.services.copyparty-svc.loadbalancer.server.port: "8000"
+      ####### HOMEPAGE #######
+      homepage.group: Core
+      homepage.name: copyparty
+      homepage.icon: copyparty.png
+      homepage.href: https://copyparty.$DOMAINNAME
+      homepage.target: _blank
+      homepage.description: Portable file server with accelerated resumable uploads, dedup, WebDAV, FTP, TFTP, zeroconf, media indexer
+      ####### GLANCE #######
+      glance.name: copyparty
+      glance.icon: sh:copyparty
+      glance.url: https://copyparty.$DOMAINNAME
+      glance.description: Portable file server with accelerated resumable uploads, dedup, WebDAV, FTP, TFTP, zeroconf, media indexer

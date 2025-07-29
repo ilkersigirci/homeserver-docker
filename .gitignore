@@ -18,3 +18,4 @@ configs/*
 !configs/immich-public-proxy
 !configs/glance
 configs/glance/docs
+!configs/copyparty

@@ -51,8 +51,7 @@ include:
   #### CORE ####
   - compose/adguardhome.yml
   - compose/crowdsec.yml
-  - compose/dufs.yml
-  - compose/filebrowser.yml
+  - compose/copyparty.yml
   - compose/gotify.yml
   - compose/headscale.yml
   - compose/homepage.yml
