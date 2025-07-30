@@ -60,14 +60,14 @@ services:
       traefik.http.routers.linkwarden-rtr.service: "linkwarden-svc"
       traefik.http.services.linkwarden-svc.loadbalancer.server.port: "3000"
       ####### HOMEPAGE #######
-      homepage.group: "Reading"
-      homepage.name: "Linkwarden"
-      homepage.icon: "linkwarden.webp"
-      homepage.href: "https://linkwarden.$DOMAINNAME"
-      homepage.target: "_blank"
-      homepage.description: "Bookmark Manager"
-      homepage.widget.type: "linkwarden"
-      homepage.widget.url: "http://linkwarden:3000"
-      homepage.widget.key: "$LINKWARDEN_ACCESS_KEY"
+      homepage.group: Reading
+      homepage.name: Linkwarden
+      homepage.icon: linkwarden.webp
+      homepage.href: https://linkwarden.$DOMAINNAME
+      homepage.target: _blank
+      homepage.description: Bookmark Manager
+      homepage.widget.type: linkwarden
+      homepage.widget.url: http://linkwarden:3000
+      homepage.widget.key: $LINKWARDEN_ACCESS_TOKEN
     profiles:
       - reading
