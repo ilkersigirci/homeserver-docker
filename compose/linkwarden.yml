@@ -5,12 +5,14 @@ services:
     restart: $OTHERS_RESTART_POLICY
     networks:
       - t3_proxy
+    expose:
+      - "5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
     volumes:
-      - $DOCKERDIR/appdata/linkwarden-db:/var/lib/postgresql/data
+      - $DATADIR/linkwarden-db:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -32,14 +34,20 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/linkwarden:/data/data
+      - $DATADIR/linkwarden:/data/data
     environment:
       STORAGE_FOLDER: /data
-      NEXTAUTH_URL: http://localhost:3000/api/v1/auth
-      NEXTAUTH_SECRET: VERY_SENSITIVE_SECRET
+      NEXTAUTH_URL: https://linkwarden.$DOMAINNAME/api/v1/auth
+      NEXTAUTH_SECRET: $LINKWARDEN_NEXTAUTH_SECRET
       DATABASE_URL: postgresql://postgres:postgres@linkwarden-db:5432/postgres
       NEXT_PUBLIC_DISABLE_REGISTRATION: true
       NEXT_PUBLIC_CREDENTIALS_ENABLED: true
+      ## OIDC
+      NEXT_PUBLIC_KEYCLOAK_ENABLED: true
+      KEYCLOAK_CUSTOM_NAME: PocketID
+      KEYCLOAK_ISSUER: https://pocketid.$BASE_DOMAINNAME
+      KEYCLOAK_CLIENT_ID: $LINKWARDEN_CLIENT_ID
+      KEYCLOAK_CLIENT_SECRET: $LINKWARDEN_CLIENT_SECRET
     labels:
       tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
