@@ -44,17 +44,6 @@
             # - url: http://rsshub:1200/telegram/channel/awesomeRSSHub
             #   title: awesomeRSSHub
 
-        - type: videos
-          style: vertical-list # horizontal-cards, grid-cards
-          title: YouTube
-          channels:
-            - UCHnyfMqiRRG1u-2MsSQLbXA # Veritasium
-            - UCbfYPyITQ-7l4upoX8nvctg # Two Minute Papers
-            - UCsXVk37bltHxD1rDPwtNM8Q # Kurzgesagt
-            - UCsBjURrPoezykLs9EqgamOA # Fireship
-            # - UCBJycsmduvYEL83R_U4JriQ # Marques Brownlee
-            # - UCXuqSBlHAE6Xw-yeJA0Tunw # Linus Tech Tips
-
         - type: bookmarks
           groups:
             - title: General
@@ -92,14 +81,6 @@
           - type: group
             widgets:
             - type: rss
-              title: X/pusholder
-              limit: 30
-              collapse-after: 5
-              cache: 1h
-              feeds:
-                - url: http://rsshub:1200/twitter/user/pusholder/readable=1&limit=30&authorNameBold=1&showAuthorInTitle=1&showAuthorInDesc=1&showQuotedAuthorAvatarInDesc=1&showAuthorAvatarInDesc=1&showEmojiForRetweetAndReply=1&showRetweetTextInTitle=0&addLinkForPics=1&showTimestampInDescription=1&showQuotedInTitle=1&heightOfPics=150
-                  title: " "
-            - type: rss
               title: T/habermha
               # style: detailed-list
               limit: 30
@@ -119,10 +100,18 @@
               feeds:
                 - url: http://homeserver-api-head:8000/api/v1/eksi/gundem/rss
                   title: " "
+            - type: rss
+              title: X/pusholder
+              limit: 30
+              collapse-after: 5
+              cache: 1h
+              feeds:
+                - url: http://rsshub:1200/twitter/user/pusholder/readable=1&limit=30&authorNameBold=1&showAuthorInTitle=1&showAuthorInDesc=1&showQuotedAuthorAvatarInDesc=1&showAuthorAvatarInDesc=1&showEmojiForRetweetAndReply=1&showRetweetTextInTitle=0&addLinkForPics=1&showTimestampInDescription=1&showQuotedInTitle=1&heightOfPics=150
+                  title: " "
 
         - type: rss
           title: News
-          hide-header: true
+          # hide-header: true
           style: horizontal-cards # vertical-list, detailed-list, horizontal-cards, horizontal-cards-2
           feeds:
             - url: https://feeds.bloomberg.com/markets/news.rss
@@ -131,6 +120,18 @@
               title: Fox Business
             - url: https://moxie.foxbusiness.com/google-publisher/technology.xml
               title: Fox Business
+
+        - type: videos
+          style: horizontal-cards # vertical-list, detailed-list, horizontal-cards, horizontal-cards-2
+          title: YouTube
+          # hide-header: true
+          channels:
+            - UCHnyfMqiRRG1u-2MsSQLbXA # Veritasium
+            - UCbfYPyITQ-7l4upoX8nvctg # Two Minute Papers
+            - UCsXVk37bltHxD1rDPwtNM8Q # Kurzgesagt
+            - UCsBjURrPoezykLs9EqgamOA # Fireship
+            # - UCBJycsmduvYEL83R_U4JriQ # Marques Brownlee
+            # - UCXuqSBlHAE6Xw-yeJA0Tunw # Linus Tech Tips
 
     - size: small
       widgets:

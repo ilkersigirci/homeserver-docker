@@ -29,25 +29,6 @@
 
     - size: full
       widgets:
-        # - type: server-stats
-        #   servers:
-        #     - type: local
-        #       name: Homeserver
-        #       # optionally override the sensor used to determine CPU temperature
-        #       # cpu-temp-sensor: thermal_zone0
-        #       hide-swap: true
-        #       # optionally hide or rename mountpoints
-        #       # mountpoints:
-        #       #   "/boot/efi":
-        #       #     hide: true
-        #       #     name: EFI
-
-        # - type: docker-containers
-        #   hide-by-default: false
-        #   # providers:
-        #   #   - type: proxy
-        #   #     host: tcp://docker-socket-proxy:2375
-        
         - type: group
           widgets:
             - type: reddit

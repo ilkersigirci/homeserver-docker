@@ -6,13 +6,12 @@
 
     - size: full
       widgets:
-        
         # - type: server-stats
         #   servers:
         #     - type: local
         #       name: Homeserver
         #       # optionally override the sensor used to determine CPU temperature
-        #       # cpu-temp-sensor: thermal_zone0
+        #       cpu-temp-sensor: k10temp_tctl
         #       hide-swap: true
         #       # optionally hide or rename mountpoints
         #       # mountpoints:
