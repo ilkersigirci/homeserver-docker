@@ -55,44 +55,40 @@
 #             deviceid: {{HOMEPAGE_VAR_TAILSCALE_DEVICE_ID}}
 #             hideErrors: true
 
-# - Graphs:
-#     - CPU:
-#         widget:
-#             type: beszel
-#             # url: https://beszel.{{HOMEPAGE_VAR_DOMAINNAME}}
-#             url: http://beszel:8090
-#             username: {{HOMEPAGE_VAR_BESZEL_EMAIL}}
-#             password: {{HOMEPAGE_VAR_BESZEL_PASSWORD}}
-#             systemId: {{HOMEPAGE_VAR_MY_HOSTNAME}}
-#             version: 2
-#             fields: ['cpu']
-#     - Memory:
-#         widget:
-#             type: beszel
-#             # url: https://beszel.{{HOMEPAGE_VAR_DOMAINNAME}}
-#             url: http://beszel:8090
-#             username: {{HOMEPAGE_VAR_BESZEL_EMAIL}}
-#             password: {{HOMEPAGE_VAR_BESZEL_PASSWORD}}
-#             systemId: {{HOMEPAGE_VAR_MY_HOSTNAME}}
-#             version: 2
-#             fields: ['memory']
-#     - Network:
-#         widget:
-#             type: beszel
-#             # url: https://beszel.{{HOMEPAGE_VAR_DOMAINNAME}}
-#             url: http://beszel:8090
-#             username: {{HOMEPAGE_VAR_BESZEL_EMAIL}}
-#             password: {{HOMEPAGE_VAR_BESZEL_PASSWORD}}
-#             systemId: {{HOMEPAGE_VAR_MY_HOSTNAME}}
-#             version: 2
-#             fields: ['network']
-#     - Disk:
-#         widget:
-#             type: beszel
-#             # url: https://beszel.{{HOMEPAGE_VAR_DOMAINNAME}}
-#             url: http://beszel:8090
-#             username: {{HOMEPAGE_VAR_BESZEL_EMAIL}}
-#             password: {{HOMEPAGE_VAR_BESZEL_PASSWORD}}
-#             systemId: {{HOMEPAGE_VAR_MY_HOSTNAME}}
-#             version: 2
-#             fields: ['disk']
+- Graphs:
+    - CPU:
+        widget:
+            type: beszel
+            url: https://beszel.gpu.{{HOMEPAGE_VAR_BASE_DOMAINNAME}}
+            username: {{HOMEPAGE_VAR_BESZEL_EMAIL}}
+            password: {{HOMEPAGE_VAR_BESZEL_PASSWORD}}
+            systemId: {{HOMEPAGE_VAR_MY_HOSTNAME}}
+            version: 2
+            fields: ['cpu']
+    - Memory:
+        widget:
+            type: beszel
+            url: https://beszel.gpu.{{HOMEPAGE_VAR_BASE_DOMAINNAME}}
+            username: {{HOMEPAGE_VAR_BESZEL_EMAIL}}
+            password: {{HOMEPAGE_VAR_BESZEL_PASSWORD}}
+            systemId: {{HOMEPAGE_VAR_MY_HOSTNAME}}
+            version: 2
+            fields: ['memory']
+    - Network:
+        widget:
+            type: beszel
+            url: https://beszel.gpu.{{HOMEPAGE_VAR_BASE_DOMAINNAME}}
+            username: {{HOMEPAGE_VAR_BESZEL_EMAIL}}
+            password: {{HOMEPAGE_VAR_BESZEL_PASSWORD}}
+            systemId: {{HOMEPAGE_VAR_MY_HOSTNAME}}
+            version: 2
+            fields: ['network']
+    - Disk:
+        widget:
+            type: beszel
+            url: https://beszel.gpu.{{HOMEPAGE_VAR_BASE_DOMAINNAME}}
+            username: {{HOMEPAGE_VAR_BESZEL_EMAIL}}
+            password: {{HOMEPAGE_VAR_BESZEL_PASSWORD}}
+            systemId: {{HOMEPAGE_VAR_MY_HOSTNAME}}
+            version: 2
+            fields: ['disk']

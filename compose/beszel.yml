@@ -1,5 +1,4 @@
-# NOTE: When adding the local agent on the same docker network, use its name: `beszel-agent` not the IP address.
-# That way, the agent doesn't need to expose the port.
+# NOTE: For OIDC: PocketID -> Application Configuration -> Enable Emails Verified
 services:
   beszel:
     image: henrygd/beszel
@@ -12,6 +11,8 @@ services:
     environment:
       TZ: $TZ
       USER_CREATION: false
+      # NOTE: Can be uncomment this if OIDC is used.
+      # DISABLE_PASSWORD_AUTH: true
     profiles:
       - monitoring
     healthcheck:
