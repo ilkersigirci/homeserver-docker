@@ -41,8 +41,8 @@ services:
       NEXTAUTH_SECRET: $LINKWARDEN_NEXTAUTH_SECRET
       DATABASE_URL: postgresql://postgres:postgres@linkwarden-db:5432/postgres
       NEXT_PUBLIC_DISABLE_REGISTRATION: true
-      NEXT_PUBLIC_CREDENTIALS_ENABLED: true
       ## OIDC
+      NEXT_PUBLIC_CREDENTIALS_ENABLED: false
       NEXT_PUBLIC_KEYCLOAK_ENABLED: true
       KEYCLOAK_CUSTOM_NAME: PocketID
       KEYCLOAK_ISSUER: https://pocketid.$BASE_DOMAINNAME
