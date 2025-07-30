@@ -76,6 +76,7 @@ include:
   - compose/healthchecks.yml
   - compose/loggifly.yml
   - compose/minio.yml
+  - compose/pgadmin.yml
   - compose/restfox.yml
   - compose/rustic.yml
   - compose/syncthing.yml

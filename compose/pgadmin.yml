@@ -1,0 +1,45 @@
+# NOTE: Chown the directory.
+# mkdir -p $DOCKERDIR/appdata/pgadmin
+# sudo chown 5050:5050 $DOCKERDIR/appdata/pgadmin
+# NOTE: Add internal databases only using their docker container names (http:// shouldn't be included)
+services:
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    restart: $MAINTENANCE_RESTART_POLICY
+    user: 5050:5050
+    profiles:
+      - maintenance
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/pgadmin:/var/lib/pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: $PGADMIN_DEFAULT_EMAIL
+      PGADMIN_DEFAULT_PASSWORD: $PGADMIN_DEFAULT_PASSWORD
+      PGADMIN_CONFIG_CONSOLE_LOG_LEVEL: 10
+    labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.pgadmin-rtr.entrypoints: websecure
+      traefik.http.routers.pgadmin-rtr.rule: Host(`pgadmin.$DOMAINNAME`)
+      ## Middlewares
+      traefik.http.routers.pgadmin-rtr.middlewares: chain-tinyauth@file
+      ## HTTP Services
+      traefik.http.routers.pgadmin-rtr.service: pgadmin-svc
+      traefik.http.services.pgadmin-svc.loadbalancer.server.port: "80"
+      ####### HOMEPAGE #######
+      homepage.group: Maintenance
+      homepage.name: pgadmin
+      homepage.icon: pgadmin.png
+      homepage.href: https://pgadmin.$DOMAINNAME
+      homepage.target: _blank
+      homepage.description: description
+      ####### GLANCE #######
+      glance.name: pgadmin
+      glance.icon: sh:pgadmin
+      glance.url: https://pgadmin.$DOMAINNAME
+      glance.description: description
