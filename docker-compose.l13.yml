@@ -55,6 +55,7 @@ include:
   - compose/socket-proxy.yml
   - compose/tinyauth.yml
   - compose/traefik.yml
+  - compose/traefik-log-dashboard.yml
   #### DESKTOP APPS ####
   #### MACHINE LEARNING ####
   ###### MAINTENANCE ####

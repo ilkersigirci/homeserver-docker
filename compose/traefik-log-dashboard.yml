@@ -1,0 +1,83 @@
+services:
+  traefik-log-dashboard-backend:
+    image: ghcr.io/hhftechnology/traefik-log-dashboard-backend:latest
+    container_name: traefik-log-dashboard-backend
+    restart: $BASE_RESTART_POLICY
+    profiles:
+      - core
+      - traefik-log-dashboard
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/logs/traefik:/logs:ro
+    environment:
+      NODE_ENV: production
+      TRAEFIK_LOG_FILE: /logs/access.log
+      PORT: 3001
+    # healthcheck:
+    #   test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001/health"]
+    #   interval: 30s
+    #   timeout: 5s
+    #   retries: 3
+    labels:
+      tinyauth.ip.bypass: $LOCAL_IPS
+      traefik.enable: "true"
+      ####### HOMEPAGE #######
+      homepage.group: Core
+      homepage.name: traefik-log-dashboard-backend
+      homepage.icon: traefik-log-dashboard-backend.png
+      homepage.target: _blank
+      homepage.description: A real-time dashboard for analyzing Traefik logs - Backend
+      ####### GLANCE #######
+      glance.name: traefik-log-dashboard-backend
+      glance.icon: sh:traefik-log-dashboard-backend
+      glance.description: A real-time dashboard for analyzing Traefik logs - Backend
+
+
+  traefik-log-dashboard-frontend:
+    image: ghcr.io/hhftechnology/traefik-log-dashboard-frontend:latest
+    container_name: traefik-log-dashboard-frontend
+    restart: $BASE_RESTART_POLICY
+    depends_on:
+      - traefik-log-dashboard-backend
+    profiles:
+      - core
+      - traefik-log-dashboard
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      BACKEND_SERVICE: traefik-log-dashboard-backend
+      BACKEND_PORT: 3001
+    # healthcheck:
+    #   test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+    #   interval: 30s
+    #   timeout: 5s
+    #   retries: 3
+    labels:
+      tinyauth.domain: traefik-log.$DOMAINNAME
+      tinyauth.ip.bypass: $LOCAL_IPS
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.traefik-log-dashboard-frontend-rtr.entrypoints: websecure
+      traefik.http.routers.traefik-log-dashboard-frontend-rtr.rule: Host(`traefik-log.$DOMAINNAME`)
+      ## Middlewares
+      traefik.http.routers.traefik-log-dashboard-frontend-rtr.middlewares: chain-tinyauth@file
+      ## HTTP Services
+      traefik.http.routers.traefik-log-dashboard-frontend-rtr.service: traefik-log-dashboard-frontend-svc
+      traefik.http.services.traefik-log-dashboard-frontend-svc.loadbalancer.server.port: "80"
+      ####### HOMEPAGE #######
+      homepage.group: Core
+      homepage.name: traefik-log-dashboard-frontend
+      homepage.icon: traefik-log-dashboard-frontend.png
+      homepage.href: https://traefik-log.$DOMAINNAME
+      homepage.target: _blank
+      homepage.description: A real-time dashboard for analyzing Traefik logs
+      ####### GLANCE #######
+      glance.name: traefik-log-dashboard-frontend
+      glance.icon: sh:traefik-log-dashboard-frontend
+      glance.url: https://traefik-log.$DOMAINNAME
+      glance.description: A real-time dashboard for analyzing Traefik logs

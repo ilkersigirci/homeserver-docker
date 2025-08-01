@@ -61,6 +61,7 @@ include:
   - compose/socket-proxy.yml
   - compose/tinyauth.yml
   - compose/traefik.yml
+  - compose/traefik-log-dashboard.yml
   # - compose/vaultwarden.yml
   #### DESKTOP APPS ####
   - compose/firefox.yml

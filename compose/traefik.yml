@@ -36,6 +36,7 @@ services:
       - --log.maxbackups=10 # Max number of old log files to keep
       - --accesslog=true
       - --accesslog.filePath=/logs/access.log
+      - --accesslog.format=json
       - --accesslog.bufferingSize=100 # Configuring a buffer of 100 lines
       - --accesslog.filters.statusCodes=204-299,400-499,500-599
       - --accesslog.fields.names.StartUTC=drop
