@@ -21,6 +21,14 @@ services:
     #   interval: 30s
     #   timeout: 5s
     #   retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
     labels:
       tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
@@ -57,6 +65,14 @@ services:
     #   interval: 30s
     #   timeout: 5s
     #   retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
     labels:
       tinyauth.domain: traefik-log.$DOMAINNAME
       tinyauth.ip.bypass: $LOCAL_IPS
@@ -65,7 +81,7 @@ services:
       traefik.http.routers.traefik-log-dashboard-frontend-rtr.entrypoints: websecure
       traefik.http.routers.traefik-log-dashboard-frontend-rtr.rule: Host(`traefik-log.$DOMAINNAME`)
       ## Middlewares
-      traefik.http.routers.traefik-log-dashboard-frontend-rtr.middlewares: chain-tinyauth@file
+      traefik.http.routers.traefik-log-dashboard-frontend-rtr.middlewares: chain-tinyauth-relaxed@file # NOTE: For geo distribution map loading
       ## HTTP Services
       traefik.http.routers.traefik-log-dashboard-frontend-rtr.service: traefik-log-dashboard-frontend-svc
       traefik.http.services.traefik-log-dashboard-frontend-svc.loadbalancer.server.port: "80"
