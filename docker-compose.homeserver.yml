@@ -115,7 +115,6 @@ include:
   - compose/linkwarden.yml
   # - compose/many-notes.yml
   - compose/obsidian.yml
-  - compose/pdfding.yml
   - compose/rsshub.yml
   # - compose/quartz.yml
   #### OTHERS ####

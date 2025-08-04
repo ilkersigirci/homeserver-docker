@@ -12,10 +12,16 @@ services:
       - no-new-privileges:true
     volumes:
       - $DOCKERDIR/logs/traefik:/logs:ro
+      - $DATADIR/maxmind:/maxmind:ro
     environment:
       NODE_ENV: production
       TRAEFIK_LOG_FILE: /logs/access.log
       PORT: 3001
+      USE_MAXMIND: true
+      MAXMIND_DB_PATH: /maxmind/GeoLite2-City.mmdb
+      MAXMIND_FALLBACK_ONLINE: false
+      GOGC: 50
+      GOMEMLIMIT: 300MiB
     # healthcheck:
     #   test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001/health"]
     #   interval: 30s
@@ -25,7 +31,7 @@ services:
       resources:
         limits:
           cpus: '0.5'
-          memory: 256M
+          memory: 512M
         reservations:
           cpus: '0.1'
           memory: 64M
