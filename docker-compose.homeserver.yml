@@ -59,7 +59,7 @@ include:
   - compose/socket-proxy.yml
   - compose/tinyauth.yml
   - compose/traefik.yml
-  - compose/traefik-log-dashboard.yml
+  # - compose/traefik-log-dashboard.yml
   - compose/vaultwarden.yml
   # - compose/vaultwarden-backup.yml
   # - compose/webfinger.yml

@@ -1,6 +1,7 @@
+# NOTE: backend uses all the resources of CPU and RAM when not restricted.
 services:
   traefik-log-dashboard-backend:
-    image: ghcr.io/hhftechnology/traefik-log-dashboard-backend:latest
+    image: ghcr.io/hhftechnology/traefik-log-dashboard-backend:1.0.5
     container_name: traefik-log-dashboard-backend
     restart: $BASE_RESTART_POLICY
     profiles:
@@ -8,6 +9,8 @@ services:
       - traefik-log-dashboard
     networks:
       - t3_proxy
+    expose:
+      - "3001"
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -51,7 +54,7 @@ services:
 
 
   traefik-log-dashboard-frontend:
-    image: ghcr.io/hhftechnology/traefik-log-dashboard-frontend:latest
+    image: ghcr.io/hhftechnology/traefik-log-dashboard-frontend:1.0.5
     container_name: traefik-log-dashboard-frontend
     restart: $BASE_RESTART_POLICY
     depends_on:
