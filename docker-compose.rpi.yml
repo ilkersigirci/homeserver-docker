@@ -57,7 +57,7 @@ include:
   - compose/tinyauth.yml
   - compose/traefik.yml
   # - compose/traefik-log-dashboard.yml
-  # - compose/vaultwarden.yml
+  - compose/vaultwarden.yml
   #### DESKTOP APPS ####
   #### MACHINE LEARNING ####
   ###### MAINTENANCE ####
