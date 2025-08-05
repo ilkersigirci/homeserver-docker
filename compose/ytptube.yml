@@ -45,4 +45,9 @@ services:
       homepage.icon: "ytptube.svg"
       homepage.href: "https://ytptube.$DOMAINNAME"
       homepage.target: "_blank"
-      homepage.description: "A Web Frontend for yt-dlp, it is a metube Fork"
+      homepage.description: "A Web Frontend for yt-dlp, youtube downloader"
+      ####### GLANCE #######
+      glance.name: "ytptube"
+      glance.icon: "sh:ytptube"
+      glance.url: "https://ytptube.$DOMAINNAME"
+      glance.description: "A Web Frontend for yt-dlp, youtube downloader"

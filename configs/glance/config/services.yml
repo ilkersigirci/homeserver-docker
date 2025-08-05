@@ -2,7 +2,7 @@
   columns:
     # - size: small
     #   widgets:
-    #     - $include: custom-widgets/tailscale.yml
+    #     - $include: custom-widgets/beszel.yml
 
     - size: full
       widgets:

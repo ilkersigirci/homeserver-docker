@@ -15,6 +15,7 @@ services:
       - $MEDIADIR/Youtube:/downloads
     environment:
       TZ: $TZ
+      ENABLE_PROMETHEUS: false
     labels:
       tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
@@ -22,7 +23,7 @@ services:
       traefik.http.routers.pinchflat-rtr.entrypoints: "websecure"
       traefik.http.routers.pinchflat-rtr.rule: "Host(`pinchflat.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.pinchflat-rtr.middlewares: "chain-tinyauth@file"
+      traefik.http.routers.pinchflat-rtr.middlewares: "chain-tinyauth-relaxed@file"
       ## HTTP Services
       traefik.http.routers.pinchflat-rtr.service: "pinchflat-svc"
       traefik.http.services.pinchflat-svc.loadbalancer.server.port: "8945"

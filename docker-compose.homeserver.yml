@@ -61,7 +61,6 @@ include:
   - compose/traefik.yml
   # - compose/traefik-log-dashboard.yml
   - compose/vaultwarden.yml
-  # - compose/vaultwarden-backup.yml
   # - compose/webfinger.yml
   #### DESKTOP APPS ####
   # - compose/krita.yml
