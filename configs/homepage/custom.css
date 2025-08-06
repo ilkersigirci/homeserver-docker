@@ -34,10 +34,24 @@
     text-rendering: optimizeLegibility !important;
     margin: 0;
     padding: 0;
-    background-color: var(--background-color);
+    background-color: var(--background-color) !important;
     color: var(--primary-color);
     font-size: 16px;
     line-height: 1.6;
+  }
+
+  /* Override Homepage background overlays due to new opacity calculation */
+  body::before,
+  .homepage-background,
+  [style*="background-image"] {
+    background-color: var(--background-color) !important;
+  }
+
+  /* Force background color for main container */
+  #__next,
+  main,
+  .homepage-container {
+    background-color: var(--background-color) !important;
   }
   
   /* Hide scrollbar but keep functionality */
@@ -184,4 +198,19 @@
   /* Adjust background color for dark mode */
   .dark\:bg-theme-900\/20:is(.dark *) {
       background-color: var(--color-200) !important;
+  }
+
+  /* Override any Homepage background overlays with new opacity calculation */
+  .bg-cover,
+  .bg-fixed,
+  [class*="bg-opacity-"],
+  [style*="opacity"] {
+    background-color: var(--background-color) !important;
+  }
+
+  /* Ensure main page background stays consistent */
+  .page-container,
+  .main-container,
+  div[class*="min-h-screen"] {
+    background-color: var(--background-color) !important;
   }
