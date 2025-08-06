@@ -8,8 +8,8 @@ hideVersion: true
 # showStats: true # show all docker stats expanded
 statusStyle: dot # basic, dot
 # favicon: https://www.google.com/favicon.ico
-# theme: dark # or light
-# color: slate # gray, zinc, neutral, stone, amber, yellow, lime, green, emerald, teal, cyan, sky, blue, indigo, violet, purple, fuchsia, pink, rose, red, white
+theme: dark # or light
+color: slate # gray, zinc, neutral, stone, amber, yellow, lime, green, emerald, teal, cyan, sky, blue, indigo, violet, purple, fuchsia, pink, rose, red, white
 # language: en
 # target: _blank # Possible options include _blank, _self, and _top
 # base: https://{{HOMEPAGE_VAR_DOMAINNAME}}
