@@ -1,3 +1,5 @@
+# NOTE: argod2id token generation (don't forget to add extra $ in the password)
+# docker exec -it vaultwarden /vaultwarden hash
 services:
   vaultwarden:
     container_name: vaultwarden
@@ -13,6 +15,18 @@ services:
       - no-new-privileges:true
     volumes:
       - $DATADIR/vaultwarden:/data/
+    environment:
+      ADMIN_TOKEN: $VAULTWARDEN_ADMIN_TOKEN
+      DATA_FOLDER: data
+      DOMAIN: https://vaultwarden.$DOMAINNAME
+      TRASH_AUTO_DELETE_DAYS: 30
+      SIGNUPS_ALLOWED: false
+      SIGNUPS_VERIFY: false
+      SIGNUPS_DOMAINS_WHITELIST: $BASE_DOMAINNAME
+      EMAIL_CHANGE_ALLOWED: true
+      REQUIRE_DEVICE_EMAIL: false
+      LOG_LEVEL: info
+      SMTP_DEBUG: false
     labels:
       tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
