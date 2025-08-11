@@ -23,7 +23,7 @@ services:
       SIGNUPS_ALLOWED: false
       SIGNUPS_VERIFY: false
       SIGNUPS_DOMAINS_WHITELIST: $BASE_DOMAINNAME
-      EMAIL_CHANGE_ALLOWED: true
+      EMAIL_CHANGE_ALLOWED: false
       REQUIRE_DEVICE_EMAIL: false
       LOG_LEVEL: info
       SMTP_DEBUG: false
