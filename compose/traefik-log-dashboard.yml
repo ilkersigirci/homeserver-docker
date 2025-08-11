@@ -1,7 +1,7 @@
 # NOTE: backend uses all the resources of CPU and RAM when not restricted.
 services:
   traefik-log-dashboard-backend:
-    image: ghcr.io/hhftechnology/traefik-log-dashboard-backend:1.0.5
+    image: ghcr.io/hhftechnology/traefik-log-dashboard-backend:1.1.0
     container_name: traefik-log-dashboard-backend
     restart: $BASE_RESTART_POLICY
     profiles:
@@ -11,6 +11,7 @@ services:
       - t3_proxy
     expose:
       - "3001"
+      - "4317"
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -23,8 +24,12 @@ services:
       USE_MAXMIND: true
       MAXMIND_DB_PATH: /maxmind/GeoLite2-City.mmdb
       MAXMIND_FALLBACK_ONLINE: false
-      GOGC: 50
+      GOGC: 20 # More aggressive garbage collection
       GOMEMLIMIT: 300MiB
+      OTLP_ENABLED: true
+      OTLP_GRPC_PORT: 4317 # For OTLP gRPC endpoint
+      OTLP_HTTP_PORT: 4318 # For OTLP HTTP endpoint
+      OTLP_DEBUG: false
     # healthcheck:
     #   test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3001/health"]
     #   interval: 30s
@@ -34,10 +39,10 @@ services:
       resources:
         limits:
           cpus: '0.5'
-          memory: 512M
+          memory: 256M
         reservations:
-          cpus: '0.1'
-          memory: 64M
+          cpus: '0.25'
+          memory: 128M
     labels:
       tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
@@ -54,7 +59,7 @@ services:
 
 
   traefik-log-dashboard-frontend:
-    image: ghcr.io/hhftechnology/traefik-log-dashboard-frontend:1.0.5
+    image: ghcr.io/hhftechnology/traefik-log-dashboard-frontend:1.1.0
     container_name: traefik-log-dashboard-frontend
     restart: $BASE_RESTART_POLICY
     depends_on:
@@ -106,3 +111,28 @@ services:
       glance.icon: sh:traefik-log-dashboard-frontend
       glance.url: https://traefik-log.$DOMAINNAME
       glance.description: A real-time dashboard for analyzing Traefik logs
+
+
+  # MaxMind GeoLite2 database updater
+  # maxmind-updater:
+  #   image: alpine:latest
+  #   container_name: maxmind-db-updater
+  #   restart: "no"
+  #   volumes:
+  #     - $DATADIR/maxmind:/data
+  #   environment:
+  #     - MAXMIND_LICENSE_KEY=$MAXMIND_LICENSE_KEY
+  #   command: >
+  #     sh -c "
+  #       apk add --no-cache wget tar &&
+  #       cd /data &&
+  #       if [ ! -f GeoLite2-City.mmdb ] || [ $$(find . -name 'GeoLite2-City.mmdb' -mtime +7) ]; then
+  #         echo 'Downloading/updating MaxMind GeoLite2-City database...' &&
+  #         wget -O GeoLite2-City.tar.gz 'https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=$$MAXMIND_LICENSE_KEY&suffix=tar.gz' &&
+  #         tar -xzf GeoLite2-City.tar.gz --strip-components=1 '*/GeoLite2-City.mmdb' &&
+  #         rm -f GeoLite2-City.tar.gz &&
+  #         echo 'MaxMind database updated successfully'
+  #       else
+  #         echo 'MaxMind database is up to date'
+  #       fi
+  #     "

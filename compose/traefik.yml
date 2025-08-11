@@ -36,7 +36,7 @@ services:
       - --log.maxbackups=10 # Max number of old log files to keep
       - --accesslog=true
       - --accesslog.filePath=/logs/access.log
-      - --accesslog.format=json
+      # - --accesslog.format=json
       - --accesslog.bufferingSize=100 # Configuring a buffer of 100 lines
       - --accesslog.filters.statusCodes=204-299,400-499,500-599
       - --accesslog.fields.names.StartUTC=drop
@@ -80,6 +80,16 @@ services:
       - --experimental.plugins.crowdsec-bouncer.version=v1.2.1
       - --experimental.plugins.webfinger.modulename=github.com/NX211/traefik-webfinger
       - --experimental.plugins.webfinger.version=v0.3.5
+      ## OTLP Tracing
+      - --tracing.otlp.grpc=true
+      - --tracing.otlp.grpc.endpoint=traefik-log-dashboard-backend:4317
+      - --tracing.otlp.grpc.insecure=true
+      - --tracing.sampleRate=0.1
+      # Global attributes added to all traces
+      - --tracing.globalAttributes.environment=production
+      - --tracing.globalAttributes.service.version=v3.0
+      - --tracing.globalAttributes.deployment.environment=$DOMAINNAME
+      
     networks:
       t3_proxy:
         ipv4_address: 192.168.90.254 # You can specify a static IP
