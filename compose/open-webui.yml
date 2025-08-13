@@ -14,7 +14,7 @@ services:
 
   open-webui:
     container_name: open-webui
-    image: ghcr.io/open-webui/open-webui:latest # :ollama
+    image: ghcr.io/open-webui/open-webui:latest
     restart: $ML_RESTART_POLICY
     # depends_on:
     #   - searxng
@@ -22,7 +22,6 @@ services:
       - t3_proxy
     volumes:
       - $DOCKERDIR/appdata/open-webui:/app/backend/data
-      # - ollama:/root/.ollama
     environment:
       # - WEBUI_AUTH=False
       ENABLE_OLLAMA_API: false
@@ -61,9 +60,10 @@ services:
     profiles:
       - ml
 
+  # NOTE: Change ENABLE_OAUTH_SIGNUP: true for the first run
   open-webui-betus:
     container_name: open-webui-betus
-    image: ghcr.io/open-webui/open-webui:latest # :ollama
+    image: ghcr.io/open-webui/open-webui:latest
     restart: $ML_RESTART_POLICY
     # depends_on:
     #   - searxng
@@ -71,20 +71,28 @@ services:
       - t3_proxy
     volumes:
       - $DOCKERDIR/appdata/open-webui-betus:/app/backend/data
-      # - ollama:/root/.ollama
     environment:
-      WEBUI_AUTH: False
+      ENABLE_SIGNUP: false
       OPENAI_API_KEY: $OPENAI_API_KEY
       WEBUI_NAME: BetusGPT
+      ## OIDC
+      ENABLE_LOGIN_FORM: false
+      ENABLE_OAUTH_SIGNUP: false
+      OAUTH_CLIENT_ID: $OPEN_WEB_UI_BETUS_CLIENT_ID
+      OAUTH_CLIENT_SECRET: $OPEN_WEB_UI_BETUS_CLIENT_SECRET
+      OPENID_PROVIDER_URL: https://pocketid.$BASE_DOMAINNAME/.well-known/openid-configuration
+      OAUTH_PROVIDER_NAME: Pocketid
+      OAUTH_SCOPES: openid email profile
+      OPENID_REDIRECT_URI: https://betuschat.$DOMAINNAME/oauth/oidc/callback
     labels:
-      tinyauth.domain: chat.$DOMAINNAME
+      tinyauth.domain: betuschat.$DOMAINNAME
       tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.open-webui-betus-rtr.entrypoints: "websecure"
-      traefik.http.routers.open-webui-betus-rtr.rule: "Host(`betus.$DOMAINNAME`)"
+      traefik.http.routers.open-webui-betus-rtr.rule: "Host(`betuschat.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.open-webui-betus-rtr.middlewares: "chain-tinyauth@file"
+      traefik.http.routers.open-webui-betus-rtr.middlewares: "chain-no-auth@file"
       ## HTTP Services
       traefik.http.routers.open-webui-betus-rtr.service: "open-webui-betus-svc"
       traefik.http.services.open-webui-betus-svc.loadbalancer.server.port: "8080"
@@ -92,9 +100,9 @@ services:
       homepage.group: "ML"
       homepage.name: "Open WebUI"
       homepage.icon: "open-webui-light.webp"
-      homepage.href: "https://betus.$DOMAINNAME"
+      homepage.href: "https://betuschat.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Selfhosted Chatgpt like App for my Betus"
     profiles:
-      # - ml
-      - not-used
+      - ml
+      # - not-used
