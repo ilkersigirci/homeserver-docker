@@ -23,7 +23,7 @@ services:
     volumes:
       - $DOCKERDIR/appdata/open-webui:/app/backend/data
     environment:
-      # - WEBUI_AUTH=False
+      # WEBUI_AUTH: false
       ENABLE_OLLAMA_API: false
       USE_OLLAMA_DOCKER: false
       ENABLE_IMAGE_GENERATION: true
@@ -72,11 +72,12 @@ services:
     volumes:
       - $DOCKERDIR/appdata/open-webui-betus:/app/backend/data
     environment:
+      # WEBUI_AUTH: false
       ENABLE_SIGNUP: false
       OPENAI_API_KEY: $OPENAI_API_KEY
       WEBUI_NAME: BetusGPT
       ## OIDC
-      ENABLE_LOGIN_FORM: false
+      ENABLE_LOGIN_FORM: true
       ENABLE_OAUTH_SIGNUP: false
       OAUTH_CLIENT_ID: $OPEN_WEB_UI_BETUS_CLIENT_ID
       OAUTH_CLIENT_SECRET: $OPEN_WEB_UI_BETUS_CLIENT_SECRET
@@ -92,7 +93,7 @@ services:
       traefik.http.routers.open-webui-betus-rtr.entrypoints: "websecure"
       traefik.http.routers.open-webui-betus-rtr.rule: "Host(`betuschat.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.open-webui-betus-rtr.middlewares: "chain-no-auth@file"
+      traefik.http.routers.open-webui-betus-rtr.middlewares: "chain-no-auth-relaxed@file"
       ## HTTP Services
       traefik.http.routers.open-webui-betus-rtr.service: "open-webui-betus-svc"
       traefik.http.services.open-webui-betus-svc.loadbalancer.server.port: "8080"
