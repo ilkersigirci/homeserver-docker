@@ -48,11 +48,12 @@ services:
     environment:
       TZ: $TZ
     labels:
+      tinyauth.domain: smarthome.$DOMAINNAME
       tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.home-assistant-rtr.entrypoints: websecure
-      traefik.http.routers.home-assistant-rtr.rule: Host(`home-assistant.$DOMAINNAME`)
+      traefik.http.routers.home-assistant-rtr.rule: Host(`smarthome.$DOMAINNAME`)
       ## Middlewares
       traefik.http.routers.home-assistant-rtr.middlewares: chain-tinyauth-relaxed@file
       ## HTTP Services
@@ -62,11 +63,11 @@ services:
       homepage.group: Monitoring
       homepage.name: home-assistant
       homepage.icon: home-assistant.png
-      homepage.href: https://home-assistant.$DOMAINNAME
+      homepage.href: https://smarthome.$DOMAINNAME
       homepage.target: _blank
       homepage.description: Home automation
       ####### GLANCE #######
       glance.name: home-assistant
       glance.icon: sh:home-assistant
-      glance.url: https://home-assistant.$DOMAINNAME
+      glance.url: https://smarthome.$DOMAINNAME
       glance.description: Home automation
