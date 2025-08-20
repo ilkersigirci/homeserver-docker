@@ -64,7 +64,7 @@ include:
   # - compose/traefik-log-dashboard.yml
   # - compose/vaultwarden.yml
   #### DESKTOP APPS ####
-  - compose/firefox.yml
+  # - compose/firefox.yml
   #### MACHINE LEARNING ####
   ###### MAINTENANCE ####
   # - compose/code-server.yml
