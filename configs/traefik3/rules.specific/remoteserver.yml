@@ -40,6 +40,14 @@ http:
         - chain-no-auth
       service: pocket-id-svc
 
+    splitpro-rtr:
+      rule: "Host(`split.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-tinyauth-relaxed
+      service: splitpro-svc
+
     immich-public-proxy-rtr:
       rule: "Host(`share.{{env "DOMAINNAME"}}`) && PathPrefix(`/share`)"
       entryPoints:
@@ -81,6 +89,11 @@ http:
         #   path: "/healthz"
         #   interval: "30s"
         #   timeout: "5s"
+
+    splitpro-svc:
+      loadBalancer:
+        servers:
+          - url: "http://100.64.0.3:8098"
 
     immich-public-proxy-svc:
       loadBalancer:

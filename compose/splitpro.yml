@@ -35,41 +35,43 @@ services:
       - splitpro
     networks:
       - t3_proxy
+    ports:
+      - "8098:3000"
     security_opt:
       - no-new-privileges:true
     environment:
       PORT: 3000
       DATABASE_URL: postgresql://postgres:postgres@splitpro-db:5432/postgres
-      NEXTAUTH_URL: https://splitpro.$DOMAINNAME
+      NEXTAUTH_URL: https://split.$BASE_DOMAINNAME
       NEXTAUTH_SECRET: $SPLITPRO_NEXTAUTH_SECRET
       ENABLE_SENDING_INVITES: false
       DISABLE_EMAIL_SIGNUP: true
-      DEFAULT_HOMEPAGE: /home
+      DEFAULT_HOMEPAGE: /balances
       # OIDC Setup - Don't mind the `Authentik` part, it works with Pocket ID
       AUTHENTIK_ID: $SPLITPRO_CLIENT_ID
       AUTHENTIK_SECRET: $SPLITPRO_CLIENT_SECRET
       AUTHENTIK_ISSUER: https://pocketid.$BASE_DOMAINNAME
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
-      traefik.enable: "true"
-      ## HTTP Routers
-      traefik.http.routers.splitpro-rtr.entrypoints: websecure
-      traefik.http.routers.splitpro-rtr.rule: Host(`splitpro.$DOMAINNAME`)
-      ## Middlewares
-      traefik.http.routers.splitpro-rtr.middlewares: "chain-tinyauth-relaxed@file"
-      # traefik.http.routers.splitpro-rtr.middlewares: chain-no-auth-relaxed@file
-      ## HTTP Services
-      traefik.http.routers.splitpro-rtr.service: splitpro-svc
-      traefik.http.services.splitpro-svc.loadbalancer.server.port: "3000"
+      # tinyauth.domain: split.$DOMAINNAME
+      # tinyauth.ip.bypass: $LOCAL_IPS
+      # traefik.enable: "true"
+      # ## HTTP Routers
+      # traefik.http.routers.splitpro-rtr.entrypoints: websecure
+      # traefik.http.routers.splitpro-rtr.rule: Host(`split.$DOMAINNAME`)
+      # ## Middlewares
+      # traefik.http.routers.splitpro-rtr.middlewares: "chain-tinyauth-relaxed@file"
+      # ## HTTP Services
+      # traefik.http.routers.splitpro-rtr.service: splitpro-svc
+      # traefik.http.services.splitpro-svc.loadbalancer.server.port: "3000"
       ####### HOMEPAGE #######
       homepage.group: Media
       homepage.name: splitpro
       homepage.icon: splitpro.png
-      homepage.href: https://splitpro.$DOMAINNAME
+      homepage.href: https://split.$BASE_DOMAINNAME
       homepage.target: _blank
       homepage.description: Open source alternative to Splitwise
       ####### GLANCE #######
       glance.name: splitpro
       glance.icon: sh:splitpro
-      glance.url: https://splitpro.$DOMAINNAME
+      glance.url: https://split.$BASE_DOMAINNAME
       glance.description: Open source alternative to Splitwise
