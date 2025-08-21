@@ -45,7 +45,8 @@ http:
       entryPoints:
         - websecure
       middlewares:
-        - chain-tinyauth-relaxed
+        - chain-no-auth-relaxed
+        # - chain-tinyauth-relaxed
       service: splitpro-svc
 
     immich-public-proxy-rtr:
