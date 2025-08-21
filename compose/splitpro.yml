@@ -43,6 +43,8 @@ services:
       NEXTAUTH_URL: https://splitpro.$DOMAINNAME
       NEXTAUTH_SECRET: $SPLITPRO_NEXTAUTH_SECRET
       ENABLE_SENDING_INVITES: false
+      DISABLE_EMAIL_SIGNUP: true
+      DEFAULT_HOMEPAGE: /home
       # OIDC Setup - Don't mind the `Authentik` part, it works with Pocket ID
       AUTHENTIK_ID: $SPLITPRO_CLIENT_ID
       AUTHENTIK_SECRET: $SPLITPRO_CLIENT_SECRET
