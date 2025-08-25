@@ -1,0 +1,40 @@
+services:
+  thunderbird:
+    container_name: thunderbird
+    image: thunderbird:latest
+    build:
+      context: $DOCKERDIR/Dockerfiles/DesktopApps/Thunderbird
+      dockerfile: $DOCKERDIR/Dockerfiles/DesktopApps/Thunderbird/Dockerfile
+    restart: $DESKTOP_IMAGES_RESTART_POLICY
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/thunderbird:/config
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+    labels:
+      tinyauth.domain: mail.$DOMAINNAME
+      tinyauth.ip.bypass: $LOCAL_IPS
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.thunderbird-rtr.entrypoints: "websecure"
+      traefik.http.routers.thunderbird-rtr.rule: "Host(`mail.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.thunderbird-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.thunderbird-rtr.service: "thunderbird-svc"
+      traefik.http.services.thunderbird-svc.loadbalancer.server.port: "3000"
+      ####### HOMEPAGE #######
+      homepage.group: "DesktopApps"
+      homepage.name: "Thunderbird"
+      homepage.icon: "thunderbird.svg"
+      homepage.href: "https://mail.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Mail Client on the web"
+    profiles:
+      - desktop_apps
+      - custom-build

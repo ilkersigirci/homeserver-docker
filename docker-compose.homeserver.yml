@@ -66,6 +66,7 @@ include:
   # - compose/krita.yml
   # - compose/firefox.yml
   # - compose/gimp.yml
+  - compose/thunderbird.yml
   #### MACHINE LEARNING ####
   # - compose/open-webui.yml
   ###### MAINTENANCE ####
