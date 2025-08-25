@@ -58,7 +58,7 @@ services:
       TZ: $TZ
       TITLE: Obsidian
     # devices:
-    #   - /dev/dri:/dev/dri #optional
+    #   - /dev/dri:/dev/dri # Optional: Only Open Source drivers are supported IE (Intel,AMDGPU,Radeon,ATI,Nouveau)
     healthcheck:
       test: ["CMD-SHELL", "curl --fail -s http://localhost:3000 || exit 1"]
       start_period: 15s

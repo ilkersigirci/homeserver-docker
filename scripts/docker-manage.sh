@@ -45,7 +45,7 @@ case "$1" in
     
     "pull")
         echo "🔄 Updating containers..."
-        COMPOSE_PROFILES=$PROFILES $COMPOSE_CMD pull
+        COMPOSE_PROFILES=$PROFILES $COMPOSE_CMD --profile '!custom-build' pull
         COMPOSE_PROFILES=$PROFILES $COMPOSE_CMD up -d
         echo "🧹 Cleaning up dangling images..."
         docker image prune -f || echo "⚠️  Warning: Image cleanup failed"

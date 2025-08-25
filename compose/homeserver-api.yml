@@ -74,6 +74,7 @@ services:
     profiles:
       - others
       - homeserver-api
+      - custom-build
     networks:
       - t3_proxy
     expose:
@@ -127,6 +128,7 @@ services:
     profiles:
       - others
       - homeserver-api
+      - custom-build
     networks:
       - t3_proxy
     # command: ["tail", "-f", "/dev/null"] # NOTE: For testing the container
