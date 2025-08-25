@@ -41,7 +41,7 @@ services:
   obsidian:
     container_name: obsidian
     image: lscr.io/linuxserver/obsidian:latest
-    restart: $OTHERS_RESTART_POLICY
+    restart: $DESKTOP_IMAGES_RESTART_POLICY
     shm_size: "1gb"
     networks:
       - t3_proxy
@@ -49,9 +49,6 @@ services:
       - no-new-privileges:true
     volumes:
       - $NOTESDIR/Markdown:/vaults
-    # depends_on:
-    #   obsidian-couchdb:
-    #     condition: service_healthy
     environment:
       PUID: $PUID
       PGID: $PGID
@@ -66,8 +63,54 @@ services:
       timeout: 5s
       retries: 3
     profiles:
+      # - reading
+      - not-used
+    labels:
+      tinyauth.domain: obsidian.$DOMAINNAME
+      tinyauth.ip.bypass: $LOCAL_IPS
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.obsidian-rtr.entrypoints: "websecure"
+      traefik.http.routers.obsidian-rtr.rule: "Host(`obsidian.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.obsidian-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.obsidian-rtr.service: "obsidian-svc"
+      traefik.http.services.obsidian-svc.loadbalancer.server.port: "3000"
+      ####### HOMEPAGE #######
+      homepage.group: "Reading"
+      homepage.name: "Obsidian"
+      homepage.icon: "obsidian.svg"
+      homepage.href: "https://obsidian.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Note Taking with Markdown"
+
+  obsidian-kasm:
+    container_name: obsidian-kasm
+    image: lscr.io/linuxserver/obsidian:v1.8.10-ls72
+    restart: $DESKTOP_IMAGES_RESTART_POLICY
+    shm_size: "1gb"
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $NOTESDIR/Markdown:/vaults
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      TITLE: Obsidian
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail -s http://localhost:3000 || exit 1"]
+      start_period: 15s
+      interval: 1m
+      timeout: 5s
+      retries: 3
+    profiles:
       - reading
     labels:
+      tinyauth.domain: obsidian.$DOMAINNAME
       tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
