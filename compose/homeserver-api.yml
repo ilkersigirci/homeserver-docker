@@ -1,9 +1,10 @@
 services:
   homeserver-api-redis:
-    image: bitnami/redis:latest
+    image: redis:8
     container_name: homeserver-api-redis
     restart: $OTHERS_RESTART_POLICY
     hostname: "homeserver-api-redis"
+    command: redis-server --requirepass "${HOMESERVER_API_REDIS_PASSWORD}"
     profiles:
       - others
       - homeserver-api
@@ -11,17 +12,14 @@ services:
       - t3_proxy
     expose:
       - "6379"
-    environment:
-      ALLOW_EMPTY_PASSWORD: "yes"
-      # REDIS_PASSWORD: $HOMESERVER_API_REDIS_PASSWORD
     healthcheck:
-      test: redis-cli ping
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${HOMESERVER_API_REDIS_PASSWORD}", "ping"]
       interval: 1s
       timeout: 3s
       retries: 50
 
   homeserver-api-rabbitmq:
-    image: bitnami/rabbitmq:latest
+    image: rabbitmq:4-management
     container_name: homeserver-api-rabbitmq
     restart: $OTHERS_RESTART_POLICY
     hostname: "homeserver-api-rabbitmq"
@@ -34,10 +32,9 @@ services:
       - "5672" # RabbitMQ AMQP port
       - "15672" # RabbitMQ Management UI port
     environment:
-      RABBITMQ_USERNAME: $HOMESERVER_API_RABBITMQ_USERNAME
-      RABBITMQ_PASSWORD: $HOMESERVER_API_RABBITMQ_PASSWORD
+      RABBITMQ_DEFAULT_USER: $HOMESERVER_API_RABBITMQ_USERNAME
+      RABBITMQ_DEFAULT_PASS: $HOMESERVER_API_RABBITMQ_PASSWORD
       RABBITMQ_VHOST: "/"
-      RABBITMQ_MANAGEMENT_ALLOW_WEB_ACCESS: "true"
       RABBITMQ_DISK_FREE_ABSOLUTE_LIMIT: "2GB"
     labels:
       tinyauth.domain: api-rabbitmq.$DOMAINNAME
@@ -93,6 +90,7 @@ services:
       - RABBITMQ_PORT=5672
       - REDIS_HOST=homeserver-api-redis
       - REDIS_PORT=6379
+      - REDIS_PASSWORD=$HOMESERVER_API_REDIS_PASSWORD
     labels:
       tinyauth.domain: api.$DOMAINNAME
       tinyauth.ip.bypass: $LOCAL_IPS
@@ -156,6 +154,7 @@ services:
       - RABBITMQ_PORT=5672
       - REDIS_HOST=homeserver-api-redis
       - REDIS_PORT=6379
+      - REDIS_PASSWORD=$HOMESERVER_API_REDIS_PASSWORD
     labels:
       tinyauth.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
