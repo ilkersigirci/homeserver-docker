@@ -49,6 +49,14 @@ http:
         # - chain-tinyauth-relaxed
       service: splitpro-svc
 
+    nas-redirect-rtr:
+      rule: "Host(`nas.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - nas-redirect
+      service: noop@internal
+
     immich-public-proxy-rtr:
       rule: "Host(`share.{{env "DOMAINNAME"}}`) && PathPrefix(`/share`)"
       entryPoints:
@@ -58,6 +66,12 @@ http:
       service: immich-public-proxy-svc
   
   middlewares:
+    nas-redirect:
+      redirectRegex:
+        regex: "^https://nas\\.(.+)"
+        replacement: "{{env "NAS_REDIRECT_URL"}}"
+        permanent: true
+
     jellyfin-redirect:
       redirectRegex:
         regex: "^https://jellyfin\\.(.+)"

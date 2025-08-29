@@ -136,6 +136,7 @@ services:
       REMOTE_SERVER_PRIVATE_IP: ${REMOTE_SERVER_PRIVATE_IP:-dummy}
       WEBFINGER_USERNAME: $WEBFINGER_USERNAME
       WEBFINGER_HREF: https://pocketid.$BASE_DOMAINNAME
+      NAS_REDIRECT_URL: ${NAS_REDIRECT_URL:-https://nasdummy.$DOMAINNAME}
     secrets:
       - cf_dns_api_token
     labels:
