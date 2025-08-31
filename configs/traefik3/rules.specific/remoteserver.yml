@@ -1,4 +1,10 @@
 http:
+  serversTransports:
+    # NOTE: Proxmox redirect requests to https which causes redirect loop with traefik. This fixes it.
+    nas-transport:
+      serverName: ""
+      insecureSkipVerify: true
+
   routers:
     webfinger-rtr:
       rule: "Host(`{{env "DOMAINNAME"}}`)"
@@ -49,13 +55,13 @@ http:
         # - chain-tinyauth-relaxed
       service: splitpro-svc
 
-    nas-redirect-rtr:
+    nas-rtr:
       rule: "Host(`nas.{{env "DOMAINNAME"}}`)"
       entryPoints:
         - websecure
       middlewares:
-        - nas-redirect
-      service: noop@internal
+        - chain-no-auth-relaxed
+      service: nas-svc
 
     immich-public-proxy-rtr:
       rule: "Host(`share.{{env "DOMAINNAME"}}`) && PathPrefix(`/share`)"
@@ -66,12 +72,6 @@ http:
       service: immich-public-proxy-svc
   
   middlewares:
-    nas-redirect:
-      redirectRegex:
-        regex: "^https://nas\\.(.+)"
-        replacement: "{{env "NAS_REDIRECT_URL"}}"
-        permanent: true
-
     jellyfin-redirect:
       redirectRegex:
         regex: "^https://jellyfin\\.(.+)"
@@ -104,6 +104,12 @@ http:
         #   path: "/healthz"
         #   interval: "30s"
         #   timeout: "5s"
+
+    nas-svc:
+      loadBalancer:
+        servers:
+          - url: "https://100.64.0.10:8006"
+        serversTransport: nas-transport
 
     splitpro-svc:
       loadBalancer:
