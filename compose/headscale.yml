@@ -1,11 +1,11 @@
 services:
-  # docker exec headscale headscale apikey create
+  # NOTE: When changing ACL in admin ui, restart the headscale container to make it take effect.
+  # NOTE: docker exec headscale headscale apikey create
   headscale:
     image: headscale/headscale:0.26.1
     container_name: headscale
     command: serve
-    # restart: $BASE_RESTART_POLICY
-    restart: "no"
+    restart: $BASE_RESTART_POLICY
     profiles:
       - core
     networks:
