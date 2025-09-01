@@ -1,0 +1,77 @@
+name: nas
+
+networks:
+  default:
+    driver: bridge
+  t3_proxy:
+    name: t3_proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.90.0/24
+  socket_proxy:
+    name: socket_proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.91.0/24
+  dockervlan:
+    name: dockervlan
+    driver: macvlan
+    driver_opts:
+      parent: ens18
+    ipam:
+      config:
+        - subnet: "192.168.1.0/24"
+          ip_range: "192.168.1.19/32"
+          gateway: "192.168.1.1"
+
+########################### SECRETS
+secrets:
+  # authelia_jwt_secret:
+  #   file: $DOCKERDIR/secrets/authelia_jwt_secret
+  # authelia_session_secret:
+  #   file: $DOCKERDIR/secrets/authelia_session_secret
+  # authelia_storage_encryption_key:
+  #   file: $DOCKERDIR/secrets/authelia_storage_encryption_key
+  cf_dns_api_token:
+    file: $DOCKERDIR/secrets/cf_dns_api_token
+  # firefly_app_key:
+  #   file: $DOCKERDIR/secrets/firefly_app_key
+  # mysql_root_password:
+  #   file: $DOCKERDIR/secrets/mysql_root_password
+  # mysql_password:
+  #   file: $DOCKERDIR/secrets/mysql_password
+  rustic_password:
+    file: $DOCKERDIR/secrets/rustic_password
+
+include:
+  ########################### SERVICES
+  #### CORE ####
+  # - compose/adguardhome.yml
+  - compose/filebrowser.yml
+  - compose/homepage.yml
+  # - compose/glance.yml
+  - compose/komodo-periphery.yml
+  - compose/socket-proxy.yml
+  - compose/tinyauth.yml
+  - compose/traefik.yml
+  # - compose/vaultwarden.yml
+  #### DESKTOP APPS ####
+  #### MACHINE LEARNING ####
+  ###### MAINTENANCE ####
+  # - compose/code-server.yml
+  # - compose/docker-gc.yml
+  # - compose/dozzle.yml
+  # - compose/healthchecks.yml
+  # - compose/syncthing.yml
+  - compose/whoami.yml
+  #### MEDIA ####
+  # - compose/transmission.yml
+  #### ML ####
+  #### MONITORING ####
+  # - compose/beszel-agent.yml
+  #### PHOTO ####
+  #### READING ####
+  # - compose/obsidian.yml
+  # - compose/quartz.yml
