@@ -1,4 +1,5 @@
 services:
+  # NOTE: First, create `filebrowser` folder in appdata.
   # For custom.css: change Global Settings->branding path to "config"
   filebrowser:
     container_name: filebrowser
