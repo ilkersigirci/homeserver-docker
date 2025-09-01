@@ -1,6 +1,6 @@
-# appdata
-# data
-# logs
+appdata
+data
+logs
 secrets
 compose/photo/.env
 .idea
