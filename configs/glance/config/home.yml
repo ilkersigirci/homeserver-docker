@@ -49,7 +49,7 @@
             - title: General
               links:
                 - title: My Blog
-                  url: https://blog.$BASE_DOMAINNAME
+                  url: https://blog.${BASE_DOMAINNAME}
                 - title: Reddit Selfhosted
                   url: https://reddit.com/r/selfhosted
             - title: Development
