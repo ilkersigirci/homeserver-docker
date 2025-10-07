@@ -93,6 +93,7 @@ include:
   - compose/jellyseerr.yml
   - compose/metadata-remote.yml
   - compose/mkvtoolnix.yml
+  - compose/openarchiver.yml
   - compose/pinchflat.yml
   - compose/scotty.yml
   - compose/splitpro.yml

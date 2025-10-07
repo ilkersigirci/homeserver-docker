@@ -1,0 +1,110 @@
+services:
+  openarchiver:
+    image: logiclabshq/open-archiver:latest
+    container_name: openarchiver
+    restart: $MEDIA_RESTART_POLICY
+    depends_on:
+      openarchiver-db:
+        condition: service_healthy
+      openarchiver-valkey:
+        condition: service_started
+      openarchiver-meilisearch:
+        condition: service_started
+      openarchiver-tika:
+        condition: service_started
+    profiles:
+      - media
+      - openarchiver
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DATADIR/openarchiver:/var/data/open-archiver
+    env_file: $DOCKERDIR/.env.openarchiver
+    environment:
+      NODE_ENV: production
+      REDIS_PASSWORD: $OPENARCHIVER_REDIS_PASSWORD
+      MEILI_MASTER_KEY: $OPENARCHIVER_MEILI_MASTER_KEY
+    labels:
+      tinyauth.domain: mailarchive.$DOMAINNAME
+      tinyauth.ip.bypass: $LOCAL_IPS
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.openarchiver-rtr.entrypoints: websecure
+      traefik.http.routers.openarchiver-rtr.rule: Host(`mailarchive.$DOMAINNAME`)
+      ## Middlewares
+      traefik.http.routers.openarchiver-rtr.middlewares: chain-tinyauth@file
+      ## HTTP Services
+      traefik.http.routers.openarchiver-rtr.service: openarchiver-svc
+      traefik.http.services.openarchiver-svc.loadbalancer.server.port: "3000"
+      ####### HOMEPAGE #######
+      homepage.group: Media
+      homepage.name: openarchiver
+      homepage.icon: openarchiver.png
+      homepage.href: https://mailarchive.$DOMAINNAME
+      homepage.target: _blank
+      homepage.description: A self-hosted, open-source email archiving solution with full-text search capability.
+      ####### GLANCE #######
+      glance.name: openarchiver
+      glance.icon: sh:openarchiver
+      glance.url: https://mailarchive.$DOMAINNAME
+      glance.description: A self-hosted, open-source email archiving solution with full-text search capability.
+
+  openarchiver-db:
+    image: postgres:16.4
+    container_name: openarchiver-db
+    restart: $MEDIA_RESTART_POLICY
+    profiles:
+      - media
+      - openarchiver
+    environment:
+      PGDATA: /pgdata
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    networks:
+      - t3_proxy
+    expose:
+      - "5432"
+    volumes:
+      - $DATADIR/openarchiver-db:/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  openarchiver-valkey:
+    image: valkey/valkey:8-alpine
+    container_name: openarchiver-valkey
+    restart: $MEDIA_RESTART_POLICY
+    command: valkey-server --requirepass $OPENARCHIVER_REDIS_PASSWORD
+    volumes:
+      - $DOCKERDIR/appdata/openarchiver-valkey:/data
+    networks:
+      - t3_proxy
+    expose:
+      - "6379"
+
+  openarchiver-meilisearch:
+    image: getmeili/meilisearch:v1.15
+    container_name: openarchiver-meilisearch
+    restart: $MEDIA_RESTART_POLICY
+    environment:
+      MEILI_MASTER_KEY: $OPENARCHIVER_MEILI_MASTER_KEY
+    volumes:
+      - $DOCKERDIR/appdata/openarchiver-meilisearch:/meili_data
+    networks:
+      - t3_proxy
+    expose:
+      - "7700"
+
+  openarchiver-tika:
+    image: apache/tika:3.2.2.0-full
+    container_name: openarchiver-tika
+    restart: $MEDIA_RESTART_POLICY
+    networks:
+      - t3_proxy
+    expose:
+      - "9998"
