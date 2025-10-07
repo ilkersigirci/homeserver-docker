@@ -81,6 +81,7 @@ include:
   - compose/restfox.yml
   - compose/rustic.yml
   - compose/syncthing.yml
+  - compose/termix.yml
   # - compose/uptime-kuma.yml
   - compose/whoami.yml
   # - compose/windows.yml

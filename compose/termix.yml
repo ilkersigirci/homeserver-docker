@@ -1,0 +1,39 @@
+services:
+  termix:
+    image: ghcr.io/lukegus/termix:latest
+    container_name: termix
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - maintenance
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/termix:/app/data
+    environment:
+      PORT: "8080"
+    labels:
+      tinyauth.domain: ssh.$DOMAINNAME
+      tinyauth.ip.bypass: $LOCAL_IPS
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.termix-rtr.entrypoints: websecure
+      traefik.http.routers.termix-rtr.rule: Host(`ssh.$DOMAINNAME`)
+      ## Middlewares
+      traefik.http.routers.termix-rtr.middlewares: chain-tinyauth@file
+      ## HTTP Services
+      traefik.http.routers.termix-rtr.service: termix-svc
+      traefik.http.services.termix-svc.loadbalancer.server.port: "8080"
+      ####### HOMEPAGE #######
+      homepage.group: Maintenance
+      homepage.name: termix
+      homepage.icon: termix.png
+      homepage.href: https://ssh.$DOMAINNAME
+      homepage.target: _blank
+      homepage.description: A web-based server management platform with SSH terminal, tunneling, and file editing capabilities.
+      ####### GLANCE #######
+      glance.name: termix
+      glance.icon: sh:termix
+      glance.url: https://ssh.$DOMAINNAME
+      glance.description: A web-based server management platform with SSH terminal, tunneling, and file editing capabilities.
