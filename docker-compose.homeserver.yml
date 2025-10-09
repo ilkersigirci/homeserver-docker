@@ -66,7 +66,7 @@ include:
   # - compose/krita.yml
   # - compose/firefox.yml
   # - compose/gimp.yml
-  - compose/thunderbird.yml
+  # - compose/thunderbird.yml # TODO
   #### MACHINE LEARNING ####
   # - compose/open-webui.yml
   ###### MAINTENANCE ####
@@ -77,7 +77,7 @@ include:
   - compose/healthchecks.yml
   - compose/loggifly.yml
   - compose/minio.yml
-  - compose/pgadmin.yml
+  # - compose/pgadmin.yml # TODO
   - compose/restfox.yml
   - compose/rustic.yml
   - compose/syncthing.yml
@@ -104,7 +104,7 @@ include:
   - compose/transmission.yml
   #### ML ####
   # - compose/sd-next.yml
-  - compose/langfuse.yml
+  # - compose/langfuse.yml # TODO
   #### MONITORING ####
   - compose/beszel.yml
   - compose/beszel-agent.yml
@@ -122,4 +122,4 @@ include:
   - compose/rsshub.yml
   # - compose/quartz.yml
   #### OTHERS ####
-  - compose/homeserver-api.yml
+  # - compose/homeserver-api.yml # TODO
