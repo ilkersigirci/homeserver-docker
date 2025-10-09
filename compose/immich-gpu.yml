@@ -1,0 +1,28 @@
+x-deploy: &gpu-deploy
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu]
+
+services:
+  # Change URL in immich settings -> admin/system-settings?isOpen=machine-learning
+  immich-machine-learning:
+    container_name: immich-machine-learning
+    image: ghcr.io/immich-app/immich-machine-learning:release-cuda
+    restart: $MEDIA_RESTART_POLICY
+    <<: *gpu-deploy
+    profiles:
+      - photos
+    networks:
+      - t3_proxy
+    ports:
+      - "3003:3003"
+    healthcheck:
+      disable: false
+    volumes:
+      - $DOCKERDIR/appdata/immich-ml/model-cache:/cache
+    environment:
+      MACHINE_LEARNING_CACHE_FOLDER: /cache

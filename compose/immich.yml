@@ -1,12 +1,3 @@
-x-deploy: &gpu-deploy
-  deploy:
-    resources:
-      reservations:
-        devices:
-          - driver: nvidia
-            count: all
-            capabilities: [gpu]
-
 # Env variables: https://immich.app/docs/install/environment-variables
 services:
   immich-redis:
@@ -19,22 +10,6 @@ services:
       - t3_proxy
     healthcheck:
       test: redis-cli ping || exit 1
-
-  immich-machine-learning:
-    container_name: immich-machine-learning
-    image: ghcr.io/immich-app/immich-machine-learning:release-cuda
-    restart: $MEDIA_RESTART_POLICY
-    <<: *gpu-deploy
-    profiles:
-      - photo
-    networks:
-      - t3_proxy
-    healthcheck:
-      disable: false
-    volumes:
-      - $DOCKERDIR/appdata/immich-ml/model-cache:/cache
-    environment:
-      MACHINE_LEARNING_CACHE_FOLDER: /cache
 
   immich-postgres:
     container_name: immich-postgres
@@ -58,7 +33,6 @@ services:
     container_name: immich-server
     image: ghcr.io/immich-app/immich-server:release
     restart: $MEDIA_RESTART_POLICY
-    <<: *gpu-deploy
     depends_on:
       - immich-redis
       - immich-postgres
