@@ -4,7 +4,7 @@ services:
     container_name: home-assistant-db
     restart: $MAINTENANCE_RESTART_POLICY
     profiles:
-      - monitoring
+      - maintenance
       - home-assistant
     environment:
       PGDATA: /pgdata
@@ -32,7 +32,7 @@ services:
       home-assistant-db:
         condition: service_healthy
     profiles:
-      - monitoring
+      - maintenance
       - home-assistant
     networks:
       - t3_proxy
@@ -48,8 +48,6 @@ services:
     environment:
       TZ: $TZ
     labels:
-      tinyauth.domain: smarthome.$DOMAINNAME
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.home-assistant-rtr.entrypoints: websecure
@@ -59,8 +57,11 @@ services:
       ## HTTP Services
       traefik.http.routers.home-assistant-rtr.service: home-assistant-svc
       traefik.http.services.home-assistant-svc.loadbalancer.server.port: "8123"
+      ####### TINYAUTH #######
+      tinyauth.apps.smarthome.config.domain: smarthome.$DOMAINNAME
+      tinyauth.apps.home-assistant.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
-      homepage.group: Monitoring
+      homepage.group: Maintenance
       homepage.name: home-assistant
       homepage.icon: home-assistant.png
       homepage.href: https://smarthome.$DOMAINNAME

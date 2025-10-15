@@ -3,7 +3,8 @@
 # Create TOTP: docker run -i -t --rm ghcr.io/steveiliop56/tinyauth:v3 totp generate --interactive
 services:
   tinyauth:
-    image: ghcr.io/steveiliop56/tinyauth:v3
+    # image: ghcr.io/steveiliop56/tinyauth:v4
+    image: ghcr.io/steveiliop56/tinyauth:nightly-distroless
     container_name: tinyauth
     restart: $BASE_RESTART_POLICY
     profiles:
@@ -18,28 +19,27 @@ services:
       # DOCKER_API_VERSION: 1.48
       APP_TITLE: Single Sign-On
       APP_URL: https://tinyauth.$DOMAINNAME
-      SECRET: $TINYAUTH_SECRET
-      COOKIE_SECURE: "true"
-      DISABLE_CONTINUE: "true"
-      LOG_LEVEL: "5"
+      SECURE_COOKIE: "true"
+      LOG_LEVEL: "info"
+      DISABLE_ANALYTICS: "false"
       # USERS: $TINYAUTH_USERS
       USERS_FILE: users_file
       LOGIN_MAX_RETRIES: 5
       ## OIDC CLIENT CONFIGURATION
-      GENERIC_NAME: PocketID
-      GENERIC_CLIENT_ID: $TINYAUTH_GENERIC_CLIENT_ID
-      GENERIC_CLIENT_SECRET: $TINYAUTH_GENERIC_CLIENT_SECRET
-      GENERIC_AUTH_URL: https://pocketid.$BASE_DOMAINNAME/authorize
-      GENERIC_TOKEN_URL: https://pocketid.$BASE_DOMAINNAME/api/oidc/token
-      GENERIC_USER_URL: https://pocketid.$BASE_DOMAINNAME/api/oidc/userinfo
-      GENERIC_SCOPES: openid email profile groups
-      GENERIC_SKIP_SSL: "true"
+      PROVIDERS_POCKETID_NAME: PocketID
+      PROVIDERS_POCKETID_CLIENT_ID: $TINYAUTH_POCKETID_CLIENT_ID
+      PROVIDERS_POCKETID_CLIENT_SECRET: $TINYAUTH_POCKETID_CLIENT_SECRET
+      PROVIDERS_POCKETID_AUTH_URL: https://pocketid.$BASE_DOMAINNAME/authorize
+      PROVIDERS_POCKETID_TOKEN_URL: https://pocketid.$BASE_DOMAINNAME/api/oidc/token
+      PROVIDERS_POCKETID_USER_INFO_URL: https://pocketid.$BASE_DOMAINNAME/api/oidc/userinfo
+      PROVIDERS_POCKETID_SCOPES: openid email profile groups
+      PROVIDERS_POCKETID_INSECURE_SKIP_VERIFY: "true"
       # OAUTH_AUTO_REDIRECT: generic # To automatically redirected to Pocket ID
       # OAUTH_WHITELIST: $POCKETID_WHITELIST_USERS
     volumes:
       - $SECRETSDIR/tinyauth_users:/tinyauth/users_file
+      - $DOCKERDIR/data/tinyauth:/data
     labels:
-      komodo.skip: # Prevents from stopping with StopAllContainers on Komodo
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.tinyauth-rtr.entrypoints: "websecure"
@@ -60,3 +60,5 @@ services:
       glance.icon: "sh:tinyauth"
       glance.url: "https://tinyauth.$DOMAINNAME"
       glance.description: "The simplest way to protect your apps with a login screen"
+      ######## KOMODO ########
+      komodo.skip: # Prevents from stopping with StopAllContainers on Komodo

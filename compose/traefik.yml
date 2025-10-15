@@ -139,9 +139,6 @@ services:
     secrets:
       - cf_dns_api_token
     labels:
-      #- "autoheal=true"
-      komodo.skip: # Prevents from stopping with StopAllContainers on Komodo
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       # HTTP Routers
       traefik.http.routers.traefik-rtr.entrypoints: "websecure"
@@ -157,6 +154,9 @@ services:
       # - "traefik.http.routers.ping.rule=Host(`traefik.$DOMAINNAME`) && Path(`/ping`)"
       #- "traefik.http.routers.ping.tls=true"
       #- "traefik.http.routers.ping.service=ping@internal"
+      ####### TINYAUTH #######
+      tinyauth.apps.traefik.config.domain: traefik.$DOMAINNAME
+      tinyauth.apps.traefik.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "Traefik"
@@ -167,3 +167,10 @@ services:
       homepage.widget.type: "traefik"
       homepage.widget.url: "http://traefik:8080" # NOTE: This doesn't work when using api.insecure=false
       # homepage.widget.fields: "[routers,services,middleware]" # NOTE: Gives Invalid fields list detected error
+      ####### GLANCE #######
+      glance.name: "Traefik"
+      glance.icon: "sh:traefik"
+      glance.url: "https://traefik.$DOMAINNAME"
+      glance.description: "Reverse Proxy Manager"
+      ######## KOMODO ########
+      komodo.skip: # Prevents from stopping with StopAllContainers on Komodo

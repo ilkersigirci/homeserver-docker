@@ -79,6 +79,9 @@ services:
     image: valkey/valkey:8-alpine
     container_name: openarchiver-valkey
     restart: $MEDIA_RESTART_POLICY
+    profiles:
+      - media
+      - openarchiver
     command: valkey-server --requirepass $OPENARCHIVER_REDIS_PASSWORD
     volumes:
       - $DOCKERDIR/appdata/openarchiver-valkey:/data
@@ -91,6 +94,9 @@ services:
     image: getmeili/meilisearch:v1.15
     container_name: openarchiver-meilisearch
     restart: $MEDIA_RESTART_POLICY
+    profiles:
+      - media
+      - openarchiver
     environment:
       MEILI_MASTER_KEY: $OPENARCHIVER_MEILI_MASTER_KEY
     volumes:
@@ -104,6 +110,9 @@ services:
     image: apache/tika:3.2.2.0-full
     container_name: openarchiver-tika
     restart: $MEDIA_RESTART_POLICY
+    profiles:
+      - media
+      - openarchiver
     networks:
       - t3_proxy
     expose:

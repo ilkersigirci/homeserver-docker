@@ -11,6 +11,11 @@
         ]
     },
     "files.watcherExclude": {
+        "**/.git/**": true,
+        "**/appdata/**": true,
+        "**/data/**": true
+    },
+    "search.exclude": {
         "**/appdata/**": true,
         "**/data/**": true
     },
