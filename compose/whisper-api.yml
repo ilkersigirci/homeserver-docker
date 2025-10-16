@@ -23,7 +23,6 @@ services:
     environment:
       ASR_MODEL: base
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.whisper-api-rtr.entrypoints: "websecure"
@@ -33,6 +32,9 @@ services:
       ## HTTP Services
       traefik.http.routers.whisper-api-rtr.service: "whisper-api-svc"
       traefik.http.services.whisper-api-svc.loadbalancer.server.port: "9000"
+      ####### TINYAUTH #######
+      tinyauth.apps.whisperapi.config.domain: whisperapi.$DOMAINNAME
+      tinyauth.apps.whisperapi.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "ML"
       homepage.name: "Whisper API"

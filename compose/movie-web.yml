@@ -9,7 +9,6 @@ services:
     networks:
       - t3_proxy
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.movieweb-rtr.entrypoints: "websecure"
@@ -19,5 +18,8 @@ services:
       ## HTTP Services
       traefik.http.routers.movieweb-rtr.service: "movieweb-svc"
       traefik.http.services.movieweb-svc.loadbalancer.server.port: "80"
+      ####### TINYAUTH #######
+      tinyauth.apps.movieweb.config.domain: movieweb.$DOMAINNAME
+      tinyauth.apps.movieweb.ip.bypass: $LOCAL_IPS
     profiles:
       - media

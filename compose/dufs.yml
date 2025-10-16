@@ -24,7 +24,6 @@ services:
       DUFS_BIND: 0.0.0.0
       DUFS_PORT: 5000
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.dufs-rtr.entrypoints: "websecure"
@@ -34,6 +33,9 @@ services:
       ## HTTP Services
       traefik.http.routers.dufs-rtr.service: "dufs-svc"
       traefik.http.services.dufs-svc.loadbalancer.server.port: "5000"
+      ####### TINYAUTH #######
+      tinyauth.apps.dufs.config.domain: dufs.$DOMAINNAME
+      tinyauth.apps.dufs.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "Dufs"

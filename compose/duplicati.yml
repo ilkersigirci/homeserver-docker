@@ -17,7 +17,6 @@ services:
       TZ: $TZ
       # CLI_ARGS:
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.duplicati-rtr.entrypoints: "websecure"
@@ -27,6 +26,9 @@ services:
       ## HTTP Services
       traefik.http.routers.duplicati-rtr.service: "duplicati-svc"
       traefik.http.services.duplicati-svc.loadbalancer.server.port: "8200"
+      ####### TINYAUTH #######
+      tinyauth.apps.duplicati.config.domain: duplicati.$DOMAINNAME
+      tinyauth.apps.duplicati.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "Duplicati"

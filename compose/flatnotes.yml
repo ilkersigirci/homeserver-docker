@@ -20,7 +20,6 @@ services:
       # - FLATNOTES_PASSWORD="changeMe!"
       FLATNOTES_SECRET_KEY: "change-stability-pushchair"
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.flatnotes-rtr.entrypoints: "websecure"
@@ -30,6 +29,9 @@ services:
       ## HTTP Services
       traefik.http.routers.flatnotes-rtr.service: "flatnotes-svc"
       traefik.http.services.flatnotes-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.flatnotes.config.domain: flatnotes.$DOMAINNAME
+      tinyauth.apps.flatnotes.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "Flatnotes"

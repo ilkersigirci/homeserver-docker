@@ -43,7 +43,6 @@ services:
       AdminEmail: admin@mail.com
       AdminPassword: strongPassword123
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.librum-rtr.entrypoints: "websecure"
@@ -53,5 +52,8 @@ services:
       ## HTTP Services
       traefik.http.routers.librum-rtr.service: "librum-svc"
       traefik.http.services.librum-svc.loadbalancer.server.port: "5000"
+      ####### TINYAUTH #######
+      tinyauth.apps.librum.config.domain: librum.$DOMAINNAME
+      tinyauth.apps.librum.ip.bypass: $LOCAL_IPS
     profiles:
       - reading

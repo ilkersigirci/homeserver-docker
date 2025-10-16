@@ -14,8 +14,6 @@ services:
     environment:
       PORT: "8080"
     labels:
-      tinyauth.domain: ssh.$DOMAINNAME
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.termix-rtr.entrypoints: websecure
@@ -25,6 +23,9 @@ services:
       ## HTTP Services
       traefik.http.routers.termix-rtr.service: termix-svc
       traefik.http.services.termix-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.ssh.config.domain: ssh.$DOMAINNAME
+      tinyauth.apps.ssh.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: Maintenance
       homepage.name: termix

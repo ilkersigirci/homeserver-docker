@@ -27,7 +27,6 @@ services:
       - $MEDIADIR:/media/local:ro
       # - $ONEDRIVEDIR:/media/onedrive:ro
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.jellyfin-rtr.entrypoints: "websecure"
@@ -38,6 +37,9 @@ services:
       ## HTTP Services
       traefik.http.routers.jellyfin-rtr.service: "jellyfin-svc"
       traefik.http.services.jellyfin-svc.loadbalancer.server.port: "8096"
+      ####### TINYAUTH #######
+      tinyauth.apps.jellyfin.config.domain: jellyfin.$DOMAINNAME
+      tinyauth.apps.jellyfin.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "Jellyfin"

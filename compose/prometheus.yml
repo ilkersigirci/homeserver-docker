@@ -31,7 +31,6 @@ services:
     #     constraints:
     #       - node.role==manager
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.prometheus-rtr.entrypoints: "websecure"
@@ -41,5 +40,8 @@ services:
       ## HTTP Services
       traefik.http.routers.prometheus-rtr.service: "prometheus-svc"
       traefik.http.services.prometheus-svc.loadbalancer.server.port: "9090"
+      ####### TINYAUTH #######
+      tinyauth.apps.prometheus.config.domain: prometheus.$DOMAINNAME
+      tinyauth.apps.prometheus.ip.bypass: $LOCAL_IPS
     profiles:
       - monitoring

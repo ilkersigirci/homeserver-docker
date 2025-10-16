@@ -19,7 +19,6 @@ services:
       DISABLE_VERSION_CHECK: true
       BASE_URL: https://changedetection.$DOMAINNAME
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.changedetection-rtr.entrypoints: "websecure"
@@ -29,6 +28,9 @@ services:
       ## HTTP Services
       traefik.http.routers.changedetection-rtr.service: "changedetection-svc"
       traefik.http.services.changedetection-svc.loadbalancer.server.port: "5000"
+      ####### TINYAUTH #######
+      tinyauth.apps.changedetection.config.domain: changedetection.$DOMAINNAME
+      tinyauth.apps.changedetection.ip.bypass: $LOCAL_IPS
       ## Homepage
       homepage.group: "Monitoring"
       homepage.name: "changedetection"

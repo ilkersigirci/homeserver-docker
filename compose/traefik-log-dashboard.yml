@@ -44,8 +44,10 @@ services:
           cpus: '0.25'
           memory: 128M
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
+      ####### TINYAUTH #######
+      tinyauth.apps.traefik-log.config.domain: traefik-log.$DOMAINNAME
+      tinyauth.apps.traefik-log.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: Core
       homepage.name: traefik-log-dashboard-backend
@@ -88,8 +90,6 @@ services:
           cpus: '0.1'
           memory: 64M
     labels:
-      tinyauth.domain: traefik-log.$DOMAINNAME
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.traefik-log-dashboard-frontend-rtr.entrypoints: websecure

@@ -23,7 +23,6 @@ services:
       DISPLAY_WIDTH: 1600
       DISPLAY_HEIGHT: 960
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.mkvtoolnix-rtr.entrypoints: "websecure"
@@ -33,6 +32,9 @@ services:
       ## HTTP Services
       traefik.http.routers.mkvtoolnix-rtr.service: "mkvtoolnix-svc"
       traefik.http.services.mkvtoolnix-svc.loadbalancer.server.port: "5800"
+      ####### TINYAUTH #######
+      tinyauth.apps.mkvtoolnix.config.domain: mkvtoolnix.$DOMAINNAME
+      tinyauth.apps.mkvtoolnix.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "Mkvtoolnix"

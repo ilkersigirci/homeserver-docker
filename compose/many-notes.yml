@@ -25,7 +25,6 @@ services:
       PHP_UPLOAD_MAX_FILE_SIZE: 500M
       SETTINGS_REGISTRATION_ENABLED: true
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.many-notes-rtr.entrypoints: "websecure"
@@ -35,6 +34,9 @@ services:
       ## HTTP Services
       traefik.http.routers.many-notes-rtr.service: "many-notes-svc"
       traefik.http.services.many-notes-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.many-notes.config.domain: many-notes.$DOMAINNAME
+      tinyauth.apps.many-notes.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "many-notes"

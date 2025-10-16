@@ -20,7 +20,6 @@ services:
       # - APP_ROOT_PATH=/
       # - ALLOW_GOOGLE_VISIBILITY=true
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers Auth
       traefik.http.routers.stirlingpdf-rtr.entrypoints: "websecure"
@@ -30,6 +29,9 @@ services:
       ## HTTP Services
       traefik.http.routers.stirlingpdf-rtr.service: "stirlingpdf-svc"
       traefik.http.services.stirlingpdf-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.stirlingpdf.config.domain: stirlingpdf.$DOMAINNAME
+      tinyauth.apps.stirlingpdf.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "StirlingPDF"

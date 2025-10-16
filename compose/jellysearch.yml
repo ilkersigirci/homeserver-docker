@@ -42,7 +42,6 @@ services:
       MEILI_MASTER_KEY: "1234"
       INDEX_CRON: "0 0 0/2 ? * * *"
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.jellysearch-rtr.entrypoints: "websecure"
@@ -53,6 +52,9 @@ services:
       ## HTTP Services
       traefik.http.routers.jellysearch-rtr.service: "jellysearch-svc"
       traefik.http.services.jellysearch-svc.loadbalancer.server.port: "5000"
+      ####### TINYAUTH #######
+      tinyauth.apps.jellyfin.config.domain: jellyfin.$DOMAINNAME
+      tinyauth.apps.jellyfin.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "jellysearch"

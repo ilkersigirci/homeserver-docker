@@ -35,7 +35,6 @@ services:
       # GLANCES_OPT: "-w" # "-C /glances/conf/glances.conf --export influxdb"
       GLANCES_OPT: "-C /glances/conf/glances.conf -w"
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.glances-rtr.entrypoints: "websecure"
@@ -45,6 +44,9 @@ services:
       ## HTTP Services
       traefik.http.routers.glances-rtr.service: "glances-svc"
       traefik.http.services.glances-svc.loadbalancer.server.port: "61208"
+      ####### TINYAUTH #######
+      tinyauth.apps.glances.config.domain: glances.$DOMAINNAME
+      tinyauth.apps.glances.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Monitoring"
       homepage.name: "Glances"

@@ -18,7 +18,6 @@ services:
     secrets:
       - firefly_app_key
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.firefly-rtr.entrypoints: "websecure"
@@ -28,6 +27,9 @@ services:
       ## HTTP Services
       traefik.http.routers.firefly-rtr.service: "firefly-svc"
       traefik.http.services.firefly-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.firefly.config.domain: firefly.$DOMAINNAME
+      tinyauth.apps.firefly.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Others"
       homepage.name: "Firefly III"

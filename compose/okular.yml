@@ -20,7 +20,6 @@ services:
       PGID: $PGID
       TZ: $TZ
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.okular-rtr.entrypoints: "websecure"
@@ -30,6 +29,9 @@ services:
       ## HTTP Services
       traefik.http.routers.okular-rtr.service: "okular-svc"
       traefik.http.services.okular-svc.loadbalancer.server.port: "3000"
+      ####### TINYAUTH #######
+      tinyauth.apps.okular.config.domain: okular.$DOMAINNAME
+      tinyauth.apps.okular.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "DesktopApps"
       homepage.name: "Okular"

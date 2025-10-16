@@ -22,7 +22,6 @@ services:
       PGID: $PGID
       TZ: $TZ
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers Auth
       traefik.http.routers.ytdl-rtr.entrypoints: "websecure"
@@ -32,6 +31,9 @@ services:
       ## HTTP Services
       # - "traefik.http.routers.ytdl-rtr.service=ytdl-svc"
       # - "traefik.http.services.ytdl-svc.loadbalancer.server.port=8081"
+      ####### TINYAUTH #######
+      tinyauth.apps.ytdl-sub.config.domain: ytdl.$DOMAINNAME
+      tinyauth.apps.ytdl-sub.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "YtdlSub"

@@ -29,7 +29,6 @@ services:
       YTP_BROWSER_ENABLED: "false"
       YTP_YTDLP_AUTO_UPDATE: "true"
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers Auth
       traefik.http.routers.ytptube-rtr.entrypoints: "websecure"
@@ -39,6 +38,9 @@ services:
       ## HTTP Services
       traefik.http.routers.ytptube-rtr.service: "ytptube-svc"
       traefik.http.services.ytptube-svc.loadbalancer.server.port: "8081"
+      ####### TINYAUTH #######
+      tinyauth.apps.ytptube.config.domain: ytptube.$DOMAINNAME
+      tinyauth.apps.ytptube.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "ytptube"

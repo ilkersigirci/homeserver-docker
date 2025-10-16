@@ -19,7 +19,6 @@ services:
       TZ: $TZ
       DISABLE_AUTH: True
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.yacht-rtr.entrypoints: "websecure"
@@ -29,6 +28,9 @@ services:
       ## HTTP Services
       traefik.http.routers.yacht-rtr.service: "yacht-svc"
       traefik.http.services.yacht-svc.loadbalancer.server.port: "8000"
+      ####### TINYAUTH #######
+      tinyauth.apps.yacht.config.domain: yacht.$DOMAINNAME
+      tinyauth.apps.yacht.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "Yacht"

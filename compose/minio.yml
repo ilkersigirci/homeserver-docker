@@ -35,7 +35,6 @@ services:
       timeout: 3s
       retries: 3
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ### API Labels ###
       ## HTTP Routers
@@ -47,6 +46,9 @@ services:
       ## HTTP Services
       traefik.http.routers.minio-api-rtr.service: "minio-api-svc"
       traefik.http.services.minio-api-svc.loadbalancer.server.port: "9000"
+      ####### TINYAUTH #######
+      tinyauth.apps.minio.config.domain: minio.$DOMAINNAME
+      tinyauth.apps.minio.ip.bypass: $LOCAL_IPS
       ### Web UI Labels ###
       ## HTTP Routers
       traefik.http.routers.minio-ui-rtr.entrypoints: "websecure"

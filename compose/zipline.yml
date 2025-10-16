@@ -54,8 +54,6 @@ services:
       timeout: 5s
       retries: 3
     labels:
-      tinyauth.domain: share.$DOMAINNAME
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.zipline-rtr.entrypoints: websecure
@@ -65,6 +63,9 @@ services:
       ## HTTP Services
       traefik.http.routers.zipline-rtr.service: zipline-svc
       traefik.http.services.zipline-svc.loadbalancer.server.port: "3000"
+      ####### TINYAUTH #######
+      tinyauth.apps.share.config.domain: share.$DOMAINNAME
+      tinyauth.apps.share.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: Media
       homepage.name: zipline

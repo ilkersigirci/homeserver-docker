@@ -55,7 +55,6 @@ services:
     volumes_from: 
       - perlite-build
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.perlite-rtr.entrypoints: "websecure"
@@ -65,6 +64,9 @@ services:
       ## HTTP Services
       traefik.http.routers.perlite-rtr.service: "perlite-svc"
       traefik.http.services.perlite-svc.loadbalancer.server.port: "80"
+      ####### TINYAUTH #######
+      tinyauth.apps.perlite.config.domain: perlite.$DOMAINNAME
+      tinyauth.apps.perlite.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "Perlite"

@@ -52,8 +52,6 @@ services:
       AUTHENTIK_SECRET: $SPLITPRO_CLIENT_SECRET
       AUTHENTIK_ISSUER: https://pocketid.$BASE_DOMAINNAME
     labels:
-      # tinyauth.domain: split.$DOMAINNAME
-      # tinyauth.ip.bypass: $LOCAL_IPS
       # traefik.enable: "true"
       # ## HTTP Routers
       # traefik.http.routers.splitpro-rtr.entrypoints: websecure
@@ -63,6 +61,9 @@ services:
       # ## HTTP Services
       # traefik.http.routers.splitpro-rtr.service: splitpro-svc
       # traefik.http.services.splitpro-svc.loadbalancer.server.port: "3000"
+      ####### TINYAUTH #######
+      tinyauth.apps.splitpro.config.domain: split.$DOMAINNAME
+      tinyauth.apps.splitpro.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: Media
       homepage.name: splitpro

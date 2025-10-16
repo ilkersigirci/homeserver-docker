@@ -24,8 +24,6 @@ services:
       # SUDO_PASSWORD_HASH: 
       # PROXY_DOMAIN: code-server-ls.my.domain
     labels:
-      tinyauth.domain: code.$DOMAINNAME
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.code-server-rtr.entrypoints: "websecure"
@@ -35,6 +33,9 @@ services:
       ## HTTP Services
       traefik.http.routers.code-server-rtr.service: "code-server-svc"
       traefik.http.services.code-server-svc.loadbalancer.server.port: "8443"
+      ####### TINYAUTH #######
+      tinyauth.apps.code-server.config.domain: code.$DOMAINNAME
+      tinyauth.apps.code-server.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "Vscode"

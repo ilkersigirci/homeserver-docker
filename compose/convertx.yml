@@ -17,7 +17,6 @@ services:
     volumes:
       - $DOCKERDIR/appdata/convertx:/app/data
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers Auth
       traefik.http.routers.convertx-rtr.entrypoints: "websecure"
@@ -27,6 +26,9 @@ services:
       ## HTTP Services
       traefik.http.routers.convertx-rtr.service: "convertx-svc"
       traefik.http.services.convertx-svc.loadbalancer.server.port: "3000"
+      ####### TINYAUTH #######
+      tinyauth.apps.convertx.config.domain: convertx.$DOMAINNAME
+      tinyauth.apps.convertx.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "ConvertX"

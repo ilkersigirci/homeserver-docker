@@ -56,8 +56,6 @@ services:
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
     labels:
-      tinyauth.domain: photos.$DOMAINNAME
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.immich-server-rtr.entrypoints: "websecure"
@@ -71,6 +69,9 @@ services:
       ## HTTP Services
       traefik.http.routers.immich-server-rtr.service: "immich-server-svc"
       traefik.http.services.immich-server-svc.loadbalancer.server.port: "2283"
+      ####### TINYAUTH #######
+      tinyauth.apps.photos.config.domain: photos.$DOMAINNAME
+      tinyauth.apps.photos.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "Immich"

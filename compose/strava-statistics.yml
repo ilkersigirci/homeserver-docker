@@ -30,8 +30,6 @@ services:
       # Do not use the refresh token displayed on your Strava API settings page, it will not work.
       STRAVA_REFRESH_TOKEN: $STRAVA_REFRESH_TOKEN
     labels:
-      tinyauth.domain: strava.$DOMAINNAME
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.strava-statistics-rtr.entrypoints: websecure
@@ -41,6 +39,9 @@ services:
       ## HTTP Services
       traefik.http.routers.strava-statistics-rtr.service: strava-statistics-svc
       traefik.http.services.strava-statistics-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.strava.config.domain: strava.$DOMAINNAME
+      tinyauth.apps.strava.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: Media
       homepage.name: strava-statistics

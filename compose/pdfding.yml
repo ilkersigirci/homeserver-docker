@@ -52,7 +52,6 @@ services:
       OIDC_CLIENT_SECRET: $OIDC_PDFDING_CLIENT_SECRET
       OIDC_AUTH_URL: https://authelia.$DOMAINNAME/.well-known/openid-configuration
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.pdfding-rtr.entrypoints: "websecure"
@@ -62,7 +61,10 @@ services:
       ## HTTP Services
       traefik.http.routers.pdfding-rtr.service: "pdfding-svc"
       traefik.http.services.pdfding-svc.loadbalancer.server.port: "8000"
-      ## Homepage
+      ####### TINYAUTH #######
+      tinyauth.apps.pdfding.config.domain: pdfding.$DOMAINNAME
+      tinyauth.apps.pdfding.ip.bypass: $LOCAL_IPS
+      ### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "pdfding"
       homepage.icon: "pdfding.svg"

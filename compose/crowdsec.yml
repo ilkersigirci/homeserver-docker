@@ -28,8 +28,6 @@ services:
         # AGENT_PASSWORD: $CROWDSEC_AGENT_PASSWORD 
         # LOCAL_API_URL: $CROWDSEC_LOCAL_API_URL 
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
-      komodo.skip: # Prevents from stopping with StopAllContainers on Komodo
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "crowdsec"
@@ -40,3 +38,5 @@ services:
       glance.name: "crowdsec"
       glance.icon: "sh:crowdsec"
       glance.description: "Open-source & collaborative security IPS"
+      ######## KOMODO ########
+      komodo.skip: # Prevents from stopping with StopAllContainers on Komodo

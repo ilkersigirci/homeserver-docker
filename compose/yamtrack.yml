@@ -70,8 +70,6 @@ services:
       # DB_PASSWORD: yamtrack
       # DB_PORT: 5432
     labels:
-      tinyauth.domain: mediatrack.$DOMAINNAME
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.yamtrack-rtr.entrypoints: websecure
@@ -82,6 +80,9 @@ services:
       ## HTTP Services
       traefik.http.routers.yamtrack-rtr.service: yamtrack-svc
       traefik.http.services.yamtrack-svc.loadbalancer.server.port: "8000"
+      ####### TINYAUTH #######
+      tinyauth.apps.mediatrack.config.domain: mediatrack.$DOMAINNAME
+      tinyauth.apps.mediatrack.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: Media
       homepage.name: yamtrack

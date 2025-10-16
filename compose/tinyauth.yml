@@ -3,8 +3,7 @@
 # Create TOTP: docker run -i -t --rm ghcr.io/steveiliop56/tinyauth:v3 totp generate --interactive
 services:
   tinyauth:
-    # image: ghcr.io/steveiliop56/tinyauth:v4
-    image: ghcr.io/steveiliop56/tinyauth:nightly-distroless
+    image: ghcr.io/steveiliop56/tinyauth:v4
     container_name: tinyauth
     restart: $BASE_RESTART_POLICY
     profiles:

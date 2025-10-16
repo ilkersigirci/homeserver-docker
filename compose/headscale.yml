@@ -21,7 +21,6 @@ services:
     environment:
       TZ: $TZ
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.headscale-rtr.entrypoints: websecure
@@ -39,6 +38,9 @@ services:
       ## HTTP Services
       traefik.http.routers.headscale-rtr.service: headscale-svc
       traefik.http.services.headscale-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.headscale.config.domain: headscale.$DOMAINNAME
+      tinyauth.apps.headscale.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: Core
       homepage.name: headscale
@@ -67,7 +69,6 @@ services:
     environment:
       ENDPOINT: "/admin"
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.headscale-admin-rtr.entrypoints: websecure
@@ -77,6 +78,9 @@ services:
       ## HTTP Services
       traefik.http.routers.headscale-admin-rtr.service: headscale-admin-svc
       traefik.http.services.headscale-admin-svc.loadbalancer.server.port: "80"
+      ####### TINYAUTH #######
+      tinyauth.apps.headscale.config.domain: headscale.$DOMAINNAME
+      tinyauth.apps.headscale.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: Core
       homepage.name: headscale-admin
@@ -92,7 +96,7 @@ services:
 
 
   headplane:
-    image: ghcr.io/tale/headplane:0.6.0
+    image: ghcr.io/tale/headplane:0.6.1
     container_name: headplane
     restart: $BASE_RESTART_POLICY
     depends_on:
@@ -112,7 +116,6 @@ services:
       # match the headscale.dns_records_path in your config.yaml
       # - $CONFIGDIR/headscale/dns_records.json:/etc/headscale/dns_records.json
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.headplane-rtr.entrypoints: websecure
@@ -122,6 +125,9 @@ services:
       ## HTTP Services
       traefik.http.routers.headplane-rtr.service: headplane-svc
       traefik.http.services.headplane-svc.loadbalancer.server.port: "3000"
+      ####### TINYAUTH #######
+      tinyauth.apps.headscale.config.domain: headscale.$DOMAINNAME
+      tinyauth.apps.headscale.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: Core
       homepage.name: headplane

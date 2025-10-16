@@ -38,7 +38,6 @@ services:
     environment:
       TZ: $TZ
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.adguardhome-rtr.entrypoints: "websecure"
@@ -57,6 +56,9 @@ services:
       traefik.tcp.routers.adguard-tls.tls.certresolver: "letsencrypt"
       traefik.tcp.routers.adguard-tls.service: "adguard-tls"
       traefik.tcp.services.adguard-tls.loadbalancer.server.port: "53"
+      ####### TINYAUTH #######
+      tinyauth.apps.adguardhome.config.domain: adguardhome.$DOMAINNAME
+      tinyauth.apps.adguardhome.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "adguardhome"

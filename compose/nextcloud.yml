@@ -106,7 +106,6 @@ services:
       NEXTCLOUD_TRUSTED_DOMAIN: $NEXTCLOUD_DOMAIN_NAME
       TRUSTED_PROXIES: 192.168.90.0/24
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.nextcloud.entrypoints: "websecure"
@@ -117,6 +116,9 @@ services:
       ## HTTP Services
       traefik.http.routers.nextcloud.service: "nextcloud"
       traefik.http.services.nextcloud.loadbalancer.server.port: "80"
+      ####### TINYAUTH #######
+      tinyauth.apps.nextcloud.config.domain: nextcloud.$DOMAINNAME
+      tinyauth.apps.nextcloud.ip.bypass: $LOCAL_IPS
       ######################################################################################
       ## NOT_WORKING
       # ## TCP Routers

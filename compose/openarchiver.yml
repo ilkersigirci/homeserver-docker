@@ -27,8 +27,6 @@ services:
       REDIS_PASSWORD: $OPENARCHIVER_REDIS_PASSWORD
       MEILI_MASTER_KEY: $OPENARCHIVER_MEILI_MASTER_KEY
     labels:
-      tinyauth.domain: mailarchive.$DOMAINNAME
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.openarchiver-rtr.entrypoints: websecure
@@ -38,6 +36,9 @@ services:
       ## HTTP Services
       traefik.http.routers.openarchiver-rtr.service: openarchiver-svc
       traefik.http.services.openarchiver-svc.loadbalancer.server.port: "3000"
+      ####### TINYAUTH #######
+      tinyauth.apps.mailarchive.config.domain: mailarchive.$DOMAINNAME
+      tinyauth.apps.mailarchive.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: Media
       homepage.name: openarchiver

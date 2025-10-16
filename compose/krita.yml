@@ -13,7 +13,6 @@ services:
       TZ: $TZ
       TITLE: Krita
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.krita-rtr.entrypoints: "websecure"
@@ -23,6 +22,9 @@ services:
       ## HTTP Services
       traefik.http.routers.krita-rtr.service: "krita-svc"
       traefik.http.services.krita-svc.loadbalancer.server.port: "3000"
+      ####### TINYAUTH #######
+      tinyauth.apps.krita.config.domain: krita.$DOMAINNAME
+      tinyauth.apps.krita.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "DesktopApps"
       homepage.name: "Krita"

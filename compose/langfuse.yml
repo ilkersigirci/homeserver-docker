@@ -91,8 +91,6 @@ services:
       LANGFUSE_INIT_USER_NAME: $LANGFUSE_INIT_USER_NAME
       LANGFUSE_INIT_USER_PASSWORD: $LANGFUSE_INIT_USER_PASSWORD
     labels:
-      tinyauth.domain: langfuse.$DOMAINNAME
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.langfuse-web-rtr.entrypoints: "websecure"
@@ -102,6 +100,9 @@ services:
       ## HTTP Services
       traefik.http.routers.langfuse-web-rtr.service: "langfuse-web-svc"
       traefik.http.services.langfuse-web-svc.loadbalancer.server.port: "3000"
+      ####### TINYAUTH #######
+      tinyauth.apps.langfuse.config.domain: langfuse.$DOMAINNAME
+      tinyauth.apps.langfuse.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: ML
       homepage.name: langfuse

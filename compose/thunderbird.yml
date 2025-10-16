@@ -17,8 +17,6 @@ services:
       PGID: $PGID
       TZ: $TZ
     labels:
-      tinyauth.domain: mail.$DOMAINNAME
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.thunderbird-rtr.entrypoints: "websecure"
@@ -28,6 +26,9 @@ services:
       ## HTTP Services
       traefik.http.routers.thunderbird-rtr.service: "thunderbird-svc"
       traefik.http.services.thunderbird-svc.loadbalancer.server.port: "3000"
+      ####### TINYAUTH #######
+      tinyauth.apps.mail.config.domain: mail.$DOMAINNAME
+      tinyauth.apps.mail.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "DesktopApps"
       homepage.name: "Thunderbird"

@@ -27,7 +27,6 @@ services:
       retries: 5
       start_period: 15s
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.copyparty-rtr.entrypoints: websecure
@@ -37,6 +36,9 @@ services:
       ## HTTP Services
       traefik.http.routers.copyparty-rtr.service: copyparty-svc
       traefik.http.services.copyparty-svc.loadbalancer.server.port: "8000"
+      ####### TINYAUTH #######
+      tinyauth.apps.copyparty.config.domain: copyparty.$DOMAINNAME
+      tinyauth.apps.copyparty.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: Core
       homepage.name: copyparty

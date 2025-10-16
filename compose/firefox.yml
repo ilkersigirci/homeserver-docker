@@ -26,7 +26,6 @@ services:
       TZ: $TZ
       TITLE: Firefox
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.firefox-rtr.entrypoints: "websecure"
@@ -36,6 +35,9 @@ services:
       ## HTTP Services
       traefik.http.routers.firefox-rtr.service: "firefox-svc"
       traefik.http.services.firefox-svc.loadbalancer.server.port: "3000"
+      ####### TINYAUTH #######
+      tinyauth.apps.firefox.config.domain: firefox.$DOMAINNAME
+      tinyauth.apps.firefox.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "DesktopApps"
       homepage.name: "Firefox"

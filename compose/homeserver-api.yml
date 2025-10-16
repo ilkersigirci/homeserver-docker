@@ -37,8 +37,6 @@ services:
       RABBITMQ_VHOST: "/"
       RABBITMQ_DISK_FREE_ABSOLUTE_LIMIT: "2GB"
     labels:
-      tinyauth.domain: api-rabbitmq.$DOMAINNAME
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.homeserver-api-rabbitmq-rtr.entrypoints: "websecure"
@@ -48,6 +46,9 @@ services:
       ## HTTP Services
       traefik.http.routers.homeserver-api-rabbitmq-rtr.service: "homeserver-api-rabbitmq-svc"
       traefik.http.services.homeserver-api-rabbitmq-svc.loadbalancer.server.port: "15672"
+      ####### TINYAUTH #######
+      tinyauth.apps.api-rabbitmq.config.domain: api-rabbitmq.$DOMAINNAME
+      tinyauth.apps.api-rabbitmq.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: Others
       homepage.name: homeserver-api-rabbitmq
@@ -92,8 +93,6 @@ services:
       - REDIS_PORT=6379
       - REDIS_PASSWORD=$HOMESERVER_API_REDIS_PASSWORD
     labels:
-      tinyauth.domain: api.$DOMAINNAME
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.homeserver-api-head-rtr.entrypoints: "websecure"
@@ -156,7 +155,6 @@ services:
       - REDIS_PORT=6379
       - REDIS_PASSWORD=$HOMESERVER_API_REDIS_PASSWORD
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: Others
       homepage.name: homeserver-api-worker

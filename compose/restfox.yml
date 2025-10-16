@@ -10,7 +10,6 @@ services:
     security_opt:
       - no-new-privileges:true
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.restfox-rtr.entrypoints: "websecure"
@@ -20,6 +19,9 @@ services:
       ## HTTP Services
       traefik.http.routers.restfox-rtr.service: "restfox-svc"
       traefik.http.services.restfox-svc.loadbalancer.server.port: "4004"
+      ####### TINYAUTH #######
+      tinyauth.apps.restfox.config.domain: restfox.$DOMAINNAME
+      tinyauth.apps.restfox.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "restfox"

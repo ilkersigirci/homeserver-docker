@@ -24,7 +24,6 @@ services:
       UWSGI_WORKERS: 4
       UWSGI_THREADS: 4
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.searxng-rtr.entrypoints: "websecure"
@@ -34,6 +33,9 @@ services:
       ## HTTP Services
       traefik.http.routers.searxng-rtr.service: "searxng-svc"
       traefik.http.services.searxng-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.searxng.config.domain: searxng.$DOMAINNAME
+      tinyauth.apps.searxng.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "ML"
       homepage.name: "searxng"

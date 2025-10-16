@@ -25,7 +25,6 @@ services:
       ALLOWED_HOSTS: localhost,healthchecks.$DOMAINNAME
       INTEGRATIONS_ALLOW_PRIVATE_IPS: "True"
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.healthchecks-rtr.entrypoints: "websecure"
@@ -35,6 +34,9 @@ services:
       ## HTTP Services
       traefik.http.routers.healthchecks-rtr.service: "healthchecks-svc"
       traefik.http.services.healthchecks-svc.loadbalancer.server.port: "8000"
+      ####### TINYAUTH #######
+      tinyauth.apps.healthchecks.config.domain: healthchecks.$DOMAINNAME
+      tinyauth.apps.healthchecks.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "Healthchecks"

@@ -19,7 +19,6 @@ services:
       CREATED_BUCKET_NAME: ilkerflix
       APP_AWS_REGION: eu-central-1
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.localstack-s3-rtr.entrypoints: "websecure"
@@ -29,6 +28,9 @@ services:
       ## HTTP Services
       traefik.http.routers.localstack-s3-rtr.service: "localstack-s3-svc"
       traefik.http.services.localstack-s3-svc.loadbalancer.server.port: "4566"
+      ####### TINYAUTH #######
+      tinyauth.apps.s3.config.domain: s3.$DOMAINNAME
+      tinyauth.apps.s3.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "S3"

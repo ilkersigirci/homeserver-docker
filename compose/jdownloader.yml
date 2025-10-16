@@ -21,7 +21,6 @@ services:
       DISPLAY_HEIGHT: 1080
       # VNC_PASSWORD: $JDOWN_VNC_PASSWD
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.jdownloader-rtr.entrypoints: "websecure"
@@ -31,6 +30,9 @@ services:
       ## HTTP Services
       traefik.http.routers.jdownloader-rtr.service: "jdownloader-svc"
       traefik.http.services.jdownloader-svc.loadbalancer.server.port: "5800"
+      ####### TINYAUTH #######
+      tinyauth.apps.download.config.domain: download.$DOMAINNAME
+      tinyauth.apps.download.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "Jdownloader"

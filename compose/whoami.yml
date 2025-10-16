@@ -10,7 +10,6 @@ services:
     security_opt:
       - no-new-privileges:true
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.whoami-rtr.entrypoints: "websecure"
@@ -21,6 +20,9 @@ services:
       ## HTTP Services
       traefik.http.routers.whoami-rtr.service: "whoami-svc"
       traefik.http.services.whoami-svc.loadbalancer.server.port: "80"
+      ####### TINYAUTH #######
+      tinyauth.apps.whoami.config.domain: whoami.$DOMAINNAME
+      tinyauth.apps.whoami.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "Whoami"

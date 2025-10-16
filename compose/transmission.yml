@@ -8,6 +8,8 @@ services:
     mem_reservation: "4096M"
     mem_limit: "4096M"
     restart: $MEDIA_RESTART_POLICY
+    profiles:
+      - media
     networks:
       t3_proxy:
         ipv4_address: 192.168.90.160
@@ -27,8 +29,6 @@ services:
       PGID: $PGID
       TZ: $TZ
     labels:
-      tinyauth.domain: torrent.$DOMAINNAME
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers Auth
       traefik.http.routers.transmission-rtr.entrypoints: "websecure"
@@ -39,6 +39,9 @@ services:
       ## HTTP Services
       traefik.http.routers.transmission-rtr.service: "transmission-svc"
       traefik.http.services.transmission-svc.loadbalancer.server.port: "9091"
+      ####### TINYAUTH #######
+      tinyauth.apps.transmission.config.domain: torrent.$DOMAINNAME
+      tinyauth.apps.transmission.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "Transmission"
@@ -48,5 +51,3 @@ services:
       homepage.description: "Torrent Client"
       homepage.widget.type: "transmission"
       homepage.widget.url: "http://transmission:9091"
-    profiles:
-      - media

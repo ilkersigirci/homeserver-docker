@@ -16,7 +16,6 @@ services:
       PGID: $PGID
       TZ: $TZ
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.mkdocs-material-rtr.entrypoints: "websecure"
@@ -26,6 +25,9 @@ services:
       ## HTTP Services
       traefik.http.routers.mkdocs-material-rtr.service: "mkdocs-material-svc"
       traefik.http.services.mkdocs-material-svc.loadbalancer.server.port: "8000"
+      ####### TINYAUTH #######
+      tinyauth.apps.mkdocs.config.domain: mkdocs.$DOMAINNAME
+      tinyauth.apps.mkdocs.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "mkdocs-material"

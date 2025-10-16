@@ -28,7 +28,6 @@ services:
       THEME: "sand" # optional
       COLOR: "dark" # optional
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.watchyourlan-rtr.entrypoints: "websecure"
@@ -38,6 +37,9 @@ services:
       ## HTTP Services
       traefik.http.routers.watchyourlan-rtr.service: "watchyourlan-svc"
       traefik.http.services.beszel-svc.loadbalancer.server.port: "8840"
+      ####### TINYAUTH #######
+      tinyauth.apps.watchyourlan.config.domain: watchyourlan.$DOMAINNAME
+      tinyauth.apps.watchyourlan.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Monitoring"
       homepage.name: "WatchYourLAN"

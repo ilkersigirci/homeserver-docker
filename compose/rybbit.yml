@@ -95,7 +95,6 @@ services:
       retries: 5
       start_period: 10s
     labels:
-      # tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.rybbit-api-rtr.entrypoints: "websecure"
@@ -106,6 +105,9 @@ services:
       traefik.http.routers.rybbit-api-rtr.service: "rybbit-api-svc"
       traefik.http.routers.rybbit-api-rtr.priority: "2"
       traefik.http.services.rybbit-api-svc.loadbalancer.server.port: "3001"
+      ####### TINYAUTH #######
+      tinyauth.apps.rybbit-backend.config.domain: analytics.$DOMAINNAME
+      tinyauth.apps.rybbit-backend.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Monitoring"
       homepage.name: "rybbit-api"
@@ -136,8 +138,6 @@ services:
       NEXT_PUBLIC_BACKEND_URL: https://analytics.$DOMAINNAME
       NEXT_PUBLIC_DISABLE_SIGNUP: ${RYBBIT_DISABLE_SIGNUP:-true}
     labels:
-      tinyauth.domain: analytics.$DOMAINNAME
-      # tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.rybbit-rtr.entrypoints: "websecure"
@@ -148,6 +148,9 @@ services:
       traefik.http.routers.rybbit-rtr.service: "rybbit-svc"
       traefik.http.routers.rybbit-rtr.priority: "1"
       traefik.http.services.rybbit-svc.loadbalancer.server.port: "3002"
+      ####### TINYAUTH #######
+      tinyauth.apps.rybbit-client.config.domain: analytics.$DOMAINNAME
+      tinyauth.apps.rybbit-client.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Monitoring"
       homepage.name: "rybbit"

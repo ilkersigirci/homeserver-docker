@@ -8,7 +8,6 @@ services:
     security_opt:
       - no-new-privileges:true
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.enclosed.entrypoints: "websecure"
@@ -18,6 +17,9 @@ services:
       ## HTTP Services
       traefik.http.routers.enclosed.service: "logseq-svc"
       traefik.http.services.logseq-svc.loadbalancer.server.port: "8787"
+      ####### TINYAUTH #######
+      tinyauth.apps.enclosed.config.domain: enclosed.$DOMAINNAME
+      tinyauth.apps.enclosed.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Others"
       homepage.name: "Enclosed"

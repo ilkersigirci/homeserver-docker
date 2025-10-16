@@ -39,8 +39,6 @@ services:
       OPENAI_API_BASE_URLS: https://api.openai.com/v1;$OPENROUTER_API_BASE_URL
       OPENAI_API_KEYS: $OPENAI_API_KEY;$OPENROUTER_API_KEY
     labels:
-      tinyauth.domain: chat.$DOMAINNAME
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.open-webui-rtr.entrypoints: "websecure"
@@ -50,6 +48,9 @@ services:
       ## HTTP Services
       traefik.http.routers.open-webui-rtr.service: "open-webui-svc"
       traefik.http.services.open-webui-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.open-webui.config.domain: chat.$DOMAINNAME
+      tinyauth.apps.open-webui.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "ML"
       homepage.name: "Open WebUI"
@@ -86,8 +87,6 @@ services:
       OAUTH_SCOPES: openid email profile
       OPENID_REDIRECT_URI: https://betuschat.$DOMAINNAME/oauth/oidc/callback
     labels:
-      tinyauth.domain: betuschat.$DOMAINNAME
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.open-webui-betus-rtr.entrypoints: "websecure"
@@ -97,6 +96,9 @@ services:
       ## HTTP Services
       traefik.http.routers.open-webui-betus-rtr.service: "open-webui-betus-svc"
       traefik.http.services.open-webui-betus-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.open-webui-betus.config.domain: betuschat.$DOMAINNAME
+      tinyauth.apps.open-webui-betus.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "ML"
       homepage.name: "Open WebUI"

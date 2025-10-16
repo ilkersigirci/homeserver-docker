@@ -10,7 +10,6 @@ services:
       # volumes:
       # - $NOTESDIR:/notes
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.logseq-rtr.entrypoints: "websecure"
@@ -20,6 +19,9 @@ services:
       ## HTTP Services
       traefik.http.routers.logseq-rtr.service: "logseq-svc"
       traefik.http.services.logseq-svc.loadbalancer.server.port: "80"
+      ####### TINYAUTH #######
+      tinyauth.apps.logseq.config.domain: logseq.$DOMAINNAME
+      tinyauth.apps.logseq.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "Logseq"

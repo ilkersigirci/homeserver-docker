@@ -16,7 +16,6 @@ services:
       PGID: $PGID
       TZ: $TZ
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.sshwifty-rtr.entrypoints: "websecure"
@@ -26,6 +25,9 @@ services:
       ## HTTP Services
       traefik.http.routers.sshwifty-rtr.service: "sshwifty-svc"
       traefik.http.services.sshwifty-svc.loadbalancer.server.port: "8182"
+      ####### TINYAUTH #######
+      tinyauth.apps.ssh.config.domain: ssh.$DOMAINNAME
+      tinyauth.apps.ssh.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "Sshwifty"

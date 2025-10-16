@@ -18,7 +18,6 @@ services:
       AUTOMATED_CONVERSION_KEEP_SOURCE: 1
       VNC_PASSWORD: $HANDBRAKE_VNC_PASSWD
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.handbrake-rtr.entrypoints: "websecure"
@@ -28,6 +27,9 @@ services:
       ## HTTP Services
       traefik.http.routers.handbrake-rtr.service: "handbrake-svc"
       traefik.http.services.handbrake-svc.loadbalancer.server.port: "5800"
+      ####### TINYAUTH #######
+      tinyauth.apps.handbrake.config.domain: handbrake.$DOMAINNAME
+      tinyauth.apps.handbrake.ip.bypass: $LOCAL_IPS
         ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "handbrake"

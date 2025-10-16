@@ -22,7 +22,6 @@ services:
       TZ: $TZ
       # - DOCKER_MODS=linuxserver/mods:universal-git
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.obsidian-custom-rtr.entrypoints: "websecure"
@@ -32,5 +31,8 @@ services:
       ## HTTP Services
       traefik.http.routers.obsidian-custom-rtr.service: "obsidian-custom-svc"
       traefik.http.services.obsidian-custom-svc.loadbalancer.server.port: "3000"
+      ####### TINYAUTH #######
+      tinyauth.apps.obsidiancustom.config.domain: obsidiancustom.$DOMAINNAME
+      tinyauth.apps.obsidiancustom.ip.bypass: $LOCAL_IPS
     profiles:
       - reading

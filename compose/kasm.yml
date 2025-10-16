@@ -20,7 +20,6 @@ services:
       KASM_PORT: 4433
       TZ: $TZ
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.kasm-rtr.entrypoints: "websecure"
@@ -31,6 +30,9 @@ services:
       ## HTTP Services
       traefik.http.routers.kasm-rtr.service: "kasm-svc"
       traefik.http.services.kasm-svc.loadbalancer.server.port: "4443"
+      ####### TINYAUTH #######
+      tinyauth.apps.kasm.config.domain: kasm.$DOMAINNAME
+      tinyauth.apps.kasm.ip.bypass: $LOCAL_IPS
       # NOTE: https://docs.linuxserver.io/faq#strict-proxy
       traefik.http.services.kasm-svc.loadbalancer.serverstransport: "ignorecert@file"
       traefik.http.services.kasm-svc.loadbalancer.server.scheme: "https"

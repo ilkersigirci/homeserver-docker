@@ -16,7 +16,6 @@ services:
       PGID: $PGID
       TZ: $TZ
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.remmina-rtr.entrypoints: "websecure"
@@ -25,4 +24,6 @@ services:
       traefik.http.routers.remmina-rtr.middlewares: "chain-no-auth@file"
       ## HTTP Services
       traefik.http.routers.remmina-rtr.service: "remmina-svc"
-      traefik.http.services.remmina-svc.loadbalancer.server.port: "3000"
+      traefik.http.services.remmina-svc.loadbalancer.server.port: "3000"      ####### TINYAUTH #######
+      tinyauth.apps.remmina.config.domain: remmina.$DOMAINNAME
+      tinyauth.apps.remmina.ip.bypass: $LOCAL_IPS

@@ -23,7 +23,6 @@ services:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.netdata-rtr.entrypoints: "websecure"
@@ -33,6 +32,9 @@ services:
       ## HTTP Services
       traefik.http.routers.netdata-rtr.service: "netdata-svc"
       traefik.http.services.netdata-svc.loadbalancer.server.port: "19999"
+      ####### TINYAUTH #######
+      tinyauth.apps.netdata.config.domain: netdata.$DOMAINNAME
+      tinyauth.apps.netdata.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Monitoring"
       homepage.name: "Netdata"

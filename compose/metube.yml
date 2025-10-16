@@ -18,7 +18,6 @@ services:
       YTDL_OPTIONS: '{"writethumbnail": true, "writeinfojson": true}' # "writeinfojson": true,
       # - YTDL_OPTIONS={"cookiefile":"/cookies/cookies.txt"}
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers Auth
       traefik.http.routers.metube-rtr.entrypoints: "websecure"
@@ -28,6 +27,9 @@ services:
       ## HTTP Services
       traefik.http.routers.metube-rtr.service: "metube-svc"
       traefik.http.services.metube-svc.loadbalancer.server.port: "8081"
+      ####### TINYAUTH #######
+      tinyauth.apps.metube.config.domain: metube.$DOMAINNAME
+      tinyauth.apps.metube.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "metube"

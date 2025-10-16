@@ -17,7 +17,6 @@ services:
       PGID: $PGID
       TZ: $TZ
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers Auth
       traefik.http.routers.beets-rtr.entrypoints: "websecure"
@@ -27,6 +26,9 @@ services:
       ## HTTP Services
       traefik.http.routers.beets-rtr.service: "beets-svc"
       traefik.http.services.beets-svc.loadbalancer.server.port: "8337"
+      ####### TINYAUTH #######
+      tinyauth.apps.beets.config.domain: beets.$DOMAINNAME
+      tinyauth.apps.beets.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "Beets"

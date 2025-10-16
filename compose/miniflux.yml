@@ -40,7 +40,6 @@ services:
       BASE_URL: https://miniflux.$DOMAINNAME
       # - "POCKET_CONSUMER_KEY=YOUR_POCKET_CONSUMER_KEY"
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.miniflux-rtr.entrypoints: "websecure"
@@ -50,3 +49,6 @@ services:
       ## HTTP Services
       traefik.http.routers.miniflux-rtr.service: "miniflux-svc"
       traefik.http.services.miniflux-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.miniflux.config.domain: miniflux.$DOMAINNAME
+      tinyauth.apps.miniflux.ip.bypass: $LOCAL_IPS

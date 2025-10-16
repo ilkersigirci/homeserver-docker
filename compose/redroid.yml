@@ -21,7 +21,6 @@ services:
     #   - PGID=$PGID
     #   - TZ=$TZ
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.redroid-rtr.entrypoints: "websecure"
@@ -31,3 +30,6 @@ services:
       ## HTTP Services
       traefik.http.routers.redroid-rtr.service: "redroid-svc"
       traefik.http.services.redroid-svc.loadbalancer.server.port: "5555"
+      ####### TINYAUTH #######
+      tinyauth.apps.redroid.config.domain: redroid.$DOMAINNAME
+      tinyauth.apps.redroid.ip.bypass: $LOCAL_IPS

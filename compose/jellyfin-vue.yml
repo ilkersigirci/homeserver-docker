@@ -13,7 +13,6 @@ services:
     #   - DEFAULT_SERVERS=demo.jellyfin.org,jellyfin:8096
     #   - DISABLE_SERVER_SELECTION=0
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.jellyfin-vue-rtr.entrypoints: "websecure"
@@ -23,6 +22,9 @@ services:
       ## HTTP Services
       traefik.http.routers.jellyfin-vue-rtr.service: "jellyfin-vue-svc"
       traefik.http.services.jellyfin-vue-svc.loadbalancer.server.port: "80"
+      ####### TINYAUTH #######
+      tinyauth.apps.jellyfin_vue.config.domain: jellyfin_vue.$DOMAINNAME
+      tinyauth.apps.jellyfin_vue.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "Jellyfin Vue"

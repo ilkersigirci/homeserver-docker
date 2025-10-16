@@ -36,7 +36,6 @@ services:
       KEYBOARD: "en-US"
       # ARGUMENTS: "-device usb-host,vendorid=0x1234,productid=0x1234" # NOTE: For usb device
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.windows-rtr.entrypoints: "websecure"
@@ -46,6 +45,9 @@ services:
       ## HTTP Services
       traefik.http.routers.windows-rtr.service: "windows-svc"
       traefik.http.services.windows-svc.loadbalancer.server.port: "8006"
+      ####### TINYAUTH #######
+      tinyauth.apps.windows.config.domain: windows.$DOMAINNAME
+      tinyauth.apps.windows.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "windows"

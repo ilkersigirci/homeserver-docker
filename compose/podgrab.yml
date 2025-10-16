@@ -13,7 +13,6 @@ services:
     environment:
       CHECK_FREQUENCY: 240
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers Auth
       traefik.http.routers.podgrab-rtr.entrypoints: "websecure"
@@ -23,5 +22,8 @@ services:
       ## HTTP Services
       traefik.http.routers.podgrab-rtr.service: "podgrab-svc"
       traefik.http.services.podgrab-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.podgrab.config.domain: podgrab.$DOMAINNAME
+      tinyauth.apps.podgrab.ip.bypass: $LOCAL_IPS
     profiles:
       - media

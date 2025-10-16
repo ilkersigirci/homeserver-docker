@@ -35,7 +35,6 @@ services:
       # - S3_BUCKET_NAME=${S3_BUCKET_NAME:-palmr-files} # Bucket name for the S3 storage (here we are using palmr-files as the bucket name to understand that this is the bucket for palmr)
       # - S3_FORCE_PATH_STYLE=true # For MinIO compatibility we have to set this to true
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.palmr-rtr.entrypoints: "websecure"
@@ -45,6 +44,9 @@ services:
       ## HTTP Services
       traefik.http.routers.palmr-rtr.service: "palmr-svc"
       traefik.http.services.palmr-svc.loadbalancer.server.port: "5487"
+      ####### TINYAUTH #######
+      tinyauth.apps.palmr.config.domain: palmr.$DOMAINNAME
+      tinyauth.apps.palmr.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "palmr"

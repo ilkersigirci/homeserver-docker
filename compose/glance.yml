@@ -27,7 +27,6 @@ services:
       TRAKT_USERNAME: $TRAKT_USERNAME
       TRAKT_CLIENT_ID: $TRAKT_CLIENT_ID
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.glance-rtr.entrypoints: "websecure"
@@ -37,6 +36,9 @@ services:
       ## HTTP Services
       traefik.http.routers.glance-rtr.service: "glance-svc"
       traefik.http.services.glance-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.glance.config.domain: glance.$DOMAINNAME
+      tinyauth.apps.glance.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "glance"

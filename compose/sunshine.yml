@@ -18,7 +18,6 @@ services:
       PGID: $PGID
       TZ: $TZ
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.sunshine-rtr.entrypoints: "websecure"
@@ -28,5 +27,8 @@ services:
       ## HTTP Services
       traefik.http.routers.sunshine-rtr.service: "sunshine-svc"
       traefik.http.services.sunshine-svc.loadbalancer.server.port: "47990"
+      ####### TINYAUTH #######
+      tinyauth.apps.sunshine.config.domain: sunshine.$DOMAINNAME
+      tinyauth.apps.sunshine.ip.bypass: $LOCAL_IPS
     profiles:
       - monitoring

@@ -21,7 +21,6 @@ services:
     environment:
       TZ: $TZ
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.portainer-rtr.entrypoints: "websecure"
@@ -31,6 +30,9 @@ services:
       ## HTTP Services
       traefik.http.routers.portainer-rtr.service: "portainer-svc"
       traefik.http.services.portainer-svc.loadbalancer.server.port: "9000"
+      ####### TINYAUTH #######
+      tinyauth.apps.portainer.config.domain: portainer.$DOMAINNAME
+      tinyauth.apps.portainer.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "Portainer"

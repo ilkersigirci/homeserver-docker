@@ -22,7 +22,6 @@ services:
       TZ: $TZ
       DOCKER_MODS: linuxserver/calibre-web:calibre # set the path to converter tool to /app/calibre/ebook-convert
     labels:
-      tinyauth.ip.bypass: $LOCAL_IPS
       traefik.enable: "true"
       ## HTTP Routers Auth
       traefik.http.routers.lazylibrarian-rtr.entrypoints: "websecure"
@@ -32,6 +31,9 @@ services:
       ## HTTP Services
       traefik.http.routers.lazylibrarian-rtr.service: "lazylibrarian-svc"
       traefik.http.services.lazylibrarian-svc.loadbalancer.server.port: "5299"
+      ####### TINYAUTH #######
+      tinyauth.apps.lazy.config.domain: lazy.$DOMAINNAME
+      tinyauth.apps.lazy.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "LazyLibrarian"
