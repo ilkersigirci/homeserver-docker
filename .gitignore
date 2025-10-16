@@ -19,3 +19,4 @@ configs/*
 !configs/glance
 configs/glance/docs
 !configs/copyparty/copyparty.conf
+!configs/rybbit
