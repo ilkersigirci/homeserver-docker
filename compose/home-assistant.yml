@@ -58,7 +58,7 @@ services:
       traefik.http.routers.home-assistant-rtr.service: home-assistant-svc
       traefik.http.services.home-assistant-svc.loadbalancer.server.port: "8123"
       ####### TINYAUTH #######
-      tinyauth.apps.smarthome.config.domain: smarthome.$DOMAINNAME
+      tinyauth.apps.home-assistant.config.domain: smarthome.$DOMAINNAME
       tinyauth.apps.home-assistant.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: Maintenance
