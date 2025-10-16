@@ -88,7 +88,7 @@ http:
     #   loadBalancer:
     #     servers:
     #       # - url: "http://10.8.0.3:8096" # Wiregurd
-    #       # - url: "http://100.64.0.3:8096" # Tailscale
+    #       # - url: "http://100.64.0.7:8096" # Tailscale
 
     # wireguard-svc:
     #   loadBalancer:
@@ -99,7 +99,7 @@ http:
       loadBalancer:
         servers:
           # - url: "http://10.8.0.3:1411"
-          - url: "http://100.64.0.3:1411"
+          - url: "http://100.64.0.7:1411"
         # healthCheck:
         #   path: "/healthz"
         #   interval: "30s"
@@ -114,10 +114,10 @@ http:
     splitpro-svc:
       loadBalancer:
         servers:
-          - url: "http://100.64.0.3:8098"
+          - url: "http://100.64.0.7:8098"
 
     immich-public-proxy-svc:
       loadBalancer:
         servers:
           # - url: "http://10.8.0.3:8097"
-          - url: "http://100.64.0.3:8097"
+          - url: "http://100.64.0.7:8097"
