@@ -53,6 +53,8 @@ services:
       glance.icon: sh:headscale
       glance.url: https://headscale.$DOMAINNAME/admin
       glance.description: An open source, self-hosted implementation of the Tailscale control server
+      ##### HEADPLANE #####
+      me.tale.headplane.target: headscale
 
   headscale-admin:
     image: goodieshq/headscale-admin:0.26.0
@@ -61,7 +63,7 @@ services:
     depends_on:
       - headscale
     profiles:
-      - core
+      - not-used
     networks:
       - t3_proxy
     security_opt:
@@ -102,16 +104,18 @@ services:
     depends_on:
       - headscale
     profiles:
-      - not-used
+      - core
     networks:
       - t3_proxy
+      - socket_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      # - $CONFIGDIR/headplane/config.yaml:/etc/headplane/config.yaml
-      - $CONFIGDIR/headscale/config.yaml:/etc/headplane/config.yaml
+      - $CONFIGDIR/headplane/config.yaml:/etc/headplane/config.yaml
       - $DATADIR/headplane:/var/lib/headplane
-      - $CONFIGDIR/headscale/config.yaml:/etc/headscale/config.yaml
+      ## Headscale related
+      - $CONFIGDIR/headscale/config.yaml:/etc/headscale/config.yaml:ro
+      - $DATADIR/headscale:/var/lib/headscale:ro
       # If using dns.extra_records in Headscale (recommended), this should
       # match the headscale.dns_records_path in your config.yaml
       # - $CONFIGDIR/headscale/dns_records.json:/etc/headscale/dns_records.json
@@ -121,7 +125,7 @@ services:
       traefik.http.routers.headplane-rtr.entrypoints: websecure
       traefik.http.routers.headplane-rtr.rule: Host(`headscale.$DOMAINNAME`) && PathPrefix(`/admin`)
       ## Middlewares
-      traefik.http.routers.headplane-rtr.middlewares: chain-tinyauth@file
+      # traefik.http.routers.headplane-rtr.middlewares: chain-tinyauth@file
       ## HTTP Services
       traefik.http.routers.headplane-rtr.service: headplane-svc
       traefik.http.services.headplane-svc.loadbalancer.server.port: "3000"
