@@ -1,45 +1,39 @@
 services:
   wyl-node-bootstrap:
-    image: aceberg/node-bootstrap
+    image: ghcr.io/aceberg/node-bootstrap:latest
     container_name: node-bootstrap
     restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      # - monitoring
+      - not-used
+    networks:
+      - t3_proxy
     ports:
       - 8850:8850
+  watchyourlan:
+    image: ghcr.io/aceberg/watchyourlan:latest
+    container_name: watchyourlan
+    restart: $MAINTENANCE_RESTART_POLICY
     profiles:
       - monitoring
-
-  watchyourlan:
-    image: aceberg/watchyourlan
-    container_name: watchyourlan
+    # command: "-n http://YOUR_IP:8850" # Uncomment those if you are using local node-bootstrap
+    # depends_on:
+    #   - wyl-node-bootstrap
     network_mode: "host"
-    restart: $MAINTENANCE_RESTART_POLICY
-    command: "-n http://YOUR_IP:8850" # put your server IP or DNS name here
-    depends_on:
-      - wyl-node-bootstrap
+    expose:
+      - 8840
     volumes:
-      - $DOCKERDIR/appdata/beszel:/data/WatchYourLAN
+      - $DOCKERDIR/appdata/watchyourlan:/data/WatchYourLAN
     environment:
-      TZ: "${TZ}" # required: needs your TZ for correct time
-      IFACES: "enp18s0 wlp16s0" # required: 1 or more interface
-      HOST: "0.0.0.0" # optional, default: 0.0.0.0
-      PORT: "8840" # optional, default: 8840
-      TIMEOUT: "120" # optional, time in seconds, default: 120
-      SHOUTRRR_URL: "" # optional, set url to notify
+      TZ: $TZ
+      IFACES: $NETWORK_INTERFACE_NAMES # required: 1 or more interface
+      HOST: 0.0.0.0
+      PORT: 8840
+      TIMEOUT: 120
+      SHOUTRRR_URL: "" # optional
       THEME: "sand" # optional
       COLOR: "dark" # optional
     labels:
-      traefik.enable: "true"
-      ## HTTP Routers
-      traefik.http.routers.watchyourlan-rtr.entrypoints: "websecure"
-      traefik.http.routers.watchyourlan-rtr.rule: "Host(`watchyourlan.$DOMAINNAME`)"
-      ## Middlewares
-      traefik.http.routers.watchyourlan-rtr.middlewares: "chain-tinyauth@file"
-      ## HTTP Services
-      traefik.http.routers.watchyourlan-rtr.service: "watchyourlan-svc"
-      traefik.http.services.beszel-svc.loadbalancer.server.port: "8840"
-      ####### TINYAUTH #######
-      tinyauth.apps.watchyourlan.config.domain: watchyourlan.$DOMAINNAME
-      tinyauth.apps.watchyourlan.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Monitoring"
       homepage.name: "WatchYourLAN"
@@ -47,5 +41,3 @@ services:
       homepage.href: "https://watchyourlan.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Network Device Monitor"
-    profiles:
-      - monitoring

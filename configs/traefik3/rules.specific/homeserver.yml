@@ -1,0 +1,15 @@
+http:
+  routers:
+    watchyourlan-rtr:
+      rule: "Host(`watchyourlan.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: watchyourlan-svc
+
+  services:
+    watchyourlan-svc:
+      loadBalancer:
+        servers:
+          - url: http://100.64.0.7:8840
