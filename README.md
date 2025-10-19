@@ -1,5 +1,8 @@
 # Homeserver Docker
 
+![Services](./resources/services.png)
+
+
 - Essential commands
 
 ```bash
@@ -29,27 +32,3 @@ Name=Start Docker Apps
 Comment[en_US]=
 Comment=
 ```
-
-## Setup
-
-- Authelia
-- ![Authelia Schema](https://camo.githubusercontent.com/9b4a111baec20c4f677b38d818b1142f5eae5a20e8d1d17c33fb1d9b339e0105/68747470733a2f2f7777772e61757468656c69612e636f6d2f696d616765732f61726368692e706e67)
-
-
-- Create Secrets
-```bash
-tr -cd '[:alnum:]' </dev/urandom | fold -w "64" | head -n 1 | tr -d '\n' | sudo tee $HOME/docker/secrets/example_secret
-```
-
-## Beszel
-
-- For telegram notifications: telegram://token@telegram?chats=channel-id
-
-- [Authelia OIDC Setup](https://www.beszel.dev/guide/oauth)
-    - Toggle off the "Hide collection create and edit controls" switch on `<your-beszel-url>/_/#/settings`
-    - Edit users collection
-    - In the "Options" tab, enable OAuth2 and add your provider.
-    - Add provider with following urls:
-        - Auth url: `<your_authelia_url>/api/oidc/authorization`
-        - Token url: `<your_authelia_url>/api/oidc/token`
-        - User info url: `<your_authelia_url>/api/oidc/userinfo`
