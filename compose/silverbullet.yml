@@ -1,0 +1,42 @@
+services:
+  silverbullet:
+    image: ghcr.io/silverbulletmd/silverbullet
+    container_name: silverbullet
+    restart: $OTHERS_RESTART_POLICY
+    profiles:
+      - reading
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $NOTESDIR/Markdown/silverbullet-test:/space
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.silverbullet-rtr.entrypoints: websecure
+      traefik.http.routers.silverbullet-rtr.rule: Host(`silverbullet.$DOMAINNAME`)
+      ## Middlewares
+      traefik.http.routers.silverbullet-rtr.middlewares: chain-tinyauth@file
+      ## HTTP Services
+      traefik.http.routers.silverbullet-rtr.service: silverbullet-svc
+      traefik.http.services.silverbullet-svc.loadbalancer.server.port: "3000"
+      ####### TINYAUTH #######
+      tinyauth.apps.silverbullet.config.domain: silverbullet.$DOMAINNAME
+      tinyauth.apps.silverbullet.ip.bypass: $LOCAL_IPS
+      ####### HOMEPAGE #######
+      homepage.group: Reading
+      homepage.name: silverbullet
+      homepage.icon: silverbullet.png
+      homepage.href: https://silverbullet.$DOMAINNAME
+      homepage.target: _blank
+      homepage.description: description
+      ####### GLANCE #######
+      glance.name: silverbullet
+      glance.icon: sh:silverbullet
+      glance.url: https://silverbullet.$DOMAINNAME
+      glance.description: description
