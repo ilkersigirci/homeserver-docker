@@ -81,10 +81,10 @@ services:
       - --experimental.plugins.webfinger.modulename=github.com/NX211/traefik-webfinger
       - --experimental.plugins.webfinger.version=v0.3.5
       ## OTLP Tracing
-      - --tracing.otlp.grpc=true
-      - --tracing.otlp.grpc.endpoint=traefik-log-dashboard-backend:4317
-      - --tracing.otlp.grpc.insecure=true
-      - --tracing.sampleRate=0.1
+      # - --tracing.otlp.grpc=true
+      # - --tracing.otlp.grpc.endpoint=traefik-log-dashboard-backend:4317
+      # - --tracing.otlp.grpc.insecure=true
+      # - --tracing.sampleRate=0.1
       # Global attributes added to all traces
       - --tracing.globalAttributes.environment=production
       - --tracing.globalAttributes.service.version=v3.0
