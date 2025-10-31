@@ -267,11 +267,6 @@ endpoints:
     interval: 1h
     url: "icmp://homepage.gpu.$DOMAINNAME"
 
-  - name: Homepage-GPU
-    <<: *https-default
-    # group: GPU
-    url: "https://homepage.gpu.$DOMAINNAME"
-
   - name: Jellyfin-GPU
     <<: *https-default
     # group: GPU
