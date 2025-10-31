@@ -254,7 +254,7 @@ endpoints:
   - name: gpu.$DOMAINNAME-DNS
     group: External
     url: "1.1.1.1" # Address of the DNS server to use
-    interval: 30s
+    interval: 1h
     dns:
       query-name: "homepage.gpu.$DOMAINNAME"
       query-type: "A"
@@ -264,6 +264,7 @@ endpoints:
 
   - name: Homepage-GPU-PING
     <<: *ping-default
+    interval: 1h
     url: "icmp://homepage.gpu.$DOMAINNAME"
 
   - name: Homepage-GPU
@@ -274,42 +275,11 @@ endpoints:
   - name: Jellyfin-GPU
     <<: *https-default
     # group: GPU
+    interval: 1h
     url: "https://jellyfin.gpu.$DOMAINNAME"
 
   - name: Immich-GPU
     <<: *https-default
     # group: GPU
+    interval: 1h
     url: "https://photos.gpu.$DOMAINNAME"
-
-  #### RPI ####
-
-  - name: rpi.$DOMAINNAME-DNS
-    group: External
-    url: "1.1.1.1" # Address of the DNS server to use
-    interval: 30s
-    dns:
-      query-name: "homepage.rpi.$DOMAINNAME"
-      query-type: "A"
-    conditions:
-      - "[BODY] == 100.64.0.6"
-      - "[DNS_RCODE] == NOERROR"
-
-  - name: AdguardHome-RPI-DNS
-    group: External
-    url: "100.64.0.6" # Address of the DNS server to use
-    interval: 30s
-    dns:
-      query-name: "dummy.local.gpu"
-      query-type: "A"
-    conditions:
-      - "[BODY] == 192.168.1.24"
-      - "[DNS_RCODE] == NOERROR"
-
-  - name: Homepage-RPI-PING
-    <<: *ping-default
-    url: "icmp://homepage.rpi.$DOMAINNAME"
-
-  - name: Notes-RPI
-    <<: *https-default
-    # group: RPI
-    url: "https://notes.rpi.$DOMAINNAME"
