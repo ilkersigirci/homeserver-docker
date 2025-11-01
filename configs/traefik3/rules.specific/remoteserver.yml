@@ -70,6 +70,14 @@ http:
       middlewares:
         - chain-no-auth-relaxed
       service: immich-public-proxy-svc
+
+    desktop-rtr:
+      rule: "Host(`desktop.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: desktop-svc
   
   middlewares:
     jellyfin-redirect:
@@ -121,3 +129,9 @@ http:
         servers:
           # - url: "http://10.8.0.3:8097"
           - url: "http://100.64.0.7:8097"
+
+    desktop-svc:
+      loadBalancer:
+        servers:
+          - url: "https://100.64.0.17:8006"
+        serversTransport: nas-transport
