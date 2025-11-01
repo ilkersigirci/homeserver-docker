@@ -108,7 +108,7 @@ http:
     nas-svc:
       loadBalancer:
         servers:
-          - url: "https://100.64.0.10:8006"
+          - url: "https://100.64.0.8:8006"
         serversTransport: nas-transport
 
     splitpro-svc:
