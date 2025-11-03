@@ -4,5 +4,5 @@
       widgets:
         - type: iframe
           hide-header: true
-          source: https://notes.gpu.${BASE_DOMAINNAME}
+          source: https://notes.${BASE_DOMAINNAME}
           height: 1000

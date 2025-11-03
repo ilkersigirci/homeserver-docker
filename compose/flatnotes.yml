@@ -11,14 +11,17 @@ services:
       - no-new-privileges:true
     volumes:
       - $NOTESDIR/Markdown:/data
+      - $DOCKERDIR/appdata/flatnotes/index:/data/.flatnotes
     environment:
       PUID: $PUID
       PGID: $PGID
       TZ: $TZ
+      FLATNOTES_HOST: 0.0.0.0
+      FLATNOTES_PORT: 8080
       FLATNOTES_AUTH_TYPE: none
       # - FLATNOTES_USERNAME="user"
       # - FLATNOTES_PASSWORD="changeMe!"
-      FLATNOTES_SECRET_KEY: "change-stability-pushchair"
+      FLATNOTES_SECRET_KEY: $FLATNOTES_SECRET_KEY
     labels:
       traefik.enable: "true"
       ## HTTP Routers

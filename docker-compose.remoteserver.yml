@@ -55,13 +55,12 @@ include:
   - compose/gotify.yml
   - compose/headscale.yml
   - compose/homepage.yml
-  # - compose/glance.yml
+  - compose/glance.yml
   - compose/komodo-periphery.yml
   # - compose/pocket-id.yml
   - compose/socket-proxy.yml
   - compose/tinyauth.yml
   - compose/traefik.yml
-  # - compose/traefik-log-dashboard.yml
   # - compose/vaultwarden.yml
   #### DESKTOP APPS ####
   # - compose/firefox.yml
@@ -90,6 +89,9 @@ include:
   - compose/rybbit.yml
   #### PHOTO ####
   #### READING ####
+  # - compose/flatnotes.yml
   # - compose/obsidian.yml
+  - compose/silverbullet.yml
+  - compose/quartz.yml
   #### OTHERS ####
   # - compose/enclosed.yml
