@@ -13,7 +13,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $NOTESDIR/Markdown/silverbullet-test:/space
+      - $NOTESDIR/Markdown:/space
     environment:
       PUID: $PUID
       PGID: $PGID
@@ -43,9 +43,9 @@ services:
       homepage.icon: silverbullet.png
       homepage.href: https://silverbullet.$DOMAINNAME
       homepage.target: _blank
-      homepage.description: description
+      homepage.description: Offline first web based Markdown editor, turbo charged with the scripting power of Lua 
       ####### GLANCE #######
       glance.name: silverbullet
       glance.icon: sh:silverbullet
       glance.url: https://silverbullet.$DOMAINNAME
-      glance.description: description
+      glance.description: Offline first web based Markdown editor, turbo charged with the scripting power of Lua
