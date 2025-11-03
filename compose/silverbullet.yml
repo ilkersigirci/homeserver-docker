@@ -1,3 +1,4 @@
+# NOTE: env variables: https://silverbullet.md/Install/Configuration
 services:
   silverbullet:
     image: ghcr.io/silverbulletmd/silverbullet
@@ -7,6 +8,8 @@ services:
       - reading
     networks:
       - t3_proxy
+    ports:
+      - "3333:3000"
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -14,7 +17,13 @@ services:
     environment:
       PUID: $PUID
       PGID: $PGID
-      TZ: $TZ
+      SB_HOSTNAME: 0.0.0.0
+      SB_PORT: 3000
+      SB_FOLDER: /space
+      SB_INDEX_PAGE: index
+      # SB_READ_ONLY: true
+      # SB_USER: admin:admin
+      # SB_LOG_PUSH: 1
     labels:
       traefik.enable: "true"
       ## HTTP Routers
