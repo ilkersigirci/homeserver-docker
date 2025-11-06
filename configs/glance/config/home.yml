@@ -139,13 +139,17 @@
           hide-header: true
           first-day-of-week: monday
 
-        - type: weather
-          hide-header: true
-          location: Ankara
-          units: metric # alternatively "imperial"
-          hour-format: 12h # alternatively "24h"
-          # Optionally hide the location from being displayed in the widget
-          # hide-location: true
+        - $include: custom-widgets/weather.yml
+
+        ## Offical weather widget
+        # - type: weather
+        #   hide-header: true
+        #   location: Ankara
+        #   units: metric # alternatively "imperial"
+        #   hour-format: 12h # alternatively "24h"
+        #   # Optionally hide the location from being displayed in the widget
+        #   # hide-location: true
+
 
 
         - type: markets

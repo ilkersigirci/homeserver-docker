@@ -32,7 +32,7 @@ services:
       traefik.http.routers.glance-rtr.entrypoints: "websecure"
       traefik.http.routers.glance-rtr.rule: "Host(`glance.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.glance-rtr.middlewares: "chain-tinyauth@file"
+      traefik.http.routers.glance-rtr.middlewares: "chain-tinyauth-relaxed@file"
       ## HTTP Services
       traefik.http.routers.glance-rtr.service: "glance-svc"
       traefik.http.services.glance-svc.loadbalancer.server.port: "8080"
