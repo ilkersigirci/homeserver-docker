@@ -107,5 +107,5 @@ services:
       homepage.target: "_blank"
       homepage.description: "Selfhosted Chatgpt like App for my Betus"
     profiles:
-      - ml
-      # - not-used
+      # - ml
+      - not-used
