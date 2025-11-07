@@ -66,6 +66,7 @@ include:
   # - compose/firefox.yml
   #### MACHINE LEARNING ####
   ###### MAINTENANCE ####
+  - compose/bentopdf.yml
   # - compose/code-server.yml
   # - compose/docker-gc.yml
   # - compose/dozzle.yml

@@ -1,0 +1,36 @@
+services:
+  bentopdf:
+    image: bentopdf/bentopdf:latest
+    container_name: bentopdf
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - maintenance
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.bentopdf-rtr.entrypoints: websecure
+      traefik.http.routers.bentopdf-rtr.rule: Host(`bentopdf.$DOMAINNAME`)
+      ## Middlewares
+      traefik.http.routers.bentopdf-rtr.middlewares: chain-tinyauth@file
+      ## HTTP Services
+      traefik.http.routers.bentopdf-rtr.service: bentopdf-svc
+      traefik.http.services.bentopdf-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.bentopdf.config.domain: bentopdf.$DOMAINNAME
+      tinyauth.apps.bentopdf.ip.bypass: $LOCAL_IPS
+      ####### HOMEPAGE #######
+      homepage.group: Maintenance
+      homepage.name: bentopdf
+      homepage.icon: bentopdf.png
+      homepage.href: https://bentopdf.$DOMAINNAME
+      homepage.target: _blank
+      homepage.description: A Privacy First PDF Toolkit 
+      ####### GLANCE #######
+      glance.name: bentopdf
+      glance.icon: sh:bentopdf
+      glance.url: https://bentopdf.$DOMAINNAME
+      glance.description: A Privacy First PDF Toolkit 
