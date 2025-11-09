@@ -71,13 +71,21 @@ http:
         - chain-no-auth-relaxed
       service: immich-public-proxy-svc
 
-    desktop-rtr:
-      rule: "Host(`desktop.{{env "DOMAINNAME"}}`)"
+    homeserver-rtr:
+      rule: "Host(`homeserver.{{env "DOMAINNAME"}}`)"
       entryPoints:
         - websecure
       middlewares:
         - chain-no-auth-relaxed
-      service: desktop-svc
+      service: homeserver-svc
+
+    openwrt-rtr:
+      rule: "Host(`openwrt.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: openwrt-svc
   
   middlewares:
     jellyfin-redirect:
@@ -130,8 +138,13 @@ http:
           # - url: "http://10.8.0.3:8097"
           - url: "http://100.64.0.7:8097"
 
-    desktop-svc:
+    homeserver-svc:
       loadBalancer:
         servers:
           - url: "https://100.64.0.17:8006"
         serversTransport: nas-transport
+
+    openwrt-svc:
+      loadBalancer:
+        servers:
+          - url: "http://100.64.0.6"
