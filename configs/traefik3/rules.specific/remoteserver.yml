@@ -141,7 +141,7 @@ http:
     homeserver-svc:
       loadBalancer:
         servers:
-          - url: "https://100.64.0.17:8006"
+          - url: "https://100.64.0.18:8006"
         serversTransport: nas-transport
 
     openwrt-svc:
