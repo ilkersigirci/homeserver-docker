@@ -55,7 +55,7 @@ include:
   - compose/gotify.yml
   - compose/headscale.yml
   - compose/homepage.yml
-  - compose/glance.yml
+  # - compose/glance.yml
   - compose/komodo-periphery.yml
   # - compose/pocket-id.yml
   - compose/socket-proxy.yml
@@ -90,9 +90,8 @@ include:
   - compose/rybbit.yml
   #### PHOTO ####
   #### READING ####
-  # - compose/flatnotes.yml
   # - compose/obsidian.yml
-  - compose/silverbullet.yml
-  - compose/quartz.yml
+  # - compose/silverbullet.yml
+  # - compose/quartz.yml
   #### OTHERS ####
   # - compose/enclosed.yml

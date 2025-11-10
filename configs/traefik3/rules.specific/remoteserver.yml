@@ -1,7 +1,7 @@
 http:
   serversTransports:
     # NOTE: Proxmox redirect requests to https which causes redirect loop with traefik. This fixes it.
-    nas-transport:
+    proxmox-transport:
       serverName: ""
       insecureSkipVerify: true
 
@@ -21,14 +21,6 @@ http:
       middlewares:
         - jellyfin-redirect
       service: noop@internal
-
-    # jellyfin-rtr:
-    #   rule: "Host(`jellyfin.gpu.{{env "DOMAINNAME"}}`)"
-    #   entryPoints:
-    #     - websecure
-    #   middlewares:
-    #     # - chain-no-auth-relaxed
-    #   service: jellyfin-svc
 
     # wireguard-rtr:
     #   rule: "Host(`wireguard.{{env "DOMAINNAME"}}`)"
@@ -104,7 +96,7 @@ http:
     #   loadBalancer:
     #     servers:
     #       # - url: "http://10.8.0.3:8096" # Wiregurd
-    #       # - url: "http://100.64.0.7:8096" # Tailscale
+    #       # - url: "http://100.64.0.19:8096" # Tailscale
 
     # wireguard-svc:
     #   loadBalancer:
@@ -114,8 +106,7 @@ http:
     pocket-id-svc:
       loadBalancer:
         servers:
-          # - url: "http://10.8.0.3:1411"
-          - url: "http://100.64.0.7:1411"
+          - url: "http://100.64.0.19:1411"
         # healthCheck:
         #   path: "/healthz"
         #   interval: "30s"
@@ -125,24 +116,23 @@ http:
       loadBalancer:
         servers:
           - url: "https://100.64.0.8:8006"
-        serversTransport: nas-transport
+        serversTransport: proxmox-transport
 
     splitpro-svc:
       loadBalancer:
         servers:
-          - url: "http://100.64.0.7:8098"
+          - url: "http://100.64.0.19:8098"
 
     immich-public-proxy-svc:
       loadBalancer:
         servers:
-          # - url: "http://10.8.0.3:8097"
-          - url: "http://100.64.0.7:8097"
+          - url: "http://100.64.0.19:8097"
 
     homeserver-svc:
       loadBalancer:
         servers:
           - url: "https://100.64.0.18:8006"
-        serversTransport: nas-transport
+        serversTransport: proxmox-transport
 
     openwrt-svc:
       loadBalancer:
