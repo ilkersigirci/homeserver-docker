@@ -8,6 +8,8 @@ services:
       - reading
     networks:
       - t3_proxy
+    ports:
+      - "1001:3000"
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -79,7 +81,7 @@ services:
       traefik.http.routers.silverbullet-test-rtr.entrypoints: websecure
       traefik.http.routers.silverbullet-test-rtr.rule: Host(`silverbullet-test.$DOMAINNAME`)
       ## Middlewares
-      # traefik.http.routers.silverbullet-test-rtr.middlewares: chain-silverbullet-test@file
+      # traefik.http.routers.silverbullet-test-rtr.middlewares: chain-silverbullet@file
       traefik.http.routers.silverbullet-test-rtr.middlewares: chain-silverbullet-tinyauth@file
       ## HTTP Services
       traefik.http.routers.silverbullet-test-rtr.service: silverbullet-test-svc

@@ -9,7 +9,7 @@ services:
     networks:
       - t3_proxy
     ports:
-      - "1411:1411"
+      - "1000:1411"
     security_opt:
       - no-new-privileges:true
     volumes:

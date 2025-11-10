@@ -119,7 +119,7 @@ services:
     networks:
       - t3_proxy
     ports:
-      - "8097:3000"
+      - "1003:3000"
     environment:
       IMMICH_URL: http://immich-server:2283
     # healthcheck:
