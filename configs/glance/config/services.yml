@@ -34,11 +34,6 @@
             height: 1000
 
           - type: iframe
-            title: RPI
-            source: https://homepage.rpi.${BASE_DOMAINNAME}
-            height: 1000
-
-          - type: iframe
             title: REMOTESERVER
             source: https://homepage.${BASE_DOMAINNAME}
             height: 1000
