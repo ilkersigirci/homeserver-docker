@@ -1,6 +1,6 @@
 http:
   middlewares:
-    chain-silverbullet:
+    chain-silverbullet-no-auth:
       chain:
         middlewares:
           - middlewares-cf-real-ip

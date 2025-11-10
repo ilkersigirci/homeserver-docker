@@ -59,7 +59,7 @@ http:
       entryPoints:
         - websecure
       middlewares:
-        - chain-silverbullet-tinyauth
+        - chain-silverbullet-no-auth
       service: silverbullet-svc
 
     jellyfin-redirect-rtr:

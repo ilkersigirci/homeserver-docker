@@ -30,7 +30,7 @@ services:
       traefik.http.routers.silverbullet-rtr.entrypoints: websecure
       traefik.http.routers.silverbullet-rtr.rule: Host(`silverbullet.$DOMAINNAME`)
       ## Middlewares
-      # traefik.http.routers.silverbullet-rtr.middlewares: chain-silverbullet@file
+      # traefik.http.routers.silverbullet-rtr.middlewares: chain-silverbullet-no-auth@file
       traefik.http.routers.silverbullet-rtr.middlewares: chain-silverbullet-tinyauth@file
       ## HTTP Services
       traefik.http.routers.silverbullet-rtr.service: silverbullet-svc
