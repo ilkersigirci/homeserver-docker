@@ -8,8 +8,6 @@ services:
       - reading
     networks:
       - t3_proxy
-    ports:
-      - "1001:3000"
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -28,7 +26,7 @@ services:
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.silverbullet-rtr.entrypoints: websecure
-      traefik.http.routers.silverbullet-rtr.rule: Host(`silverbullet.$DOMAINNAME`)
+      traefik.http.routers.silverbullet-rtr.rule: Host(`notes.$DOMAINNAME`)
       ## Middlewares
       # traefik.http.routers.silverbullet-rtr.middlewares: chain-silverbullet-no-auth@file
       traefik.http.routers.silverbullet-rtr.middlewares: chain-silverbullet-tinyauth@file
@@ -36,19 +34,19 @@ services:
       traefik.http.routers.silverbullet-rtr.service: silverbullet-svc
       traefik.http.services.silverbullet-svc.loadbalancer.server.port: "3000"
       ####### TINYAUTH #######
-      tinyauth.apps.silverbullet.config.domain: silverbullet.$DOMAINNAME
+      tinyauth.apps.silverbullet.config.domain: notes.$DOMAINNAME
       tinyauth.apps.silverbullet.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: Reading
       homepage.name: silverbullet
       homepage.icon: silverbullet.png
-      homepage.href: https://silverbullet.$DOMAINNAME
+      homepage.href: https://notes.$DOMAINNAME
       homepage.target: _blank
       homepage.description: Offline first web based Markdown editor, turbo charged with the scripting power of Lua 
       ####### GLANCE #######
       glance.name: silverbullet
       glance.icon: sh:silverbullet
-      glance.url: https://silverbullet.$DOMAINNAME
+      glance.url: https://notes.$DOMAINNAME
       glance.description: Offline first web based Markdown editor, turbo charged with the scripting power of Lua
 
   silverbullet-test:

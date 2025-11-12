@@ -54,14 +54,6 @@ http:
         - chain-no-auth
       service: pocket-id-svc
 
-    silverbullet-rtr:
-      rule: "Host(`silverbullet.{{env "DOMAINNAME"}}`)"
-      entryPoints:
-        - websecure
-      middlewares:
-        - chain-silverbullet-no-auth
-      service: silverbullet-svc
-
     jellyfin-redirect-rtr:
       rule: "Host(`jellyfin.{{env "DOMAINNAME"}}`)"
       entryPoints:
@@ -130,11 +122,6 @@ http:
         #   path: "/healthz"
         #   interval: "30s"
         #   timeout: "5s"
-
-    silverbullet-svc:
-      loadBalancer:
-        servers:
-          - url: "http://100.64.0.19:1001"
 
     # jellyfin-svc:
     #   loadBalancer:

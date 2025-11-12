@@ -106,7 +106,7 @@ include:
   # - compose/watchyourlan.yml
   #### PHOTO ####
   # - compose/immich-gpu.yml
-  # - compose/immich.yml
+  - compose/immich.yml
   #### READING ####
   # - compose/flatnotes.yml
   - compose/linkwarden.yml
