@@ -11,7 +11,7 @@ services:
       - no-new-privileges:true
     volumes:
       - $DOCKERDIR/appdata/czkawka:/config:rw
-      - $MEDIADIR/Photos/Pictures:/storage:rw
+      - $PHOTOSDIR/Pictures:/storage:rw
     environment:
       PUID: $PUID
       PGID: $PGID

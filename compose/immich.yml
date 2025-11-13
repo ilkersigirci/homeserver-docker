@@ -44,10 +44,10 @@ services:
       disable: false
     volumes:
       - ${UPLOAD_LOCATION}:/usr/src/app/upload
-      - ${MEDIADIR}/Photos/Pictures:/mnt/media/Photos/Pictures:ro
-      - ${MEDIADIR}/Photos/Videos:/mnt/media/Photos/Videos:ro
-      # - ${MEDIADIR}/Photos/Pictures:/mnt/media/Photos/Pictures
-      # - ${MEDIADIR}/Photos/Videos:/mnt/media/Photos/Videos
+      - $PHOTOSDIR/Pictures:/mnt/media/Photos/Pictures:ro
+      - $PHOTOSDIR/Videos:/mnt/media/Photos/Videos:ro
+      # - $PHOTOSDIR/Pictures:/mnt/media/Photos/Pictures
+      # - $PHOTOSDIR/Videos:/mnt/media/Photos/Videos
     environment:
       UPLOAD_LOCATION: ${UPLOAD_LOCATION}
       IMMICH_LOG_LEVEL: ${IMMICH_LOG_LEVEL}
