@@ -1,17 +1,18 @@
-# NOTE: env variables: https://silverbullet.md/Install/Configuration
 services:
-  silverbullet:
+  silverbullet-test:
     image: ghcr.io/silverbulletmd/silverbullet
-    container_name: silverbullet
+    container_name: silverbullet-test
     restart: $OTHERS_RESTART_POLICY
     profiles:
       - reading
     networks:
       - t3_proxy
+    ports:
+      - "3333:3000"
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $NOTESDIR/Markdown:/space
+      - $DOCKERDIR/appdata/silverbullet-test:/space
     environment:
       PUID: $PUID
       PGID: $PGID
@@ -25,26 +26,26 @@ services:
     labels:
       traefik.enable: "true"
       ## HTTP Routers
-      traefik.http.routers.silverbullet-rtr.entrypoints: websecure
-      traefik.http.routers.silverbullet-rtr.rule: Host(`notes.$DOMAINNAME`)
+      traefik.http.routers.silverbullet-test-rtr.entrypoints: websecure
+      traefik.http.routers.silverbullet-test-rtr.rule: Host(`silverbullet-test.$DOMAINNAME`)
       ## Middlewares
-      # traefik.http.routers.silverbullet-rtr.middlewares: chain-silverbullet-no-auth@file
-      traefik.http.routers.silverbullet-rtr.middlewares: chain-silverbullet-tinyauth@file
+      # traefik.http.routers.silverbullet-test-rtr.middlewares: chain-silverbullet@file
+      traefik.http.routers.silverbullet-test-rtr.middlewares: chain-silverbullet-tinyauth@file
       ## HTTP Services
-      traefik.http.routers.silverbullet-rtr.service: silverbullet-svc
-      traefik.http.services.silverbullet-svc.loadbalancer.server.port: "3000"
+      traefik.http.routers.silverbullet-test-rtr.service: silverbullet-test-svc
+      traefik.http.services.silverbullet-test-svc.loadbalancer.server.port: "3000"
       ####### TINYAUTH #######
-      tinyauth.apps.silverbullet.config.domain: notes.$DOMAINNAME
-      tinyauth.apps.silverbullet.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.silverbullet-test.config.domain: silverbullet-test.$DOMAINNAME
+      tinyauth.apps.silverbullet-test.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: Reading
-      homepage.name: silverbullet
+      homepage.name: silverbullet-test
       homepage.icon: silverbullet.png
-      homepage.href: https://notes.$DOMAINNAME
+      homepage.href: https://silverbullet-test.$DOMAINNAME
       homepage.target: _blank
       homepage.description: Offline first web based Markdown editor, turbo charged with the scripting power of Lua 
       ####### GLANCE #######
-      glance.name: silverbullet
+      glance.name: silverbullet-test
       glance.icon: sh:silverbullet
-      glance.url: https://notes.$DOMAINNAME
+      glance.url: https://silverbullet-test.$DOMAINNAME
       glance.description: Offline first web based Markdown editor, turbo charged with the scripting power of Lua

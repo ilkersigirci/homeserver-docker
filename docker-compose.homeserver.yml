@@ -114,6 +114,7 @@ include:
   # - compose/obsidian.yml
   - compose/rsshub.yml
   - compose/silverbullet.yml
+  - compose/silverbullet-test.yml
   # - compose/quartz.yml
   #### OTHERS ####
   # - compose/homeserver-api.yml # TODO
