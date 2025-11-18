@@ -1,0 +1,47 @@
+name: home
+
+networks:
+  default:
+    driver: bridge
+  t3_proxy:
+    name: t3_proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.90.0/24
+  socket_proxy:
+    name: socket_proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.91.0/24
+  dockervlan:
+    name: dockervlan
+    driver: macvlan
+    driver_opts:
+      parent: eth0
+    ipam:
+      config:
+        - subnet: "192.168.1.0/24"
+          ip_range: "192.168.1.19/32"
+          gateway: "192.168.1.1"
+
+########################### SECRETS
+secrets:
+  cf_dns_api_token:
+    file: $DOCKERDIR/secrets/cf_dns_api_token
+
+include:
+  ########################### SERVICES
+  #### CORE ####
+  # - compose/adguardhome.yml
+  - compose/socket-proxy.yml
+  - compose/tinyauth.yml
+  - compose/traefik.yml
+  # - compose/vaultwarden.yml
+  ###### MAINTENANCE ####
+  - compose/syncthing.yml
+  - compose/whoami.yml
+  #### READING ####
+  - compose/silverbullet.yml
+
