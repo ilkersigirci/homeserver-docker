@@ -22,13 +22,13 @@ http:
         - chain-no-auth-relaxed
       service: openwrt-svc
 
-    homeserver-rtr:
-      rule: "Host(`homeserver.{{env "DOMAINNAME"}}`)"
+    gpu-rtr:
+      rule: "Host(`gpu.{{env "DOMAINNAME"}}`)"
       entryPoints:
         - websecure
       middlewares:
         - chain-no-auth-relaxed
-      service: homeserver-svc
+      service: gpu-svc
 
     nas-rtr:
       rule: "Host(`nas.{{env "DOMAINNAME"}}`)"
@@ -97,7 +97,7 @@ http:
         servers:
           - url: "http://100.64.0.6"
 
-    homeserver-svc:
+    gpu-svc:
       loadBalancer:
         servers:
           - url: "https://100.64.0.18:8006"

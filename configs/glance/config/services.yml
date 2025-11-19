@@ -9,7 +9,7 @@
         # - type: server-stats
         #   servers:
         #     - type: local
-        #       name: Homeserver
+        #       name: GPU
         #       # optionally override the sensor used to determine CPU temperature
         #       cpu-temp-sensor: k10temp_tctl
         #       hide-swap: true
@@ -28,7 +28,7 @@
         - type: group
           widgets:
           - type: iframe
-            title: HOMESERVER
+            title: GPU
             source: https://homepage.gpu.${BASE_DOMAINNAME}
             # source: http://homepage:3000
             height: 1000

@@ -8,21 +8,8 @@ http:
         - chain-no-auth-relaxed
       service: watchyourlan-svc
 
-    openwrt-rtr:
-      rule: "Host(`openwrt.{{env "DOMAINNAME"}}`)"
-      entryPoints:
-        - websecure
-      middlewares:
-        - chain-no-auth-relaxed
-      service: openwrt-svc
-
   services:
     watchyourlan-svc:
       loadBalancer:
         servers:
           - url: http://100.64.0.7:8840
-
-    openwrt-svc:
-      loadBalancer:
-        servers:
-          - url: "http://100.64.0.6:80"
