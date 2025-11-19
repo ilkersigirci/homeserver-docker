@@ -1,0 +1,49 @@
+http:
+  serversTransports:
+    # NOTE: Proxmox redirect requests to https which causes redirect loop with traefik. This fixes it.
+    proxmox-transport:
+      serverName: ""
+      insecureSkipVerify: true
+
+  routers:
+    openwrt-rtr:
+      rule: "Host(`openwrt.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: openwrt-svc
+
+    gpu-rtr:
+      rule: "Host(`gpu.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: gpu-svc
+
+    nas-rtr:
+      rule: "Host(`nas.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: nas-svc
+
+  services:
+    openwrt-svc:
+      loadBalancer:
+        servers:
+          - url: "http://100.64.0.6:81"
+
+    gpu-svc:
+      loadBalancer:
+        servers:
+          - url: "https://100.64.0.18:8006"
+        serversTransport: proxmox-transport
+
+    nas-svc:
+      loadBalancer:
+        servers:
+          - url: "https://100.64.0.8:8006"
+        serversTransport: proxmox-transport
