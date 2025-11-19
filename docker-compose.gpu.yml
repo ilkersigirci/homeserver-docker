@@ -52,7 +52,7 @@ include:
   # - compose/dufs.yml
   - compose/filebrowser.yml
   - compose/homepage.yml
-  - compose/glance.yml
+  # - compose/glance.yml
   # - compose/komodo.yml
   - compose/pocket-id.yml
   - compose/socket-proxy.yml
@@ -70,7 +70,6 @@ include:
   # - compose/open-webui.yml
   ###### MAINTENANCE ####
   # - compose/code-server.yml
-  - compose/convertx.yml
   # - compose/docker-gc.yml
   - compose/dozzle.yml
   - compose/healthchecks.yml
@@ -78,7 +77,7 @@ include:
   - compose/loggifly.yml
   # - compose/pgadmin.yml # TODO
   # - compose/rustic.yml
-  - compose/syncthing.yml
+  # - compose/syncthing.yml
   - compose/termix.yml
   # - compose/uptime-kuma.yml
   - compose/whoami.yml
@@ -92,8 +91,8 @@ include:
   - compose/pinchflat.yml
   # - compose/scotty.yml
   # - compose/splitpro.yml
-  - compose/strava-statistics.yml
-  - compose/yamtrack.yml
+  # - compose/strava-statistics.yml
+  # - compose/yamtrack.yml
   - compose/ytptube.yml
   - compose/transmission.yml
   #### ML ####
@@ -108,13 +107,10 @@ include:
   # - compose/immich-gpu.yml
   - compose/immich.yml
   #### READING ####
-  # - compose/flatnotes.yml
   - compose/linkwarden.yml
-  # - compose/many-notes.yml
   # - compose/obsidian.yml
   - compose/rsshub.yml
-  - compose/silverbullet.yml
-  - compose/silverbullet-test.yml
+  # - compose/silverbullet.yml
   # - compose/quartz.yml
   #### OTHERS ####
   # - compose/homeserver-api.yml # TODO

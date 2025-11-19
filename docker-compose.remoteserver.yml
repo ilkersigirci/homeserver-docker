@@ -68,6 +68,7 @@ include:
   ###### MAINTENANCE ####
   - compose/bentopdf.yml
   # - compose/code-server.yml
+  - compose/convertx.yml
   # - compose/docker-gc.yml
   # - compose/dozzle.yml
   - compose/gatus.yml

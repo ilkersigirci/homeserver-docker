@@ -35,6 +35,8 @@ include:
   ########################### SERVICES
   #### CORE ####
   # - compose/adguardhome.yml
+  - compose/glance.yml
+  - compose/homepage.yml
   - compose/socket-proxy.yml
   - compose/tinyauth.yml
   - compose/traefik.yml
@@ -44,4 +46,3 @@ include:
   - compose/whoami.yml
   #### READING ####
   - compose/silverbullet.yml
-
