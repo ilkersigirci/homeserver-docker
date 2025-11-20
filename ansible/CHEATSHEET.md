@@ -75,6 +75,12 @@ This allows the RPi to use the SSH keys on your local machine.
    ansible-playbook -i ansible/inventory.ini ansible/setup_rpi.yml --ssh-common-args='-o ForwardAgent=yes'
    ```
 
+### 7. Deploying Updates
+To pull the latest code and restart containers:
+```bash
+ansible-playbook -i ansible/inventory.ini ansible/deploy.yml --ssh-common-args='-o ForwardAgent=yes'
+```
+
 ## Directory Structure
 - `inventory.ini`: List of your servers (RPis).
 - `setup_rpi.yml`: The script (playbook) that defines what to install/configure.

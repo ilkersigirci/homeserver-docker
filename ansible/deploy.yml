@@ -1,0 +1,32 @@
+---
+- name: Deploy Docker Compose Updates
+  hosts: rpis
+  become: no
+  vars:
+    repo_path: "/home/{{ ansible_user }}/docker"
+    compose_file: "docker-compose.{{ ansible_env.MY_HOSTNAME }}.yml"
+
+  tasks:
+    - name: Pull latest changes from git
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ repo_path }}"
+        version: main
+        update: yes
+        accept_hostkey: yes
+      register: git_output
+
+    - name: Display git result
+      debug:
+        msg: "Repo updated: {{ git_output.changed }}"
+
+    - name: Update and Restart Docker Containers
+      # We use shell because the ansible docker_compose module requires the python SDK
+      # which might not be installed, and the CLI is often more reliable for simple 'up'
+      shell: |
+        docker compose -f {{ compose_file }} up -d --remove-orphans
+      args:
+        chdir: "{{ repo_path }}"
+      # Run this only if git changed, OR always? 
+      # 'up -d' is idempotent (safe to run always), so we run it always 
+      # to ensure state matches config even if git didn't change (e.g. manual tampering)

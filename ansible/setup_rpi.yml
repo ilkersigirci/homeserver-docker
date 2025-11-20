@@ -4,8 +4,7 @@
   become: true
   vars:
     user_name: ilker
-    repo_url: "git@github.com:ilkersigirci/homeserver-docker.git"
-    repo_dest: "/home/{{ user_name }}/docker"
+    repo_path: "/home/{{ user_name }}/docker"
 
   tasks:
     - name: Update and upgrade apt packages
@@ -24,6 +23,12 @@
           - htop
           - ncdu
         state: present
+
+    - name: Set MY_HOSTNAME environment variable
+      lineinfile:
+        path: /etc/environment
+        regexp: '^MY_HOSTNAME='
+        line: 'MY_HOSTNAME=rpi'
 
     - name: Install Docker dependencies
       apt:
@@ -87,7 +92,7 @@
 
     - name: Ensure destination directory exists
       file:
-        path: "{{ repo_dest }}"
+        path: "{{ repo_path }}"
         state: directory
         owner: "{{ user_name }}"
         group: "{{ user_name }}"
@@ -96,7 +101,7 @@
     - name: Clone private repository
       git:
         repo: "{{ repo_url }}"
-        dest: "{{ repo_dest }}"
+        dest: "{{ repo_path }}"
         accept_hostkey: yes
         version: main
         force: yes
