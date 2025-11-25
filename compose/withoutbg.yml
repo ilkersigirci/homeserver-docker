@@ -1,0 +1,42 @@
+services:
+  withoutbg:
+    image: withoutbg/app:latest
+    container_name: withoutbg
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - maintenance
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DATADIR/withoutbg:/data/
+    # environment:
+    #   PUID: $PUID
+    #   PGID: $PGID
+    #   TZ: $TZ
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.withoutbg-rtr.entrypoints: websecure
+      traefik.http.routers.withoutbg-rtr.rule: Host(`withoutbg.$DOMAINNAME`)
+      ## Middlewares
+      traefik.http.routers.withoutbg-rtr.middlewares: chain-tinyauth@file
+      ## HTTP Services
+      traefik.http.routers.withoutbg-rtr.service: withoutbg-svc
+      traefik.http.services.withoutbg-svc.loadbalancer.server.port: "80"
+      ####### TINYAUTH #######
+      tinyauth.apps.withoutbg.config.domain: withoutbg.$DOMAINNAME
+      tinyauth.apps.withoutbg.ip.bypass: $LOCAL_IPS
+      ####### HOMEPAGE #######
+      homepage.group: Maintenance
+      homepage.name: withoutbg
+      homepage.icon: withoutbg.png
+      homepage.href: https://withoutbg.$DOMAINNAME
+      homepage.target: _blank
+      homepage.description: Image Background Removal Toolkit
+      ####### GLANCE #######
+      glance.name: withoutbg
+      glance.icon: sh:withoutbg
+      glance.url: https://withoutbg.$DOMAINNAME
+      glance.description: Image Background Removal Toolkit

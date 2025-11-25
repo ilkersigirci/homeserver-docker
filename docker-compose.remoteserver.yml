@@ -77,6 +77,7 @@ include:
   - compose/syncthing.yml
   # - compose/uptime-kuma.yml
   - compose/whoami.yml
+  - compose/withoutbg.yml
   #### MEDIA ####
   - compose/bitplay.yml
   - compose/mazanoke.yml
