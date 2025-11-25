@@ -28,19 +28,24 @@
         - type: group
           widgets:
           - type: iframe
+            title: HOME
+            source: https://homepage.home.${BASE_DOMAINNAME}
+            # source: http://homepage:3000
+            height: 1000
+          - type: iframe
             title: GPU
             source: https://homepage.gpu.${BASE_DOMAINNAME}
             # source: http://homepage:3000
             height: 1000
 
           - type: iframe
-            title: REMOTESERVER
-            source: https://homepage.${BASE_DOMAINNAME}
+            title: NAS
+            source: https://homepage.nas.${BASE_DOMAINNAME}
             height: 1000
 
           - type: iframe
-            title: NAS
-            source: https://homepage.nas.${BASE_DOMAINNAME}
+            title: REMOTE
+            source: https://homepage.${BASE_DOMAINNAME}
             height: 1000
 
           - type: iframe
