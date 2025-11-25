@@ -9,12 +9,6 @@ services:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
-    volumes:
-      - $DATADIR/withoutbg:/data/
-    # environment:
-    #   PUID: $PUID
-    #   PGID: $PGID
-    #   TZ: $TZ
     labels:
       traefik.enable: "true"
       ## HTTP Routers
