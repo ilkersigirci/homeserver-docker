@@ -5,7 +5,7 @@ services:
   # chmod 600 $DOCKERDIR/appdata/traefik3/acme/acme.json
   traefik:
     container_name: traefik
-    image: traefik:3.6
+    image: ghcr.io/traefik/traefik:3.6
     restart: $BASE_RESTART_POLICY
     profiles:
       - core
