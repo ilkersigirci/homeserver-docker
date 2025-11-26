@@ -1,0 +1,48 @@
+# NOTE: In sabnzb.ini file -> host_whitelist add: sabnzbd.$DOMAINNAME
+services:
+  sabnzbd:
+    image: lscr.io/linuxserver/sabnzbd:latest
+    container_name: sabnzbd
+    restart: $MEDIA_RESTART_POLICY
+    hostname: sabnzbd.$DOMAINNAME
+    profiles:
+      - media
+      - arr
+    networks:
+      t3_proxy:
+        ipv4_address: 192.168.90.159
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/sabnzbd:/config
+      - $MEDIADIR/Downloads/sabnzbd/complete:/downloads
+      - $MEDIADIR/Downloads/sabnzbd/incomplete:/incomplete-downloads
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.sabnzbd-rtr.entrypoints: websecure
+      traefik.http.routers.sabnzbd-rtr.rule: Host(`sabnzbd.$DOMAINNAME`)
+      ## Middlewares
+      traefik.http.routers.sabnzbd-rtr.middlewares: chain-tinyauth@file
+      ## HTTP Services
+      traefik.http.routers.sabnzbd-rtr.service: sabnzbd-svc
+      traefik.http.services.sabnzbd-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.sabnzbd.config.domain: sabnzbd.$DOMAINNAME
+      tinyauth.apps.sabnzbd.ip.bypass: $LOCAL_IPS
+      ####### HOMEPAGE #######
+      homepage.group: Media
+      homepage.name: sabnzbd
+      homepage.icon: sabnzbd.png
+      homepage.href: https://sabnzbd.$DOMAINNAME
+      homepage.target: _blank
+      homepage.description: description
+      ####### GLANCE #######
+      glance.name: sabnzbd
+      glance.icon: sh:sabnzbd
+      glance.url: https://sabnzbd.$DOMAINNAME
+      glance.description: description

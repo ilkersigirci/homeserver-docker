@@ -89,6 +89,7 @@ include:
   - compose/jellyseerr.yml
   # - compose/openarchiver.yml
   - compose/pinchflat.yml
+  - compose/sabnzbd.yml
   # - compose/scotty.yml
   # - compose/splitpro.yml
   # - compose/strava-statistics.yml
