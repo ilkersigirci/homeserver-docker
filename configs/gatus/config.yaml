@@ -224,7 +224,7 @@ endpoints:
     url: "100.64.0.4" # Address of the DNS server to use
     interval: 30s
     dns:
-      query-name: "desktop-main"
+      query-name: "rpi0"
       query-type: "A"
     conditions:
       - "[BODY] == 100.64.0.17"
