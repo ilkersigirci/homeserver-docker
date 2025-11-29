@@ -1,0 +1,37 @@
+# NOTE: In initial configuration screen, choose dashboard port 81 to avoid conflict with traefik
+services:
+  adguardhome:
+    image: adguard/adguardhome:latest
+    container_name: adguardhome
+    restart: $BASE_RESTART_POLICY
+    profiles:
+      - core
+    network_mode: host
+    expose:
+      - "81"
+      - "53"
+      - "853"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $CONFIGDIR/adguardhome:/opt/adguardhome/conf:rw
+      - $DOCKERDIR/appdata/adguardhome/work:/opt/adguardhome/work
+    environment:
+      TZ: $TZ
+    labels:
+      ####### HOMEPAGE #######
+      homepage.group: "Core"
+      homepage.name: "adguardhome"
+      homepage.icon: "adguard-home.svg"
+      homepage.href: "https://adguardhome.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Network-wide ads & trackers blocking DNS server"
+      homepage.widget.type: "adguard"
+      homepage.widget.url: "http://adguardhome:81"
+      homepage.widget.username: "$ADGUARD_USERNAME"
+      homepage.widget.password: "$ADGUARD_PASSWORD"
+      ####### GLANCE #######
+      glance.name: "adguardhome"
+      glance.icon: "sh:adguard-home"
+      glance.url: "https://adguardhome.$DOMAINNAME"
+      glance.description: "Network-wide ads & trackers blocking DNS server"

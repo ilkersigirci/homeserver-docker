@@ -34,7 +34,7 @@ secrets:
 include:
   ########################### SERVICES
   #### CORE ####
-  # - compose/adguardhome.yml
+  - compose/adguardhome-host.yml
   - compose/glance.yml
   - compose/homepage.yml
   - compose/socket-proxy.yml

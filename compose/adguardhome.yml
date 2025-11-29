@@ -5,12 +5,18 @@ services:
     restart: $BASE_RESTART_POLICY
     profiles:
       - core
-    # network_mode: host
+    ## For bridge network
+    networks:
+      t3_proxy:
+        ipv4_address: 192.168.90.90
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+    #   ## For dockervlan network
     # networks:
     #   dockervlan:
     #      ipv4_address: 192.168.1.19 # IP address inside defined range
     # ports:
-    #   ## For dockervlan
     #   - 53/udp
     #   - 53/tcp
     #   - 67/udp
@@ -20,9 +26,6 @@ services:
     #   - 443/tcp
     #   - 853/tcp
     #   - 3000/tcp
-    networks:
-      t3_proxy:
-        ipv4_address: 192.168.90.90
     expose:
       - "80"
       - "53"

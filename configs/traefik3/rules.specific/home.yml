@@ -30,6 +30,14 @@ http:
         - chain-no-auth-relaxed
       service: nas-svc
 
+    adguardhome-rtr:
+      rule: "Host(`adguardhome.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: adguardhome-svc
+
   services:
     openwrt-svc:
       loadBalancer:
@@ -47,3 +55,8 @@ http:
         servers:
           - url: "https://100.64.0.8:8006"
         serversTransport: proxmox-transport
+
+    adguardhome-svc:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.2.12:81"
