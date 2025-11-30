@@ -3,20 +3,19 @@ services:
     image: lscr.io/linuxserver/radarr:latest
     container_name: radarr
     depends_on:
-      - transmission
-      # - prowlarr
+      - prowlarr
     restart: $MEDIA_RESTART_POLICY
+    profiles:
+      - media
+      - arr
     networks:
       - t3_proxy
     #  t3_proxy:
     #    ipv4_address: 192.168.90.162
-    ports:
-      - "7878:7878"
     security_opt:
       - no-new-privileges:true
     volumes:
-      - "/etc/localtime:/etc/localtime:ro"
-      # - $CONFIGDIR/radarr:/config
+      - $DOCKERDIR/appdata/radarr:/config
       # Optional. See why MediaCover is mounted as volume https://github.com/htpcBeginner/docker-traefik/discussions/147
       # - $DATADIR/radarr/MediaCover:/config/MediaCover
       - $MEDIADIR/Downloads:/data/downloads
@@ -37,7 +36,6 @@ services:
       traefik.http.routers.radarr-rtr.rule: "Host(`radarr.$DOMAINNAME`)"
       traefik.http.routers.radarr-rtr.priority: "99"
       # Middlewares
-      traefik.http.routers.radar-rtr.middlewares: "chain-tinyauth@file"
       # traefik.http.routers.radarr-rtr-bypass.middlewares: "chain-no-auth@file"
       traefik.http.routers.radarr-rtr.middlewares: "chain-tinyauth@file"
       # HTTP Services
@@ -54,6 +52,3 @@ services:
       homepage.href: "https://radarr.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Movie Manager"
-    profiles:
-      - media
-      - arr

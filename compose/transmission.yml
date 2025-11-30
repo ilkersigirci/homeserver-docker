@@ -2,7 +2,7 @@ services:
   # Diffent GUIs in web home:
   # /combustion-release/ -- /transmission-web-control/ -- /kettu/ -- /flood-for-transmission/
   transmission:
-    image: lscr.io/linuxserver/transmission
+    image: lscr.io/linuxserver/transmission:latest
     container_name: transmission
     # cpus: "0.5"
     mem_reservation: "4096M"
@@ -10,6 +10,7 @@ services:
     restart: $MEDIA_RESTART_POLICY
     profiles:
       - media
+      - arr
     networks:
       t3_proxy:
         ipv4_address: 192.168.90.160

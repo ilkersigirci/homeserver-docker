@@ -4,7 +4,11 @@ services:
     container_name: prowlarr
     depends_on:
       - transmission
+      - sabnzbd
     restart: $MEDIA_RESTART_POLICY
+    profiles:
+      - media
+      - arr
     networks:
       - t3_proxy
     security_opt:
@@ -12,7 +16,6 @@ services:
     volumes:
       - $DOCKERDIR/appdata/prowlarr:/config
       - $MEDIADIR/Downloads:/data/downloads
-      - "/etc/localtime:/etc/localtime:ro"
     environment:
       PUID: $PUID
       PGID: $PGID
@@ -37,6 +40,3 @@ services:
       homepage.href: "https://prowlarr.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Indexer Manager"
-    profiles:
-      - media
-      - arr

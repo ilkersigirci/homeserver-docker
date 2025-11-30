@@ -89,6 +89,7 @@ include:
   - compose/jellyseerr.yml
   # - compose/openarchiver.yml
   - compose/pinchflat.yml
+  # - compose/prowlarr.yml
   - compose/sabnzbd.yml
   # - compose/scotty.yml
   # - compose/splitpro.yml
