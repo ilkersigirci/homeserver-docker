@@ -3,7 +3,7 @@
 services:
   vaultwarden:
     container_name: vaultwarden
-    image: vaultwarden/server:latest # TODO: ghcr.io/
+    image: ghcr.io/dani-garcia/vaultwarden:latest
     profiles:
       - core
     depends_on:
