@@ -73,7 +73,6 @@ include:
   # - compose/docker-gc.yml
   - compose/dozzle.yml
   - compose/healthchecks.yml
-  - compose/home-assistant.yml
   - compose/loggifly.yml
   # - compose/pgadmin.yml # TODO
   # - compose/rustic.yml

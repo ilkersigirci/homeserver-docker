@@ -42,6 +42,7 @@ include:
   - compose/traefik.yml
   - compose/vaultwarden.yml
   ###### MAINTENANCE ####
+  - compose/home-assistant.yml
   - compose/syncthing.yml
   - compose/whoami.yml
   #### READING ####
