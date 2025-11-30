@@ -40,7 +40,7 @@ include:
   - compose/socket-proxy.yml
   - compose/tinyauth.yml
   - compose/traefik.yml
-  # - compose/vaultwarden.yml
+  - compose/vaultwarden.yml
   ###### MAINTENANCE ####
   - compose/syncthing.yml
   - compose/whoami.yml
