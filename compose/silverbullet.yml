@@ -42,7 +42,7 @@ services:
       homepage.icon: silverbullet.png
       homepage.href: https://notes.$DOMAINNAME
       homepage.target: _blank
-      homepage.description: Offline first web based Markdown editor, turbo charged with the scripting power of Lua 
+      homepage.description: Offline first web based Markdown editor, turbo charged with the scripting power of Lua
       ####### GLANCE #######
       glance.name: silverbullet
       glance.icon: sh:silverbullet

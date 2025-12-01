@@ -47,5 +47,10 @@ services:
       homepage.href: "https://syncthing.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "File Synchronization"
+      ####### GLANCE #######
+      glance.name: "syncthing"
+      glance.icon: "sh:syncthing"
+      glance.url: "https://syncthing.$DOMAINNAME"
+      glance.description: "File Synchronization"
     profiles:
       - maintenance

@@ -30,3 +30,8 @@ services:
       homepage.href: "https://whoami.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Tiny Go webserver that prints OS information and HTTP request to output"
+      ####### GLANCE #######
+      glance.name: "whoami"
+      glance.icon: "sh:whoami"
+      glance.url: "https://whoami.$DOMAINNAME"
+      glance.description: "Tiny Go webserver that prints OS information and HTTP request to output"
