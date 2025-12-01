@@ -72,6 +72,7 @@ include:
   # - compose/code-server.yml
   # - compose/docker-gc.yml
   - compose/dozzle.yml
+  - compose/forgejo.yml
   - compose/healthchecks.yml
   - compose/loggifly.yml
   # - compose/pgadmin.yml # TODO

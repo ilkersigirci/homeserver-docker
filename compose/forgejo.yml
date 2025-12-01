@@ -1,0 +1,82 @@
+services:
+  forgejo-db:
+    image: postgres:16.4
+    container_name: forgejo-db
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - maintenance
+      - forgejo
+    environment:
+      PGDATA: /pgdata
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    networks:
+      - t3_proxy
+    expose:
+      - "5432"
+    volumes:
+      - $DATADIR/forgejo-db:/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+
+  # NOTE: Create `forgejo/gitea` and `forgejo/conf` dirs with current user beforehand.
+  forgejo:
+    image: codeberg.org/forgejo/forgejo:13-rootless
+    container_name: forgejo
+    user: 1000:1000
+    restart: $MAINTENANCE_RESTART_POLICY
+    depends_on:
+      forgejo-db:
+        condition: service_healthy
+    profiles:
+      - maintenance
+      - forgejo
+    networks:
+      - t3_proxy
+    ports:
+      - "222:2222"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DATADIR/forgejo/gitea:/var/lib/gitea
+      - $DATADIR/forgejo/conf:/etc/gitea
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      USER_UID: $PUID
+      USER_GID: $PGID
+      FORGEJO__database__DB_TYPE: postgres
+      FORGEJO__database__HOST: forgejo-db:5432
+      FORGEJO__database__NAME: postgres
+      FORGEJO__database__USER: postgres
+      FORGEJO__database__PASSWD: postgres
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.forgejo-rtr.entrypoints: websecure
+      traefik.http.routers.forgejo-rtr.rule: Host(`forgejo.$DOMAINNAME`)
+      ## Middlewares
+      traefik.http.routers.forgejo-rtr.middlewares: chain-tinyauth@file
+      ## HTTP Services
+      traefik.http.routers.forgejo-rtr.service: forgejo-svc
+      traefik.http.services.forgejo-svc.loadbalancer.server.port: "3000"
+      ####### TINYAUTH #######
+      tinyauth.apps.forgejo.config.domain: forgejo.$DOMAINNAME
+      tinyauth.apps.forgejo.ip.bypass: $LOCAL_IPS
+      ####### HOMEPAGE #######
+      homepage.group: Maintenance
+      homepage.name: forgejo
+      homepage.icon: forgejo.png
+      homepage.href: https://forgejo.$DOMAINNAME
+      homepage.target: _blank
+      homepage.description: Self-hosted Git service
+      ####### GLANCE #######
+      glance.name: forgejo
+      glance.icon: sh:forgejo
+      glance.url: https://forgejo.$DOMAINNAME
+      glance.description: Self-hosted Git service
