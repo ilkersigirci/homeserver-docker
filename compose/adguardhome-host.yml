@@ -27,7 +27,7 @@ services:
       homepage.target: "_blank"
       homepage.description: "Network-wide ads & trackers blocking DNS server"
       homepage.widget.type: "adguard"
-      homepage.widget.url: "http://adguardhome:81"
+      homepage.widget.url: "https://adguardhome.$DOMAINNAME"
       homepage.widget.username: "$ADGUARD_USERNAME"
       homepage.widget.password: "$ADGUARD_PASSWORD"
       ####### GLANCE #######
