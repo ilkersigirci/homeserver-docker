@@ -25,6 +25,7 @@ services:
 
 
   # NOTE: Create `forgejo/gitea` and `forgejo/conf` dirs with current user beforehand.
+  # NOTE: Configuration is located in: forgejo/gitea/custom/conf/app.ini
   forgejo:
     image: codeberg.org/forgejo/forgejo:13-rootless
     container_name: forgejo
@@ -50,6 +51,9 @@ services:
     environment:
       USER_UID: $PUID
       USER_GID: $PGID
+      FORGEJO__server__ROOT_URL: https://git.$DOMAINNAME
+      FORGEJO__server__DOMAIN: git.$DOMAINNAME
+      FORGEJO__server__SSH_DOMAIN: git.$DOMAINNAME
       FORGEJO__database__DB_TYPE: postgres
       FORGEJO__database__HOST: forgejo-db:5432
       FORGEJO__database__NAME: postgres
@@ -59,24 +63,24 @@ services:
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.forgejo-rtr.entrypoints: websecure
-      traefik.http.routers.forgejo-rtr.rule: Host(`forgejo.$DOMAINNAME`)
+      traefik.http.routers.forgejo-rtr.rule: Host(`git.$DOMAINNAME`)
       ## Middlewares
       traefik.http.routers.forgejo-rtr.middlewares: chain-tinyauth@file
       ## HTTP Services
       traefik.http.routers.forgejo-rtr.service: forgejo-svc
       traefik.http.services.forgejo-svc.loadbalancer.server.port: "3000"
       ####### TINYAUTH #######
-      tinyauth.apps.forgejo.config.domain: forgejo.$DOMAINNAME
+      tinyauth.apps.forgejo.config.domain: git.$DOMAINNAME
       tinyauth.apps.forgejo.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: Maintenance
       homepage.name: forgejo
       homepage.icon: forgejo.png
-      homepage.href: https://forgejo.$DOMAINNAME
+      homepage.href: https://git.$DOMAINNAME
       homepage.target: _blank
       homepage.description: Self-hosted Git service
       ####### GLANCE #######
       glance.name: forgejo
       glance.icon: sh:forgejo
-      glance.url: https://forgejo.$DOMAINNAME
+      glance.url: https://git.$DOMAINNAME
       glance.description: Self-hosted Git service
