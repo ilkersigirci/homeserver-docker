@@ -40,7 +40,7 @@ services:
     networks:
       - t3_proxy
     ports:
-      - "222:2222"
+      - "2222:2222"
     security_opt:
       - no-new-privileges:true
     volumes:
