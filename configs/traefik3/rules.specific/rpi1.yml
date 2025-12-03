@@ -1,0 +1,15 @@
+http:
+  routers:
+    adguardhome-rtr:
+      rule: "Host(`adguardhome.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: adguardhome-svc
+
+  services:
+    adguardhome-svc:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.2.13:81"
