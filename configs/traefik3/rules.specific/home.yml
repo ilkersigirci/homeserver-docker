@@ -38,6 +38,14 @@ http:
         - chain-no-auth-relaxed
       service: adguardhome-svc
 
+    home-assistant-rtr:
+      rule: "Host(`smarthome.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: home-assistant-svc
+
   services:
     openwrt-svc:
       loadBalancer:
@@ -60,3 +68,8 @@ http:
       loadBalancer:
         servers:
           - url: "http://192.168.2.12:81"
+
+    home-assistant-svc:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.2.12:8123"

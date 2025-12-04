@@ -34,11 +34,9 @@ services:
     profiles:
       - maintenance
       - home-assistant
-    networks:
-      - t3_proxy
-    # cap_add:
-    #   - NET_ADMIN
-    #   - NET_RAW
+    network_mode: host
+    # networks:
+    #   - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -48,18 +46,18 @@ services:
     environment:
       TZ: $TZ
     labels:
-      traefik.enable: "true"
-      ## HTTP Routers
-      traefik.http.routers.home-assistant-rtr.entrypoints: websecure
-      traefik.http.routers.home-assistant-rtr.rule: Host(`smarthome.$DOMAINNAME`)
-      ## Middlewares
-      traefik.http.routers.home-assistant-rtr.middlewares: chain-tinyauth-relaxed@file
-      ## HTTP Services
-      traefik.http.routers.home-assistant-rtr.service: home-assistant-svc
-      traefik.http.services.home-assistant-svc.loadbalancer.server.port: "8123"
-      ####### TINYAUTH #######
-      tinyauth.apps.home-assistant.config.domain: smarthome.$DOMAINNAME
-      tinyauth.apps.home-assistant.ip.bypass: $LOCAL_IPS
+      # traefik.enable: "true"
+      # ## HTTP Routers
+      # traefik.http.routers.home-assistant-rtr.entrypoints: websecure
+      # traefik.http.routers.home-assistant-rtr.rule: Host(`smarthome.$DOMAINNAME`)
+      # ## Middlewares
+      # traefik.http.routers.home-assistant-rtr.middlewares: chain-tinyauth-relaxed@file
+      # ## HTTP Services
+      # traefik.http.routers.home-assistant-rtr.service: home-assistant-svc
+      # traefik.http.services.home-assistant-svc.loadbalancer.server.port: "8123"
+      # ####### TINYAUTH #######
+      # tinyauth.apps.home-assistant.config.domain: smarthome.$DOMAINNAME
+      # tinyauth.apps.home-assistant.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: Maintenance
       homepage.name: home-assistant
