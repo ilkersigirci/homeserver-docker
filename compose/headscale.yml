@@ -1,5 +1,4 @@
 services:
-  # NOTE: When changing ACL in admin ui, restart the headscale container to make it take effect.
   # NOTE: docker exec headscale headscale apikey create
   headscale:
     image: headscale/headscale:0.26.1
@@ -56,6 +55,7 @@ services:
       ##### HEADPLANE #####
       me.tale.headplane.target: headscale
 
+  # NOTE: When changing ACL in admin ui, restart the headscale container to make it take effect.
   headscale-admin:
     image: goodieshq/headscale-admin:0.26.0
     container_name: headscale-admin
