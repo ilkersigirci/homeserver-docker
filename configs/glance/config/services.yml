@@ -39,9 +39,14 @@
             height: 1000
 
           - type: iframe
-            title: NAS
-            source: https://homepage.nas.${BASE_DOMAINNAME}
+            title: RPI1
+            source: https://homepage.rpi1.${BASE_DOMAINNAME}
             height: 1000
+
+          # - type: iframe
+          #   title: NAS
+          #   source: https://homepage.nas.${BASE_DOMAINNAME}
+          #   height: 1000
 
           - type: iframe
             title: REMOTE
