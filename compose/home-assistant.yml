@@ -27,7 +27,6 @@ services:
 
   home-assistant:
     image: ghcr.io/home-assistant/home-assistant:stable
-    # image: lscr.io/linuxserver/homeassistant:latest
     container_name: home-assistant
     restart: $MAINTENANCE_RESTART_POLICY
     depends_on:
@@ -37,8 +36,6 @@ services:
       - maintenance
       - home-assistant
     network_mode: host
-    # networks:
-    #   - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -48,18 +45,51 @@ services:
     environment:
       TZ: $TZ
     labels:
-      # traefik.enable: "true"
-      # ## HTTP Routers
-      # traefik.http.routers.home-assistant-rtr.entrypoints: websecure
-      # traefik.http.routers.home-assistant-rtr.rule: Host(`smarthome.$DOMAINNAME`)
-      # ## Middlewares
-      # traefik.http.routers.home-assistant-rtr.middlewares: chain-tinyauth-relaxed@file
-      # ## HTTP Services
-      # traefik.http.routers.home-assistant-rtr.service: home-assistant-svc
-      # traefik.http.services.home-assistant-svc.loadbalancer.server.port: "8123"
-      # ####### TINYAUTH #######
-      # tinyauth.apps.home-assistant.config.domain: smarthome.$DOMAINNAME
-      # tinyauth.apps.home-assistant.ip.bypass: $LOCAL_IPS
+      ####### HOMEPAGE #######
+      homepage.group: Maintenance
+      homepage.name: home-assistant
+      homepage.icon: home-assistant.png
+      homepage.href: https://smarthome.$DOMAINNAME
+      homepage.target: _blank
+      homepage.description: Home automation
+      ####### GLANCE #######
+      glance.name: home-assistant
+      glance.icon: sh:home-assistant
+      glance.url: https://smarthome.$DOMAINNAME
+      glance.description: Home automation
+
+  home-assistant-proxied:
+    image: ghcr.io/home-assistant/home-assistant:stable
+    container_name: home-assistant-proxied
+    restart: $MAINTENANCE_RESTART_POLICY
+    depends_on:
+      home-assistant-db:
+        condition: service_healthy
+    profiles:
+      - not-used
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $CONFIGDIR/home-assistant:/config
+      - /etc/localtime:/etc/localtime:ro
+      # - /run/dbus:/run/dbus:ro
+    environment:
+      TZ: $TZ
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.home-assistant-rtr.entrypoints: websecure
+      traefik.http.routers.home-assistant-rtr.rule: Host(`smarthome.$DOMAINNAME`)
+      ## Middlewares
+      traefik.http.routers.home-assistant-rtr.middlewares: chain-tinyauth-relaxed@file
+      ## HTTP Services
+      traefik.http.routers.home-assistant-rtr.service: home-assistant-svc
+      traefik.http.services.home-assistant-svc.loadbalancer.server.port: "8123"
+      ####### TINYAUTH #######
+      tinyauth.apps.home-assistant.config.domain: smarthome.$DOMAINNAME
+      tinyauth.apps.home-assistant.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: Maintenance
       homepage.name: home-assistant
