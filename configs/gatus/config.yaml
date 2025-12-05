@@ -40,7 +40,7 @@ ui:
   title: Health Dashboard
   description: Monitor the health of $TITLE
   header: $TITLE
-  dashboard-heading: Health Dashboard
+  dashboard-heading: Uptime
   dashboard-subheading: " "
   custom-css: |
     /* Root variables for Catppuccin Frappe theme to match homepage */
@@ -207,21 +207,6 @@ ui:
       border-color: hsl(240, 16%, 22%) !important;
     }
 
-    /* Reposition settings to top right, left of other buttons */
-    #settings {
-      position: absolute !important;
-      top: 2.25rem !important;
-      bottom: auto !important;
-      left: auto !important;
-      right: 8rem !important;
-    }
-
-    @media (min-width: 1300px) {
-      #settings {
-        right: calc(50% - 32rem) !important;
-      }
-    }
-
     /* Hide Powered by Gatus footer */
     footer {
       display: none !important;
@@ -237,16 +222,24 @@ endpoints:
   #     - "[BODY].status == UP"
   #     - "[RESPONSE_TIME] < 150"
 
-  ################# INTERNAL SERVICES #################
+  ################# EXTERNAL SERVICES #################
+  - name: check-domain-expiration
+    group: External
+    url: "https://$DOMAINNAME/"
+    interval: 1h
+    conditions:
+      - "[DOMAIN_EXPIRATION] > 720h"
+
+  ################# REMOTESERVER #################
   - name: Postgres
-    group: Internal
+    group: Remoteserver
     url: "tcp://gatus-db:5432"
     interval: 30s
     conditions:
       - "[CONNECTED] == true"
 
   - name: AdguardHome-DNS
-    group: Internal
+    group: Remoteserver
     url: "100.64.0.4" # Address of the DNS server to use
     interval: 30s
     dns:
@@ -257,7 +250,7 @@ endpoints:
       - "[DNS_RCODE] == NOERROR"
 
   - name: $DOMAINNAME-DNS
-    group: Internal
+    group: Remoteserver
     url: "1.1.1.1" # Address of the DNS server to use
     interval: 30s
     dns:
@@ -267,18 +260,57 @@ endpoints:
       - "[BODY] == 100.64.0.4"
       - "[DNS_RCODE] == NOERROR"
 
-  ################# EXTERNAL SERVICES #################
-  - name: check-domain-expiration
-    group: External
-    url: "https://$DOMAINNAME/"
-    interval: 1h
-    conditions:
-      - "[DOMAIN_EXPIRATION] > 720h"
+  ################# HOME #################
 
-  #### GPU ####
+  - name: home.$DOMAINNAME-CloudflareDNS
+    group: Home
+    url: "1.1.1.1" # Address of the DNS server to use
+    interval: 1h
+    dns:
+      query-name: "homepage.home.$DOMAINNAME"
+      query-type: "A"
+    conditions:
+      - "[BODY] == 100.64.0.17"
+      - "[DNS_RCODE] == NOERROR"
+
+  - name: LocalDNS - home.$DOMAINNAME
+    group: Home
+    url: "100.64.0.17" # Address of the DNS server to use
+    interval: 1h
+    dns:
+      query-name: "homepage.home.$DOMAINNAME"
+      query-type: "A"
+    conditions:
+      - "[BODY] == 192.168.2.12"
+      - "[DNS_RCODE] == NOERROR"
+
+  - name: LocalDNS - rpi1.$DOMAINNAME
+    group: Home
+    url: "100.64.0.17" # Address of the DNS server to use
+    interval: 1h
+    dns:
+      query-name: "homepage.rpi1.$DOMAINNAME"
+      query-type: "A"
+    conditions:
+      - "[BODY] == 192.168.2.13"
+      - "[DNS_RCODE] == NOERROR"
+
+  - name: LocalDNS - gpu.$DOMAINNAME
+    group: Home
+    url: "100.64.0.17" # Address of the DNS server to use
+    interval: 1h
+    dns:
+      query-name: "homepage.gpu.$DOMAINNAME"
+      query-type: "A"
+    conditions:
+      - "[BODY] == 192.168.2.9"
+      - "[DNS_RCODE] == NOERROR"
+
+
+  ################# GPU #################
 
   - name: gpu.$DOMAINNAME-DNS
-    group: External
+    group: GPU
     url: "1.1.1.1" # Address of the DNS server to use
     interval: 1h
     dns:
