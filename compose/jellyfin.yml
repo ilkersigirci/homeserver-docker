@@ -6,7 +6,7 @@ services:
     # cpus: "0.5"
     mem_reservation: "2048M"
     mem_limit: "2048M"
-    restart: "unless-stopped"
+    restart: $MEDIA_RESTART_POLICY
     profiles:
       - media
       - jellyfin
