@@ -37,6 +37,11 @@ alerting:
     priority: 10
 
 ui:
+  title: Health Dashboard
+  description: Monitor the health of $TITLE
+  header: $TITLE
+  dashboard-heading: Health Dashboard
+  dashboard-subheading: " "
   custom-css: |
     /* Root variables for Catppuccin Frappe theme to match homepage */
     :root {
@@ -101,6 +106,7 @@ ui:
     header {
       background-color: hsl(240, 13%, 14%) !important;
       border-bottom-color: hsl(240, 16%, 22%) !important;
+      display: none !important;
     }
 
     /* Logo area background fix */
@@ -199,6 +205,26 @@ ui:
     #settings .bg-background\\/95 {
       background-color: hsl(240, 16%, 18%) !important;
       border-color: hsl(240, 16%, 22%) !important;
+    }
+
+    /* Reposition settings to top right, left of other buttons */
+    #settings {
+      position: absolute !important;
+      top: 2.25rem !important;
+      bottom: auto !important;
+      left: auto !important;
+      right: 8rem !important;
+    }
+
+    @media (min-width: 1300px) {
+      #settings {
+        right: calc(50% - 32rem) !important;
+      }
+    }
+
+    /* Hide Powered by Gatus footer */
+    footer {
+      display: none !important;
     }
 
 endpoints:
