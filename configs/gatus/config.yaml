@@ -1,7 +1,7 @@
 ######### Default Configurations #################
 
 https-default: &https-default
-  group: External
+  group: Https-Default-Group
   interval: 30s
   client:
     timeout: 10s
@@ -13,7 +13,7 @@ https-default: &https-default
       send-on-resolved: true
 
 ping-default: &ping-default
-  group: External
+  group: Ping-Default-Group
   interval: 30s
   conditions:
     - "[CONNECTED] == true"
@@ -262,7 +262,7 @@ endpoints:
 
   ################# HOME #################
 
-  - name: home.$DOMAINNAME-CloudflareDNS
+  - name: DNS - home
     group: Home
     url: "1.1.1.1" # Address of the DNS server to use
     interval: 1h
@@ -273,7 +273,7 @@ endpoints:
       - "[BODY] == 100.64.0.17"
       - "[DNS_RCODE] == NOERROR"
 
-  - name: LocalDNS - home.$DOMAINNAME
+  - name: LocalDNS - home
     group: Home
     url: "100.64.0.17" # Address of the DNS server to use
     interval: 1h
@@ -284,7 +284,7 @@ endpoints:
       - "[BODY] == 192.168.2.12"
       - "[DNS_RCODE] == NOERROR"
 
-  - name: LocalDNS - rpi1.$DOMAINNAME
+  - name: LocalDNS - rpi1
     group: Home
     url: "100.64.0.17" # Address of the DNS server to use
     interval: 1h
@@ -295,7 +295,7 @@ endpoints:
       - "[BODY] == 192.168.2.13"
       - "[DNS_RCODE] == NOERROR"
 
-  - name: LocalDNS - gpu.$DOMAINNAME
+  - name: LocalDNS - gpu
     group: Home
     url: "100.64.0.17" # Address of the DNS server to use
     interval: 1h
@@ -309,7 +309,7 @@ endpoints:
 
   ################# GPU #################
 
-  - name: gpu.$DOMAINNAME-DNS
+  - name: DNS - gpu
     group: GPU
     url: "1.1.1.1" # Address of the DNS server to use
     interval: 1h
@@ -322,17 +322,18 @@ endpoints:
 
   - name: Homepage-GPU-PING
     <<: *ping-default
+    group: GPU
     interval: 1h
     url: "icmp://homepage.gpu.$DOMAINNAME"
 
   - name: Jellyfin-GPU
     <<: *https-default
-    # group: GPU
+    group: GPU
     interval: 1h
     url: "https://jellyfin.gpu.$DOMAINNAME"
 
   - name: Immich-GPU
     <<: *https-default
-    # group: GPU
+    group: GPU
     interval: 1h
     url: "https://photos.gpu.$DOMAINNAME"
