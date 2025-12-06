@@ -1,4 +1,4 @@
-# NOTE: In sabnzb.ini file -> host_whitelist add: sabnzbd.$DOMAINNAME
+# NOTE: In sabnzb.ini file -> host_whitelist add: sabnzbd.$DOMAINNAME, sabnzbd
 services:
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd:latest
@@ -40,9 +40,12 @@ services:
       homepage.icon: sabnzbd.png
       homepage.href: https://sabnzbd.$DOMAINNAME
       homepage.target: _blank
-      homepage.description: description
+      homepage.description: The automated Usenet download tool
+      homepage.widget.type: sabnzbd
+      homepage.widget.url: http://sabnzbd:8080
+      homepage.widget.key: $SABNZBD_API_KEY
       ####### GLANCE #######
       glance.name: sabnzbd
       glance.icon: sh:sabnzbd
       glance.url: https://sabnzbd.$DOMAINNAME
-      glance.description: description
+      glance.description: The automated Usenet download tool
