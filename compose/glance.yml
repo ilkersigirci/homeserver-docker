@@ -26,6 +26,8 @@ services:
       JELLYFIN_KEY: $JELLYFIN_API_KEY
       TRAKT_USERNAME: $TRAKT_USERNAME
       TRAKT_CLIENT_ID: $TRAKT_CLIENT_ID
+      HASS_URL: $HASS_URL
+      HASS_API_KEY: $HASS_API_KEY
     labels:
       traefik.enable: "true"
       ## HTTP Routers

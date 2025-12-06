@@ -1,0 +1,38 @@
+- type: custom-api
+  title: HASS Sensors
+  cache: 1m
+  url: ${HASS_URL}/api/states
+  headers:
+    Authorization: "Bearer ${HASS_API_KEY}"
+    Content-Type: "application/json"
+  template: |
+    {{ if eq .Response.StatusCode 200 }}
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+        {{ range .JSON.Array "" }}
+          {{ $id := .String "entity_id" }}
+          {{ $state := .String "state" }}
+          {{ if and (or 
+                        (eq $id "sensor.homeserver_smart_plug_current_consumption") 
+                        (eq $id "sensor.kitchen_smart_plug_current_consumption")
+                        (eq $id "sensor.smart_plug_nas_current_consumption")
+                        (eq $id "sensor.bedroom_smart_plug_current_consumption")
+                    )
+                    (ne $state "unavailable")
+                    (ne $state "unknown")
+          }}
+            <div class="background-faint radius-8" style="padding: 6px 10px; text-align: center;">
+              <div class="color-highlight size-h3" style="line-height: 1.2;">
+                {{ $state }}{{ .String "attributes.unit_of_measurement" }}
+              </div>
+              <div class="size-h6 color-subdue" style="line-height: 1.2;">
+                {{ .String "attributes.friendly_name" }}
+              </div>
+            </div>
+          {{ end }}
+        {{ end }}
+      </div>
+    {{ else }}
+      <div style="text-align: center;" class="color-negative size-h4">
+        Error: {{ .Response.StatusCode }} - {{ .Response.Status }}
+      </div>
+    {{ end }}

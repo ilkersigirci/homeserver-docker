@@ -69,3 +69,5 @@
         - type: group
           widgets:
           - $include: custom-widgets/headscale.yml
+
+        - $include: custom-widgets/hass-sensor-stats.yml
