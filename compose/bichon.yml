@@ -15,8 +15,8 @@ services:
       BICHON_HTTP_PORT: 15630
       BICHON_LOG_LEVEL: info
       BICHON_ROOT_DIR: /data
-      BICHON_PUBLIC_URL: https://mailarchiver.$DOMAINNAME
-      BICHON_CORS_ORIGINS: https://mailarchiver.$DOMAINNAME
+      BICHON_PUBLIC_URL: https://mailarchive.$DOMAINNAME
+      BICHON_CORS_ORIGINS: https://mailarchive.$DOMAINNAME
       BICHON_ENCRYPT_PASSWORD: $BICHON_ENCRYPT_PASSWORD
       # BICHON_ENABLE_ACCESS_TOKEN: true
     labels:
