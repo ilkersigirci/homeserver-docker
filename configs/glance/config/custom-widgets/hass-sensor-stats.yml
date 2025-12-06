@@ -1,6 +1,6 @@
 - type: custom-api
   title: HASS Sensors
-  cache: 1m
+  cache: 30s
   url: ${HASS_URL}/api/states
   headers:
     Authorization: "Bearer ${HASS_API_KEY}"
