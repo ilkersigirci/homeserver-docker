@@ -25,7 +25,7 @@ services:
       traefik.http.routers.bichon-rtr.entrypoints: "websecure"
       traefik.http.routers.bichon-rtr.rule: "Host(`mailarchive.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.bichon-rtr.middlewares: "chain-tinyauth@file"
+      traefik.http.routers.bichon-rtr.middlewares: "chain-tinyauth-relaxed@file"
       ## HTTP Services
       traefik.http.routers.bichon-rtr.service: "bichon-svc"
       traefik.http.services.bichon-svc.loadbalancer.server.port: "15630"
