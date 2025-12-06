@@ -71,3 +71,5 @@
           - $include: custom-widgets/headscale.yml
 
         - $include: custom-widgets/hass-sensor-stats.yml
+
+        - $include: custom-widgets/syncthing.yml

@@ -28,6 +28,9 @@ services:
       TRAKT_CLIENT_ID: $TRAKT_CLIENT_ID
       HASS_URL: $HASS_URL
       HASS_API_KEY: $HASS_API_KEY
+      SYNCTHING_URL: $SYNCTHING_URL
+      SYNCTHING_API_KEY: $SYNCTHING_API_KEY
+      SYNCTHING_NOTES_FOLDER_ID: $SYNCTHING_NOTES_FOLDER_ID
     labels:
       traefik.enable: "true"
       ## HTTP Routers
