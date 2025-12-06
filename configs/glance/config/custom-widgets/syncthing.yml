@@ -1,72 +1,92 @@
 - type: custom-api
   title: "Syncthing"
-  cache: 300s                 # refresh interval
-  headers:                   # auth for *every* request
+  cache: 1m
+  headers:
     X-API-Key: ${SYNCTHING_API_KEY}
-  # ---------------- Main request: discover folders ----------------
-  url: "${SYNCTHING_URL}/rest/system/config"
-  # ---------------- Sub-requests: one per folder ------------------
+  # Main request: Get connections to count connected devices
+  url: "${SYNCTHING_URL}/rest/system/connections"
+  
   subrequests:
-    ${SYNCTHING_NOTES_FOLDER_ID}:
+    completion:
       url: "${SYNCTHING_URL}/rest/db/completion"
+      headers: { X-API-Key: ${SYNCTHING_API_KEY} }
+    errors:
+      url: "${SYNCTHING_URL}/rest/system/error"
+      headers: { X-API-Key: ${SYNCTHING_API_KEY} }
+    notes:
+      url: "${SYNCTHING_URL}/rest/db/status"
       parameters: { folder: "${SYNCTHING_NOTES_FOLDER_ID}" }
-      headers:    { X-API-Key: ${SYNCTHING_API_KEY} }
-  # ---------------- Options visible to the template ---------------
-  options:
-    debug: false             # switch to true to show JSON <details>
-    folders:
-      - id: ${SYNCTHING_NOTES_FOLDER_ID}
-        name: "Notes"
-        enabled: true
-  # ---------------- Template defined earlier ----------------------
-  template: |-
-    <!-- Syncthing folder-by-folder progress --------------------------------- -->
-    {{ $debug   := or (.Options.debug) false }}
-    {{ $folders := .Options.folders }}
+      headers: { X-API-Key: ${SYNCTHING_API_KEY} }
 
-    {{ if ne .Response.StatusCode 200 }}
-      <!-- The *main* request failed (e.g. /rest/system/config).               -->
-      <p class="text-danger">⚠️ Syncthing API unreachable ({{ .Response.Status }})</p>
+  template: |
+    {{ $connections := .JSON }}
+    {{ $completion := .Subrequest "completion" }}
+    {{ $errors := .Subrequest "errors" }}
+    {{ $notes := .Subrequest "notes" }}
+    
+    {{ if or (ne .Response.StatusCode 200) (ne $completion.Response.StatusCode 200) }}
+      <p class="text-danger">⚠️ Syncthing API unreachable</p>
     {{ else }}
-      <ul class="list">
-        {{ range $folders }}
-          {{ $id   := .id }}
-          {{ $name := .name }}
-          {{ if .enabled }}
-            {{ $r := $.Subrequest $id }}
-            {{ if eq $r.Response.StatusCode 200 }}
-              {{ $comp := $r.JSON.Float "completion" }}
-              <li>
-                <span class="{{ if eq $comp 100.0 }}text-success{{ else if gt $comp 0.0 }}text-info{{ else }}text-danger{{ end }}">
-                  {{ if eq $comp 100.0 }}✔️
-                  {{ else if gt $comp 0.0 }}🔄
-                  {{ else }}⚠️
-                  {{ end }}
-                  {{ $name }} - 
-                  {{ if eq $comp 100.0 }}
-                    In Sync (100 %)
-                  {{ else if gt $comp 0.0 }}
-                    Syncing ({{ printf "%.1f" $comp }} %)
-                  {{ else }}
-                    Unreachable
-                  {{ end }}
-                </span>
-              </li>
-            {{ else }}
-              <!-- Sub-request didn’t return 200 -->
-              <li><span class="text-danger">⚠️ {{ $name }} - Unreachable</span></li>
-            {{ end }}
+      <div class="size-h6 margin-bottom-5">GENERAL</div>
+      <div class="flex justify-between text-center">
+        <div>
+          {{/* Count connected devices by iterating */}}
+          {{ $devs := $connections.Array "connections.@values" }}
+          {{ $connected := 0.0 }}
+          {{ range $devs }}
+            {{ if .Bool "connected" }}{{ $connected = add $connected 1.0 }}{{ end }}
           {{ end }}
-        {{ end }}
-      </ul>
-    {{ end }}
+          <div class="color-highlight size-h3">
+            {{ printf "%.0f" $connected }} / {{ len $devs }}
+          </div>
+          <div class="size-h6">DEVICES</div>
+        </div>
+        <div>
+          <div class="color-highlight size-h3">
+            {{ printf "%.0f" ($completion.JSON.Float "completion") }}%
+          </div>
+          <div class="size-h6">SYNCED</div>
+        </div>
+        <div>
+          <div class="color-highlight size-h3">
+            {{ $errors.JSON.Int "errors.#" }}
+          </div>
+          <div class="size-h6">ERRORS</div>
+        </div>
+        <div>
+          <div class="color-highlight size-h3">
+            {{/* Convert bytes to GB (1073741824) */}}
+            {{ div ($completion.JSON.Float "globalBytes") 1073741824 | printf "%.1f" }} GB
+          </div>
+          <div class="size-h6">STORAGE</div>
+        </div>
+      </div>
 
-    {{/* ---------- OPTIONAL DEBUG BLOCK ---------- */}}
-    {{ if $debug }}
-      <details style="margin-top:0.5rem">
-        <summary>Debug - raw Syncthing JSON</summary>
-        <pre style="font-size:10px">
-    {{ (printf "%+v" .JSON) }}
-        </pre>
-      </details>
+      {{ if eq $notes.Response.StatusCode 200 }}
+        <div class="margin-top-15">
+          <div class="size-h6 margin-bottom-5">NOTES</div>
+          <div class="flex justify-between text-center">
+            <div style="width: 33%">
+              <div class="color-highlight size-h3">
+                {{ $notes.JSON.Int "globalFiles" }}
+              </div>
+              <div class="size-h6">FILES</div>
+            </div>
+            <div style="width: 33%">
+              <div class="color-highlight size-h3">
+                {{ div ($notes.JSON.Float "globalBytes") 1048576 | printf "%.1f" }} MB
+              </div>
+              <div class="size-h6">SIZE</div>
+            </div>
+            <div style="width: 33%">
+              <div class="color-highlight size-h3">
+                {{ $inSync := $notes.JSON.Float "inSyncBytes" }}
+                {{ $total := $notes.JSON.Float "globalBytes" }}
+                {{ if eq $total 0.0 }}100%{{ else }}{{ mul (div $inSync $total) 100 | printf "%.0f" }}%{{ end }}
+              </div>
+              <div class="size-h6">SYNCED</div>
+            </div>
+          </div>
+        </div>
+      {{ end }}
     {{ end }}
