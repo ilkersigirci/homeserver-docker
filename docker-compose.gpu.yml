@@ -96,7 +96,7 @@ include:
   # - compose/splitpro.yml
   # - compose/strava-statistics.yml
   # - compose/yamtrack.yml
-  - compose/ytptube.yml
+  # - compose/ytptube.yml # TODO: restart always
   - compose/transmission.yml
   #### ML ####
   # - compose/sd-next.yml
