@@ -1,9 +1,12 @@
 services:
-  # NOTE: docker exec headscale headscale apikey create
+  # NOTE: docker exec headscale headscale apikeys create --expiration 360d
   headscale:
-    image: headscale/headscale:0.26.1
+    image: ghcr.io/juanfont/headscale:0.27.2-rc.1
     container_name: headscale
     command: serve
+    read_only: true
+    tmpfs:
+      - /var/run/headscale
     restart: $BASE_RESTART_POLICY
     profiles:
       - core
@@ -19,6 +22,10 @@ services:
       - $DATADIR/headscale:/var/lib/headscale
     environment:
       TZ: $TZ
+    healthcheck:
+        test: ["CMD", "headscale", "health"]
+        # start_period: 5s
+        # interval: 1m
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -97,8 +104,9 @@ services:
       glance.description: Admin Web Interface for headscale
 
 
+  # Configuration file: https://github.com/tale/headplane/blob/main/config.example.yaml
   headplane:
-    image: ghcr.io/tale/headplane:0.6.1
+    image: ghcr.io/tale/headplane:0.6.2-beta.2
     container_name: headplane
     restart: $BASE_RESTART_POLICY
     depends_on:
@@ -119,6 +127,23 @@ services:
       # If using dns.extra_records in Headscale (recommended), this should
       # match the headscale.dns_records_path in your config.yaml
       # - $CONFIGDIR/headscale/dns_records.json:/etc/headscale/dns_records.json
+    environment:
+      # CONFIG OVERRIDES
+      HEADPLANE_LOAD_ENV_OVERRIDES: true
+      ## SERVER
+      HEADPLANE_SERVER__HOST: 0.0.0.0
+      HEADPLANE_SERVER__PORT: 3000
+      HEADPLANE_SERVER__BASE_URL: https://headscale.$DOMAINNAME
+      HEADPLANE_SERVER__COOKIE_SECRET: $HEADPLANE_COOKIE_SECRET
+      ## HEADSCALE
+      HEADPLANE_HEADSCALE__URL: http://headscale:8080
+      HEADPLANE_HEADSCALE__PUBLIC_URL: https://headscale.$DOMAINNAME
+      ## INTEGRATION
+      HEADPLANE_INTEGRATION__AGENT__ENABLED: true
+      HEADPLANE_INTEGRATION__AGENT__PRE_AUTHKEY: $HEADPLANE_AGENT_PRE_AUTHKEY
+      HEADPLANE_INTEGRATION__AGENT__HOST_NAME: $HEADPLANE_AGENT_HOST_NAME
+      HEADPLANE_INTEGRATION__DOCKER__ENABLED: true
+      HEADPLANE_INTEGRATION__DOCKER__SOCKET: tcp://docker-socket-proxy:2375
     labels:
       traefik.enable: "true"
       ## HTTP Routers
