@@ -1,4 +1,15 @@
-######### Default Configurations #################
+######### Default Templates #################
+http-default: &http-default
+  group: Http-Default-Group
+  interval: 30s
+  client:
+    timeout: 10s
+  conditions:
+    - "[STATUS] == 200"
+  alerts:
+    - type: gotify
+      send-on-resolved: true
+
 
 https-default: &https-default
   group: Https-Default-Group
@@ -35,6 +46,148 @@ alerting:
     server-url: https://gotify.$DOMAINNAME
     token: $GOTIFY_NOTIFICATION_TOKEN
     priority: 10
+
+###################################################
+
+endpoints:
+  # - name: front-end
+  #   group: core
+  #   url: "https://twin.sh/health"
+  #   interval: 5m
+  #   conditions:
+  #     - "[STATUS] == 200"
+  #     - "[BODY].status == UP"
+  #     - "[RESPONSE_TIME] < 150"
+
+  ################# EXTERNAL SERVICES #################
+  - name: check-domain-expiration
+    group: External
+    url: "https://$DOMAINNAME/"
+    interval: 1h
+    conditions:
+      - "[DOMAIN_EXPIRATION] > 720h"
+
+  ################# REMOTESERVER #################
+  - name: Postgres
+    group: Remoteserver
+    url: "tcp://gatus-db:5432"
+    interval: 30s
+    conditions:
+      - "[CONNECTED] == true"
+
+  - name: AdguardHome-DNS
+    group: Remoteserver
+    url: "100.64.0.4" # Address of the DNS server to use
+    interval: 30s
+    dns:
+      query-name: "rpi0"
+      query-type: "A"
+    conditions:
+      - "[BODY] == 100.64.0.17"
+      - "[DNS_RCODE] == NOERROR"
+
+  - name: $DOMAINNAME-DNS
+    group: Remoteserver
+    url: "1.1.1.1" # Address of the DNS server to use
+    interval: 30s
+    dns:
+      query-name: "homepage.$DOMAINNAME"
+      query-type: "A"
+    conditions:
+      - "[BODY] == 100.64.0.4"
+      - "[DNS_RCODE] == NOERROR"
+
+  - name: Pocketid-Remoteserver
+    <<: *https-default
+    group: Remoteserver
+    interval: 1h
+    url: "https://pocketid.$DOMAINNAME"
+
+  ################# HOME #################
+
+  - name: DNS - home
+    group: Home
+    url: "1.1.1.1" # Address of the DNS server to use
+    interval: 1h
+    dns:
+      query-name: "homepage.home.$DOMAINNAME"
+      query-type: "A"
+    conditions:
+      - "[BODY] == 100.64.0.17"
+      - "[DNS_RCODE] == NOERROR"
+
+  - name: LocalDNS - home
+    group: Home
+    url: "100.64.0.17" # Address of the DNS server to use
+    interval: 1h
+    dns:
+      query-name: "homepage.home.$DOMAINNAME"
+      query-type: "A"
+    conditions:
+      - "[BODY] == 192.168.2.12"
+      - "[DNS_RCODE] == NOERROR"
+
+  - name: LocalDNS - rpi1
+    group: Home
+    url: "100.64.0.17" # Address of the DNS server to use
+    interval: 1h
+    dns:
+      query-name: "homepage.rpi1.$DOMAINNAME"
+      query-type: "A"
+    conditions:
+      - "[BODY] == 192.168.2.13"
+      - "[DNS_RCODE] == NOERROR"
+
+  - name: LocalDNS - gpu
+    group: Home
+    url: "100.64.0.17" # Address of the DNS server to use
+    interval: 1h
+    dns:
+      query-name: "homepage.gpu.$DOMAINNAME"
+      query-type: "A"
+    conditions:
+      - "[BODY] == 192.168.2.9"
+      - "[DNS_RCODE] == NOERROR"
+
+
+  ################# GPU #################
+
+  - name: DNS - gpu
+    group: GPU
+    url: "1.1.1.1" # Address of the DNS server to use
+    interval: 1h
+    dns:
+      query-name: "homepage.gpu.$DOMAINNAME"
+      query-type: "A"
+    conditions:
+      - "[BODY] == 100.64.0.19"
+      - "[DNS_RCODE] == NOERROR"
+
+  - name: Homepage-GPU-PING
+    <<: *ping-default
+    group: GPU
+    interval: 1h
+    url: "icmp://homepage.gpu.$DOMAINNAME"
+
+  - name: Jellyfin-GPU
+    <<: *https-default
+    group: GPU
+    interval: 1h
+    url: "https://jellyfin.gpu.$DOMAINNAME"
+
+  - name: Immich-GPU
+    <<: *https-default
+    group: GPU
+    interval: 1h
+    url: "https://photos.gpu.$DOMAINNAME"
+
+  - name: Pocketid-GPU
+    <<: *http-default
+    group: GPU
+    interval: 1h
+    url: "http://100.64.0.19:1000"
+
+###################################################
 
 ui:
   title: Health Dashboard
@@ -211,129 +364,3 @@ ui:
     footer {
       display: none !important;
     }
-
-endpoints:
-  # - name: front-end
-  #   group: core
-  #   url: "https://twin.sh/health"
-  #   interval: 5m
-  #   conditions:
-  #     - "[STATUS] == 200"
-  #     - "[BODY].status == UP"
-  #     - "[RESPONSE_TIME] < 150"
-
-  ################# EXTERNAL SERVICES #################
-  - name: check-domain-expiration
-    group: External
-    url: "https://$DOMAINNAME/"
-    interval: 1h
-    conditions:
-      - "[DOMAIN_EXPIRATION] > 720h"
-
-  ################# REMOTESERVER #################
-  - name: Postgres
-    group: Remoteserver
-    url: "tcp://gatus-db:5432"
-    interval: 30s
-    conditions:
-      - "[CONNECTED] == true"
-
-  - name: AdguardHome-DNS
-    group: Remoteserver
-    url: "100.64.0.4" # Address of the DNS server to use
-    interval: 30s
-    dns:
-      query-name: "rpi0"
-      query-type: "A"
-    conditions:
-      - "[BODY] == 100.64.0.17"
-      - "[DNS_RCODE] == NOERROR"
-
-  - name: $DOMAINNAME-DNS
-    group: Remoteserver
-    url: "1.1.1.1" # Address of the DNS server to use
-    interval: 30s
-    dns:
-      query-name: "homepage.$DOMAINNAME"
-      query-type: "A"
-    conditions:
-      - "[BODY] == 100.64.0.4"
-      - "[DNS_RCODE] == NOERROR"
-
-  ################# HOME #################
-
-  - name: DNS - home
-    group: Home
-    url: "1.1.1.1" # Address of the DNS server to use
-    interval: 1h
-    dns:
-      query-name: "homepage.home.$DOMAINNAME"
-      query-type: "A"
-    conditions:
-      - "[BODY] == 100.64.0.17"
-      - "[DNS_RCODE] == NOERROR"
-
-  - name: LocalDNS - home
-    group: Home
-    url: "100.64.0.17" # Address of the DNS server to use
-    interval: 1h
-    dns:
-      query-name: "homepage.home.$DOMAINNAME"
-      query-type: "A"
-    conditions:
-      - "[BODY] == 192.168.2.12"
-      - "[DNS_RCODE] == NOERROR"
-
-  - name: LocalDNS - rpi1
-    group: Home
-    url: "100.64.0.17" # Address of the DNS server to use
-    interval: 1h
-    dns:
-      query-name: "homepage.rpi1.$DOMAINNAME"
-      query-type: "A"
-    conditions:
-      - "[BODY] == 192.168.2.13"
-      - "[DNS_RCODE] == NOERROR"
-
-  - name: LocalDNS - gpu
-    group: Home
-    url: "100.64.0.17" # Address of the DNS server to use
-    interval: 1h
-    dns:
-      query-name: "homepage.gpu.$DOMAINNAME"
-      query-type: "A"
-    conditions:
-      - "[BODY] == 192.168.2.9"
-      - "[DNS_RCODE] == NOERROR"
-
-
-  ################# GPU #################
-
-  - name: DNS - gpu
-    group: GPU
-    url: "1.1.1.1" # Address of the DNS server to use
-    interval: 1h
-    dns:
-      query-name: "homepage.gpu.$DOMAINNAME"
-      query-type: "A"
-    conditions:
-      - "[BODY] == 100.64.0.19"
-      - "[DNS_RCODE] == NOERROR"
-
-  - name: Homepage-GPU-PING
-    <<: *ping-default
-    group: GPU
-    interval: 1h
-    url: "icmp://homepage.gpu.$DOMAINNAME"
-
-  - name: Jellyfin-GPU
-    <<: *https-default
-    group: GPU
-    interval: 1h
-    url: "https://jellyfin.gpu.$DOMAINNAME"
-
-  - name: Immich-GPU
-    <<: *https-default
-    group: GPU
-    interval: 1h
-    url: "https://photos.gpu.$DOMAINNAME"
