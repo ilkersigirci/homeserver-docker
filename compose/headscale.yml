@@ -1,4 +1,5 @@
 services:
+  # Configuration file: https://github.com/tale/headplane/blob/main/config.example.yamls 
   # NOTE: docker exec headscale headscale apikeys create --expiration 360d
   headscale:
     image: ghcr.io/juanfont/headscale:0.27.2-rc.1
@@ -61,48 +62,6 @@ services:
       glance.description: An open source, self-hosted implementation of the Tailscale control server
       ##### HEADPLANE #####
       me.tale.headplane.target: headscale
-
-  # NOTE: When changing ACL in admin ui, restart the headscale container to make it take effect.
-  headscale-admin:
-    image: goodieshq/headscale-admin:0.26.0
-    container_name: headscale-admin
-    restart: $BASE_RESTART_POLICY
-    depends_on:
-      - headscale
-    profiles:
-      - not-used
-    networks:
-      - t3_proxy
-    security_opt:
-      - no-new-privileges:true
-    environment:
-      ENDPOINT: "/admin"
-    labels:
-      traefik.enable: "true"
-      ## HTTP Routers
-      traefik.http.routers.headscale-admin-rtr.entrypoints: websecure
-      traefik.http.routers.headscale-admin-rtr.rule: Host(`headscale.$DOMAINNAME`) && PathPrefix(`/admin`)
-      ## Middlewares
-      # traefik.http.routers.headscale-admin-rtr.middlewares: chain-tinyauth@file
-      ## HTTP Services
-      traefik.http.routers.headscale-admin-rtr.service: headscale-admin-svc
-      traefik.http.services.headscale-admin-svc.loadbalancer.server.port: "80"
-      ####### TINYAUTH #######
-      tinyauth.apps.headscale.config.domain: headscale.$DOMAINNAME
-      tinyauth.apps.headscale.ip.bypass: $LOCAL_IPS
-      ####### HOMEPAGE #######
-      homepage.group: Core
-      homepage.name: headscale-admin
-      homepage.icon: headscale.png
-      homepage.href: https://headscale.$DOMAINNAME/admin
-      homepage.target: _blank
-      homepage.description: Admin Web Interface for headscale
-      ####### GLANCE #######
-      glance.name: headscale-admin
-      glance.icon: sh:headscale
-      glance.url: https://headscale.$DOMAINNAME/admin
-      glance.description: Admin Web Interface for headscale
-
 
   # Configuration file: https://github.com/tale/headplane/blob/main/config.example.yaml
   headplane:
@@ -169,3 +128,45 @@ services:
       glance.icon: sh:headplane
       glance.url: https://headscale.$DOMAINNAME/admin
       glance.description: A feature-complete Web UI for Headscale
+
+
+  # NOTE: When changing ACL in admin ui, restart the headscale container to make it take effect.
+  headscale-admin:
+    image: goodieshq/headscale-admin:0.26.0
+    container_name: headscale-admin
+    restart: $BASE_RESTART_POLICY
+    depends_on:
+      - headscale
+    profiles:
+      - not-used
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      ENDPOINT: "/admin"
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.headscale-admin-rtr.entrypoints: websecure
+      traefik.http.routers.headscale-admin-rtr.rule: Host(`headscale.$DOMAINNAME`) && PathPrefix(`/admin`)
+      ## Middlewares
+      # traefik.http.routers.headscale-admin-rtr.middlewares: chain-tinyauth@file
+      ## HTTP Services
+      traefik.http.routers.headscale-admin-rtr.service: headscale-admin-svc
+      traefik.http.services.headscale-admin-svc.loadbalancer.server.port: "80"
+      ####### TINYAUTH #######
+      tinyauth.apps.headscale.config.domain: headscale.$DOMAINNAME
+      tinyauth.apps.headscale.ip.bypass: $LOCAL_IPS
+      ####### HOMEPAGE #######
+      homepage.group: Core
+      homepage.name: headscale-admin
+      homepage.icon: headscale.png
+      homepage.href: https://headscale.$DOMAINNAME/admin
+      homepage.target: _blank
+      homepage.description: Admin Web Interface for headscale
+      ####### GLANCE #######
+      glance.name: headscale-admin
+      glance.icon: sh:headscale
+      glance.url: https://headscale.$DOMAINNAME/admin
+      glance.description: Admin Web Interface for headscale
