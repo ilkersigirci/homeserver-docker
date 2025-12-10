@@ -26,3 +26,12 @@ http:
           - middlewares-rate-limit
           - middlewares-secure-headers-original
           - middlewares-tinyauth
+
+    chain-tinyauth-arcane:
+      chain:
+        middlewares:
+          - middlewares-cf-real-ip
+          - middlewares-crowdsec-bouncer
+          - middlewares-rate-limit
+          - middlewares-secure-headers-arcane
+          - middlewares-tinyauth

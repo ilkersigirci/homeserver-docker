@@ -58,7 +58,7 @@ http:
 
     # Alternative headers for applications that need more flexibility
     middlewares-secure-headers-relaxed:
-      headers:
+      headers: &headers-relaxed
         accessControlAllowMethods:
           - GET
           - OPTIONS
@@ -87,3 +87,9 @@ http:
           Cross-Origin-Opener-Policy: "same-origin-allow-popups"
         customRequestHeaders:
           X-Forwarded-Proto: https
+
+    # Specific headers for Arcane (disables nosniff)
+    middlewares-secure-headers-arcane:
+      headers:
+        <<: *headers-relaxed
+        contentTypeNosniff: false

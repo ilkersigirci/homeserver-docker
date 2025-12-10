@@ -14,7 +14,7 @@ services:
     privileged: true
     ports:
       # - "127.0.0.1:2375:2375"
-      - "2375:2375" # NOTE: Use this if you want portainer to manage multiple docker endpoints within my home network.
+      - "2375:2375" # NOTE: Use this if you want to expose docker socket in LAN.
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
@@ -28,26 +28,26 @@ services:
       BUILD: 0
       COMMIT: 0
       CONFIGS: 0
-      CONTAINERS: 1 # For Homepage, Dozzle
+      CONTAINERS: 1 # For Homepage, Dozzle, Arcane
       DISABLE_IPV6: 0
       DISTRIBUTION: 0
       EVENTS: 1
-      EXEC: 0
-      IMAGES: 0
-      INFO: 1  # For Dozzle
-      NETWORKS: 0 # For Portainer
+      EXEC: 1 # For Arcane
+      IMAGES: 1 # For Arcane
+      INFO: 1  # For Dozzle, Arcane
+      NETWORKS: 1 # For Arcane
       NODES: 0
       PING: 1
       PLUGINS: 0
-      POST: 0 # Use for Watchtower
+      POST: 1 # For Arcane
       PROXY_READ_TIMEOUT: 240
       SECRETS: 0
-      SERVICES: 0 # For Portainer
+      SERVICES: 0
       SESSION: 0
       SWARM: 0
       SYSTEM: 0
-      TASKS: 0 # For Portainer
+      TASKS: 0
       VERSION: 1
-      VOLUMES: 0 # For Portainer
+      VOLUMES: 1 # For Arcane
     labels:
       komodo.skip: # Prevents from stopping with StopAllContainers on Komodo

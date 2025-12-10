@@ -1,0 +1,70 @@
+# NOTE: Default username and pass: arcane / arcane-admin
+# TODO: How to set Apprise notification as env var instead of in UI?
+services:
+  arcane:
+    image: ghcr.io/getarcaneapp/arcane:latest
+    container_name: arcane
+    restart: $BASE_RESTART_POLICY
+    profiles:
+      - core
+    networks:
+      - t3_proxy
+      - socket_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/arcane:/app/data
+      # - $DOCKERDIR:$DOCKERDIR:ro
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      APP_URL: https://arcane.$DOMAINNAME
+      PORT: 3552
+      DOCKER_HOST: tcp://docker-socket-proxy:2375
+      ENCRYPTION_KEY: $ARCANE_ENCRYPTION_KEY
+      JWT_SECRET: $ARCANE_JWT_SECRET
+      ANALYTICS_DISABLED: true
+      LOG_LEVEL: info
+      ## UI CONFIGS
+      UI_CONFIGURATION_DISABLED: true
+      PROJECTS_DIRECTORY: $DOCKERDIR
+      ### OIDC
+      # OIDC_ENABLED: true
+      # OIDC_CLIENT_ID: "your_arcane_client_id_from_provider"
+      # OIDC_CLIENT_SECRET: "your_super_secret_client_secret_from_provider"
+      # OIDC_ISSUER_URL: https://auth.example.com
+      # OIDC_SCOPES: openid email profile groups
+      # OIDC_ADMIN_CLAIM: groups
+      # OIDC_ADMIN_VALUE: _arcane_admins
+      # OIDC_MERGE_ACCOUNTS: true
+    healthcheck:
+      test: ['CMD-SHELL', 'curl -fsS http://localhost:3552/api/health >/dev/null || exit 1']
+      start_period: 15s
+      interval: 1m
+      timeout: 3s
+      retries: 5
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.arcane-rtr.entrypoints: websecure
+      traefik.http.routers.arcane-rtr.rule: Host(`arcane.$DOMAINNAME`)
+      ## Middlewares
+      traefik.http.routers.arcane-rtr.middlewares: chain-tinyauth-arcane@file # FIXME: Doesn't work currently
+      ## HTTP Services
+      traefik.http.routers.arcane-rtr.service: arcane-svc
+      traefik.http.services.arcane-svc.loadbalancer.server.port: "3552"
+      ####### TINYAUTH #######
+      tinyauth.apps.arcane.config.domain: arcane.$DOMAINNAME
+      tinyauth.apps.arcane.ip.bypass: $LOCAL_IPS
+      ####### HOMEPAGE #######
+      homepage.group: Core
+      homepage.name: arcane
+      homepage.icon: arcane.png
+      homepage.href: https://arcane.$DOMAINNAME
+      homepage.target: _blank
+      homepage.description: Modern Docker Management
+      ####### GLANCE #######
+      glance.name: arcane
+      glance.icon: sh:arcane
+      glance.url: https://arcane.$DOMAINNAME
+      glance.description: Modern Docker Management
