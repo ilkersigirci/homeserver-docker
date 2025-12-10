@@ -48,11 +48,11 @@ secrets:
 include:
   ########################### SERVICES
   #### CORE ####
+  - compose/arcane-agent.yml
   - compose/adguardhome.yml
   - compose/filebrowser.yml
   - compose/homepage.yml
   # - compose/glance.yml
-  - compose/komodo-periphery.yml
   - compose/socket-proxy.yml
   - compose/tinyauth.yml
   - compose/traefik.yml
@@ -62,7 +62,6 @@ include:
   #### MACHINE LEARNING ####
   ###### MAINTENANCE ####
   # - compose/code-server.yml
-  # - compose/docker-gc.yml
   # - compose/dozzle.yml
   - compose/healthchecks.yml
   - compose/syncthing.yml

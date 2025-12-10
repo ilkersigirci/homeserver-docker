@@ -54,7 +54,6 @@ include:
   - compose/filebrowser.yml
   - compose/homepage.yml
   # - compose/glance.yml
-  # - compose/komodo.yml
   - compose/pocket-id.yml
   - compose/socket-proxy.yml
   - compose/tinyauth.yml
@@ -72,7 +71,7 @@ include:
   ###### MAINTENANCE ####
   # - compose/code-server.yml
   # - compose/docker-gc.yml
-  - compose/dozzle.yml
+  # - compose/dozzle.yml
   - compose/forgejo.yml
   - compose/healthchecks.yml
   - compose/loggifly.yml

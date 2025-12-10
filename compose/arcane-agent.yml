@@ -1,0 +1,29 @@
+services:
+  arcane-agent:
+    image: ghcr.io/getarcaneapp/arcane-headless:latest
+    container_name: arcane-agent
+    restart: $BASE_RESTART_POLICY
+    profiles:
+      - core
+    networks:
+      - t3_proxy
+      - socket_proxy
+    ports:
+      - "3553:3553"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/arcane-agent:/app/data
+    environment:
+      AGENT_MODE: true
+      AGENT_BOOTSTRAP_TOKEN: $ARCANE_AGENT_BOOTSTRAP_TOKEN
+    labels:
+      ####### HOMEPAGE #######
+      homepage.group: Core
+      homepage.name: arcane-agent
+      homepage.icon: arcane.png
+      homepage.description: Modern Docker Management Remote Agent
+      ####### GLANCE #######
+      glance.name: arcane-agent
+      glance.icon: sh:arcane
+      glance.description: Modern Docker Management Remote Agent

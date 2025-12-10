@@ -49,14 +49,13 @@ secrets:
 include:
   ########################### SERVICES
   #### CORE ####
+  - compose/arcane-agent.yml
   - compose/adguardhome.yml
   - compose/crowdsec.yml
   - compose/copyparty.yml
   - compose/gotify.yml
   - compose/headscale.yml
   - compose/homepage.yml
-  # - compose/glance.yml
-  - compose/komodo-periphery.yml
   # - compose/pocket-id.yml
   - compose/socket-proxy.yml
   - compose/tinyauth.yml
@@ -69,7 +68,6 @@ include:
   - compose/bentopdf.yml
   # - compose/code-server.yml
   - compose/convertx.yml
-  # - compose/docker-gc.yml
   # - compose/dozzle.yml
   - compose/gatus.yml
   - compose/it-tools.yml
