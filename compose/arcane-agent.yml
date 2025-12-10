@@ -17,6 +17,7 @@ services:
     environment:
       AGENT_MODE: true
       AGENT_BOOTSTRAP_TOKEN: $ARCANE_AGENT_BOOTSTRAP_TOKEN
+      DOCKER_HOST: tcp://docker-socket-proxy:2375
     labels:
       ####### HOMEPAGE #######
       homepage.group: Core
