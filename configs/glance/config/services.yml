@@ -59,8 +59,8 @@
             height: 1000
 
           - type: iframe
-            title: DOZZLE
-            source: https://dozzle.gpu.${BASE_DOMAINNAME}
+            title: ARCANE
+            source: https://arcane.gpu.${BASE_DOMAINNAME}
             # source: http://dozzle:8080
             height: 1000
 
