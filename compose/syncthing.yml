@@ -1,6 +1,4 @@
-# NOTE: Disable Local, Global Announce, Relays and NATS in the Syncthing GUI
 # NOTE: 22000:22000/tcp port is probably needed for other devices to see this device.
-#  `remoteserver` needs this but somehow, homeserver does not. TEST IT
 services:
   syncthing:
     container_name: syncthing
