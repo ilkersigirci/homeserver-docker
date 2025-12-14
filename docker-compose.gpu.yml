@@ -86,7 +86,6 @@ include:
   - compose/bichon.yml
   # - compose/feishin.yml
   - compose/jellyfin.yml
-  - compose/jellysearch.yml
   - compose/jellyseerr.yml
   # - compose/openarchiver.yml
   - compose/pinchflat.yml
