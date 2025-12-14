@@ -15,8 +15,8 @@ services:
       - no-new-privileges:true
     volumes:
       - $DOCKERDIR/appdata/sabnzbd:/config
-      - $MEDIADIR/Downloads/sabnzbd/complete:/config/Downloads/complete
-      - $MEDIADIR/Downloads/sabnzbd/incomplete:/config/Downloads/incomplete
+      - $MEDIADIR/Downloads/complete:/config/Downloads/complete
+      - $MEDIADIR/Downloads/incomplete:/config/Downloads/incomplete
     environment:
       PUID: $PUID
       PGID: $PGID
