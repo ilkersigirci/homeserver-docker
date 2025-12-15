@@ -1,7 +1,7 @@
 services:
   # NOTE: Install in Jellyfin UI https://github.com/arnesacnussem/jellyfin-plugin-meilisearch
   jellyfin-meilisearch:
-    image: getmeili/meilisearch:v1.9
+    image: getmeili/meilisearch:latest
     container_name: jellyfin-meilisearch
     restart: $MEDIA_RESTART_POLICY
     profiles:
