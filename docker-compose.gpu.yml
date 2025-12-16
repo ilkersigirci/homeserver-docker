@@ -49,7 +49,6 @@ include:
   ########################### SERVICES
   #### CORE ####
   - compose/arcane.yml
-  - compose/crowdsec.yml
   # - compose/dufs.yml
   - compose/filebrowser.yml
   - compose/homepage.yml

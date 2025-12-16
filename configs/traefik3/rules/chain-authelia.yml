@@ -3,8 +3,8 @@ http:
     chain-authelia:
       chain:
         middlewares:
-          - middlewares-cf-real-ip
-          - middlewares-crowdsec-bouncer
+          # - middlewares-cf-real-ip
+          # - middlewares-crowdsec-bouncer
           - middlewares-rate-limit
           - middlewares-secure-headers
           - middlewares-authelia
@@ -12,8 +12,8 @@ http:
     chain-authelia-relaxed:
       chain:
         middlewares:
-          - middlewares-cf-real-ip
-          - middlewares-crowdsec-bouncer
+          # - middlewares-cf-real-ip
+          # - middlewares-crowdsec-bouncer
           - middlewares-rate-limit
           - middlewares-secure-headers-relaxed
           - middlewares-authelia

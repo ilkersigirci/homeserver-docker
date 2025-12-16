@@ -3,8 +3,8 @@ http:
     chain-tinyauth:
       chain:
         middlewares:
-          - middlewares-cf-real-ip
-          - middlewares-crowdsec-bouncer
+          # - middlewares-cf-real-ip
+          # - middlewares-crowdsec-bouncer
           - middlewares-rate-limit
           - middlewares-secure-headers
           - middlewares-tinyauth
@@ -12,8 +12,8 @@ http:
     chain-tinyauth-relaxed:
       chain:
         middlewares:
-          - middlewares-cf-real-ip
-          - middlewares-crowdsec-bouncer
+          # - middlewares-cf-real-ip
+          # - middlewares-crowdsec-bouncer
           - middlewares-rate-limit
           - middlewares-secure-headers-relaxed
           - middlewares-tinyauth
@@ -21,8 +21,8 @@ http:
     chain-tinyauth-original:
       chain:
         middlewares:
-          - middlewares-cf-real-ip
-          - middlewares-crowdsec-bouncer
+          # - middlewares-cf-real-ip
+          # - middlewares-crowdsec-bouncer
           - middlewares-rate-limit
           - middlewares-secure-headers-original
           - middlewares-tinyauth
@@ -30,8 +30,8 @@ http:
     chain-tinyauth-arcane:
       chain:
         middlewares:
-          - middlewares-cf-real-ip
-          - middlewares-crowdsec-bouncer
+          # - middlewares-cf-real-ip
+          # - middlewares-crowdsec-bouncer
           - middlewares-rate-limit
           - middlewares-secure-headers-arcane
           - middlewares-tinyauth

@@ -3,16 +3,16 @@ http:
     chain-silverbullet-no-auth:
       chain:
         middlewares:
-          - middlewares-cf-real-ip
-          - middlewares-crowdsec-bouncer
+          # - middlewares-cf-real-ip
+          # - middlewares-crowdsec-bouncer
           - middlewares-rate-limit
           - middlewares-silverbullet-headers
 
     chain-silverbullet-tinyauth:
       chain:
         middlewares:
-          - middlewares-cf-real-ip
-          - middlewares-crowdsec-bouncer
+          # - middlewares-cf-real-ip
+          # - middlewares-crowdsec-bouncer
           - middlewares-rate-limit
           - middlewares-silverbullet-headers
           - middlewares-tinyauth
