@@ -149,6 +149,11 @@ endpoints:
       - "[BODY] == 192.168.2.9"
       - "[DNS_RCODE] == NOERROR"
 
+  - name: Pocketid - home
+    <<: *http-default
+    group: Home
+    interval: 1h
+    url: "http://100.64.0.17:1000"
 
   ################# GPU #################
 
@@ -180,12 +185,6 @@ endpoints:
     group: GPU
     interval: 1h
     url: "https://photos.gpu.$DOMAINNAME"
-
-  - name: Pocketid-GPU
-    <<: *http-default
-    group: GPU
-    interval: 1h
-    url: "http://100.64.0.19:1000"
 
 ###################################################
 
