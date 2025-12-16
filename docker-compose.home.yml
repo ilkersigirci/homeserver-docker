@@ -38,6 +38,7 @@ include:
   - compose/adguardhome-host.yml
   - compose/glance.yml
   - compose/homepage.yml
+  - compose/pocket-id.yml
   - compose/socket-proxy.yml
   - compose/tinyauth.yml
   - compose/traefik.yml

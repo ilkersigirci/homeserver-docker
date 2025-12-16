@@ -70,7 +70,7 @@ http:
     pocket-id-svc:
       loadBalancer:
         servers:
-          - url: "http://100.64.0.19:1000"
+          - url: "http://100.64.0.17:1000"
         # healthCheck:
         #   path: "/healthz"
         #   interval: "30s"
