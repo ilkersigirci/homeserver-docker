@@ -13,7 +13,7 @@ services:
     # https://github.com/FerretDB/documentdb/pkgs/container/postgres-documentdb
     image: ghcr.io/ferretdb/postgres-documentdb:latest
     container_name: komodo-postgres
-    restart: $BASE_RESTART_POLICY
+    restart: $CORE_RESTART_POLICY
     profiles:
       - core
       - komodo
@@ -39,7 +39,7 @@ services:
     # https://github.com/FerretDB/FerretDB/pkgs/container/ferretdb
     image: ghcr.io/ferretdb/ferretdb:latest
     container_name: komodo-ferretdb
-    restart: $BASE_RESTART_POLICY
+    restart: $CORE_RESTART_POLICY
     profiles:
       - core
       - komodo
@@ -60,7 +60,7 @@ services:
   komodo-core:
     image: ghcr.io/moghtech/komodo-core:${COMPOSE_KOMODO_IMAGE_TAG:-latest}
     container_name: komodo-core
-    restart: $BASE_RESTART_POLICY
+    restart: $CORE_RESTART_POLICY
     profiles:
       - core
       - komodo
@@ -123,7 +123,7 @@ services:
   komodo-periphery-main:
     image: ghcr.io/moghtech/komodo-periphery:${COMPOSE_KOMODO_IMAGE_TAG:-latest}
     container_name: komodo-periphery-main
-    restart: $BASE_RESTART_POLICY
+    restart: $CORE_RESTART_POLICY
     # user: $PUID:$PGID # NOTE:Get permission denied error when using this
     profiles:
       - core

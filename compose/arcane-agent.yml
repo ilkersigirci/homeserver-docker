@@ -2,7 +2,7 @@ services:
   arcane-agent:
     image: ghcr.io/getarcaneapp/arcane-headless:latest
     container_name: arcane-agent
-    restart: $BASE_RESTART_POLICY
+    restart: $CORE_RESTART_POLICY
     profiles:
       - core
     networks:

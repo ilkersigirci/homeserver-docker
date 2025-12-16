@@ -6,7 +6,7 @@ services:
     image: ghcr.io/authelia/authelia:4.38.18
     depends_on:
       - traefik
-    restart: $BASE_RESTART_POLICY
+    restart: $CORE_RESTART_POLICY
     profiles:
       - core
     networks:

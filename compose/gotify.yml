@@ -3,7 +3,7 @@ services:
   gotify:
     image: ghcr.io/gotify/server:latest
     container_name: gotify
-    restart: $BASE_RESTART_POLICY
+    restart: $CORE_RESTART_POLICY
     profiles:
       - core
     networks:
