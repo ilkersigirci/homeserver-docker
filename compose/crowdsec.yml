@@ -19,9 +19,9 @@ services:
       - /var/log:/var/log:ro
       - $DOCKERDIR/logs/traefik:/logs/traefik:ro
     environment:
-        GID: $PGID
-        COLLECTIONS: "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/base-http-scenarios crowdsecurity/whitelist-good-actors crowdsecurity/iptables crowdsecurity/linux crowdsecurity/sshd"
-        CUSTOM_HOSTNAME: $MY_HOSTNAME
+      GID: $PGID
+      COLLECTIONS: "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/base-http-scenarios crowdsecurity/whitelist-good-actors crowdsecurity/iptables crowdsecurity/linux crowdsecurity/sshd"
+      CUSTOM_HOSTNAME: $MY_HOSTNAME
         # DISABLE_LOCAL_API: "true" # Only after successfully registering and validating remote agent below.
         # # For the following, check local_api_credentials.yaml after cscli lapi register (secondary machine) and cscli machine validate (on primary machine)
         # AGENT_USERNAME: $CROWDSEC_AGENT_USERNAME 
@@ -39,4 +39,4 @@ services:
       glance.icon: "sh:crowdsec"
       glance.description: "Open-source & collaborative security IPS"
       ######## KOMODO ########
-      komodo.skip: # Prevents from stopping with StopAllContainers on Komodo
+      komodo.skip: "" # Prevents from stopping with StopAllContainers on Komodo

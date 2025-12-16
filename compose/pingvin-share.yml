@@ -20,25 +20,25 @@ services:
     labels:
       traefik.enable: "true"
       ## HTTP Routers
-      traefik.http.routers.pingvin-share-rtr.entrypoints: websecure
-      traefik.http.routers.pingvin-share-rtr.rule: Host(`pingvin-share.$DOMAINNAME`)
+      traefik.http.routers.pingvin-share-rtr.entrypoints: "websecure"
+      traefik.http.routers.pingvin-share-rtr.rule: "Host(`pingvin-share.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.pingvin-share-rtr.middlewares: chain-no-auth@file
+      traefik.http.routers.pingvin-share-rtr.middlewares: "chain-no-auth@file"
       ## HTTP Services
-      traefik.http.routers.pingvin-share-rtr.service: pingvin-share-svc
+      traefik.http.routers.pingvin-share-rtr.service: "pingvin-share-svc"
       traefik.http.services.pingvin-share-svc.loadbalancer.server.port: "3000"
       ####### TINYAUTH #######
-      tinyauth.apps.pingvin-share.config.domain: pingvin-share.$DOMAINNAME
-      tinyauth.apps.pingvin-share.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.pingvin-share.config.domain: "pingvin-share.$DOMAINNAME"
+      tinyauth.apps.pingvin-share.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: Media
-      homepage.name: pingvin-share
-      homepage.icon: pingvin-share.png
-      homepage.href: https://pingvin-share.$DOMAINNAME
-      homepage.target: _blank
-      homepage.description: A self-hosted file sharing platform
+      homepage.group: "Media"
+      homepage.name: "pingvin-share"
+      homepage.icon: "pingvin-share.png"
+      homepage.href: "https://pingvin-share.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "A self-hosted file sharing platform"
       ####### GLANCE #######
-      glance.name: pingvin-share
-      glance.icon: sh:pingvin-share
-      glance.url: https://pingvin-share.$DOMAINNAME
-      glance.description: A self-hosted file sharing platform
+      glance.name: "pingvin-share"
+      glance.icon: "sh:pingvin-share"
+      glance.url: "https://pingvin-share.$DOMAINNAME"
+      glance.description: "A self-hosted file sharing platform"

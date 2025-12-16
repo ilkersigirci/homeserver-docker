@@ -19,25 +19,25 @@ services:
     labels:
       traefik.enable: "true"
       ## HTTP Routers
-      traefik.http.routers.metadata-remote-rtr.entrypoints: websecure
-      traefik.http.routers.metadata-remote-rtr.rule: Host(`music-metadata.$DOMAINNAME`)
+      traefik.http.routers.metadata-remote-rtr.entrypoints: "websecure"
+      traefik.http.routers.metadata-remote-rtr.rule: "Host(`music-metadata.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.metadata-remote-rtr.middlewares: chain-tinyauth@file
+      traefik.http.routers.metadata-remote-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      traefik.http.routers.metadata-remote-rtr.service: metadata-remote-svc
+      traefik.http.routers.metadata-remote-rtr.service: "metadata-remote-svc"
       traefik.http.services.metadata-remote-svc.loadbalancer.server.port: "8338"
       ####### TINYAUTH #######
-      tinyauth.apps.music-metadata.config.domain: music-metadata.$DOMAINNAME
-      tinyauth.apps.music-metadata.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.music-metadata.config.domain: "music-metadata.$DOMAINNAME"
+      tinyauth.apps.music-metadata.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: Media
-      homepage.name: metadata-remote
-      homepage.icon: metadata-remote.png
-      homepage.href: https://music-metadata.$DOMAINNAME
-      homepage.target: _blank
-      homepage.description:  Edit music metadata with ease
+      homepage.group: "Media"
+      homepage.name: "metadata-remote"
+      homepage.icon: "metadata-remote.png"
+      homepage.href: "https://music-metadata.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Edit music metadata with ease"
       ####### GLANCE #######
-      glance.name: metadata-remote
-      glance.icon: sh:metadata-remote
-      glance.url: https://music-metadata.$DOMAINNAME
-      glance.description: Edit music metadata with ease
+      glance.name: "metadata-remote"
+      glance.icon: "sh:metadata-remote"
+      glance.url: "https://music-metadata.$DOMAINNAME"
+      glance.description: "Edit music metadata with ease"

@@ -45,8 +45,8 @@ services:
       traefik.http.routers.palmr-rtr.service: "palmr-svc"
       traefik.http.services.palmr-svc.loadbalancer.server.port: "5487"
       ####### TINYAUTH #######
-      tinyauth.apps.palmr.config.domain: palmr.$DOMAINNAME
-      tinyauth.apps.palmr.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.palmr.config.domain: "palmr.$DOMAINNAME"
+      tinyauth.apps.palmr.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "palmr"

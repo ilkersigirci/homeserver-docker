@@ -27,8 +27,8 @@ services:
       traefik.http.routers.kavita-rtr.service: "kavita-svc"
       traefik.http.services.kavita-svc.loadbalancer.server.port: "5000"
       ####### TINYAUTH #######
-      tinyauth.apps.kavita.config.domain: kavita.$DOMAINNAME
-      tinyauth.apps.kavita.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.kavita.config.domain: "kavita.$DOMAINNAME"
+      tinyauth.apps.kavita.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "Kavita"

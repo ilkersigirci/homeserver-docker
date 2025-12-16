@@ -22,12 +22,12 @@ services:
       LOG_LEVEL: "INFO"
     labels:
       ####### HOMEPAGE #######
-      homepage.group: Maintenance
-      homepage.name: loggifly
-      homepage.icon: loggifly.png
-      homepage.target: _blank
-      homepage.description: Get Alerts from your Docker Container Logs
+      homepage.group: "Maintenance"
+      homepage.name: "loggifly"
+      homepage.icon: "loggifly.png"
+      homepage.target: "_blank"
+      homepage.description: "Get Alerts from your Docker Container Logs"
       ####### GLANCE #######
-      glance.name: loggifly
-      glance.icon: sh:loggifly
-      glance.description: Get Alerts from your Docker Container Logs
+      glance.name: "loggifly"
+      glance.icon: "sh:loggifly"
+      glance.description: "Get Alerts from your Docker Container Logs"

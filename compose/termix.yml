@@ -16,25 +16,25 @@ services:
     labels:
       traefik.enable: "true"
       ## HTTP Routers
-      traefik.http.routers.termix-rtr.entrypoints: websecure
-      traefik.http.routers.termix-rtr.rule: Host(`ssh.$DOMAINNAME`)
+      traefik.http.routers.termix-rtr.entrypoints: "websecure"
+      traefik.http.routers.termix-rtr.rule: "Host(`ssh.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.termix-rtr.middlewares: chain-tinyauth@file
+      traefik.http.routers.termix-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      traefik.http.routers.termix-rtr.service: termix-svc
+      traefik.http.routers.termix-rtr.service: "termix-svc"
       traefik.http.services.termix-svc.loadbalancer.server.port: "8080"
       ####### TINYAUTH #######
-      tinyauth.apps.ssh.config.domain: ssh.$DOMAINNAME
-      tinyauth.apps.ssh.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.ssh.config.domain: "ssh.$DOMAINNAME"
+      tinyauth.apps.ssh.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: Maintenance
-      homepage.name: termix
-      homepage.icon: termix.png
-      homepage.href: https://ssh.$DOMAINNAME
-      homepage.target: _blank
-      homepage.description: A web-based server management platform with SSH terminal, tunneling, and file editing capabilities.
+      homepage.group: "Maintenance"
+      homepage.name: "termix"
+      homepage.icon: "termix.png"
+      homepage.href: "https://ssh.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "A web-based server management platform with SSH terminal, tunneling, and file editing capabilities."
       ####### GLANCE #######
-      glance.name: termix
-      glance.icon: sh:termix
-      glance.url: https://ssh.$DOMAINNAME
-      glance.description: A web-based server management platform with SSH terminal, tunneling, and file editing capabilities.
+      glance.name: "termix"
+      glance.icon: "sh:termix"
+      glance.url: "https://ssh.$DOMAINNAME"
+      glance.description: "A web-based server management platform with SSH terminal, tunneling, and file editing capabilities."

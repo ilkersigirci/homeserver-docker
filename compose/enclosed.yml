@@ -18,8 +18,8 @@ services:
       traefik.http.routers.enclosed.service: "logseq-svc"
       traefik.http.services.logseq-svc.loadbalancer.server.port: "8787"
       ####### TINYAUTH #######
-      tinyauth.apps.enclosed.config.domain: enclosed.$DOMAINNAME
-      tinyauth.apps.enclosed.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.enclosed.config.domain: "enclosed.$DOMAINNAME"
+      tinyauth.apps.enclosed.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Others"
       homepage.name: "Enclosed"

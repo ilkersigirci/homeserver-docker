@@ -29,8 +29,8 @@ services:
       wgd_port: 51821
     labels:
       ####### TINYAUTH #######
-      tinyauth.apps.wgdashboard.config.domain: wireguard.$DOMAINNAME
-      tinyauth.apps.wgdashboard.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.wgdashboard.config.domain: "wireguard.$DOMAINNAME"
+      tinyauth.apps.wgdashboard.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "Wg-Dashboard"
@@ -39,4 +39,4 @@ services:
       homepage.target: "_blank"
       homepage.description: "Simple dashboard for WireGuard VPN written in Python & Vue.js"
       ###### KOMODO ########
-      komodo.skip: # Prevents from stopping with StopAllContainers on Komodo
+      komodo.skip: "" # Prevents from stopping with StopAllContainers on Komodo

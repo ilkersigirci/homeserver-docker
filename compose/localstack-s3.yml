@@ -29,8 +29,8 @@ services:
       traefik.http.routers.localstack-s3-rtr.service: "localstack-s3-svc"
       traefik.http.services.localstack-s3-svc.loadbalancer.server.port: "4566"
       ####### TINYAUTH #######
-      tinyauth.apps.s3.config.domain: s3.$DOMAINNAME
-      tinyauth.apps.s3.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.s3.config.domain: "s3.$DOMAINNAME"
+      tinyauth.apps.s3.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "S3"

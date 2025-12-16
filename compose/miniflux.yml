@@ -50,5 +50,5 @@ services:
       traefik.http.routers.miniflux-rtr.service: "miniflux-svc"
       traefik.http.services.miniflux-svc.loadbalancer.server.port: "8080"
       ####### TINYAUTH #######
-      tinyauth.apps.miniflux.config.domain: miniflux.$DOMAINNAME
-      tinyauth.apps.miniflux.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.miniflux.config.domain: "miniflux.$DOMAINNAME"
+      tinyauth.apps.miniflux.ip.bypass: "$LOCAL_IPS"

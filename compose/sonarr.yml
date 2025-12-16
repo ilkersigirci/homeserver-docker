@@ -43,8 +43,8 @@ services:
       traefik.http.routers.sonarr-rtr-bypass.service: "sonarr-svc"
       traefik.http.services.sonarr-svc.loadbalancer.server.port: "8989"
       ####### TINYAUTH #######
-      tinyauth.apps.sonarr.config.domain: sonarr.$DOMAINNAME
-      tinyauth.apps.sonarr.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.sonarr.config.domain: "sonarr.$DOMAINNAME"
+      tinyauth.apps.sonarr.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "Sonarr"

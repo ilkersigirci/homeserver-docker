@@ -47,15 +47,15 @@ services:
       traefik.http.routers.homeserver-api-rabbitmq-rtr.service: "homeserver-api-rabbitmq-svc"
       traefik.http.services.homeserver-api-rabbitmq-svc.loadbalancer.server.port: "15672"
       ####### TINYAUTH #######
-      tinyauth.apps.api-rabbitmq.config.domain: api-rabbitmq.$DOMAINNAME
-      tinyauth.apps.api-rabbitmq.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.api-rabbitmq.config.domain: "api-rabbitmq.$DOMAINNAME"
+      tinyauth.apps.api-rabbitmq.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: Others
-      homepage.name: homeserver-api-rabbitmq
-      homepage.icon: rabbitmq.png
-      homepage.href: https://api-rabbitmq.$DOMAINNAME
-      homepage.target: _blank
-      homepage.description: Homeserver API RabbitMQ
+      homepage.group: "Others"
+      homepage.name: "homeserver-api-rabbitmq"
+      homepage.icon: "rabbitmq.png"
+      homepage.href: "https://api-rabbitmq.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Homeserver API RabbitMQ"
 
   homeserver-api-head:
     image: homeserver-api:latest
@@ -103,12 +103,12 @@ services:
       traefik.http.routers.homeserver-api-head-rtr.service: "homeserver-api-head-svc"
       traefik.http.services.homeserver-api-head-svc.loadbalancer.server.port: "8000"
       ####### HOMEPAGE #######
-      homepage.group: Others
-      homepage.name: homeserver-api-head
-      homepage.icon: homeserver-api.png
-      homepage.href: https://api.$DOMAINNAME
-      homepage.target: _blank
-      homepage.description: Homeserver API Head
+      homepage.group: "Others"
+      homepage.name: "homeserver-api-head"
+      homepage.icon: "homeserver-api.png"
+      homepage.href: "https://api.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Homeserver API Head"
 
   homeserver-api-worker:
     image: homeserver-api:latest
@@ -156,8 +156,8 @@ services:
       - REDIS_PASSWORD=$HOMESERVER_API_REDIS_PASSWORD
     labels:
       ####### HOMEPAGE #######
-      homepage.group: Others
-      homepage.name: homeserver-api-worker
-      homepage.icon: homeserver-api.png
-      homepage.target: _blank
-      homepage.description: Homeserver API Worker
+      homepage.group: "Others"
+      homepage.name: "homeserver-api-worker"
+      homepage.icon: "homeserver-api.png"
+      homepage.target: "_blank"
+      homepage.description: "Homeserver API Worker"

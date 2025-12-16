@@ -46,18 +46,18 @@ services:
     labels:
       traefik.enable: "true"
       ####### TINYAUTH #######
-      tinyauth.apps.traefik-log.config.domain: traefik-log.$DOMAINNAME
-      tinyauth.apps.traefik-log.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.traefik-log.config.domain: "traefik-log.$DOMAINNAME"
+      tinyauth.apps.traefik-log.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: Core
-      homepage.name: traefik-log-dashboard-backend
-      homepage.icon: traefik-log-dashboard-backend.png
-      homepage.target: _blank
-      homepage.description: A real-time dashboard for analyzing Traefik logs - Backend
+      homepage.group: "Core"
+      homepage.name: "traefik-log-dashboard-backend"
+      homepage.icon: "traefik-log-dashboard-backend.png"
+      homepage.target: "_blank"
+      homepage.description: "A real-time dashboard for analyzing Traefik logs - Backend"
       ####### GLANCE #######
-      glance.name: traefik-log-dashboard-backend
-      glance.icon: sh:traefik-log-dashboard-backend
-      glance.description: A real-time dashboard for analyzing Traefik logs - Backend
+      glance.name: "traefik-log-dashboard-backend"
+      glance.icon: "sh:traefik-log-dashboard-backend"
+      glance.description: "A real-time dashboard for analyzing Traefik logs - Backend"
 
 
   traefik-log-dashboard-frontend:
@@ -92,25 +92,25 @@ services:
     labels:
       traefik.enable: "true"
       ## HTTP Routers
-      traefik.http.routers.traefik-log-dashboard-frontend-rtr.entrypoints: websecure
-      traefik.http.routers.traefik-log-dashboard-frontend-rtr.rule: Host(`traefik-log.$DOMAINNAME`)
+      traefik.http.routers.traefik-log-dashboard-frontend-rtr.entrypoints: "websecure"
+      traefik.http.routers.traefik-log-dashboard-frontend-rtr.rule: "Host(`traefik-log.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.traefik-log-dashboard-frontend-rtr.middlewares: chain-tinyauth-relaxed@file # NOTE: For geo distribution map loading
+      traefik.http.routers.traefik-log-dashboard-frontend-rtr.middlewares: "chain-tinyauth-relaxed@file" # NOTE: For geo distribution map loading
       ## HTTP Services
-      traefik.http.routers.traefik-log-dashboard-frontend-rtr.service: traefik-log-dashboard-frontend-svc
+      traefik.http.routers.traefik-log-dashboard-frontend-rtr.service: "traefik-log-dashboard-frontend-svc"
       traefik.http.services.traefik-log-dashboard-frontend-svc.loadbalancer.server.port: "80"
       ####### HOMEPAGE #######
-      homepage.group: Core
-      homepage.name: traefik-log-dashboard-frontend
-      homepage.icon: traefik-log-dashboard-frontend.png
-      homepage.href: https://traefik-log.$DOMAINNAME
-      homepage.target: _blank
-      homepage.description: A real-time dashboard for analyzing Traefik logs
+      homepage.group: "Core"
+      homepage.name: "traefik-log-dashboard-frontend"
+      homepage.icon: "traefik-log-dashboard-frontend.png"
+      homepage.href: "https://traefik-log.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "A real-time dashboard for analyzing Traefik logs"
       ####### GLANCE #######
-      glance.name: traefik-log-dashboard-frontend
-      glance.icon: sh:traefik-log-dashboard-frontend
-      glance.url: https://traefik-log.$DOMAINNAME
-      glance.description: A real-time dashboard for analyzing Traefik logs
+      glance.name: "traefik-log-dashboard-frontend"
+      glance.icon: "sh:traefik-log-dashboard-frontend"
+      glance.url: "https://traefik-log.$DOMAINNAME"
+      glance.description: "A real-time dashboard for analyzing Traefik logs"
 
 
   # MaxMind GeoLite2 database updater

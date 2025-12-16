@@ -12,25 +12,25 @@ services:
     labels:
       traefik.enable: "true"
       ## HTTP Routers
-      traefik.http.routers.omni-tools-rtr.entrypoints: websecure
-      traefik.http.routers.omni-tools-rtr.rule: Host(`omni-tools.$DOMAINNAME`)
+      traefik.http.routers.omni-tools-rtr.entrypoints: "websecure"
+      traefik.http.routers.omni-tools-rtr.rule: "Host(`omni-tools.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.omni-tools-rtr.middlewares: chain-tinyauth-relaxed@file
+      traefik.http.routers.omni-tools-rtr.middlewares: "chain-tinyauth-relaxed@file"
       ## HTTP Services
-      traefik.http.routers.omni-tools-rtr.service: omni-tools-svc
+      traefik.http.routers.omni-tools-rtr.service: "omni-tools-svc"
       traefik.http.services.omni-tools-svc.loadbalancer.server.port: "80"
       ####### TINYAUTH #######
-      tinyauth.apps.omni-tools.config.domain: omni-tools.$DOMAINNAME
-      tinyauth.apps.omni-tools.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.omni-tools.config.domain: "omni-tools.$DOMAINNAME"
+      tinyauth.apps.omni-tools.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: Maintenance
-      homepage.name: omni-tools
-      homepage.icon: omni-tools.png
-      homepage.href: https://omni-tools.$DOMAINNAME
-      homepage.target: _blank
-      homepage.description: Web-based tools for everyday tasks
+      homepage.group: "Maintenance"
+      homepage.name: "omni-tools"
+      homepage.icon: "omni-tools.png"
+      homepage.href: "https://omni-tools.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Web-based tools for everyday tasks"
       ####### GLANCE #######
-      glance.name: omni-tools
-      glance.icon: sh:omni-tools
-      glance.url: https://omni-tools.$DOMAINNAME
-      glance.description: Web-based tools for everyday tasks
+      glance.name: "omni-tools"
+      glance.icon: "sh:omni-tools"
+      glance.url: "https://omni-tools.$DOMAINNAME"
+      glance.description: "Web-based tools for everyday tasks"

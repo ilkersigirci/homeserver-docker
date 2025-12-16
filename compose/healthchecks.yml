@@ -35,8 +35,8 @@ services:
       traefik.http.routers.healthchecks-rtr.service: "healthchecks-svc"
       traefik.http.services.healthchecks-svc.loadbalancer.server.port: "8000"
       ####### TINYAUTH #######
-      tinyauth.apps.healthchecks.config.domain: healthchecks.$DOMAINNAME
-      tinyauth.apps.healthchecks.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.healthchecks.config.domain: "healthchecks.$DOMAINNAME"
+      tinyauth.apps.healthchecks.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "Healthchecks"

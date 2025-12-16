@@ -49,8 +49,8 @@ services:
       traefik.http.routers.open-webui-rtr.service: "open-webui-svc"
       traefik.http.services.open-webui-svc.loadbalancer.server.port: "8080"
       ####### TINYAUTH #######
-      tinyauth.apps.open-webui.config.domain: chat.$DOMAINNAME
-      tinyauth.apps.open-webui.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.open-webui.config.domain: "chat.$DOMAINNAME"
+      tinyauth.apps.open-webui.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "ML"
       homepage.name: "Open WebUI"
@@ -97,8 +97,8 @@ services:
       traefik.http.routers.open-webui-betus-rtr.service: "open-webui-betus-svc"
       traefik.http.services.open-webui-betus-svc.loadbalancer.server.port: "8080"
       ####### TINYAUTH #######
-      tinyauth.apps.open-webui-betus.config.domain: betuschat.$DOMAINNAME
-      tinyauth.apps.open-webui-betus.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.open-webui-betus.config.domain: "betuschat.$DOMAINNAME"
+      tinyauth.apps.open-webui-betus.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "ML"
       homepage.name: "Open WebUI"

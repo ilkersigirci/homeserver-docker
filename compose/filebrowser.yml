@@ -35,8 +35,8 @@ services:
       traefik.http.routers.filebrowser-rtr.service: "filebrowser-svc"
       traefik.http.services.filebrowser-svc.loadbalancer.server.port: "80"
       ####### TINYAUTH #######
-      tinyauth.apps.filebrowser.config.domain: filebrowser.$DOMAINNAME
-      tinyauth.apps.filebrowser.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.filebrowser.config.domain: "filebrowser.$DOMAINNAME"
+      tinyauth.apps.filebrowser.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "FileBrowser"

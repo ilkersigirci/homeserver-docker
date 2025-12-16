@@ -32,8 +32,8 @@ services:
       traefik.http.routers.dozzle-rtr.service: "dozzle-svc"
       traefik.http.services.dozzle-svc.loadbalancer.server.port: "8080"
       ####### TINYAUTH #######
-      tinyauth.apps.dozzle.config.domain: dozzle.$DOMAINNAME
-      tinyauth.apps.dozzle.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.dozzle.config.domain: "dozzle.$DOMAINNAME"
+      tinyauth.apps.dozzle.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "Dozzle"

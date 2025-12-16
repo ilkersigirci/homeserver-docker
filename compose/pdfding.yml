@@ -37,16 +37,16 @@ services:
       HOST_NAME: pdfding.$DOMAINNAME
       LOG_LEVEL: INFO
       DATABASE_TYPE: SQLITE
-      ACCOUNT_EMAIL_VERIFICATION: FALSE
-      DISABLE_USER_SIGNUP: FALSE
-      BACKUP_ENABLE: FALSE
+      ACCOUNT_EMAIL_VERIFICATION: false
+      DISABLE_USER_SIGNUP: false
+      BACKUP_ENABLE: false
       ## For Postgres
       # - DATABASE_TYPE=POSTGRES
       # - POSTGRES_PASSWORD=pdfding
       # - POSTGRES_HOST=pdfding-db
       ## For OIDC
-      OIDC_ENABLE: TRUE
-      OIDC_ONLY: TRUE
+      OIDC_ENABLE: true
+      OIDC_ONLY: true
       OIDC_PROVIDER_NAME: Authelia
       OIDC_CLIENT_ID: pdfding
       OIDC_CLIENT_SECRET: $OIDC_PDFDING_CLIENT_SECRET
@@ -62,8 +62,8 @@ services:
       traefik.http.routers.pdfding-rtr.service: "pdfding-svc"
       traefik.http.services.pdfding-svc.loadbalancer.server.port: "8000"
       ####### TINYAUTH #######
-      tinyauth.apps.pdfding.config.domain: pdfding.$DOMAINNAME
-      tinyauth.apps.pdfding.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.pdfding.config.domain: "pdfding.$DOMAINNAME"
+      tinyauth.apps.pdfding.ip.bypass: "$LOCAL_IPS"
       ### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "pdfding"

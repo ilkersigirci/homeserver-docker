@@ -21,15 +21,7 @@ services:
       CLICKHOUSE_USER: ${RYBBIT_CLICKHOUSE_USER:-default}
       CLICKHOUSE_PASSWORD: ${RYBBIT_CLICKHOUSE_PASSWORD:-frog}
     healthcheck:
-      test:
-        [
-          "CMD",
-          "wget",
-          "--no-verbose",
-          "--tries=1",
-          "--spider",
-          "http://localhost:8123/ping",
-        ]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8123/ping"]
       interval: 3s
       timeout: 5s
       retries: 5
@@ -106,8 +98,8 @@ services:
       traefik.http.routers.rybbit-api-rtr.priority: "2"
       traefik.http.services.rybbit-api-svc.loadbalancer.server.port: "3001"
       ####### TINYAUTH #######
-      tinyauth.apps.rybbit-backend.config.domain: analytics.$DOMAINNAME
-      tinyauth.apps.rybbit-backend.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.rybbit-backend.config.domain: "analytics.$DOMAINNAME"
+      tinyauth.apps.rybbit-backend.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Monitoring"
       homepage.name: "rybbit-api"
@@ -149,8 +141,8 @@ services:
       traefik.http.routers.rybbit-rtr.priority: "1"
       traefik.http.services.rybbit-svc.loadbalancer.server.port: "3002"
       ####### TINYAUTH #######
-      tinyauth.apps.rybbit-client.config.domain: analytics.$DOMAINNAME
-      tinyauth.apps.rybbit-client.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.rybbit-client.config.domain: "analytics.$DOMAINNAME"
+      tinyauth.apps.rybbit-client.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Monitoring"
       homepage.name: "rybbit"

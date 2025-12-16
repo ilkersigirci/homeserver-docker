@@ -1,48 +1,48 @@
 services:
   rsshub-browserless:
-      image: browserless/chrome
-      container_name: rsshub-browserless
-      restart: $OTHERS_RESTART_POLICY
-      profiles:
-        - reading
-        - rsshub
-      networks:
-        - t3_proxy
-      ulimits:
-          core:
-              hard: 0
-              soft: 0
-      healthcheck:
-          test: ["CMD", "curl", "-f", "http://localhost:3000/pressure"]
-          interval: 1m
-          timeout: 10s
-          retries: 3
-      labels:
+    image: browserless/chrome
+    container_name: rsshub-browserless
+    restart: $OTHERS_RESTART_POLICY
+    profiles:
+      - reading
+      - rsshub
+    networks:
+      - t3_proxy
+    ulimits:
+      core:
+        hard: 0
+        soft: 0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/pressure"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
+    labels:
         ####### GLANCE #######
-        glance.name: "rsshub-browserless"
-        glance.parent: "rsshub"
+      glance.name: "rsshub-browserless"
+      glance.parent: "rsshub"
 
   rsshub-redis:
-      image: redis:alpine
-      container_name: rsshub-redis
-      restart: $OTHERS_RESTART_POLICY
-      profiles:
-        - reading
-        - rsshub
-      networks:
-        - t3_proxy
-      volumes:
-          - $DOCKERDIR/appdata/rsshub-redis:/data
-      healthcheck:
-          test: ["CMD", "redis-cli", "ping"]
-          interval: 1m
-          timeout: 10s
-          retries: 5
-          start_period: 5s
-      labels:
+    image: redis:alpine
+    container_name: rsshub-redis
+    restart: $OTHERS_RESTART_POLICY
+    profiles:
+      - reading
+      - rsshub
+    networks:
+      - t3_proxy
+    volumes:
+      - $DOCKERDIR/appdata/rsshub-redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1m
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+    labels:
         ####### GLANCE #######
-        glance.name: "rsshub-redis"
-        glance.parent: "rsshub"
+      glance.name: "rsshub-redis"
+      glance.parent: "rsshub"
 
   rsshub:
     image: ghcr.io/diygod/rsshub:latest
@@ -56,8 +56,8 @@ services:
     security_opt:
       - no-new-privileges:true
     depends_on:
-        - rsshub-redis
-        - rsshub-browserless
+      - rsshub-redis
+      - rsshub-browserless
     environment:
       NODE_ENV: production
       CACHE_TYPE: redis
@@ -67,10 +67,10 @@ services:
       # TWITTER_USERNAME: $TWITTER_USERNAME
       # TWITTER_PASSWORD: $TWITTER_PASSWORD
     healthcheck:
-          test: ["CMD", "curl", "-f", "http://localhost:1200/healthz"]
-          interval: 1m
-          timeout: 10s
-          retries: 3
+      test: ["CMD", "curl", "-f", "http://localhost:1200/healthz"]
+      interval: 1m
+      timeout: 10s
+      retries: 3
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -82,8 +82,8 @@ services:
       traefik.http.routers.rsshub-rtr.service: "rsshub-svc"
       traefik.http.services.rsshub-svc.loadbalancer.server.port: "1200"
       ####### TINYAUTH #######
-      tinyauth.apps.rsshub.config.domain: rsshub.$DOMAINNAME
-      tinyauth.apps.rsshub.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.rsshub.config.domain: "rsshub.$DOMAINNAME"
+      tinyauth.apps.rsshub.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "rsshub"

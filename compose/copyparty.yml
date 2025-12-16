@@ -29,25 +29,25 @@ services:
     labels:
       traefik.enable: "true"
       ## HTTP Routers
-      traefik.http.routers.copyparty-rtr.entrypoints: websecure
-      traefik.http.routers.copyparty-rtr.rule: Host(`copyparty.$DOMAINNAME`)
+      traefik.http.routers.copyparty-rtr.entrypoints: "websecure"
+      traefik.http.routers.copyparty-rtr.rule: "Host(`copyparty.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.copyparty-rtr.middlewares: chain-tinyauth@file
+      traefik.http.routers.copyparty-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      traefik.http.routers.copyparty-rtr.service: copyparty-svc
+      traefik.http.routers.copyparty-rtr.service: "copyparty-svc"
       traefik.http.services.copyparty-svc.loadbalancer.server.port: "8000"
       ####### TINYAUTH #######
-      tinyauth.apps.copyparty.config.domain: copyparty.$DOMAINNAME
-      tinyauth.apps.copyparty.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.copyparty.config.domain: "copyparty.$DOMAINNAME"
+      tinyauth.apps.copyparty.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: Core
-      homepage.name: copyparty
-      homepage.icon: copyparty.png
-      homepage.href: https://copyparty.$DOMAINNAME
-      homepage.target: _blank
-      homepage.description: Portable file server with accelerated resumable uploads, dedup, WebDAV, FTP, TFTP, zeroconf, media indexer
+      homepage.group: "Core"
+      homepage.name: "copyparty"
+      homepage.icon: "copyparty.png"
+      homepage.href: "https://copyparty.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Portable file server with accelerated resumable uploads, dedup, WebDAV, FTP, TFTP, zeroconf, media indexer"
       ####### GLANCE #######
-      glance.name: copyparty
-      glance.icon: sh:copyparty
-      glance.url: https://copyparty.$DOMAINNAME
-      glance.description: Portable file server with accelerated resumable uploads, dedup, WebDAV, FTP, TFTP, zeroconf, media indexer
+      glance.name: "copyparty"
+      glance.icon: "sh:copyparty"
+      glance.url: "https://copyparty.$DOMAINNAME"
+      glance.description: "Portable file server with accelerated resumable uploads, dedup, WebDAV, FTP, TFTP, zeroconf, media indexer"

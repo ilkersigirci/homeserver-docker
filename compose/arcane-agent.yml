@@ -20,11 +20,11 @@ services:
       DOCKER_HOST: tcp://docker-socket-proxy:2375
     labels:
       ####### HOMEPAGE #######
-      homepage.group: Core
-      homepage.name: arcane-agent
-      homepage.icon: arcane.png
-      homepage.description: Modern Docker Management Remote Agent
+      homepage.group: "Core"
+      homepage.name: "arcane-agent"
+      homepage.icon: "arcane.png"
+      homepage.description: "Modern Docker Management Remote Agent"
       ####### GLANCE #######
-      glance.name: arcane-agent
-      glance.icon: sh:arcane
-      glance.description: Modern Docker Management Remote Agent
+      glance.name: "arcane-agent"
+      glance.icon: "sh:arcane"
+      glance.description: "Modern Docker Management Remote Agent"

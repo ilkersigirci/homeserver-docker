@@ -50,8 +50,8 @@ services:
       retries: 3
     labels:
       ####### TINYAUTH #######
-      tinyauth.apps.wg-easy-14.config.domain: wireguard.$DOMAINNAME
-      tinyauth.apps.wg-easy-14.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.wg-easy-14.config.domain: "wireguard.$DOMAINNAME"
+      tinyauth.apps.wg-easy-14.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "Wg-Easy"
@@ -66,7 +66,7 @@ services:
       homepage.widget.password: "DUMMY"
       homepage.widget.threshold: "2"
       ######## KOMODO ########
-      komodo.skip: # Prevents from stopping with StopAllContainers on Komodo
+      komodo.skip: "" # Prevents from stopping with StopAllContainers on Komodo
 
 
   # To get WG_DEVICE, run this inside the container: ip route get 8.8.8.8 | awk '{print $5}'. Default is eth0.
@@ -116,8 +116,8 @@ services:
       traefik.http.routers.wg-easy-14-no-host-rtr.service: "wg-easy-14-no-host-svc"
       traefik.http.services.wg-easy-14-no-host-svc.loadbalancer.server.port: "51821"
       ####### TINYAUTH #######
-      tinyauth.apps.wg-easy-14-no-host.config.domain: wireguard.$DOMAINNAME
-      tinyauth.apps.wg-easy-14-no-host.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.wg-easy-14-no-host.config.domain: "wireguard.$DOMAINNAME"
+      tinyauth.apps.wg-easy-14-no-host.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "Wireguard"
@@ -126,7 +126,7 @@ services:
       homepage.target: "_blank"
       homepage.description: "The easiest way to run WireGuard VPN and UI"
       ###### KOMODO ########
-      komodo.skip: # Prevents from stopping with StopAllContainers on Komodo
+      komodo.skip: "" # Prevents from stopping with StopAllContainers on Komodo
 
   wg-easy:
     image: ghcr.io/wg-easy/wg-easy:development
@@ -172,8 +172,8 @@ services:
       # - "traefik.udp.routers.wg-easy-rtr.service-wg-easy-svc"
       # - "traefik.udp.services.wg-easy-svc.loadbalancer.server.port=51820"
       ####### TINYAUTH #######
-      tinyauth.apps.wg-easy.config.domain: wireguard.$DOMAINNAME
-      tinyauth.apps.wg-easy.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.wg-easy.config.domain: "wireguard.$DOMAINNAME"
+      tinyauth.apps.wg-easy.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "Wireguard"
@@ -182,4 +182,4 @@ services:
       homepage.target: "_blank"
       homepage.description: "The easiest way to run WireGuard VPN and UI"
       ###### KOMODO ########
-      komodo.skip: # Prevents from stopping with StopAllContainers on Komodo
+      komodo.skip: "" # Prevents from stopping with StopAllContainers on Komodo

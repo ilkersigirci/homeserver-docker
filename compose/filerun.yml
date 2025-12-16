@@ -28,7 +28,7 @@ services:
 
   filerun:
     image: filerun/filerun
-    container_name: filerun 
+    container_name: filerun
     profiles:
       - core
     networks:
@@ -65,8 +65,8 @@ services:
       traefik.http.routers.filerun-rtr.service: "filerun-svc"
       traefik.http.services.filerun-svc.loadbalancer.server.port: "80"
       ####### TINYAUTH #######
-      tinyauth.apps.filerun.config.domain: filerun.$DOMAINNAME
-      tinyauth.apps.filerun.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.filerun.config.domain: "filerun.$DOMAINNAME"
+      tinyauth.apps.filerun.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "Filerun"

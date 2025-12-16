@@ -46,17 +46,17 @@ services:
       TZ: $TZ
     labels:
       ####### HOMEPAGE #######
-      homepage.group: Maintenance
-      homepage.name: home-assistant
-      homepage.icon: home-assistant.png
-      homepage.href: https://smarthome.$DOMAINNAME
-      homepage.target: _blank
-      homepage.description: Home automation
+      homepage.group: "Maintenance"
+      homepage.name: "home-assistant"
+      homepage.icon: "home-assistant.png"
+      homepage.href: "https://smarthome.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Home automation"
       ####### GLANCE #######
-      glance.name: home-assistant
-      glance.icon: sh:home-assistant
-      glance.url: https://smarthome.$DOMAINNAME
-      glance.description: Home automation
+      glance.name: "home-assistant"
+      glance.icon: "sh:home-assistant"
+      glance.url: "https://smarthome.$DOMAINNAME"
+      glance.description: "Home automation"
 
   home-assistant-proxied:
     image: ghcr.io/home-assistant/home-assistant:stable
@@ -80,25 +80,25 @@ services:
     labels:
       traefik.enable: "true"
       ## HTTP Routers
-      traefik.http.routers.home-assistant-rtr.entrypoints: websecure
-      traefik.http.routers.home-assistant-rtr.rule: Host(`smarthome.$DOMAINNAME`)
+      traefik.http.routers.home-assistant-rtr.entrypoints: "websecure"
+      traefik.http.routers.home-assistant-rtr.rule: "Host(`smarthome.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.home-assistant-rtr.middlewares: chain-tinyauth-relaxed@file
+      traefik.http.routers.home-assistant-rtr.middlewares: "chain-tinyauth-relaxed@file"
       ## HTTP Services
-      traefik.http.routers.home-assistant-rtr.service: home-assistant-svc
+      traefik.http.routers.home-assistant-rtr.service: "home-assistant-svc"
       traefik.http.services.home-assistant-svc.loadbalancer.server.port: "8123"
       ####### TINYAUTH #######
-      tinyauth.apps.home-assistant.config.domain: smarthome.$DOMAINNAME
-      tinyauth.apps.home-assistant.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.home-assistant.config.domain: "smarthome.$DOMAINNAME"
+      tinyauth.apps.home-assistant.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: Maintenance
-      homepage.name: home-assistant
-      homepage.icon: home-assistant.png
-      homepage.href: https://smarthome.$DOMAINNAME
-      homepage.target: _blank
-      homepage.description: Home automation
+      homepage.group: "Maintenance"
+      homepage.name: "home-assistant"
+      homepage.icon: "home-assistant.png"
+      homepage.href: "https://smarthome.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Home automation"
       ####### GLANCE #######
-      glance.name: home-assistant
-      glance.icon: sh:home-assistant
-      glance.url: https://smarthome.$DOMAINNAME
-      glance.description: Home automation
+      glance.name: "home-assistant"
+      glance.icon: "sh:home-assistant"
+      glance.url: "https://smarthome.$DOMAINNAME"
+      glance.description: "Home automation"

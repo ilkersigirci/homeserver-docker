@@ -101,19 +101,19 @@ services:
       traefik.http.routers.langfuse-web-rtr.service: "langfuse-web-svc"
       traefik.http.services.langfuse-web-svc.loadbalancer.server.port: "3000"
       ####### TINYAUTH #######
-      tinyauth.apps.langfuse.config.domain: langfuse.$DOMAINNAME
-      tinyauth.apps.langfuse.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.langfuse.config.domain: "langfuse.$DOMAINNAME"
+      tinyauth.apps.langfuse.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: ML
-      homepage.name: langfuse
-      homepage.icon: langfuse.svg
-      homepage.href: https://langfuse.$DOMAINNAME
-      homepage.target: _blank
+      homepage.group: "ML"
+      homepage.name: "langfuse"
+      homepage.icon: "langfuse.svg"
+      homepage.href: "https://langfuse.$DOMAINNAME"
+      homepage.target: "_blank"
       homepage.description: "LLM engineering platform: LLM Observability, metrics, evals, prompt management, playground, datasets"
       ####### GLANCE #######
-      glance.name: langfuse
-      glance.icon: sh:langfuse
-      glance.url: https://langfuse.$DOMAINNAME
+      glance.name: "langfuse"
+      glance.icon: "sh:langfuse"
+      glance.url: "https://langfuse.$DOMAINNAME"
       glance.description: "LLM engineering platform: LLM Observability, metrics, evals, prompt management, playground, datasets"
 
   # NOTE: Create related dirs

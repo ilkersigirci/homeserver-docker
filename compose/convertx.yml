@@ -1,5 +1,5 @@
 services:
-  convertx: 
+  convertx:
     image: ghcr.io/c4illin/convertx
     container_name: convertx
     restart: $MAINTENANCE_RESTART_POLICY
@@ -27,8 +27,8 @@ services:
       traefik.http.routers.convertx-rtr.service: "convertx-svc"
       traefik.http.services.convertx-svc.loadbalancer.server.port: "3000"
       ####### TINYAUTH #######
-      tinyauth.apps.convertx.config.domain: convertx.$DOMAINNAME
-      tinyauth.apps.convertx.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.convertx.config.domain: "convertx.$DOMAINNAME"
+      tinyauth.apps.convertx.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "ConvertX"

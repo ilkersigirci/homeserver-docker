@@ -23,8 +23,8 @@ services:
       traefik.http.routers.jellyfin-vue-rtr.service: "jellyfin-vue-svc"
       traefik.http.services.jellyfin-vue-svc.loadbalancer.server.port: "80"
       ####### TINYAUTH #######
-      tinyauth.apps.jellyfin_vue.config.domain: jellyfin_vue.$DOMAINNAME
-      tinyauth.apps.jellyfin_vue.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.jellyfin_vue.config.domain: "jellyfin_vue.$DOMAINNAME"
+      tinyauth.apps.jellyfin_vue.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "Jellyfin Vue"

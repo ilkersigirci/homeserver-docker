@@ -34,8 +34,8 @@ services:
       traefik.http.routers.quartz-rtr.service: "quartz-svc"
       traefik.http.services.quartz-svc.loadbalancer.server.port: "80"
       ####### TINYAUTH #######
-      tinyauth.apps.quartz.config.domain: quartz.$DOMAINNAME
-      tinyauth.apps.quartz.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.quartz.config.domain: "quartz.$DOMAINNAME"
+      tinyauth.apps.quartz.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "Quartz"

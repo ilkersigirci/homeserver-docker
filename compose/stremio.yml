@@ -27,8 +27,8 @@ services:
       traefik.http.routers.stremio-rtr.service: "stremio-svc"
       traefik.http.services.stremio-svc.loadbalancer.server.port: "8080"
       ####### TINYAUTH #######
-      tinyauth.apps.stremio.config.domain: stremio.$DOMAINNAME
-      tinyauth.apps.stremio.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.stremio.config.domain: "stremio.$DOMAINNAME"
+      tinyauth.apps.stremio.ip.bypass: "$LOCAL_IPS"
       ## HTTP Routers - API
       traefik.http.routers.stremio-api-rtr.entrypoints: "websecure"
       traefik.http.routers.stremio-api-rtr.rule: "Host(`stremio-api.$DOMAINNAME`)"

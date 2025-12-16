@@ -62,25 +62,25 @@ services:
     labels:
       traefik.enable: "true"
       ## HTTP Routers
-      traefik.http.routers.forgejo-rtr.entrypoints: websecure
-      traefik.http.routers.forgejo-rtr.rule: Host(`git.$DOMAINNAME`)
+      traefik.http.routers.forgejo-rtr.entrypoints: "websecure"
+      traefik.http.routers.forgejo-rtr.rule: "Host(`git.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.forgejo-rtr.middlewares: chain-tinyauth@file
+      traefik.http.routers.forgejo-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      traefik.http.routers.forgejo-rtr.service: forgejo-svc
+      traefik.http.routers.forgejo-rtr.service: "forgejo-svc"
       traefik.http.services.forgejo-svc.loadbalancer.server.port: "3000"
       ####### TINYAUTH #######
-      tinyauth.apps.forgejo.config.domain: git.$DOMAINNAME
-      tinyauth.apps.forgejo.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.forgejo.config.domain: "git.$DOMAINNAME"
+      tinyauth.apps.forgejo.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: Maintenance
-      homepage.name: forgejo
-      homepage.icon: forgejo.png
-      homepage.href: https://git.$DOMAINNAME
-      homepage.target: _blank
-      homepage.description: Self-hosted Git service
+      homepage.group: "Maintenance"
+      homepage.name: "forgejo"
+      homepage.icon: "forgejo.png"
+      homepage.href: "https://git.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Self-hosted Git service"
       ####### GLANCE #######
-      glance.name: forgejo
-      glance.icon: sh:forgejo
-      glance.url: https://git.$DOMAINNAME
-      glance.description: Self-hosted Git service
+      glance.name: "forgejo"
+      glance.icon: "sh:forgejo"
+      glance.url: "https://git.$DOMAINNAME"
+      glance.description: "Self-hosted Git service"

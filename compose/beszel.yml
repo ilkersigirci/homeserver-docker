@@ -30,18 +30,18 @@ services:
       traefik.http.routers.beszel-rtr.service: "beszel-svc"
       traefik.http.services.beszel-svc.loadbalancer.server.port: "8090"
       ####### TINYAUTH #######
-      tinyauth.apps.beszel.config.domain: beszel.$DOMAINNAME
-      tinyauth.apps.beszel.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.beszel.config.domain: "beszel.$DOMAINNAME"
+      tinyauth.apps.beszel.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: Monitoring
-      homepage.name: Beszel
-      homepage.icon: beszel.svg
-      homepage.href: https://beszel.$DOMAINNAME
-      homepage.target: _blank
-      homepage.description: Lightweight server monitoring hub with historical data, docker stats, and alerts
-      homepage.widget.type: beszel
-      homepage.widget.url: http://beszel:8090
-      homepage.widget.username: $BESZEL_EMAIL
-      homepage.widget.password: $BESZEL_PASSWORD
+      homepage.group: "Monitoring"
+      homepage.name: "Beszel"
+      homepage.icon: "beszel.svg"
+      homepage.href: "https://beszel.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Lightweight server monitoring hub with historical data, docker stats, and alerts"
+      homepage.widget.type: "beszel"
+      homepage.widget.url: "http://beszel:8090"
+      homepage.widget.username: "$BESZEL_EMAIL"
+      homepage.widget.password: "$BESZEL_PASSWORD"
       # - homepage.widget.systemId=$MY_HOSTNAME
       homepage.widget.version: "2"

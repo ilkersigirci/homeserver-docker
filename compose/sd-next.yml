@@ -30,7 +30,7 @@ services:
       traefik.http.routers.sdnext-rtr.service: "sdnext-svc"
       traefik.http.services.sdnext-svc.loadbalancer.server.port: "7860"
       ####### TINYAUTH #######
-      tinyauth.apps.sdnext.config.domain: sdnext.$DOMAINNAME
-      tinyauth.apps.sdnext.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.sdnext.config.domain: "sdnext.$DOMAINNAME"
+      tinyauth.apps.sdnext.ip.bypass: "$LOCAL_IPS"
     profiles:
       - ml

@@ -39,8 +39,8 @@ services:
       traefik.http.routers.vaultwarden-rtr.service: "vaultwarden-svc"
       traefik.http.services.vaultwarden-svc.loadbalancer.server.port: "80"
       ####### TINYAUTH #######
-      tinyauth.apps.vaultwarden.config.domain: vaultwarden.$DOMAINNAME
-      tinyauth.apps.vaultwarden.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.vaultwarden.config.domain: "vaultwarden.$DOMAINNAME"
+      tinyauth.apps.vaultwarden.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "Vaultwarden"

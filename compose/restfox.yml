@@ -20,8 +20,8 @@ services:
       traefik.http.routers.restfox-rtr.service: "restfox-svc"
       traefik.http.services.restfox-svc.loadbalancer.server.port: "4004"
       ####### TINYAUTH #######
-      tinyauth.apps.restfox.config.domain: restfox.$DOMAINNAME
-      tinyauth.apps.restfox.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.restfox.config.domain: "restfox.$DOMAINNAME"
+      tinyauth.apps.restfox.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "restfox"

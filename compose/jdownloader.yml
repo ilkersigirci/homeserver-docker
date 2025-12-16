@@ -24,15 +24,15 @@ services:
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.jdownloader-rtr.entrypoints: "websecure"
-      traefik.http.routers.jdownloader-rtr.rule: "Host(`download.$DOMAINNAME`)"
+      traefik.http.routers.jdownloader-rtr.rule: "Host(`jdownloader.$DOMAINNAME`)"
       ## Middlewares
       traefik.http.routers.jdownloader-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
       traefik.http.routers.jdownloader-rtr.service: "jdownloader-svc"
       traefik.http.services.jdownloader-svc.loadbalancer.server.port: "5800"
       ####### TINYAUTH #######
-      tinyauth.apps.download.config.domain: download.$DOMAINNAME
-      tinyauth.apps.download.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.jdownloader.config.domain: "jdownloader.$DOMAINNAME"
+      tinyauth.apps.jdownloader.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "Jdownloader"

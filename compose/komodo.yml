@@ -30,7 +30,7 @@ services:
       POSTGRES_PASSWORD: ${KOMODO_DB_PASSWORD}
       POSTGRES_DB: postgres
     labels:
-      komodo.skip: # Prevent Komodo from stopping with StopAllContainers
+      komodo.skip: "" # Prevent Komodo from stopping with StopAllContainers
 
   # NOTE: First create the FerretDB state directory
   # mkdir -p $DOCKERDIR/appdata/komodo/ferretdb
@@ -56,8 +56,7 @@ services:
     environment:
       FERRETDB_POSTGRESQL_URL: postgres://${KOMODO_DB_USERNAME}:${KOMODO_DB_PASSWORD}@komodo-postgres:5432/postgres
     labels:
-      komodo.skip: # Prevent Komodo from stopping with StopAllContainers
-  
+      komodo.skip: "" # Prevent Komodo from stopping with StopAllContainers
   komodo-core:
     image: ghcr.io/moghtech/komodo-core:${COMPOSE_KOMODO_IMAGE_TAG:-latest}
     container_name: komodo-core
@@ -88,7 +87,7 @@ services:
     # extra_hosts:
     #   - host.docker.internal:host-gateway
     labels:
-      komodo.skip: # Prevent Komodo from stopping with StopAllContainers
+      komodo.skip: "" # Prevent Komodo from stopping with StopAllContainers
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.komodo-core-rtr.entrypoints: "websecure"
@@ -99,8 +98,8 @@ services:
       traefik.http.routers.komodo-core-rtr.service: "komodo-core-svc"
       traefik.http.services.komodo-core-svc.loadbalancer.server.port: "9120"
       ####### TINYAUTH #######
-      tinyauth.apps.komodo.config.domain: komodo.$DOMAINNAME
-      tinyauth.apps.komodo.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.komodo.config.domain: "komodo.$DOMAINNAME"
+      tinyauth.apps.komodo.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "komodo"
@@ -157,4 +156,4 @@ services:
       - $DOCKERDIR:$DOCKERDIR:ro
       - $HARDDISKROOTDIR:$HARDDISKROOTDIR:ro
     labels:
-      komodo.skip: # Prevent Komodo from stopping with StopAllContainers
+      komodo.skip: "" # Prevent Komodo from stopping with StopAllContainers

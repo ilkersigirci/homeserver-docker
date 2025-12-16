@@ -12,25 +12,25 @@ services:
     labels:
       traefik.enable: "true"
       ## HTTP Routers
-      traefik.http.routers.bentopdf-rtr.entrypoints: websecure
-      traefik.http.routers.bentopdf-rtr.rule: Host(`pdftool.$DOMAINNAME`)
+      traefik.http.routers.bentopdf-rtr.entrypoints: "websecure"
+      traefik.http.routers.bentopdf-rtr.rule: "Host(`pdftool.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.bentopdf-rtr.middlewares: chain-tinyauth@file
+      traefik.http.routers.bentopdf-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      traefik.http.routers.bentopdf-rtr.service: bentopdf-svc
+      traefik.http.routers.bentopdf-rtr.service: "bentopdf-svc"
       traefik.http.services.bentopdf-svc.loadbalancer.server.port: "8080"
       ####### TINYAUTH #######
-      tinyauth.apps.bentopdf.config.domain: pdftool.$DOMAINNAME
-      tinyauth.apps.bentopdf.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.bentopdf.config.domain: "pdftool.$DOMAINNAME"
+      tinyauth.apps.bentopdf.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: Maintenance
-      homepage.name: bentopdf
-      homepage.icon: bentopdf.png
-      homepage.href: https://pdftool.$DOMAINNAME
-      homepage.target: _blank
-      homepage.description: A Privacy First PDF Toolkit 
+      homepage.group: "Maintenance"
+      homepage.name: "bentopdf"
+      homepage.icon: "bentopdf.png"
+      homepage.href: "https://pdftool.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "A Privacy First PDF Toolkit"
       ####### GLANCE #######
-      glance.name: bentopdf
-      glance.icon: sh:bentopdf
-      glance.url: https://pdftool.$DOMAINNAME
-      glance.description: A Privacy First PDF Toolkit 
+      glance.name: "bentopdf"
+      glance.icon: "sh:bentopdf"
+      glance.url: "https://pdftool.$DOMAINNAME"
+      glance.description: "A Privacy First PDF Toolkit"

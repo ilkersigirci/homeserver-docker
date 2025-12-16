@@ -18,29 +18,29 @@ services:
     labels:
       traefik.enable: "true"
       ## HTTP Routers
-      traefik.http.routers.gotify-rtr.entrypoints: websecure
-      traefik.http.routers.gotify-rtr.rule: Host(`gotify.$DOMAINNAME`)
+      traefik.http.routers.gotify-rtr.entrypoints: "websecure"
+      traefik.http.routers.gotify-rtr.rule: "Host(`gotify.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.gotify-rtr.middlewares: chain-tinyauth-relaxed@file
+      traefik.http.routers.gotify-rtr.middlewares: "chain-tinyauth-relaxed@file"
       # traefik.http.routers.gotify-rtr.middlewares: chain-no-auth-relaxed@file
       ## HTTP Services
-      traefik.http.routers.gotify-rtr.service: gotify-svc
+      traefik.http.routers.gotify-rtr.service: "gotify-svc"
       traefik.http.services.gotify-svc.loadbalancer.server.port: "80"
       ####### TINYAUTH #######
-      tinyauth.apps.gotify.config.domain: gotify.$DOMAINNAME
-      tinyauth.apps.gotify.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.gotify.config.domain: "gotify.$DOMAINNAME"
+      tinyauth.apps.gotify.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: Core
-      homepage.name: gotify
-      homepage.icon: gotify.png
-      homepage.href: https://gotify.$DOMAINNAME
-      homepage.target: _blank
-      homepage.description: A simple server for sending and receiving messages
-      homepage.widget.type: gotify
+      homepage.group: "Core"
+      homepage.name: "gotify"
+      homepage.icon: "gotify.png"
+      homepage.href: "https://gotify.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "A simple server for sending and receiving messages"
+      homepage.widget.type: "gotify"
       homepage.widget.url: "http://gotify:80"
       homepage.widget.key: "$GOTIFY_HOMEPAGE_CLIENT_TOKEN"
       ####### GLANCE #######
-      glance.name: gotify
-      glance.icon: sh:gotify
-      glance.url: https://gotify.$DOMAINNAME
-      glance.description: A simple server for sending and receiving messages
+      glance.name: "gotify"
+      glance.icon: "sh:gotify"
+      glance.url: "https://gotify.$DOMAINNAME"
+      glance.description: "A simple server for sending and receiving messages"

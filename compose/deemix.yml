@@ -28,8 +28,8 @@ services:
       traefik.http.routers.deemix-rtr.service: "deemix-svc"
       traefik.http.services.deemix-svc.loadbalancer.server.port: "6595"
       ####### TINYAUTH #######
-      tinyauth.apps.deemix.config.domain: deemix.$DOMAINNAME
-      tinyauth.apps.deemix.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.deemix.config.domain: "deemix.$DOMAINNAME"
+      tinyauth.apps.deemix.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "Deemix"

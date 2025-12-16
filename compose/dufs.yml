@@ -34,8 +34,8 @@ services:
       traefik.http.routers.dufs-rtr.service: "dufs-svc"
       traefik.http.services.dufs-svc.loadbalancer.server.port: "5000"
       ####### TINYAUTH #######
-      tinyauth.apps.dufs.config.domain: dufs.$DOMAINNAME
-      tinyauth.apps.dufs.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.dufs.config.domain: "dufs.$DOMAINNAME"
+      tinyauth.apps.dufs.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "Dufs"

@@ -39,8 +39,8 @@ services:
       traefik.http.routers.ytptube-rtr.service: "ytptube-svc"
       traefik.http.services.ytptube-svc.loadbalancer.server.port: "8081"
       ####### TINYAUTH #######
-      tinyauth.apps.ytptube.config.domain: ytptube.$DOMAINNAME
-      tinyauth.apps.ytptube.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.ytptube.config.domain: "ytptube.$DOMAINNAME"
+      tinyauth.apps.ytptube.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "ytptube"

@@ -60,8 +60,8 @@ services:
       traefik.http.routers.gatus-rtr.service: "gatus-svc"
       traefik.http.services.gatus-svc.loadbalancer.server.port: "8080"
       ####### TINYAUTH #######
-      tinyauth.apps.gatus.config.domain: gatus.$DOMAINNAME
-      tinyauth.apps.gatus.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.gatus.config.domain: "gatus.$DOMAINNAME"
+      tinyauth.apps.gatus.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Monitoring"
       homepage.name: "Gatus"

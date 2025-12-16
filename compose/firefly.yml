@@ -28,8 +28,8 @@ services:
       traefik.http.routers.firefly-rtr.service: "firefly-svc"
       traefik.http.services.firefly-svc.loadbalancer.server.port: "8080"
       ####### TINYAUTH #######
-      tinyauth.apps.firefly.config.domain: firefly.$DOMAINNAME
-      tinyauth.apps.firefly.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.firefly.config.domain: "firefly.$DOMAINNAME"
+      tinyauth.apps.firefly.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Others"
       homepage.name: "Firefly III"

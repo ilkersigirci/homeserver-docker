@@ -24,28 +24,28 @@ services:
     labels:
       traefik.enable: "true"
       ## HTTP Routers
-      traefik.http.routers.sabnzbd-rtr.entrypoints: websecure
-      traefik.http.routers.sabnzbd-rtr.rule: Host(`sabnzbd.$DOMAINNAME`)
+      traefik.http.routers.sabnzbd-rtr.entrypoints: "websecure"
+      traefik.http.routers.sabnzbd-rtr.rule: "Host(`sabnzbd.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.sabnzbd-rtr.middlewares: chain-tinyauth-relaxed@file
+      traefik.http.routers.sabnzbd-rtr.middlewares: "chain-tinyauth-relaxed@file"
       ## HTTP Services
-      traefik.http.routers.sabnzbd-rtr.service: sabnzbd-svc
+      traefik.http.routers.sabnzbd-rtr.service: "sabnzbd-svc"
       traefik.http.services.sabnzbd-svc.loadbalancer.server.port: "8080"
       ####### TINYAUTH #######
-      tinyauth.apps.sabnzbd.config.domain: sabnzbd.$DOMAINNAME
-      tinyauth.apps.sabnzbd.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.sabnzbd.config.domain: "sabnzbd.$DOMAINNAME"
+      tinyauth.apps.sabnzbd.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: Media
-      homepage.name: sabnzbd
-      homepage.icon: sabnzbd.png
-      homepage.href: https://sabnzbd.$DOMAINNAME
-      homepage.target: _blank
-      homepage.description: The automated Usenet download tool
-      homepage.widget.type: sabnzbd
-      homepage.widget.url: http://sabnzbd:8080
-      homepage.widget.key: $SABNZBD_API_KEY
+      homepage.group: "Media"
+      homepage.name: "sabnzbd"
+      homepage.icon: "sabnzbd.png"
+      homepage.href: "https://sabnzbd.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "The automated Usenet download tool"
+      homepage.widget.type: "sabnzbd"
+      homepage.widget.url: "http://sabnzbd:8080"
+      homepage.widget.key: "$SABNZBD_API_KEY"
       ####### GLANCE #######
-      glance.name: sabnzbd
-      glance.icon: sh:sabnzbd
-      glance.url: https://sabnzbd.$DOMAINNAME
-      glance.description: The automated Usenet download tool
+      glance.name: "sabnzbd"
+      glance.icon: "sh:sabnzbd"
+      glance.url: "https://sabnzbd.$DOMAINNAME"
+      glance.description: "The automated Usenet download tool"

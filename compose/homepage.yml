@@ -38,8 +38,8 @@ services:
       traefik.http.routers.homepage-rtr.service: "homepage-svc"
       traefik.http.services.homepage-svc.loadbalancer.server.port: "3000"
       ####### TINYAUTH #######
-      tinyauth.apps.homepage.config.domain: homepage.$DOMAINNAME
-      tinyauth.apps.homepage.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.homepage.config.domain: "homepage.$DOMAINNAME"
+      tinyauth.apps.homepage.ip.bypass: "$LOCAL_IPS"
       ####### GLANCE #######
       glance.name: "homepage"
       glance.icon: "si:homepage"

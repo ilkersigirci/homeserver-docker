@@ -30,8 +30,8 @@ services:
       traefik.http.routers.okular-rtr.service: "okular-svc"
       traefik.http.services.okular-svc.loadbalancer.server.port: "3000"
       ####### TINYAUTH #######
-      tinyauth.apps.okular.config.domain: okular.$DOMAINNAME
-      tinyauth.apps.okular.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.okular.config.domain: "okular.$DOMAINNAME"
+      tinyauth.apps.okular.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "DesktopApps"
       homepage.name: "Okular"

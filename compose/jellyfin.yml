@@ -66,8 +66,8 @@ services:
       traefik.http.routers.jellyfin-rtr.service: "jellyfin-svc"
       traefik.http.services.jellyfin-svc.loadbalancer.server.port: "8096"
       ####### TINYAUTH #######
-      tinyauth.apps.jellyfin.config.domain: jellyfin.$DOMAINNAME
-      tinyauth.apps.jellyfin.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.jellyfin.config.domain: "jellyfin.$DOMAINNAME"
+      tinyauth.apps.jellyfin.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "Jellyfin"

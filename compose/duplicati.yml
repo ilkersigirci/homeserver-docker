@@ -27,8 +27,8 @@ services:
       traefik.http.routers.duplicati-rtr.service: "duplicati-svc"
       traefik.http.services.duplicati-svc.loadbalancer.server.port: "8200"
       ####### TINYAUTH #######
-      tinyauth.apps.duplicati.config.domain: duplicati.$DOMAINNAME
-      tinyauth.apps.duplicati.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.duplicati.config.domain: "duplicati.$DOMAINNAME"
+      tinyauth.apps.duplicati.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "Duplicati"

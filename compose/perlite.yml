@@ -30,12 +30,12 @@ services:
       SITE_TITLE: Digital.Garden
       SITE_TYPE: article
       SITE_URL: https://perlite.$DOMAINNAME
-      SITE_IMAGE: 
+      SITE_IMAGE:
       SITE_DESC: Ilkerflix Digital Garden
       SITE_NAME: Perlite
-      SITE_TWITTER: 
+      SITE_TWITTER:
       SITE_LOGO: perlite.svg
-      SITE_HOMEPAGE: 
+      SITE_HOMEPAGE:
       SITE_GITHUB: https://github.com/ilkersigirci
 
   perlite:
@@ -52,7 +52,7 @@ services:
       - no-new-privileges:true
     volumes:
       - $CONFIGDIR/perlite/web.conf:/etc/nginx/conf.d/default.conf:ro
-    volumes_from: 
+    volumes_from:
       - perlite-build
     labels:
       traefik.enable: "true"
@@ -65,8 +65,8 @@ services:
       traefik.http.routers.perlite-rtr.service: "perlite-svc"
       traefik.http.services.perlite-svc.loadbalancer.server.port: "80"
       ####### TINYAUTH #######
-      tinyauth.apps.perlite.config.domain: perlite.$DOMAINNAME
-      tinyauth.apps.perlite.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.perlite.config.domain: "perlite.$DOMAINNAME"
+      tinyauth.apps.perlite.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "Perlite"

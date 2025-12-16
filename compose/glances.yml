@@ -45,8 +45,8 @@ services:
       traefik.http.routers.glances-rtr.service: "glances-svc"
       traefik.http.services.glances-svc.loadbalancer.server.port: "61208"
       ####### TINYAUTH #######
-      tinyauth.apps.glances.config.domain: glances.$DOMAINNAME
-      tinyauth.apps.glances.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.glances.config.domain: "glances.$DOMAINNAME"
+      tinyauth.apps.glances.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Monitoring"
       homepage.name: "Glances"

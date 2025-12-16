@@ -56,25 +56,25 @@ services:
     labels:
       traefik.enable: "true"
       ## HTTP Routers
-      traefik.http.routers.zipline-rtr.entrypoints: websecure
-      traefik.http.routers.zipline-rtr.rule: Host(`share.$DOMAINNAME`)
+      traefik.http.routers.zipline-rtr.entrypoints: "websecure"
+      traefik.http.routers.zipline-rtr.rule: "Host(`share.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.zipline-rtr.middlewares: chain-no-auth@file
+      traefik.http.routers.zipline-rtr.middlewares: "chain-no-auth@file"
       ## HTTP Services
-      traefik.http.routers.zipline-rtr.service: zipline-svc
+      traefik.http.routers.zipline-rtr.service: "zipline-svc"
       traefik.http.services.zipline-svc.loadbalancer.server.port: "3000"
       ####### TINYAUTH #######
       # tinyauth.apps.zipline.config.domain: share.$DOMAINNAME
       # tinyauth.apps.zipline.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
-      homepage.group: Media
-      homepage.name: zipline
-      homepage.icon: zipline.png
-      homepage.href: https://share.$DOMAINNAME
-      homepage.target: _blank
-      homepage.description: A ShareX/file upload server and link shortener
+      homepage.group: "Media"
+      homepage.name: "zipline"
+      homepage.icon: "zipline.png"
+      homepage.href: "https://share.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "A ShareX/file upload server and link shortener"
       ####### GLANCE #######
-      glance.name: zipline
-      glance.icon: sh:zipline
-      glance.url: https://share.$DOMAINNAME
-      glance.description: A ShareX/file upload server and link shortener
+      glance.name: "zipline"
+      glance.icon: "sh:zipline"
+      glance.url: "https://share.$DOMAINNAME"
+      glance.description: "A ShareX/file upload server and link shortener"

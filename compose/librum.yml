@@ -53,7 +53,7 @@ services:
       traefik.http.routers.librum-rtr.service: "librum-svc"
       traefik.http.services.librum-svc.loadbalancer.server.port: "5000"
       ####### TINYAUTH #######
-      tinyauth.apps.librum.config.domain: librum.$DOMAINNAME
-      tinyauth.apps.librum.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.librum.config.domain: "librum.$DOMAINNAME"
+      tinyauth.apps.librum.ip.bypass: "$LOCAL_IPS"
     profiles:
       - reading

@@ -29,28 +29,28 @@ services:
     labels:
       traefik.enable: "true"
       ## HTTP Routers
-      traefik.http.routers.openarchiver-rtr.entrypoints: websecure
-      traefik.http.routers.openarchiver-rtr.rule: Host(`mailarchive.$DOMAINNAME`)
+      traefik.http.routers.openarchiver-rtr.entrypoints: "websecure"
+      traefik.http.routers.openarchiver-rtr.rule: "Host(`mailarchive.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.openarchiver-rtr.middlewares: chain-tinyauth@file
+      traefik.http.routers.openarchiver-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
-      traefik.http.routers.openarchiver-rtr.service: openarchiver-svc
+      traefik.http.routers.openarchiver-rtr.service: "openarchiver-svc"
       traefik.http.services.openarchiver-svc.loadbalancer.server.port: "3000"
       ####### TINYAUTH #######
-      tinyauth.apps.mailarchive.config.domain: mailarchive.$DOMAINNAME
-      tinyauth.apps.mailarchive.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.mailarchive.config.domain: "mailarchive.$DOMAINNAME"
+      tinyauth.apps.mailarchive.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: Media
-      homepage.name: openarchiver
-      homepage.icon: openarchiver.png
-      homepage.href: https://mailarchive.$DOMAINNAME
-      homepage.target: _blank
-      homepage.description: A self-hosted, open-source email archiving solution with full-text search capability.
+      homepage.group: "Media"
+      homepage.name: "openarchiver"
+      homepage.icon: "openarchiver.png"
+      homepage.href: "https://mailarchive.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "A self-hosted, open-source email archiving solution with full-text search capability."
       ####### GLANCE #######
-      glance.name: openarchiver
-      glance.icon: sh:openarchiver
-      glance.url: https://mailarchive.$DOMAINNAME
-      glance.description: A self-hosted, open-source email archiving solution with full-text search capability.
+      glance.name: "openarchiver"
+      glance.icon: "sh:openarchiver"
+      glance.url: "https://mailarchive.$DOMAINNAME"
+      glance.description: "A self-hosted, open-source email archiving solution with full-text search capability."
 
   openarchiver-db:
     image: postgres:16.4

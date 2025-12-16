@@ -31,8 +31,8 @@ services:
       traefik.http.routers.portainer-rtr.service: "portainer-svc"
       traefik.http.services.portainer-svc.loadbalancer.server.port: "9000"
       ####### TINYAUTH #######
-      tinyauth.apps.portainer.config.domain: portainer.$DOMAINNAME
-      tinyauth.apps.portainer.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.portainer.config.domain: "portainer.$DOMAINNAME"
+      tinyauth.apps.portainer.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "Portainer"

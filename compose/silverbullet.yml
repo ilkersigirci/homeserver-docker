@@ -25,26 +25,26 @@ services:
     labels:
       traefik.enable: "true"
       ## HTTP Routers
-      traefik.http.routers.silverbullet-rtr.entrypoints: websecure
-      traefik.http.routers.silverbullet-rtr.rule: Host(`notes.$DOMAINNAME`)
+      traefik.http.routers.silverbullet-rtr.entrypoints: "websecure"
+      traefik.http.routers.silverbullet-rtr.rule: "Host(`notes.$DOMAINNAME`)"
       ## Middlewares
       # traefik.http.routers.silverbullet-rtr.middlewares: chain-silverbullet-no-auth@file
-      traefik.http.routers.silverbullet-rtr.middlewares: chain-silverbullet-tinyauth@file
+      traefik.http.routers.silverbullet-rtr.middlewares: "chain-silverbullet-tinyauth@file"
       ## HTTP Services
-      traefik.http.routers.silverbullet-rtr.service: silverbullet-svc
+      traefik.http.routers.silverbullet-rtr.service: "silverbullet-svc"
       traefik.http.services.silverbullet-svc.loadbalancer.server.port: "3000"
       ####### TINYAUTH #######
-      tinyauth.apps.silverbullet.config.domain: notes.$DOMAINNAME
-      tinyauth.apps.silverbullet.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.silverbullet.config.domain: "notes.$DOMAINNAME"
+      tinyauth.apps.silverbullet.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: Reading
-      homepage.name: silverbullet
-      homepage.icon: silverbullet.png
-      homepage.href: https://notes.$DOMAINNAME
-      homepage.target: _blank
-      homepage.description: Offline first web based Markdown editor, turbo charged with the scripting power of Lua
+      homepage.group: "Reading"
+      homepage.name: "silverbullet"
+      homepage.icon: "silverbullet.png"
+      homepage.href: "https://notes.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Offline first web based Markdown editor, turbo charged with the scripting power of Lua"
       ####### GLANCE #######
-      glance.name: silverbullet
-      glance.icon: sh:silverbullet
-      glance.url: https://notes.$DOMAINNAME
-      glance.description: Offline first web based Markdown editor, turbo charged with the scripting power of Lua
+      glance.name: "silverbullet"
+      glance.icon: "sh:silverbullet"
+      glance.url: "https://notes.$DOMAINNAME"
+      glance.description: "Offline first web based Markdown editor, turbo charged with the scripting power of Lua"

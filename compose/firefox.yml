@@ -1,11 +1,11 @@
-x-deploy: &gpu-deploy
+x-deploy:
   deploy:
     resources:
       reservations:
         devices:
           - driver: nvidia
             count: all
-            capabilities: [compute,video,graphics,utility]
+            capabilities: [compute, video, graphics, utility]
 
 services:
   firefox:
@@ -36,8 +36,8 @@ services:
       traefik.http.routers.firefox-rtr.service: "firefox-svc"
       traefik.http.services.firefox-svc.loadbalancer.server.port: "3000"
       ####### TINYAUTH #######
-      tinyauth.apps.firefox.config.domain: firefox.$DOMAINNAME
-      tinyauth.apps.firefox.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.firefox.config.domain: "firefox.$DOMAINNAME"
+      tinyauth.apps.firefox.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "DesktopApps"
       homepage.name: "Firefox"

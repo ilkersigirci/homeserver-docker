@@ -32,25 +32,25 @@ services:
     labels:
       traefik.enable: "true"
       ## HTTP Routers
-      traefik.http.routers.strava-statistics-rtr.entrypoints: websecure
-      traefik.http.routers.strava-statistics-rtr.rule: Host(`strava.$DOMAINNAME`)
+      traefik.http.routers.strava-statistics-rtr.entrypoints: "websecure"
+      traefik.http.routers.strava-statistics-rtr.rule: "Host(`strava.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.strava-statistics-rtr.middlewares: chain-tinyauth-relaxed@file
+      traefik.http.routers.strava-statistics-rtr.middlewares: "chain-tinyauth-relaxed@file"
       ## HTTP Services
-      traefik.http.routers.strava-statistics-rtr.service: strava-statistics-svc
+      traefik.http.routers.strava-statistics-rtr.service: "strava-statistics-svc"
       traefik.http.services.strava-statistics-svc.loadbalancer.server.port: "8080"
       ####### TINYAUTH #######
-      tinyauth.apps.strava.config.domain: strava.$DOMAINNAME
-      tinyauth.apps.strava.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.strava.config.domain: "strava.$DOMAINNAME"
+      tinyauth.apps.strava.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: Media
-      homepage.name: strava-statistics
-      homepage.icon: strava-statistics.png
-      homepage.href: https://strava.$DOMAINNAME
-      homepage.target: _blank
-      homepage.description: Dashboard for your Strava data
+      homepage.group: "Media"
+      homepage.name: "strava-statistics"
+      homepage.icon: "strava-statistics.png"
+      homepage.href: "https://strava.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Dashboard for your Strava data"
       ####### GLANCE #######
-      glance.name: strava-statistics
-      glance.icon: sh:strava-statistics
-      glance.url: https://strava.$DOMAINNAME
-      glance.description: Dashboard for your Strava data
+      glance.name: "strava-statistics"
+      glance.icon: "sh:strava-statistics"
+      glance.url: "https://strava.$DOMAINNAME"
+      glance.description: "Dashboard for your Strava data"

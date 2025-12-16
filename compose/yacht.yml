@@ -17,7 +17,7 @@ services:
       PUID: $PUID
       PGID: $PGID
       TZ: $TZ
-      DISABLE_AUTH: True
+      DISABLE_AUTH: true
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -29,8 +29,8 @@ services:
       traefik.http.routers.yacht-rtr.service: "yacht-svc"
       traefik.http.services.yacht-svc.loadbalancer.server.port: "8000"
       ####### TINYAUTH #######
-      tinyauth.apps.yacht.config.domain: yacht.$DOMAINNAME
-      tinyauth.apps.yacht.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.yacht.config.domain: "yacht.$DOMAINNAME"
+      tinyauth.apps.yacht.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "Yacht"

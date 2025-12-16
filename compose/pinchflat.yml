@@ -27,8 +27,8 @@ services:
       traefik.http.routers.pinchflat-rtr.service: "pinchflat-svc"
       traefik.http.services.pinchflat-svc.loadbalancer.server.port: "8945"
       ####### TINYAUTH #######
-      tinyauth.apps.pinchflat.config.domain: pinchflat.$DOMAINNAME
-      tinyauth.apps.pinchflat.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.pinchflat.config.domain: "pinchflat.$DOMAINNAME"
+      tinyauth.apps.pinchflat.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "pinchflat"

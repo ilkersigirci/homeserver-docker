@@ -28,7 +28,7 @@ services:
       traefik.http.routers.sunshine-rtr.service: "sunshine-svc"
       traefik.http.services.sunshine-svc.loadbalancer.server.port: "47990"
       ####### TINYAUTH #######
-      tinyauth.apps.sunshine.config.domain: sunshine.$DOMAINNAME
-      tinyauth.apps.sunshine.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.sunshine.config.domain: "sunshine.$DOMAINNAME"
+      tinyauth.apps.sunshine.ip.bypass: "$LOCAL_IPS"
     profiles:
       - monitoring

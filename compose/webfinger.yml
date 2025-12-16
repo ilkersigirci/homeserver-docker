@@ -22,8 +22,8 @@ services:
       traefik.http.routers.webfinger-rtr.service: "webfinger-svc"
       traefik.http.services.webfinger-svc.loadbalancer.server.port: "80"
       ####### TINYAUTH #######
-      tinyauth.apps.webfinger.config.domain: $DOMAINNAME
-      tinyauth.apps.webfinger.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.webfinger.config.domain: "$DOMAINNAME"
+      tinyauth.apps.webfinger.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "webfinger"

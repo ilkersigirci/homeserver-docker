@@ -31,8 +31,8 @@ services:
       traefik.http.routers.prowlarr-rtr.service: "prowlarr-svc"
       traefik.http.services.prowlarr-svc.loadbalancer.server.port: "9696"
       ####### TINYAUTH #######
-      tinyauth.apps.prowlarr.config.domain: prowlarr.$DOMAINNAME
-      tinyauth.apps.prowlarr.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.prowlarr.config.domain: "prowlarr.$DOMAINNAME"
+      tinyauth.apps.prowlarr.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "Prowlarr"

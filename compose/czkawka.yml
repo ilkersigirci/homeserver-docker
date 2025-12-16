@@ -28,8 +28,8 @@ services:
       traefik.http.routers.czkawka-rtr.service: "czkawka-svc"
       traefik.http.services.czkawka-svc.loadbalancer.server.port: "5800"
       ####### TINYAUTH #######
-      tinyauth.apps.czkawka.config.domain: czkawka.$DOMAINNAME
-      tinyauth.apps.czkawka.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.czkawka.config.domain: "czkawka.$DOMAINNAME"
+      tinyauth.apps.czkawka.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "Czkawka"

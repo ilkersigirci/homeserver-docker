@@ -89,7 +89,7 @@ services:
       - --tracing.globalAttributes.environment=production
       - --tracing.globalAttributes.service.version=v3.0
       - --tracing.globalAttributes.deployment.environment=$DOMAINNAME
-      
+
     networks:
       t3_proxy:
         ipv4_address: 192.168.90.254 # You can specify a static IP
@@ -155,8 +155,8 @@ services:
       #- "traefik.http.routers.ping.tls=true"
       #- "traefik.http.routers.ping.service=ping@internal"
       ####### TINYAUTH #######
-      tinyauth.apps.traefik.config.domain: traefik.$DOMAINNAME
-      tinyauth.apps.traefik.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.traefik.config.domain: "traefik.$DOMAINNAME"
+      tinyauth.apps.traefik.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "Traefik"
@@ -173,4 +173,4 @@ services:
       glance.url: "https://traefik.$DOMAINNAME"
       glance.description: "Reverse Proxy Manager"
       ######## KOMODO ########
-      komodo.skip: # Prevents from stopping with StopAllContainers on Komodo
+      komodo.skip: "" # Prevents from stopping with StopAllContainers on Komodo

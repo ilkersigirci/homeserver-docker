@@ -76,8 +76,8 @@ services:
       traefik.http.routers.obsidian-rtr.service: "obsidian-svc"
       traefik.http.services.obsidian-svc.loadbalancer.server.port: "3000"
       ####### TINYAUTH #######
-      tinyauth.apps.obsidian.config.domain: obsidian.$DOMAINNAME
-      tinyauth.apps.obsidian.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.obsidian.config.domain: "obsidian.$DOMAINNAME"
+      tinyauth.apps.obsidian.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "Obsidian"
@@ -121,8 +121,8 @@ services:
       traefik.http.routers.obsidian-rtr.service: "obsidian-svc"
       traefik.http.services.obsidian-svc.loadbalancer.server.port: "3000"
       ####### TINYAUTH #######
-      tinyauth.apps.obsidian.config.domain: obsidian.$DOMAINNAME
-      tinyauth.apps.obsidian.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.obsidian.config.domain: "obsidian.$DOMAINNAME"
+      tinyauth.apps.obsidian.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "Obsidian"

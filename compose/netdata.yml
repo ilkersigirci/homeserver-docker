@@ -33,8 +33,8 @@ services:
       traefik.http.routers.netdata-rtr.service: "netdata-svc"
       traefik.http.services.netdata-svc.loadbalancer.server.port: "19999"
       ####### TINYAUTH #######
-      tinyauth.apps.netdata.config.domain: netdata.$DOMAINNAME
-      tinyauth.apps.netdata.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.netdata.config.domain: "netdata.$DOMAINNAME"
+      tinyauth.apps.netdata.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Monitoring"
       homepage.name: "Netdata"

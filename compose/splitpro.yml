@@ -62,17 +62,17 @@ services:
       # traefik.http.routers.splitpro-rtr.service: splitpro-svc
       # traefik.http.services.splitpro-svc.loadbalancer.server.port: "3000"
       ####### TINYAUTH #######
-      tinyauth.apps.splitpro.config.domain: split.$DOMAINNAME
-      tinyauth.apps.splitpro.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.splitpro.config.domain: "split.$DOMAINNAME"
+      tinyauth.apps.splitpro.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: Media
-      homepage.name: splitpro
-      homepage.icon: splitpro.png
-      homepage.href: https://split.$BASE_DOMAINNAME
-      homepage.target: _blank
-      homepage.description: Open source alternative to Splitwise
+      homepage.group: "Media"
+      homepage.name: "splitpro"
+      homepage.icon: "splitpro.png"
+      homepage.href: "https://split.$BASE_DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Open source alternative to Splitwise"
       ####### GLANCE #######
-      glance.name: splitpro
-      glance.icon: sh:splitpro
-      glance.url: https://split.$BASE_DOMAINNAME
-      glance.description: Open source alternative to Splitwise
+      glance.name: "splitpro"
+      glance.icon: "sh:splitpro"
+      glance.url: "https://split.$BASE_DOMAINNAME"
+      glance.description: "Open source alternative to Splitwise"

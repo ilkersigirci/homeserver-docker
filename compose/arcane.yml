@@ -46,25 +46,25 @@ services:
     labels:
       traefik.enable: "true"
       ## HTTP Routers
-      traefik.http.routers.arcane-rtr.entrypoints: websecure
-      traefik.http.routers.arcane-rtr.rule: Host(`arcane.$DOMAINNAME`)
+      traefik.http.routers.arcane-rtr.entrypoints: "websecure"
+      traefik.http.routers.arcane-rtr.rule: "Host(`arcane.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.arcane-rtr.middlewares: chain-tinyauth-arcane@file # FIXME: Doesn't work currently
+      traefik.http.routers.arcane-rtr.middlewares: "chain-tinyauth-arcane@file" # FIXME: Doesn't work currently
       ## HTTP Services
-      traefik.http.routers.arcane-rtr.service: arcane-svc
+      traefik.http.routers.arcane-rtr.service: "arcane-svc"
       traefik.http.services.arcane-svc.loadbalancer.server.port: "3552"
       ####### TINYAUTH #######
-      tinyauth.apps.arcane.config.domain: arcane.$DOMAINNAME
-      tinyauth.apps.arcane.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.arcane.config.domain: "arcane.$DOMAINNAME"
+      tinyauth.apps.arcane.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: Core
-      homepage.name: arcane
-      homepage.icon: arcane.png
-      homepage.href: https://arcane.$DOMAINNAME
-      homepage.target: _blank
-      homepage.description: Modern Docker Management
+      homepage.group: "Core"
+      homepage.name: "arcane"
+      homepage.icon: "arcane.png"
+      homepage.href: "https://arcane.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Modern Docker Management"
       ####### GLANCE #######
-      glance.name: arcane
-      glance.icon: sh:arcane
-      glance.url: https://arcane.$DOMAINNAME
-      glance.description: Modern Docker Management
+      glance.name: "arcane"
+      glance.icon: "sh:arcane"
+      glance.url: "https://arcane.$DOMAINNAME"
+      glance.description: "Modern Docker Management"

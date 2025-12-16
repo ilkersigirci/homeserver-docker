@@ -5,10 +5,10 @@ services:
     restart: $MAINTENANCE_RESTART_POLICY
     stop_grace_period: 2m
     cap_add:
-        - NET_ADMIN
+      - NET_ADMIN
     devices:
-        - /dev/kvm
-        - /dev/net/tun
+      - /dev/kvm
+      - /dev/net/tun
         # - /dev/sda:/disk2
         # - /dev/bus/usb
     profiles:
@@ -46,8 +46,8 @@ services:
       traefik.http.routers.windows-rtr.service: "windows-svc"
       traefik.http.services.windows-svc.loadbalancer.server.port: "8006"
       ####### TINYAUTH #######
-      tinyauth.apps.windows.config.domain: windows.$DOMAINNAME
-      tinyauth.apps.windows.ip.bypass: $LOCAL_IPS
+      tinyauth.apps.windows.config.domain: "windows.$DOMAINNAME"
+      tinyauth.apps.windows.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "windows"
