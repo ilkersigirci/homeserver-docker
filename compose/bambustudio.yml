@@ -1,0 +1,51 @@
+# NOTE: Consumes +2GB RAM
+services:
+  bambustudio:
+    image: lscr.io/linuxserver/bambustudio:latest
+    container_name: bambustudio
+    restart: $DESKTOP_IMAGES_RESTART_POLICY
+    hostname: bambustudio
+    shm_size: "1gb"
+    profiles:
+      - desktop_apps
+    networks:
+      - t3_proxy
+    expose:
+      - 3000 # HTTP
+      - 3001 # HTTPS
+    security_opt:
+      - no-new-privileges:true
+      - seccomp:unconfined
+    volumes:
+      - $DATADIR/bambustudio:/config
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      TITLE: Bambu-Studio
+      # DARK_MODE: true
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.bambustudio-rtr.entrypoints: "websecure"
+      traefik.http.routers.bambustudio-rtr.rule: "Host(`bambustudio.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.bambustudio-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.bambustudio-rtr.service: "bambustudio-svc"
+      traefik.http.services.bambustudio-svc.loadbalancer.server.port: "3000"
+      ####### TINYAUTH #######
+      tinyauth.apps.bambustudio.config.domain: "bambustudio.$DOMAINNAME"
+      tinyauth.apps.bambustudio.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "DesktopApps"
+      homepage.name: "bambustudio"
+      homepage.icon: "bambustudio.png"
+      homepage.href: "https://bambustudio.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "PC Software for BambuLab and other 3D printers"
+      ####### GLANCE #######
+      glance.name: "bambustudio"
+      glance.icon: "sh:bambustudio"
+      glance.url: "https://bambustudio.$DOMAINNAME"
+      glance.description: "PC Software for BambuLab and other 3D printers"

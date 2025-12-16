@@ -60,6 +60,7 @@ include:
   # - compose/vaultwarden.yml
   # - compose/webfinger.yml
   #### DESKTOP APPS ####
+  # - compose/bambustudio.yml
   # - compose/krita.yml
   # - compose/firefox.yml
   # - compose/gimp.yml
