@@ -49,3 +49,4 @@ include:
   - compose/whoami.yml
   #### READING ####
   - compose/silverbullet.yml
+  - compose/silverbullet-test.yml
