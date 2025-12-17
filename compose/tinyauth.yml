@@ -35,6 +35,9 @@ services:
       PROVIDERS_POCKETID_INSECURE_SKIP_VERIFY: "true"
       # OAUTH_AUTO_REDIRECT: generic # To automatically redirected to Pocket ID
       # OAUTH_WHITELIST: $POCKETID_WHITELIST_USERS
+      ## ACL Env example
+      # TINYAUTH_APPS_WHOAMI_CONFIG_DOMAIN: whoami.example.com
+      # TINYAUTH_APPS_WHOAMI_USERS_ALLOW: john
     volumes:
       - $SECRETSDIR/tinyauth_users:/tinyauth/users_file
       - $DOCKERDIR/data/tinyauth:/data
