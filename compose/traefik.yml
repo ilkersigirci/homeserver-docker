@@ -89,7 +89,6 @@ services:
       - --tracing.globalAttributes.environment=production
       - --tracing.globalAttributes.service.version=v3.0
       - --tracing.globalAttributes.deployment.environment=$DOMAINNAME
-
     networks:
       t3_proxy:
         ipv4_address: 192.168.90.254 # You can specify a static IP
@@ -132,7 +131,7 @@ services:
       # Passing custom env variables to the container to be able to use this variables in the rules.
       DOMAINNAME: $DOMAINNAME
       BASE_DOMAINNAME: $BASE_DOMAINNAME
-      CROWDSEC_TRAEFIK_BOUNCER_API_KEY: $CROWDSEC_TRAEFIK_BOUNCER_API_KEY
+      CROWDSEC_TRAEFIK_BOUNCER_API_KEY: ${CROWDSEC_TRAEFIK_BOUNCER_API_KEY:-}
       REMOTE_SERVER_PRIVATE_IP: ${REMOTE_SERVER_PRIVATE_IP:-dummy}
       WEBFINGER_USERNAME: $WEBFINGER_USERNAME
       WEBFINGER_HREF: https://pocketid.$BASE_DOMAINNAME

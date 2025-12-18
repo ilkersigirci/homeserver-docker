@@ -3,16 +3,20 @@ http:
     chain-silverbullet-no-auth:
       chain:
         middlewares:
-          # - middlewares-cf-real-ip
-          # - middlewares-crowdsec-bouncer
+{{if env "CROWDSEC_TRAEFIK_BOUNCER_API_KEY"}}
+          - middlewares-cf-real-ip
+          - middlewares-crowdsec-bouncer
+{{end}}
           - middlewares-rate-limit
           - middlewares-silverbullet-headers
 
     chain-silverbullet-tinyauth:
       chain:
         middlewares:
-          # - middlewares-cf-real-ip
-          # - middlewares-crowdsec-bouncer
+{{if env "CROWDSEC_TRAEFIK_BOUNCER_API_KEY"}}
+          - middlewares-cf-real-ip
+          - middlewares-crowdsec-bouncer
+{{end}}
           - middlewares-rate-limit
           - middlewares-silverbullet-headers
           - middlewares-tinyauth
