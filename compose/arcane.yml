@@ -2,7 +2,7 @@
 # TODO: How to set Apprise notification as env var instead of in UI?
 services:
   arcane:
-    image: ghcr.io/getarcaneapp/arcane:latest
+    image: ghcr.io/getarcaneapp/arcane:next
     container_name: arcane
     restart: $CORE_RESTART_POLICY
     profiles:
@@ -29,14 +29,14 @@ services:
       UI_CONFIGURATION_DISABLED: true
       PROJECTS_DIRECTORY: $DOCKERDIR
       ### OIDC
-      # OIDC_ENABLED: true
-      # OIDC_CLIENT_ID: "your_arcane_client_id_from_provider"
-      # OIDC_CLIENT_SECRET: "your_super_secret_client_secret_from_provider"
-      # OIDC_ISSUER_URL: https://auth.example.com
-      # OIDC_SCOPES: openid email profile groups
-      # OIDC_ADMIN_CLAIM: groups
-      # OIDC_ADMIN_VALUE: _arcane_admins
-      # OIDC_MERGE_ACCOUNTS: true
+      OIDC_ENABLED: true
+      OIDC_CLIENT_ID: $ARCANE_CLIENT_ID
+      OIDC_CLIENT_SECRET: $ARCANE_CLIENT_SECRET
+      OIDC_ISSUER_URL: https://pocketid.$BASE_DOMAINNAME
+      OIDC_SCOPES: openid email profile groups
+      OIDC_ADMIN_CLAIM: groups
+      OIDC_ADMIN_VALUE: admin
+      OIDC_MERGE_ACCOUNTS: true
     healthcheck:
       test: ['CMD-SHELL', 'curl -fsS http://localhost:3552/api/health >/dev/null || exit 1']
       start_period: 15s
