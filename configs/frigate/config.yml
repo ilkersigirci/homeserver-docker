@@ -1,0 +1,73 @@
+tls:
+  enabled: False
+
+mqtt:
+  enabled: true
+  host: mosquitto
+
+# Hardware acceleration for Intel Xe Graphics
+ffmpeg:
+  hwaccel_args: preset-vaapi
+
+# OpenVINO detector for Intel GPU
+detectors:
+  ov:
+    type: openvino
+    device: GPU
+
+model:
+  width: 300
+  height: 300
+  input_tensor: nhwc
+  input_pixel_format: bgr
+  path: /openvino-model/ssdlite_mobilenet_v2.xml
+  labelmap_path: /openvino-model/coco_91cl_bkgr.txt
+
+go2rtc:
+  streams:
+    tiandy_main:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@{FRIGATE_RTSP_HOST}:{FRIGATE_RTSP_PORT}/1/1
+      #- "ffmpeg:back#video=h264#hardware"
+    tiandy_sub:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@{FRIGATE_RTSP_HOST}:{FRIGATE_RTSP_PORT}/1/2
+
+cameras:
+  tiandy_camera:
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/tiandy_main
+          roles:
+            - record
+        - path: rtsp://127.0.0.1:8554/tiandy_sub
+          roles:
+            - detect
+
+    detect:
+      enabled: true
+      # IMPORTANT: Update width and height to match your camera's sub-stream resolution exactly
+      width: 704
+      height: 576
+      fps: 5
+
+    record:
+      enabled: true
+      alerts:
+        retain:
+          days: 10
+      detections:
+        retain:
+          days: 10
+    snapshots:
+      enabled: true
+
+    objects:
+      track:
+        - person
+        - face
+        - car
+        - cat
+
+
+detect:
+  enabled: true
+version: 0.16-0

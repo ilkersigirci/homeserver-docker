@@ -47,3 +47,5 @@ include:
   - compose/whoami.yml
   #### MONITORING ####
   - compose/beszel-agent.yml
+  - compose/frigate.yml
+  - compose/mosquitto.yml

@@ -20,3 +20,5 @@ configs/*
 configs/glance/docs
 !configs/copyparty/copyparty.conf
 !configs/rybbit
+!configs/frigate
+!configs/mosquitto

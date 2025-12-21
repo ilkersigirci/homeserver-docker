@@ -1,0 +1,68 @@
+x-deploy: &gpu-deploy
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu]
+
+services:
+  frigate:
+    image: ghcr.io/blakeblackshear/frigate:stable
+    container_name: frigate
+    restart: $MEDIA_RESTART_POLICY
+    stop_grace_period: 30s # allow enough time to shut down the various services
+    shm_size: "512mb"
+    # <<: *gpu-deploy
+    profiles:
+      - media
+    networks:
+      - t3_proxy
+    ports:
+      - "1984:1984" # go2rtc web app
+      - "8554:8554" # RTSP feeds
+      - "8555:8555/tcp" # WebRTC over tcp
+      - "8555:8555/udp" # WebRTC over udp
+    security_opt:
+      - no-new-privileges:true
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128 # For intel hwaccel, needs to be updated for your hardware
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - $CONFIGDIR/frigate:/config
+      - $DATADIR/frigate:/media/frigate
+      - type: tmpfs # Optional: 1GB of memory, reduces SSD/SD Card wear
+        target: /tmp/cache
+        tmpfs:
+          size: 1000000000
+    environment:
+      FRIGATE_RTSP_HOST: $FRIGATE_RTSP_HOST
+      FRIGATE_RTSP_PORT: $FRIGATE_RTSP_PORT
+      FRIGATE_RTSP_USER: $FRIGATE_RTSP_USER
+      FRIGATE_RTSP_PASSWORD: $FRIGATE_RTSP_PASSWORD
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.frigate-rtr.entrypoints: "websecure"
+      traefik.http.routers.frigate-rtr.rule: "Host(`frigate.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.frigate-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.frigate-rtr.service: "frigate-svc"
+      traefik.http.services.frigate-svc.loadbalancer.server.port: "8971"
+      ####### TINYAUTH #######
+      tinyauth.apps.frigate.config.domain: "frigate.$DOMAINNAME"
+      tinyauth.apps.frigate.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "Media"
+      homepage.name: "frigate"
+      homepage.icon: "frigate.png"
+      homepage.href: "https://frigate.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "description"
+      ####### GLANCE #######
+      glance.name: "frigate"
+      glance.icon: "sh:frigate"
+      glance.url: "https://frigate.$DOMAINNAME"
+      glance.description: "description"

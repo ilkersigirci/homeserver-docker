@@ -1,0 +1,35 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto:latest
+    container_name: mosquitto
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - monitoring
+    networks:
+      - t3_proxy
+    ports:
+      - "1883:1883" # default mqtt port
+      - "9001:9001" # default mqtt port for websockets
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $CONFIGDIR/mosquitto:/mosquitto/config
+      - $DATADIR/mosquitto:/mosquitto/data
+      - $DOCKERDIR/logs/mosquitto:/mosquitto/log
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+    labels:
+      ####### HOMEPAGE #######
+      homepage.group: "Monitoring"
+      homepage.name: "mosquitto"
+      homepage.icon: "mosquitto.png"
+      homepage.href: "#"
+      homepage.target: "_blank"
+      homepage.description: "Message broker that implements MQTT version 5, 3.1.1 and 3.1"
+      ####### GLANCE #######
+      glance.name: "mosquitto"
+      glance.icon: "sh:mosquitto"
+      glance.url: "#"
+      glance.description: "Message broker that implements MQTT version 5, 3.1.1 and 3.1"
