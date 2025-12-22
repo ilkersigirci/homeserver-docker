@@ -3,7 +3,7 @@ tls:
 
 mqtt:
   enabled: true
-  host: mosquitto
+  host: "{FRIGATE_MOSQUITTO_HOST}"
 
 # Hardware acceleration for Intel Xe Graphics
 ffmpeg:

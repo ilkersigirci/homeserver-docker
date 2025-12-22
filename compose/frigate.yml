@@ -21,6 +21,7 @@ services:
       - t3_proxy
     ports:
       - "1984:1984" # go2rtc web app
+      - "8971:8971" # frigate web app and api port. For HA connection.
       - "8554:8554" # RTSP feeds
       - "8555:8555/tcp" # WebRTC over tcp
       - "8555:8555/udp" # WebRTC over udp
@@ -41,6 +42,7 @@ services:
       FRIGATE_RTSP_PORT: $FRIGATE_RTSP_PORT
       FRIGATE_RTSP_USER: $FRIGATE_RTSP_USER
       FRIGATE_RTSP_PASSWORD: $FRIGATE_RTSP_PASSWORD
+      FRIGATE_MOSQUITTO_HOST: ${FRIGATE_MOSQUITTO_HOST:-mosquitto}
     labels:
       traefik.enable: "true"
       ## HTTP Routers
