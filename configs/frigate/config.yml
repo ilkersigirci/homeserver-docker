@@ -1,6 +1,14 @@
 tls:
   enabled: False
 
+auth:
+  enabled: False
+
+logger:
+  default: info
+  logs:
+    frigate.event: debug
+
 mqtt:
   enabled: true
   host: "{FRIGATE_MOSQUITTO_HOST}"
@@ -8,6 +16,9 @@ mqtt:
 # Hardware acceleration for Intel Xe Graphics
 ffmpeg:
   hwaccel_args: preset-vaapi
+
+detect:
+  enabled: true
 
 # OpenVINO detector for Intel GPU
 detectors:
@@ -67,7 +78,4 @@ cameras:
         - car
         - cat
 
-
-detect:
-  enabled: true
 version: 0.16-0
