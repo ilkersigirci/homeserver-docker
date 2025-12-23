@@ -47,7 +47,7 @@ http:
       service: home-assistant-svc
 
     gotify-rtr:
-      rule: "Host(`gotify.{{env "DOMAINNAME"}}`)"
+      rule: "Host(`gotify.{{env "BASE_DOMAINNAME"}}`)"
       entryPoints:
         - websecure
       middlewares:
