@@ -8,6 +8,8 @@ services:
       - core
     networks:
       - t3_proxy
+    ports:
+      - "1005:80"
     security_opt:
       - no-new-privileges:true
     volumes:

@@ -46,6 +46,14 @@ http:
         - chain-no-auth-relaxed
       service: home-assistant-svc
 
+    gotify-rtr:
+      rule: "Host(`gotify.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: gotify-svc
+
   services:
     openwrt-svc:
       loadBalancer:
@@ -55,13 +63,13 @@ http:
     gpu-svc:
       loadBalancer:
         servers:
-          - url: "https://100.64.0.18:8006"
+          - url: "https://192.168.2.4:8006"
         serversTransport: proxmox-transport
 
     nas-svc:
       loadBalancer:
         servers:
-          - url: "https://100.64.0.8:8006"
+          - url: "https://192.168.2.7:8006"
         serversTransport: proxmox-transport
 
     adguardhome-svc:
@@ -73,3 +81,8 @@ http:
       loadBalancer:
         servers:
           - url: "http://192.168.2.12:8123"
+
+    gotify-svc:
+      loadBalancer:
+        servers:
+          - url: "http://100.64.0.4:1005"
