@@ -54,6 +54,46 @@ http:
         - chain-no-auth-relaxed
       service: gotify-svc
 
+    cam0-rtr:
+      rule: "Host(`cam0.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: cam0-svc
+
+    cam1-rtr:
+      rule: "Host(`cam1.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: cam1-svc
+
+    cam2-rtr:
+      rule: "Host(`cam2.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: cam2-svc
+
+    cam3-rtr:
+      rule: "Host(`cam3.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: cam3-svc
+
+    cam4-rtr:
+      rule: "Host(`cam4.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: cam4-svc
+
   services:
     openwrt-svc:
       loadBalancer:
@@ -86,3 +126,29 @@ http:
       loadBalancer:
         servers:
           - url: "http://100.64.0.4:1005"
+
+
+    cam0-svc:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.2.120"
+
+    cam1-svc:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.2.121"
+
+    cam2-svc:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.2.122"
+
+    cam3-svc:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.2.123"
+
+    cam4-svc:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.2.124"
