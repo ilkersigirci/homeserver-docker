@@ -1,10 +1,13 @@
 ---
 - name: Deploy Docker Compose Updates
-  hosts: rpis
-  become: no
+  hosts: all
+  become: true
+  become_user: "{{ user_name }}"
   vars:
-    repo_path: "/home/{{ ansible_user }}/docker"
-    compose_file: "docker-compose.{{ ansible_env.MY_HOSTNAME }}.yml"
+    user_name: ilker
+    repo_path: "/home/{{ user_name }}/docker"
+    # Use inventory variable if defined, otherwise default to hostname-based file
+    compose_file: "{{ hostvars[inventory_hostname].compose_file | default('docker-compose.' + inventory_hostname + '.yml') }}"
 
   tasks:
     - name: Pull latest changes from git

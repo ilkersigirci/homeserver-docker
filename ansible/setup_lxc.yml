@@ -1,12 +1,38 @@
 ---
-- name: Setup Raspberry Pis
-  hosts: rpis
+- name: Setup Debian Hosts
+  hosts: all
   become: true
+  gather_facts: false
   vars:
-    user_name: ilker
+    ansible_user: root
     repo_path: "/home/{{ user_name }}/docker"
 
   tasks:
+    - name: Install sudo
+      apt:
+        name: sudo
+        state: present
+        update_cache: yes
+      become: false
+
+    - name: Gather facts
+      setup:
+
+    - name: Create user {{ user_name }}
+      user:
+        name: "{{ user_name }}"
+        password: "{{ user_password | password_hash('sha512') }}"
+        shell: /bin/bash
+        groups: sudo
+        append: yes
+        state: present
+
+    - name: Set up authorized keys
+      authorized_key:
+        user: "{{ user_name }}"
+        state: present
+        key: "{{ ssh_public_key }}"
+
     - name: Update and upgrade apt packages
       apt:
         update_cache: yes
@@ -28,7 +54,7 @@
       lineinfile:
         path: /etc/environment
         regexp: '^MY_HOSTNAME='
-        line: 'MY_HOSTNAME=rpi'
+        line: "MY_HOSTNAME={{ inventory_hostname }}"
 
     - name: Install Docker dependencies
       apt:
@@ -90,14 +116,6 @@
         state: started
         enabled: yes
 
-    - name: Ensure destination directory exists
-      file:
-        path: "{{ repo_path }}"
-        state: directory
-        owner: "{{ user_name }}"
-        group: "{{ user_name }}"
-        mode: '0755'
-
     - name: Clone private repository
       git:
         repo: "{{ repo_url }}"
@@ -105,4 +123,11 @@
         accept_hostkey: yes
         version: main
         force: yes
-      become: no
+      become: false
+
+    - name: Ensure repo ownership
+      file:
+        path: "{{ repo_path }}"
+        owner: "{{ user_name }}"
+        group: "{{ user_name }}"
+        recurse: yes

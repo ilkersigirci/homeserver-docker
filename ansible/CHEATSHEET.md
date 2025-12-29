@@ -1,11 +1,11 @@
-# Ansible Cheatsheet for Raspberry Pi Management
+# Ansible Cheatsheet for Debian Host Management
 
 ## Prerequisites
-1. **SSH Access**: Ensure you can SSH into your Raspberry Pis from this machine.
+1. **SSH Access**: Ensure you can SSH into your hosts (RPis, LXCs, VMs) as **root** from this machine.
    ```bash
-   ssh-copy-id ilker@192.168.1.X
+   ssh-copy-id root@192.168.2.X
    ```
-2. **Inventory**: Update `ansible/inventory.ini` with the correct IP addresses of your Pis.
+2. **Inventory**: Update `ansible/inventory.ini` with the correct IP addresses of your hosts.
 
 ## Common Commands
 
@@ -16,43 +16,43 @@ ansible -i ansible/inventory.ini all -m ping
 ```
 
 ### 2. Running a Playbook
-Run the setup playbook to update the system and install Docker.
+Run the setup playbook to update the system, create user, and install Docker.
 ```bash
-ansible-playbook -i ansible/inventory.ini ansible/setup_rpi.yml
+ansible-playbook -i ansible/inventory.ini ansible/setup_lxc.yml
 ```
 *If you need to provide a sudo password:*
 ```bash
-ansible-playbook -i ansible/inventory.ini ansible/setup_rpi.yml --ask-become-pass
+ansible-playbook -i ansible/inventory.ini ansible/setup_lxc.yml --ask-become-pass
 ```
 
 ### 3. Ad-Hoc Commands
-Run a single command on all Pis without writing a playbook.
+Run a single command on all hosts without writing a playbook.
 
 **Check disk usage:**
 ```bash
-ansible -i ansible/inventory.ini rpis -a "df -h"
+ansible -i ansible/inventory.ini all -a "df -h"
 ```
 
 **Check memory usage:**
 ```bash
-ansible -i ansible/inventory.ini rpis -a "free -m"
+ansible -i ansible/inventory.ini all -a "free -m"
 ```
 
-**Reboot all Pis:**
+**Reboot all hosts:**
 ```bash
-ansible -i ansible/inventory.ini rpis -a "sudo reboot"
+ansible -i ansible/inventory.ini all -a "sudo reboot"
 ```
 
 ### 4. Limiting Execution
-Run the playbook only on a specific host (e.g., `rpi1`).
+Run the playbook only on a specific host (e.g., `lxc1`).
 ```bash
-ansible-playbook -i ansible/inventory.ini ansible/setup_rpi.yml --limit rpi1
+ansible-playbook -i ansible/inventory.ini ansible/setup_lxc.yml --limit lxc1
 ```
 
 ### 5. Syntax Check
 Check your playbook for syntax errors before running.
 ```bash
-ansible-playbook -i ansible/inventory.ini ansible/setup_rpi.yml --syntax-check
+ansible-playbook -i ansible/inventory.ini ansible/setup_lxc.yml --syntax-check
 ```
 
 ### 6. Handling Private Repositories
@@ -62,8 +62,10 @@ If you are cloning a private GitHub repository, you need to authenticate.
 This allows the RPi to use the SSH keys on your local machine.
 1. Ensure your SSH key is added to your local agent:
    ```bash
+   eval "$(ssh-agent -s)"
+
    ssh-add -L  # Check if key is listed
-   ssh-add ~/.ssh/id_rsa  # Add if missing
+   ssh-add ~/.ssh/id_ed25519  # Add if missing
    ```
 2. Enable forwarding in `ansible.cfg` (create if missing in `ansible/` folder):
    ```ini
@@ -72,7 +74,7 @@ This allows the RPi to use the SSH keys on your local machine.
    ```
    *Or pass it in the command line:*
    ```bash
-   ansible-playbook -i ansible/inventory.ini ansible/setup_rpi.yml --ssh-common-args='-o ForwardAgent=yes'
+   ansible-playbook -i ansible/inventory.ini ansible/setup_lxc.yml --ssh-common-args='-o ForwardAgent=yes'
    ```
 
 ### 7. Deploying Updates
@@ -83,4 +85,4 @@ ansible-playbook -i ansible/inventory.ini ansible/deploy.yml --ssh-common-args='
 
 ## Directory Structure
 - `inventory.ini`: List of your servers (RPis).
-- `setup_rpi.yml`: The script (playbook) that defines what to install/configure.
+- `setup_lxc.yml`: The script (playbook) that defines what to install/configure.

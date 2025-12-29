@@ -1,0 +1,65 @@
+services:
+  semaphore:
+    # image: public.ecr.aws/semaphore/pro/server:v2.16.47
+    image: semaphoreui/semaphore:latest
+    container_name: semaphore
+    restart: $MAINTENANCE_RESTART_POLICY
+    profiles:
+      - maintenance
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      # TODO: Fix volume bind permission issues
+      # - $DATADIR/semaphore:/var/lib/semaphore # Contains frequently changing files.
+      # - $DOCKERDIR/appdata/semaphore:/tmp/semaphore # Contains cache: cloned repositories, generated inventory files, etc.
+      # - $CONFIGDIR/semaphore:/etc/semaphore
+      - $DOCKERDIR/ansible:/srv/ansible:ro
+    environment:
+      SEMAPHORE_DB_DIALECT: sqlite
+      SEMAPHORE_ADMIN: admin
+      SEMAPHORE_ADMIN_PASSWORD: admin
+      SEMAPHORE_ADMIN_NAME: Admin
+      SEMAPHORE_ADMIN_EMAIL: admin@$BASE_DOMAINNAME
+      # SEMAPHORE_USE_REMOTE_RUNNER: "True"
+      SEMAPHORE_GOTIFY_ALERT: True
+      SEMAPHORE_GOTIFY_URL: https://gotify.$BASE_DOMAINNAME
+      SEMAPHORE_GOTIFY_TOKEN: $GOTIFY_SEMAPHORE_TOKEN
+      ANSIBLE_HOST_KEY_CHECKING: False
+      # SEMAPHORE_OIDC_PROVIDERS: |
+      #   {
+      #     "{{ idp_domain }}": {
+      #       "provider_url": "https://{{ idp_domain }}/oauth2/openid/{{ semaphore_oidc_client_id }}",
+      #       "client_id": "{{ semaphore_oidc_client_id }}",
+      #       "client_secret": "{{ semaphore_oidc_client_secret }}",
+      #       "redirect_url": "https://{{ semaphore_domain }}/api/auth/oidc/{{ idp_domain }}/redirect",
+      #       "name_claim": "name",
+      #       "display_name": "Sign in with {{ idp_domain }}"
+      #     }
+      #   }
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.semaphore-rtr.entrypoints: "websecure"
+      traefik.http.routers.semaphore-rtr.rule: "Host(`semaphore.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.semaphore-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.semaphore-rtr.service: "semaphore-svc"
+      traefik.http.services.semaphore-svc.loadbalancer.server.port: "3000"
+      ####### TINYAUTH #######
+      tinyauth.apps.semaphore.config.domain: "semaphore.$DOMAINNAME"
+      tinyauth.apps.semaphore.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "Maintenance"
+      homepage.name: "semaphore"
+      homepage.icon: "semaphore.png"
+      homepage.href: "https://semaphore.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Modern UI and powerful API for Ansible"
+      ####### GLANCE #######
+      glance.name: "semaphore"
+      glance.icon: "sh:semaphore"
+      glance.url: "https://semaphore.$DOMAINNAME"
+      glance.description: "Modern UI and powerful API for Ansible"
