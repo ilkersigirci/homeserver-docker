@@ -2,7 +2,7 @@
 # TODO: How to set Apprise notification as env var instead of in UI?
 services:
   arcane:
-    image: ghcr.io/getarcaneapp/arcane:next
+    image: ghcr.io/getarcaneapp/arcane:latest
     container_name: arcane
     restart: $CORE_RESTART_POLICY
     profiles:
