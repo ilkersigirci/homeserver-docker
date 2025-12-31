@@ -85,6 +85,7 @@ include:
   # - compose/feishin.yml
   - compose/jellyfin.yml
   - compose/jellyseerr.yml
+  - compose/kiwix-serve.yml
   # - compose/openarchiver.yml
   - compose/pinchflat.yml
   # - compose/prowlarr.yml

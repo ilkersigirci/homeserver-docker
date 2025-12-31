@@ -1,0 +1,40 @@
+services:
+  kiwix-serve:
+    image: ghcr.io/kiwix/kiwix-serve:latest
+    container_name: kiwix-serve
+    restart: $MEDIA_RESTART_POLICY
+    # command: wikipedia.zim wiktionary.zim
+    command: '*.zim'
+    profiles:
+      - media
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $KIWIXDIR:/data
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.kiwix-serve-rtr.entrypoints: "websecure"
+      traefik.http.routers.kiwix-serve-rtr.rule: "Host(`kiwix.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.kiwix-serve-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.kiwix-serve-rtr.service: "kiwix-serve-svc"
+      traefik.http.services.kiwix-serve-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.kiwix-serve.config.domain: "kiwix.$DOMAINNAME"
+      tinyauth.apps.kiwix-serve.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "Media"
+      homepage.name: "kiwix-serve"
+      homepage.icon: "kiwix-serve.png"
+      homepage.href: "https://kiwix.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "A ZIM compatible Web server"
+      ####### GLANCE #######
+      glance.name: "kiwix-serve"
+      glance.icon: "sh:kiwix-serve"
+      glance.url: "https://kiwix.$DOMAINNAME"
+      glance.description: "A ZIM compatible Web server"
