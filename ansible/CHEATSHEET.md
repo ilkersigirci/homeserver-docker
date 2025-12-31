@@ -5,24 +5,24 @@
    ```bash
    ssh-copy-id root@192.168.2.X
    ```
-2. **Inventory**: Update `ansible/inventory.ini` with the correct IP addresses of your hosts.
+2. **Inventory**: Update `ansible/inventory.yaml` with the correct IP addresses of your hosts.
 
 ## Common Commands
 
 ### 1. Connectivity Check
 Ping all hosts in the inventory to ensure Ansible can reach them.
 ```bash
-ansible -i ansible/inventory.ini all -m ping
+ansible -i ansible/inventory.yaml all -m ping
 ```
 
 ### 2. Running a Playbook
 Run the setup playbook to update the system, create user, and install Docker.
 ```bash
-ansible-playbook -i ansible/inventory.ini ansible/setup_lxc.yml
+ansible-playbook -i ansible/inventory.yaml ansible/setup_lxc.yml
 ```
 *If you need to provide a sudo password:*
 ```bash
-ansible-playbook -i ansible/inventory.ini ansible/setup_lxc.yml --ask-become-pass
+ansible-playbook -i ansible/inventory.yaml ansible/setup_lxc.yml --ask-become-pass
 ```
 
 ### 3. Ad-Hoc Commands
@@ -30,29 +30,29 @@ Run a single command on all hosts without writing a playbook.
 
 **Check disk usage:**
 ```bash
-ansible -i ansible/inventory.ini all -a "df -h"
+ansible -i ansible/inventory.yaml all -a "df -h"
 ```
 
 **Check memory usage:**
 ```bash
-ansible -i ansible/inventory.ini all -a "free -m"
+ansible -i ansible/inventory.yaml all -a "free -m"
 ```
 
 **Reboot all hosts:**
 ```bash
-ansible -i ansible/inventory.ini all -a "sudo reboot"
+ansible -i ansible/inventory.yaml all -a "sudo reboot"
 ```
 
 ### 4. Limiting Execution
 Run the playbook only on a specific host (e.g., `lxc1`).
 ```bash
-ansible-playbook -i ansible/inventory.ini ansible/setup_lxc.yml --limit lxc1
+ansible-playbook -i ansible/inventory.yaml ansible/setup_lxc.yml --limit lxc1
 ```
 
 ### 5. Syntax Check
 Check your playbook for syntax errors before running.
 ```bash
-ansible-playbook -i ansible/inventory.ini ansible/setup_lxc.yml --syntax-check
+ansible-playbook -i ansible/inventory.yaml ansible/setup_lxc.yml --syntax-check
 ```
 
 ### 6. Handling Private Repositories
@@ -74,15 +74,15 @@ This allows the RPi to use the SSH keys on your local machine.
    ```
    *Or pass it in the command line:*
    ```bash
-   ansible-playbook -i ansible/inventory.ini ansible/setup_lxc.yml --ssh-common-args='-o ForwardAgent=yes'
+   ansible-playbook -i ansible/inventory.yaml ansible/setup_lxc.yml --ssh-common-args='-o ForwardAgent=yes'
    ```
 
 ### 7. Deploying Updates
 To pull the latest code and restart containers:
 ```bash
-ansible-playbook -i ansible/inventory.ini ansible/deploy.yml --ssh-common-args='-o ForwardAgent=yes'
+ansible-playbook -i ansible/inventory.yaml ansible/deploy.yml --ssh-common-args='-o ForwardAgent=yes'
 ```
 
 ## Directory Structure
-- `inventory.ini`: List of your servers (RPis).
+- `inventory.yaml`: List of your servers (RPis).
 - `setup_lxc.yml`: The script (playbook) that defines what to install/configure.

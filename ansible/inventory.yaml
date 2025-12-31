@@ -1,0 +1,22 @@
+lxcs:
+  hosts:
+    lxc1:
+      ansible_host: 192.168.2.20
+    # rpi1:
+    #   ansible_host: 192.168.2.13
+    # rpi2:
+    #   ansible_host: 192.168.2.13
+    # rpi3:
+    #   ansible_host: 192.168.2.14
+  vars:
+    user_name: ilker
+    user_password: ilker
+    ansible_user: "{{ user_name }}"
+    # Common variables
+    repo_url: git@github.com:ilkersigirci/homeserver-docker.git
+    compose_file: docker-compose.rpi.yml
+    ssh_public_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMi9rMCBs8S6G9Mr6MGs2vcS/EO52tArC7whkVL0KeG/ rpi0"
+
+    # If you haven't set up SSH keys yet, you can uncomment the line below to ask for password
+    # ansible_ssh_pass: yourpassword
+    # Or use --ask-pass when running the playbook
