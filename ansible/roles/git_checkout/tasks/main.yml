@@ -1,0 +1,8 @@
+---
+- name: Clone private repository
+  ansible.builtin.git:
+    repo: "{{ repo_url }}"
+    dest: "{{ repo_path }}"
+    accept_hostkey: true
+    version: main
+    force: true

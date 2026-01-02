@@ -2,6 +2,7 @@ appdata
 data
 logs
 secrets
+.ansible
 compose/photo/.env
 .idea
 .env*

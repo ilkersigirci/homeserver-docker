@@ -1,0 +1,18 @@
+---
+- name: Deploy Docker Compose Updates
+  hosts: all
+  become: true
+  become_user: "{{ user_name }}"
+
+  tasks:
+    - name: Pull latest changes from git
+      ansible.builtin.include_role:
+        name: git_pull
+
+    - name: Update and Restart Docker Containers
+      ansible.builtin.shell: |
+        docker compose -f docker-compose.${MY_HOSTNAME}.yml up -d --remove-orphans
+      args:
+        chdir: "{{ repo_path }}"
+      register: compose_output
+      changed_when: "'Created' in compose_output.stderr or 'Recreated' in compose_output.stderr or 'Started' in compose_output.stderr"

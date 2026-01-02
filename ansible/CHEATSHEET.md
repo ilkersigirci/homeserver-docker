@@ -67,6 +67,14 @@ This allows the RPi to use the SSH keys on your local machine.
    ssh-add -L  # Check if key is listed
    ssh-add ~/.ssh/id_ed25519  # Add if missing
    ```
+   *Tip: To avoid running this every time, add the following to your `~/.bashrc` or `~/.zshrc`:*
+   ```bash
+   if [ -z "$SSH_AUTH_SOCK" ]; then
+      eval "$(ssh-agent -s)" > /dev/null
+      ssh-add ~/.ssh/id_ed25519 2> /dev/null
+   fi
+   ```
+
 2. Enable forwarding in `ansible.cfg` (create if missing in `ansible/` folder):
    ```ini
    [ssh_connection]

@@ -1,0 +1,11 @@
+---
+- name: Setup Debian Hosts
+  hosts: all
+  become: true
+  gather_facts: false
+  vars:
+    ansible_user: root
+
+  roles:
+    - common
+    - docker
