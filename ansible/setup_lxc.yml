@@ -9,38 +9,39 @@
 
   tasks:
     - name: Install sudo
-      apt:
+      ansible.builtin.apt:
         name: sudo
         state: present
-        update_cache: yes
+        update_cache: true
       become: false
 
     - name: Gather facts
-      setup:
+      ansible.builtin.setup:
 
     - name: Create user {{ user_name }}
-      user:
+      ansible.builtin.user:
         name: "{{ user_name }}"
         password: "{{ user_password | password_hash('sha512') }}"
         shell: /bin/bash
         groups: sudo
-        append: yes
+        append: true
         state: present
 
+    # ansible-galaxy collection install ansible.posix
     - name: Set up authorized keys
-      authorized_key:
+      ansible.posix.authorized_key:
         user: "{{ user_name }}"
         state: present
         key: "{{ ssh_public_key }}"
 
     - name: Update and upgrade apt packages
-      apt:
-        update_cache: yes
+      ansible.builtin.apt:
+        update_cache: true
         upgrade: dist
         cache_valid_time: 3600
 
     - name: Install essential packages
-      apt:
+      ansible.builtin.apt:
         name:
           - git
           - curl
@@ -51,38 +52,39 @@
         state: present
 
     - name: Set MY_HOSTNAME environment variable
-      lineinfile:
+      ansible.builtin.lineinfile:
         path: /etc/environment
         regexp: '^MY_HOSTNAME='
         line: "MY_HOSTNAME={{ inventory_hostname }}"
 
     - name: Install Docker dependencies
-      apt:
+      ansible.builtin.apt:
         name:
           - ca-certificates
           - gnupg
         state: present
 
     - name: Create directory for Docker GPG key
-      file:
+      ansible.builtin.file:
         path: /etc/apt/keyrings
         state: directory
         mode: '0755'
 
     - name: Check if Docker GPG key exists
-      stat:
+      ansible.builtin.stat:
         path: /etc/apt/keyrings/docker.asc
       register: docker_gpg
 
     - name: Add Docker's official GPG key
-      get_url:
+      ansible.builtin.get_url:
         url: https://download.docker.com/linux/debian/gpg
         dest: /etc/apt/keyrings/docker.asc
         mode: '0644'
       when: not docker_gpg.stat.exists
 
     - name: Add Docker repository
-      shell: |
+      ansible.builtin.shell: |
+        set -o pipefail
         echo \
           "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian \
           $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
@@ -91,11 +93,11 @@
         creates: /etc/apt/sources.list.d/docker.list
 
     - name: Update apt cache after adding Docker repo
-      apt:
-        update_cache: yes
+      ansible.builtin.apt:
+        update_cache: true
 
     - name: Install Docker packages
-      apt:
+      ansible.builtin.apt:
         name:
           - docker-ce
           - docker-ce-cli
@@ -105,29 +107,29 @@
         state: present
 
     - name: Add user to docker group
-      user:
+      ansible.builtin.user:
         name: "{{ user_name }}"
         groups: docker
-        append: yes
+        append: true
 
     - name: Enable and start Docker service
-      service:
+      ansible.builtin.service:
         name: docker
         state: started
-        enabled: yes
+        enabled: true
 
     - name: Clone private repository
-      git:
+      ansible.builtin.git:
         repo: "{{ repo_url }}"
         dest: "{{ repo_path }}"
-        accept_hostkey: yes
+        accept_hostkey: true
         version: main
-        force: yes
+        force: true
       become: false
 
     - name: Ensure repo ownership
-      file:
+      ansible.builtin.file:
         path: "{{ repo_path }}"
         owner: "{{ user_name }}"
         group: "{{ user_name }}"
-        recurse: yes
+        recurse: true
