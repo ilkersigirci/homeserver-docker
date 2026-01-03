@@ -1,0 +1,6 @@
+---
+user_name: ilker
+user_password: ilker
+ansible_user: "{{ user_name }}"
+repo_url: git@github.com:ilkersigirci/homeserver-docker.git
+repo_path: "/home/{{ user_name }}/docker"

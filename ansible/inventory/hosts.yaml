@@ -8,12 +8,7 @@ lxcs:
     #   ansible_host: 192.168.2.13
     # rpi3:
     #   ansible_host: 192.168.2.14
-  vars:
-    user_name: ilker
-    user_password: ilker
-    ansible_user: "{{ user_name }}"
-    # Common variables
-    repo_url: git@github.com:ilkersigirci/homeserver-docker.git
-    repo_path: "/home/{{ user_name }}/docker"
-    compose_file: docker-compose.rpi.yml
-    ssh_public_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMi9rMCBs8S6G9Mr6MGs2vcS/EO52tArC7whkVL0KeG/ rpi0"
+  
+  # NOTE: vars are in the group_vars/lxcs.yml
+  # vars:
+  #   dummy_var: dummy_value
