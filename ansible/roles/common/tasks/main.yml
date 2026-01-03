@@ -18,6 +18,7 @@
     append: true
     state: present
 
+  # ansible-galaxy collection install ansible.posix
 - name: Set up authorized keys
   ansible.posix.authorized_key:
     user: "{{ user_name }}"

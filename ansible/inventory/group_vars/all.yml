@@ -1,2 +1,2 @@
 ---
-ssh_public_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMi9rMCBs8S6G9Mr6MGs2vcS/EO52tArC7whkVL0KeG/ rpi0"
+ssh_public_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFadqKW8w7ESy4RpHpHiADosfPCN3fDBKBXPxqhw7LGj homeserver-docker"
