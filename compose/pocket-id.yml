@@ -20,6 +20,7 @@ services:
       TZ: $TZ
       APP_URL: https://pocketid.$BASE_DOMAINNAME
       PORT: 1411
+      ENCRYPTION_KEY: $POCKETID_ENCRYPTION_KEY
     healthcheck:
         test: "curl -f http://localhost:1411/healthz"
         interval: 1m30s
