@@ -1,0 +1,39 @@
+---
+- name: Showcase Vaultwarden as Secret Manager
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    # -------------------------------------------------------------------------
+    # PREREQUISITES:
+    # 1. Install Unofficial Bitwarden CLI ('rbw') https://github.com/doy/rbw
+    # 2. Ensure rbw is configured and unlocked (run 'rbw login' and 'rbw unlock')
+    # -------------------------------------------------------------------------
+
+    # Lazy loaded secrets from Vaultwarden
+    ansible_user: "{{ lookup('pipe', 'rbw get  Ansible.Test --field username') }}"
+    ansible_password: "{{ lookup('pipe', 'rbw get Ansible.Test') }}"
+
+  tasks:
+    - name: Check if rbw is unlocked
+      ansible.builtin.command: rbw unlocked
+      changed_when: false
+      register: rbw_check
+      ignore_errors: true
+      failed_when: false
+
+    - name: Fail if rbw is not ready
+      ansible.builtin.fail:
+        msg: "rbw is not unlocked or configured. Please run 'rbw unlock'."
+      when: "'locked' in rbw_check.stderr or 'locked' in rbw_check.stdout"
+
+    - name: Display the retrieved username
+      ansible.builtin.debug:
+        msg: "The ansible user is: {{ ansible_user }}"
+      failed_when: false
+
+    - name: Display the retrieved password
+      ansible.builtin.debug:
+        msg: "The ansible password is: {{ ansible_password }}"
+      failed_when: false

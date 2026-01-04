@@ -59,8 +59,8 @@ ansible-playbook -i ./inventory/hosts.yaml ./playbooks/setup_lxc.yml --syntax-ch
 If you are cloning a private GitHub repository, you need to authenticate.
 
 **SSH Agent Forwarding**
-This allows the RPi to use the SSH keys on your local machine.
-1. Ensure your SSH key is added to your local agent:
+This allows your other machines to use the SSH keys on your local machine.
+1. (Alternative) Add your local agent using local `ssh-agent`:
    ```bash
    eval "$(ssh-agent -s)"
 
@@ -74,8 +74,15 @@ This allows the RPi to use the SSH keys on your local machine.
       ssh-add ~/.ssh/id_ed25519 2> /dev/null
    fi
    ```
+2. Use `ssh-agent` of Unofficial Bitwarden cli `rbw` (recommended for better security):
+   ```bash
+   if [ -z "$XDG_RUNTIME_DIR" ]; then
+      export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+   fi
+   export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/rbw/ssh-agent-socket"
+   ```
 
-2. Enable forwarding in `ansible.cfg`:
+3. Enable forwarding in `ansible.cfg`:
    ```ini
    [ssh_connection]
    ssh_args = -o ForwardAgent=yes
