@@ -1,0 +1,11 @@
+---
+- name: Check if rbw is unlocked
+  ansible.builtin.command: rbw unlocked
+  changed_when: false
+  register: check_rbw_reg
+  failed_when: false
+
+- name: Fail if rbw is not ready
+  ansible.builtin.fail:
+    msg: "rbw is not unlocked or configured. Please run 'rbw unlock' on the control node."
+  when: check_rbw_reg.rc != 0

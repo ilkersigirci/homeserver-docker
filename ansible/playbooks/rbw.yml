@@ -11,21 +11,9 @@
   gather_facts: false
 
   tasks:
-    - name: Check if rbw is unlocked
-      ansible.builtin.command: rbw unlocked
-      changed_when: false
-      register: rbw_check
-      ignore_errors: true
-      failed_when: false
-
-    - name: Fail if rbw is not ready
-      ansible.builtin.fail:
-        msg: "rbw is not unlocked or configured. Please run 'rbw unlock'."
-      # when: "'locked' in rbw_check.stderr or 'locked' in rbw_check.stdout"
-      when: >
-        rbw_check.rc is defined and rbw_check.rc != 0 or
-        'locked' in (rbw_check.stderr | default('')) or
-        'locked' in (rbw_check.stdout | default(''))
+    - name: Ensure rbw is unlocked
+      ansible.builtin.include_role:
+        name: check_rbw
 
     - name: Set ansible credentials
       ansible.builtin.set_fact:
