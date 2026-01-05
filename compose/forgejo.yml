@@ -30,6 +30,9 @@ services:
     image: codeberg.org/forgejo/forgejo:13-rootless
     container_name: forgejo
     user: 1000:1000
+    cpus: "1.5"
+    mem_reservation: "512M"
+    mem_limit: "2G"
     restart: $MAINTENANCE_RESTART_POLICY
     depends_on:
       forgejo-db:
