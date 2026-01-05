@@ -16,6 +16,16 @@ bash scripts/docker-manage.sh down
 bash scripts/docker-manage.sh pull
 ```
 
+- Useful aliases
+
+```bash
+alias dup="docker compose --file $HOME/docker/compose/$MY_HOSTNAME.yml up"
+alias ddown="docker compose --file $HOME/docker/compose/$MY_HOSTNAME.yml down --volumes --remove-orphans"
+alias drm="docker compose --file $HOME/docker/compose/$MY_HOSTNAME.yml rm -svf"
+alias dpull="docker compose --file $HOME/docker/compose/$MY_HOSTNAME.yml pull"
+alias dbuild="docker compose --file $HOME/docker/compose/$MY_HOSTNAME.yml build"
+```
+
 - Start containers at machine start-up
 
 ```bash

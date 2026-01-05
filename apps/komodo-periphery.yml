@@ -2,7 +2,7 @@
 # TODO: Create custom config file and give allowed_ips = ["x.y.z.t"] etc.
 # NOTE: For stacks
 #  - Set Run Directory: $DOCKERDIR
-#  - File Paths: docker-compose.$MY_HOSTNAME.yml
+#  - File Paths: compose/$MY_HOSTNAME.yml
 #  - env file path: EMPTY
 #  - Additional Env Files: .env
 # FIXME: `core` compose profile is not working.

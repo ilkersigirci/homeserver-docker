@@ -1,0 +1,117 @@
+name: gpu
+
+networks:
+  default:
+    driver: bridge
+  t3_proxy:
+    name: t3_proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.90.0/24
+  socket_proxy:
+    name: socket_proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.91.0/24
+  dockervlan:
+    name: dockervlan
+    driver: macvlan
+    driver_opts:
+      parent: enp18s0
+    ipam:
+      config:
+        - subnet: "192.168.1.0/24"
+          ip_range: "192.168.1.19/32"
+          gateway: "192.168.1.1"
+
+########################### SECRETS
+secrets:
+  # authelia_jwt_secret:
+  #   file: $DOCKERDIR/secrets/authelia_jwt_secret
+  # authelia_session_secret:
+  #   file: $DOCKERDIR/secrets/authelia_session_secret
+  # authelia_storage_encryption_key:
+  #   file: $DOCKERDIR/secrets/authelia_storage_encryption_key
+  cf_dns_api_token:
+    file: $DOCKERDIR/secrets/cf_dns_api_token
+  # firefly_app_key:
+  #   file: $DOCKERDIR/secrets/firefly_app_key
+  # mysql_root_password:
+  #   file: $DOCKERDIR/secrets/mysql_root_password
+  # mysql_password:
+  #   file: $DOCKERDIR/secrets/mysql_password
+  rustic_password:
+    file: $DOCKERDIR/secrets/rustic_password
+
+include:
+  ########################### SERVICES
+  #### CORE ####
+  - ../apps/arcane.yml
+  # - ../apps/dufs.yml
+  - ../apps/filebrowser.yml
+  - ../apps/homepage.yml
+  - ../apps/socket-proxy.yml
+  - ../apps/tinyauth.yml
+  - ../apps/traefik.yml
+  # - ../apps/traefik-log-dashboard.yml
+  # - ../apps/vaultwarden.yml
+  # - ../apps/webfinger.yml
+  #### DESKTOP APPS ####
+  # - ../apps/bambustudio.yml
+  # - ../apps/krita.yml
+  # - ../apps/firefox.yml
+  # - ../apps/gimp.yml
+  # - ../apps/thunderbird.yml # TODO
+  #### MACHINE LEARNING ####
+  # - ../apps/open-webui.yml
+  ###### MAINTENANCE ####
+  # - ../apps/code-server.yml
+  # - ../apps/docker-gc.yml
+  # - ../apps/dozzle.yml
+  - ../apps/forgejo.yml
+  - ../apps/healthchecks.yml
+  - ../apps/loggifly.yml
+  # - ../apps/pgadmin.yml # TODO
+  # - ../apps/rustic.yml
+  # - ../apps/syncthing.yml
+  - ../apps/termix.yml
+  # - ../apps/uptime-kuma.yml
+  - ../apps/whoami.yml
+  # - ../apps/watchtower.yml
+  #### MEDIA ####
+  - ../apps/bichon.yml
+  # - ../apps/feishin.yml
+  - ../apps/jellyfin.yml
+  - ../apps/jellyseerr.yml
+  - ../apps/kiwix-serve.yml
+  # - ../apps/openarchiver.yml
+  - ../apps/pinchflat.yml
+  # - ../apps/prowlarr.yml
+  - ../apps/sabnzbd.yml
+  # - ../apps/scotty.yml
+  # - ../apps/splitpro.yml
+  # - ../apps/strava-statistics.yml
+  # - ../apps/yamtrack.yml
+  # - ../apps/ytptube.yml # TODO: restart always
+  - ../apps/transmission.yml
+  #### ML ####
+  # - ../apps/sd-next.yml
+  # - ../apps/langfuse.yml # TODO
+  #### MONITORING ####
+  - ../apps/beszel.yml
+  - ../apps/beszel-agent.yml
+  # - ../apps/changedetection.yml
+  # - ../apps/watchyourlan.yml
+  #### PHOTO ####
+  # - ../apps/immich-gpu.yml
+  - ../apps/immich.yml
+  #### READING ####
+  - ../apps/linkwarden.yml
+  # - ../apps/obsidian.yml
+  - ../apps/rsshub.yml
+  # - ../apps/silverbullet.yml
+  # - ../apps/quartz.yml
+  #### OTHERS ####
+  # - ../apps/homeserver-api.yml # TODO

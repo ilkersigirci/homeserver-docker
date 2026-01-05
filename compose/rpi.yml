@@ -1,4 +1,4 @@
-name: nas
+name: rpi
 
 networks:
   default:
@@ -19,7 +19,7 @@ networks:
     name: dockervlan
     driver: macvlan
     driver_opts:
-      parent: ens18
+      parent: enp18s0
     ipam:
       config:
         - subnet: "192.168.1.0/24"
@@ -48,17 +48,30 @@ secrets:
 include:
   ########################### SERVICES
   #### CORE ####
-  - compose/arcane-agent.yml
-  - compose/filebrowser.yml
-  - compose/homepage.yml
-  # - compose/glance.yml
-  - compose/socket-proxy.yml
-  - compose/tinyauth.yml
-  - compose/traefik.yml
+  - ../apps/arcane-agent.yml
+  - ../apps/adguardhome.yml
+  - ../apps/filebrowser.yml
+  - ../apps/homepage.yml
+  # - ../apps/glance.yml
+  - ../apps/socket-proxy.yml
+  - ../apps/tinyauth.yml
+  - ../apps/traefik.yml
+  # - ../apps/traefik-log-dashboard.yml
+  - ../apps/vaultwarden.yml
+  #### DESKTOP APPS ####
+  #### MACHINE LEARNING ####
   ###### MAINTENANCE ####
-  # - compose/syncthing.yml
-  - compose/whoami.yml
+  # - ../apps/code-server.yml
+  # - ../apps/dozzle.yml
+  - ../apps/healthchecks.yml
+  - ../apps/syncthing.yml
+  - ../apps/whoami.yml
   #### MEDIA ####
-  # - compose/transmission.yml
+  # - ../apps/transmission.yml
+  #### ML ####
   #### MONITORING ####
-  # - compose/beszel-agent.yml
+  - ../apps/beszel-agent.yml
+  #### PHOTO ####
+  #### READING ####
+  # - ../apps/obsidian.yml
+  - ../apps/quartz.yml

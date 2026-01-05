@@ -116,7 +116,7 @@ services:
   # Systemd or not explanation: https://github.com/moghtech/komodo/discussions/220#discussioncomment-11551625
   # NOTE: For stacks
   #  - Set Run Directory: $DOCKERDIR
-  #  - File Paths: docker-compose.$MY_HOSTNAME.yml
+  #  - File Paths: compose/$MY_HOSTNAME.yml
   #  - env file path: EMPTY
   #  - Additional Env Files: .env
   # FIXME: `core` compose profile is not working.

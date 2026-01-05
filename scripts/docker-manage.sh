@@ -9,7 +9,7 @@ fi
 
 # Configuration
 PROFILES="core,desktop_apps,ml,maintenance,media,monitoring,photo,reading,others"
-COMPOSE_CMD="docker compose -f docker-compose.$MY_HOSTNAME.yml --env-file $HOME/docker/.env"
+COMPOSE_CMD="docker compose -f compose/$MY_HOSTNAME.yml --env-file $HOME/docker/.env"
 
 # Function to display usage
 usage() {

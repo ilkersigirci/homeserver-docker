@@ -1,4 +1,4 @@
-name: rpi
+name: remoteserver
 
 networks:
   default:
@@ -9,6 +9,7 @@ networks:
     ipam:
       config:
         - subnet: 192.168.90.0/24
+        - subnet: fdcc:ad94:bacf:61a3::/64
   socket_proxy:
     name: socket_proxy
     driver: bridge
@@ -19,7 +20,7 @@ networks:
     name: dockervlan
     driver: macvlan
     driver_opts:
-      parent: enp18s0
+      parent: enp0s3
     ipam:
       config:
         - subnet: "192.168.1.0/24"
@@ -48,30 +49,49 @@ secrets:
 include:
   ########################### SERVICES
   #### CORE ####
-  - compose/arcane-agent.yml
-  - compose/adguardhome.yml
-  - compose/filebrowser.yml
-  - compose/homepage.yml
-  # - compose/glance.yml
-  - compose/socket-proxy.yml
-  - compose/tinyauth.yml
-  - compose/traefik.yml
-  # - compose/traefik-log-dashboard.yml
-  - compose/vaultwarden.yml
+  - ../apps/arcane-agent.yml
+  - ../apps/adguardhome.yml
+  - ../apps/crowdsec.yml
+  - ../apps/copyparty.yml
+  - ../apps/gotify.yml
+  - ../apps/headscale.yml
+  - ../apps/homepage.yml
+  # - ../apps/pocket-id.yml
+  - ../apps/socket-proxy.yml
+  - ../apps/tinyauth.yml
+  - ../apps/traefik.yml
+  # - ../apps/vaultwarden.yml
   #### DESKTOP APPS ####
+  # - ../apps/firefox.yml
   #### MACHINE LEARNING ####
   ###### MAINTENANCE ####
-  # - compose/code-server.yml
-  # - compose/dozzle.yml
-  - compose/healthchecks.yml
-  - compose/syncthing.yml
-  - compose/whoami.yml
+  - ../apps/bentopdf.yml
+  # - ../apps/code-server.yml
+  - ../apps/convertx.yml
+  # - ../apps/dozzle.yml
+  - ../apps/gatus.yml
+  - ../apps/it-tools.yml
+  - ../apps/omni-tools.yml
+  - ../apps/syncthing.yml
+  # - ../apps/uptime-kuma.yml
+  - ../apps/whoami.yml
+  - ../apps/withoutbg.yml
   #### MEDIA ####
-  # - compose/transmission.yml
+  - ../apps/bitplay.yml
+  - ../apps/mazanoke.yml
+  - ../apps/stremio.yml
+  # - ../apps/transmission.yml
+  - ../apps/zipline.yml
   #### ML ####
+  - ../apps/open-webui.yml
+  - ../apps/searxng.yml
   #### MONITORING ####
-  - compose/beszel-agent.yml
+  - ../apps/beszel-agent.yml
+  - ../apps/rybbit.yml
   #### PHOTO ####
   #### READING ####
-  # - compose/obsidian.yml
-  - compose/quartz.yml
+  # - ../apps/obsidian.yml
+  # - ../apps/silverbullet.yml
+  # - ../apps/quartz.yml
+  #### OTHERS ####
+  # - ../apps/enclosed.yml

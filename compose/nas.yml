@@ -1,4 +1,4 @@
-name: remoteserver
+name: nas
 
 networks:
   default:
@@ -9,7 +9,6 @@ networks:
     ipam:
       config:
         - subnet: 192.168.90.0/24
-        - subnet: fdcc:ad94:bacf:61a3::/64
   socket_proxy:
     name: socket_proxy
     driver: bridge
@@ -20,7 +19,7 @@ networks:
     name: dockervlan
     driver: macvlan
     driver_opts:
-      parent: enp0s3
+      parent: ens18
     ipam:
       config:
         - subnet: "192.168.1.0/24"
@@ -49,49 +48,17 @@ secrets:
 include:
   ########################### SERVICES
   #### CORE ####
-  - compose/arcane-agent.yml
-  - compose/adguardhome.yml
-  - compose/crowdsec.yml
-  - compose/copyparty.yml
-  - compose/gotify.yml
-  - compose/headscale.yml
-  - compose/homepage.yml
-  # - compose/pocket-id.yml
-  - compose/socket-proxy.yml
-  - compose/tinyauth.yml
-  - compose/traefik.yml
-  # - compose/vaultwarden.yml
-  #### DESKTOP APPS ####
-  # - compose/firefox.yml
-  #### MACHINE LEARNING ####
+  - ../apps/arcane-agent.yml
+  - ../apps/filebrowser.yml
+  - ../apps/homepage.yml
+  # - ../apps/glance.yml
+  - ../apps/socket-proxy.yml
+  - ../apps/tinyauth.yml
+  - ../apps/traefik.yml
   ###### MAINTENANCE ####
-  - compose/bentopdf.yml
-  # - compose/code-server.yml
-  - compose/convertx.yml
-  # - compose/dozzle.yml
-  - compose/gatus.yml
-  - compose/it-tools.yml
-  - compose/omni-tools.yml
-  - compose/syncthing.yml
-  # - compose/uptime-kuma.yml
-  - compose/whoami.yml
-  - compose/withoutbg.yml
+  # - ../apps/syncthing.yml
+  - ../apps/whoami.yml
   #### MEDIA ####
-  - compose/bitplay.yml
-  - compose/mazanoke.yml
-  - compose/stremio.yml
-  # - compose/transmission.yml
-  - compose/zipline.yml
-  #### ML ####
-  - compose/open-webui.yml
-  - compose/searxng.yml
+  # - ../apps/transmission.yml
   #### MONITORING ####
-  - compose/beszel-agent.yml
-  - compose/rybbit.yml
-  #### PHOTO ####
-  #### READING ####
-  # - compose/obsidian.yml
-  # - compose/silverbullet.yml
-  # - compose/quartz.yml
-  #### OTHERS ####
-  # - compose/enclosed.yml
+  # - ../apps/beszel-agent.yml

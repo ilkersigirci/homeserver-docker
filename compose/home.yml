@@ -34,11 +34,19 @@ secrets:
 include:
   ########################### SERVICES
   #### CORE ####
-  - compose/arcane-agent.yml
-  - compose/adguardhome-host.yml
-  - compose/homepage.yml
-  - compose/socket-proxy.yml
-  - compose/tinyauth.yml
-  - compose/traefik.yml
+  - ../apps/arcane-agent.yml
+  - ../apps/adguardhome-host.yml
+  - ../apps/glance.yml
+  - ../apps/homepage.yml
+  - ../apps/pocket-id.yml
+  - ../apps/socket-proxy.yml
+  - ../apps/tinyauth.yml
+  - ../apps/traefik.yml
+  - ../apps/vaultwarden.yml
   ###### MAINTENANCE ####
-  - compose/whoami.yml
+  - ../apps/home-assistant.yml
+  - ../apps/syncthing.yml
+  - ../apps/whoami.yml
+  #### READING ####
+  - ../apps/silverbullet.yml
+  - ../apps/silverbullet-test.yml

@@ -36,16 +36,16 @@ secrets:
 include:
   ########################### SERVICES
   #### CORE ####
-  - compose/arcane-agent.yml
-  - compose/dufs.yml
-  - compose/homepage.yml
-  - compose/socket-proxy.yml
-  - compose/tinyauth.yml
-  - compose/traefik.yml
+  - ../apps/arcane-agent.yml
+  - ../apps/dufs.yml
+  - ../apps/homepage.yml
+  - ../apps/socket-proxy.yml
+  - ../apps/tinyauth.yml
+  - ../apps/traefik.yml
   ###### MAINTENANCE ####
-  - compose/syncthing.yml
-  - compose/whoami.yml
+  - ../apps/syncthing.yml
+  - ../apps/whoami.yml
   #### MONITORING ####
-  - compose/beszel-agent.yml
-  - compose/frigate.yml
-  - compose/mosquitto.yml
+  - ../apps/beszel-agent.yml
+  - ../apps/frigate.yml
+  - ../apps/mosquitto.yml
