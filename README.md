@@ -3,7 +3,7 @@
 ![Services](./resources/services.png)
 
 
-- Essential commands
+Essential commands
 
 ```bash
 # Start selected components
@@ -16,7 +16,7 @@ bash scripts/docker-manage.sh down
 bash scripts/docker-manage.sh pull
 ```
 
-- Useful aliases
+Useful aliases
 
 ```bash
 alias dup="docker compose --file $HOME/docker/compose/$MY_HOSTNAME.yml up"
@@ -26,7 +26,7 @@ alias dpull="docker compose --file $HOME/docker/compose/$MY_HOSTNAME.yml pull"
 alias dbuild="docker compose --file $HOME/docker/compose/$MY_HOSTNAME.yml build"
 ```
 
-- Start containers at machine start-up
+Start containers at machine start-up
 
 ```bash
 nano $HOME/.config/autostart/start.sh.desktop
