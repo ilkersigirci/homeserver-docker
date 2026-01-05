@@ -1,0 +1,15 @@
+---
+- name: Setup Nerd Fonts
+  hosts: dev-devices
+  become: true
+
+  tasks:
+    - name: Install FiraCode Nerd Font (Retina variants only)
+      ansible.builtin.include_role:
+        name: nerd_fonts
+      vars:
+        nerd_fonts_name: FiraCode
+        nerd_fonts_version: "3.4.0"
+        nerd_fonts_files:
+          - FiraCodeNerdFontMono-Retina.ttf
+          - FiraCodeNerdFont-Retina.ttf

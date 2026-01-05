@@ -1,0 +1,9 @@
+---
+nerd_fonts_name: FiraCode
+nerd_fonts_version: "3.4.0"
+
+nerd_fonts_files:
+  - FiraCodeNerdFontMono-Retina.ttf
+  - FiraCodeNerdFont-Retina.ttf
+
+nerd_fonts_install_dir: /usr/local/share/fonts/nerd-fonts

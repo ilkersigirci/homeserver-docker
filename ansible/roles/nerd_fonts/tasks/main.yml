@@ -1,0 +1,33 @@
+---
+- name: Ensure Nerd Fonts dependencies are installed
+  ansible.builtin.apt:
+    name:
+      - unzip
+      - fontconfig
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Ensure Nerd Fonts install directory exists
+  ansible.builtin.file:
+    path: "{{ nerd_fonts_install_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Check if known Nerd Font files exist
+  ansible.builtin.stat:
+    path: "{{ nerd_fonts_install_dir }}/{{ item }}"
+  loop: "{{ nerd_fonts_files }}"
+  register: nerd_fonts_stat
+
+- name: Download and extract Nerd Fonts
+  ansible.builtin.unarchive:
+    src: "https://github.com/ryanoasis/nerd-fonts/releases/download/v{{ nerd_fonts_version }}/{{ nerd_fonts_name }}.zip"
+    dest: "{{ nerd_fonts_install_dir }}"
+    remote_src: true
+    include: "{{ nerd_fonts_files }}"
+    extra_opts:
+      - "-j"
+    mode: '0644'
+  when: nerd_fonts_stat.results | selectattr('stat.exists', 'equalto', false) | list | length > 0
+  notify: Update font cache
