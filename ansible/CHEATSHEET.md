@@ -9,6 +9,12 @@
 
 ## Common Commands
 
+### 0. Install Requirements (Ansible Galaxy collections)
+Install the collections listed in `./collections/requirements.yaml` (e.g., `ansible.posix`).
+```bash
+ansible-galaxy collection install -r ./collections/requirements.yaml
+```
+
 ### 1. Connectivity Check
 Ping all hosts in the inventory to ensure Ansible can reach them.
 ```bash
