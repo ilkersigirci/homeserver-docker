@@ -1,11 +1,10 @@
 ---
 - name: Setup Debian Hosts
-  hosts: all
+  hosts: lxcs
   become: true
-  gather_facts: false
   vars:
     ansible_user: root
 
   roles:
-    - common
-    - docker
+    - role: common
+    - role: docker_install

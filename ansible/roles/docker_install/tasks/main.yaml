@@ -1,0 +1,71 @@
+---
+- name: Ensure prerequisites are installed
+  ansible.builtin.apt:
+    name:
+      - ca-certificates  # TLS CA bundle for HTTPS APT repos
+      - curl  # Fetch Docker GPG key over HTTPS
+      - gnupg  # Handle/dearmor GPG keys when needed
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Ensure apt keyrings directory exists
+  ansible.builtin.file:
+    path: "/etc/apt/keyrings"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Install Docker GPG key (keyring)
+  ansible.builtin.get_url:
+    url: "{{ docker_install_apt_gpg_url }}"
+    dest: "{{ docker_install_apt_keyring_path }}"
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Add Docker repository
+  ansible.builtin.apt_repository:
+    repo: "{{ docker_install_apt_repository }}"
+    state: present
+
+- name: Install Docker Engine
+  ansible.builtin.apt:
+    name:
+      - docker-ce  # Docker Engine (dockerd)
+      - docker-ce-cli  # Docker CLI (docker)
+      - containerd.io  # Container runtime required by Docker
+      - docker-buildx-plugin  # Modern docker build (BuildKit/buildx)
+      - docker-compose-plugin  # docker compose v2 subcommand
+    state: present
+    update_cache: true
+
+- name: Ensure /etc/docker exists
+  ansible.builtin.file:
+    path: "/etc/docker"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Configure Docker daemon options
+  ansible.builtin.template:
+    src: "templates/docker_daemon.json.j2"
+    dest: "/etc/docker/daemon.json"
+    owner: 'root'
+    group: 'root'
+    mode: '0644'
+  notify: Restart Docker
+
+- name: Add user to docker group
+  ansible.builtin.user:
+    name: "{{ user_name }}"
+    groups: docker
+    append: true
+
+- name: Ensure Docker service is enabled and running
+  ansible.builtin.service:
+    name: docker
+    enabled: true
+    state: started

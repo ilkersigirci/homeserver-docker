@@ -1,0 +1,20 @@
+---
+docker_install_apt_release_channel: "stable"
+docker_install_apt_distro_map:
+  Debian: debian
+  Ubuntu: ubuntu
+  Raspbian: debian
+docker_install_apt_distro: "{{ docker_install_apt_distro_map.get(ansible_distribution, (ansible_distribution | lower)) }}"
+docker_install_apt_arch_map:
+  x86_64: amd64
+  aarch64: arm64
+  armv7l: armhf
+docker_install_apt_arch: "{{ docker_install_apt_arch_map.get(ansible_architecture, ansible_architecture) }}"
+docker_install_apt_keyring_path: "/etc/apt/keyrings/docker.gpg"
+docker_install_apt_gpg_url: "https://download.docker.com/linux/{{ docker_install_apt_distro }}/gpg"
+docker_install_apt_repository: >-
+  deb [arch={{ docker_install_apt_arch }} signed-by={{ docker_install_apt_keyring_path }}]
+  https://download.docker.com/linux/{{ docker_install_apt_distro }} {{ ansible_distribution_release }}
+  {{ docker_install_apt_release_channel }}
+docker_install_daemon_options:
+  storage-driver: "overlay2"

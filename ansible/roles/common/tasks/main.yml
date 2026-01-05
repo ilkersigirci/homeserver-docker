@@ -4,7 +4,6 @@
     name: sudo
     state: present
     update_cache: true
-  become: false
 
 - name: Gather facts
   ansible.builtin.setup:
@@ -16,6 +15,8 @@
     shell: /bin/bash
     groups: sudo
     append: true
+    create_home: true
+    update_password: on_create
     state: present
 
   # ansible-galaxy collection install ansible.posix
@@ -47,13 +48,14 @@
 - name: Install essential packages
   ansible.builtin.apt:
     name:
-      - git
-      - curl
-      - wget
-      - vim
-      - nano
-      - htop
-      - ncdu
+      - ca-certificates  # TLS CA bundle for HTTPS downloads/repos
+      - git  # Common VCS dependency for many setups
+      - curl  # HTTP client for API calls/downloads
+      - wget  # Simple downloader (often used in scripts)
+      - vim  # Editor
+      - nano  # Editor
+      - htop  # Process viewer
+      - ncdu  # Disk usage analyzer
     state: present
 
 - name: Set MY_HOSTNAME environment variable
