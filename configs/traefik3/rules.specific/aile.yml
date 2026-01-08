@@ -1,0 +1,15 @@
+http:
+  routers:
+    home-assistant-rtr:
+      rule: "Host(`smarthome.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: home-assistant-svc
+
+  services:
+    home-assistant-svc:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.2.117:8123"
