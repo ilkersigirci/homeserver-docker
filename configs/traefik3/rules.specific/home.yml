@@ -30,6 +30,14 @@ http:
         - chain-no-auth-relaxed
       service: nas-svc
 
+    aile-rtr:
+      rule: "Host(`aile.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: aile-svc
+
     adguardhome-rtr:
       rule: "Host(`adguardhome.{{env "DOMAINNAME"}}`)"
       entryPoints:
@@ -62,37 +70,21 @@ http:
         - chain-no-auth-relaxed
       service: cam0-svc
 
-    cam1-rtr:
-      rule: "Host(`cam1.{{env "DOMAINNAME"}}`)"
+    cam0-ws-rtr:
+      rule: "Host(`cam0.{{env "DOMAINNAME"}}`) && Header(`Upgrade`, `websocket`)"
       entryPoints:
         - websecure
       middlewares:
         - chain-no-auth-relaxed
-      service: cam1-svc
+      service: cam0-ws-svc
 
-    cam2-rtr:
-      rule: "Host(`cam2.{{env "DOMAINNAME"}}`)"
+    frigate-rtr:
+      rule: "Host(`frigate.{{env "DOMAINNAME"}}`)"
       entryPoints:
         - websecure
       middlewares:
         - chain-no-auth-relaxed
-      service: cam2-svc
-
-    cam3-rtr:
-      rule: "Host(`cam3.{{env "DOMAINNAME"}}`)"
-      entryPoints:
-        - websecure
-      middlewares:
-        - chain-no-auth-relaxed
-      service: cam3-svc
-
-    cam4-rtr:
-      rule: "Host(`cam4.{{env "DOMAINNAME"}}`)"
-      entryPoints:
-        - websecure
-      middlewares:
-        - chain-no-auth-relaxed
-      service: cam4-svc
+      service: frigate-svc
 
   services:
     openwrt-svc:
@@ -112,6 +104,12 @@ http:
           - url: "https://192.168.2.7:8006"
         serversTransport: proxmox-transport
 
+    aile-svc:
+      loadBalancer:
+        servers:
+          - url: "https://192.168.2.119:8006"
+        serversTransport: proxmox-transport
+
     adguardhome-svc:
       loadBalancer:
         servers:
@@ -127,28 +125,17 @@ http:
         servers:
           - url: "http://100.64.0.4:1005"
 
-
     cam0-svc:
       loadBalancer:
         servers:
           - url: "http://192.168.2.120"
 
-    cam1-svc:
+    cam0-ws-svc:
       loadBalancer:
         servers:
-          - url: "http://192.168.2.121"
+          - url: "http://192.168.2.120"
 
-    cam2-svc:
+    frigate-svc:
       loadBalancer:
         servers:
-          - url: "http://192.168.2.122"
-
-    cam3-svc:
-      loadBalancer:
-        servers:
-          - url: "http://192.168.2.123"
-
-    cam4-svc:
-      loadBalancer:
-        servers:
-          - url: "http://192.168.2.124"
+          - url: "http://192.168.2.118:8971"
