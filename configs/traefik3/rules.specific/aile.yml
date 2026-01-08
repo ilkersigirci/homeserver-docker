@@ -8,8 +8,34 @@ http:
         - chain-no-auth-relaxed
       service: home-assistant-svc
 
+    watchyourlan-rtr:
+      rule: "Host(`lan.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: watchyourlan-svc
+
+    watchyourlan-assets-rtr:
+      rule: "Host(`lan.{{env "DOMAINNAME"}}`) && PathPrefix(`/node_modules`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: watchyourlan-assets-svc
+
   services:
     home-assistant-svc:
       loadBalancer:
         servers:
-          - url: "http://192.168.2.117:8123"
+          - url: "http://{{env "LOCAL_STATIC_IP"}}:8123"
+
+    watchyourlan-svc:
+      loadBalancer:
+        servers:
+          - url: "http://{{env "LOCAL_STATIC_IP"}}:8840"
+
+    watchyourlan-assets-svc:
+      loadBalancer:
+        servers:
+          - url: "http://{{env "LOCAL_STATIC_IP"}}:8850"

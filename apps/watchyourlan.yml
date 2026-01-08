@@ -1,24 +1,26 @@
 services:
+  #  Optional, local themes and icons
   wyl-node-bootstrap:
     image: ghcr.io/aceberg/node-bootstrap:latest
     container_name: node-bootstrap
     restart: $MAINTENANCE_RESTART_POLICY
     profiles:
-      # - monitoring
-      - not-used
+      - monitoring
     networks:
       - t3_proxy
     ports:
       - 8850:8850
+
   watchyourlan:
     image: ghcr.io/aceberg/watchyourlan:latest
     container_name: watchyourlan
     restart: $MAINTENANCE_RESTART_POLICY
     profiles:
       - monitoring
-    # command: "-n http://YOUR_IP:8850" # Uncomment those if you are using local node-bootstrap
-    # depends_on:
-    #   - wyl-node-bootstrap
+    # command: "-n http://$LOCAL_STATIC_IP:8850"
+    command: "-n https://lan.$DOMAINNAME"
+    depends_on:
+      - wyl-node-bootstrap
     network_mode: "host"
     expose:
       - 8840

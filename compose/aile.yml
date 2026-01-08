@@ -40,4 +40,5 @@ include:
   - ../apps/traefik.yml
   ###### MAINTENANCE ####
   - ../apps/home-assistant.yml
+  - ../apps/watchyourlan.yml
   - ../apps/whoami.yml
