@@ -1,0 +1,24 @@
+services:
+  # Change URL in immich settings -> admin/system-settings?isOpen=machine-learning
+  immich-machine-learning:
+    container_name: immich-machine-learning
+    image: ghcr.io/immich-app/immich-machine-learning:release-openvino
+    restart: $MEDIA_RESTART_POLICY
+    device_cgroup_rules:
+      - 'c 189:* rmw'
+    devices:
+      - /dev/dri:/dev/dri
+    profiles:
+      - photos
+    networks:
+      - t3_proxy
+    ports:
+      - "3003:3003"
+    healthcheck:
+      disable: false
+    volumes:
+      - /dev/bus/usb:/dev/bus/usb
+      - $DOCKERDIR/appdata/immich-ml/model-cache:/cache
+    environment:
+      MACHINE_LEARNING_CACHE_FOLDER: /cache
+      OMP_NUM_THREADS: 8
