@@ -39,6 +39,9 @@
             - type: reddit
               subreddit: europe
               show-thumbnails: true
+            - type: reddit
+              subreddit: BambuLab
+              show-thumbnails: true
 
         - type: rss
           limit: 20
