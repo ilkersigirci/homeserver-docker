@@ -1,6 +1,6 @@
 ---
 - name: Setup Nerd Fonts
-  hosts: dev-devices
+  hosts: dev_devices
   become: true
 
   tasks:

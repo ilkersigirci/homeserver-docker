@@ -1,9 +1,7 @@
 ---
 - name: Setup Debian Hosts
-  hosts: lxcs
+  hosts: lxcs,rpis
   become: true
-  vars:
-    ansible_user: root
 
   roles:
     - role: common

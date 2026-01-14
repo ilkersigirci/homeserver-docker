@@ -24,11 +24,11 @@ ansible -i ./inventory/hosts.yaml all -m ping
 ### 2. Running a Playbook
 Run the setup playbook to update the system, create user, and install Docker.
 ```bash
-ansible-playbook -i ./inventory/hosts.yaml ./playbooks/setup_lxc.yml
+ansible-playbook -i ./inventory/hosts.yaml ./playbooks/setup_debian.yml
 ```
 *If you need to provide a sudo password:*
 ```bash
-ansible-playbook -i ./inventory/hosts.yaml ./playbooks/setup_lxc.yml --ask-become-pass
+ansible-playbook -i ./inventory/hosts.yaml ./playbooks/setup_debian.yml --ask-become-pass
 ```
 
 ### 3. Ad-Hoc Commands
@@ -52,13 +52,13 @@ ansible -i ./inventory/hosts.yaml all -a "sudo reboot"
 ### 4. Limiting Execution
 Run the playbook only on a specific host (e.g., `lxc1`).
 ```bash
-ansible-playbook -i ./inventory/hosts.yaml ./playbooks/setup_lxc.yml --limit lxc1
+ansible-playbook -i ./inventory/hosts.yaml ./playbooks/setup_debian.yml --limit lxc1
 ```
 
 ### 5. Syntax Check
 Check your playbook for syntax errors before running.
 ```bash
-ansible-playbook -i ./inventory/hosts.yaml ./playbooks/setup_lxc.yml --syntax-check
+ansible-playbook -i ./inventory/hosts.yaml ./playbooks/setup_debian.yml --syntax-check
 ```
 
 ### 6. Handling Private Repositories
@@ -95,7 +95,7 @@ This allows your other machines to use the SSH keys on your local machine.
    ```
    *Or pass it in the command line:*
    ```bash
-   ansible-playbook -i ./inventory/hosts.yaml ./playbooks/setup_lxc.yml --ssh-common-args='-o ForwardAgent=yes'
+   ansible-playbook -i ./inventory/hosts.yaml ./playbooks/setup_debian.yml --ssh-common-args='-o ForwardAgent=yes'
    ```
 
 ### 7. Deploying Updates
