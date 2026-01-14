@@ -15,7 +15,8 @@ mqtt:
 
 # Hardware acceleration for Intel Xe Graphics
 ffmpeg:
-  hwaccel_args: preset-vaapi
+  # hwaccel_args: preset-vaapi
+  hwaccel_args: preset-intel-qsv-h264
 
 detect:
   enabled: true
@@ -36,20 +37,35 @@ model:
 
 go2rtc:
   streams:
-    tiandy_main:
-      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@{FRIGATE_RTSP_HOST}:{FRIGATE_RTSP_PORT}/1/1
-      #- "ffmpeg:back#video=h264#hardware"
-    tiandy_sub:
-      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@{FRIGATE_RTSP_HOST}:{FRIGATE_RTSP_PORT}/1/2
+    giris_main:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.2.120:{FRIGATE_RTSP_PORT}/1/1
+    giris_sub:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.2.120:{FRIGATE_RTSP_PORT}/1/2
+    garajustu_main:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.2.121:{FRIGATE_RTSP_PORT}/1/1
+    garajustu_sub:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.2.121:{FRIGATE_RTSP_PORT}/1/2
+    altbahce_main:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.2.122:{FRIGATE_RTSP_PORT}/1/1
+    altbahce_sub:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.2.122:{FRIGATE_RTSP_PORT}/1/2
+    kamelya_main:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.2.123:{FRIGATE_RTSP_PORT}/1/1
+    kamelya_sub:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.2.123:{FRIGATE_RTSP_PORT}/1/2
+    raylikapi_main:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.2.124:{FRIGATE_RTSP_PORT}/1/1
+    raylikapi_sub:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.2.124:{FRIGATE_RTSP_PORT}/1/2
 
 cameras:
-  tiandy_camera:
+  giris: &camera_defaults
     ffmpeg:
       inputs:
-        - path: rtsp://127.0.0.1:8554/tiandy_main
+        - path: rtsp://127.0.0.1:8554/giris_main
           roles:
             - record
-        - path: rtsp://127.0.0.1:8554/tiandy_sub
+        - path: rtsp://127.0.0.1:8554/giris_sub
           roles:
             - detect
 
@@ -64,18 +80,66 @@ cameras:
       enabled: true
       alerts:
         retain:
-          days: 10
+          days: 30
       detections:
         retain:
-          days: 10
+          days: 30
     snapshots:
       enabled: true
 
     objects:
       track:
         - person
-        - face
         - car
-        - cat
+        - motorcycle
+        - horse
+        - suitcase
+        - knife
+        # - face
+        # - cat
+
+  garajustu:
+    <<: *camera_defaults
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/garajustu_main
+          roles:
+            - record
+        - path: rtsp://127.0.0.1:8554/garajustu_sub
+          roles:
+            - detect
+
+  altbahce:
+    <<: *camera_defaults
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/altbahce_main
+          roles:
+            - record
+        - path: rtsp://127.0.0.1:8554/altbahce_sub
+          roles:
+            - detect
+
+  kamelya:
+    <<: *camera_defaults
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/kamelya_main
+          roles:
+            - record
+        - path: rtsp://127.0.0.1:8554/kamelya_sub
+          roles:
+            - detect
+
+  raylikapi:
+    <<: *camera_defaults
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/raylikapi_main
+          roles:
+            - record
+        - path: rtsp://127.0.0.1:8554/raylikapi_sub
+          roles:
+            - detect
 
 version: 0.16-0
