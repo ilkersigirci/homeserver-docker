@@ -1,4 +1,4 @@
-name: home
+name: dell
 
 networks:
   default:
@@ -34,19 +34,15 @@ secrets:
 include:
   ########################### SERVICES
   #### CORE ####
-  - ../apps/arcane-agent.yml
-  - ../apps/adguardhome-host.yml
-  - ../apps/glance.yml
   - ../apps/homepage.yml
-  - ../apps/pocket-id.yml
+  - ../apps/filebrowser.yml
   - ../apps/socket-proxy.yml
   - ../apps/tinyauth.yml
   - ../apps/traefik.yml
-  - ../apps/vaultwarden.yml
   ###### MAINTENANCE ####
   - ../apps/home-assistant.yml
-  - ../apps/syncthing.yml
+  - ../apps/watchyourlan.yml
   - ../apps/whoami.yml
-  #### READING ####
-  - ../apps/silverbullet.yml
-  - ../apps/silverbullet-test.yml
+  #### MEDIA ####
+  - ../apps/immich.yml
+  - ../apps/immich-gpu-intel.yml
