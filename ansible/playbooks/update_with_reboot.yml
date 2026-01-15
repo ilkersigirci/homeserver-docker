@@ -3,16 +3,9 @@
   hosts: all
   become: true
   tasks:
-    - name: Update apt repo and cache on all Debian/Ubuntu boxes
-      ansible.builtin.apt:
-        update_cache: true
-        force_apt_get: true
-        cache_valid_time: 3600
-
-    - name: Upgrade all packages on servers
-      ansible.builtin.apt:
-        upgrade: dist
-        force_apt_get: true
+    - name: Update and clean system
+      ansible.builtin.include_role:
+        name: apt_update
 
     - name: Check if a reboot is needed on all servers
       register: reboot_required_file
@@ -29,11 +22,3 @@
         post_reboot_delay: 30
         test_command: uptime
       when: reboot_required_file.stat.exists
-
-    - name: Remove useless packages from the cache
-      ansible.builtin.apt:
-        autoclean: true
-
-    - name: Remove dependencies that are no longer required
-      ansible.builtin.apt:
-        autoremove: true
