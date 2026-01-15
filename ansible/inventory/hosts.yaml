@@ -2,11 +2,15 @@ dev_devices:
   hosts:
     l13:
       ansible_host: 192.168.2.5
+    gpu_coding:
+      ansible_host: 192.168.2.21
 
 lxcs:
   hosts:
     lxc1:
       ansible_host: 192.168.2.20
+    gpu_coding:
+      ansible_host: 192.168.2.21
 
 rpis:
   hosts:

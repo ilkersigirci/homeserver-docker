@@ -55,7 +55,18 @@
       - nano  # Editor
       - htop  # Process viewer
       - ncdu  # Disk usage analyzer
+      - locales
     state: present
+
+- name: Enable en_US and tr_TR locales
+  ansible.builtin.lineinfile:
+    path: /etc/locale.gen
+    regexp: '^#?\s*{{ item | regex_escape() }}'
+    line: "{{ item }}"
+  loop:
+    - "en_US.UTF-8 UTF-8"
+    - "tr_TR.UTF-8 UTF-8"
+  notify: Generate locales
 
 - name: Set MY_HOSTNAME environment variable
   ansible.builtin.lineinfile:
