@@ -22,5 +22,4 @@
     },
     "remote.autoForwardPorts": false,
     "remote.restoreForwardedPorts": false,
-    "ansible.python.interpreterPath": "~/.local/bin/python3.13"
 }

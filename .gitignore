@@ -2,7 +2,6 @@ appdata
 data
 logs
 secrets
-.ansible
 .idea
 .env*
 
