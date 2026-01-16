@@ -1,8 +1,0 @@
----
-- name: Setup Repository
-  hosts: all
-  become: false
-  gather_facts: false
-
-  roles:
-    - git_pull
