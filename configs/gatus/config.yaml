@@ -112,7 +112,6 @@ endpoints:
     url: "https://pocketid.$DOMAINNAME"
 
   ################# HOME #################
-
   - name: DNS - home
     group: Home
     url: "1.1.1.1" # Address of the DNS server to use
@@ -124,9 +123,16 @@ endpoints:
       - "[BODY] == 100.64.0.17"
       - "[DNS_RCODE] == NOERROR"
 
-  - name: LocalDNS - home
+  - name: Pocketid - home
+    <<: *http-default
     group: Home
-    url: "100.64.0.17" # Address of the DNS server to use
+    interval: 1h
+    url: "http://100.64.0.17:1000"
+
+  ################# RPI1 #################
+  - name: LocalDNS - home
+    group: RPI1
+    url: "100.64.0.10" # Address of the DNS server to use
     interval: 1h
     dns:
       query-name: "homepage.home.$DOMAINNAME"
@@ -136,8 +142,8 @@ endpoints:
       - "[DNS_RCODE] == NOERROR"
 
   - name: LocalDNS - rpi1
-    group: Home
-    url: "100.64.0.17" # Address of the DNS server to use
+    group: RPI1
+    url: "100.64.0.10" # Address of the DNS server to use
     interval: 1h
     dns:
       query-name: "homepage.rpi1.$DOMAINNAME"
@@ -147,8 +153,8 @@ endpoints:
       - "[DNS_RCODE] == NOERROR"
 
   - name: LocalDNS - gpu
-    group: Home
-    url: "100.64.0.17" # Address of the DNS server to use
+    group: RPI1
+    url: "100.64.0.10" # Address of the DNS server to use
     interval: 1h
     dns:
       query-name: "homepage.gpu.$DOMAINNAME"
@@ -156,12 +162,6 @@ endpoints:
     conditions:
       - "[BODY] == 192.168.2.9"
       - "[DNS_RCODE] == NOERROR"
-
-  - name: Pocketid - home
-    <<: *http-default
-    group: Home
-    interval: 1h
-    url: "http://100.64.0.17:1000"
 
   ################# GPU #################
 
