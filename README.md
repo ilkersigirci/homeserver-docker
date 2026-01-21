@@ -19,11 +19,11 @@ bash scripts/docker-manage.sh pull
 Useful aliases
 
 ```bash
-alias dup="docker compose --file $HOME/docker/compose/$MY_HOSTNAME.yml up"
-alias ddown="docker compose --file $HOME/docker/compose/$MY_HOSTNAME.yml down --volumes --remove-orphans"
-alias drm="docker compose --file $HOME/docker/compose/$MY_HOSTNAME.yml rm -svf"
-alias dpull="docker compose --file $HOME/docker/compose/$MY_HOSTNAME.yml pull"
-alias dbuild="docker compose --file $HOME/docker/compose/$MY_HOSTNAME.yml build"
+alias dup="docker compose --env-file $HOME/docker/.env --file $HOME/docker/compose/$MY_HOSTNAME.yml up"
+alias ddown="docker compose --env-file $HOME/docker/.env --file $HOME/docker/compose/$MY_HOSTNAME.yml down --volumes --remove-orphans"
+alias drm="docker compose --env-file $HOME/docker/.env --file $HOME/docker/compose/$MY_HOSTNAME.yml rm -svf"
+alias dpull="docker compose --env-file $HOME/docker/.env --file $HOME/docker/compose/$MY_HOSTNAME.yml pull"
+alias dbuild="docker compose --env-file $HOME/docker/.env --file $HOME/docker/compose/$MY_HOSTNAME.yml build"
 ```
 
 Start containers at machine start-up
