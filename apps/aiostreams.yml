@@ -9,6 +9,8 @@ services:
       - media
     networks:
       - t3_proxy
+    ports:
+      - "1006:3000"
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -41,9 +43,9 @@ services:
       homepage.icon: "aiostreams.png"
       homepage.href: "https://aiostreams.$DOMAINNAME"
       homepage.target: "_blank"
-      homepage.description: "description"
+      homepage.description: "Consolidates multiple Stremio addons and debrid services into a single addon"
       ####### GLANCE #######
       glance.name: "aiostreams"
       glance.icon: "sh:aiostreams"
       glance.url: "https://aiostreams.$DOMAINNAME"
-      glance.description: "description"
+      glance.description: "Consolidates multiple Stremio addons and debrid services into a single addon"
