@@ -23,7 +23,7 @@
             limit: 20
             cache: 2h
             feeds:
-              - url: http://rsshub:1200/themoviedb/trending/movie/day/en-US
+              - url: https://rsshub.gpu.${BASE_DOMAINNAME}/themoviedb/trending/movie/day/en-US
                 title: " "
           
           - type: rss
@@ -32,7 +32,7 @@
             limit: 20
             cache: 2h
             feeds:
-              - url: http://rsshub:1200/themoviedb/movie/upcoming/en-US
+              - url: https://rsshub.gpu.${BASE_DOMAINNAME}/themoviedb/movie/upcoming/en-US
                 title: " "
 
           - type: rss
@@ -41,7 +41,7 @@
             limit: 20
             cache: 2h
             feeds:
-              - url: http://rsshub:1200/themoviedb/movie/top-rated/en-US
+              - url: https://rsshub.gpu.${BASE_DOMAINNAME}/themoviedb/movie/top-rated/en-US
                 title: " "
 
         - type: group
@@ -53,7 +53,7 @@
             limit: 20
             cache: 2h
             feeds:
-              - url: http://rsshub:1200/themoviedb/trending/tv/day/en-US
+              - url: https://rsshub.gpu.${BASE_DOMAINNAME}/themoviedb/trending/tv/day/en-US
                 title: " "
           
           - type: rss
@@ -62,7 +62,7 @@
             limit: 20
             cache: 2h
             feeds:
-              - url: http://rsshub:1200/themoviedb/tv/top-rated/en-US
+              - url: https://rsshub.gpu.${BASE_DOMAINNAME}/themoviedb/tv/top-rated/en-US
                 title: " "
 
         # - type: split-column
