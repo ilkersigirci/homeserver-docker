@@ -1,5 +1,6 @@
 # NOTE: Dashboard images not working on Firefox
 # TODO: If possible, serve api in port 11470 using PathPrefix(`/api/`) to avoid CORS workaround with the web app.
+# TODO: Self Host AIOmetadata
 services:
   stremio:
     image: tsaridas/stremio-docker:latest

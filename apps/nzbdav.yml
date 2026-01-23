@@ -1,0 +1,44 @@
+services:
+  nzbdav:
+    image: nzbdav/nzbdav:latest
+    container_name: nzbdav
+    restart: $MEDIA_RESTART_POLICY
+    profiles:
+      - media
+    networks:
+      - t3_proxy
+    expose:
+      - "3000"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $DOCKERDIR/appdata/nzbdav:/config
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.nzbdav-rtr.entrypoints: "websecure"
+      traefik.http.routers.nzbdav-rtr.rule: "Host(`nzbdav.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.nzbdav-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.nzbdav-rtr.service: "nzbdav-svc"
+      traefik.http.services.nzbdav-svc.loadbalancer.server.port: "3000"
+      ####### TINYAUTH #######
+      tinyauth.apps.nzbdav.config.domain: "nzbdav.$DOMAINNAME"
+      tinyauth.apps.nzbdav.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "Media"
+      homepage.name: "nzbdav"
+      homepage.icon: "nzbdav.png"
+      homepage.href: "https://nzbdav.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Usenet streaming with a WebDAV server and a SABnzbd-compatible API"
+      ####### GLANCE #######
+      glance.name: "nzbdav"
+      glance.icon: "sh:nzbdav"
+      glance.url: "https://nzbdav.$DOMAINNAME"
+      glance.description: "Usenet streaming with a WebDAV server and a SABnzbd-compatible API"
