@@ -11,14 +11,11 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $CONFIGDIR/loggifly:/config
+      - $CONFIGDIR/loggifly:/config:ro
     environment:
       DOCKER_HOST: $DOCKER_REMOTE_HOSTS
       TZ: $TZ
-      APPRISE_URL: $APPRISE_GOTIFY_URL
-      CONTAINERS: "traefik,vaultwarden,tinyauth"
-      GLOBAL_KEYWORDS: "error,failed login,password"
-      GLOBAL_KEYWORDS_WITH_ATTACHMENT: "critical"
+      APPRISE_URL: $GOTIFY_LOGGIFLY_APPRISE_URL
       LOG_LEVEL: "INFO"
     labels:
       ####### HOMEPAGE #######

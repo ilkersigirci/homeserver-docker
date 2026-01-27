@@ -8,16 +8,17 @@ secrets
 # Configs
 acme.json
 configs/*
-!configs/gatus
-!configs/homepage
+!configs/copyparty/copyparty.conf
 !configs/filebrowser
+!configs/frigate/config.yml
+!configs/gatus
+!configs/glance
+!configs/homepage
+!configs/immich-public-proxy
+!configs/loggifly
+!configs/mosquitto
+!configs/quartz
+!configs/rybbit
 !configs/strava-statistics
 !configs/traefik3
-!configs/quartz
-!configs/immich-public-proxy
-!configs/glance
 configs/glance/docs
-!configs/copyparty/copyparty.conf
-!configs/rybbit
-!configs/frigate/config.yml
-!configs/mosquitto
