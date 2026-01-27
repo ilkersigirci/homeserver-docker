@@ -1,7 +1,7 @@
 # NOTE: In initial configuration screen, choose dashboard port 81 to avoid conflict with traefik
 services:
   adguardhome:
-    image: adguard/adguardhome:latest
+    image: adguard/adguardhome:v0.107.71
     container_name: adguardhome
     restart: $CORE_RESTART_POLICY
     profiles:
