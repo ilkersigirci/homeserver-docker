@@ -35,7 +35,7 @@ include:
   ########################### SERVICES
   #### CORE ####
   - ../apps/arcane-agent.yml
-  - ../apps/adguardhome-host.yml
+  # - ../apps/adguardhome-host.yml
   - ../apps/glance.yml
   - ../apps/homepage.yml
   - ../apps/pocket-id.yml
