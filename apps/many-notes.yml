@@ -1,9 +1,9 @@
 services:
-  # NOTE: sudo chown -R 33:33 $DOCKERDIR/appdata/many-notes
+  # NOTE: sudo chown -R 33:33 $REPO_PATH/appdata/many-notes
   many-notes:
     container_name: many-notes
     image: brufdev/many-notes:latest
-    # restart: $OTHERS_RESTART_POLICY
+    # restart: $RESTART_POLICY_OTHERS
     restart: "no"
     profiles:
       - reading
@@ -12,12 +12,12 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/many-notes/db:/var/www/html/database/sqlite
-      - $DOCKERDIR/appdata/many-notes/typesense:/var/www/html/typesense
-      - $DOCKERDIR/logs/many-notes:/var/www/html/storage/logs
-      - $DOCKERDIR/appdata/many-notes/private:/var/www/html/storage/app/private
+      - $REPO_PATH/appdata/many-notes/db:/var/www/html/database/sqlite
+      - $REPO_PATH/appdata/many-notes/typesense:/var/www/html/typesense
+      - $REPO_PATH/logs/many-notes:/var/www/html/storage/logs
+      - $REPO_PATH/appdata/many-notes/private:/var/www/html/storage/app/private
       # FIXME: Not working
-      - $NOTESDIR/Markdown:/var/www/html/storage/app/private/vaults/2/my-vault:ro
+      - $DIR_NOTES/Markdown:/var/www/html/storage/app/private/vaults/2/my-vault:ro
     environment:
       APP_URL: https://many-notes.$DOMAINNAME
       APP_TIMEZONE: $TZ

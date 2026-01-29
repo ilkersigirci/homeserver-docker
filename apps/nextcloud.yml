@@ -17,7 +17,7 @@ services:
     ports:
       - "$MARIADB_PORT:3306"
     volumes:
-      - $DOCKERDIR/appdata/mariadb/data:/config
+      - $REPO_PATH/appdata/mariadb/data:/config
     environment:
       PUID: $PUID
       PGID: $PGID
@@ -48,7 +48,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/redis/data:/data
+      - $REPO_PATH/appdata/redis/data:/data
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     # environment:
@@ -96,8 +96,8 @@ services:
       - 777:80
     # Persistent volumes with bind mounts to easily move/backup data
     volumes:
-      - $DOCKERDIR/appdata/nextcloud/data:/var/www/html
-      - $DOCKERDIR/appdata/nextcloud/cloud:/var/www/html/data
+      - $REPO_PATH/appdata/nextcloud/data:/var/www/html
+      - $REPO_PATH/appdata/nextcloud/cloud:/var/www/html/data
       # - $NEXTCLOUD_DIR:/var/www/html/data
     environment:
       # PUID: $PUID

@@ -2,7 +2,7 @@ services:
   vscodium:
     image: lscr.io/linuxserver/vscodium:latest
     container_name: vscodium
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - maintenance
     security_opt:
@@ -13,9 +13,9 @@ services:
     networks:
       - t3_proxy
     volumes:
-      - $DOCKERDIR/appdata/vscodium:/config
-      - $DOCKERDIR:/config/workspace/docker
-      - $NOTESDIR:/config/workspace/notes
+      - $REPO_PATH/appdata/vscodium:/config
+      - $REPO_PATH:/config/workspace/docker
+      - $DIR_NOTES:/config/workspace/notes
     environment:
       PUID: $PUID
       PGID: $PGID

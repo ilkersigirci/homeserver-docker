@@ -2,15 +2,15 @@ services:
   mkdocs-material:
     container_name: mkdocs-material
     image: squidfunk/mkdocs-material
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     command: serve --dev-addr=0.0.0.0:8000 --no-livereload
     networks:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $NOTESDIR/Markdown/Programming/Interview:/docs/docs/blog/posts:ro
-      - $CONFIGDIR/mkdocs-material/mkdocs.yml:/docs/mkdocs.yml
+      - $DIR_NOTES/Markdown/Programming/Interview:/docs/docs/blog/posts:ro
+      - $REPO_PATH/configs/mkdocs-material/mkdocs.yml:/docs/mkdocs.yml
     environment:
       PUID: $PUID
       PGID: $PGID

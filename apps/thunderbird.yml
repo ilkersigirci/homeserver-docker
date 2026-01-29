@@ -3,15 +3,15 @@ services:
     container_name: thunderbird
     image: thunderbird:latest
     build:
-      context: $DOCKERDIR/Dockerfiles/DesktopApps/Thunderbird
-      dockerfile: $DOCKERDIR/Dockerfiles/DesktopApps/Thunderbird/Dockerfile
-    restart: $DESKTOP_IMAGES_RESTART_POLICY
+      context: $REPO_PATH/Dockerfiles/DesktopApps/Thunderbird
+      dockerfile: $REPO_PATH/Dockerfiles/DesktopApps/Thunderbird/Dockerfile
+    restart: $RESTART_POLICY_DESKTOP_IMAGES
     networks:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/thunderbird:/config
+      - $REPO_PATH/appdata/thunderbird:/config
     environment:
       PUID: $PUID
       PGID: $PGID

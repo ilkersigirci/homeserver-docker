@@ -5,7 +5,7 @@ services:
   tinyauth:
     image: ghcr.io/steveiliop56/tinyauth:v4
     container_name: tinyauth
-    restart: $CORE_RESTART_POLICY
+    restart: $RESTART_POLICY_CORE
     profiles:
       - core
     networks:
@@ -26,8 +26,8 @@ services:
       LOGIN_MAX_RETRIES: 5
       ## OIDC CLIENT CONFIGURATION
       PROVIDERS_POCKETID_NAME: PocketID
-      PROVIDERS_POCKETID_CLIENT_ID: $TINYAUTH_POCKETID_CLIENT_ID
-      PROVIDERS_POCKETID_CLIENT_SECRET: $TINYAUTH_POCKETID_CLIENT_SECRET
+      PROVIDERS_POCKETID_CLIENT_ID: $TINYAUTH_CLIENT_ID
+      PROVIDERS_POCKETID_CLIENT_SECRET: $TINYAUTH_CLIENT_SECRET
       PROVIDERS_POCKETID_AUTH_URL: https://pocketid.$BASE_DOMAINNAME/authorize
       PROVIDERS_POCKETID_TOKEN_URL: https://pocketid.$BASE_DOMAINNAME/api/oidc/token
       PROVIDERS_POCKETID_USER_INFO_URL: https://pocketid.$BASE_DOMAINNAME/api/oidc/userinfo
@@ -39,8 +39,8 @@ services:
       # TINYAUTH_APPS_WHOAMI_CONFIG_DOMAIN: whoami.example.com
       # TINYAUTH_APPS_WHOAMI_USERS_ALLOW: john
     volumes:
-      - $SECRETSDIR/tinyauth_users:/tinyauth/users_file
-      - $DOCKERDIR/data/tinyauth:/data
+      - $REPO_PATH/secrets/tinyauth_users:/tinyauth/users_file
+      - $REPO_PATH/data/tinyauth:/data
     labels:
       traefik.enable: "true"
       ## HTTP Routers

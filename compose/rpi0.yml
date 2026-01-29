@@ -29,7 +29,7 @@ networks:
 ########################### SECRETS
 secrets:
   cf_dns_api_token:
-    file: $DOCKERDIR/secrets/cf_dns_api_token
+    file: $REPO_PATH/secrets/cf_dns_api_token
 
 include:
   ########################### SERVICES

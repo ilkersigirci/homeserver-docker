@@ -2,13 +2,13 @@ services:
   logseq:
     container_name: logseq
     image: ghcr.io/logseq/logseq-webapp:latest
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     networks:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
       # volumes:
-      # - $NOTESDIR:/notes
+      # - $DIR_NOTES:/notes
     labels:
       traefik.enable: "true"
       ## HTTP Routers

@@ -2,7 +2,7 @@ services:
   upsnap:
     image: ghcr.io/seriousm4x/upsnap:5
     container_name: upsnap
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     # # you can change the listen ip:port inside the container like this:
     entrypoint: /bin/sh -c "./upsnap serve --http 0.0.0.0:8090"
     # # To use a non-root user, create the mountpoint first (mkdir data) so that it has the right permission.
@@ -19,7 +19,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/upsnap:/app/pb_data
+      - $REPO_PATH/appdata/upsnap:/app/pb_data
     healthcheck:
       test: curl -fs "http://localhost:8090/api/health" || exit 1
       interval: 10s

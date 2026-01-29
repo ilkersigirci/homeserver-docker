@@ -3,7 +3,7 @@ services:
   jellyfin-meilisearch:
     image: getmeili/meilisearch:v1.32.1
     container_name: jellyfin-meilisearch
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     profiles:
       - media
       - jellyfin
@@ -14,7 +14,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/jellyfin-meilisearch:/meili_data
+      - $REPO_PATH/appdata/jellyfin-meilisearch:/meili_data
     environment:
       MEILI_MASTER_KEY: "1234"
     labels:
@@ -29,7 +29,7 @@ services:
     # cpus: "0.5"
     mem_reservation: "2048M"
     mem_limit: "2048M"
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     depends_on:
       - jellyfin-meilisearch
     profiles:
@@ -45,11 +45,11 @@ services:
     # user: $PGID:$PUID
     user: 0:0
     volumes:
-      - $DOCKERDIR/appdata/jellyfin:/config
-      - $DOCKERDIR/appdata/jellyfin/cache:/cache
-      - $DATADIR/jellyfin/metadata:/config/metadata
-      - $DATADIR/downloads:/media/downloads:ro
-      - $MEDIADIR:/media/local:ro
+      - $REPO_PATH/appdata/jellyfin:/config
+      - $REPO_PATH/appdata/jellyfin/cache:/cache
+      - $REPO_PATH/data/jellyfin/metadata:/config/metadata
+      - $REPO_PATH/data/downloads:/media/downloads:ro
+      - $DIR_MEDIA:/media/local:ro
       # - $ONEDRIVEDIR:/media/onedrive:ro
     environment:
       MEILI_URL: http://jellyfin-meilisearch:7700

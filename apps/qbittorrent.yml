@@ -3,7 +3,7 @@ services:
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent
     container_name: qbittorrent
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     # network_mode: "service:gluetun"
     # depends_on:
     #   - gluetun
@@ -12,8 +12,8 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/qbittorrent:/config
-      - $MEDIADIR/Downloads:/data/downloads # Ensure that downloads folder is set to /data/downloads in qBittorrent
+      - $REPO_PATH/appdata/qbittorrent:/config
+      - $DIR_MEDIA/Downloads:/data/downloads # Ensure that downloads folder is set to /data/downloads in qBittorrent
     environment:
       PUID: $PUID
       PGID: $PGID

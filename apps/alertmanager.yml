@@ -2,13 +2,13 @@ services:
   alertmanager:
     image: prom/alertmanager:latest
     container_name: alertmanager
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     networks:
       - t3_proxy
     expose:
       - 9093
     volumes:
-      - $CONFIGDIR/alertmanager/config.yml:/etc/alertmanager/config.yml
+      - $REPO_PATH/configs/alertmanager/config.yml:/etc/alertmanager/config.yml
     command:
       - '--config.file=/etc/alertmanager/config.yml'
       - '--storage.path=/alertmanager'

@@ -4,7 +4,7 @@ services:
     container_name: radarr
     depends_on:
       - prowlarr
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     profiles:
       - media
       - arr
@@ -15,11 +15,11 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/radarr:/config
+      - $REPO_PATH/appdata/radarr:/config
       # Optional. See why MediaCover is mounted as volume https://github.com/htpcBeginner/docker-traefik/discussions/147
-      # - $DATADIR/radarr/MediaCover:/config/MediaCover
-      - $MEDIADIR/Downloads:/data/downloads
-      - $MEDIADIR/Movies_Radarr:/data/media
+      # - $REPO_PATH/data/radarr/MediaCover:/config/MediaCover
+      - $DIR_MEDIA/Downloads:/data/downloads
+      - $DIR_MEDIA/Movies_Radarr:/data/media
     environment:
       PUID: $PUID
       PGID: $PGID

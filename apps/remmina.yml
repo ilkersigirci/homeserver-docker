@@ -2,7 +2,7 @@ services:
   remmina:
     image: lscr.io/linuxserver/remmina
     container_name: remmina
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - maintenance
     networks:
@@ -10,7 +10,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/remmina:/config
+      - $REPO_PATH/appdata/remmina:/config
     environment:
       PUID: $PUID
       PGID: $PGID

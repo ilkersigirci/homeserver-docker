@@ -2,7 +2,7 @@ services:
   docker-gc:
     image: clockworksoul/docker-gc-cron:latest
     container_name: docker-gc
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - maintenance
     networks:
@@ -10,7 +10,7 @@ services:
     security_opt:
       - no-new-privileges:true
     # volumes:
-    #   - $DOCKERDIR/appdata/docker-gc/docker-gc-exclude:/etc/docker-gc-exclude
+    #   - $REPO_PATH/appdata/docker-gc/docker-gc-exclude:/etc/docker-gc-exclude
     environment:
       TZ: $TZ
       DOCKER_HOST: tcp://docker-socket-proxy:2375

@@ -4,7 +4,7 @@ services:
   zipline-db:
     image: postgres:16.4
     container_name: zipline-db
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     profiles:
       - media
       - zipline
@@ -18,7 +18,7 @@ services:
     expose:
       - "5432"
     volumes:
-      - $DATADIR/zipline-db:/pgdata
+      - $REPO_PATH/data/zipline-db:/pgdata
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -28,7 +28,7 @@ services:
   zipline:
     image: ghcr.io/diced/zipline:latest
     container_name: zipline
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     depends_on:
       zipline-db:
         condition: service_healthy
@@ -40,9 +40,9 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - "$DATADIR/zipline/uploads:/zipline/uploads"
-      - "$DATADIR/zipline/public:/zipline/public"
-      - "$DATADIR/zipline/themes:/zipline/themes"
+      - "$REPO_PATH/data/zipline/uploads:/zipline/uploads"
+      - "$REPO_PATH/data/zipline/public:/zipline/public"
+      - "$REPO_PATH/data/zipline/themes:/zipline/themes"
     environment:
       DATASOURCE_TYPE: "local"
       # DATASOURCE_LOCAL_DIRECTORY: "/path/to/your/local/files"

@@ -2,7 +2,7 @@ services:
   metadata-remote:
     image: ghcr.io/wow-signal-dev/metadata-remote:latest
     container_name: metadata-remote
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     profiles:
       - media
     networks:
@@ -10,7 +10,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $MEDIADIR/Music/Deemix:/music
+      - $DIR_MEDIA/Music/Deemix:/music
       # To add multiple music folders, mount them as well like this:
       # - /path/to/music1:/music/Library1
     environment:

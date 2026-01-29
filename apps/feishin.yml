@@ -2,7 +2,7 @@ services:
   feishin:
     image: ghcr.io/jeffvli/feishin:latest
     container_name: feishin
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     depends_on:
       - jellyfin
     networks:

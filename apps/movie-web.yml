@@ -5,7 +5,7 @@ services:
     build: $GITHUBREPOSDIR/movie-web
     image: movie-web:4.2.0
     # image: ghcr.io/movie-web/movie-web # NOTE: There is no pushed docker image
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     networks:
       - t3_proxy
     labels:

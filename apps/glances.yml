@@ -15,7 +15,7 @@ services:
     # image: nicolargo/glances:ubuntu-latest-full
     image: nicolargo/glances:dev
     container_name: glances
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     <<: *gpu-deploy
     # network_mode: host
     networks:
@@ -27,7 +27,7 @@ services:
     #   - no-new-privileges:true
     pid: host
     volumes:
-      # - $CONFIGDIR/glances/glances.conf:/glances/conf/glances.conf # Use this if you want to add a glances.conf file
+      # - $REPO_PATH/configs/glances/glances.conf:/glances/conf/glances.conf # Use this if you want to add a glances.conf file
       - $USERDIR:/data/home:ro
     environment:
       TZ: "${TZ}"

@@ -3,18 +3,18 @@ services:
     container_name: obsidian-custom
     image: obsidian-custom:latest
     build:
-      context: $DOCKERDIR/Dockerfiles/DesktopApps/Obsidian
-      dockerfile: $DOCKERDIR/Dockerfiles/DesktopApps/Obsidian/Dockerfile
-      # dockerfile: $DOCKERDIR/Dockerfiles/DesktopApps/Obsidian/Dockerfile_Appimage
+      context: $REPO_PATH/Dockerfiles/DesktopApps/Obsidian
+      dockerfile: $REPO_PATH/Dockerfiles/DesktopApps/Obsidian/Dockerfile
+      # dockerfile: $REPO_PATH/Dockerfiles/DesktopApps/Obsidian/Dockerfile_Appimage
       # args:
       #   - OBSIDIAN_VERSION=1.5.12
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     networks:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $NOTESDIR/Markdown:/vaults
+      - $DIR_NOTES/Markdown:/vaults
       # - /path/to/config:/config
     environment:
       PUID: $PUID

@@ -3,13 +3,13 @@ services:
   # obsidian-couchdb:
   #   container_name: obsidian-couchdb
   #   image: couchdb:latest
-  #   restart: $OTHERS_RESTART_POLICY
+  #   restart: $RESTART_POLICY_OTHERS
   #   networks:
   #     - t3_proxy
   #   security_opt:
   #     - no-new-privileges:true
   #   volumes:
-  #     - $DOCKERDIR/appdata/couchdb:/opt/couchdb/data
+  #     - $REPO_PATH/appdata/couchdb:/opt/couchdb/data
   #   environment:
   #     - COUCHDB_USER=admin
   #     - COUCHDB_PASSWORD=admin
@@ -41,14 +41,14 @@ services:
   obsidian:
     container_name: obsidian
     image: lscr.io/linuxserver/obsidian:latest
-    restart: $DESKTOP_IMAGES_RESTART_POLICY
+    restart: $RESTART_POLICY_DESKTOP_IMAGES
     shm_size: "1gb"
     networks:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $NOTESDIR/Markdown:/vaults
+      - $DIR_NOTES/Markdown:/vaults
     environment:
       PUID: $PUID
       PGID: $PGID
@@ -89,14 +89,14 @@ services:
   obsidian-kasm:
     container_name: obsidian-kasm
     image: lscr.io/linuxserver/obsidian:v1.8.10-ls72
-    restart: $DESKTOP_IMAGES_RESTART_POLICY
+    restart: $RESTART_POLICY_DESKTOP_IMAGES
     shm_size: "1gb"
     networks:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $NOTESDIR/Markdown:/vaults
+      - $DIR_NOTES/Markdown:/vaults
     environment:
       PUID: $PUID
       PGID: $PGID

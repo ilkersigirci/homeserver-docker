@@ -3,7 +3,7 @@ services:
   syncthing:
     container_name: syncthing
     image: lscr.io/linuxserver/syncthing:latest
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     networks:
       - t3_proxy
     ports:
@@ -14,8 +14,8 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/syncthing:/config
-      - $NOTESDIR/Markdown:/notes
+      - $REPO_PATH/appdata/syncthing:/config
+      - $DIR_NOTES/Markdown:/notes
     environment:
       PUID: $PUID
       PGID: $PGID

@@ -2,7 +2,7 @@ services:
   convertx:
     image: ghcr.io/c4illin/convertx
     container_name: convertx
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - maintenance
     networks:
@@ -15,7 +15,7 @@ services:
       HTTP_ALLOWED: true # setting this to true is unsafe, only set this to true locally
       ALLOW_UNAUTHENTICATED: true # allows anyone to use the service without logging in, only set this to true locally
     volumes:
-      - $DOCKERDIR/appdata/convertx:/app/data
+      - $REPO_PATH/appdata/convertx:/app/data
     labels:
       traefik.enable: "true"
       ## HTTP Routers Auth

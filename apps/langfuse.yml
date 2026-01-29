@@ -117,9 +117,9 @@ services:
       glance.description: "LLM engineering platform: LLM Observability, metrics, evals, prompt management, playground, datasets"
 
   # NOTE: Create related dirs
-  ## sudo mkdir -p $DATADIR/langfuse/clickhouse/data
-  ## sudo mkdir -p $DATADIR/langfuse/clickhouse/logs
-  ## sudo chown -R 101:101 $DATADIR/langfuse/clickhouse
+  ## sudo mkdir -p $REPO_PATH/data/langfuse/clickhouse/data
+  ## sudo mkdir -p $REPO_PATH/data/langfuse/clickhouse/logs
+  ## sudo chown -R 101:101 $REPO_PATH/data/langfuse/clickhouse
   langfuse-clickhouse:
     image: docker.io/clickhouse/clickhouse-server
     container_name: langfuse-clickhouse
@@ -133,8 +133,8 @@ services:
       CLICKHOUSE_USER: $LANGFUSE_CLICKHOUSE_USER
       CLICKHOUSE_PASSWORD: $LANGFUSE_CLICKHOUSE_PASSWORD
     volumes:
-      - $DATADIR/langfuse/clickhouse/data:/var/lib/clickhouse
-      - $DATADIR/langfuse/clickhouse/logs:/var/log/clickhouse-server
+      - $REPO_PATH/data/langfuse/clickhouse/data:/var/lib/clickhouse
+      - $REPO_PATH/data/langfuse/clickhouse/logs:/var/log/clickhouse-server
     networks:
       - t3_proxy
     expose:
@@ -205,7 +205,7 @@ services:
     expose:
       - 5432
     volumes:
-      - $DATADIR/langfuse/langfuse-db:/pgdata
+      - $REPO_PATH/data/langfuse/langfuse-db:/pgdata
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s

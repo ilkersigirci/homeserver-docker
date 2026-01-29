@@ -5,7 +5,7 @@ services:
   stremio:
     image: tsaridas/stremio-docker:latest
     container_name: stremio
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     networks:
       - t3_proxy
     expose:
@@ -16,7 +16,7 @@ services:
     environment:
       NO_CORS: 1
     volumes:
-      - $CONFIGDIR/stremio:/root/.stremio-server
+      - $REPO_PATH/configs/stremio:/root/.stremio-server
     labels:
       traefik.enable: "true"
       ## HTTP Routers Auth - Web UI
@@ -62,7 +62,7 @@ services:
   stremio-server:
     image: stremio/server:latest
     container_name: stremio-server
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     networks:
       - t3_proxy
     security_opt:

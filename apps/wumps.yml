@@ -7,12 +7,12 @@ services:
     build:
       context: $GITHUBREPOSDIR/wumps
       dockerfile: $GITHUBREPOSDIR/wumps/Dockerfile
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - maintenance
     network_mode: host
     volumes:
-      - $DOCKERDIR/configs/wumps/config.ini:/app/config.ini
+      - $REPO_PATH/configs/wumps/config.ini:/app/config.ini
     # labels:
     #   - "traefik.enable=true"
     #   ## HTTP Routers

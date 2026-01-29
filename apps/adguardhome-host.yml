@@ -3,7 +3,7 @@ services:
   adguardhome:
     image: adguard/adguardhome:v0.107.71
     container_name: adguardhome
-    restart: $CORE_RESTART_POLICY
+    restart: $RESTART_POLICY_CORE
     profiles:
       - core
     network_mode: host
@@ -14,8 +14,8 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $CONFIGDIR/adguardhome:/opt/adguardhome/conf:rw
-      - $DOCKERDIR/appdata/adguardhome/work:/opt/adguardhome/work
+      - $REPO_PATH/configs/adguardhome:/opt/adguardhome/conf:rw
+      - $REPO_PATH/appdata/adguardhome/work:/opt/adguardhome/work
     environment:
       TZ: $TZ
     labels:

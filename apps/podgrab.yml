@@ -2,14 +2,14 @@ services:
   podgrab:
     image: akhilrex/podgrab:latest
     container_name: podgrab
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     networks:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/podgrab:/config
-      - $MEDIADIR/Podcasts:/assets
+      - $REPO_PATH/appdata/podgrab:/config
+      - $DIR_MEDIA/Podcasts:/assets
     environment:
       CHECK_FREQUENCY: 240
     labels:

@@ -3,9 +3,9 @@ services:
     container_name: handbrake
     image: jlesage/handbrake:latest
     volumes:
-      - $DATADIR/downloads:/data/downloads
-      - $DOCKERDIR/appdata/handbrake/config:/config
-      - $DOCKERDIR/appdata/handbrake/watch:/watch
+      - $REPO_PATH/data/downloads:/data/downloads
+      - $REPO_PATH/appdata/handbrake/config:/config
+      - $REPO_PATH/appdata/handbrake/watch:/watch
     environment:
       USER_ID: $PUID
       GROUP_ID: $PGID

@@ -2,7 +2,7 @@ services:
   glance:
     image: glanceapp/glance:latest
     container_name: glance
-    restart: $CORE_RESTART_POLICY
+    restart: $RESTART_POLICY_CORE
     profiles:
       - core
     networks:
@@ -10,8 +10,8 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $CONFIGDIR/glance/config:/app/config
-      - $CONFIGDIR/glance/assets:/app/assets
+      - $REPO_PATH/configs/glance/config:/app/config
+      - $REPO_PATH/configs/glance/assets:/app/assets
     environment:
       TZ: $TZ
       MY_SECRET_TOKEN: "glance_secret_token"

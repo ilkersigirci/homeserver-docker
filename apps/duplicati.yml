@@ -2,15 +2,15 @@ services:
   duplicati:
     image: lscr.io/linuxserver/duplicati
     container_name: duplicati
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - maintenance
     networks:
       - t3_proxy
     volumes:
-      - $DOCKERDIR/appdata/duplicati:/config
-      - $BACKUPDIR:/backups
-      - $DOCKERDIR:/source
+      - $REPO_PATH/appdata/duplicati:/config
+      - $DIR_BACKUP:/backups
+      - $REPO_PATH:/source
     environment:
       PUID: $PUID
       PGID: $PGID

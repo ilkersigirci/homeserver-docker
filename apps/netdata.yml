@@ -2,7 +2,7 @@ services:
   netdata:
     image: netdata/netdata:latest
     container_name: netdata
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     pid: host
     networks:
       - t3_proxy
@@ -13,9 +13,9 @@ services:
     security_opt:
       - apparmor:unconfined
     volumes:
-      - $DOCKERDIR/appdata/netdata/netdataconfig:/etc/netdata
-      - $DOCKERDIR/appdata/netdata/netdatalib:/var/lib/netdata
-      - $DOCKERDIR/appdata/netdata/netdatacache:/var/cache/netdata
+      - $REPO_PATH/appdata/netdata/netdataconfig:/etc/netdata
+      - $REPO_PATH/appdata/netdata/netdatalib:/var/lib/netdata
+      - $REPO_PATH/appdata/netdata/netdatacache:/var/cache/netdata
       - /etc/passwd:/host/etc/passwd:ro
       - /etc/group:/host/etc/group:ro
       - /etc/localtime:/etc/localtime:ro

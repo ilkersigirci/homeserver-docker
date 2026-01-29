@@ -2,7 +2,7 @@ services:
   chromium:
     container_name: chromium
     image: lscr.io/linuxserver/ungoogled-chromium:latest
-    restart: $DESKTOP_IMAGES_RESTART_POLICY
+    restart: $RESTART_POLICY_DESKTOP_IMAGES
     shm_size: "1gb"
     networks:
       - t3_proxy

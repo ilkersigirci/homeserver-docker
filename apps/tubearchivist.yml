@@ -2,13 +2,13 @@ services:
   tubearchivist:
     image: bbilly1/tubearchivist:latest
     container_name: tubearchivist
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     networks:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $MEDIADIR/Youtube:/youtube
+      - $DIR_MEDIA/Youtube:/youtube
     environment:
       TA_USERNAME: admin
       TA_PASSWORD: admin

@@ -3,7 +3,7 @@ services:
   bitplay:
     image: ghcr.io/aculix/bitplay:main
     container_name: bitplay
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     profiles:
       - media
     networks:
@@ -12,7 +12,7 @@ services:
       - no-new-privileges:true
     volumes:
       # NOTE: create the directory before running the container
-      - $CONFIGDIR/bitplay:/app/config
+      - $REPO_PATH/configs/bitplay:/app/config
     labels:
       traefik.enable: "true"
       ## HTTP Routers

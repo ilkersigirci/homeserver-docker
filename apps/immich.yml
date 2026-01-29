@@ -3,7 +3,7 @@ services:
   immich-redis:
     container_name: immich-redis
     image: docker.io/valkey/valkey:8@sha256:81db6d39e1bba3b3ff32bd3a1b19a6d69690f94a3954ec131277b9a26b95b3aa
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     profiles:
       - photo
     networks:
@@ -14,17 +14,17 @@ services:
   immich-postgres:
     container_name: immich-postgres
     image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     profiles:
       - photo
     networks:
       - t3_proxy
     volumes:
-      - $DOCKERDIR/appdata/immich-db:/var/lib/postgresql/data
+      - $REPO_PATH/appdata/immich-db:/var/lib/postgresql/data
     environment:
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_DB: ${DB_DATABASE_NAME}
+      POSTGRES_PASSWORD: $IMMICH_DB_PASSWORD
+      POSTGRES_USER: $IMMICH_DB_USERNAME
+      POSTGRES_DB: $IMMICH_DB_DATABASE_NAME
       POSTGRES_INITDB_ARGS: '--data-checksums'
       PG_DATA: /var/lib/postgresql/data
       # Uncomment the DB_STORAGE_TYPE: 'HDD' var if your database isn't stored on SSDs
@@ -33,7 +33,7 @@ services:
   immich-server:
     container_name: immich-server
     image: ghcr.io/immich-app/immich-server:release
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     depends_on:
       - immich-redis
       - immich-postgres
@@ -44,18 +44,18 @@ services:
     healthcheck:
       disable: false
     volumes:
-      - ${UPLOAD_LOCATION}:/usr/src/app/upload
-      - $PHOTOSDIR/Pictures:/mnt/media/Photos/Pictures:ro
-      - $PHOTOSDIR/Videos:/mnt/media/Photos/Videos:ro
-      # - $PHOTOSDIR/Pictures:/mnt/media/Photos/Pictures
-      # - $PHOTOSDIR/Videos:/mnt/media/Photos/Videos
+      - $IMMICH_UPLOAD_LOCATION:/usr/src/app/upload
+      - $DIR_PHOTOS/Pictures:/mnt/media/Photos/Pictures:ro
+      - $DIR_PHOTOS/Videos:/mnt/media/Photos/Videos:ro
+      # - $DIR_PHOTOS/Pictures:/mnt/media/Photos/Pictures
+      # - $DIR_PHOTOS/Videos:/mnt/media/Photos/Videos
     environment:
-      UPLOAD_LOCATION: ${UPLOAD_LOCATION}
-      IMMICH_LOG_LEVEL: ${IMMICH_LOG_LEVEL}
-      REDIS_HOSTNAME: ${REDIS_HOSTNAME}
-      DB_HOSTNAME: ${DB_HOSTNAME}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
+      UPLOAD_LOCATION: $IMMICH_UPLOAD_LOCATION
+      IMMICH_LOG_LEVEL: info
+      REDIS_HOSTNAME: $IMMICH_REDIS_HOSTNAME
+      DB_HOSTNAME: $IMMICH_DB_HOSTNAME
+      DB_USERNAME: $IMMICH_DB_USERNAME
+      DB_PASSWORD: $IMMICH_DB_PASSWORD
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -112,7 +112,7 @@ services:
   immich-public-proxy:
     container_name: immich-public-proxy
     image: alangrainger/immich-public-proxy:latest
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     depends_on:
       - immich-server
     profiles:
@@ -128,7 +128,7 @@ services:
     #   start_period: 10s
     #   timeout: 5s
     volumes:
-      - $CONFIGDIR/immich-public-proxy/config.json:/app/config.json:ro
+      - $REPO_PATH/configs/immich-public-proxy/config.json:/app/config.json:ro
     labels:
       ####### HOMEPAGE #######
       homepage.group: "Media"

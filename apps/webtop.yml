@@ -2,7 +2,7 @@ services:
   webtop:
     container_name: webtop
     image: lscr.io/linuxserver/webtop:latest
-    restart: $DESKTOP_IMAGES_RESTART_POLICY
+    restart: $RESTART_POLICY_DESKTOP_IMAGES
     shm_size: "1gb" #optional
     devices: #optional
       - /dev/dri:/dev/dri
@@ -12,7 +12,7 @@ services:
     networks:
       - t3_proxy
     volumes:
-      - $DOCKERDIR/appdata/webtop:/config
+      - $REPO_PATH/appdata/webtop:/config
     environment:
       PUID: $PUID
       PGID: $PGID

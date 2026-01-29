@@ -2,7 +2,7 @@ services:
   windows:
     image: dockurr/windows:latest
     container_name: windows
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     stop_grace_period: 2m
     cap_add:
       - NET_ADMIN
@@ -22,7 +22,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/windows:/storage
+      - $REPO_PATH/appdata/windows:/storage
       # - /mnt/d/Archive/FORMAT/Windows/WIN11.PRO.23H2.U8.X64.(NORMAL).ISO:/custom.iso
     environment:
       VERSION: "11"

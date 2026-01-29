@@ -1,11 +1,11 @@
 # NOTE: Create folders before starting the container
-# mkdir $DOCKERDIR/appdata/ytptube
-# mkdir $DOCKERDIR/logs/ytptube
+# mkdir $REPO_PATH/appdata/ytptube
+# mkdir $REPO_PATH/logs/ytptube
 services:
   ytptube:
     image: ghcr.io/arabcoders/ytptube:latest
     container_name: ytptube
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     user: $PUID:$PGID
     profiles:
       - media
@@ -15,9 +15,9 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/ytptube:/config:rw
-      - $DOCKERDIR/logs/ytptube:/config/logs:rw
-      - $MEDIADIR/Youtube:/downloads:rw
+      - $REPO_PATH/appdata/ytptube:/config:rw
+      - $REPO_PATH/logs/ytptube:/config/logs:rw
+      - $DIR_MEDIA/Youtube:/downloads:rw
     tmpfs:
       - /tmp
     environment:

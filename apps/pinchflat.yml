@@ -2,7 +2,7 @@ services:
   pinchflat:
     image: ghcr.io/kieraneglin/pinchflat:latest
     container_name: pinchflat
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     profiles:
       - media
       - youtube
@@ -11,8 +11,8 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/pinchflat:/config
-      - $MEDIADIR/Youtube:/downloads
+      - $REPO_PATH/appdata/pinchflat:/config
+      - $DIR_MEDIA/Youtube:/downloads
     environment:
       TZ: $TZ
       ENABLE_PROMETHEUS: false

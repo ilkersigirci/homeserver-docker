@@ -12,7 +12,7 @@ services:
   immich-machine-learning:
     container_name: immich-machine-learning
     image: ghcr.io/immich-app/immich-machine-learning:release-cuda
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     <<: *gpu-deploy
     profiles:
       - photos
@@ -23,6 +23,6 @@ services:
     healthcheck:
       disable: false
     volumes:
-      - $DOCKERDIR/appdata/immich-ml/model-cache:/cache
+      - $REPO_PATH/appdata/immich-ml/model-cache:/cache
     environment:
       MACHINE_LEARNING_CACHE_FOLDER: /cache

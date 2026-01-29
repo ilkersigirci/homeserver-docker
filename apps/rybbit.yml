@@ -3,7 +3,7 @@ services:
   rybbit-clickhouse:
     image: clickhouse/clickhouse-server:25.4.2
     container_name: rybbit-clickhouse
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - monitoring
       - rybbit
@@ -13,8 +13,8 @@ services:
       - "8123"
       - "9000"
     volumes:
-      - $DOCKERDIR/appdata/rybbit/clickhouse:/var/lib/clickhouse
-      - $CONFIGDIR/rybbit/clickhouse:/etc/clickhouse-server/config.d:ro
+      - $REPO_PATH/appdata/rybbit/clickhouse:/var/lib/clickhouse
+      - $REPO_PATH/configs/rybbit/clickhouse:/etc/clickhouse-server/config.d:ro
     environment:
       TZ: $TZ
       CLICKHOUSE_DB: ${RYBBIT_CLICKHOUSE_DB:-analytics}
@@ -30,7 +30,7 @@ services:
   rybbit-postgres:
     image: postgres:17.4
     container_name: rybbit-postgres
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - monitoring
       - rybbit
@@ -39,7 +39,7 @@ services:
     expose:
       - "5432"
     volumes:
-      - $DOCKERDIR/appdata/rybbit/postgres:/var/lib/postgresql/data
+      - $REPO_PATH/appdata/rybbit/postgres:/var/lib/postgresql/data
     environment:
       # - TZ=$TZ # Doesn't work
       POSTGRES_USER: ${RYBBIT_POSTGRES_USER:-frog}
@@ -55,7 +55,7 @@ services:
   rybbit-backend:
     image: ghcr.io/rybbit-io/rybbit-backend:${RYBBIT_IMAGE_TAG:-latest}
     container_name: rybbit-backend
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     depends_on:
       rybbit-clickhouse:
         condition: service_healthy
@@ -116,7 +116,7 @@ services:
   rybbit-client:
     image: ghcr.io/rybbit-io/rybbit-client:${RYBBIT_IMAGE_TAG:-latest}
     container_name: rybbit-client
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     depends_on:
       - rybbit-backend
     profiles:

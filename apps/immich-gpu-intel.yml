@@ -3,7 +3,7 @@ services:
   immich-machine-learning:
     container_name: immich-machine-learning
     image: ghcr.io/immich-app/immich-machine-learning:release-openvino
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     device_cgroup_rules:
       - 'c 189:* rmw'
     devices:
@@ -18,7 +18,7 @@ services:
       disable: false
     volumes:
       - /dev/bus/usb:/dev/bus/usb
-      - $DOCKERDIR/appdata/immich-ml/model-cache:/cache
+      - $REPO_PATH/appdata/immich-ml/model-cache:/cache
     environment:
       MACHINE_LEARNING_CACHE_FOLDER: /cache
       OMP_NUM_THREADS: 8

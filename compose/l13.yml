@@ -29,9 +29,9 @@ networks:
 ########################### SECRETS
 secrets:
   cf_dns_api_token:
-    file: $DOCKERDIR/secrets/cf_dns_api_token
+    file: $REPO_PATH/secrets/cf_dns_api_token
   rustic_password:
-    file: $DOCKERDIR/secrets/rustic_password
+    file: $REPO_PATH/secrets/rustic_password
 
 include:
   ########################### SERVICES

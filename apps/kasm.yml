@@ -2,12 +2,12 @@ services:
   kasm:
     container_name: kasm
     image: lscr.io/linuxserver/kasm:latest
-    restart: $DESKTOP_IMAGES_RESTART_POLICY
+    restart: $RESTART_POLICY_DESKTOP_IMAGES
     privileged: true
     networks:
       - t3_proxy
     volumes:
-      - $DOCKERDIR/appdata/kasm/opt:/opt
+      - $REPO_PATH/appdata/kasm/opt:/opt
     #   - /path/to/profiles:/profiles #optional
     #   - /dev/input:/dev/input #optional
     #   - /run/udev/data:/run/udev/data #optional

@@ -4,7 +4,7 @@ services:
   arcane:
     image: ghcr.io/getarcaneapp/arcane:latest
     container_name: arcane
-    restart: $CORE_RESTART_POLICY
+    restart: $RESTART_POLICY_CORE
     profiles:
       - core
     networks:
@@ -13,8 +13,8 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/arcane:/app/data
-      # - $DOCKERDIR:$DOCKERDIR:ro
+      - $REPO_PATH/appdata/arcane:/app/data
+      # - $REPO_PATH:$REPO_PATH:ro
     environment:
       PUID: $PUID
       PGID: $PGID
@@ -27,7 +27,7 @@ services:
       LOG_LEVEL: info
       ## UI CONFIGS
       UI_CONFIGURATION_DISABLED: true
-      PROJECTS_DIRECTORY: $DOCKERDIR
+      PROJECTS_DIRECTORY: $REPO_PATH
       ### OIDC
       OIDC_ENABLED: true
       OIDC_CLIENT_ID: $ARCANE_CLIENT_ID

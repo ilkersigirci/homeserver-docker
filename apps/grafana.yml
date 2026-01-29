@@ -4,7 +4,7 @@ services:
     container_name: grafana
     depends_on:
       - prometheus
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     networks:
       - t3_proxy
     security_opt:
@@ -13,9 +13,9 @@ services:
     #   - "$GRAFANA_PORT:3000"
     user: "0"
     volumes:
-      - $DOCKERDIR/appdata/grafana:/var/lib/grafana
-      - $CONFIGDIR/grafana/grafana.ini:/etc/grafana/grafana.ini
-      - $CONFIGDIR/grafana/provisioning/:/etc/grafana/provisioning/
+      - $REPO_PATH/appdata/grafana:/var/lib/grafana
+      - $REPO_PATH/configs/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - $REPO_PATH/configs/grafana/provisioning/:/etc/grafana/provisioning/
     environment:
       GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource,grafana-worldmap-panel,grafana-piechart-panel"
       GF_SECURITY_ADMIN_USER: 'admin'

@@ -2,7 +2,7 @@ services:
   jellysearch:
     image: domistyle/jellysearch
     container_name: jellysearch
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     depends_on:
       - jellyfin
     profiles:
@@ -13,7 +13,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/jellyfin:/config:ro # Jellyfin config
+      - $REPO_PATH/appdata/jellyfin:/config:ro # Jellyfin config
     environment:
       JELLYFIN_URL: http://jellyfin:8096
       MEILI_URL: http://jellyfin-meilisearch:7700

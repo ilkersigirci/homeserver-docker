@@ -1,7 +1,7 @@
 # Systemd or not explanation: https://github.com/moghtech/komodo/discussions/220#discussioncomment-11551625
 # TODO: Create custom config file and give allowed_ips = ["x.y.z.t"] etc.
 # NOTE: For stacks
-#  - Set Run Directory: $DOCKERDIR
+#  - Set Run Directory: $REPO_PATH
 #  - File Paths: compose/$MY_HOSTNAME.yml
 #  - env file path: EMPTY
 #  - Additional Env Files: .env
@@ -10,7 +10,7 @@ services:
   komodo-periphery:
     image: ghcr.io/moghtech/komodo-periphery:${COMPOSE_KOMODO_IMAGE_TAG:-latest}
     container_name: komodo-periphery
-    restart: $CORE_RESTART_POLICY
+    restart: $RESTART_POLICY_CORE
     ## If you want to use a custom periphery config file, use command to pass it to periphery.
     # command: periphery --config-path ${PERIPHERY_ROOT_DIRECTORY:-/etc/komodo}/periphery.config
     profiles:
@@ -56,5 +56,5 @@ services:
       ## Default: /etc/komodo.
       - ${PERIPHERY_ROOT_DIRECTORY:-/etc/komodo}:${PERIPHERY_ROOT_DIRECTORY:-/etc/komodo}
       ## CUSTOM: Docker Compose Stack on the host machine. Match the EXACT path.
-      - $DOCKERDIR:$DOCKERDIR:ro
-      - $HARDDISKROOTDIR:$HARDDISKROOTDIR:ro
+      - $REPO_PATH:$REPO_PATH:ro
+      - $DIR_HARDDISKROOT:$DIR_HARDDISKROOT:ro

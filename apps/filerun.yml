@@ -2,7 +2,7 @@ services:
   filerun_db:
     container_name: filerun_db
     image: linuxserver/mariadb:latest
-    restart: $PHOTO_RESTART_POLICY
+    restart: $MEDIA_RESTART_POLICY
     hostname: filerun_db
     profiles:
       - core
@@ -11,7 +11,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/filerun_db/data:/config
+      - $REPO_PATH/appdata/filerun_db/data:/config
     environment:
       PUID: $PUID
       PGID: $PGID
@@ -38,8 +38,8 @@ services:
     # user: $PGID:$PUID
     user: 0:0
     volumes:
-      - $DOCKERDIR/appdata/filerun/html:/var/www/html
-      - $HARDDISKROOTDIR:/user-files:ro
+      - $REPO_PATH/appdata/filerun/html:/var/www/html
+      - $DIR_HARDDISKROOT:/user-files:ro
     depends_on:
       - filerun_db
     links:

@@ -2,7 +2,7 @@ services:
   metube:
     image: alexta69/metube:latest
     container_name: metube
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     profiles:
       - media
       - youtube
@@ -11,7 +11,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $MEDIADIR/Youtube:/downloads
+      - $DIR_MEDIA/Youtube:/downloads
       #      - /path/to/cookies:/cookies
     environment:
       OUTPUT_TEMPLATE: '%(title)s [%(id)s].%(ext)s'

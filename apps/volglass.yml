@@ -5,15 +5,15 @@ services:
     build:
       # context: $GITHUBREPOSDIR/volglass
       # dockerfile: $GITHUBREPOSDIR/volglass/Dockerfile
-      context: $DOCKERDIR/apps/notes
-      dockerfile: $DOCKERDIR/apps/notes/Dockerfile_volglass
-    restart: $OTHERS_RESTART_POLICY
+      context: $REPO_PATH/apps/notes
+      dockerfile: $REPO_PATH/apps/notes/Dockerfile_volglass
+    restart: $RESTART_POLICY_OTHERS
     networks:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $NOTESDIR/Markdown:/app/posts:ro
+      - $DIR_NOTES/Markdown:/app/posts:ro
     environment:
       PUID: $PUID
       PGID: $PGID

@@ -2,13 +2,13 @@ services:
   freshrss:
     container_name: freshrss
     image: lscr.io/linuxserver/freshrss
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     networks:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/freshrss:/config
+      - $REPO_PATH/appdata/freshrss:/config
     environment:
       PUID: $PUID
       PGID: $PGID

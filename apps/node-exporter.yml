@@ -2,7 +2,7 @@ services:
   node-exporter:
     image: prom/node-exporter:latest
     container_name: node-exporter
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     networks:
       - t3_proxy
     # Expose ports within stack without publishing them to the host machine

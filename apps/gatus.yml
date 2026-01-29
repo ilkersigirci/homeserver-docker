@@ -2,7 +2,7 @@ services:
   gatus-db:
     image: postgres:16.4
     container_name: gatus-db
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - monitoring
       - gatus
@@ -16,7 +16,7 @@ services:
     expose:
       - "5432"
     volumes:
-      - $DATADIR/gatus-db:/pgdata
+      - $REPO_PATH/data/gatus-db:/pgdata
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -26,7 +26,7 @@ services:
   gatus:
     image: ghcr.io/twin/gatus:stable
     container_name: gatus
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     depends_on:
       gatus-db:
         condition: service_healthy
@@ -39,7 +39,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $CONFIGDIR/gatus:/config
+      - $REPO_PATH/configs/gatus:/config
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres

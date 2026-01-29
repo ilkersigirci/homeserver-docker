@@ -3,7 +3,7 @@ services:
   traefik-log-dashboard-backend:
     image: ghcr.io/hhftechnology/traefik-log-dashboard-backend:1.1.0
     container_name: traefik-log-dashboard-backend
-    restart: $CORE_RESTART_POLICY
+    restart: $RESTART_POLICY_CORE
     profiles:
       - core
       - traefik-log-dashboard
@@ -15,8 +15,8 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/logs/traefik:/logs:ro
-      - $DATADIR/maxmind:/maxmind:ro
+      - $REPO_PATH/logs/traefik:/logs:ro
+      - $REPO_PATH/data/maxmind:/maxmind:ro
     environment:
       NODE_ENV: production
       TRAEFIK_LOG_FILE: /logs/access.log
@@ -63,7 +63,7 @@ services:
   traefik-log-dashboard-frontend:
     image: ghcr.io/hhftechnology/traefik-log-dashboard-frontend:1.1.0
     container_name: traefik-log-dashboard-frontend
-    restart: $CORE_RESTART_POLICY
+    restart: $RESTART_POLICY_CORE
     depends_on:
       - traefik-log-dashboard-backend
     profiles:
@@ -119,7 +119,7 @@ services:
   #   container_name: maxmind-db-updater
   #   restart: "no"
   #   volumes:
-  #     - $DATADIR/maxmind:/data
+  #     - $REPO_PATH/data/maxmind:/data
   #   environment:
   #     - MAXMIND_LICENSE_KEY=$MAXMIND_LICENSE_KEY
   #   command: >

@@ -11,7 +11,7 @@ services:
   frigate:
     image: ghcr.io/blakeblackshear/frigate:stable
     container_name: frigate
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     stop_grace_period: 30s # allow enough time to shut down the various services
     shm_size: "512mb"
     # <<: *gpu-deploy
@@ -31,8 +31,8 @@ services:
       - /dev/dri/renderD128:/dev/dri/renderD128 # For intel hwaccel, needs to be updated for your hardware
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - $CONFIGDIR/frigate:/config
-      - $DATADIR/frigate:/media/frigate
+      - $REPO_PATH/configs/frigate:/config
+      - $REPO_PATH/data/frigate:/media/frigate
       - type: tmpfs # Optional: 1GB of memory, reduces SSD/SD Card wear
         target: /tmp/cache
         tmpfs:

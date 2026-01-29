@@ -12,9 +12,9 @@ services:
     # ports:
     #  - "$LAZYLIBRARIAN_PORT:5299"
     volumes:
-      - $DOCKERDIR/appdata/lazylibrarian:/config
-      - $DATADIR/downloads:/data/downloads
-      - $DOCKERDIR/appdata/calibre/books:/books:rw
+      - $REPO_PATH/appdata/lazylibrarian:/config
+      - $REPO_PATH/data/downloads:/data/downloads
+      - $REPO_PATH/appdata/calibre/books:/books:rw
       - "/etc/localtime:/etc/localtime:ro"
     environment:
       PUID: $PUID

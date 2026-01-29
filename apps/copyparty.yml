@@ -3,7 +3,7 @@ services:
     image: ghcr.io/9001/copyparty-ac:latest
     container_name: copyparty
     user: $PUID:$PGID
-    restart: $CORE_RESTART_POLICY
+    restart: $RESTART_POLICY_CORE
     profiles:
       - core
     networks:
@@ -11,10 +11,11 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $CONFIGDIR/copyparty:/cfg
-      - $USERDIR/docker/configs:/w/docker/configs:rw
-      - $USERDIR/docker/compose:/w/docker/compose:rw
-      # - $HARDDISKROOTDIR:/w/Harddisk:ro
+      - $REPO_PATH/configs/copyparty:/cfg
+      - $REPO_PATH/configs:/w/docker/configs:rw
+      - $REPO_PATH/compose:/w/docker/compose:rw
+      - $REPO_PATH/compose/apps:/w/docker/apps:rw
+      # - $DIR_HARDDISKROOT:/w/Harddisk:ro
     # environment:
     #   # Makes download-as-zip 3x as fast, filesystem-indexing 1.5x as fast, etc. (Uses x2 RAM)
     #   LD_PRELOAD: /usr/lib/libmimalloc-secure.so.2

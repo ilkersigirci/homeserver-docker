@@ -2,13 +2,13 @@ services:
   darktable:
     container_name: darktable
     image: lscr.io/linuxserver/darktable:latest
-    restart: $DESKTOP_IMAGES_RESTART_POLICY
+    restart: $RESTART_POLICY_DESKTOP_IMAGES
     networks:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $PHOTOSDIR:/photos
+      - $DIR_PHOTOS:/photos
     environment:
       PUID: $PUID
       PGID: $PGID

@@ -2,7 +2,7 @@ services:
   krita:
     container_name: krita
     image: lscr.io/linuxserver/krita:latest
-    restart: $DESKTOP_IMAGES_RESTART_POLICY
+    restart: $RESTART_POLICY_DESKTOP_IMAGES
     networks:
       - t3_proxy
     security_opt:

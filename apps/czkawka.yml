@@ -2,7 +2,7 @@ services:
   czkawka:
     container_name: czkawka
     image: jlesage/czkawka:latest
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - maintenance
     networks:
@@ -10,8 +10,8 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/czkawka:/config:rw
-      - $PHOTOSDIR/Pictures:/storage:rw
+      - $REPO_PATH/appdata/czkawka:/config:rw
+      - $DIR_PHOTOS/Pictures:/storage:rw
     environment:
       PUID: $PUID
       PGID: $PGID

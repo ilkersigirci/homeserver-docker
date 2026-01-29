@@ -3,7 +3,7 @@ services:
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd:latest
     container_name: sabnzbd
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     hostname: sabnzbd.$DOMAINNAME
     profiles:
       - media
@@ -14,9 +14,9 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/sabnzbd:/config
-      - $MEDIADIR/Downloads/complete:/config/Downloads/complete
-      - $MEDIADIR/Downloads/incomplete:/config/Downloads/incomplete
+      - $REPO_PATH/appdata/sabnzbd:/config
+      - $DIR_MEDIA/Downloads/complete:/config/Downloads/complete
+      - $DIR_MEDIA/Downloads/incomplete:/config/Downloads/incomplete
     environment:
       PUID: $PUID
       PGID: $PGID

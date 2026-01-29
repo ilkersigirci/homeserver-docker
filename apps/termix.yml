@@ -2,7 +2,7 @@ services:
   termix:
     image: ghcr.io/lukegus/termix:latest
     container_name: termix
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - maintenance
     networks:
@@ -10,7 +10,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/termix:/app/data
+      - $REPO_PATH/appdata/termix:/app/data
     environment:
       PORT: "8080"
     labels:

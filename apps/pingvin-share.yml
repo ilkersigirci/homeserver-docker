@@ -2,7 +2,7 @@ services:
   pingvin-share:
     image: ghcr.io/stonith404/pingvin-share:latest
     container_name: pingvin-share
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     profiles:
       - media
     networks:
@@ -10,9 +10,9 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - "$CONFIGDIR/pingvin-share/config.yaml:/opt/app/config.yaml" # Add this line, if you want to configure pingvin-share via config file and not via UI
-      - "$DOCKERDIR/appdata/pingvin-share/data:/opt/app/backend/data"
-      - "$DOCKERDIR/appdata/pingvin-share/data/images:/opt/app/frontend/public/img"
+      - "$REPO_PATH/configs/pingvin-share/config.yaml:/opt/app/config.yaml" # Add this line, if you want to configure pingvin-share via config file and not via UI
+      - "$REPO_PATH/appdata/pingvin-share/data:/opt/app/backend/data"
+      - "$REPO_PATH/appdata/pingvin-share/data/images:/opt/app/frontend/public/img"
     environment:
       PUID: $PUID
       PGID: $PGID

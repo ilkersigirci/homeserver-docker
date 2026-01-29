@@ -2,7 +2,7 @@ services:
   it-tools:
     image: ghcr.io/corentinth/it-tools:latest
     container_name: it-tools
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - maintenance
     networks:

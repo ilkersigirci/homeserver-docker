@@ -2,7 +2,7 @@ services:
   backrest:
     container_name: backrest
     image: garethgeorge/backrest:latest-alpine
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - maintenance
       - backup
@@ -12,12 +12,12 @@ services:
       - no-new-privileges:true
     hostname: backrest
     volumes:
-      - $DOCKERDIR/appdata/backrest/data:/data
-      - $DOCKERDIR/appdata/backrest/config:/config
-      - $DOCKERDIR/appdata/backrest/cache:/cache
-      - $NOTESDIR/Markdown:/userdata/Markdown:ro # [optional] mount local paths to backup here.
+      - $REPO_PATH/appdata/backrest/data:/data
+      - $REPO_PATH/appdata/backrest/config:/config
+      - $REPO_PATH/appdata/backrest/cache:/cache
+      - $DIR_NOTES/Markdown:/userdata/Markdown:ro # [optional] mount local paths to backup here.
       # - /MY-REPOS:/repos # [optional] mount repos if using local storage, not necessary for remotes e.g. B2, S3, etc.
-      - $CONFIGDIR/rclone:/root/.config/rclone:rw
+      - $REPO_PATH/configs/rclone:/root/.config/rclone:rw
     environment:
       BACKREST_DATA: /data # path for backrest data. restic binary and the database are placed here.
       BACKREST_CONFIG: /config/config.json # path for the backrest config file.

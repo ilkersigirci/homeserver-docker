@@ -2,16 +2,16 @@ services:
   beets:
     image: lscr.io/linuxserver/beets:latest
     container_name: beets
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     networks:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      # - $CONFIGDIR/beets/config.yaml:/config/config.yaml # FIXME: not working
-      - $DOCKERDIR/appdata/beets:/config
-      - $MEDIADIR/Music/Beets_TEST/Music:/music
-      - $MEDIADIR/Music/Beets_TEST/Downloads:/downloads
+      # - $REPO_PATH/configs/beets/config.yaml:/config/config.yaml # FIXME: not working
+      - $REPO_PATH/appdata/beets:/config
+      - $DIR_MEDIA/Music/Beets_TEST/Music:/music
+      - $DIR_MEDIA/Music/Beets_TEST/Downloads:/downloads
     environment:
       PUID: $PUID
       PGID: $PGID

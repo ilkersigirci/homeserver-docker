@@ -2,7 +2,7 @@ services:
   localstack-s3:
     image: gresau/localstack-persist:3
     container_name: localstack-s3
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - maintenance
     networks:
@@ -11,8 +11,8 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/localstack-s3:/persisted-data
-      - $DOCKERDIR/scripts/localstack_create_s3_bucket.sh:/etc/localstack/init/ready.d/script.sh
+      - $REPO_PATH/appdata/localstack-s3:/persisted-data
+      - $REPO_PATH/scripts/localstack_create_s3_bucket.sh:/etc/localstack/init/ready.d/script.sh
     environment:
       DEBUG: 0
       SERVICES: s3
