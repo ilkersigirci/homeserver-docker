@@ -127,7 +127,8 @@ services:
       - $REPO_PATH/logs/traefik:/logs # for fail2ban or crowdsec - make sure to touch file before starting container
     environment:
       TZ: $TZ
-      CF_DNS_API_TOKEN_FILE: /run/secrets/cf_dns_api_token
+      CF_DNS_API_TOKEN: $CLOUDFLARE_DNS_API_TOKEN
+      # CF_DNS_API_TOKEN_FILE: /run/secrets/cf_dns_api_token
       # Passing custom env variables to the container to be able to use this variables in the rules.
       LOCAL_STATIC_IP: $LOCAL_STATIC_IP
       DOMAINNAME: $DOMAINNAME
@@ -136,8 +137,8 @@ services:
       REMOTE_SERVER_PRIVATE_IP: ${REMOTE_SERVER_PRIVATE_IP:-dummy}
       WEBFINGER_USERNAME: $WEBFINGER_USERNAME
       WEBFINGER_HREF: https://pocketid.$BASE_DOMAINNAME
-    secrets:
-      - cf_dns_api_token
+    # secrets:
+    #   - cf_dns_api_token
     labels:
       traefik.enable: "true"
       # HTTP Routers
