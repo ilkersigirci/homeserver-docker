@@ -3,7 +3,6 @@ services:
     image: ghcr.io/alexta69/metube:latest
     container_name: metube
     restart: $RESTART_POLICY_MEDIA
-    user: $PUID:$PGID
     profiles:
       - media
       - youtube
@@ -15,6 +14,11 @@ services:
       - $DIR_MEDIA/Youtube:/downloads
       - $DIR_MEDIA/Youtube/cookies:/cookies
     environment:
+      UID: $PUID
+      GID: $PGID
+      CHOWN_DIRS: true
+      LOGLEVEL: ${METUBE_LOGLEVEL:-INFO}
+      PORT: 8081
       OUTPUT_TEMPLATE: '%(title)s [%(id)s].%(ext)s'
       # YTDL_OPTIONS: '{"writethumbnail": true, "writeinfojson": true}' # "writeinfojson": true,
       YTDL_OPTIONS: '{"cookiefile":"/cookies/cookies.txt"}'
