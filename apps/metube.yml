@@ -3,6 +3,7 @@ services:
     image: ghcr.io/alexta69/metube:latest
     container_name: metube
     restart: $RESTART_POLICY_MEDIA
+    user: $PUID:$PGID
     profiles:
       - media
       - youtube
