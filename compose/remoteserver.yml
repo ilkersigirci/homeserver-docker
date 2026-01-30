@@ -66,10 +66,10 @@ include:
   - ../apps/aiostreams.yml
   - ../apps/bitplay.yml
   - ../apps/mazanoke.yml
+  - ../apps/metube.yml
   - ../apps/nzbdav.yml
   - ../apps/stremio.yml
   # - ../apps/transmission.yml
-  - ../apps/ytptube.yml
   - ../apps/zipline.yml
   #### ML ####
   - ../apps/open-webui.yml

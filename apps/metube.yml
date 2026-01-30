@@ -1,6 +1,6 @@
 services:
   metube:
-    image: alexta69/metube:latest
+    image: ghcr.io/alexta69/metube:latest
     container_name: metube
     restart: $RESTART_POLICY_MEDIA
     profiles:
@@ -12,11 +12,11 @@ services:
       - no-new-privileges:true
     volumes:
       - $DIR_MEDIA/Youtube:/downloads
-      #      - /path/to/cookies:/cookies
+      - $DIR_MEDIA/Youtube/cookies:/cookies
     environment:
       OUTPUT_TEMPLATE: '%(title)s [%(id)s].%(ext)s'
-      YTDL_OPTIONS: '{"writethumbnail": true, "writeinfojson": true}' # "writeinfojson": true,
-      # - YTDL_OPTIONS={"cookiefile":"/cookies/cookies.txt"}
+      YTDL_OPTIONS: '{"cookiefile":"/cookies/cookies.txt"}'
+      # YTDL_OPTIONS: '{"writethumbnail": true, "writeinfojson": true}' # "writeinfojson": true,
     labels:
       traefik.enable: "true"
       ## HTTP Routers Auth
