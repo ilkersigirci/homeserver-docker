@@ -2,7 +2,7 @@ services:
   linkwarden-db:
     container_name: linkwarden-db
     image: postgres:16-alpine
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     networks:
       - t3_proxy
     expose:
@@ -12,7 +12,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
     volumes:
-      - $DATADIR/linkwarden-db:/var/lib/postgresql/data
+      - $REPO_PATH/data/linkwarden-db:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -25,7 +25,7 @@ services:
   linkwarden:
     container_name: linkwarden
     image: ghcr.io/linkwarden/linkwarden:latest
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     depends_on:
       linkwarden-db:
         condition: service_healthy
@@ -34,7 +34,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DATADIR/linkwarden:/data/data
+      - $REPO_PATH/data/linkwarden:/data/data
     environment:
       STORAGE_FOLDER: /data
       NEXTAUTH_URL: https://linkwarden.$DOMAINNAME/api/v1/auth

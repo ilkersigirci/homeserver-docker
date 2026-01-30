@@ -2,7 +2,7 @@ services:
   mazanoke:
     image: ghcr.io/civilblur/mazanoke:latest
     container_name: mazanoke
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     profiles:
       - media
     networks:

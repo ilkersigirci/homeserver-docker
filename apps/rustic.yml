@@ -13,10 +13,10 @@ services:
     image: ghcr.io/rustic-rs/rustic:latest
     # user: $PUID:$PGID
     # build:
-    #   context: $DOCKERDIR/Dockerfiles/Rustic
+    #   context: $REPO_PATH/Dockerfiles/Rustic
     #   args:
     #     RUSTIC_VERSION: v0.9.5
-    # restart: $MAINTENANCE_RESTART_POLICY
+    # restart: $RESTART_POLICY_MAINTENANCE
     restart: "no"
     command: help
     profiles:
@@ -27,15 +27,15 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $CONFIGDIR/rustic/rustic.toml:/etc/rustic/rustic.toml:ro
-      - $DOCKERDIR/logs/rustic:/logs:rw
-      # - $CONFIGDIR/rclone:/root/.config/rclone:rw
-      - $BACKUPDIR/RUSTIC/Repos/TestRepo:/repos/TestRepo:rw
-      - $BACKUPDIR/RUSTIC/Restores:/restores:rw
-      - $BACKUPDIR/RUSTIC/BackupTest:/backups/BackupTest:ro
-      - $DATADIR/vaultwarden-backup:/backups/Vaultwarden:ro
-      # - $CONFIGDIR:/backups/docker_configs:ro
-      # - $NOTESDIR/Markdown:/backups/Markdown:ro
+      - $REPO_PATH/configs/rustic/rustic.toml:/etc/rustic/rustic.toml:ro
+      - $REPO_PATH/logs/rustic:/logs:rw
+      # - $REPO_PATH/configs/rclone:/root/.config/rclone:rw
+      - $DIR_BACKUP/RUSTIC/Repos/TestRepo:/repos/TestRepo:rw
+      - $DIR_BACKUP/RUSTIC/Restores:/restores:rw
+      - $DIR_BACKUP/RUSTIC/BackupTest:/backups/BackupTest:ro
+      - $REPO_PATH/data/vaultwarden-backup:/backups/Vaultwarden:ro
+      # - $REPO_PATH/configs:/backups/docker_configs:ro
+      # - $DIR_NOTES/Markdown:/backups/Markdown:ro
     environment:
       TZ: $TZ
       RUSTIC_PASSWORD: /run/secrets/rustic_password

@@ -7,7 +7,7 @@ services:
   strava-statistics:
     image: robiningelbrecht/strava-statistics:latest
     container_name: strava-statistics
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     profiles:
       - media
     networks:
@@ -15,10 +15,10 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $CONFIGDIR/strava-statistics:/var/www/config/app:ro
-      - $DOCKERDIR/appdata/strava-statistics/build:/var/www/build
-      - $DOCKERDIR/appdata/strava-statistics/storage/database:/var/www/storage/database
-      - $DOCKERDIR/appdata/strava-statistics/storage/files:/var/www/storage/files
+      - $REPO_PATH/configs/strava-statistics:/var/www/config/app:ro
+      - $REPO_PATH/appdata/strava-statistics/build:/var/www/build
+      - $REPO_PATH/appdata/strava-statistics/storage/database:/var/www/storage/database
+      - $REPO_PATH/appdata/strava-statistics/storage/files:/var/www/storage/files
     environment:
       PUID: $PUID
       PGID: $PGID

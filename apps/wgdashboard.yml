@@ -9,7 +9,7 @@ services:
   wgdashboard:
     image: docker.io/donaldzou/wgdashboard:latest
     container_name: wgdashboard
-    restart: $CORE_RESTART_POLICY
+    restart: $RESTART_POLICY_CORE
     profiles:
       - core
     network_mode: host
@@ -20,8 +20,8 @@ services:
       - NET_ADMIN
       - SYS_MODULE
     volumes:
-      - $CONFIGDIR/wgdashboard:/etc/wireguard
-      - $DATADIR/wgdashboard:/data
+      - $REPO_PATH/configs/wgdashboard:/etc/wireguard
+      - $REPO_PATH/data/wgdashboard:/data
     environment:
       tz: $TZ
       global_dns: 10.8.0.1

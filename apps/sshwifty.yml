@@ -2,7 +2,7 @@ services:
   sshwifty:
     container_name: sshwifty
     image: niruix/sshwifty:latest
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - maintenance
     networks:
@@ -10,7 +10,7 @@ services:
     security_opt:
       - no-new-privileges:true
     # volumes:
-    #   - $DOCKERDIR/appdata/czkawka:/config:rw
+    #   - $REPO_PATH/appdata/czkawka:/config:rw
     environment:
       PUID: $PUID
       PGID: $PGID

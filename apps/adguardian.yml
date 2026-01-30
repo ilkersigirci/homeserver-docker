@@ -3,7 +3,7 @@ services:
   adguardian:
     image: ghcr.io/lissy93/adguardian:latest
     container_name: adguardian
-    restart: $CORE_RESTART_POLICY
+    restart: $RESTART_POLICY_CORE
     profiles:
       - core
     networks:

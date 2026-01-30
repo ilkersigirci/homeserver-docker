@@ -3,11 +3,11 @@ services:
     image: mariadb:latest
     container_name: librum_db
     hostname: librum_db
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     networks:
       - t3_proxy
     volumes:
-      - $DOCKERDIR/appdata/librum_db:/var/lib/mysql
+      - $REPO_PATH/appdata/librum_db:/var/lib/mysql
     environment:
       MARIADB_USER: librum
       MARIADB_PASSWORD: mariadb
@@ -21,7 +21,7 @@ services:
     build: $GITHUBREPOSDIR/Librum-Server
     image: librum:latest
     hostname: librum
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     depends_on:
       - librum_db
     networks:
@@ -31,7 +31,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $MEDIADIR/Books/Librum:/var/lib/librum-server/librum_storage
+      - $DIR_MEDIA/Books/Librum:/var/lib/librum-server/librum_storage
     environment:
       JWTValidIssuer: exampleIssuer
       JWTKey: exampleOfALongSecretToken

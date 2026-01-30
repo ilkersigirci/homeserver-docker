@@ -6,16 +6,16 @@ services:
     container_name: quartz
     # image: shommey/dockerized-quartz
     image: ilkersigirci/dockerized-quartz:latest
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     networks:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $NOTESDIR/Markdown:/vault:ro
-      - $DATADIR/quartz/repo:/usr/src/app/quartz # Optional: Mount existing Quartz repo
-      - $CONFIGDIR/quartz/quartz.config.ts:/usr/src/app/quartz/quartz.config.ts:ro
-      - $CONFIGDIR/quartz/quartz.layout.ts:/usr/src/app/quartz/quartz.layout.ts:ro
+      - $DIR_NOTES/Markdown:/vault:ro
+      - $REPO_PATH/data/quartz/repo:/usr/src/app/quartz # Optional: Mount existing Quartz repo
+      - $REPO_PATH/configs/quartz/quartz.config.ts:/usr/src/app/quartz/quartz.config.ts:ro
+      - $REPO_PATH/configs/quartz/quartz.layout.ts:/usr/src/app/quartz/quartz.layout.ts:ro
     environment:
       AUTO_REBUILD: false
       REBUILD_WEBHOOK_SECRET: $QUARTZ_REBUILD_WEBHOOK_SECRET

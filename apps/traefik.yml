@@ -1,12 +1,12 @@
 services:
   # Traefik 3 - Reverse Proxy
   # Touch (create empty files) acme/acme.json. Set acme.json permissions to 600.
-  # touch $DOCKERDIR/appdata/traefik3/acme/acme.json
-  # chmod 600 $DOCKERDIR/appdata/traefik3/acme/acme.json
+  # touch $REPO_PATH/appdata/traefik3/acme/acme.json
+  # chmod 600 $REPO_PATH/appdata/traefik3/acme/acme.json
   traefik:
     container_name: traefik
     image: ghcr.io/traefik/traefik:3.6
-    restart: $CORE_RESTART_POLICY
+    restart: $RESTART_POLICY_CORE
     profiles:
       - core
     command: # CLI arguments
@@ -60,7 +60,7 @@ services:
       # - --providers.file.filename=/path/to/file # Load dynamic configuration from a file
       - --providers.file.watch=true # Only works on top level files in the rules folder
       # - --certificatesResolvers.dns-cloudflare.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory # LetsEncrypt Staging Server - uncomment when testing
-      - --certificatesResolvers.dns-cloudflare.acme.email=$CLOUDFLARE_EMAIL # FIXME: Not working: /run/secrets/cloudflare_email
+      - --certificatesResolvers.dns-cloudflare.acme.email=$CLOUDFLARE_EMAIL
       - --certificatesResolvers.dns-cloudflare.acme.storage=/acme.json
       - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.provider=cloudflare
       - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.resolvers=1.1.1.1:53,1.0.0.1:53
@@ -121,13 +121,14 @@ services:
       #   mode: host
     volumes:
       # - /etc/localtime:/etc/localtime:ro # Set timezone
-      - $CONFIGDIR/traefik3/rules:/rules:ro # file provider directory
-      - $CONFIGDIR/traefik3/rules.specific/$MY_HOSTNAME.yml:/rules/dummy_specific.yml:ro # file provider directory
-      - $CONFIGDIR/traefik3/acme/acme.json:/acme.json # cert location - you must touch this file and change permissions to 600
-      - $DOCKERDIR/logs/traefik:/logs # for fail2ban or crowdsec - make sure to touch file before starting container
+      - $REPO_PATH/configs/traefik3/rules:/rules:ro # file provider directory
+      - $REPO_PATH/configs/traefik3/rules.specific/$MY_HOSTNAME.yml:/rules/dummy_specific.yml:ro # file provider directory
+      - $REPO_PATH/configs/traefik3/acme/acme.json:/acme.json # cert location - you must touch this file and change permissions to 600
+      - $REPO_PATH/logs/traefik:/logs # for fail2ban or crowdsec - make sure to touch file before starting container
     environment:
       TZ: $TZ
-      CF_DNS_API_TOKEN_FILE: /run/secrets/cf_dns_api_token
+      CF_DNS_API_TOKEN: $CLOUDFLARE_DNS_API_TOKEN
+      # CF_DNS_API_TOKEN_FILE: /run/secrets/cf_dns_api_token
       # Passing custom env variables to the container to be able to use this variables in the rules.
       LOCAL_STATIC_IP: $LOCAL_STATIC_IP
       DOMAINNAME: $DOMAINNAME
@@ -136,8 +137,8 @@ services:
       REMOTE_SERVER_PRIVATE_IP: ${REMOTE_SERVER_PRIVATE_IP:-dummy}
       WEBFINGER_USERNAME: $WEBFINGER_USERNAME
       WEBFINGER_HREF: https://pocketid.$BASE_DOMAINNAME
-    secrets:
-      - cf_dns_api_token
+    # secrets:
+    #   - cf_dns_api_token
     labels:
       traefik.enable: "true"
       # HTTP Routers

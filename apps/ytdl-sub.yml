@@ -3,20 +3,20 @@ services:
   ytdl-sub:
     image: ghcr.io/jmbannon/ytdl-sub:latest
     container_name: ytdl-sub
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     networks:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      # - $CONFIGDIR/ytdl-sub/config:/config
-      - $CONFIGDIR/ytdl-sub/config.yaml:/config/config.yaml
-      - $CONFIGDIR/ytdl-sub/subscriptions.yaml:/config/subscriptions.yaml
-      - $CONFIGDIR/ytdl-sub/download_yt.sh:/config/download_yt.sh
-      - $MEDIADIR/Youtube_Sub:/tv_shows
-      # - MEDIADIR/Movies:/movies # optional
+      # - $REPO_PATH/configs/ytdl-sub/config:/config
+      - $REPO_PATH/configs/ytdl-sub/config.yaml:/config/config.yaml
+      - $REPO_PATH/configs/ytdl-sub/subscriptions.yaml:/config/subscriptions.yaml
+      - $REPO_PATH/configs/ytdl-sub/download_yt.sh:/config/download_yt.sh
+      - $DIR_MEDIA/Youtube_Sub:/tv_shows
+      # - DIR_MEDIA/Movies:/movies # optional
       # - <path/to/music_videos>:/music_videos # optional
-      # - MEDIADIR/Music:/music # optional
+      # - DIR_MEDIA/Music:/music # optional
     environment:
       PUID: $PUID
       PGID: $PGID

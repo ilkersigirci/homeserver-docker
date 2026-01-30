@@ -9,16 +9,16 @@ services:
       - core
     depends_on:
       - traefik
-    restart: $CORE_RESTART_POLICY
+    restart: $RESTART_POLICY_CORE
     networks:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $CONFIGDIR/filebrowser:/config
-      - $DOCKERDIR/appdata/filebrowser:/database
+      - $REPO_PATH/configs/filebrowser:/config
+      - $REPO_PATH/appdata/filebrowser:/database
       - $USERDIR:/srv/Home
-      - $HARDDISKROOTDIR:/srv/Harddisk
+      - $DIR_HARDDISKROOT:/srv/Harddisk
     environment:
       PUID: $PUID
       PGID: $PGID

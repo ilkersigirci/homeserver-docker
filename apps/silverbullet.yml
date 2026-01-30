@@ -3,7 +3,7 @@ services:
   silverbullet:
     image: ghcr.io/silverbulletmd/silverbullet
     container_name: silverbullet
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     profiles:
       - reading
     networks:
@@ -11,7 +11,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $NOTESDIR/Markdown:/space
+      - $DIR_NOTES/Markdown:/space
     environment:
       PUID: $PUID
       PGID: $PGID

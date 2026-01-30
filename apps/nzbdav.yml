@@ -2,7 +2,7 @@ services:
   nzbdav:
     image: nzbdav/nzbdav:latest
     container_name: nzbdav
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     profiles:
       - media
     networks:
@@ -12,7 +12,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/nzbdav:/config
+      - $REPO_PATH/appdata/nzbdav:/config
     environment:
       PUID: $PUID
       PGID: $PGID

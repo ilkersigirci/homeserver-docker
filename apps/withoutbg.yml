@@ -2,7 +2,7 @@ services:
   withoutbg:
     image: withoutbg/app:latest
     container_name: withoutbg
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - maintenance
     networks:

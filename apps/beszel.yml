@@ -3,11 +3,11 @@ services:
   beszel:
     image: henrygd/beszel
     container_name: beszel
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     networks:
       - t3_proxy
     volumes:
-      - $DOCKERDIR/appdata/beszel:/beszel_data
+      - $REPO_PATH/appdata/beszel:/beszel_data
     environment:
       TZ: $TZ
       USER_CREATION: false

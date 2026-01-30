@@ -2,7 +2,7 @@ services:
   buildarr:
     image: callum027/buildarr:latest
     container_name: buildarr
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     depends_on:
       - prowlarr
       - radarr
@@ -10,7 +10,7 @@ services:
     networks:
       - t3_proxy
     volumes:
-      - $CONFIGDIR/buildarr:/config
+      - $REPO_PATH/configs/buildarr:/config
     environment:
       PUID: $PUID
       PGID: $PGID

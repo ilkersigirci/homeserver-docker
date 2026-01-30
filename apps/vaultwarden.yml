@@ -3,18 +3,18 @@
 services:
   vaultwarden:
     container_name: vaultwarden
-    image: ghcr.io/dani-garcia/vaultwarden:latest
+    image: ghcr.io/dani-garcia/vaultwarden:1.35.2
     profiles:
       - core
     depends_on:
       - traefik
-    restart: $CORE_RESTART_POLICY
+    restart: $RESTART_POLICY_CORE
     networks:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DATADIR/vaultwarden:/data/
+      - $REPO_PATH/data/vaultwarden:/data/
     environment:
       ADMIN_TOKEN: $VAULTWARDEN_ADMIN_TOKEN
       DATA_FOLDER: data

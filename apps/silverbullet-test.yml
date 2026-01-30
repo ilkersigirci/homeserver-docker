@@ -2,7 +2,7 @@ services:
   silverbullet-test:
     image: ghcr.io/silverbulletmd/silverbullet
     container_name: silverbullet-test
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     profiles:
       - reading
     networks:
@@ -10,7 +10,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/silverbullet-test:/space
+      - $REPO_PATH/appdata/silverbullet-test:/space
     environment:
       PUID: $PUID
       PGID: $PGID

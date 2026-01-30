@@ -2,14 +2,14 @@ services:
   jdownloader:
     image: jlesage/jdownloader-2:latest
     container_name: jdownloader
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     networks:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/jdownloader:/config:rw
-      - $MEDIADIR/Downloads:/output:rw
+      - $REPO_PATH/appdata/jdownloader:/config:rw
+      - $DIR_MEDIA/Downloads:/output:rw
     environment:
       USER_ID: $PUID
       GROUP_ID: $PGID

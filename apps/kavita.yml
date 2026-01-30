@@ -3,14 +3,14 @@ services:
     container_name: kavita
     image: kizaing/kavita:latest
     # image: ghcr.io/kareadita/kavita:latest
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     networks:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/kavita:/kavita/config
-      - $MEDIADIR/Books:/book
+      - $REPO_PATH/appdata/kavita:/kavita/config
+      - $DIR_MEDIA/Books:/book
       # - ./manga:/manga
     environment:
       PUID: $PUID

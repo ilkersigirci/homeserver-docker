@@ -2,7 +2,7 @@ services:
   perlite-build:
     container_name: perlite-build
     image: sec77/perlite:latest
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     profiles:
       - reading
     networks:
@@ -12,7 +12,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $NOTESDIR/Markdown:/var/www/perlite/Vault:ro
+      - $DIR_NOTES/Markdown:/var/www/perlite/Vault:ro
     environment:
       NOTES_PATH: Vault
       HIDE_FOLDERS: private,trash
@@ -41,7 +41,7 @@ services:
   perlite:
     container_name: perlite
     image: nginx:stable-alpine
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     depends_on:
       - perlite-build
     profiles:
@@ -51,7 +51,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $CONFIGDIR/perlite/web.conf:/etc/nginx/conf.d/default.conf:ro
+      - $REPO_PATH/configs/perlite/web.conf:/etc/nginx/conf.d/default.conf:ro
     volumes_from:
       - perlite-build
     labels:

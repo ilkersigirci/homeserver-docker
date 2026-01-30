@@ -2,7 +2,7 @@ services:
   kiwix-serve:
     image: ghcr.io/kiwix/kiwix-serve:latest
     container_name: kiwix-serve
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     # command: wikipedia.zim wiktionary.zim
     command: '*.zim'
     profiles:
@@ -12,7 +12,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $KIWIXDIR:/data
+      - $DIR_KIWIX:/data
     labels:
       traefik.enable: "true"
       ## HTTP Routers

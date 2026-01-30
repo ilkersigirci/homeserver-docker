@@ -4,17 +4,17 @@ services:
     container_name: okular
     image: okular:latest
     build:
-      context: $DOCKERDIR/Dockerfiles/DesktopApps/Okular
-      dockerfile: $DOCKERDIR/Dockerfiles/DesktopApps/Okular/Dockerfile
-    restart: $DESKTOP_IMAGES_RESTART_POLICY
+      context: $REPO_PATH/Dockerfiles/DesktopApps/Okular
+      dockerfile: $REPO_PATH/Dockerfiles/DesktopApps/Okular/Dockerfile
+    restart: $RESTART_POLICY_DESKTOP_IMAGES
     networks:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/okular:/config
-      - $MEDIADIR/Books:/books
-      - $HARDDISKROOTDIR/School/Thesis/Papers:/thesis
+      - $REPO_PATH/appdata/okular:/config
+      - $DIR_MEDIA/Books:/books
+      - $DIR_HARDDISKROOT/School/Thesis/Papers:/thesis
     environment:
       PUID: $PUID
       PGID: $PGID

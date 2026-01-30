@@ -2,7 +2,7 @@ services:
   healthchecks:
     image: lscr.io/linuxserver/healthchecks:latest
     container_name: healthchecks
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - maintenance
     networks:
@@ -10,7 +10,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/healthchecks/config:/config
+      - $REPO_PATH/appdata/healthchecks/config:/config
     environment:
       PUID: $PUID
       PGID: $PGID

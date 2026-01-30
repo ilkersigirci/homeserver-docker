@@ -2,7 +2,7 @@ services:
   flatnotes:
     container_name: flatnotes
     image: dullage/flatnotes:latest
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     profiles:
       - reading
     networks:
@@ -10,8 +10,8 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $NOTESDIR/Markdown:/data
-      - $DOCKERDIR/appdata/flatnotes/index:/data/.flatnotes
+      - $DIR_NOTES/Markdown:/data
+      - $REPO_PATH/appdata/flatnotes/index:/data/.flatnotes
     environment:
       PUID: $PUID
       PGID: $PGID

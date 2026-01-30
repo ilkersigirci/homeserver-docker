@@ -12,12 +12,12 @@ services:
   sd-next:
     container_name: sd-next
     image: vladmandic/sdnext-cuda:latest
-    restart: $ML_RESTART_POLICY
+    restart: $RESTART_POLICY_ML
     <<: *gpu-deploy
     networks:
       - t3_proxy
     volumes:
-      - $DOCKERDIR/appdata/sd-next:/mnt/data:rw
+      - $REPO_PATH/appdata/sd-next:/mnt/data:rw
       - $MLMODELSDIR/sdnext:/mnt/models:ro
     labels:
       traefik.enable: "true"

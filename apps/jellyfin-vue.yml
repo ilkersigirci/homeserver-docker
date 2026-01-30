@@ -2,7 +2,7 @@ services:
   jellyfin-vue:
     image: ghcr.io/jellyfin/jellyfin-vue:unstable
     container_name: jellyfin-vue
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     # depends_on:
     #   - jellyfin
     networks:

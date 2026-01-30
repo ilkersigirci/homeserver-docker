@@ -3,7 +3,7 @@ services:
   changedetection:
     image: ghcr.io/dgtlmoon/changedetection.io
     container_name: changedetection
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - monitoring
     networks:
@@ -11,7 +11,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/changedetection:/datastore
+      - $REPO_PATH/appdata/changedetection:/datastore
     environment:
       TZ: $TZ
       PORT: 5000

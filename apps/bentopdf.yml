@@ -2,7 +2,7 @@ services:
   bentopdf:
     image: ghcr.io/alam00000/bentopdf:latest
     container_name: bentopdf
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - maintenance
     networks:

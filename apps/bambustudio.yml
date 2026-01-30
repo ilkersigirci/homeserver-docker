@@ -3,7 +3,7 @@ services:
   bambustudio:
     image: lscr.io/linuxserver/bambustudio:latest
     container_name: bambustudio
-    restart: $DESKTOP_IMAGES_RESTART_POLICY
+    restart: $RESTART_POLICY_DESKTOP_IMAGES
     hostname: bambustudio
     shm_size: "1gb"
     profiles:
@@ -17,7 +17,7 @@ services:
       - no-new-privileges:true
       - seccomp:unconfined
     volumes:
-      - $DATADIR/bambustudio:/config
+      - $REPO_PATH/data/bambustudio:/config
     environment:
       PUID: $PUID
       PGID: $PGID

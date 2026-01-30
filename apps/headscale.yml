@@ -8,7 +8,7 @@ services:
     read_only: true
     tmpfs:
       - /var/run/headscale
-    restart: $CORE_RESTART_POLICY
+    restart: $RESTART_POLICY_CORE
     profiles:
       - core
     networks:
@@ -19,8 +19,8 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $CONFIGDIR/headscale:/etc/headscale:ro
-      - $DATADIR/headscale:/var/lib/headscale
+      - $REPO_PATH/configs/headscale:/etc/headscale:ro
+      - $REPO_PATH/data/headscale:/var/lib/headscale
     environment:
       TZ: $TZ
     healthcheck:
@@ -67,7 +67,7 @@ services:
   headplane:
     image: ghcr.io/tale/headplane:0.6.2-beta.3
     container_name: headplane
-    restart: $CORE_RESTART_POLICY
+    restart: $RESTART_POLICY_CORE
     depends_on:
       - headscale
     profiles:
@@ -78,14 +78,14 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $CONFIGDIR/headplane/config.yaml:/etc/headplane/config.yaml
-      - $DATADIR/headplane:/var/lib/headplane
+      - $REPO_PATH/configs/headplane/config.yaml:/etc/headplane/config.yaml
+      - $REPO_PATH/data/headplane:/var/lib/headplane
       ## Headscale related
-      - $CONFIGDIR/headscale/config.yaml:/etc/headscale/config.yaml:ro
-      - $DATADIR/headscale:/var/lib/headscale:ro
+      - $REPO_PATH/configs/headscale/config.yaml:/etc/headscale/config.yaml:ro
+      - $REPO_PATH/data/headscale:/var/lib/headscale:ro
       # If using dns.extra_records in Headscale (recommended), this should
       # match the headscale.dns_records_path in your config.yaml
-      # - $CONFIGDIR/headscale/dns_records.json:/etc/headscale/dns_records.json
+      # - $REPO_PATH/configs/headscale/dns_records.json:/etc/headscale/dns_records.json
     environment:
       # CONFIG OVERRIDES
       HEADPLANE_LOAD_ENV_OVERRIDES: true
@@ -134,7 +134,7 @@ services:
   headscale-admin:
     image: goodieshq/headscale-admin:0.26.0
     container_name: headscale-admin
-    restart: $CORE_RESTART_POLICY
+    restart: $RESTART_POLICY_CORE
     depends_on:
       - headscale
     profiles:

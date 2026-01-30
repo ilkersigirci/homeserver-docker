@@ -2,14 +2,14 @@ services:
   tubesync:
     image: ghcr.io/meeb/tubesync:latest
     container_name: tubesync
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     networks:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/tubesync:/config
-      - $MEDIADIR/Youtube:/downloads
+      - $REPO_PATH/appdata/tubesync:/config
+      - $DIR_MEDIA/Youtube:/downloads
     environment:
       PUID: $PUID
       PGID: $PGID

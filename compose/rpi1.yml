@@ -27,9 +27,9 @@ networks:
           gateway: "192.168.1.1"
 
 ########################### SECRETS
-secrets:
-  cf_dns_api_token:
-    file: $DOCKERDIR/secrets/cf_dns_api_token
+# secrets:
+#   cf_dns_api_token:
+#     file: $REPO_PATH/secrets/cf_dns_api_token
 
 include:
   ########################### SERVICES

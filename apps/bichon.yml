@@ -2,7 +2,7 @@ services:
   bichon:
     image: rustmailer/bichon:latest
     container_name: bichon
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     profiles:
       - media
     networks:
@@ -10,7 +10,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DATADIR/bichon:/data
+      - $REPO_PATH/data/bichon:/data
     environment:
       BICHON_HTTP_PORT: 15630
       BICHON_LOG_LEVEL: info

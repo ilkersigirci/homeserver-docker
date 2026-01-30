@@ -12,7 +12,7 @@ services:
   llama-cpp:
     image: ghcr.io/ggerganov/llama.cpp:server-cuda
     container_name: llama-cpp
-    restart: $ML_RESTART_POLICY
+    restart: $RESTART_POLICY_ML
     <<: *gpu-deploy
     networks:
       - t3_proxy

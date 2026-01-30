@@ -2,7 +2,7 @@ services:
   sunshine:
     image: ghcr.io/lizardbyte/sunshine:latest-ubuntu-22.04
     container_name: sunshine
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     networks:
       - t3_proxy
     ports:
@@ -12,7 +12,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $CONFIGDIR/sunshine:/config
+      - $REPO_PATH/configs/sunshine:/config
     environment:
       PUID: $PUID
       PGID: $PGID

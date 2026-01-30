@@ -2,7 +2,7 @@ services:
   home-assistant-db:
     image: postgres:16.4
     container_name: home-assistant-db
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - maintenance
       - home-assistant
@@ -18,7 +18,7 @@ services:
     expose:
       - "5432"
     volumes:
-      - $DATADIR/home-assistant-db:/pgdata
+      - $REPO_PATH/data/home-assistant-db:/pgdata
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -28,7 +28,7 @@ services:
   home-assistant:
     image: ghcr.io/home-assistant/home-assistant:stable
     container_name: home-assistant
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     depends_on:
       home-assistant-db:
         condition: service_healthy
@@ -39,7 +39,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $CONFIGDIR/home-assistant:/config
+      - $REPO_PATH/configs/home-assistant:/config
       - /etc/localtime:/etc/localtime:ro
       # - /run/dbus:/run/dbus:ro
     environment:
@@ -61,7 +61,7 @@ services:
   home-assistant-proxied:
     image: ghcr.io/home-assistant/home-assistant:stable
     container_name: home-assistant-proxied
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     depends_on:
       home-assistant-db:
         condition: service_healthy
@@ -72,7 +72,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $CONFIGDIR/home-assistant:/config
+      - $REPO_PATH/configs/home-assistant:/config
       - /etc/localtime:/etc/localtime:ro
       # - /run/dbus:/run/dbus:ro
     environment:

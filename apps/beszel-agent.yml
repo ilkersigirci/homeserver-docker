@@ -2,13 +2,13 @@ services:
   beszel-agent:
     image: henrygd/beszel-agent
     container_name: beszel-agent
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     # network_mode: host
     networks:
       - t3_proxy
       - socket_proxy
     volumes:
-      - $DOCKERDIR/appdata/beszel_agent:/var/lib/beszel-agent
+      - $REPO_PATH/appdata/beszel_agent:/var/lib/beszel-agent
     #   # monitor other disks / partitions by mounting a folder in /extra-filesystems
     #   # - /mnt/d:/extra-filesystems/sda1:ro
     environment:
@@ -16,7 +16,7 @@ services:
       LISTEN: 45876
       HUB_URL: https://beszel.gpu.$BASE_DOMAINNAME
       TOKEN: $BESZEL_AGENT_TOKEN
-      KEY: $BESZEL_KEY
+      KEY: $BESZEL_AGENT_KEY
     profiles:
       - monitoring
     healthcheck:

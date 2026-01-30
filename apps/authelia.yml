@@ -6,16 +6,16 @@ services:
     image: ghcr.io/authelia/authelia:4.38.18
     depends_on:
       - traefik
-    restart: $CORE_RESTART_POLICY
+    restart: $RESTART_POLICY_CORE
     profiles:
       - core
     networks:
       - t3_proxy
     volumes:
-      - $DOCKERDIR/appdata/authelia:/config
-      - $CONFIGDIR/authelia/config/configuration.yml:/config/configuration.yml
-      - $CONFIGDIR/authelia/config/users.yml:/config/users.yml
-      - $CONFIGDIR/authelia/secrets:/secrets
+      - $REPO_PATH/appdata/authelia:/config
+      - $REPO_PATH/configs/authelia/config/configuration.yml:/config/configuration.yml
+      - $REPO_PATH/configs/authelia/config/users.yml:/config/users.yml
+      - $REPO_PATH/configs/authelia/secrets:/secrets
     environment:
       PUID: $PUID
       PGID: $PGID

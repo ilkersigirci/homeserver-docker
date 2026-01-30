@@ -1,12 +1,12 @@
 # NOTE: Chown the directory.
-# mkdir -p $DOCKERDIR/appdata/pgadmin
-# sudo chown 5050:5050 $DOCKERDIR/appdata/pgadmin
+# mkdir -p $REPO_PATH/appdata/pgadmin
+# sudo chown 5050:5050 $REPO_PATH/appdata/pgadmin
 # NOTE: Add internal databases only using their docker container names (http:// shouldn't be included)
 services:
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: pgadmin
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     user: 5050:5050
     profiles:
       - maintenance
@@ -15,7 +15,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/pgadmin:/var/lib/pgadmin
+      - $REPO_PATH/appdata/pgadmin:/var/lib/pgadmin
     environment:
       PGADMIN_DEFAULT_EMAIL: $PGADMIN_DEFAULT_EMAIL
       PGADMIN_DEFAULT_PASSWORD: $PGADMIN_DEFAULT_PASSWORD

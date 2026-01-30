@@ -2,7 +2,7 @@ services:
   dufs:
     container_name: dufs
     image: sigoden/dufs:latest
-    restart: $CORE_RESTART_POLICY
+    restart: $RESTART_POLICY_CORE
     command: /data -A
     profiles:
       - core
@@ -11,10 +11,10 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/dufs:/data
-      # - $DOCKERDIR/appdata/dufs/Apps/Books:/data/Apps/Books # NOTE: For syncing MoonReader with webdav
+      - $REPO_PATH/appdata/dufs:/data
+      # - $REPO_PATH/appdata/dufs/Apps/Books:/data/Apps/Books # NOTE: For syncing MoonReader with webdav
       - $USERDIR:/data/Home
-      - $HARDDISKROOTDIR:/data/Harddisk
+      - $DIR_HARDDISKROOT:/data/Harddisk
     # healthcheck:
     #   test: "curl http://127.0.0.1:5000/__dufs__/health" # NOTE: Not working since there is no curl
     #   interval: 10s

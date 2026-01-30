@@ -12,8 +12,8 @@ services:
     mem_reservation: "4096M" # NOTE: Probably has a memory leak on veresion 0.6.0
     mem_limit: "4096M" # NOTE: Probably has a memory leak on veresion 0.6.0
     build:
-      context: $DOCKERDIR/Dockerfiles/Scotty
-    # restart: $MEDIA_RESTART_POLICY
+      context: $REPO_PATH/Dockerfiles/Scotty
+    # restart: $RESTART_POLICY_MEDIA
     restart: "no"
     command: --help
     profiles:
@@ -27,8 +27,8 @@ services:
     # [error] failed to initialize database, got error unable to open database file: out of memory (14)
     # Error: unable to open database file: out of memory (14)
     volumes:
-      - $CONFIGDIR/scotty.toml:/config/scotty.toml:rw
-      - $CONFIGDIR/scotty.sqlite3:/root/.config/scotty/scotty.sqlite3:rw
+      - $REPO_PATH/configs/scotty.toml:/config/scotty.toml:rw
+      - $REPO_PATH/configs/scotty.sqlite3:/root/.config/scotty/scotty.sqlite3:rw
     environment:
       PUID: $PUID
       PGID: $PGID

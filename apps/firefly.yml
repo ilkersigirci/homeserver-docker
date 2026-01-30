@@ -2,13 +2,13 @@ services:
   firefly:
     container_name: firefly
     image: fireflyiii/core:latest
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     networks:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/freshrss:/config
+      - $REPO_PATH/appdata/freshrss:/config
     environment:
       TZ: $TZ
       APP_KEY_FILE: /run/secrets/firefly_app_key

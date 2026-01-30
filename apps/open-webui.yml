@@ -2,26 +2,26 @@ services:
   # searxng:
   #   container_name: searxng
   #   image: searxng/searxng:latest
-  #   restart: $ML_RESTART_POLICY
+  #   restart: $RESTART_POLICY_ML
   #   networks:
   #     - t3_proxy
   #   # ports:
   #   #   - "8080:8080"
   #   volumes:
-  #     - $DOCKERDIR/appdata/searxng:/etc/searxng
+  #     - $REPO_PATH/appdata/searxng:/etc/searxng
   #   profiles:
   #     - ml
 
   open-webui:
     container_name: open-webui
     image: ghcr.io/open-webui/open-webui:latest
-    restart: $ML_RESTART_POLICY
+    restart: $RESTART_POLICY_ML
     # depends_on:
     #   - searxng
     networks:
       - t3_proxy
     volumes:
-      - $DOCKERDIR/appdata/open-webui:/app/backend/data
+      - $REPO_PATH/appdata/open-webui:/app/backend/data
     environment:
       # WEBUI_AUTH: false
       ENABLE_OLLAMA_API: false
@@ -65,13 +65,13 @@ services:
   open-webui-betus:
     container_name: open-webui-betus
     image: ghcr.io/open-webui/open-webui:latest
-    restart: $ML_RESTART_POLICY
+    restart: $RESTART_POLICY_ML
     # depends_on:
     #   - searxng
     networks:
       - t3_proxy
     volumes:
-      - $DOCKERDIR/appdata/open-webui-betus:/app/backend/data
+      - $REPO_PATH/appdata/open-webui-betus:/app/backend/data
     environment:
       # WEBUI_AUTH: false
       ENABLE_SIGNUP: false

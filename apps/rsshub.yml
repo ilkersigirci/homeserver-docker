@@ -2,7 +2,7 @@ services:
   rsshub-browserless:
     image: browserless/chrome
     container_name: rsshub-browserless
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     profiles:
       - reading
       - rsshub
@@ -25,14 +25,14 @@ services:
   rsshub-redis:
     image: redis:alpine
     container_name: rsshub-redis
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     profiles:
       - reading
       - rsshub
     networks:
       - t3_proxy
     volumes:
-      - $DOCKERDIR/appdata/rsshub-redis:/data
+      - $REPO_PATH/appdata/rsshub-redis:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 1m
@@ -47,7 +47,7 @@ services:
   rsshub:
     image: ghcr.io/diygod/rsshub:latest
     container_name: rsshub
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     profiles:
       - reading
       - rsshub
@@ -64,8 +64,6 @@ services:
       REDIS_URL: "redis://rsshub-redis:6379/"
       PUPPETEER_WS_ENDPOINT: "ws://rsshub-browserless:3000"
       TWITTER_AUTH_TOKEN: $TWITTER_AUTH_TOKEN
-      # TWITTER_USERNAME: $TWITTER_USERNAME
-      # TWITTER_PASSWORD: $TWITTER_PASSWORD
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:1200/healthz"]
       interval: 1m

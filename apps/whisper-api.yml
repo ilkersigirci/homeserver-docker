@@ -12,14 +12,14 @@ services:
   whisper-api:
     container_name: whisper-api
     image: onerahmet/openai-whisper-asr-webservice:latest-gpu
-    restart: $ML_RESTART_POLICY
+    restart: $RESTART_POLICY_ML
     <<: *gpu-deploy
     networks:
       - t3_proxy
     # ports:
     #   - "9000:9000"
     volumes:
-      - $DOCKERDIR/appdata/whisper-api:/app
+      - $REPO_PATH/appdata/whisper-api:/app
     environment:
       ASR_MODEL: base
     labels:

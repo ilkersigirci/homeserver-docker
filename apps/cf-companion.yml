@@ -5,7 +5,7 @@ services:
     image: tiredofit/traefik-cloudflare-companion:latest
     security_opt:
       - no-new-privileges:true
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - maintenance
     networks:

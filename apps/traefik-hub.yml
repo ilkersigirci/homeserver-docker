@@ -7,7 +7,7 @@ services:
     depends_on:
       - traefik
     # pull_policy: always
-    restart: $CORE_RESTART_POLICY
+    restart: $RESTART_POLICY_CORE
     command:
       - run
       - --hub.token=586b63fb-3e4a-409d-9452-1de2bda1a2b7

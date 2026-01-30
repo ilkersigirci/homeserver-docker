@@ -2,7 +2,7 @@ services:
   gimp:
     container_name: gimp
     image: lscr.io/linuxserver/gimp:latest
-    restart: $DESKTOP_IMAGES_RESTART_POLICY
+    restart: $RESTART_POLICY_DESKTOP_IMAGES
     networks:
       - t3_proxy
     security_opt:

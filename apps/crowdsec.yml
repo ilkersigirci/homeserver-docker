@@ -2,7 +2,7 @@ services:
   crowdsec:
     image: crowdsecurity/crowdsec:latest
     container_name: crowdsec
-    restart: $CORE_RESTART_POLICY
+    restart: $RESTART_POLICY_CORE
     profiles:
       - core
     networks:
@@ -14,10 +14,10 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/crowdsec:/var/lib/crowdsec/data
-      - $CONFIGDIR/crowdsec/config:/etc/crowdsec
+      - $REPO_PATH/appdata/crowdsec:/var/lib/crowdsec/data
+      - $REPO_PATH/configs/crowdsec/config:/etc/crowdsec
       - /var/log:/var/log:ro
-      - $DOCKERDIR/logs/traefik:/logs/traefik:ro
+      - $REPO_PATH/logs/traefik:/logs/traefik:ro
     environment:
       GID: $PGID
       COLLECTIONS: "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/base-http-scenarios crowdsecurity/whitelist-good-actors crowdsecurity/iptables crowdsecurity/linux crowdsecurity/sshd"

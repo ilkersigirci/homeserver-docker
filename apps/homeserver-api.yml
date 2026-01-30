@@ -2,7 +2,7 @@ services:
   homeserver-api-redis:
     image: redis:8
     container_name: homeserver-api-redis
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     hostname: "homeserver-api-redis"
     command: redis-server --requirepass "${HOMESERVER_API_REDIS_PASSWORD}"
     profiles:
@@ -21,7 +21,7 @@ services:
   homeserver-api-rabbitmq:
     image: rabbitmq:4-management
     container_name: homeserver-api-rabbitmq
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     hostname: "homeserver-api-rabbitmq"
     profiles:
       - others
@@ -60,14 +60,14 @@ services:
   homeserver-api-head:
     image: homeserver-api:latest
     container_name: homeserver-api-head
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     tty: true
     depends_on:
       - homeserver-api-redis
       - homeserver-api-rabbitmq
     build:
-      context: $MYREPOSDIR/homeserver-api
-      dockerfile: $MYREPOSDIR/homeserver-api/docker/Dockerfile
+      context: $DIR_MYREPOS/homeserver-api
+      dockerfile: $DIR_MYREPOS/homeserver-api/docker/Dockerfile
       target: development
     profiles:
       - others
@@ -80,9 +80,9 @@ services:
     # command: ["tail", "-f", "/dev/null"] # NOTE: For testing the container
     command: ["uv", "run", "--module", "app.__main__"]
     volumes:
-      - $MYREPOSDIR/homeserver-api/app:/app/app
+      - $DIR_MYREPOS/homeserver-api/app:/app/app
     env_file:
-      - $MYREPOSDIR/homeserver-api/.env
+      - $DIR_MYREPOS/homeserver-api/.env
     environment:
       - INSTANCE_TYPE=API
       - HOST=0.0.0.0
@@ -113,14 +113,14 @@ services:
   homeserver-api-worker:
     image: homeserver-api:latest
     container_name: homeserver-api-worker
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     tty: true
     depends_on:
       - homeserver-api-redis
       - homeserver-api-rabbitmq
     build:
-      context: $MYREPOSDIR/homeserver-api
-      dockerfile: $MYREPOSDIR/homeserver-api/docker/Dockerfile
+      context: $DIR_MYREPOS/homeserver-api
+      dockerfile: $DIR_MYREPOS/homeserver-api/docker/Dockerfile
       target: development
     profiles:
       - others
@@ -144,9 +144,9 @@ services:
       - "[app/worker/tasks/*.py]"
     # <<: *gpu-all-deploy
     volumes:
-      - $MYREPOSDIR/homeserver-api/app:/app/app
+      - $DIR_MYREPOS/homeserver-api/app:/app/app
     env_file:
-      - $MYREPOSDIR/homeserver-api/.env
+      - $DIR_MYREPOS/homeserver-api/.env
     environment:
       - INSTANCE_TYPE=WORKER
       - RABBITMQ_HOST=homeserver-api-rabbitmq

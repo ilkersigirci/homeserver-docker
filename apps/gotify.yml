@@ -3,7 +3,7 @@ services:
   gotify:
     image: ghcr.io/gotify/server:latest
     container_name: gotify
-    restart: $CORE_RESTART_POLICY
+    restart: $RESTART_POLICY_CORE
     profiles:
       - core
     networks:
@@ -13,10 +13,10 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/gotify:/app/data
+      - $REPO_PATH/appdata/gotify:/app/data
     environment:
       TZ: $TZ
-      GOTIFY_DEFAULTUSER_PASS: $GOTIFY_DEFAULTUSER_PASS
+      GOTIFY_DEFAULTUSER_PASS: $GOTIFY_DEFAULT_USER_PASS
     labels:
       traefik.enable: "true"
       ## HTTP Routers

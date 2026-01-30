@@ -2,7 +2,7 @@ services:
   restfox:
     image: flawiddsouza/restfox:0.14.1
     container_name: restfox
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - maintenance
     networks:

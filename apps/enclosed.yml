@@ -2,7 +2,7 @@ services:
   enclosed:
     container_name: enclosed
     image: corentinth/enclosed:latest
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     networks:
       - t3_proxy
     security_opt:

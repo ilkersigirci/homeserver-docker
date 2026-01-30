@@ -7,7 +7,7 @@ services:
   #   networks:
   #     - t3_proxy
   #   volumes:
-  #     - $DOCKERDIR/appdata/sqlite_data:/var/lib/postgresql/data/
+  #     - $REPO_PATH/appdata/sqlite_data:/var/lib/postgresql/data/
   #   environment:
   #     - POSTGRES_DB=pdfding
   #     - POSTGRES_USER=pdfding
@@ -18,7 +18,7 @@ services:
   pdfding:
     image: mrmn/pdfding:latest
     container_name: pdfding
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     profiles:
       - reading
     networks:
@@ -28,8 +28,8 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/pdfding-db:/home/nonroot/pdfding/db
-      - $MEDIADIR/PDFs/pdfding:/home/nonroot/pdfding/media
+      - $REPO_PATH/appdata/pdfding-db:/home/nonroot/pdfding/db
+      - $DIR_MEDIA/PDFs/pdfding:/home/nonroot/pdfding/media
     environment:
       DEFAULT_THEME: dark
       DEFAULT_THEME_COLOR: blue

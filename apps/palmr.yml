@@ -2,7 +2,7 @@ services:
   palmr:
     image: kyantech/palmr:latest
     container_name: palmr
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     profiles:
       - media
     networks:
@@ -12,7 +12,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DATADIR/palmr:/app/server
+      - $REPO_PATH/data/palmr:/app/server
     # healthcheck:
     #   test: ["CMD", "curl", "-f", "http://localhost:5487/api/health"]
     #   interval: 30s

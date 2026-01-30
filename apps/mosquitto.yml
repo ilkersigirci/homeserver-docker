@@ -2,7 +2,7 @@ services:
   mosquitto:
     image: eclipse-mosquitto:latest
     container_name: mosquitto
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - monitoring
     networks:
@@ -13,9 +13,9 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $CONFIGDIR/mosquitto:/mosquitto/config
-      - $DATADIR/mosquitto:/mosquitto/data
-      - $DOCKERDIR/logs/mosquitto:/mosquitto/log
+      - $REPO_PATH/configs/mosquitto:/mosquitto/config
+      - $REPO_PATH/data/mosquitto:/mosquitto/data
+      - $REPO_PATH/logs/mosquitto:/mosquitto/log
     environment:
       PUID: $PUID
       PGID: $PGID

@@ -7,7 +7,7 @@ services:
     # cpus: "0.5"
     mem_reservation: "4096M"
     mem_limit: "4096M"
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     profiles:
       - media
       - arr
@@ -20,11 +20,11 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/transmission:/config
-      - $MEDIADIR/Downloads:/data/downloads
-      # - $MEDIADIR/Downloads/test:/downloads
+      - $REPO_PATH/appdata/transmission:/config
+      - $DIR_MEDIA/Downloads:/data/downloads
+      # - $DIR_MEDIA/Downloads/test:/downloads
       # If not set, tranmission creates reduntant volumes
-      - $MEDIADIR/Downloads/torrent_files:/watch
+      - $DIR_MEDIA/Downloads/torrent_files:/watch
     environment:
       PUID: $PUID
       PGID: $PGID

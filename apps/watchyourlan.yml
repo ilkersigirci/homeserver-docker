@@ -3,7 +3,7 @@ services:
   wyl-node-bootstrap:
     image: ghcr.io/aceberg/node-bootstrap:latest
     container_name: node-bootstrap
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - monitoring
     networks:
@@ -14,7 +14,7 @@ services:
   watchyourlan:
     image: ghcr.io/aceberg/watchyourlan:latest
     container_name: watchyourlan
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - monitoring
     # command: "-n http://$LOCAL_STATIC_IP:8850"
@@ -25,7 +25,7 @@ services:
     expose:
       - 8840
     volumes:
-      - $DOCKERDIR/appdata/watchyourlan:/data/WatchYourLAN
+      - $REPO_PATH/appdata/watchyourlan:/data/WatchYourLAN
     environment:
       TZ: $TZ
       IFACES: $NETWORK_INTERFACE_NAMES # required: 1 or more interface

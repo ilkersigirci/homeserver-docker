@@ -2,7 +2,7 @@ services:
   arcane-agent:
     image: ghcr.io/getarcaneapp/arcane-headless:latest
     container_name: arcane-agent
-    restart: $CORE_RESTART_POLICY
+    restart: $RESTART_POLICY_CORE
     profiles:
       - core
     networks:
@@ -13,7 +13,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/arcane-agent:/app/data
+      - $REPO_PATH/appdata/arcane-agent:/app/data
     environment:
       AGENT_MODE: true
       AGENT_BOOTSTRAP_TOKEN: $ARCANE_AGENT_BOOTSTRAP_TOKEN

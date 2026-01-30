@@ -2,7 +2,7 @@ services:
   miniflux-db:
     container_name: miniflux-db
     image: postgres:latest
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     profiles:
       - reading
     environment:
@@ -10,7 +10,7 @@ services:
       POSTGRES_USER: miniflux
       POSTGRES_PASSWORD: miniflux
     volumes:
-      - $DOCKERDIR/appdata/miniflux-db:/var/lib/postgresql/data
+      - $REPO_PATH/appdata/miniflux-db:/var/lib/postgresql/data
     # healthcheck:
     #   test: ["CMD", "pg_isready", "-U", "miniflux"]
     #   interval: 1m
@@ -20,7 +20,7 @@ services:
   miniflux:
     container_name: miniflux
     image: miniflux/miniflux:latest
-    restart: $OTHERS_RESTART_POLICY
+    restart: $RESTART_POLICY_OTHERS
     profiles:
       - reading
     depends_on:
@@ -30,7 +30,7 @@ services:
     security_opt:
       - no-new-privileges:true
     # volumes:
-    #   - $DOCKERDIR/appdata/miniflux:/config
+    #   - $REPO_PATH/appdata/miniflux:/config
     environment:
       DATABASE_URL: postgres://miniflux:miniflux@miniflux-db/miniflux?sslmode=disable
       RUN_MIGRATIONS: 1

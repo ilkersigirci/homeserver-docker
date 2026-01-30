@@ -2,16 +2,16 @@ services:
   code-server:
     image: lscr.io/linuxserver/code-server
     container_name: code-server
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - maintenance
     networks:
       - t3_proxy
     volumes:
-      - $DOCKERDIR/appdata/code-server:/config
-      - $DOCKERDIR:/config/workspace/docker
-      - $NOTESDIR:/config/workspace/notes
-      - $MYREPOSDIR:/config/workspace/MyRepos
+      - $REPO_PATH/appdata/code-server:/config
+      - $REPO_PATH:/config/workspace/docker
+      # - $DIR_NOTES:/config/workspace/notes
+      # - $DIR_MYREPOS:/config/workspace/MyRepos
     environment:
       PUID: $PUID
       PGID: $PGID

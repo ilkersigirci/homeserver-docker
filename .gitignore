@@ -4,6 +4,7 @@ logs
 secrets
 .idea
 .env*
+.github
 
 # Configs
 acme.json

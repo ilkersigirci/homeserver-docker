@@ -3,7 +3,7 @@ services:
     # image: public.ecr.aws/semaphore/pro/server:v2.16.47
     image: semaphoreui/semaphore:latest
     container_name: semaphore
-    restart: $MAINTENANCE_RESTART_POLICY
+    restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - maintenance
     networks:
@@ -12,10 +12,10 @@ services:
       - no-new-privileges:true
     volumes:
       # TODO: Fix volume bind permission issues
-      # - $DATADIR/semaphore:/var/lib/semaphore # Contains frequently changing files.
-      # - $DOCKERDIR/appdata/semaphore:/tmp/semaphore # Contains cache: cloned repositories, generated inventory files, etc.
-      # - $CONFIGDIR/semaphore:/etc/semaphore
-      - $DOCKERDIR/ansible:/srv/ansible:ro
+      # - $REPO_PATH/data/semaphore:/var/lib/semaphore # Contains frequently changing files.
+      # - $REPO_PATH/appdata/semaphore:/tmp/semaphore # Contains cache: cloned repositories, generated inventory files, etc.
+      # - $REPO_PATH/configs/semaphore:/etc/semaphore
+      - $REPO_PATH/ansible:/srv/ansible:ro
     environment:
       SEMAPHORE_DB_DIALECT: sqlite
       SEMAPHORE_ADMIN: admin

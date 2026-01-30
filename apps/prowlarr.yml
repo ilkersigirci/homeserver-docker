@@ -5,7 +5,7 @@ services:
     depends_on:
       - transmission
       - sabnzbd
-    restart: $MEDIA_RESTART_POLICY
+    restart: $RESTART_POLICY_MEDIA
     profiles:
       - media
       - arr
@@ -14,8 +14,8 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $DOCKERDIR/appdata/prowlarr:/config
-      - $MEDIADIR/Downloads:/data/downloads
+      - $REPO_PATH/appdata/prowlarr:/config
+      - $DIR_MEDIA/Downloads:/data/downloads
     environment:
       PUID: $PUID
       PGID: $PGID
