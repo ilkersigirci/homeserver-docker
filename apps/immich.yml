@@ -51,7 +51,7 @@ services:
       # - $DIR_PHOTOS/Videos:/mnt/media/Photos/Videos
     environment:
       UPLOAD_LOCATION: $IMMICH_UPLOAD_LOCATION
-      IMMICH_LOG_LEVEL: info
+      IMMICH_LOG_LEVEL: ${IMMICH_LOG_LEVEL:-error}
       REDIS_HOSTNAME: $IMMICH_REDIS_HOSTNAME
       DB_HOSTNAME: $IMMICH_DB_HOSTNAME
       DB_USERNAME: $IMMICH_DB_USERNAME
