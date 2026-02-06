@@ -63,6 +63,11 @@ services:
       homepage.href: "https://arcane.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Modern Docker Management"
+      homepage.widget.type: "arcane"
+      homepage.widget.url: "http://arcane:3552"
+      homepage.widget.key: "$ARCANE_API_KEY"
+      homepage.widget.env: "0"
+      homepage.widget.fields: ["running", "stopped", "total", "image_updates"]
       ####### GLANCE #######
       glance.name: "arcane"
       glance.icon: "sh:arcane"
