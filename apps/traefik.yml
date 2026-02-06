@@ -167,7 +167,7 @@ services:
       homepage.description: "Reverse Proxy Manager"
       homepage.widget.type: "traefik"
       homepage.widget.url: "http://traefik:8080" # NOTE: This doesn't work when using api.insecure=false
-      # homepage.widget.fields: "[routers,services,middleware]" # NOTE: Gives Invalid fields list detected error
+      homepage.widget.fields: "routers, services, middleware"
       ####### GLANCE #######
       glance.name: "Traefik"
       glance.icon: "sh:traefik"
