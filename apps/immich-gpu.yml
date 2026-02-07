@@ -1,14 +1,5 @@
-x-deploy: &gpu-deploy
-  deploy:
-    resources:
-      reservations:
-        devices:
-          - driver: nvidia
-            count: all
-            capabilities: [gpu]
-
+# NOTE: Change URL in immich settings -> admin/system-settings?isOpen=machine-learning
 services:
-  # Change URL in immich settings -> admin/system-settings?isOpen=machine-learning
   immich-machine-learning:
     container_name: immich-machine-learning
     image: ghcr.io/immich-app/immich-machine-learning:release-cuda

@@ -1,0 +1,53 @@
+services:
+  couchdb:
+    image: couchdb:latest
+    container_name: couchdb
+    restart: $RESTART_POLICY_OTHERS
+    profiles:
+      - others
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $REPO_PATH/appdata/couchdb:/opt/couchdb/data
+    environment:
+      COUCHDB_USER: admin
+      COUCHDB_PASSWORD: admin
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail -u admin:admin -s http://localhost:5984/_up | grep -Eo '\"status\":\"ok\"' || exit 1"]
+      start_period: 15s
+      interval: 1m
+      timeout: 5s
+      retries: 3
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.couchdb-rtr.entrypoints: "websecure"
+      traefik.http.routers.couchdb-rtr.rule: "Host(`couchdb.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.couchdb-rtr.middlewares: "couchdb-middlware"
+      traefik.http.middlewares.couchdb-middlware.headers.accesscontrolallowmethods: "GET,PUT,POST,HEAD,DELETE"
+      traefik.http.middlewares.couchdb-middlware.headers.accesscontrolallowheaders: "accept,authorization,content-type,origin,referer"
+      traefik.http.middlewares.couchdb-middlware.headers.accesscontrolalloworiginlist: "app://obsidian.md,capacitor://localhost,http://localhost,https://couchdb.$DOMAINNAME"
+      traefik.http.middlewares.couchdb-middlware.headers.accesscontrolmaxage: "3600"
+      traefik.http.middlewares.couchdb-middlware.headers.addvaryheader: "true"
+      traefik.http.middlewares.couchdb-middlware.headers.accessControlAllowCredentials: "true"
+      ## HTTP Services
+      traefik.http.routers.couchdb-rtr.service: "couchdb-svc"
+      traefik.http.services.couchdb-svc.loadbalancer.server.port: "5984"
+      ####### TINYAUTH #######
+      tinyauth.apps.couchdb.config.domain: "couchdb.$DOMAINNAME"
+      tinyauth.apps.couchdb.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "Others"
+      homepage.name: "couchdb"
+      homepage.icon: "couchdb.png"
+      homepage.href: "https://couchdb.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "description"
+      ####### GLANCE #######
+      glance.name: "couchdb"
+      glance.icon: "sh:couchdb"
+      glance.url: "https://couchdb.$DOMAINNAME"
+      glance.description: "description"

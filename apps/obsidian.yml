@@ -1,50 +1,14 @@
 services:
-  ## https://github.com/vrtmrz/obsidian-livesync/blob/main/docs/setup_own_server.md#setup-couchdb-to-your-server
-  # obsidian-couchdb:
-  #   container_name: obsidian-couchdb
-  #   image: couchdb:latest
-  #   restart: $RESTART_POLICY_OTHERS
-  #   networks:
-  #     - t3_proxy
-  #   security_opt:
-  #     - no-new-privileges:true
-  #   volumes:
-  #     - $REPO_PATH/appdata/couchdb:/opt/couchdb/data
-  #   environment:
-  #     - COUCHDB_USER=admin
-  #     - COUCHDB_PASSWORD=admin
-  #   labels:
-  #     - "traefik.enable=true"
-  #     ## HTTP Routers
-  #     - "traefik.http.routers.couchdb-rtr.entrypoints=websecure"
-  #     - "traefik.http.routers.couchdb-rtr.rule=Host(`couchdb.$DOMAINNAME`)"
-  #     ## Middlewares
-  #     - "traefik.http.routers.couchdb-rtr.middlewares=obsidiancors" # NOTE: chain-no-auth and chain-authelia not working
-  #     - "traefik.http.middlewares.obsidiancors.headers.accesscontrolallowmethods=GET,PUT,POST,HEAD,DELETE"
-  #     - "traefik.http.middlewares.obsidiancors.headers.accesscontrolallowheaders=accept,authorization,content-type,origin,referer"
-  #     - "traefik.http.middlewares.obsidiancors.headers.accesscontrolalloworiginlist=app://obsidian.md,capacitor://localhost,http://localhost,https://couchdb.$DOMAINNAME"
-  #     - "traefik.http.middlewares.obsidiancors.headers.accesscontrolmaxage=3600"
-  #     - "traefik.http.middlewares.obsidiancors.headers.addvaryheader=true"
-  #     - "traefik.http.middlewares.obsidiancors.headers.accessControlAllowCredentials=true"
-  #     ## HTTP Services
-  #     - "traefik.http.routers.couchdb-rtr.service=couchdb-svc"
-  #     - "traefik.http.services.couchdb-svc.loadbalancer.server.port=5984"
-  #   healthcheck:
-  #     test: ["CMD-SHELL", "curl --fail -u admin:admin -s http://localhost:5984/_up | grep -Eo '\"status\":\"ok\"' || exit 1"]
-  #     start_period: 15s
-  #     interval: 1m
-  #     timeout: 5s
-  #     retries: 3
-  #   profiles:
-  #     - reading
-
   obsidian:
     container_name: obsidian
     image: lscr.io/linuxserver/obsidian:latest
     restart: $RESTART_POLICY_DESKTOP_IMAGES
     shm_size: "1gb"
+    <<: *gpu-deploy
     networks:
       - t3_proxy
+    ports:
+      - "3000:3000"
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -54,8 +18,7 @@ services:
       PGID: $PGID
       TZ: $TZ
       TITLE: Obsidian
-    # devices:
-    #   - /dev/dri:/dev/dri # Optional: Only Open Source drivers are supported IE (Intel,AMDGPU,Radeon,ATI,Nouveau)
+      PIXELFLUX_WAYLAND: true
     healthcheck:
       test: ["CMD-SHELL", "curl --fail -s http://localhost:3000 || exit 1"]
       start_period: 15s
