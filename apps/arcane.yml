@@ -28,6 +28,7 @@ services:
       ## UI CONFIGS
       UI_CONFIGURATION_DISABLED: true
       PROJECTS_DIRECTORY: $REPO_PATH
+      # ACCENT_COLOR: fasdfasdf # UI Accent color (oklch format)
       ### OIDC
       OIDC_ENABLED: true
       OIDC_CLIENT_ID: $ARCANE_CLIENT_ID
