@@ -46,6 +46,7 @@ include:
   ###### MAINTENANCE ####
   - ../apps/home-assistant.yml
   - ../apps/syncthing.yml
+  - ../apps/watchyourlan.yml
   - ../apps/whoami.yml
   #### READING ####
   - ../apps/silverbullet.yml

@@ -17,7 +17,6 @@ services:
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - monitoring
-    # command: "-n http://$LOCAL_STATIC_IP:8850"
     command: "-n https://lan.$DOMAINNAME"
     depends_on:
       - wyl-node-bootstrap
@@ -40,6 +39,6 @@ services:
       homepage.group: "Monitoring"
       homepage.name: "WatchYourLAN"
       homepage.icon: "watchyourlan.svg"
-      homepage.href: "https://watchyourlan.$DOMAINNAME"
+      homepage.href: "https://lan.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Network Device Monitor"
