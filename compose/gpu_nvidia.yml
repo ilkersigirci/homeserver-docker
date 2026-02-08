@@ -37,7 +37,7 @@ include:
   - ../apps/arcane-agent.yml
   - ../apps/socket-proxy.yml
   #### DESKTOP APPS ####
-  # - ../apps/bambustudio.yml
+  - ../apps/bambustudio.yml
   # - ../apps/krita.yml
   # - ../apps/firefox.yml
   # - ../apps/gimp.yml

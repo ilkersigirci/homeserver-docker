@@ -10,6 +10,8 @@ services:
       - desktop_apps
     networks:
       - t3_proxy
+    ports:
+      - "3001:3000" # HTTP
     expose:
       - 3000 # HTTP
       - 3001 # HTTPS
@@ -24,6 +26,7 @@ services:
       TZ: $TZ
       TITLE: Bambu-Studio
       # DARK_MODE: true
+      PIXELFLUX_WAYLAND: true
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -49,3 +52,10 @@ services:
       glance.icon: "sh:bambustudio"
       glance.url: "https://bambustudio.$DOMAINNAME"
       glance.description: "PC Software for BambuLab and other 3D printers"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, compute, utility, video, graphics]

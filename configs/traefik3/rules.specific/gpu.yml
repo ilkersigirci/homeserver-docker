@@ -1,13 +1,5 @@
 http:
   routers:
-    watchyourlan-rtr:
-      rule: "Host(`watchyourlan.{{env "DOMAINNAME"}}`)"
-      entryPoints:
-        - websecure
-      middlewares:
-        - chain-no-auth-relaxed
-      service: watchyourlan-svc
-
     obsidian-rtr:
       rule: "Host(`obsidian.{{env "DOMAINNAME"}}`)"
       entryPoints:
@@ -16,13 +8,21 @@ http:
         - chain-no-auth
       service: obsidian-svc
 
-  services:
-    watchyourlan-svc:
-      loadBalancer:
-        servers:
-          - url: http://100.64.0.7:8840
+    bambustudio-rtr:
+      rule: "Host(`bambustudio.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth
+      service: bambustudio-svc
 
+  services:
     obsidian-svc:
       loadBalancer:
         servers:
           - url: http://192.168.2.19:3000
+
+    bambustudio-svc:
+      loadBalancer:
+        servers:
+          - url: http://192.168.2.19:3001
