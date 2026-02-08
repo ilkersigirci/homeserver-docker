@@ -1,10 +1,13 @@
+include:
+  - ../compose/gpu_nvidia_deploy.yml
+
 services:
   obsidian:
     container_name: obsidian
     image: lscr.io/linuxserver/obsidian:latest
     restart: $RESTART_POLICY_DESKTOP_IMAGES
     shm_size: "1gb"
-    <<: *gpu-deploy
+    <<: *gpu-nvidia-deploy
     networks:
       - t3_proxy
     ports:

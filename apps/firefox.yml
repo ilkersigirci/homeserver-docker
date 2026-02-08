@@ -12,7 +12,7 @@ services:
     container_name: firefox
     image: lscr.io/linuxserver/firefox:latest
     restart: $RESTART_POLICY_DESKTOP_IMAGES
-    # <<: *gpu-deploy
+    # <<: *gpu-nvidia-deploy
     shm_size: "1gb"
     profiles:
       - desktop_apps

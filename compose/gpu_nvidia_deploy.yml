@@ -1,0 +1,10 @@
+x-deploy: &gpu-nvidia-deploy
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: all
+            # capabilities: [gpu]
+            # capabilities: [gpu, compute, utility]
+            capabilities: [gpu, compute, utility, video, graphics]

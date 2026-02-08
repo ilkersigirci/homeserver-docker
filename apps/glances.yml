@@ -1,12 +1,5 @@
-x-deploy: &gpu-deploy
-  deploy:
-    resources:
-      reservations:
-        devices:
-          - driver: nvidia
-            count: all
-            capabilities: [gpu, compute, utility]
-            # capabilities: [compute, utility]
+include:
+  - ../compose/gpu_nvidia_deploy.yml
 
 services:
   # FIXME: To show wifi network usage, we need `network_mode: host`. But this way, we can't use traefik.
@@ -16,7 +9,7 @@ services:
     image: nicolargo/glances:dev
     container_name: glances
     restart: $RESTART_POLICY_MAINTENANCE
-    <<: *gpu-deploy
+    <<: *gpu-nvidia-deploy
     # network_mode: host
     networks:
       - t3_proxy

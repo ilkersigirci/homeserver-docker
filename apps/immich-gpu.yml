@@ -1,10 +1,13 @@
 # NOTE: Change URL in immich settings -> admin/system-settings?isOpen=machine-learning
+include:
+  - ../compose/gpu_nvidia_deploy.yml
+
 services:
   immich-machine-learning:
     container_name: immich-machine-learning
     image: ghcr.io/immich-app/immich-machine-learning:release-cuda
     restart: $RESTART_POLICY_MEDIA
-    <<: *gpu-deploy
+    <<: *gpu-nvidia-deploy
     profiles:
       - photos
     networks:

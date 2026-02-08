@@ -1,11 +1,5 @@
-x-deploy: &gpu-deploy
-  deploy:
-    resources:
-      reservations:
-        devices:
-          - driver: nvidia
-            count: all
-            capabilities: [gpu]
+include:
+  - ../compose/gpu_nvidia_deploy.yml
 
 services:
   frigate:
@@ -14,7 +8,7 @@ services:
     restart: $RESTART_POLICY_MEDIA
     stop_grace_period: 30s # allow enough time to shut down the various services
     shm_size: "512mb"
-    # <<: *gpu-deploy
+    # <<: *gpu-nvidia-deploy
     profiles:
       - media
     networks:
