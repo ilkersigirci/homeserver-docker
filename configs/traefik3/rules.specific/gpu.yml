@@ -8,8 +8,21 @@ http:
         - chain-no-auth-relaxed
       service: watchyourlan-svc
 
+    obsidian-rtr:
+      rule: "Host(`obsidian.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth
+      service: obsidian-svc
+
   services:
     watchyourlan-svc:
       loadBalancer:
         servers:
           - url: http://100.64.0.7:8840
+
+    obsidian-svc:
+      loadBalancer:
+        servers:
+          - url: http://192.168.2.19:3000
