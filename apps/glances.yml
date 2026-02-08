@@ -1,6 +1,3 @@
-include:
-  - ../compose/gpu_nvidia_deploy.yml
-
 services:
   # FIXME: To show wifi network usage, we need `network_mode: host`. But this way, we can't use traefik.
   # FIXME: Find a way to show GPU stats
@@ -9,7 +6,8 @@ services:
     image: nicolargo/glances:dev
     container_name: glances
     restart: $RESTART_POLICY_MAINTENANCE
-    <<: *gpu-nvidia-deploy
+    profiles:
+      - monitoring
     # network_mode: host
     networks:
       - t3_proxy
@@ -47,5 +45,10 @@ services:
       homepage.href: "https://glances.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "System Monitor"
-    profiles:
-      - monitoring
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, compute, utility, video, graphics]

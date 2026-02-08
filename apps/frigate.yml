@@ -1,6 +1,3 @@
-include:
-  - ../compose/gpu_nvidia_deploy.yml
-
 services:
   frigate:
     image: ghcr.io/blakeblackshear/frigate:stable
@@ -8,7 +5,6 @@ services:
     restart: $RESTART_POLICY_MEDIA
     stop_grace_period: 30s # allow enough time to shut down the various services
     shm_size: "512mb"
-    # <<: *gpu-nvidia-deploy
     profiles:
       - media
     networks:
@@ -62,3 +58,10 @@ services:
       glance.icon: "sh:frigate"
       glance.url: "https://frigate.$DOMAINNAME"
       glance.description: "description"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, compute, utility, video, graphics]

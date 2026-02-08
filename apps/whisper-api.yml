@@ -1,12 +1,10 @@
-include:
-  - ../compose/gpu_nvidia_deploy.yml
-
 services:
   whisper-api:
     container_name: whisper-api
     image: onerahmet/openai-whisper-asr-webservice:latest-gpu
     restart: $RESTART_POLICY_ML
-    <<: *gpu-nvidia-deploy
+    profiles:
+      - ml
     networks:
       - t3_proxy
     # ports:
@@ -35,5 +33,10 @@ services:
       homepage.href: "https://whisperapi.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Speech to Text API"
-    profiles:
-      - ml
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, compute, utility, video, graphics]

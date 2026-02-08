@@ -1,12 +1,10 @@
-include:
-  - ../compose/gpu_nvidia_deploy.yml
-
 services:
   sd-next:
     container_name: sd-next
     image: vladmandic/sdnext-cuda:latest
     restart: $RESTART_POLICY_ML
-    <<: *gpu-nvidia-deploy
+    profiles:
+      - ml
     networks:
       - t3_proxy
     volumes:
@@ -25,5 +23,10 @@ services:
       ####### TINYAUTH #######
       tinyauth.apps.sdnext.config.domain: "sdnext.$DOMAINNAME"
       tinyauth.apps.sdnext.ip.bypass: "$LOCAL_IPS"
-    profiles:
-      - ml
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, compute, utility, video, graphics]

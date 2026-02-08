@@ -1,12 +1,10 @@
-include:
-  - ../compose/gpu_nvidia_deploy.yml
-
 services:
   llama-cpp:
     image: ghcr.io/ggerganov/llama.cpp:server-cuda
     container_name: llama-cpp
     restart: $RESTART_POLICY_ML
-    <<: *gpu-nvidia-deploy
+    profiles:
+      - ml
     networks:
       - t3_proxy
     environment:
@@ -49,5 +47,10 @@ services:
       homepage.href: "https://llamapi.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "LLM inference in C/C++"
-    profiles:
-      - ml
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, compute, utility, video, graphics]
