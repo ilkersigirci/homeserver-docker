@@ -19,7 +19,7 @@ services:
       AGENT_BOOTSTRAP_TOKEN: $ARCANE_AGENT_BOOTSTRAP_TOKEN
       ANALYTICS_DISABLED: true
       DOCKER_HOST: tcp://docker-socket-proxy:2375
-      GPU_MONITORING_ENABLED: {$GPU_MONITORING_ENABLED:-false}
+      GPU_MONITORING_ENABLED: ${GPU_MONITORING_ENABLED:-false}
     labels:
       ####### HOMEPAGE #######
       homepage.group: "Core"
