@@ -35,7 +35,10 @@ include:
   ########################### SERVICES
   #### CORE ####
   - ../apps/arcane-agent.yml
+  - ../apps/homepage.yml
   - ../apps/socket-proxy.yml
+  - ../apps/tinyauth.yml
+  - ../apps/traefik.yml
   #### DESKTOP APPS ####
   # - ../apps/bambustudio.yml
   # - ../apps/krita.yml

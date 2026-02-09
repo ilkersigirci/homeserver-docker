@@ -1,12 +1,5 @@
 http:
   routers:
-    sealskin-rtr:
-      rule: "Host(`sealskin.{{env "DOMAINNAME"}}`)"
-      entryPoints:
-        - websecure
-      middlewares:
-        - chain-no-auth
-      service: sealskin-svc
     obsidian-rtr:
       rule: "Host(`obsidian.{{env "DOMAINNAME"}}`)"
       entryPoints:
@@ -24,10 +17,6 @@ http:
       service: bambustudio-svc
 
   services:
-    sealskin-svc:
-      loadBalancer:
-        servers:
-          - url: http://192.168.2.19:3001
     obsidian-svc:
       loadBalancer:
         servers:
