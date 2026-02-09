@@ -21,8 +21,8 @@ services:
       SECURE_COOKIE: "true"
       LOG_LEVEL: "info"
       DISABLE_ANALYTICS: "false"
-      # USERS: $TINYAUTH_USERS
-      USERS_FILE: users_file
+      USERS: $TINYAUTH_USERS
+      # USERS_FILE: users_file
       LOGIN_MAX_RETRIES: 5
       ## OIDC CLIENT CONFIGURATION
       PROVIDERS_POCKETID_NAME: PocketID
@@ -39,8 +39,8 @@ services:
       # TINYAUTH_APPS_WHOAMI_CONFIG_DOMAIN: whoami.example.com
       # TINYAUTH_APPS_WHOAMI_USERS_ALLOW: john
     volumes:
-      - $REPO_PATH/secrets/tinyauth_users:/tinyauth/users_file
       - $REPO_PATH/data/tinyauth:/data
+      # - $REPO_PATH/secrets/tinyauth_users:/tinyauth/users_file
     labels:
       traefik.enable: "true"
       ## HTTP Routers

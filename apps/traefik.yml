@@ -1,8 +1,8 @@
 services:
   # Traefik 3 - Reverse Proxy
   # Touch (create empty files) acme/acme.json. Set acme.json permissions to 600.
-  # touch $REPO_PATH/appdata/traefik3/acme/acme.json
-  # chmod 600 $REPO_PATH/appdata/traefik3/acme/acme.json
+  # touch $REPO_PATH/configs/traefik3/acme/acme.json
+  # chmod 600 $REPO_PATH/configs/traefik3/acme/acme.json
   traefik:
     container_name: traefik
     image: ghcr.io/traefik/traefik:3.6
