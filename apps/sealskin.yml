@@ -11,9 +11,10 @@ services:
       - socket_proxy
     expose:
       - "8000" # HTTP Fallback API communication port. 
-      - "8443" # HTTPS Sessions and API communication port.
+      - "8001" # HTTPS Sessions and API communication port.
     ports:
       - "3000:8000"
+      - "3001:8001"
     mem_limit: 7g
     security_opt:
       - no-new-privileges:true
@@ -28,7 +29,7 @@ services:
       ## Sealskin Specific
       SEALSKIN_LOG_LEVEL: "INFO"
       SEALSKIN_API_PORT: 8000
-      SEALSKIN_SESSION_PORT: 8000
+      SEALSKIN_SESSION_PORT: 8001
       SEALSKIN_PUID: $PUID
       SEALSKIN_PGID: $PGID
     labels:
@@ -38,9 +39,9 @@ services:
       traefik.http.routers.sealskin-rtr.rule: "Host(`sealskin.$DOMAINNAME`)"
       ## Middlewares
       traefik.http.routers.sealskin-rtr.middlewares: "chain-tinyauth@file"
-      ## HTTP Services
+      ## HTTP Services (Session Port handles all traffic and internally routes to API)
       traefik.http.routers.sealskin-rtr.service: "sealskin-svc"
-      traefik.http.services.sealskin-svc.loadbalancer.server.port: "8000"
+      traefik.http.services.sealskin-svc.loadbalancer.server.port: "8001"
       ####### TINYAUTH #######
       tinyauth.apps.sealskin.config.domain: "sealskin.$DOMAINNAME"
       tinyauth.apps.sealskin.ip.bypass: "$LOCAL_IPS"
