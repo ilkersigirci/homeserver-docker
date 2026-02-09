@@ -37,12 +37,12 @@ include:
   - ../apps/arcane-agent.yml
   - ../apps/socket-proxy.yml
   #### DESKTOP APPS ####
-  - ../apps/bambustudio.yml
+  # - ../apps/bambustudio.yml
   # - ../apps/krita.yml
   # - ../apps/firefox.yml
   # - ../apps/gimp.yml
+  # - ../apps/obsidian.yml
+  - ../apps/sealskin.yml
   # - ../apps/thunderbird.yml # TODO
   #### PHOTO ####
   - ../apps/immich-gpu.yml
-  #### READING ####
-  - ../apps/obsidian.yml

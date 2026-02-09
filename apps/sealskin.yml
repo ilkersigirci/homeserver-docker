@@ -1,0 +1,58 @@
+services:
+  sealskin:
+    image: lscr.io/linuxserver/sealskin:latest
+    container_name: sealskin
+    restart: $RESTART_POLICY_DESKTOP_IMAGES
+    profiles:
+      - desktop_apps
+    networks:
+      - t3_proxy
+      - socket_proxy
+    expose:
+      - "8000" # HTTP Fallback API communication port. 
+      - "8443" # HTTPS Sessions and API communication port.
+    ports:
+      - "3002:8000"
+    mem_limit: 7g
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $REPO_PATH/appdata/sealskin:/config
+      - $REPO_PATH/data/sealskin:/storage
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      HOST_URL: "https://sealskin.$DOMAINNAME"
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.sealskin-rtr.entrypoints: "websecure"
+      traefik.http.routers.sealskin-rtr.rule: "Host(`sealskin.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.sealskin-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.sealskin-rtr.service: "sealskin-svc"
+      traefik.http.services.sealskin-svc.loadbalancer.server.port: "8000"
+      ####### TINYAUTH #######
+      tinyauth.apps.sealskin.config.domain: "sealskin.$DOMAINNAME"
+      tinyauth.apps.sealskin.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "DesktopApps"
+      homepage.name: "sealskin"
+      homepage.icon: "sealskin.png"
+      homepage.href: "https://sealskin.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Streaming containerized desktop applications to your browser"
+      ####### GLANCE #######
+      glance.name: "sealskin"
+      glance.icon: "sh:sealskin"
+      glance.url: "https://sealskin.$DOMAINNAME"
+      glance.description: "Streaming containerized desktop applications to your browser"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, compute, utility, video, graphics]

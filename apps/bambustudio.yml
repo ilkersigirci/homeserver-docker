@@ -5,7 +5,8 @@ services:
     container_name: bambustudio
     restart: $RESTART_POLICY_DESKTOP_IMAGES
     hostname: bambustudio
-    shm_size: "1gb"
+    # shm_size: "1gb"
+    mem_limit: 5g
     profiles:
       - desktop_apps
     networks:

@@ -4,6 +4,8 @@ services:
     image: lscr.io/linuxserver/obsidian:latest
     restart: $RESTART_POLICY_DESKTOP_IMAGES
     shm_size: "1gb"
+    profiles:
+      - desktop_apps
     networks:
       - t3_proxy
     ports:
@@ -24,8 +26,6 @@ services:
       interval: 1m
       timeout: 5s
       retries: 3
-    profiles:
-      - reading
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -40,7 +40,7 @@ services:
       tinyauth.apps.obsidian.config.domain: "obsidian.$DOMAINNAME"
       tinyauth.apps.obsidian.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: "Reading"
+      homepage.group: "DesktopApps"
       homepage.name: "Obsidian"
       homepage.icon: "obsidian.svg"
       homepage.href: "https://obsidian.$DOMAINNAME"
@@ -92,7 +92,7 @@ services:
       tinyauth.apps.obsidian.config.domain: "obsidian.$DOMAINNAME"
       tinyauth.apps.obsidian.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: "Reading"
+      homepage.group: "DesktopApps"
       homepage.name: "Obsidian"
       homepage.icon: "obsidian.svg"
       homepage.href: "https://obsidian.$DOMAINNAME"
