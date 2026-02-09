@@ -12,7 +12,7 @@ services:
     networks:
       - t3_proxy
     ports:
-      - "3001:3000" # HTTP
+      - "3002:3000" # HTTP
     expose:
       - 3000 # HTTP
       - 3001 # HTTPS

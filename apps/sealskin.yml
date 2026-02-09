@@ -12,7 +12,7 @@ services:
       - "8000" # HTTP Fallback API communication port. 
       - "8443" # HTTPS Sessions and API communication port.
     ports:
-      - "3002:8000"
+      - "3000:8000"
     mem_limit: 7g
     security_opt:
       - no-new-privileges:true
