@@ -1,14 +1,18 @@
 services:
   webtop:
     container_name: webtop
-    image: lscr.io/linuxserver/webtop:latest
+    image: lscr.io/linuxserver/webtop:debian-kde
     restart: $RESTART_POLICY_DESKTOP_IMAGES
-    shm_size: "1gb" #optional
-    devices: #optional
-      - /dev/dri:/dev/dri
+    shm_size: "1gb"
+    mem_limit: 6g
+    profiles:
+      - desktop_apps
+    # devices:
+    #   - /dev/dri:/dev/dri
     # privileged: true
-    # security_opt:
-    #   - seccomp:unconfined #optional
+    security_opt:
+      - no-new-privileges:true
+      # - seccomp:unconfined #optional
     networks:
       - t3_proxy
     volumes:
@@ -18,6 +22,12 @@ services:
       PGID: $PGID
       TZ: $TZ
       TITLE: Debian on the Browser
+      PIXELFLUX_WAYLAND: true
+      # Linuxserver Docker Mods
+      DOCKER_MODS: linuxserver/mods:universal-package-install
+      INSTALL_PACKAGES: git|glmark2
+      # Selkies related variables
+      SELKIES_USE_CPU: "False|locked"
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -38,5 +48,10 @@ services:
       homepage.href: "https://webtop.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Debian Desktop in Browser"
-    profiles:
-      - desktop_apps
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu, compute, utility, video, graphics]
