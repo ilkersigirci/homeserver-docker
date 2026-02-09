@@ -1,3 +1,4 @@
+# NOTE: In browser extension, paste $REPO_PATH/appdata/sealskin/admin.json
 services:
   sealskin:
     image: lscr.io/linuxserver/sealskin:latest
@@ -24,6 +25,12 @@ services:
       PGID: $PGID
       TZ: $TZ
       HOST_URL: "https://sealskin.$DOMAINNAME"
+      ## Sealskin Specific
+      SEALSKIN_LOG_LEVEL: "INFO"
+      SEALSKIN_API_PORT: 8000
+      SEALSKIN_SESSION_PORT: 8000
+      SEALSKIN_PUID: $PUID
+      SEALSKIN_PGID: $PGID
     labels:
       traefik.enable: "true"
       ## HTTP Routers
