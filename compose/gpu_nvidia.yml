@@ -47,6 +47,7 @@ include:
   # - ../apps/obsidian.yml
   # - ../apps/sealskin.yml
   # - ../apps/thunderbird.yml # TODO
+  - ../apps/vscodium.yml
   - ../apps/webtop.yml
   #### PHOTO ####
   - ../apps/immich-gpu.yml

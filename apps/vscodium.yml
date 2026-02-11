@@ -7,36 +7,56 @@ services:
       - maintenance
     security_opt:
       - no-new-privileges:true
-    # cap_add:
-    #   - IPC_LOCK
-    # shm_size: "1gb"
+    # NOTE: Required for keyring functionality.
+    cap_add:
+      - IPC_LOCK
+    shm_size: "1gb"
     networks:
       - t3_proxy
     volumes:
       - $REPO_PATH/appdata/vscodium:/config
       - $REPO_PATH:/config/workspace/docker
-      - $DIR_NOTES:/config/workspace/notes
     environment:
       PUID: $PUID
       PGID: $PGID
       TZ: $TZ
+      TITLE: Vscode
+      PIXELFLUX_WAYLAND: true
+      # DRI_NODE: /dev/dri/renderD128 # NOTE: Don't set this. It breaks HW.
+      DISABLE_ZINK: true
+      DISABLE_IPV6: true
+      DISABLE_DRI3: true
     labels:
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.vscodium-rtr.entrypoints: "websecure"
-      traefik.http.routers.vscodium-rtr.rule: "Host(`vscodium.$DOMAINNAME`)"
+      traefik.http.routers.vscodium-rtr.rule: "Host(`code.$DOMAINNAME`)"
       ## Middlewares
       traefik.http.routers.vscodium-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
       traefik.http.routers.vscodium-rtr.service: "vscodium-svc"
       traefik.http.services.vscodium-svc.loadbalancer.server.port: "3000"
       ####### TINYAUTH #######
-      tinyauth.apps.vscodium.config.domain: "vscodium.$DOMAINNAME"
+      tinyauth.apps.vscodium.config.domain: "code.$DOMAINNAME"
       tinyauth.apps.vscodium.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "VSCodium"
       homepage.icon: "vscode.svg"
-      homepage.href: "https://vscodium.$DOMAINNAME"
+      homepage.href: "https://code.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Code Editor"
+    # For Nvidia Zero Copy Rendering
+    group_add:
+      # - "44" # video
+      - "992" # render
+    devices:
+      # - /dev/dri:/dev/dri
+      - /dev/dri/renderD128:/dev/dri/renderD128
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [compute,video,graphics,utility]
