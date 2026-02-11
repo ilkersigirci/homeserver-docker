@@ -25,8 +25,7 @@ services:
       TITLE: Bambu-Studio
       # DARK_MODE: true
       PIXELFLUX_WAYLAND: true
-      # DRINODE: /dev/dri/renderD128 # NOTE: Permission denied
-      DRI_NODE: /dev/dri/renderD128
+      # DRI_NODE: /dev/dri/renderD128 # NOTE: Don't set this. It breaks HW.
       DISABLE_ZINK: true
       DISABLE_IPV6: true
       DISABLE_DRI3: true
@@ -57,11 +56,11 @@ services:
       glance.description: "PC Software for BambuLab and other 3D printers"
     # For Nvidia Zero Copy Rendering
     group_add:
-      - "44" # video
+      # - "44" # video
       - "992" # render
     devices:
-      - /dev/dri:/dev/dri
-      # - /dev/dri/renderD128:/dev/dri/renderD128
+      # - /dev/dri:/dev/dri
+      - /dev/dri/renderD128:/dev/dri/renderD128
     deploy:
       resources:
         reservations:

@@ -22,14 +22,13 @@ services:
       TZ: $TZ
       TITLE: Debian on the Browser
       PIXELFLUX_WAYLAND: true
-      # DRINODE: /dev/dri/renderD128 # NOTE: Permission denied
-      DRI_NODE: /dev/dri/renderD128
+      # DRI_NODE: /dev/dri/renderD128 # NOTE: Don't set this. It breaks HW.
       DISABLE_ZINK: true
       DISABLE_IPV6: true
       DISABLE_DRI3: true
       # Linuxserver Docker Mods
       DOCKER_MODS: linuxserver/mods:universal-package-install
-      INSTALL_PACKAGES: chromium|glmark2-es2-wayland
+      INSTALL_PACKAGES: nvtop|htop|chromium
       # Selkies related variables
       # SELKIES_USE_CPU: "False|locked"
       SHELL: /bin/bash
@@ -55,11 +54,11 @@ services:
       homepage.description: "Debian Desktop in Browser"
     # For Nvidia Zero Copy Rendering
     group_add:
-      - "44" # video
+      # - "44" # video
       - "992" # render
     devices:
-      - /dev/dri:/dev/dri
-      # - /dev/dri/renderD128:/dev/dri/renderD128
+      # - /dev/dri:/dev/dri
+      - /dev/dri/renderD128:/dev/dri/renderD128
     deploy:
       resources:
         reservations:
