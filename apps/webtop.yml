@@ -28,7 +28,7 @@ services:
       DISABLE_DRI3: true
       # Linuxserver Docker Mods
       DOCKER_MODS: linuxserver/mods:universal-package-install
-      INSTALL_PACKAGES: nvtop|htop|chromium
+      INSTALL_PACKAGES: htop|nvtop
       # Selkies related variables
       # SELKIES_USE_CPU: "False|locked"
       SHELL: /bin/bash
@@ -36,20 +36,20 @@ services:
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.webtop-rtr.entrypoints: "websecure"
-      traefik.http.routers.webtop-rtr.rule: "Host(`webtop.$DOMAINNAME`)"
+      traefik.http.routers.webtop-rtr.rule: "Host(`kde.$DOMAINNAME`)"
       ## Middlewares
       traefik.http.routers.webtop-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
       traefik.http.routers.webtop-rtr.service: "webtop-svc"
       traefik.http.services.webtop-svc.loadbalancer.server.port: "3000"
       ####### TINYAUTH #######
-      tinyauth.apps.webtop.config.domain: "webtop.$DOMAINNAME"
+      tinyauth.apps.webtop.config.domain: "kde.$DOMAINNAME"
       tinyauth.apps.webtop.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "DesktopApps"
       homepage.name: "Webtop"
       homepage.icon: "webtop.svg"
-      homepage.href: "https://webtop.$DOMAINNAME"
+      homepage.href: "https://kde.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Debian Desktop in Browser"
     # For Nvidia Zero Copy Rendering
