@@ -6,18 +6,12 @@ services:
     restart: $RESTART_POLICY_DESKTOP_IMAGES
     shm_size: "1gb"
     mem_limit: 6g
-    group_add:
-      - "44"
-      - "992"
     profiles:
       - desktop_apps
-    devices:
-      - /dev/dri:/dev/dri
-      # - /dev/dri/renderD128:/dev/dri/renderD128
     privileged: true
-    security_opt:
-      # - no-new-privileges:true
-      - seccomp:unconfined #optional
+    # security_opt:
+    #   # - no-new-privileges:true
+    #   - seccomp:unconfined
     networks:
       - t3_proxy
     volumes:
@@ -30,11 +24,12 @@ services:
       PIXELFLUX_WAYLAND: true
       # DRINODE: /dev/dri/renderD128 # NOTE: Permission denied
       DRI_NODE: /dev/dri/renderD128
-      # DISABLE_IPV6: true
-      # DISABLE_DRI3: true
+      DISABLE_ZINK: true
+      DISABLE_IPV6: true
+      DISABLE_DRI3: true
       # Linuxserver Docker Mods
-      # DOCKER_MODS: linuxserver/mods:universal-package-install
-      # INSTALL_PACKAGES: git|glmark2
+      DOCKER_MODS: linuxserver/mods:universal-package-install
+      INSTALL_PACKAGES: chromium|glmark2-es2-wayland
       # Selkies related variables
       # SELKIES_USE_CPU: "False|locked"
       SHELL: /bin/bash
@@ -58,6 +53,13 @@ services:
       homepage.href: "https://webtop.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Debian Desktop in Browser"
+    # For Nvidia Zero Copy Rendering
+    group_add:
+      - "44" # video
+      - "992" # render
+    devices:
+      - /dev/dri:/dev/dri
+      # - /dev/dri/renderD128:/dev/dri/renderD128
     deploy:
       resources:
         reservations:

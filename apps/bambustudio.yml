@@ -11,14 +11,11 @@ services:
       - desktop_apps
     networks:
       - t3_proxy
-    ports:
-      - "3002:3000" # HTTP
     expose:
       - 3000 # HTTP
       - 3001 # HTTPS
     security_opt:
       - no-new-privileges:true
-      - seccomp:unconfined
     volumes:
       - $REPO_PATH/data/bambustudio:/config
     environment:
@@ -28,6 +25,11 @@ services:
       TITLE: Bambu-Studio
       # DARK_MODE: true
       PIXELFLUX_WAYLAND: true
+      # DRINODE: /dev/dri/renderD128 # NOTE: Permission denied
+      DRI_NODE: /dev/dri/renderD128
+      DISABLE_ZINK: true
+      DISABLE_IPV6: true
+      DISABLE_DRI3: true
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -53,10 +55,17 @@ services:
       glance.icon: "sh:bambustudio"
       glance.url: "https://bambustudio.$DOMAINNAME"
       glance.description: "PC Software for BambuLab and other 3D printers"
+    # For Nvidia Zero Copy Rendering
+    group_add:
+      - "44" # video
+      - "992" # render
+    devices:
+      - /dev/dri:/dev/dri
+      # - /dev/dri/renderD128:/dev/dri/renderD128
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
               count: all
-              capabilities: [gpu, compute, utility, video, graphics]
+              capabilities: [gpu, compute, utility, video, graphics, display]
