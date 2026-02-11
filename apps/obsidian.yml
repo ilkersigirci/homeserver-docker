@@ -46,55 +46,17 @@ services:
       homepage.href: "https://obsidian.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Note Taking with Markdown"
+    # For Nvidia Zero Copy Rendering
+    group_add:
+      # - "44" # video
+      - "992" # render
+    devices:
+      # - /dev/dri:/dev/dri
+      - /dev/dri/renderD128:/dev/dri/renderD128
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
               count: all
-              capabilities: [gpu, compute, utility, video, graphics]
-
-  obsidian-kasm:
-    container_name: obsidian-kasm
-    image: lscr.io/linuxserver/obsidian:v1.8.10-ls72
-    restart: $RESTART_POLICY_DESKTOP_IMAGES
-    shm_size: "1gb"
-    networks:
-      - t3_proxy
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - $DIR_NOTES/Markdown:/vaults
-    environment:
-      PUID: $PUID
-      PGID: $PGID
-      TZ: $TZ
-      TITLE: Obsidian
-    healthcheck:
-      test: ["CMD-SHELL", "curl --fail -s http://localhost:3000 || exit 1"]
-      start_period: 15s
-      interval: 1m
-      timeout: 5s
-      retries: 3
-    profiles:
-      - not-used
-    labels:
-      traefik.enable: "true"
-      ## HTTP Routers
-      traefik.http.routers.obsidian-rtr.entrypoints: "websecure"
-      traefik.http.routers.obsidian-rtr.rule: "Host(`obsidian.$DOMAINNAME`)"
-      ## Middlewares
-      traefik.http.routers.obsidian-rtr.middlewares: "chain-tinyauth@file"
-      ## HTTP Services
-      traefik.http.routers.obsidian-rtr.service: "obsidian-svc"
-      traefik.http.services.obsidian-svc.loadbalancer.server.port: "3000"
-      ####### TINYAUTH #######
-      tinyauth.apps.obsidian.config.domain: "obsidian.$DOMAINNAME"
-      tinyauth.apps.obsidian.ip.bypass: "$LOCAL_IPS"
-      ####### HOMEPAGE #######
-      homepage.group: "DesktopApps"
-      homepage.name: "Obsidian"
-      homepage.icon: "obsidian.svg"
-      homepage.href: "https://obsidian.$DOMAINNAME"
-      homepage.target: "_blank"
-      homepage.description: "Note Taking with Markdown"
+              capabilities: [gpu, compute, utility, video, graphics, display]
