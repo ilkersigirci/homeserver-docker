@@ -1,7 +1,7 @@
 # NOTE: Register worker: docker exec -it restate restate deployments register http://192.168.2.21:9080 --force --use-http1.1
 services:
   restate:
-    image: docker.restate.dev/restatedev/restate:latest
+    image: ghcr.io/restatedev/restate:latest
     container_name: restate
     restart: $RESTART_POLICY_OTHERS
     profiles:
@@ -14,10 +14,10 @@ services:
       - 9071
     security_opt:
       - no-new-privileges:true
+    depends_on:
+      - jaeger
     environment:
-      PUID: $PUID
-      PGID: $PGID
-      TZ: $TZ
+      RESTATE_TRACING_ENDPOINT: http://jaeger:4317 # OTLP gRPC endpoint for Jaeger
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -32,7 +32,7 @@ services:
       traefik.http.routers.restate-api-rtr.entrypoints: "websecure"
       traefik.http.routers.restate-api-rtr.rule: "Host(`restate-api.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.restate-api-rtr.middlewares: "chain-no-auth@file"
+      # traefik.http.routers.restate-api-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
       traefik.http.routers.restate-api-rtr.service: "restate-api-svc"
       traefik.http.services.restate-api-svc.loadbalancer.server.port: "8080"

@@ -1,0 +1,42 @@
+services:
+  jaeger:
+    image: jaegertracing/jaeger:latest
+    container_name: jaeger
+    restart: $RESTART_POLICY_OTHERS
+    profiles:
+      - others
+    networks:
+      - t3_proxy
+    expose:
+      - 4317 # OTLP gRPC port
+      - 4318 # OTLP HTTP port
+      - 16686 # Jaeger UI port
+    security_opt:
+      - no-new-privileges:true
+    # environment:
+    #   OTEL_ENABLED: true
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.jaeger-rtr.entrypoints: "websecure"
+      traefik.http.routers.jaeger-rtr.rule: "Host(`jaeger.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.jaeger-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.jaeger-rtr.service: "jaeger-svc"
+      traefik.http.services.jaeger-svc.loadbalancer.server.port: "16686"
+      ####### TINYAUTH #######
+      tinyauth.apps.jaeger.config.domain: "jaeger.$DOMAINNAME"
+      tinyauth.apps.jaeger.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "Others"
+      homepage.name: "jaeger"
+      homepage.icon: "jaeger.png"
+      homepage.href: "https://jaeger.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "OTel Distributed Tracing Platform for Observability"
+      ####### GLANCE #######
+      glance.name: "jaeger"
+      glance.icon: "sh:jaeger"
+      glance.url: "https://jaeger.$DOMAINNAME"
+      glance.description: "OTel Distributed Tracing Platform for Observability"
