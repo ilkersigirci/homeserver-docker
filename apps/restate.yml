@@ -1,0 +1,53 @@
+# NOTE: Register worker: docker exec -it restate restate deployments register http://192.168.2.21:9080 --force --use-http1.1
+services:
+  restate:
+    image: docker.restate.dev/restatedev/restate:latest
+    container_name: restate
+    restart: $RESTART_POLICY_OTHERS
+    profiles:
+      - others
+    networks:
+      - t3_proxy
+    expose:
+      - 8080
+      - 9070
+      - 9071
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.restate-rtr.entrypoints: "websecure"
+      traefik.http.routers.restate-rtr.rule: "Host(`restate.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.restate-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.restate-rtr.service: "restate-svc"
+      traefik.http.services.restate-svc.loadbalancer.server.port: "9070"
+      ## HTTP Routers - API
+      traefik.http.routers.restate-api-rtr.entrypoints: "websecure"
+      traefik.http.routers.restate-api-rtr.rule: "Host(`restate-api.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.restate-api-rtr.middlewares: "chain-no-auth@file"
+      ## HTTP Services
+      traefik.http.routers.restate-api-rtr.service: "restate-api-svc"
+      traefik.http.services.restate-api-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.restate.config.domain: "restate.$DOMAINNAME"
+      tinyauth.apps.restate.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "Others"
+      homepage.name: "restate"
+      homepage.icon: "restate.png"
+      homepage.href: "https://restate.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Workflow Orchestration Tool for Building resilient backends and agents"
+      ####### GLANCE #######
+      glance.name: "restate"
+      glance.icon: "sh:restate"
+      glance.url: "https://restate.$DOMAINNAME"
+      glance.description: "Workflow Orchestration Tool for Building resilient backends and agents"

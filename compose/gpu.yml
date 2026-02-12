@@ -101,3 +101,4 @@ include:
   # - ../apps/quartz.yml
   #### OTHERS ####
   # - ../apps/homeserver-api.yml # TODO
+  - ../apps/restate.yml
