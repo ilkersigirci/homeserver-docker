@@ -100,6 +100,7 @@ include:
   # - ../apps/silverbullet.yml
   # - ../apps/quartz.yml
   #### OTHERS ####
+  - ../apps/hatchet.yml
   # - ../apps/homeserver-api.yml # TODO
-  - ../apps/jaeger.yml
+  # - ../apps/jaeger.yml
   - ../apps/restate.yml

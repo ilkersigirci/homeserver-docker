@@ -14,10 +14,10 @@ services:
       - 9071
     security_opt:
       - no-new-privileges:true
-    depends_on:
-      - jaeger
-    environment:
-      RESTATE_TRACING_ENDPOINT: http://jaeger:4317 # OTLP gRPC endpoint for Jaeger
+    # depends_on:
+    #   - jaeger
+    # environment:
+    #   RESTATE_TRACING_ENDPOINT: http://jaeger:4317 # OTLP gRPC endpoint for Jaeger
     labels:
       traefik.enable: "true"
       ## HTTP Routers

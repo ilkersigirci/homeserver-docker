@@ -1,0 +1,86 @@
+# Default user / pass is admin@example.com / Admin123!!
+services:
+  hatchet-db:
+    image: postgres:16.4
+    container_name: hatchet-db
+    command: postgres -c 'max_connections=200'
+    restart: $RESTART_POLICY_OTHERS
+    profiles:
+      - others
+      - hatchet
+    environment:
+      PGDATA: /pgdata
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    networks:
+      - t3_proxy
+    expose:
+      - 5432
+    volumes:
+      - $REPO_PATH/data/hatchet-db:/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  hatchet-lite:
+    image: ghcr.io/hatchet-dev/hatchet/hatchet-lite:latest
+    container_name: hatchet-lite
+    restart: $RESTART_POLICY_OTHERS
+    depends_on:
+      hatchet-db:
+        condition: service_healthy
+    profiles:
+      - others
+      - hatchet
+    networks:
+      - t3_proxy
+    expose:
+      - 8888 # HTTP UI
+      - 7077 # gRPC API
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $REPO_PATH/configs/hatchet-lite:/config
+    environment:
+      # Refer to https://docs.hatchet.run/self-hosting/configuration-options
+      # for a list of all supported environment variables
+      DATABASE_URL: "postgresql://postgres:postgres@hatchet-db:5432/postgres?sslmode=disable"
+      SERVER_AUTH_COOKIE_DOMAIN: $DOMAINNAME
+      SERVER_AUTH_COOKIE_INSECURE: "t"
+      SERVER_GRPC_BIND_ADDRESS: "0.0.0.0"
+      SERVER_GRPC_INSECURE: "t"
+      SERVER_GRPC_BROADCAST_ADDRESS: localhost:7077
+      SERVER_GRPC_PORT: "7077"
+      SERVER_URL: https://hatchet.$DOMAINNAME
+      SERVER_AUTH_SET_EMAIL_VERIFIED: "t"
+      SERVER_DEFAULT_ENGINE_VERSION: "V1"
+      SERVER_INTERNAL_CLIENT_INTERNAL_GRPC_BROADCAST_ADDRESS: localhost:7077
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.hatchet-lite-rtr.entrypoints: "websecure"
+      traefik.http.routers.hatchet-lite-rtr.rule: "Host(`hatchet.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.hatchet-lite-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.hatchet-lite-rtr.service: "hatchet-lite-svc"
+      traefik.http.services.hatchet-lite-svc.loadbalancer.server.port: "8888"
+      ####### TINYAUTH #######
+      tinyauth.apps.hatchet-lite.config.domain: "hatchet.$DOMAINNAME"
+      tinyauth.apps.hatchet-lite.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "Others"
+      homepage.name: "hatchet-lite"
+      homepage.icon: "hatchet-lite.png"
+      homepage.href: "https://hatchet.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Run Background Tasks at Scale"
+      ####### GLANCE #######
+      glance.name: "hatchet-lite"
+      glance.icon: "sh:hatchet-lite"
+      glance.url: "https://hatchet.$DOMAINNAME"
+      glance.description: "Run Background Tasks at Scale"
