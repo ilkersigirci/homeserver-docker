@@ -53,7 +53,7 @@ services:
       SERVER_AUTH_COOKIE_INSECURE: "t"
       SERVER_GRPC_BIND_ADDRESS: "0.0.0.0"
       SERVER_GRPC_INSECURE: "t"
-      SERVER_GRPC_BROADCAST_ADDRESS: localhost:7077
+      SERVER_GRPC_BROADCAST_ADDRESS: hatchet-rpc.$DOMAINNAME:443
       SERVER_GRPC_PORT: "7077"
       SERVER_URL: https://hatchet.$DOMAINNAME
       SERVER_AUTH_SET_EMAIL_VERIFIED: "t"
@@ -69,18 +69,26 @@ services:
       ## HTTP Services
       traefik.http.routers.hatchet-lite-rtr.service: "hatchet-lite-svc"
       traefik.http.services.hatchet-lite-svc.loadbalancer.server.port: "8888"
+      ## gRPC Router (RPC)
+      traefik.http.routers.hatchet-rpc-rtr.entrypoints: "websecure"
+      traefik.http.routers.hatchet-rpc-rtr.rule: "Host(`hatchet-rpc.$DOMAINNAME`)"
+      traefik.http.routers.hatchet-rpc-rtr.tls: "true"
+      traefik.http.routers.hatchet-rpc-rtr.service: "hatchet-rpc-svc"
+      ## gRPC Service (h2c)
+      traefik.http.services.hatchet-rpc-svc.loadbalancer.server.port: "7077"
+      traefik.http.services.hatchet-rpc-svc.loadbalancer.server.scheme: "h2c"
       ####### TINYAUTH #######
       tinyauth.apps.hatchet-lite.config.domain: "hatchet.$DOMAINNAME"
       tinyauth.apps.hatchet-lite.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Others"
       homepage.name: "hatchet-lite"
-      homepage.icon: "hatchet-lite.png"
+      homepage.icon: "hatchet.png"
       homepage.href: "https://hatchet.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Run Background Tasks at Scale"
       ####### GLANCE #######
       glance.name: "hatchet-lite"
-      glance.icon: "sh:hatchet-lite"
+      glance.icon: "sh:hatchet"
       glance.url: "https://hatchet.$DOMAINNAME"
       glance.description: "Run Background Tasks at Scale"
