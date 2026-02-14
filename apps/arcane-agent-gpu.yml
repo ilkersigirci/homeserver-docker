@@ -1,0 +1,41 @@
+services:
+  arcane-agent:
+    image: ghcr.io/getarcaneapp/arcane-headless:latest
+    container_name: arcane-agent
+    restart: $RESTART_POLICY_CORE
+    profiles:
+      - core
+    networks:
+      - t3_proxy
+      - socket_proxy
+    ports:
+      - "3553:3553"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $REPO_PATH/appdata/arcane-agent:/app/data
+    environment:
+      AGENT_MODE: true
+      ANALYTICS_DISABLED: true
+      AGENT_TOKEN: $ARCANE_AGENT_BOOTSTRAP_TOKEN
+      MANAGER_API_URL: https://arcane.gpu.$BASE_DOMAINNAME
+      DOCKER_HOST: tcp://docker-socket-proxy:2375
+      GPU_MONITORING_ENABLED: true
+      GPU_TYPE: nvidia
+    labels:
+      ####### HOMEPAGE #######
+      homepage.group: "Core"
+      homepage.name: "arcane-agent"
+      homepage.icon: "arcane.png"
+      homepage.description: "Modern Docker Management Remote Agent"
+      ####### GLANCE #######
+      glance.name: "arcane-agent"
+      glance.icon: "sh:arcane"
+      glance.description: "Modern Docker Management Remote Agent"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

@@ -34,7 +34,7 @@ networks:
 include:
   ########################### SERVICES
   #### CORE ####
-  - ../apps/arcane-agent.yml
+  - ../apps/arcane-agent-gpu.yml
   - ../apps/homepage.yml
   - ../apps/socket-proxy.yml
   - ../apps/tinyauth.yml
