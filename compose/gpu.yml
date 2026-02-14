@@ -102,5 +102,3 @@ include:
   #### OTHERS ####
   - ../apps/hatchet.yml
   # - ../apps/homeserver-api.yml # TODO
-  # - ../apps/jaeger.yml
-  - ../apps/restate.yml
