@@ -45,7 +45,7 @@ services:
       disable: false
     volumes:
       - $IMMICH_UPLOAD_LOCATION:/usr/src/app/upload
-      - $DIR_PHOTOS/Pictures:/mnt/media/Photos/Pictures:ro
+      - $DIR_PHOTOS/Pictures:/mnt/media/Photos/Pictures
       - $DIR_PHOTOS/Videos:/mnt/media/Photos/Videos:ro
       # - $DIR_PHOTOS/Pictures:/mnt/media/Photos/Pictures
       # - $DIR_PHOTOS/Videos:/mnt/media/Photos/Videos
