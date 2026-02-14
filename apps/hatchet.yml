@@ -59,13 +59,14 @@ services:
       SERVER_AUTH_SET_EMAIL_VERIFIED: "t"
       SERVER_DEFAULT_ENGINE_VERSION: "V1"
       SERVER_INTERNAL_CLIENT_INTERNAL_GRPC_BROADCAST_ADDRESS: localhost:7077
+      SERVER_LIMITS_DEFAULT_TENANT_RETENTION_PERIOD: 720h # 30 days
     labels:
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.hatchet-lite-rtr.entrypoints: "websecure"
       traefik.http.routers.hatchet-lite-rtr.rule: "Host(`hatchet.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.hatchet-lite-rtr.middlewares: "chain-tinyauth@file"
+      traefik.http.routers.hatchet-lite-rtr.middlewares: "chain-tinyauth-relaxed@file" # NOTE: For task input loading
       ## HTTP Services
       traefik.http.routers.hatchet-lite-rtr.service: "hatchet-lite-svc"
       traefik.http.services.hatchet-lite-svc.loadbalancer.server.port: "8888"
