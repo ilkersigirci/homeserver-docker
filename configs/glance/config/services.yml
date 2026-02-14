@@ -35,12 +35,15 @@
           - type: iframe
             title: HOME
             source: https://homepage.home.${BASE_DOMAINNAME}
-            # source: http://homepage:3000
             height: 1000
           - type: iframe
             title: GPU
             source: https://homepage.gpu.${BASE_DOMAINNAME}
-            # source: http://homepage:3000
+            height: 1000
+
+          - type: iframe
+            title: GPU2
+            source: https://homepage.gpu2.${BASE_DOMAINNAME}
             height: 1000
 
           - type: iframe
