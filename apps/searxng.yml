@@ -6,7 +6,7 @@ services:
     depends_on:
       - searxng-redis
     profiles:
-      - ml
+      - programming
       - searxng
     networks:
       - t3_proxy
@@ -37,7 +37,7 @@ services:
       tinyauth.apps.searxng.config.domain: "searxng.$DOMAINNAME"
       tinyauth.apps.searxng.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: "ML"
+      homepage.group: "Programming"
       homepage.name: "searxng"
       homepage.icon: "searxng.png"
       homepage.href: "https://searxng.$DOMAINNAME"
@@ -55,7 +55,7 @@ services:
     command: valkey-server --save 30 1 --loglevel warning
     restart: $RESTART_POLICY_ML
     profiles:
-      - ml
+      - programming
       - searxng
     networks:
       - t3_proxy

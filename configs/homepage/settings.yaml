@@ -60,9 +60,9 @@ layout:
   Reading:
     tab: Second
     style: column
-  DesktopApps:
+  Programming:
     tab: Second
     style: row
-  ML:
+  DesktopApps:
     tab: Second
     style: row

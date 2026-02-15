@@ -93,6 +93,10 @@ include:
   #### PHOTO ####
   # - ../apps/immich-gpu.yml
   - ../apps/immich.yml
+  #### PROGRAMMING ####
+  - ../apps/hatchet.yml
+  # - ../apps/homeserver-api.yml # TODO
+  - ../apps/minio.yml
   #### READING ####
   - ../apps/linkwarden.yml
   # - ../apps/obsidian.yml
@@ -100,5 +104,3 @@ include:
   # - ../apps/silverbullet.yml
   # - ../apps/quartz.yml
   #### OTHERS ####
-  - ../apps/hatchet.yml
-  # - ../apps/homeserver-api.yml # TODO

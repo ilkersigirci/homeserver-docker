@@ -4,9 +4,9 @@ services:
     image: postgres:16.4
     container_name: hatchet-db
     command: postgres -c 'max_connections=200'
-    restart: $RESTART_POLICY_OTHERS
+    restart: $RESTART_POLICY_PROGRAMMING
     profiles:
-      - others
+      - programming
       - hatchet
     environment:
       PGDATA: /pgdata
@@ -29,12 +29,12 @@ services:
   hatchet-lite:
     image: ghcr.io/hatchet-dev/hatchet/hatchet-lite:latest
     container_name: hatchet-lite
-    restart: $RESTART_POLICY_OTHERS
+    restart: $RESTART_POLICY_PROGRAMMING
     depends_on:
       hatchet-db:
         condition: service_healthy
     profiles:
-      - others
+      - programming
       - hatchet
     networks:
       - t3_proxy
@@ -82,7 +82,7 @@ services:
       tinyauth.apps.hatchet-lite.config.domain: "hatchet.$DOMAINNAME"
       tinyauth.apps.hatchet-lite.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: "Others"
+      homepage.group: "Programming"
       homepage.name: "hatchet-lite"
       homepage.icon: "hatchet.png"
       homepage.href: "https://hatchet.$DOMAINNAME"

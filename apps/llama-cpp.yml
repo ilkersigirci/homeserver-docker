@@ -4,7 +4,7 @@ services:
     container_name: llama-cpp
     restart: $RESTART_POLICY_ML
     profiles:
-      - ml
+      - programming
     networks:
       - t3_proxy
     environment:
@@ -41,7 +41,7 @@ services:
       tinyauth.apps.llamapi.config.domain: "llamapi.$DOMAINNAME"
       tinyauth.apps.llamapi.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: "ML"
+      homepage.group: "Programming"
       homepage.name: "Llama-cpp"
       homepage.icon: "llama-cpp.svg"
       homepage.href: "https://llamapi.$DOMAINNAME"

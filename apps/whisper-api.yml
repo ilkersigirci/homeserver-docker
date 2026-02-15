@@ -4,7 +4,7 @@ services:
     image: onerahmet/openai-whisper-asr-webservice:latest-gpu
     restart: $RESTART_POLICY_ML
     profiles:
-      - ml
+      - programming
     networks:
       - t3_proxy
     # ports:
@@ -27,7 +27,7 @@ services:
       tinyauth.apps.whisperapi.config.domain: "whisperapi.$DOMAINNAME"
       tinyauth.apps.whisperapi.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: "ML"
+      homepage.group: "Programming"
       homepage.name: "Whisper API"
       homepage.icon: "whisper.svg"
       homepage.href: "https://whisperapi.$DOMAINNAME"

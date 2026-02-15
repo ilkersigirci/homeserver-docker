@@ -2,9 +2,9 @@ services:
   hyperdx:
     image: docker.hyperdx.io/hyperdx/hyperdx-all-in-one
     container_name: hyperdx
-    restart: $RESTART_POLICY_OTHERS
+    restart: $RESTART_POLICY_PROGRAMMING
     profiles:
-      - others
+      - programming
     networks:
       - t3_proxy
     expose:
@@ -33,7 +33,7 @@ services:
       tinyauth.apps.hyperdx.config.domain: "hyperdx.$DOMAINNAME"
       tinyauth.apps.hyperdx.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: "Others"
+      homepage.group: "Programming"
       homepage.name: "hyperdx"
       homepage.icon: "hyperdx.png"
       homepage.href: "https://hyperdx.$DOMAINNAME"

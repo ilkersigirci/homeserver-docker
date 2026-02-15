@@ -1,15 +1,16 @@
 # NOTE: After the specified version, Minio Admin UI isn't available anymore.
 # NOTE: For OIDC, in pocketid -> users -> custom claims -> Add key=policy value=consoleAdmin
 #       Don't add Callback URLs in PocketID, they are added automatically by minio MINIO_BROWSER_REDIRECT_URL.
-#       OIDC doesn't work when ui is in the subpath, the callback url is wrong with two backslashes, https://minio.$DOMAINNAME/ui//oauth_callback
+#       OIDC doesn't work when ui is in a subpath.
 services:
   minio:
-    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    # image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    image: minio/minio:RELEASE.2025-04-22T22-12-26Z-cpuv1 # NOTE: For Proxmox VM
     container_name: minio
-    restart: $RESTART_POLICY_MAINTENANCE
+    restart: $RESTART_POLICY_PROGRAMMING
     command: server /data --console-address ":9001"
     profiles:
-      - maintenance
+      - programming
     networks:
       - t3_proxy
     expose:
@@ -22,7 +23,7 @@ services:
     environment:
       MINIO_ROOT_USER: $MINIO_ROOT_USER
       MINIO_ROOT_PASSWORD: $MINIO_ROOT_PASSWORD
-      MINIO_BROWSER_REDIRECT_URL: https://minio.$DOMAINNAME/ui/
+      MINIO_BROWSER_REDIRECT_URL: https://minio-ui.$DOMAINNAME
       MINIO_IDENTITY_OPENID_DISPLAY_NAME: Login with PocketID
       MINIO_IDENTITY_OPENID_CONFIG_URL: https://pocketid.$BASE_DOMAINNAME/.well-known/openid-configuration
       MINIO_IDENTITY_OPENID_CLIENT_ID: $MINIO_CLIENT_ID
@@ -52,23 +53,19 @@ services:
       ### Web UI Labels ###
       ## HTTP Routers
       traefik.http.routers.minio-ui-rtr.entrypoints: "websecure"
-      traefik.http.routers.minio-ui-rtr.rule: "Host(`minio.$DOMAINNAME`) && PathPrefix(`/ui/`)"
-      ## Middlewares
-      traefik.http.routers.minio-ui-rtr.middlewares: "minio-stripprefix@docker"
+      traefik.http.routers.minio-ui-rtr.rule: "Host(`minio-ui.$DOMAINNAME`)"
       ## HTTP Services
       traefik.http.routers.minio-ui-rtr.service: "minio-ui-svc"
       traefik.http.services.minio-ui-svc.loadbalancer.server.port: "9001"
-      ## Path rewriting middleware
-      traefik.http.middlewares.minio-stripprefix.stripprefix.prefixes: "/ui/"
       ####### HOMEPAGE #######
-      homepage.group: "Maintenance"
+      homepage.group: "Programming"
       homepage.name: "minio"
       homepage.icon: "minio.png"
-      homepage.href: "https://minio.$DOMAINNAME/ui/"
+      homepage.href: "https://minio-ui.$DOMAINNAME"
       homepage.target: "_blank"
-      homepage.description: "MinIO is a high-performance, S3 compatible object store, open sourced under GNU AGPLv3 license."
+      homepage.description: "MinIO is a high-performance, S3 compatible object store"
       ####### GLANCE #######
       glance.name: "minio"
       glance.icon: "sh:minio"
-      glance.url: "https://minio.$DOMAINNAME/ui/"
-      glance.description: "MinIO is a high-performance, S3 compatible object store, open sourced under GNU AGPLv3 license."
+      glance.url: "https://minio-ui.$DOMAINNAME"
+      glance.description: "MinIO is a high-performance, S3 compatible object store"

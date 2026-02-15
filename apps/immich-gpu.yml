@@ -5,7 +5,8 @@ services:
     image: ghcr.io/immich-app/immich-machine-learning:release-cuda
     restart: $RESTART_POLICY_MEDIA
     profiles:
-      - photo
+      - media
+      - immich
     networks:
       - t3_proxy
     ports:

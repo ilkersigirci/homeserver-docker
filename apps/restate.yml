@@ -3,9 +3,9 @@ services:
   restate:
     image: ghcr.io/restatedev/restate:latest
     container_name: restate
-    restart: $RESTART_POLICY_OTHERS
+    restart: $RESTART_POLICY_PROGRAMMING
     profiles:
-      - others
+      - programming
     networks:
       - t3_proxy
     expose:
@@ -40,7 +40,7 @@ services:
       tinyauth.apps.restate.config.domain: "restate.$DOMAINNAME"
       tinyauth.apps.restate.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: "Others"
+      homepage.group: "Programming"
       homepage.name: "restate"
       homepage.icon: "restate.png"
       homepage.href: "https://restate.$DOMAINNAME"

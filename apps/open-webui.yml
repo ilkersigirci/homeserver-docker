@@ -52,14 +52,14 @@ services:
       tinyauth.apps.open-webui.config.domain: "chat.$DOMAINNAME"
       tinyauth.apps.open-webui.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: "ML"
+      homepage.group: "Programming"
       homepage.name: "Open WebUI"
       homepage.icon: "open-webui-light.webp"
       homepage.href: "https://chat.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Selfhosted Chatgpt like App"
     profiles:
-      - ml
+      - programming
 
   # NOTE: Change ENABLE_OAUTH_SIGNUP: true for the first run
   open-webui-betus:
@@ -100,7 +100,7 @@ services:
       tinyauth.apps.open-webui-betus.config.domain: "betuschat.$DOMAINNAME"
       tinyauth.apps.open-webui-betus.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: "ML"
+      homepage.group: "Programming"
       homepage.name: "Open WebUI"
       homepage.icon: "open-webui-light.webp"
       homepage.href: "https://betuschat.$DOMAINNAME"

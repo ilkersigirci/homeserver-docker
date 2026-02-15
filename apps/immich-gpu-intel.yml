@@ -9,7 +9,8 @@ services:
     devices:
       - /dev/dri:/dev/dri
     profiles:
-      - photos
+      - media
+      - immich
     networks:
       - t3_proxy
     ports:
