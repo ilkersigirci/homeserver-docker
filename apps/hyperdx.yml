@@ -1,0 +1,46 @@
+services:
+  hyperdx:
+    image: docker.hyperdx.io/hyperdx/hyperdx-all-in-one
+    container_name: hyperdx
+    restart: $RESTART_POLICY_OTHERS
+    profiles:
+      - others
+    networks:
+      - t3_proxy
+    expose:
+      - 4317 # OpenTelemetry gRPC
+      - 4318 # OpenTelemetry HTTP
+      - 8080 # HyperDX UI
+    security_opt:
+      - no-new-privileges:true
+    # volumes:
+    #   - $REPO_PATH/data/hyperdx:/data/
+    environment:
+      USAGE_STATS_ENABLEDD: false
+      HYPERDX_APP_URL: https://hyperdx.$DOMAINNAME
+      FRONTEND_URL: https://hyperdx.$DOMAINNAME
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.hyperdx-rtr.entrypoints: "websecure"
+      traefik.http.routers.hyperdx-rtr.rule: "Host(`hyperdx.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.hyperdx-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.hyperdx-rtr.service: "hyperdx-svc"
+      traefik.http.services.hyperdx-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.hyperdx.config.domain: "hyperdx.$DOMAINNAME"
+      tinyauth.apps.hyperdx.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "Others"
+      homepage.name: "hyperdx"
+      homepage.icon: "hyperdx.png"
+      homepage.href: "https://hyperdx.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Observability platform for OTel using Clickhouse"
+      ####### GLANCE #######
+      glance.name: "hyperdx"
+      glance.icon: "sh:hyperdx"
+      glance.url: "https://hyperdx.$DOMAINNAME"
+      glance.description: "Observability platform for OTel using Clickhouse"
