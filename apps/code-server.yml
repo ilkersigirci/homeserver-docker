@@ -2,9 +2,9 @@ services:
   code-server:
     image: lscr.io/linuxserver/code-server
     container_name: code-server
-    restart: $RESTART_POLICY_MAINTENANCE
+    restart: $RESTART_POLICY_PROGRAMMING
     profiles:
-      - maintenance
+      - programming
     networks:
       - t3_proxy
     volumes:
@@ -37,7 +37,7 @@ services:
       tinyauth.apps.code-server.config.domain: "code.$DOMAINNAME"
       tinyauth.apps.code-server.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: "Maintenance"
+      homepage.group: "Programming"
       homepage.name: "Vscode"
       homepage.icon: "vscode.svg"
       homepage.href: "https://code.$DOMAINNAME"

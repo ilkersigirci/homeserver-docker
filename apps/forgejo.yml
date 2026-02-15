@@ -2,9 +2,9 @@ services:
   forgejo-db:
     image: postgres:16.4
     container_name: forgejo-db
-    restart: $RESTART_POLICY_MAINTENANCE
+    restart: $RESTART_POLICY_PROGRAMMING
     profiles:
-      - maintenance
+      - programming
       - forgejo
     environment:
       PGDATA: /pgdata
@@ -33,12 +33,12 @@ services:
     cpus: "1.5"
     mem_reservation: "512M"
     mem_limit: "2G"
-    restart: $RESTART_POLICY_MAINTENANCE
+    restart: $RESTART_POLICY_PROGRAMMING
     depends_on:
       forgejo-db:
         condition: service_healthy
     profiles:
-      - maintenance
+      - programming
       - forgejo
     networks:
       - t3_proxy
@@ -76,7 +76,7 @@ services:
       tinyauth.apps.forgejo.config.domain: "git.$DOMAINNAME"
       tinyauth.apps.forgejo.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: "Maintenance"
+      homepage.group: "Programming"
       homepage.name: "forgejo"
       homepage.icon: "forgejo.png"
       homepage.href: "https://git.$DOMAINNAME"

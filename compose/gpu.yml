@@ -50,16 +50,10 @@ include:
   # - ../apps/firefox.yml
   # - ../apps/gimp.yml
   # - ../apps/thunderbird.yml # TODO
-  #### MACHINE LEARNING ####
-  # - ../apps/open-webui.yml
   ###### MAINTENANCE ####
-  # - ../apps/code-server.yml
-  # - ../apps/docker-gc.yml
   # - ../apps/dozzle.yml
-  - ../apps/forgejo.yml
-  - ../apps/healthchecks.yml
+  # - ../apps/healthchecks.yml
   - ../apps/loggifly.yml
-  # - ../apps/pgadmin.yml # TODO
   # - ../apps/rustic.yml
   # - ../apps/syncthing.yml
   - ../apps/termix.yml
@@ -82,9 +76,6 @@ include:
   # - ../apps/yamtrack.yml
   # - ../apps/ytptube.yml # TODO: restart always
   - ../apps/transmission.yml
-  #### ML ####
-  # - ../apps/sd-next.yml
-  # - ../apps/langfuse.yml # TODO
   #### MONITORING ####
   - ../apps/beszel.yml
   - ../apps/beszel-agent.yml
@@ -94,9 +85,12 @@ include:
   # - ../apps/immich-gpu.yml
   - ../apps/immich.yml
   #### PROGRAMMING ####
+  - ../apps/forgejo.yml
   - ../apps/hatchet.yml
   # - ../apps/homeserver-api.yml # TODO
+  - ../apps/langfuse.yml
   - ../apps/minio.yml
+  # - ../apps/pgadmin.yml # TODO
   #### READING ####
   - ../apps/linkwarden.yml
   # - ../apps/obsidian.yml

@@ -49,7 +49,7 @@ include:
   # - ../apps/thunderbird.yml # TODO
   # - ../apps/vscodium.yml
   # - ../apps/webtop.yml
-  #### PHOTO ####
+  #### MEDIA ####
   - ../apps/immich-gpu.yml
 
 

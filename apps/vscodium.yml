@@ -2,9 +2,10 @@ services:
   vscodium:
     image: lscr.io/linuxserver/vscodium:latest
     container_name: vscodium
-    restart: $RESTART_POLICY_MAINTENANCE
+    restart: $RESTART_POLICY_PROGRAMMING
     profiles:
-      - maintenance
+      - programming
+      - desktop_apps
     security_opt:
       - no-new-privileges:true
     # NOTE: Required for keyring functionality.
@@ -40,7 +41,7 @@ services:
       tinyauth.apps.vscodium.config.domain: "code.$DOMAINNAME"
       tinyauth.apps.vscodium.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: "Maintenance"
+      homepage.group: "Programming"
       homepage.name: "VSCodium"
       homepage.icon: "vscode.svg"
       homepage.href: "https://code.$DOMAINNAME"

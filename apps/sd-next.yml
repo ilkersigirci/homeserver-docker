@@ -2,7 +2,7 @@ services:
   sd-next:
     container_name: sd-next
     image: vladmandic/sdnext-cuda:latest
-    restart: $RESTART_POLICY_ML
+    restart: $RESTART_POLICY_PROGRAMMING
     profiles:
       - programming
     networks:

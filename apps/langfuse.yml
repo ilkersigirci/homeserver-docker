@@ -1,21 +1,97 @@
 # NOTE: Don't forget to create a bucket named "langfuse" in Minio.
+
 services:
+  # NOTE: Create related dirs
+  ## sudo mkdir -p $REPO_PATH/data/langfuse/clickhouse/data
+  ## sudo mkdir -p $REPO_PATH/data/langfuse/clickhouse/logs
+  ## sudo chown -R 101:101 $REPO_PATH/data/langfuse/clickhouse
+  langfuse-clickhouse:
+    image: clickhouse/clickhouse-server
+    container_name: langfuse-clickhouse
+    restart: $RESTART_POLICY_PROGRAMMING
+    user: "101:101"
+    profiles:
+      - programming
+      - langfuse
+    environment:
+      CLICKHOUSE_DB: default
+      CLICKHOUSE_USER: $LANGFUSE_CLICKHOUSE_USER
+      CLICKHOUSE_PASSWORD: $LANGFUSE_CLICKHOUSE_PASSWORD
+    volumes:
+      - $REPO_PATH/data/langfuse/clickhouse/data:/var/lib/clickhouse
+      - $REPO_PATH/data/langfuse/clickhouse/logs:/var/log/clickhouse-server
+    networks:
+      - t3_proxy
+    expose:
+      - 8123
+      - 9000
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:8123/ping || exit 1
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 1s
+
+  langfuse-db:
+    image: postgres:16.4
+    container_name: langfuse-db
+    restart: $RESTART_POLICY_PROGRAMMING
+    profiles:
+      - programming
+      - langfuse
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+      PGDATA: /pgdata
+    networks:
+      - t3_proxy
+    expose:
+      - 5432
+    volumes:
+      - $REPO_PATH/data/langfuse/langfuse-db:/pgdata
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+
+  langfuse-redis:
+    image: redis:7
+    container_name: langfuse-redis
+    restart: $RESTART_POLICY_PROGRAMMING
+    command: >
+      --requirepass $LANGFUSE_REDIS_PASSWORD
+    profiles:
+      - programming
+      - langfuse
+    networks:
+      - t3_proxy
+    expose:
+      - 6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 10s
+      retries: 10
+
   langfuse-worker:
-    image: docker.io/langfuse/langfuse-worker:3
+    image: langfuse/langfuse-worker:3
     container_name: langfuse-worker
-    restart: ${OTHERS_RESTART_POLICY:-unless-stopped}
+    restart: $RESTART_POLICY_PROGRAMMING
     depends_on: &langfuse-depends-on
-      langfuse-db:
-        condition: service_healthy
-      # minio:
-      #   condition: service_healthy
-      langfuse-redis:
-        condition: service_healthy
       langfuse-clickhouse:
         condition: service_healthy
+      langfuse-db:
+        condition: service_healthy
+      langfuse-redis:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
     profiles:
+      - programming
       - langfuse
-      - ml
     networks:
       - t3_proxy
     expose:
@@ -68,13 +144,13 @@ services:
       SMTP_CONNECTION_URL: ${SMTP_CONNECTION_URL:-}
 
   langfuse-web:
-    image: docker.io/langfuse/langfuse:3
+    image: langfuse/langfuse:3
     container_name: langfuse-web
-    restart: ${OTHERS_RESTART_POLICY:-unless-stopped}
+    restart: $RESTART_POLICY_PROGRAMMING
     depends_on: *langfuse-depends-on
     profiles:
+      - programming
       - langfuse
-      - ml
     networks:
       - t3_proxy
     environment:
@@ -115,99 +191,3 @@ services:
       glance.icon: "sh:langfuse"
       glance.url: "https://langfuse.$DOMAINNAME"
       glance.description: "LLM engineering platform: LLM Observability, metrics, evals, prompt management, playground, datasets"
-
-  # NOTE: Create related dirs
-  ## sudo mkdir -p $REPO_PATH/data/langfuse/clickhouse/data
-  ## sudo mkdir -p $REPO_PATH/data/langfuse/clickhouse/logs
-  ## sudo chown -R 101:101 $REPO_PATH/data/langfuse/clickhouse
-  langfuse-clickhouse:
-    image: docker.io/clickhouse/clickhouse-server
-    container_name: langfuse-clickhouse
-    restart: ${OTHERS_RESTART_POLICY:-unless-stopped}
-    user: "101:101"
-    profiles:
-      - langfuse
-      - ml
-    environment:
-      CLICKHOUSE_DB: default
-      CLICKHOUSE_USER: $LANGFUSE_CLICKHOUSE_USER
-      CLICKHOUSE_PASSWORD: $LANGFUSE_CLICKHOUSE_PASSWORD
-    volumes:
-      - $REPO_PATH/data/langfuse/clickhouse/data:/var/lib/clickhouse
-      - $REPO_PATH/data/langfuse/clickhouse/logs:/var/log/clickhouse-server
-    networks:
-      - t3_proxy
-    expose:
-      - 8123
-      - 9000
-    healthcheck:
-      test: wget --no-verbose --tries=1 --spider http://localhost:8123/ping || exit 1
-      interval: 5s
-      timeout: 5s
-      retries: 10
-      start_period: 1s
-
-  # NOTE: Not necessary to deploy this since we have already a central minio container.
-  # minio:
-  #   image: docker.io/minio/minio
-  #   restart: always
-  #   entrypoint: sh
-  #   # create the 'langfuse' bucket before starting the service
-  #   command: -c 'mkdir -p /data/langfuse && minio server --address ":9000" --console-address ":9001" /data'
-  #   environment:
-  #     MINIO_ROOT_USER: minio
-  #     MINIO_ROOT_PASSWORD: miniosecret # CHANGEME
-  #   ports:
-  #     - 9090:9000
-  #     - 127.0.0.1:9091:9001
-  #   volumes:
-  #     - langfuse_minio_data:/data
-  #   healthcheck:
-  #     test: ["CMD", "mc", "ready", "local"]
-  #     interval: 1s
-  #     timeout: 5s
-  #     retries: 5
-  #     start_period: 1s
-
-  langfuse-redis:
-    image: docker.io/redis:7
-    container_name: langfuse-redis
-    restart: ${OTHERS_RESTART_POLICY:-unless-stopped}
-    command: >
-      --requirepass $LANGFUSE_REDIS_PASSWORD
-    profiles:
-      - langfuse
-      - ml
-    networks:
-      - t3_proxy
-    expose:
-      - 6379
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 3s
-      timeout: 10s
-      retries: 10
-
-  langfuse-db:
-    image: docker.io/postgres:16.4
-    container_name: langfuse-db
-    restart: ${OTHERS_RESTART_POLICY:-unless-stopped}
-    profiles:
-      - langfuse
-      - ml
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
-      PGDATA: /pgdata
-    networks:
-      - t3_proxy
-    expose:
-      - 5432
-    volumes:
-      - $REPO_PATH/data/langfuse/langfuse-db:/pgdata
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
