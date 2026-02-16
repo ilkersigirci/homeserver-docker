@@ -76,9 +76,5 @@ include:
   #### PROGRAMMING ####
   - ../apps/open-webui.yml
   - ../apps/searxng.yml
-  #### READING ####
-  # - ../apps/obsidian.yml
-  # - ../apps/silverbullet.yml
-  # - ../apps/quartz.yml
   #### OTHERS ####
   # - ../apps/enclosed.yml

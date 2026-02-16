@@ -4,6 +4,8 @@ services:
     image: lscr.io/linuxserver/ungoogled-chromium:latest
     restart: $RESTART_POLICY_DESKTOP_IMAGES
     shm_size: "1gb"
+    profiles:
+      - desktop_apps
     networks:
       - t3_proxy
     security_opt:
@@ -13,6 +15,11 @@ services:
       PGID: $PGID
       TZ: $TZ
       TITLE: chromium
+      PIXELFLUX_WAYLAND: true
+      # DRI_NODE: /dev/dri/renderD128 # NOTE: Don't set this. It breaks HW.
+      DISABLE_ZINK: true
+      DISABLE_IPV6: true
+      DISABLE_DRI3: true
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -33,13 +40,23 @@ services:
       homepage.href: "https://chromium.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Ungoogled Chromium Browser"
-    # devices:
-    #   - /dev/dri:/dev/dri #optional
     healthcheck:
       test: ["CMD-SHELL", "curl --fail -s http://localhost:3000 || exit 1"]
       start_period: 15s
       interval: 1m
       timeout: 5s
       retries: 3
-    profiles:
-      - desktop_apps
+    # For Nvidia Zero Copy Rendering
+    group_add:
+      # - "44" # video
+      - "992" # render
+    devices:
+      # - /dev/dri:/dev/dri
+      - /dev/dri/renderD128:/dev/dri/renderD128
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [compute,video,graphics,utility]
