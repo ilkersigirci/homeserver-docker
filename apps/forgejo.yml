@@ -23,13 +23,45 @@ services:
       timeout: 5s
       retries: 3
 
+  # forgejo-dind:
+  #   image: docker:29.1.4-dind
+  #   container_name: forgejo-dind
+  #   privileged: true
+  #   restart: $RESTART_POLICY_PROGRAMMING
+  #   profiles:
+  #     - programming
+  #     - forgejo
+  #   networks:
+  #     - t3_proxy
+  #   command: ["dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false"]
 
-  # NOTE: Create `forgejo/gitea` and `forgejo/conf` dirs with current user beforehand.
-  # NOTE: Configuration is located in: forgejo/gitea/custom/conf/app.ini
+  # forgejo-runner:
+  #   image: code.forgejo.org/forgejo/runner:latest
+  #   container_name: forgejo-runner
+  #   user: $PUID:$PGUID
+  #   restart: $RESTART_POLICY_PROGRAMMING
+  #   command: '/bin/sh -c "while : ; do sleep 1 ; done ;"'
+  #   # command: '/bin/sh -c "sleep 5; forgejo-runner daemon --config /config.yaml"'
+  #   depends_on:
+  #     forgejo-dind:
+  #       condition: service_started
+  #   profiles:
+  #     - programming
+  #     - forgejo
+  #   networks:
+  #     - t3_proxy
+  #   environment:
+  #     DOCKER_HOST: tcp://forgejo-dind:2375
+  #   volumes:
+  #     - $REPO_PATH/data/forgejo/runner/data:/data
+  #     - $REPO_PATH/configs/forgejo/runner/config.yaml:/config.yaml
+
+  # NOTE: Create `$REPO_PATH/data/forgejo/gitea` and `$REPO_PATH/data/forgejo/conf` dirs with current user beforehand.
+  # NOTE: Configuration is located in: $REPO_PATH/data/forgejo/gitea/custom/conf/app.ini
   forgejo:
-    image: codeberg.org/forgejo/forgejo:13-rootless
+    image: codeberg.org/forgejo/forgejo:14-rootless
     container_name: forgejo
-    user: 1000:1000
+    user: $PUID:$PGID
     cpus: "1.5"
     mem_reservation: "512M"
     mem_limit: "2G"
@@ -49,11 +81,10 @@ services:
     volumes:
       - $REPO_PATH/data/forgejo/gitea:/var/lib/gitea
       - $REPO_PATH/data/forgejo/conf:/etc/gitea
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
     environment:
       USER_UID: $PUID
       USER_GID: $PGID
+      TZ: $TZ
       FORGEJO__server__ROOT_URL: https://git.$DOMAINNAME
       FORGEJO__server__DOMAIN: git.$DOMAINNAME
       FORGEJO__server__SSH_DOMAIN: git.$DOMAINNAME
