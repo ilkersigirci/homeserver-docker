@@ -79,7 +79,7 @@
           - type: group
             widgets:
             - type: rss
-              title: T/habermha
+              title: T/mhahabertg
               # style: detailed-list
               limit: 30
               collapse-after: 5
