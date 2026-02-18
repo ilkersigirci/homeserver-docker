@@ -25,6 +25,7 @@ services:
 
   # forgejo-dind:
   #   image: docker:29.1.4-dind
+  #   # image: docker:dind
   #   container_name: forgejo-dind
   #   privileged: true
   #   restart: $RESTART_POLICY_PROGRAMMING
@@ -36,7 +37,7 @@ services:
   #   command: ["dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false"]
 
   # forgejo-runner:
-  #   image: code.forgejo.org/forgejo/runner:latest
+  #   image: code.forgejo.org/forgejo/runner:12
   #   container_name: forgejo-runner
   #   user: $PUID:$PGUID
   #   restart: $RESTART_POLICY_PROGRAMMING
