@@ -9,6 +9,7 @@ secrets
 # Configs
 acme.json
 configs/*
+configs/glance/docs
 !configs/copyparty/copyparty.conf
 !configs/filebrowser
 !configs/frigate/config.yml
@@ -22,4 +23,4 @@ configs/*
 !configs/rybbit
 !configs/strava-statistics
 !configs/traefik3
-configs/glance/docs
+!configs/forgejo
