@@ -1,6 +1,7 @@
 networks:
   forgejo_ci:
     internal: true
+  forgejo_dind_egress:
 
 services:
   forgejo-db:
@@ -36,6 +37,7 @@ services:
       - programming
       - forgejo
     networks:
+      - forgejo_dind_egress
       - forgejo_ci
     command: ["dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false"]
     healthcheck:
