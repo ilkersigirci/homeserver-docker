@@ -1,0 +1,30 @@
+http:
+  middlewares:
+    pocket-id-cors:
+      headers:
+        accessControlAllowMethods:
+          - GET
+          - POST
+          - OPTIONS
+        accessControlAllowHeaders:
+          - Accept
+          - Accept-Language
+          - Content-Language
+          - Content-Type
+          - Authorization
+          - Origin
+          - Cache-Control
+          - Pragma
+          - X-Requested-With
+        accessControlExposeHeaders:
+          - Content-Length
+          - Content-Type
+        accessControlAllowOriginList:
+          - "https://api.{{env "DOMAINNAME"}}"
+        accessControlAllowCredentials: true
+        accessControlMaxAge: 86400
+        addVaryHeader: true
+        hostsProxyHeaders:
+          - "X-Forwarded-Host"
+        customRequestHeaders:
+          X-Forwarded-Proto: https

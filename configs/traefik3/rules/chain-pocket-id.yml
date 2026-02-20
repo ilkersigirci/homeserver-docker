@@ -1,0 +1,7 @@
+http:
+  middlewares:
+    chain-pocket-id:
+      chain:
+        middlewares:
+          - chain-no-auth
+          - pocket-id-cors

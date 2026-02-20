@@ -20,8 +20,8 @@ http:
       rule: "Host(`api.{{env "DOMAINNAME"}}`)"
       entryPoints:
         - websecure
-      middlewares:
-        - chain-no-auth-relaxed
+      # middlewares:
+      #   - chain-no-auth-relaxed
       service: gpu-api-svc
 
   services:

@@ -21,7 +21,7 @@ http:
       entryPoints:
         - websecure
       middlewares:
-        - chain-no-auth
+        - chain-pocket-id
       service: pocket-id-svc
 
     jellyfin-redirect-rtr:
