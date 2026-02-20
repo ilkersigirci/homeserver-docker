@@ -16,6 +16,14 @@ http:
         - chain-no-auth
       service: bambustudio-svc
 
+    gpu-api-rtr:
+      rule: "Host(`api.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: gpu-api-svc
+
   services:
     obsidian-svc:
       loadBalancer:
@@ -25,3 +33,7 @@ http:
       loadBalancer:
         servers:
           - url: http://192.168.2.19:3003
+    gpu-api-svc:
+      loadBalancer:
+        servers:
+          - url: http://192.168.2.21:8000
