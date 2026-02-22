@@ -166,6 +166,7 @@ container:
   # Only takes effect if "network" is set to "".
   enable_ipv6: false
   # Whether to use privileged mode or not when launching task containers (privileged mode is required for Docker-in-Docker).
+  # NOTE: Also for QEMU action to work, it is necessary to set privileged to true
   privileged: false
   # And other options to be used when the container is started (eg, --volume /etc/ssl/certs:/etc/ssl/certs:ro).
   options:
