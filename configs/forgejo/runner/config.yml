@@ -58,6 +58,7 @@ runner:
     - ubuntu-24.04:docker://ghcr.io/catthehacker/ubuntu:runner-24.04
     - ubuntu-22.04:docker://ghcr.io/catthehacker/ubuntu:runner-22.04
     - ubuntu-20.04:docker://ghcr.io/catthehacker/ubuntu:runner-20.04
+    - debian-trixie:docker://node:24-trixie
 
 cache:
   #
