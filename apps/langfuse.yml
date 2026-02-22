@@ -87,8 +87,8 @@ services:
         condition: service_healthy
       langfuse-redis:
         condition: service_healthy
-      minio:
-        condition: service_healthy
+      # minio:
+      #   condition: service_healthy
     profiles:
       - programming
       - langfuse

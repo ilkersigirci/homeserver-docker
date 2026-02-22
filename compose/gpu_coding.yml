@@ -1,0 +1,48 @@
+name: gpu_coding
+
+networks:
+  default:
+    driver: bridge
+  t3_proxy:
+    name: t3_proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.90.0/24
+  socket_proxy:
+    name: socket_proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.91.0/24
+  dockervlan:
+    name: dockervlan
+    driver: macvlan
+    driver_opts:
+      parent: enp18s0
+    ipam:
+      config:
+        - subnet: "192.168.1.0/24"
+          ip_range: "192.168.1.19/32"
+          gateway: "192.168.1.1"
+
+########################### SECRETS
+# secrets:
+#   cf_dns_api_token:
+#     file: $REPO_PATH/secrets/cf_dns_api_token
+
+include:
+  ########################### SERVICES
+  #### CORE ####
+  - ../apps/arcane-agent-gpu.yml
+  - ../apps/homepage.yml
+  - ../apps/socket-proxy.yml
+  - ../apps/tinyauth.yml
+  - ../apps/traefik.yml
+  #### PROGRAMMING ####
+  - ../apps/forgejo.yml
+  - ../apps/forgejo-runner.yml
+  - ../apps/hatchet.yml
+  - ../apps/langfuse.yml
+  - ../apps/minio.yml
+  # - ../apps/pgadmin.yml # TODO

@@ -84,14 +84,6 @@ include:
   #### PHOTO ####
   # - ../apps/immich-gpu.yml
   - ../apps/immich.yml
-  #### PROGRAMMING ####
-  - ../apps/forgejo.yml
-  - ../apps/forgejo-runner.yml
-  - ../apps/hatchet.yml
-  # - ../apps/homeserver-api.yml # TODO
-  - ../apps/langfuse.yml
-  - ../apps/minio.yml
-  # - ../apps/pgadmin.yml # TODO
   #### READING ####
   - ../apps/linkwarden.yml
   # - ../apps/obsidian.yml

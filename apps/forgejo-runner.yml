@@ -16,7 +16,7 @@ services:
       - forgejo_dind_egress
       - forgejo_ci
     volumes:
-      - $FORGEJO_DIND_PATH:/var/lib/docker
+      - $REPO_PATH/data/forgejo/dind:/var/lib/docker
     command: ["dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false"]
     healthcheck:
       test: ["CMD-SHELL", "docker -H tcp://127.0.0.1:2375 info > /dev/null 2>&1"]
