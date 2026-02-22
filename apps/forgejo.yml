@@ -28,53 +28,6 @@ services:
       timeout: 5s
       retries: 3
 
-  forgejo-dind:
-    image: docker:29-dind
-    container_name: forgejo-dind
-    privileged: true
-    restart: $RESTART_POLICY_PROGRAMMING
-    profiles:
-      - programming
-      - forgejo
-    networks:
-      - forgejo_dind_egress
-      - forgejo_ci
-    volumes:
-      - $REPO_PATH/data/forgejo/dind:/var/lib/docker
-    command: ["dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false"]
-    healthcheck:
-      test: ["CMD-SHELL", "docker -H tcp://127.0.0.1:2375 info > /dev/null 2>&1"]
-      interval: 10s
-      timeout: 5s
-      retries: 6
-      start_period: 15s
-
-  # NOTE: Create `$REPO_PATH/data/forgejo/runner` dir with current user beforehand.
-  # NOTE: First run without the daemon command to initialize the runner, then use the daemon command one.
-  forgejo-runner:
-    image: code.forgejo.org/forgejo/runner:12
-    container_name: forgejo-runner
-    user: $PUID:$PGID
-    restart: $RESTART_POLICY_PROGRAMMING
-    # command: '/bin/sh -c "while : ; do sleep 1 ; done ;"'
-    command: '/bin/sh -c "sleep 5; forgejo-runner daemon --config /config.yml"'
-    security_opt:
-      - no-new-privileges:true
-    depends_on:
-      forgejo-dind:
-        condition: service_healthy
-    profiles:
-      - programming
-      - forgejo
-    networks:
-      - t3_proxy
-      - forgejo_ci
-    environment:
-      DOCKER_HOST: tcp://forgejo-dind:2375
-    volumes:
-      - $REPO_PATH/data/forgejo/runner:/data
-      - $REPO_PATH/configs/forgejo/runner/config.yml:/config.yml
-
   # NOTE: Create `$REPO_PATH/data/forgejo/gitea` and `$REPO_PATH/data/forgejo/conf` dirs with current user beforehand.
   # NOTE: Configuration is located in: $REPO_PATH/data/forgejo/gitea/custom/conf/app.ini
   forgejo:
@@ -88,8 +41,8 @@ services:
     depends_on:
       forgejo-db:
         condition: service_healthy
-      forgejo-runner:
-        condition: service_started
+      # forgejo-runner:
+      #   condition: service_started
     profiles:
       - programming
       - forgejo

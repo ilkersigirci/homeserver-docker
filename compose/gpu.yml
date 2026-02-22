@@ -86,6 +86,7 @@ include:
   - ../apps/immich.yml
   #### PROGRAMMING ####
   - ../apps/forgejo.yml
+  - ../apps/forgejo-runner.yml
   - ../apps/hatchet.yml
   # - ../apps/homeserver-api.yml # TODO
   - ../apps/langfuse.yml
