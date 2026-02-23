@@ -44,7 +44,7 @@ services:
       - programming
       - forgejo
     networks:
-      - t3_proxy
+      - forgejo_dind_egress
       - forgejo_ci
     environment:
       DOCKER_HOST: tcp://forgejo-dind:2375
