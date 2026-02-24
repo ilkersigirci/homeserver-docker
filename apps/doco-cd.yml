@@ -25,6 +25,12 @@ services:
       WEBHOOK_SECRET: $DOCO_CD_WEBHOOK_SECRET
       # APPRISE_API_URL: $GOTIFY_DOCO_CD_APPRISE_URL
       APPRISE_NOTIFY_LEVEL: "success"
+    healthcheck:
+      test: [ "CMD", "/doco-cd", "healthcheck" ]
+      start_period: 15s
+      interval: 30s
+      timeout: 5s
+      retries: 3
     labels:
       traefik.enable: "true"
       ## HTTP Routers
