@@ -1,7 +1,9 @@
 networks:
   forgejo_ci:
+    name: forgejo_ci
     internal: true
-  forgejo_dind_egress: 
+  forgejo_dind_egress:
+    name: forgejo_dind_egress
  
 services:
   forgejo-dind:
