@@ -1,3 +1,4 @@
+# NOTE: For docker-config auth: echo -n "username:password" | base64
 services:
   doco-cd:
     image: ghcr.io/kimdre/doco-cd:0.67.1
@@ -16,7 +17,7 @@ services:
     volumes:
       - $REPO_PATH/data/doco-cd:/data
       ## Optional: To pull from your private Forgejo registry
-      # - $REPO_PATH/configs/doco-cd/docker-config.json:/root/.docker/config.json:ro
+      - $REPO_PATH/configs/doco-cd/docker-config.json:/root/.docker/config.json:ro
     environment:
       TZ: $TZ
       LOG_LEVEL: INFO
