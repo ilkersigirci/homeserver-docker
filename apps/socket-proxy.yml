@@ -49,5 +49,3 @@ services:
       TASKS: 0
       VERSION: 1
       VOLUMES: 1 # For Arcane
-    labels:
-      komodo.skip: "" # Prevents from stopping with StopAllContainers on Komodo

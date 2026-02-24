@@ -38,5 +38,3 @@ services:
       glance.name: "crowdsec"
       glance.icon: "sh:crowdsec"
       glance.description: "Open-source & collaborative security IPS"
-      ######## KOMODO ########
-      komodo.skip: "" # Prevents from stopping with StopAllContainers on Komodo

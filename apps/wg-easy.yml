@@ -65,8 +65,6 @@ services:
       # homepage.widget.username: "yourwgusername" # required for v15 and above
       homepage.widget.password: "DUMMY"
       homepage.widget.threshold: "2"
-      ######## KOMODO ########
-      komodo.skip: "" # Prevents from stopping with StopAllContainers on Komodo
 
 
   # To get WG_DEVICE, run this inside the container: ip route get 8.8.8.8 | awk '{print $5}'. Default is eth0.
@@ -125,8 +123,6 @@ services:
       homepage.href: "https://wg-no-host.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "The easiest way to run WireGuard VPN and UI"
-      ###### KOMODO ########
-      komodo.skip: "" # Prevents from stopping with StopAllContainers on Komodo
 
   wg-easy:
     image: ghcr.io/wg-easy/wg-easy:development
@@ -181,5 +177,3 @@ services:
       homepage.href: "https://wireguard.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "The easiest way to run WireGuard VPN and UI"
-      ###### KOMODO ########
-      komodo.skip: "" # Prevents from stopping with StopAllContainers on Komodo

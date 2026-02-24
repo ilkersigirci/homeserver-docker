@@ -173,5 +173,3 @@ services:
       glance.icon: "sh:traefik"
       glance.url: "https://traefik.$DOMAINNAME"
       glance.description: "Reverse Proxy Manager"
-      ######## KOMODO ########
-      komodo.skip: "" # Prevents from stopping with StopAllContainers on Komodo

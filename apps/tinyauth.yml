@@ -62,5 +62,3 @@ services:
       glance.icon: "sh:tinyauth"
       glance.url: "https://tinyauth.$DOMAINNAME"
       glance.description: "The simplest way to protect your apps with a login screen"
-      ######## KOMODO ########
-      komodo.skip: "" # Prevents from stopping with StopAllContainers on Komodo

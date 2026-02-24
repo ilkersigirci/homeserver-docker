@@ -38,5 +38,3 @@ services:
       homepage.href: "https://wireguard.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Simple dashboard for WireGuard VPN written in Python & Vue.js"
-      ###### KOMODO ########
-      komodo.skip: "" # Prevents from stopping with StopAllContainers on Komodo
