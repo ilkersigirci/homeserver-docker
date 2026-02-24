@@ -40,6 +40,7 @@ include:
   - ../apps/tinyauth.yml
   - ../apps/traefik.yml
   #### PROGRAMMING ####
+  - ../apps/doco-cd.yml
   - ../apps/forgejo.yml
   - ../apps/forgejo-runner.yml
   - ../apps/hatchet.yml
