@@ -47,6 +47,11 @@
             height: 1000
 
           - type: iframe
+            title: Coding
+            source: https://homepage.coding.${BASE_DOMAINNAME}
+            height: 1000
+
+          - type: iframe
             title: RPI1
             source: https://homepage.rpi1.${BASE_DOMAINNAME}
             height: 1000
