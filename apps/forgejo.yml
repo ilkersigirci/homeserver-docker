@@ -72,6 +72,7 @@ services:
       FORGEJO__service__REQUIRE_SIGNIN_VIEW: true
       FORGEJO__service__ALLOW_ONLY_EXTERNAL_REGISTRATION: true
       FORGEJO__webhook__ALLOWED_HOST_LIST: doco-cd.$DOMAINNAME
+      FORGEJO__cron.cleanup_packages__SCHEDULE: "@every 6h"
       
     labels:
       traefik.enable: "true"
