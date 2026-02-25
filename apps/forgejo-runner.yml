@@ -30,7 +30,7 @@ services:
       start_period: 15s
 
   forgejo-dind-gc:
-    image: clockworksoul/docker-gc-cron:latest
+    image: docker:29-cli
     container_name: forgejo-dind-gc
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
@@ -46,12 +46,25 @@ services:
     environment:
       TZ: $TZ
       DOCKER_HOST: tcp://forgejo-dind:2375
-      CRON: 0 0 */6 * * *
-      FORCE_IMAGE_REMOVAL: 1
-      FORCE_CONTAINER_REMOVAL: 1
-      GRACE_PERIOD_SECONDS: 172800 # 2 days
-      DRY_RUN: 1
-      CLEAN_UP_VOLUMES: 1
+      GC_INTERVAL_SECONDS: 21600 # 6 hours
+      GC_UNTIL: 48h
+      GC_DRY_RUN: 1
+    command:
+      - /bin/sh
+      - -ec
+      - |
+        echo "forgejo-dind-gc: pruning every $${GC_INTERVAL_SECONDS}s (until=$${GC_UNTIL})"
+        while true; do
+          if [ "$${GC_DRY_RUN}" = "1" ]; then
+            echo "forgejo-dind-gc: dry-run enabled; showing current usage only"
+            docker system df -v || true
+            docker builder du || true
+          else
+            docker system prune -af --volumes --filter "until=$${GC_UNTIL}" || true
+            docker builder prune -af --filter "until=$${GC_UNTIL}" || true
+          fi
+          sleep "$${GC_INTERVAL_SECONDS}"
+        done
 
   # NOTE: Create `$REPO_PATH/data/forgejo/runner` dir with current user beforehand.
   # NOTE: First run without the daemon command to initialize the runner, then use the daemon command one.
