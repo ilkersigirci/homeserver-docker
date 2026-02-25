@@ -1,5 +1,4 @@
 appdata
-data
 logs
 secrets
 .idea
@@ -24,3 +23,7 @@ configs/glance/docs
 !configs/strava-statistics
 !configs/traefik3
 !configs/forgejo
+
+# Data
+data/*
+!data/forgejo

@@ -6,6 +6,7 @@ services:
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
       - programming
+      - forgejo
     networks:
       - t3_proxy
       - socket_proxy
