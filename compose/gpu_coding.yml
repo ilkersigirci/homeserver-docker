@@ -47,4 +47,3 @@ include:
   - ../apps/langfuse.yml
   - ../apps/minio.yml
   # - ../apps/pgadmin.yml # TODO
-  - ../apps/rustfs.yml
