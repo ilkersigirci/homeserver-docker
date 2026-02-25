@@ -17,6 +17,8 @@ services:
     networks:
       - forgejo_dind_egress
       - forgejo_ci
+    environment:
+      DOCKER_TLS_CERTDIR: ""
     volumes:
       - $REPO_PATH/data/forgejo/dind:/var/lib/docker
     command: ["dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false"]
@@ -26,6 +28,30 @@ services:
       timeout: 5s
       retries: 6
       start_period: 15s
+
+  forgejo-dind-gc:
+    image: clockworksoul/docker-gc-cron:latest
+    container_name: forgejo-dind-gc
+    restart: $RESTART_POLICY_PROGRAMMING
+    profiles:
+      - programming
+      - forgejo
+    depends_on:
+      forgejo-dind:
+        condition: service_healthy
+    networks:
+      - forgejo_ci
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      TZ: $TZ
+      DOCKER_HOST: tcp://forgejo-dind:2375
+      CRON: 0 0 */6 * * *
+      FORCE_IMAGE_REMOVAL: 1
+      FORCE_CONTAINER_REMOVAL: 1
+      GRACE_PERIOD_SECONDS: 172800 # 2 days
+      DRY_RUN: 1
+      CLEAN_UP_VOLUMES: 1
 
   # NOTE: Create `$REPO_PATH/data/forgejo/runner` dir with current user beforehand.
   # NOTE: First run without the daemon command to initialize the runner, then use the daemon command one.
@@ -50,6 +76,7 @@ services:
       - forgejo_ci
     environment:
       DOCKER_HOST: tcp://forgejo-dind:2375
+      DOCKER_BUILDKIT: 1
     volumes:
       - $REPO_PATH/data/forgejo/runner:/data
       - $REPO_PATH/configs/forgejo/runner/config.yml:/config.yml

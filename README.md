@@ -42,3 +42,15 @@ Name=Start Docker Apps
 Comment[en_US]=
 Comment=
 ```
+
+Docker Daemon Json Example
+```json title="/etc/docker/daemon.json"
+{
+  "storage-driver": "overlay2",
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "10m",
+    "max-file": "3"
+  }
+}
+```
