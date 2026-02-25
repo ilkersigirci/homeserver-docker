@@ -66,7 +66,6 @@ services:
           sleep "$${GC_INTERVAL_SECONDS}"
         done
 
-  # NOTE: Create `$REPO_PATH/data/forgejo/runner` dir with current user beforehand.
   # NOTE: First run without the daemon command to initialize the runner, then use the daemon command one.
   # NOTE: docker exec -it forgejo-runner /bin/sh -c "forgejo-runner register"
   forgejo-runner:
