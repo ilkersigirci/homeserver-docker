@@ -5,7 +5,8 @@ services:
     container_name: rustfs-volume-permission-helper
     restart: "no"
     profiles:
-      - programming
+      # - programming
+      - not-used
     networks:
       - t3_proxy
     volumes:
