@@ -1,0 +1,97 @@
+services:
+  # RustFS volume permissions fixer service
+  rustfs-volume-permission-helper:
+    image: alpine
+    container_name: rustfs-volume-permission-helper
+    restart: "no"
+    profiles:
+      - programming
+    networks:
+      - t3_proxy
+    volumes:
+      - $REPO_PATH/data/rustfs/data_0:/data0
+      - $REPO_PATH/data/rustfs/data_1:/data1
+      - $REPO_PATH/data/rustfs/data_2:/data2
+      - $REPO_PATH/data/rustfs/data_3:/data3
+      - $REPO_PATH/logs/rustfs:/logs
+    command: >
+      sh -c "
+        chown -R 10001:10001 /data0 /data1 /data2 /data3 /logs &&
+        echo 'Volume Permissions fixed' &&
+        exit 0
+      "
+
+  rustfs:
+    image: rustfs/rustfs:latest
+    container_name: rustfs
+    restart: $RESTART_POLICY_PROGRAMMING
+    profiles:
+      - programming
+    networks:
+      - t3_proxy
+    expose:
+      - 9000 # API
+      - 9001 # Web UI
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $REPO_PATH/data/rustfs/data_0:/data/rustfs0
+      - $REPO_PATH/data/rustfs/data_1:/data/rustfs1
+      - $REPO_PATH/data/rustfs/data_2:/data/rustfs2
+      - $REPO_PATH/data/rustfs/data_3:/data/rustfs3
+      - $REPO_PATH/logs/rustfs:/app/logs
+    environment:
+      RUSTFS_ADDRESS: 0.0.0.0:9000
+      RUSTFS_CONSOLE_ADDRESS: 0.0.0.0:9001
+      RUSTFS_CONSOLE_ENABLE: true
+      RUSTFS_ACCESS_KEY: $RUSTFS_ACCESS_KEY
+      RUSTFS_SECRET_KEY: $RUSTFS_SECRET_KEY
+      RUSTFS_VOLUMES: /data/rustfs{0...3}
+      RUSTFS_OBS_LOGGER_LEVEL: info
+      # RUSTFS_OBS_ENDPOINT: http://otel-collector:4318
+      # Object Cache
+      RUSTFS_OBJECT_CACHE_ENABLE: true
+      RUSTFS_OBJECT_CACHE_TTL_SECS: 300
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "sh", "-c",
+          "curl -f http://127.0.0.1:9000/health && curl -f http://127.0.0.1:9001/rustfs/console/health"
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.rustfs-rtr.entrypoints: "websecure"
+      traefik.http.routers.rustfs-rtr.rule: "Host(`rustfs.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.rustfs-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.rustfs-rtr.service: "rustfs-svc"
+      traefik.http.services.rustfs-svc.loadbalancer.server.port: "9000"
+      ####### TINYAUTH #######
+      tinyauth.apps.rustfs.config.domain: "rustfs.$DOMAINNAME"
+      tinyauth.apps.rustfs.ip.bypass: "$LOCAL_IPS"
+      ### Web UI Labels ###
+      ## HTTP Routers
+      traefik.http.routers.rustfs-ui-rtr.entrypoints: "websecure"
+      traefik.http.routers.rustfs-ui-rtr.rule: "Host(`rustfs-ui.$DOMAINNAME`)"
+      ## HTTP Services
+      traefik.http.routers.rustfs-ui-rtr.service: "rustfs-ui-svc"
+      traefik.http.services.rustfs-ui-svc.loadbalancer.server.port: "9001" 
+      ####### HOMEPAGE #######
+      homepage.group: "Programming"
+      homepage.name: "rustfs"
+      homepage.icon: "rustfs.png"
+      homepage.href: "https://rustfs-ui.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "S3-compatible high-performance object storage system written in Rust"
+      ####### GLANCE #######
+      glance.name: "rustfs"
+      glance.icon: "sh:rustfs"
+      glance.url: "https://rustfs-ui.$DOMAINNAME"
+      glance.description: "S3-compatible high-performance object storage system written in Rust"
