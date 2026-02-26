@@ -24,7 +24,7 @@ services:
       extra_params: "--o:ssl.enable=false"
       aliasgroup1: "https://.*:443"
 
-  # NOTE: In settings Enable: Force SSL
+  # NOTE: In settings Enable: Force SSL, Transfer, MCP
   # NOTE: Selfhosted Version: v0.6.20260226
   # NOTE: Enterprise Version: v0.6.20260105
   filestash:
@@ -43,6 +43,7 @@ services:
       - $REPO_PATH/configs/filestash/filestash.bin:/app/filestash
     environment:
       APPLICATION_URL: filestash.$DOMAINNAME
+      ADMIN_CONSOLE: $FILESTASH_ADMIN_PASSWORD_BCRYPT
       CANARY: false
       # OFFICE_URL: http://filestash-wopi-server:9980
       # OFFICE_FILESTASH_URL: http://app:8334
