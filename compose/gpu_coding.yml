@@ -35,6 +35,7 @@ include:
   ########################### SERVICES
   #### CORE ####
   - ../apps/arcane-agent-gpu.yml
+  - ../apps/filestash.yml
   - ../apps/homepage.yml
   - ../apps/socket-proxy.yml
   - ../apps/tinyauth.yml

@@ -26,3 +26,4 @@ configs/glance/docs
 
 # Data
 data/*
+!data/filestash
