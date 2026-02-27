@@ -1,0 +1,40 @@
+{
+    "groups": {
+        "group:admin": [
+            "ilker@"
+        ]
+    },
+    "tagOwners": {},
+    "hosts": {},
+    "acls": [
+        {
+            "#ha-meta": {
+                "name": "",
+                "open": true
+            },
+            "action": "accept",
+            "src": [
+                "*"
+            ],
+            "dst": [
+                "*:*"
+            ]
+        }
+    ],
+    "ssh": [
+        {
+            "action": "accept",
+            "src": [
+                "group:admin"
+            ],
+            "dst": [
+                "autogroup:member"
+            ],
+            "users": [
+                "ilker",
+                "ubuntu",
+                "root"
+            ]
+        }
+    ]
+}
