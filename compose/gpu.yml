@@ -56,7 +56,7 @@ include:
   - ../apps/loggifly.yml
   # - ../apps/rustic.yml
   # - ../apps/syncthing.yml
-  - ../apps/termix.yml
+  # - ../apps/termix.yml
   # - ../apps/uptime-kuma.yml
   - ../apps/whoami.yml
   # - ../apps/watchtower.yml
