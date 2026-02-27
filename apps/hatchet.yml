@@ -26,9 +26,9 @@ services:
       retries: 3
       start_period: 10s
 
-  hatchet-lite:
-    image: ghcr.io/hatchet-dev/hatchet/hatchet-lite:latest
-    container_name: hatchet-lite
+  hatchet:
+    image: ghcr.io/hatchet-dev/hatchet/hatchet-lite:v0.79.11
+    container_name: hatchet
     restart: $RESTART_POLICY_PROGRAMMING
     depends_on:
       hatchet-db:
@@ -44,7 +44,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $REPO_PATH/configs/hatchet-lite:/config
+      - $REPO_PATH/configs/hatchet:/config
     environment:
       # Refer to https://docs.hatchet.run/self-hosting/configuration-options
       # for a list of all supported environment variables
@@ -63,13 +63,13 @@ services:
     labels:
       traefik.enable: "true"
       ## HTTP Routers
-      traefik.http.routers.hatchet-lite-rtr.entrypoints: "websecure"
-      traefik.http.routers.hatchet-lite-rtr.rule: "Host(`hatchet.$DOMAINNAME`)"
+      traefik.http.routers.hatchet-rtr.entrypoints: "websecure"
+      traefik.http.routers.hatchet-rtr.rule: "Host(`hatchet.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.hatchet-lite-rtr.middlewares: "chain-tinyauth-relaxed@file" # NOTE: For task input loading
+      traefik.http.routers.hatchet-rtr.middlewares: "chain-tinyauth-relaxed@file" # NOTE: For task input loading
       ## HTTP Services
-      traefik.http.routers.hatchet-lite-rtr.service: "hatchet-lite-svc"
-      traefik.http.services.hatchet-lite-svc.loadbalancer.server.port: "8888"
+      traefik.http.routers.hatchet-rtr.service: "hatchet-svc"
+      traefik.http.services.hatchet-svc.loadbalancer.server.port: "8888"
       ## gRPC Router (RPC)
       traefik.http.routers.hatchet-rpc-rtr.entrypoints: "websecure"
       traefik.http.routers.hatchet-rpc-rtr.rule: "Host(`hatchet-rpc.$DOMAINNAME`)"
@@ -79,17 +79,17 @@ services:
       traefik.http.services.hatchet-rpc-svc.loadbalancer.server.port: "7077"
       traefik.http.services.hatchet-rpc-svc.loadbalancer.server.scheme: "h2c"
       ####### TINYAUTH #######
-      tinyauth.apps.hatchet-lite.config.domain: "hatchet.$DOMAINNAME"
-      tinyauth.apps.hatchet-lite.ip.bypass: "$LOCAL_IPS"
+      tinyauth.apps.hatchet.config.domain: "hatchet.$DOMAINNAME"
+      tinyauth.apps.hatchet.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Programming"
-      homepage.name: "hatchet-lite"
+      homepage.name: "hatchet"
       homepage.icon: "hatchet.png"
       homepage.href: "https://hatchet.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Run Background Tasks at Scale"
       ####### GLANCE #######
-      glance.name: "hatchet-lite"
+      glance.name: "hatchet"
       glance.icon: "sh:hatchet"
       glance.url: "https://hatchet.$DOMAINNAME"
       glance.description: "Run Background Tasks at Scale"
