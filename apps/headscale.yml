@@ -78,7 +78,6 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $REPO_PATH/configs/headplane/config.yaml:/etc/headplane/config.yaml
       - $REPO_PATH/data/headplane:/var/lib/headplane
       ## Headscale related
       - $REPO_PATH/configs/headscale/config.yaml:/etc/headscale/config.yaml:ro
