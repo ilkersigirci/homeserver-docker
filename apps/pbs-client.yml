@@ -1,0 +1,49 @@
+# NOTE: .env.example https://github.com/Aterfax/pbs-client-docker/blob/main/docker-compose/.env.example
+services:
+  pbs-client:
+    image: aterfax/pbs-client:latest
+    container_name: pbs-client
+    hostname: pbs-client-$DOMAINNAME
+    restart: $RESTART_POLICY_MAINTENANCE
+    profiles:
+      - maintenance
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /run:exec
+    volumes:
+      - type: tmpfs
+        target: /tmp
+        tmpfs:
+          size: 1073741824
+      - ./pbsconfig/:/root/.config/proxmox-backup/
+      # Note - if you want to restore backups make sure to change to read write below.
+      # See the 'restore-backup' command inside the container.
+      - ./backups/test1:/backups/test1:ro
+      - ./backups/test2:/backups/test2:ro
+      - ./backups/test3:/backups/test3:ro
+    environment:
+      TZ: $TZ
+      PBS_ENDPOINT: pbs.home.$BASE_DOMAINNAME
+      PBS_DATASTORE: FILL_IT
+      PBS_ENCRYPTION_PASSWORD: FILL_IT
+      CRON_SCHEDULE: 0 */4 * * *
+      UNENCRYPTED: 0
+      # If you want to skip backup on startup, set CRON_BACKUP_ONLY=1
+      CRON_BACKUP_ONLY: 0
+      PBS_API_KEY_NAME: username@pam!test
+      PBS_API_KEY_SECRET: FILL_IT
+      # PBS_BACKUP_CMD_APPEND_EXTRA_OPTS: --include-dev
+      # PBS_RESTORE_CMD_APPEND_EXTRA_OPTS: --include-dev
+    labels:
+      ####### HOMEPAGE #######
+      homepage.group: "Maintenance"
+      homepage.name: "pbs-client"
+      homepage.icon: "pbs-client.png"
+      homepage.description: "Proxmox Backup Client"
+      ####### GLANCE #######
+      glance.name: "pbs-client"
+      glance.icon: "sh:pbs-client"
+      glance.description: "Proxmox Backup Client"
