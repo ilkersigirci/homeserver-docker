@@ -1,0 +1,70 @@
+services:
+  oxicloud-db:
+    image: postgres:18.2-alpine3.23
+    container_name: oxicloud-db
+    restart: $RESTART_POLICY_MEDIA
+    profiles:
+      - media
+      - oxicloud
+    environment:
+      PGDATA: /pgdata
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: oxicloud
+    networks:
+      - t3_proxy
+    expose:
+      - "5432"
+    volumes:
+      - $REPO_PATH/data/oxicloud/db:/pgdata
+      - $REPO_PATH/configs/oxicloud/db/schema.sql:/docker-entrypoint-initdb.d/10-schema.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  oxicloud:
+    image: diocrafts/oxicloud:latest
+    container_name: oxicloud
+    restart: $RESTART_POLICY_MEDIA
+    depends_on:
+      oxicloud-db:
+        condition: service_healthy
+    profiles:
+      - media
+      - oxicloud
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $REPO_PATH/data/oxicloud:/app/storage
+    # TODO: https://github.com/DioCrafts/OxiCloud/blob/main/example.env
+    environment:
+      TZ: $TZ
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.oxicloud-rtr.entrypoints: "websecure"
+      traefik.http.routers.oxicloud-rtr.rule: "Host(`oxicloud.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.oxicloud-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.oxicloud-rtr.service: "oxicloud-svc"
+      traefik.http.services.oxicloud-svc.loadbalancer.server.port: "8086"
+      ####### TINYAUTH #######
+      tinyauth.apps.oxicloud.config.domain: "oxicloud.$DOMAINNAME"
+      tinyauth.apps.oxicloud.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "group"
+      homepage.name: "oxicloud"
+      homepage.icon: "oxicloud.png"
+      homepage.href: "https://oxicloud.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Rust Based Cloud storage your files, photos, calendars & contacts"
+      ####### GLANCE #######
+      glance.name: "oxicloud"
+      glance.icon: "sh:oxicloud"
+      glance.url: "https://oxicloud.$DOMAINNAME"
+      glance.description: "Rust Based Cloud storage your files, photos, calendars & contacts"

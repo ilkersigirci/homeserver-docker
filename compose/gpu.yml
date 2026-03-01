@@ -67,6 +67,7 @@ include:
   - ../apps/jellyseerr.yml
   - ../apps/kiwix-serve.yml
   # - ../apps/openarchiver.yml
+  # - ../apps/oxicloud.yml
   - ../apps/pinchflat.yml
   # - ../apps/prowlarr.yml
   - ../apps/sabnzbd.yml
