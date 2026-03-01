@@ -38,7 +38,8 @@ include:
   - ../apps/arcane-agent.yml
   - ../apps/adguardhome.yml
   - ../apps/crowdsec.yml
-  - ../apps/copyparty.yml
+  # - ../apps/copyparty.yml
+  # - ../apps/filestash.yml
   - ../apps/gotify.yml
   - ../apps/headscale.yml
   - ../apps/homepage.yml
@@ -46,19 +47,15 @@ include:
   - ../apps/socket-proxy.yml
   - ../apps/tinyauth.yml
   - ../apps/traefik.yml
-  # - ../apps/vaultwarden.yml
   #### DESKTOP APPS ####
   # - ../apps/firefox.yml
   ###### MAINTENANCE ####
   - ../apps/bentopdf.yml
-  # - ../apps/code-server.yml
   - ../apps/convertx.yml
-  # - ../apps/dozzle.yml
   - ../apps/gatus.yml
   - ../apps/it-tools.yml
   - ../apps/omni-tools.yml
   - ../apps/syncthing.yml
-  # - ../apps/uptime-kuma.yml
   - ../apps/whoami.yml
   - ../apps/withoutbg.yml
   #### MEDIA ####
@@ -69,12 +66,9 @@ include:
   - ../apps/nzbdav.yml
   - ../apps/stremio.yml
   # - ../apps/transmission.yml
-  - ../apps/zipline.yml
   #### MONITORING ####
   - ../apps/beszel-agent.yml
   - ../apps/rybbit.yml
   #### PROGRAMMING ####
   - ../apps/open-webui.yml
   - ../apps/searxng.yml
-  #### OTHERS ####
-  # - ../apps/enclosed.yml

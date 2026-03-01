@@ -24,7 +24,6 @@ services:
       extra_params: "--o:ssl.enable=false"
       aliasgroup1: "https://.*:443"
 
-  # NOTE: In settings Enable: Force SSL, Transfer, MCP
   # NOTE: Selfhosted Version: v0.6.20260226
   # NOTE: Enterprise Version: v0.6.20260105
   filestash:
