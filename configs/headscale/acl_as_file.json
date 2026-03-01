@@ -25,10 +25,13 @@
         {
             "action": "accept",
             "src": [
-                "group:admin"
+                "autogroup:member"
+                //"group:admin"
             ],
             "dst": [
-                "autogroup:member"
+                "autogroup:self"
+                //"autogroup:member",
+                //"autogroup:tagged",
             ],
             "users": [
                 "ilker",
