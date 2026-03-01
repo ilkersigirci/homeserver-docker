@@ -1,3 +1,4 @@
+# NOTE: Developer says %70 of the code is vibe coded
 services:
   oxicloud-db:
     image: postgres:18.2-alpine3.23
