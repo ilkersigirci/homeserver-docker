@@ -78,6 +78,7 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
+      - $REPO_PATH/configs/headplane/config.example.yml:/etc/headplane/config.yaml:ro
       - $REPO_PATH/data/headplane:/var/lib/headplane
       ## Headscale related
       - $REPO_PATH/configs/headscale/config.yaml:/etc/headscale/config.yaml:ro
@@ -86,8 +87,6 @@ services:
       # match the headscale.dns_records_path in your config.yaml
       # - $REPO_PATH/configs/headscale/dns_records.json:/etc/headscale/dns_records.json
     environment:
-      # CONFIG OVERRIDES
-      HEADPLANE_LOAD_ENV_OVERRIDES: true
       ## SERVER
       HEADPLANE_SERVER__HOST: 0.0.0.0
       HEADPLANE_SERVER__PORT: 3000
