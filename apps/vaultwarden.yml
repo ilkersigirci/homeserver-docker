@@ -20,7 +20,7 @@ services:
       DATA_FOLDER: data
       DOMAIN: https://vaultwarden.$DOMAINNAME
       TRASH_AUTO_DELETE_DAYS: 30
-      SIGNUPS_ALLOWED: true
+      SIGNUPS_ALLOWED: false
       SIGNUPS_VERIFY: false
       SIGNUPS_DOMAINS_WHITELIST: $BASE_DOMAINNAME
       EMAIL_CHANGE_ALLOWED: false
@@ -30,7 +30,7 @@ services:
       SMTP_DEBUG: false
       ## OIDC
       SSO_ENABLED: true
-      SSO_ONLY: true
+      SSO_ONLY: false
       SSO_SIGNUPS_MATCH_EMAIL: true
       SSO_ALLOW_UNKNOWN_EMAIL_VERIFICATION: false
       SSO_AUTHORITY: https://pocketid.$BASE_DOMAINNAME
