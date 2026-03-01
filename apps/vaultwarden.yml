@@ -20,13 +20,26 @@ services:
       DATA_FOLDER: data
       DOMAIN: https://vaultwarden.$DOMAINNAME
       TRASH_AUTO_DELETE_DAYS: 30
-      SIGNUPS_ALLOWED: false
+      SIGNUPS_ALLOWED: true
       SIGNUPS_VERIFY: false
       SIGNUPS_DOMAINS_WHITELIST: $BASE_DOMAINNAME
       EMAIL_CHANGE_ALLOWED: false
       REQUIRE_DEVICE_EMAIL: false
       LOG_LEVEL: info
+      # LOG_LEVEL: info,vaultwarden::sso=debug
       SMTP_DEBUG: false
+      ## OIDC
+      SSO_ENABLED: true
+      SSO_ONLY: true
+      SSO_SIGNUPS_MATCH_EMAIL: true
+      SSO_ALLOW_UNKNOWN_EMAIL_VERIFICATION: false
+      SSO_AUTHORITY: https://pocketid.$BASE_DOMAINNAME
+      SSO_SCOPES: openid profile email
+      SSO_PKCE: true
+      SSO_CLIENT_ID: $VAULTWARDEN_CLIENT_ID
+      SSO_CLIENT_SECRET: $VAULTWARDEN_CLIENT_SECRET
+      SSO_CLIENT_CACHE_EXPIRATION: 0
+      SSO_DEBUG_TOKENS: false
     labels:
       traefik.enable: "true"
       ## HTTP Routers
