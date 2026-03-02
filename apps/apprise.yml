@@ -1,0 +1,45 @@
+# NOTE: By default, bind volume user is 1000.
+services:
+  apprise:
+    image: caronc/apprise:latest
+    container_name: apprise
+    restart: $RESTART_POLICY_MAINTENANCE
+    profiles:
+      - maintenance
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $REPO_PATH/data/apprise:/config
+    environment:
+      BASE_URL: https://apprise.$DOMAINNAME
+      LOG_LEVEL: INFO
+      DEBUG: no
+      APPRISE_CONFIG_DIR: /config
+      # SECRET_KEY: $APPRISE_SECRET_KEY
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.apprise-rtr.entrypoints: "websecure"
+      traefik.http.routers.apprise-rtr.rule: "Host(`apprise.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.apprise-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.apprise-rtr.service: "apprise-svc"
+      traefik.http.services.apprise-svc.loadbalancer.server.port: "8000"
+      ####### TINYAUTH #######
+      tinyauth.apps.apprise.config.domain: "apprise.$DOMAINNAME"
+      tinyauth.apps.apprise.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "Maintenance"
+      homepage.name: "apprise"
+      homepage.icon: "apprise.png"
+      homepage.href: "https://apprise.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "description"
+      ####### GLANCE #######
+      glance.name: "apprise"
+      glance.icon: "sh:apprise"
+      glance.url: "https://apprise.$DOMAINNAME"
+      glance.description: "description"

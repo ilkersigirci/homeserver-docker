@@ -44,6 +44,7 @@ include:
   - ../apps/traefik.yml
   - ../apps/vaultwarden.yml
   ###### MAINTENANCE ####
+  - ../apps/apprise.yml
   - ../apps/home-assistant.yml
   - ../apps/syncthing.yml
   - ../apps/watchyourlan.yml
