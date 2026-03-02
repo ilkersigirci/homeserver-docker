@@ -37,9 +37,9 @@ services:
       homepage.icon: "apprise.png"
       homepage.href: "https://apprise.$DOMAINNAME"
       homepage.target: "_blank"
-      homepage.description: "description"
+      homepage.description: "Push Notifications that work with just about every platform!"
       ####### GLANCE #######
       glance.name: "apprise"
       glance.icon: "sh:apprise"
       glance.url: "https://apprise.$DOMAINNAME"
-      glance.description: "description"
+      glance.description: "Push Notifications that work with just about every platform!"

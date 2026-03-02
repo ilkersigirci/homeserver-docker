@@ -25,7 +25,7 @@ services:
       DOCKER_HOST: tcp://docker-socket-proxy:2375
       GIT_ACCESS_TOKEN: $FORGEJO_REPO_READ_TOKEN
       WEBHOOK_SECRET: $DOCO_CD_WEBHOOK_SECRET
-      # APPRISE_API_URL: $GOTIFY_DOCO_CD_APPRISE_URL
+      APPRISE_API_URL: https://apprise.home.$BASE_DOMAINNAME
       APPRISE_NOTIFY_LEVEL: "success"
     healthcheck:
       test: [ "CMD", "/doco-cd", "healthcheck" ]
