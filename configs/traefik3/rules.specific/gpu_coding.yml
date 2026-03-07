@@ -1,0 +1,15 @@
+http:
+  routers:
+    t3code-rtr:
+      rule: "Host(`t3code.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth
+      service: t3code-svc
+
+  services:
+    t3code-svc:
+      loadBalancer:
+        servers:
+          - url: "http://{{env "LOCAL_STATIC_IP"}}:3773"
