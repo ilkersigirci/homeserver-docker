@@ -8,8 +8,34 @@ http:
         - chain-no-auth
       service: t3code-svc
 
+    homeserver-api-rtr:
+      rule: "Host(`api.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: homeserver-api-svc
+
+    homeserver-api-ui-rtr:
+      rule: "Host(`api-ui.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      # middlewares:
+      #   - chain-no-auth-relaxed
+      service: homeserver-api-ui-svc
+
   services:
     t3code-svc:
       loadBalancer:
         servers:
           - url: "http://{{env "LOCAL_STATIC_IP"}}:3773"
+
+    homeserver-api-svc:
+      loadBalancer:
+        servers:
+          - url: "http://{{env "LOCAL_STATIC_IP"}}:8000"
+
+    homeserver-api-ui-svc:
+      loadBalancer:
+        servers:
+          - url: "http://{{env "LOCAL_STATIC_IP"}}:5002"
