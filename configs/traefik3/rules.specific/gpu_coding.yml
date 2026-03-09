@@ -9,7 +9,7 @@ http:
       service: t3code-svc
 
     homeserver-api-rtr:
-      rule: "Host(`api.{{env "DOMAINNAME"}}`)"
+      rule: "Host(`api-backend.{{env "DOMAINNAME"}}`)"
       entryPoints:
         - websecure
       middlewares:
@@ -17,11 +17,11 @@ http:
       service: homeserver-api-svc
 
     homeserver-api-ui-rtr:
-      rule: "Host(`api-ui.{{env "DOMAINNAME"}}`)"
+      rule: "Host(`api.{{env "DOMAINNAME"}}`)"
       entryPoints:
         - websecure
-      # middlewares:
-      #   - chain-no-auth-relaxed
+      middlewares:
+        - chain-no-auth-relaxed
       service: homeserver-api-ui-svc
 
   services:
