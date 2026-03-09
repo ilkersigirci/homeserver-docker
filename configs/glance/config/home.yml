@@ -39,6 +39,8 @@
               title: selfh.st
             - url: https://samwho.dev/rss.xml
               title: SamWho
+            - url: https://simonwillison.net/atom/everything
+              title: simonw
             - url: https://obsidian.md/changelog.xml
               title: Obsidian Changelog
 
