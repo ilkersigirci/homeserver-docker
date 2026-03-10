@@ -15,24 +15,10 @@
   columns:
     - size: small
       widgets:
-        - type: custom-api
-          title: Random Fact
-          cache: 6h
-          url: https://uselessfacts.jsph.pl/api/v2/facts/random
-          template: |
-            <p class="size-h4 color-paragraph">{{ .JSON.String "text" }}</p>
-
-        - type: to-do
-          title: ToDo
-          id: general
-
-        # - type: to-do
-        #   title: Work ToDo
-        #   id: work
-
         - type: rss
-          limit: 10
-          collapse-after: 3
+          title: Software RSS
+          limit: 20
+          collapse-after: 7
           cache: 12h
           feeds:
             - url: https://selfh.st/rss/
@@ -41,8 +27,10 @@
               title: SamWho
             - url: https://simonwillison.net/atom/everything
               title: simonw
-            - url: https://obsidian.md/changelog.xml
-              title: Obsidian Changelog
+            - url: https://feeds.feedburner.com/ThePragmaticEngineer
+              title: The Pragmatic Engineer
+            # - url: https://obsidian.md/changelog.xml
+            #   title: Obsidian Changelog
 
         - type: bookmarks
           groups:
@@ -136,6 +124,22 @@
 
     - size: small
       widgets:
+        - type: to-do
+          title: ToDo
+          id: general
+
+        # - type: to-do
+        #   title: Work ToDo
+        #   id: work
+
+        - type: custom-api
+          title: Random Fact
+          cache: 6h
+          url: https://uselessfacts.jsph.pl/api/v2/facts/random
+          template: |
+            <p class="size-h4 color-paragraph">{{ .JSON.String "text" }}</p>
+
+
         - type: calendar
           hide-header: true
           first-day-of-week: monday
