@@ -47,4 +47,5 @@ include:
   - ../apps/hatchet.yml
   - ../apps/langfuse.yml
   - ../apps/minio.yml
+  - ../apps/versitygw.yml
   # - ../apps/pgadmin.yml # TODO
