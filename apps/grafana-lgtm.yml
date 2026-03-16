@@ -9,12 +9,18 @@ services:
       - t3_proxy
     expose:
       - 3000 # Grafana
-      - 4317 # gRPC
-      - 4318 # HTTP
+      - 3100 # Loki
+      - 3200 # tempo
+      - 3500 # Pyroscope
+      - 4317 # OTLP/gRPC
+      - 4318 # OTLP/HTTP
+      - 9090 # Prometheus
+      - 9411 # Zipkin
     security_opt:
       - no-new-privileges:true
     volumes:
       ## CONFIGS
+      - $REPO_PATH/configs/grafana-lgtm/grafana/dashboards:/otel-lgtm/grafana/conf/provisioning/dashboards/custom:ro
       # - $REPO_PATH/configs/grafana-lgtm/prometheus.yaml:/otel-lgtm/prometheus.yaml:ro
       # - $REPO_PATH/configs/grafana-lgtm/loki-config.yaml:/otel-lgtm/loki-config.yaml:ro
       # - $REPO_PATH/configs/grafana-lgtm/tempo-config.yaml:/otel-lgtm/tempo-config.yaml:ro
@@ -25,17 +31,28 @@ services:
       - $REPO_PATH/appdata/grafana-lgtm/prometheus:/data/prometheus
       - $REPO_PATH/appdata/grafana-lgtm/loki:/data/loki
     environment:
+      TZ: $TZ
+      ################## GRAFANA CONFIGS ##################
+      ##### NORMAL CONFIGS #####
       GF_DEFAULT_INSTANCE_NAME: $DOMAINNAME
       GF_SERVER_ROOT_URL: https://grafana.$DOMAINNAME
       GF_PATHS_DATA: /data/grafana
       GF_LOG_LEVEL: 'info'
-      # GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /otel-lgtm/grafana/conf/provisioning/dashboards/custom/custom-dashboard.json
-      ## Normal Auth
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /otel-lgtm/grafana/conf/provisioning/dashboards/custom/Traefik-Opentelemetry.json
+      # GF_PANELS_DISABLE_SANITIZE_HTML: true ?
+      # GF_PLUGINS_ENABLE_ALPHA: true ?
+      # GF_ALLOW_EMBEDDING: true ?
+      # GF_grafanaconThemes: true ?
+      # GF_INSTALL_PLUGINS: yesoreyeram-infinity-datasource ?
+      # GF_FEATURE_TOGGLES_ENABLE: provisioning ?
+      ##### AUTH CONFIGS #####
+      ## Normal Auth ##
       # GF_SECURITY_ADMIN_USER: admin
       # GF_SECURITY_ADMIN_PASSWORD: admin
       GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION: true
       GF_USERS_ALLOW_SIGN_UP: false
-      ## OAUTH
+      ## OAUTH ##
+      GF_AUTH_ANONYMOUS_ENABLED: false
       GF_AUTH_BASIC_ENABLED: false
       GF_AUTH_DISABLE_LOGIN_FORM: true
       GF_AUTH_OAUTH_AUTO_LOGIN: true
@@ -50,6 +67,8 @@ services:
       GF_AUTH_GENERIC_OAUTH_API_URL: https://pocketid.$BASE_DOMAINNAME/api/oidc/userinfo
       GF_AUTH_GENERIC_OAUTH_USE_PKCE: true
       GF_AUTH_GENERIC_OAUTH_USE_REFRESH_TOKEN: true
+      ################ OTHER CONFIGS ##################
+      LOKI_ARGS: --pattern-ingester.enabled=true
     labels:
       traefik.enable: "true"
       ## HTTP Routers
