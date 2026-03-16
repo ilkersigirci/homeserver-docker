@@ -13,22 +13,27 @@ services:
       - --global.checkNewVersion=true
       - --global.sendAnonymousUsage=false
       - --entrypoints.web.address=:80
-      - --entrypoints.websecure.address=:443
-      - --entrypoints.dot.address=:853
-      - --entrypoints.traefik.address=:8080
-      # - --entrypoints.ping.address=:8081
-      - --entrypoints.websecure.asDefault=true
-      - --entrypoints.websecure.http.tls=true
       - --entrypoints.web.http.redirections.entrypoint.to=websecure
       - --entrypoints.web.http.redirections.entrypoint.scheme=https
       - --entrypoints.web.http.redirections.entrypoint.permanent=true
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.websecure.asDefault=true
+      - --entrypoints.websecure.http.tls=true
+      - --entrypoints.dot.address=:853
+      - --entrypoints.traefik.address=:8080
       # Allow these IPs to set the X-Forwarded-* headers - Cloudflare IPs: https://www.cloudflare.com/ips/
       - --entrypoints.websecure.forwardedHeaders.trustedIPs=$CLOUDFLARE_IPS,$LOCAL_IPS
       - --api=true
       - --api.dashboard=true
-      - --api.insecure=true
-      #- --ping=true
+      - --api.insecure=false
+      - --ping=true
       # - --serversTransport.insecureSkipVerify=true
+      # TLS defaults for all websecure routers
+      - --entrypoints.websecure.http.tls.options=tls-max@file
+      # Add dns-cloudflare as default certresolver for all services. Also enables TLS and no need to specify on individual services
+      - --entrypoints.websecure.http.tls.certresolver=dns-cloudflare
+      - --entrypoints.websecure.http.tls.domains[0].main=$DOMAINNAME
+      - --entrypoints.websecure.http.tls.domains[0].sans=*.$DOMAINNAME
       - --log=true
       - --log.filePath=/logs/traefik.log
       - --log.level=INFO # (Default: error) DEBUG, INFO, WARN, ERROR, FATAL, PANIC
@@ -36,28 +41,6 @@ services:
       - --log.maxbackups=10 # Max number of old log files to keep
       - --accesslog=true
       - --accesslog.filePath=/logs/access.log
-      ## OTEL / OTLP Export (env-gated; keeps local file logs enabled)
-      - --metrics.otlp=${TRAEFIK_OTEL_ENABLED:-false}
-      - --metrics.otlp.serviceName=${TRAEFIK_OTEL_SERVICE_NAME:-traefik}
-      - --metrics.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-false}
-      - --metrics.otlp.grpc.endpoint=${TRAEFIK_OTEL_GRPC_ENDPOINT:-grafana-lgtm:4317}
-      - --metrics.otlp.grpc.insecure=${TRAEFIK_OTEL_GRPC_INSECURE:-false}
-      # - --tracing.sampleRate=0.1
-      - --tracing=${TRAEFIK_OTEL_ENABLED:-false}
-      - --tracing.serviceName=${TRAEFIK_OTEL_SERVICE_NAME:-traefik}
-      - --tracing.otlp=${TRAEFIK_OTEL_ENABLED:-false}
-      - --tracing.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-false}
-      - --tracing.otlp.grpc.endpoint=${TRAEFIK_OTEL_GRPC_ENDPOINT:-grafana-lgtm:4317}
-      - --tracing.otlp.grpc.insecure=${TRAEFIK_OTEL_GRPC_INSECURE:-false}
-      - --experimental.otlpLogs=true
-      - --log.otlp.serviceName=${TRAEFIK_OTEL_SERVICE_NAME:-traefik}
-      - --log.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-false}
-      - --log.otlp.grpc.endpoint=${TRAEFIK_OTEL_GRPC_ENDPOINT:-grafana-lgtm:4317}
-      - --log.otlp.grpc.insecure=${TRAEFIK_OTEL_GRPC_INSECURE:-false}
-      - --accesslog.otlp.serviceName=${TRAEFIK_OTEL_SERVICE_NAME:-traefik}
-      - --accesslog.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-false}
-      - --accesslog.otlp.grpc.endpoint=${TRAEFIK_OTEL_GRPC_ENDPOINT:-grafana-lgtm:4317}
-      - --accesslog.otlp.grpc.insecure=${TRAEFIK_OTEL_GRPC_INSECURE:-false}
       # - --accesslog.format=json
       - --accesslog.bufferingSize=100 # Configuring a buffer of 100 lines
       - --accesslog.filters.statusCodes=204-299,400-499,500-599
@@ -68,31 +51,38 @@ services:
       # Automatically set Host rule for services
       # - --providers.docker.defaultrule=Host(`{{ index .Labels "com.docker.compose.service" }}.$DOMAINNAME`)
       - --providers.docker.exposedByDefault=false
-      # - --entrypoints.websecure.http.middlewares=chain-oauth@file
-      - --entrypoints.websecure.http.tls.options=tls-max@file
-      # Add dns-cloudflare as default certresolver for all services. Also enables TLS and no need to specify on individual services
-      - --entrypoints.websecure.http.tls.certresolver=dns-cloudflare
-      - --entrypoints.websecure.http.tls.domains[0].main=$DOMAINNAME
-      - --entrypoints.websecure.http.tls.domains[0].sans=*.$DOMAINNAME
-      # - --entrypoints.websecure.http.tls.domains[1].main=$DOMAINNAME1 # Pulls main cert for second domain
-      # - --entrypoints.websecure.http.tls.domains[1].sans=*.$DOMAINNAME1 # Pulls wildcard cert for second domain
       - --providers.docker.network=t3_proxy
       # - --providers.swarm.endpoint=tcp://127.0.0.1:2377 # Traefik v3 Swarm
       - --providers.file.directory=/rules # Load dynamic configuration from one or more .toml or .yml files in a directory
       # - --providers.file.filename=/path/to/file # Load dynamic configuration from a file
       - --providers.file.watch=true # Only works on top level files in the rules folder
-      # - --certificatesResolvers.dns-cloudflare.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory # LetsEncrypt Staging Server - uncomment when testing
       - --certificatesResolvers.dns-cloudflare.acme.email=$CLOUDFLARE_EMAIL
       - --certificatesResolvers.dns-cloudflare.acme.storage=/acme.json
       - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.provider=cloudflare
       - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.resolvers=1.1.1.1:53,1.0.0.1:53
       - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.delayBeforeCheck=90 # To delay DNS check and reduce LE hitrate
-      # - --metrics.prometheus=true
-      # - --metrics.prometheus.buckets=0.1,0.3,1.2,5.0
-      ## Enable Hub communication (open the port 9900 and 9901 by default)
-      # - --experimental.hub=true
-      # - --hub.tls.insecure=true
-      # - --metrics.prometheus.addrouterslabels=true
+      ## OTEL / OTLP Export (env-gated; local file logs stay enabled)
+      - --metrics.otlp=${TRAEFIK_OTEL_ENABLED:-false}
+      - --metrics.otlp.serviceName=${TRAEFIK_OTEL_SERVICE_NAME:-traefik}
+      - --metrics.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-false}
+      - --metrics.otlp.grpc.endpoint=${TRAEFIK_OTEL_GRPC_ENDPOINT:-grafana-lgtm:4317}
+      - --metrics.otlp.grpc.insecure=${TRAEFIK_OTEL_GRPC_INSECURE:-false}
+      - --tracing.sampleRate=1.0
+      - --tracing=${TRAEFIK_OTEL_ENABLED:-false}
+      - --tracing.serviceName=${TRAEFIK_OTEL_SERVICE_NAME:-traefik}
+      - --tracing.otlp=${TRAEFIK_OTEL_ENABLED:-false}
+      - --tracing.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-false}
+      - --tracing.otlp.grpc.endpoint=${TRAEFIK_OTEL_GRPC_ENDPOINT:-grafana-lgtm:4317}
+      - --tracing.otlp.grpc.insecure=${TRAEFIK_OTEL_GRPC_INSECURE:-false}
+      - --experimental.otlpLogs=${TRAEFIK_OTEL_ENABLED:-false}
+      - --log.otlp.serviceName=${TRAEFIK_OTEL_SERVICE_NAME:-traefik}
+      - --log.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-false}
+      - --log.otlp.grpc.endpoint=${TRAEFIK_OTEL_GRPC_ENDPOINT:-grafana-lgtm:4317}
+      - --log.otlp.grpc.insecure=${TRAEFIK_OTEL_GRPC_INSECURE:-false}
+      - --accesslog.otlp.serviceName=${TRAEFIK_OTEL_SERVICE_NAME:-traefik}
+      - --accesslog.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-false}
+      - --accesslog.otlp.grpc.endpoint=${TRAEFIK_OTEL_GRPC_ENDPOINT:-grafana-lgtm:4317}
+      - --accesslog.otlp.grpc.insecure=${TRAEFIK_OTEL_GRPC_INSECURE:-false}
       ## Plugins
       - --experimental.plugins.cf-real-ip.modulename=github.com/fma965/cloudflarewarp
       - --experimental.plugins.cf-real-ip.version=v1.0.0
@@ -102,6 +92,9 @@ services:
       - --experimental.plugins.crowdsec-bouncer.version=v1.2.1
       - --experimental.plugins.webfinger.modulename=github.com/NX211/traefik-webfinger
       - --experimental.plugins.webfinger.version=v0.3.5
+      ## Enable Hub communication (open the port 9900 and 9901 by default)
+      # - --experimental.hub=true
+      # - --hub.tls.insecure=true
     networks:
       t3_proxy:
         ipv4_address: 192.168.90.254 # You can specify a static IP
@@ -111,10 +104,13 @@ services:
     #   - host.docker.internal:172.17.0.1
     security_opt:
       - no-new-privileges:true
-    #healthcheck:
-    #  test: ["CMD", "traefik", "healthcheck", "--ping"]
-    #  interval: 1m
-    #  retries: 3
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+      start_interval: 2s
     ports:
       - target: 80
         published: 80
@@ -142,7 +138,7 @@ services:
       TZ: $TZ
       CF_DNS_API_TOKEN: $CLOUDFLARE_DNS_API_TOKEN
       # CF_DNS_API_TOKEN_FILE: /run/secrets/cf_dns_api_token
-      # Passing custom env variables to the container to be able to use this variables in the rules.
+      ## Passing custom env variables to the container to be able to use this variables in the rules.
       LOCAL_STATIC_IP: $LOCAL_STATIC_IP
       DOMAINNAME: $DOMAINNAME
       BASE_DOMAINNAME: $BASE_DOMAINNAME
@@ -150,7 +146,7 @@ services:
       REMOTE_SERVER_PRIVATE_IP: ${REMOTE_SERVER_PRIVATE_IP:-dummy}
       WEBFINGER_USERNAME: $WEBFINGER_USERNAME
       WEBFINGER_HREF: https://pocketid.$BASE_DOMAINNAME
-      # Shared resource attributes for traces/metrics/logs/access logs (OTEL_RESOURCE_ATTRIBUTES)
+      ## Shared resource attributes for traces/metrics/logs/access logs (OTEL_RESOURCE_ATTRIBUTES)
       OTEL_RESOURCE_ATTRIBUTES: service.namespace=${TRAEFIK_OTEL_SERVICE_NAMESPACE:-edge},service.instance.id=${MY_HOSTNAME:-unknown},service.version=${TRAEFIK_OTEL_SERVICE_VERSION:-3.6},deployment.environment.name=${TRAEFIK_OTEL_DEPLOYMENT_ENVIRONMENT:-production}
     # secrets:
     #   - cf_dns_api_token
@@ -164,8 +160,9 @@ services:
       traefik.http.routers.traefik-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
       # traefik.http.routers.traefik-rtr.service: "api@internal" # NOTE: For api.insecure=false
-      traefik.http.routers.traefik-rtr.service: "traefik-svc"  # NOTE: For api.insecure=true
-      traefik.http.services.traefik-svc.loadbalancer.server.port: "8080" # NOTE: For api.insecure=true
+      traefik.http.routers.traefik-rtr.service: "api@internal"
+      # traefik.http.routers.traefik-rtr.service: "traefik-svc"  # NOTE: For api.insecure=true
+      # traefik.http.services.traefik-svc.loadbalancer.server.port: "8080" # NOTE: For api.insecure=true
       ## Healthcheck/ping
       # - "traefik.http.routers.ping.rule=Host(`traefik.$DOMAINNAME`) && Path(`/ping`)"
       #- "traefik.http.routers.ping.tls=true"
@@ -181,7 +178,8 @@ services:
       homepage.target: "_blank" # _blank: New tab --- _self: Same tab --- _top: New window
       homepage.description: "Reverse Proxy Manager"
       homepage.widget.type: "traefik"
-      homepage.widget.url: "http://traefik:8080" # NOTE: This doesn't work when using api.insecure=false
+      homepage.widget.url: "https://traefik.$DOMAINNAME"
+      # homepage.widget.url: "http://traefik:8080" # NOTE: This doesn't work when using api.insecure=false
       homepage.widget.fields: "routers, services, middleware"
       ####### GLANCE #######
       glance.name: "Traefik"
