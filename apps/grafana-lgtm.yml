@@ -1,0 +1,78 @@
+services:
+  grafana-lgtm:
+    image: grafana/otel-lgtm:0.21.0
+    container_name: grafana-lgtm
+    restart: $RESTART_POLICY_MAINTENANCE
+    profiles:
+      - monitoring
+    networks:
+      - t3_proxy
+    expose:
+      - 3000 # Grafana
+      - 4317 # gRPC
+      - 4318 # HTTP
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      ## CONFIGS
+      # - $REPO_PATH/configs/grafana-lgtm/prometheus.yaml:/otel-lgtm/prometheus.yaml:ro
+      # - $REPO_PATH/configs/grafana-lgtm/loki-config.yaml:/otel-lgtm/loki-config.yaml:ro
+      # - $REPO_PATH/configs/grafana-lgtm/tempo-config.yaml:/otel-lgtm/tempo-config.yaml:ro
+      # - $REPO_PATH/configs/grafana-lgtm/pyroscope-config.yaml:/otel-lgtm/pyroscope-config.yaml:ro
+      # - $REPO_PATH/configs/grafana-lgtm/otelcol-config.yaml:/otel-lgtm/otelcol-config.yaml:ro
+      ## DATA
+      - $REPO_PATH/appdata/grafana-lgtm/grafana:/data/grafana
+      - $REPO_PATH/appdata/grafana-lgtm/prometheus:/data/prometheus
+      - $REPO_PATH/appdata/grafana-lgtm/loki:/data/loki
+    environment:
+      GF_DEFAULT_INSTANCE_NAME: $DOMAINNAME
+      GF_SERVER_ROOT_URL: https://grafana.$DOMAINNAME
+      GF_PATHS_DATA: /data/grafana
+      GF_LOG_LEVEL: 'info'
+      # GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /otel-lgtm/grafana/conf/provisioning/dashboards/custom/custom-dashboard.json
+      ## Normal Auth
+      # GF_SECURITY_ADMIN_USER: admin
+      # GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_SECURITY_DISABLE_INITIAL_ADMIN_CREATION: true
+      GF_USERS_ALLOW_SIGN_UP: false
+      ## OAUTH
+      GF_AUTH_BASIC_ENABLED: false
+      GF_AUTH_DISABLE_LOGIN_FORM: true
+      GF_AUTH_OAUTH_AUTO_LOGIN: true
+      GF_AUTH_GENERIC_OAUTH_ENABLED: true
+      GF_AUTH_GENERIC_OAUTH_NAME: PocketID
+      GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: true
+      GF_AUTH_GENERIC_OAUTH_CLIENT_ID: $GRAFANA_CLIENT_ID
+      GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: $GRAFANA_CLIENT_SECRET
+      GF_AUTH_GENERIC_OAUTH_SCOPES: openid profile email
+      GF_AUTH_GENERIC_OAUTH_AUTH_URL: https://pocketid.$BASE_DOMAINNAME/authorize
+      GF_AUTH_GENERIC_OAUTH_TOKEN_URL: https://pocketid.$BASE_DOMAINNAME/api/oidc/token
+      GF_AUTH_GENERIC_OAUTH_API_URL: https://pocketid.$BASE_DOMAINNAME/api/oidc/userinfo
+      GF_AUTH_GENERIC_OAUTH_USE_PKCE: true
+      GF_AUTH_GENERIC_OAUTH_USE_REFRESH_TOKEN: true
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.grafana-lgtm-rtr.entrypoints: "websecure"
+      traefik.http.routers.grafana-lgtm-rtr.rule: "Host(`grafana.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.grafana-lgtm-rtr.middlewares: "chain-tinyauth@file"
+      # traefik.http.routers.grafana-lgtm-rtr.middlewares: "chain-tinyauth-relaxed@file" # For RSS feed in the homepage
+      ## HTTP Services
+      traefik.http.routers.grafana-lgtm-rtr.service: "grafana-lgtm-svc"
+      traefik.http.services.grafana-lgtm-svc.loadbalancer.server.port: "3000"
+      ####### TINYAUTH #######
+      tinyauth.apps.grafana-lgtm.config.domain: "grafana.$DOMAINNAME"
+      tinyauth.apps.grafana-lgtm.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "Monitoring"
+      homepage.name: "grafana-lgtm"
+      homepage.icon: "grafana.svg"
+      homepage.href: "https://grafana.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "AIO OpenTelemetry Backend"
+      ####### GLANCE #######
+      glance.name: "grafana-lgtm"
+      glance.icon: "sh:grafana"
+      glance.url: "https://grafana.$DOMAINNAME"
+      glance.description: "AIO OpenTelemetry Backend"
