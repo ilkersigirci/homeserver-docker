@@ -1,4 +1,5 @@
 # NOTE: Enable admin UI. You must use IAM for that
+# Config Reference: https://github.com/versity/versitygw/blob/main/extra/example.conf
 services:
   versitygw:
     image: ghcr.io/versity/versitygw:latest

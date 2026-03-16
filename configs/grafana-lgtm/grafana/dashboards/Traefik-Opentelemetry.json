@@ -84,7 +84,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(rate({service_name=\"traefik\"}[1m]))",
+          "expr": "sum(rate({service_name=\"traefik\"} | RequestProtocol=~\".+\" [1m]))",
           "queryType": "range",
           "refId": "A"
         }
@@ -160,7 +160,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "quantile_over_time(\r\n  0.95,\r\n  ({service_name=\"traefik\"} | json Duration | unwrap Duration)[5m]\r\n) by (service_name) / 1e6\r\n",
+          "expr": "avg by (service_name) (\r\n  quantile_over_time(\r\n    0.95,\r\n    ({service_name=\"traefik\"} | RequestProtocol=~\".+\" | unwrap Duration | __error__=\"\")[5m]\r\n  )\r\n) / 1e6\r\n",
           "legendFormat": "{{service_name}}",
           "queryType": "range",
           "refId": "A"
@@ -376,7 +376,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({service_name=\"traefik\"}  |= \"RequestProtocol\" [$__interval]))",
+          "expr": "sum(count_over_time({service_name=\"traefik\"} | RequestProtocol=~\".+\" [$__interval]))",
           "legendFormat": "",
           "queryType": "range",
           "refId": "A"
@@ -450,7 +450,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum_over_time({service_name=\"traefik\"}|= \"RequestProtocol\" | json | OriginStatus=200 | unwrap DownstreamContentSize |  __error__=\"\" [$__interval])",
+          "expr": "sum(sum_over_time(({service_name=\"traefik\"} | RequestProtocol=~\".+\" | unwrap DownstreamContentSize | __error__=\"\")[$__interval]))",
           "legendFormat": "Bytes sent",
           "queryType": "range",
           "refId": "A",
@@ -812,7 +812,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "sum by (DownstreamStatus) (\r\n  count_over_time(\r\n    {service_name=\"traefik\"}\r\n      |~ \"^\\\\{\"\r\n      | json\r\n      | __error__=\"\"\r\n      | DownstreamStatus!=\"0\"\r\n      | DownstreamStatus!=\"\"\r\n  [$__range])\r\n)\r\n",
+          "expr": "sum by (DownstreamStatus) (\r\n  count_over_time(\r\n    {service_name=\"traefik\"}\r\n      | RequestProtocol=~\".+\"\r\n      | DownstreamStatus!=\"0\"\r\n      | DownstreamStatus!=\"\"\r\n  [$__range])\r\n)\r\n",
           "legendFormat": "HTTP Status: {{DownstreamStatus}}",
           "queryType": "range",
           "refId": "A",
@@ -1170,7 +1170,7 @@
           "direction": "backward",
           "editorMode": "code",
           "expr": "topk(20,\r\n  sum by (request_X_Real_Ip) (\r\n    count_over_time(\r\n      {service_name=\"traefik\"} |= \"RequestProtocol\"\r\n      | json | __error__=\"\"\r\n      | request_Cf_Ipcountry=~\"[A-Z]{2}\"\r\n    [$__range])\r\n  )\r\n)\r\n",
-          "legendFormat": "{{request_Cf_Ipcountry}}",
+          "legendFormat": "{{request_X_Real_Ip}}",
           "queryType": "instant",
           "refId": "A",
           "step": ""
@@ -1342,7 +1342,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{service_name=\"traefik\"} |= \"RequestProtocol\" | json  | line_format \"Status: {{.OriginStatus}} Client From {{.request_Cf_Ipcountry}} IP {{.request_Cf_Connecting_Ip}} {{.request_X_Real_Ip}} {{.RequestMethod}} {{.RequestAddr}}{{.RequestPath}} Route To {{.ServiceAddr}}\"",
+          "expr": "{service_name=\"traefik\"} | RequestProtocol=~\".+\" | line_format \"[{{.service_instance_id}}] Status: {{.DownstreamStatus}} Client {{.ClientHost}} {{.RequestMethod}} {{.RequestAddr}}{{.RequestPath}} -> {{.ServiceAddr}}\"",
           "legendFormat": "",
           "queryType": "range",
           "refId": "A"
@@ -1390,7 +1390,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{service_name=\"traefik\"} \r\n| detected_level=\"info\" \r\n| DownstreamStatus != 200\r\n| DownstreamStatus!=\"0\"\r\n| OriginStatus!=\"0\"\r\n| DownstreamStatus!=\"\"\r\n| line_format \"Status: {{.OriginStatus}} Client From {{.request_Cf_Ipcountry}} IP {{.request_Cf_Connecting_Ip}} {{.RequestMethod}} {{.RequestAddr}}{{.RequestPath}} Route To {{.ServiceAddr}}\"",
+          "expr": "{service_name=\"traefik\"}\r\n| RequestProtocol=~\".+\"\r\n| DownstreamStatus!=\"200\"\r\n| DownstreamStatus!=\"0\"\r\n| DownstreamStatus!=\"\"\r\n| line_format \"[{{.service_instance_id}}] Status: {{.DownstreamStatus}} Client {{.ClientHost}} {{.RequestMethod}} {{.RequestAddr}}{{.RequestPath}} -> {{.ServiceAddr}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -2073,5 +2073,5 @@
   "timezone": "browser",
   "title": "Traefik Opentelemetry",
   "uid": "adbp9s4",
-  "version": 8
+  "version": 9
 }

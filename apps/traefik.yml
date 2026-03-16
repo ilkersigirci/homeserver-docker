@@ -12,10 +12,19 @@ services:
     command: # CLI arguments. OTEL / OTLP Export (env-gated; local file logs stay enabled)
       - --accesslog=true
       - --accesslog.bufferingSize=100 # Configuring a buffer of 100 lines
-      - --accesslog.fields.names.StartUTC=drop
+      - --accesslog.fields.defaultMode=keep
+      - --accesslog.fields.headers.defaultMode=drop
+      - --accesslog.fields.headers.names.CF-Connecting-IP=keep
+      - --accesslog.fields.headers.names.X-Forwarded-For=keep
+      - --accesslog.fields.headers.names.X-Real-IP=keep
+      - --accesslog.fields.headers.names.CF-IPCountry=keep
+      - --accesslog.fields.headers.names.CF-Ray=keep
+      - --accesslog.fields.headers.names.User-Agent=keep
+      - --accesslog.fields.headers.names.Authorization=drop
+      - --accesslog.fields.headers.names.Cookie=drop
       - --accesslog.filePath=/logs/access.log
-      - --accesslog.filters.statusCodes=204-299,400-499,500-599
-      # - --accesslog.format=json
+      # - --accesslog.filters.statusCodes=204-299,400-499,500-599
+      - --accesslog.format=json
       - --accesslog.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-false}
       - --accesslog.otlp.grpc.endpoint=${TRAEFIK_OTEL_GRPC_ENDPOINT:-grafana-lgtm:4317}
       - --accesslog.otlp.grpc.insecure=${TRAEFIK_OTEL_GRPC_INSECURE:-false}
@@ -47,7 +56,7 @@ services:
       - --entrypoints.websecure.http.tls.options=tls-max@file
       ## Enable Hub communication (open the port 9900 and 9901 by default)
       # - --experimental.hub=true
-      - --experimental.otlpLogs=${TRAEFIK_OTEL_ENABLED:-false}
+      - --experimental.otlpLogs=${TRAEFIK_OTEL_ENABLED:-true}
       ## Plugins
       - --experimental.plugins.cf-real-ip.modulename=github.com/fma965/cloudflarewarp
       # - --experimental.plugins.cf-real-ip.modulename=github.com/jramsgz/traefik-real-ip
@@ -62,18 +71,25 @@ services:
       # - --hub.tls.insecure=true
       - --log=true
       - --log.filePath=/logs/traefik.log
-      - --log.level=INFO # (Default: error) DEBUG, INFO, WARN, ERROR, FATAL, PANIC
-      - --log.maxbackups=10 # Max number of old log files to keep
-      - --log.maxsize=1 # Max size in MB of the log file
-      - --log.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-false}
+      - --log.level=INFO # DEBUG, INFO, WARN, ERROR (default), FATAL, PANIC
+      - --log.maxbackups=5 # Max number of old log files to keep
+      - --log.maxsize=100 # Max size in MB of the log file
+      - --log.maxage=7 # Max age in days
+      - --log.compress=true
+      - --log.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-true}
       - --log.otlp.grpc.endpoint=${TRAEFIK_OTEL_GRPC_ENDPOINT:-grafana-lgtm:4317}
       - --log.otlp.grpc.insecure=${TRAEFIK_OTEL_GRPC_INSECURE:-false}
       - --log.otlp.serviceName=${TRAEFIK_OTEL_SERVICE_NAME:-traefik}
-      - --metrics.otlp=${TRAEFIK_OTEL_ENABLED:-false}
-      - --metrics.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-false}
+      - --metrics.otlp=${TRAEFIK_OTEL_ENABLED:-true}
+      - --metrics.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-true}
       - --metrics.otlp.grpc.endpoint=${TRAEFIK_OTEL_GRPC_ENDPOINT:-grafana-lgtm:4317}
       - --metrics.otlp.grpc.insecure=${TRAEFIK_OTEL_GRPC_INSECURE:-false}
       - --metrics.otlp.serviceName=${TRAEFIK_OTEL_SERVICE_NAME:-traefik}
+      - --metrics.addInternals=true
+      - --metrics.otlp.addEntryPointsLabels=true
+      - --metrics.otlp.addRoutersLabels=true
+      - --metrics.otlp.addServicesLabels=true
+      - --metrics.otlp.pushInterval=10s
       - --ping=true
       - --providers.docker=true
       # Automatically set Host rule for services
@@ -87,11 +103,12 @@ services:
       - --providers.file.watch=true # Only works on top level files in the rules folder
       # - --providers.swarm.endpoint=tcp://127.0.0.1:2377 # Traefik v3 Swarm
       # - --serversTransport.insecureSkipVerify=true
-      - --tracing=${TRAEFIK_OTEL_ENABLED:-false}
-      - --tracing.otlp=${TRAEFIK_OTEL_ENABLED:-false}
-      - --tracing.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-false}
+      - --tracing=${TRAEFIK_OTEL_ENABLED:-true}
+      - --tracing.otlp=${TRAEFIK_OTEL_ENABLED:-true}
+      - --tracing.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-true}
       - --tracing.otlp.grpc.endpoint=${TRAEFIK_OTEL_GRPC_ENDPOINT:-grafana-lgtm:4317}
       - --tracing.otlp.grpc.insecure=${TRAEFIK_OTEL_GRPC_INSECURE:-false}
+      - --tracing.addInternals=true
       - --tracing.sampleRate=1.0
       - --tracing.serviceName=${TRAEFIK_OTEL_SERVICE_NAME:-traefik}
     networks:
