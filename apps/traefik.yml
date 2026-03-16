@@ -36,6 +36,28 @@ services:
       - --log.maxbackups=10 # Max number of old log files to keep
       - --accesslog=true
       - --accesslog.filePath=/logs/access.log
+      ## OTEL / OTLP Export (env-gated; keeps local file logs enabled)
+      - --metrics.otlp=${TRAEFIK_OTEL_ENABLED:-false}
+      - --metrics.otlp.serviceName=${TRAEFIK_OTEL_SERVICE_NAME:-traefik}
+      - --metrics.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-false}
+      - --metrics.otlp.grpc.endpoint=${TRAEFIK_OTEL_GRPC_ENDPOINT:-grafana-lgtm:4317}
+      - --metrics.otlp.grpc.insecure=${TRAEFIK_OTEL_GRPC_INSECURE:-false}
+      # - --tracing.sampleRate=0.1
+      - --tracing=${TRAEFIK_OTEL_ENABLED:-false}
+      - --tracing.serviceName=${TRAEFIK_OTEL_SERVICE_NAME:-traefik}
+      - --tracing.otlp=${TRAEFIK_OTEL_ENABLED:-false}
+      - --tracing.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-false}
+      - --tracing.otlp.grpc.endpoint=${TRAEFIK_OTEL_GRPC_ENDPOINT:-grafana-lgtm:4317}
+      - --tracing.otlp.grpc.insecure=${TRAEFIK_OTEL_GRPC_INSECURE:-false}
+      - --experimental.otlpLogs=true
+      - --log.otlp.serviceName=${TRAEFIK_OTEL_SERVICE_NAME:-traefik}
+      - --log.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-false}
+      - --log.otlp.grpc.endpoint=${TRAEFIK_OTEL_GRPC_ENDPOINT:-grafana-lgtm:4317}
+      - --log.otlp.grpc.insecure=${TRAEFIK_OTEL_GRPC_INSECURE:-false}
+      - --accesslog.otlp.serviceName=${TRAEFIK_OTEL_SERVICE_NAME:-traefik}
+      - --accesslog.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-false}
+      - --accesslog.otlp.grpc.endpoint=${TRAEFIK_OTEL_GRPC_ENDPOINT:-grafana-lgtm:4317}
+      - --accesslog.otlp.grpc.insecure=${TRAEFIK_OTEL_GRPC_INSECURE:-false}
       # - --accesslog.format=json
       - --accesslog.bufferingSize=100 # Configuring a buffer of 100 lines
       - --accesslog.filters.statusCodes=204-299,400-499,500-599
@@ -80,15 +102,6 @@ services:
       - --experimental.plugins.crowdsec-bouncer.version=v1.2.1
       - --experimental.plugins.webfinger.modulename=github.com/NX211/traefik-webfinger
       - --experimental.plugins.webfinger.version=v0.3.5
-      ## OTLP Tracing
-      # - --tracing.otlp.grpc=true
-      # - --tracing.otlp.grpc.endpoint=traefik-log-dashboard-backend:4317
-      # - --tracing.otlp.grpc.insecure=true
-      # - --tracing.sampleRate=0.1
-      # Global attributes added to all traces
-      - --tracing.globalAttributes.environment=production
-      - --tracing.globalAttributes.service.version=v3.0
-      - --tracing.globalAttributes.deployment.environment=$DOMAINNAME
     networks:
       t3_proxy:
         ipv4_address: 192.168.90.254 # You can specify a static IP
@@ -137,6 +150,8 @@ services:
       REMOTE_SERVER_PRIVATE_IP: ${REMOTE_SERVER_PRIVATE_IP:-dummy}
       WEBFINGER_USERNAME: $WEBFINGER_USERNAME
       WEBFINGER_HREF: https://pocketid.$BASE_DOMAINNAME
+      # Shared resource attributes for traces/metrics/logs/access logs (OTEL_RESOURCE_ATTRIBUTES)
+      OTEL_RESOURCE_ATTRIBUTES: service.namespace=${TRAEFIK_OTEL_SERVICE_NAMESPACE:-edge},service.instance.id=${MY_HOSTNAME:-unknown},service.version=${TRAEFIK_OTEL_SERVICE_VERSION:-3.6},deployment.environment.name=${TRAEFIK_OTEL_DEPLOYMENT_ENVIRONMENT:-production}
     # secrets:
     #   - cf_dns_api_token
     labels:
