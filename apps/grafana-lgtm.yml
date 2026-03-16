@@ -61,6 +61,14 @@ services:
       ## HTTP Services
       traefik.http.routers.grafana-lgtm-rtr.service: "grafana-lgtm-svc"
       traefik.http.services.grafana-lgtm-svc.loadbalancer.server.port: "3000"
+      ## gRPC Router (RPC)
+      traefik.http.routers.grafana-lgtm-rpc-rtr.entrypoints: "websecure"
+      traefik.http.routers.grafana-lgtm-rpc-rtr.rule: "Host(`grafana-rpc.$DOMAINNAME`)"
+      traefik.http.routers.grafana-lgtm-rpc-rtr.tls: "true"
+      traefik.http.routers.grafana-lgtm-rpc-rtr.service: "grafana-lgtm-rpc-svc"
+      ## gRPC Service (h2c)
+      traefik.http.services.grafana-lgtm-rpc-svc.loadbalancer.server.port: "4317"
+      traefik.http.services.grafana-lgtm-rpc-svc.loadbalancer.server.scheme: "h2c"
       ####### TINYAUTH #######
       tinyauth.apps.grafana-lgtm.config.domain: "grafana.$DOMAINNAME"
       tinyauth.apps.grafana-lgtm.ip.bypass: "$LOCAL_IPS"
