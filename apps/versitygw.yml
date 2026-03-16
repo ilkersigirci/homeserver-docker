@@ -1,3 +1,4 @@
+# NOTE: Enable admin UI. You must use IAM for that
 services:
   versitygw:
     image: ghcr.io/versity/versitygw:latest
