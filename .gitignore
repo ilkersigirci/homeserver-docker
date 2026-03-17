@@ -30,4 +30,3 @@ configs/glance/docs
 
 # Data
 data/*
-!data/otel-collector-agent
