@@ -16,6 +16,8 @@ services:
       - 4318 # OTLP/HTTP
       - 9090 # Prometheus
       - 9411 # Zipkin
+    ports:
+      - "4317:4317" # OTLP/gRPC
     security_opt:
       - no-new-privileges:true
     volumes:

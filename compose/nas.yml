@@ -47,5 +47,3 @@ include:
   - ../apps/whoami.yml
   #### MEDIA ####
   # - ../apps/transmission.yml
-  #### MONITORING ####
-  # - ../apps/beszel-agent.yml

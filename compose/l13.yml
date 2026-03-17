@@ -45,6 +45,5 @@ include:
   - ../apps/syncthing.yml
   - ../apps/whoami.yml
   #### MONITORING ####
-  - ../apps/beszel-agent.yml
   - ../apps/frigate.yml
   - ../apps/mosquitto.yml

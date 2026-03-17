@@ -45,7 +45,6 @@ include:
   - ../apps/doco-cd.yml
   - ../apps/forgejo.yml
   - ../apps/forgejo-runner.yml
-  - ../apps/grafana-lgtm.yml
   - ../apps/hatchet.yml
   - ../apps/langfuse.yml
   - ../apps/minio.yml

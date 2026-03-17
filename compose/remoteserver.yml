@@ -68,7 +68,6 @@ include:
   - ../apps/stremio.yml
   # - ../apps/transmission.yml
   #### MONITORING ####
-  - ../apps/beszel-agent.yml
   - ../apps/rybbit.yml
   #### PROGRAMMING ####
   - ../apps/open-webui.yml
