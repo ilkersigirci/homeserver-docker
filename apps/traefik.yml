@@ -118,7 +118,7 @@ services:
       - --tracing.serviceName=traefik
     depends_on:
       otel-collector-agent:
-        condition: service_started
+        condition: service_healthy
     networks:
       t3_proxy:
         ipv4_address: 192.168.90.254 # You can specify a static IP

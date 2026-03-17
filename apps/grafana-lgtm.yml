@@ -86,13 +86,13 @@ services:
       traefik.http.routers.grafana-lgtm-rpc-rtr.entrypoints: "websecure"
       traefik.http.routers.grafana-lgtm-rpc-rtr.rule: "Host(`grafana-rpc.$DOMAINNAME`) && HeadersRegexp(`Content-Type`, `(?i)^application/grpc.*`)"
       traefik.http.routers.grafana-lgtm-rpc-rtr.tls: "true"
-      traefik.http.routers.grafana-lgtm-rpc-rtr.middlewares: "middlewares-cf-real-ip@file,grafana-lgtm-rpc-allowlist"
+      traefik.http.routers.grafana-lgtm-rpc-rtr.middlewares: "chain-rpc@file,grafana-lgtm-rpc-allowlist"
       traefik.http.routers.grafana-lgtm-rpc-rtr.service: "grafana-lgtm-rpc-svc"
       ## OTLP HTTP Router
       traefik.http.routers.grafana-lgtm-rpc-http-rtr.entrypoints: "websecure"
       traefik.http.routers.grafana-lgtm-rpc-http-rtr.rule: "Host(`grafana-rpc.$DOMAINNAME`) && PathPrefix(`/v1/`)"
       traefik.http.routers.grafana-lgtm-rpc-http-rtr.tls: "true"
-      traefik.http.routers.grafana-lgtm-rpc-http-rtr.middlewares: "middlewares-cf-real-ip@file,grafana-lgtm-rpc-allowlist"
+      traefik.http.routers.grafana-lgtm-rpc-http-rtr.middlewares: "chain-rpc@file,grafana-lgtm-rpc-allowlist"
       traefik.http.routers.grafana-lgtm-rpc-http-rtr.service: "grafana-lgtm-rpc-http-svc"
       ## OTLP ingress hardening (LAN/VPN allow list)
       traefik.http.middlewares.grafana-lgtm-rpc-allowlist.ipallowlist.sourcerange: "$LOCAL_IPS"

@@ -74,6 +74,7 @@ services:
       traefik.http.routers.hatchet-rpc-rtr.entrypoints: "websecure"
       traefik.http.routers.hatchet-rpc-rtr.rule: "Host(`hatchet-rpc.$DOMAINNAME`)"
       traefik.http.routers.hatchet-rpc-rtr.tls: "true"
+      traefik.http.routers.hatchet-rpc-rtr.middlewares: "chain-rpc@file"
       traefik.http.routers.hatchet-rpc-rtr.service: "hatchet-rpc-svc"
       ## gRPC Service (h2c)
       traefik.http.services.hatchet-rpc-svc.loadbalancer.server.port: "7077"

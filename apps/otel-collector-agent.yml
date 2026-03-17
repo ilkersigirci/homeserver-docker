@@ -11,6 +11,13 @@ services:
       - --config=/etc/otelcol/config.yaml
     security_opt:
       - no-new-privileges:true
+    healthcheck:
+      # Distroless image (no shell/curl). Use collector binary for a lightweight health probe.
+      test: ["CMD", "/otelcol-contrib", "validate", "--config=/etc/otelcol/config.yaml"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     networks:
       - t3_proxy
     expose:

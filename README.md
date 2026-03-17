@@ -70,9 +70,3 @@ OTEL_EXPORTER_OTLP_PROTOCOL=grpc
 OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector-agent:4317
 OTEL_EXPORTER_OTLP_INSECURE=true
 ```
-
-For Python/FastAPI auto-instrumentation, use an instrumented start command:
-
-```bash
-opentelemetry-instrument uv run --module app.__main__
-```

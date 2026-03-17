@@ -42,6 +42,7 @@ receivers:
             - cgroup
             - cgroup2
             - cgroup2fs
+            - cifs
             - configfs
             - debugfs
             - devpts
