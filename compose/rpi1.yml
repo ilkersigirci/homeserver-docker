@@ -37,7 +37,7 @@ include:
   - ../apps/arcane-agent.yml
   - ../apps/adguardhome-host.yml
   - ../apps/homepage.yml
-  - ../apps/socket-proxy.yml
+  - ../apps/docker-socket-proxy.yml
   - ../apps/tinyauth.yml
   - ../apps/traefik.yml
   - ../apps/otel-collector-agent.yml

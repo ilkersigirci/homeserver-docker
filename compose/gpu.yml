@@ -38,7 +38,7 @@ include:
   # - ../apps/dufs.yml
   - ../apps/filebrowser.yml
   - ../apps/homepage.yml
-  - ../apps/socket-proxy.yml
+  - ../apps/docker-socket-proxy.yml
   - ../apps/tinyauth.yml
   - ../apps/traefik.yml
   - ../apps/otel-collector-agent.yml
