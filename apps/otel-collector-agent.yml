@@ -1,0 +1,45 @@
+services:
+  # NOTE: Local edge collector that receives OTLP from local services and forwards to central LGTM.
+  otel-collector-agent:
+    container_name: otel-collector-agent
+    image: otel/opentelemetry-collector-contrib:0.147.0
+    restart: $RESTART_POLICY_CORE
+    profiles:
+      - core
+    user: $PUID:$PGID
+    command:
+      - --config=/etc/otelcol/config.yaml
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      # Distroless image (no shell/curl). Use collector binary for a lightweight health probe.
+      test: ["CMD", "/otelcol-contrib", "validate", "--config=/etc/otelcol/config.yaml"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - t3_proxy
+    expose:
+    - 1888 # pprof extension
+    - 4317 # OTLP gRPC receiver
+    - 4318 # OTLP http receiver
+    - 8888 # Prometheus metrics exposed by the Collector
+    - 8889 # Prometheus exporter metrics
+    - 13133 # health_check extension
+    - 55679 # zpages extension
+    volumes:
+      - $REPO_PATH/configs/grafana-lgtm/otelcol-agent-config.yaml:/etc/otelcol/config.yaml:ro
+      - $REPO_PATH/data/otel-collector-agent:/var/lib/otelcol/file_storage
+      - /:/hostfs:ro
+    environment:
+      TZ: $TZ
+      OTEL_COLLECTOR_GATEWAY_ENDPOINT: $OTEL_COLLECTOR_GATEWAY_ENDPOINT
+      OTEL_COLLECTOR_GATEWAY_INSECURE: $OTEL_COLLECTOR_GATEWAY_INSECURE
+      OTEL_COLLECTOR_GATEWAY_AUTHORIZATION_HEADER: ${OTEL_COLLECTOR_GATEWAY_AUTHORIZATION_HEADER:-}
+      OTEL_COLLECTOR_MEMORY_LIMIT_MIB: ${OTEL_COLLECTOR_MEMORY_LIMIT_MIB:-128}
+      OTEL_COLLECTOR_MEMORY_SPIKE_LIMIT_MIB: ${OTEL_COLLECTOR_MEMORY_SPIKE_LIMIT_MIB:-32}
+      OTEL_COLLECTOR_SERVICE_NAMESPACE: ${OTEL_COLLECTOR_SERVICE_NAMESPACE:-edge}
+      OTEL_COLLECTOR_SERVICE_INSTANCE_ID: $MY_HOSTNAME
+      OTEL_COLLECTOR_DEPLOYMENT_ENVIRONMENT: ${OTEL_DEPLOYMENT_ENVIRONMENT:-production}
+      OTEL_COLLECTOR_HOSTMETRICS_SERVICE_NAME: hostmetrics

@@ -20,7 +20,7 @@ services:
       - no-new-privileges:true
     volumes:
       ## CONFIGS
-      - $REPO_PATH/configs/grafana-lgtm/grafana/dashboards:/otel-lgtm/grafana/conf/provisioning/dashboards/custom:ro
+      - $REPO_PATH/configs/grafana-lgtm/grafana/provisioning/dashboards:/otel-lgtm/grafana/conf/provisioning/dashboards:ro
       # - $REPO_PATH/configs/grafana-lgtm/prometheus.yaml:/otel-lgtm/prometheus.yaml:ro
       # - $REPO_PATH/configs/grafana-lgtm/loki-config.yaml:/otel-lgtm/loki-config.yaml:ro
       # - $REPO_PATH/configs/grafana-lgtm/tempo-config.yaml:/otel-lgtm/tempo-config.yaml:ro
@@ -38,13 +38,12 @@ services:
       GF_SERVER_ROOT_URL: https://grafana.$DOMAINNAME
       GF_PATHS_DATA: /data/grafana
       GF_LOG_LEVEL: 'info'
-      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /otel-lgtm/grafana/conf/provisioning/dashboards/custom/Traefik-Opentelemetry.json
-      # GF_PANELS_DISABLE_SANITIZE_HTML: true ?
-      # GF_PLUGINS_ENABLE_ALPHA: true ?
-      # GF_ALLOW_EMBEDDING: true ?
-      # GF_grafanaconThemes: true ?
-      # GF_INSTALL_PLUGINS: yesoreyeram-infinity-datasource ?
-      # GF_FEATURE_TOGGLES_ENABLE: provisioning ?
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /otel-lgtm/grafana/conf/provisioning/dashboards/OTEL/Traefik-Opentelemetry.json
+      # GF_PANELS_DISABLE_SANITIZE_HTML: "true" # Allow raw HTML/JS in text panels (XSS risk).
+      # GF_PLUGINS_ENABLE_ALPHA: "true" # Enable alpha plugins (experimental quality).
+      # GF_SECURITY_ALLOW_EMBEDDING: "true" # Allow Grafana in iframes.
+      # GF_PLUGINS_PREINSTALL: "yesoreyeram-infinity-datasource" # Preinstall Infinity datasource plugin.
+      GF_FEATURE_TOGGLES_ENABLE: "provisioning" # Enable new provisioning/Git Sync features.
       ##### AUTH CONFIGS #####
       ## Normal Auth ##
       # GF_SECURITY_ADMIN_USER: admin
@@ -61,12 +60,15 @@ services:
       GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: true
       GF_AUTH_GENERIC_OAUTH_CLIENT_ID: $GRAFANA_CLIENT_ID
       GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: $GRAFANA_CLIENT_SECRET
-      GF_AUTH_GENERIC_OAUTH_SCOPES: openid profile email
+      GF_AUTH_GENERIC_OAUTH_SCOPES: openid profile email groups
       GF_AUTH_GENERIC_OAUTH_AUTH_URL: https://pocketid.$BASE_DOMAINNAME/authorize
       GF_AUTH_GENERIC_OAUTH_TOKEN_URL: https://pocketid.$BASE_DOMAINNAME/api/oidc/token
       GF_AUTH_GENERIC_OAUTH_API_URL: https://pocketid.$BASE_DOMAINNAME/api/oidc/userinfo
       GF_AUTH_GENERIC_OAUTH_USE_PKCE: true
       GF_AUTH_GENERIC_OAUTH_USE_REFRESH_TOKEN: true
+      GF_AUTH_GENERIC_OAUTH_SKIP_ORG_ROLE_SYNC: false
+      GF_AUTH_GENERIC_OAUTH_ALLOW_ASSIGN_GRAFANA_ADMIN: true
+      GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "contains(groups[*], 'admin') && 'GrafanaAdmin' || 'Viewer'"
       ################ OTHER CONFIGS ##################
       LOKI_ARGS: --pattern-ingester.enabled=true
     labels:
@@ -82,12 +84,23 @@ services:
       traefik.http.services.grafana-lgtm-svc.loadbalancer.server.port: "3000"
       ## gRPC Router (RPC)
       traefik.http.routers.grafana-lgtm-rpc-rtr.entrypoints: "websecure"
-      traefik.http.routers.grafana-lgtm-rpc-rtr.rule: "Host(`grafana-rpc.$DOMAINNAME`)"
+      traefik.http.routers.grafana-lgtm-rpc-rtr.rule: "Host(`grafana-rpc.$DOMAINNAME`) && HeadersRegexp(`Content-Type`, `(?i)^application/grpc.*`)"
       traefik.http.routers.grafana-lgtm-rpc-rtr.tls: "true"
+      traefik.http.routers.grafana-lgtm-rpc-rtr.middlewares: "chain-rpc@file,grafana-lgtm-rpc-allowlist"
       traefik.http.routers.grafana-lgtm-rpc-rtr.service: "grafana-lgtm-rpc-svc"
+      ## OTLP HTTP Router
+      traefik.http.routers.grafana-lgtm-rpc-http-rtr.entrypoints: "websecure"
+      traefik.http.routers.grafana-lgtm-rpc-http-rtr.rule: "Host(`grafana-rpc.$DOMAINNAME`) && PathPrefix(`/v1/`)"
+      traefik.http.routers.grafana-lgtm-rpc-http-rtr.tls: "true"
+      traefik.http.routers.grafana-lgtm-rpc-http-rtr.middlewares: "chain-rpc@file,grafana-lgtm-rpc-allowlist"
+      traefik.http.routers.grafana-lgtm-rpc-http-rtr.service: "grafana-lgtm-rpc-http-svc"
+      ## OTLP ingress hardening (LAN/VPN allow list)
+      traefik.http.middlewares.grafana-lgtm-rpc-allowlist.ipallowlist.sourcerange: "$LOCAL_IPS"
       ## gRPC Service (h2c)
       traefik.http.services.grafana-lgtm-rpc-svc.loadbalancer.server.port: "4317"
       traefik.http.services.grafana-lgtm-rpc-svc.loadbalancer.server.scheme: "h2c"
+      ## OTLP HTTP Service
+      traefik.http.services.grafana-lgtm-rpc-http-svc.loadbalancer.server.port: "4318"
       ####### TINYAUTH #######
       tinyauth.apps.grafana-lgtm.config.domain: "grafana.$DOMAINNAME"
       tinyauth.apps.grafana-lgtm.ip.bypass: "$LOCAL_IPS"

@@ -92,6 +92,14 @@ services:
       - REDIS_HOST=homeserver-api-redis
       - REDIS_PORT=6379
       - REDIS_PASSWORD=$HOMESERVER_API_REDIS_PASSWORD
+      - OTEL_SERVICE_NAME=homeserver-api-head
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector-agent:4317
+      - OTEL_EXPORTER_OTLP_INSECURE=true
+      - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_METRICS_EXPORTER=otlp
+      - OTEL_LOGS_EXPORTER=otlp
+      - OTEL_RESOURCE_ATTRIBUTES=service.namespace=apps,service.instance.id=${MY_HOSTNAME:-unknown},deployment.environment.name=${OTEL_DEPLOYMENT_ENVIRONMENT:-production}
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -154,6 +162,14 @@ services:
       - REDIS_HOST=homeserver-api-redis
       - REDIS_PORT=6379
       - REDIS_PASSWORD=$HOMESERVER_API_REDIS_PASSWORD
+      - OTEL_SERVICE_NAME=homeserver-api-worker
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector-agent:4317
+      - OTEL_EXPORTER_OTLP_INSECURE=true
+      - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_METRICS_EXPORTER=otlp
+      - OTEL_LOGS_EXPORTER=otlp
+      - OTEL_RESOURCE_ATTRIBUTES=service.namespace=apps,service.instance.id=${MY_HOSTNAME:-unknown},deployment.environment.name=${OTEL_DEPLOYMENT_ENVIRONMENT:-production}
     labels:
       ####### HOMEPAGE #######
       homepage.group: "Others"

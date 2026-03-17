@@ -1,0 +1,154 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+
+  # Collects hardware metrics from this specific machine
+  hostmetrics:
+    collection_interval: 30s
+    root_path: /hostfs
+    scrapers:
+      cpu: {}
+      memory: {}
+      load: {}
+      # disk: {}
+      disk:
+        exclude:
+          devices:
+            - ^loop.*
+            - ^ram.*
+            - ^fd.*
+          match_type: regexp
+      # filesystem: {}
+      filesystem:
+        exclude_mount_points:
+          mount_points:
+            - ^/proc($|/)
+            - ^/sys($|/)
+            - ^/run($|/)
+            - ^/dev($|/)
+            - ^/var/lib/docker($|/)
+            - ^/var/lib/containers($|/)
+            - ^/snap($|/)
+          match_type: regexp
+        exclude_fs_types:
+          fs_types:
+            - autofs
+            - binfmt_misc
+            - bpf
+            - cgroup
+            - cgroup2
+            - cgroup2fs
+            - cifs
+            - configfs
+            - debugfs
+            - devpts
+            - devtmpfs
+            - fusectl
+            - hugetlbfs
+            - mqueue
+            - nsfs
+            - overlay
+            - proc
+            - procfs
+            - pstore
+            - rpc_pipefs
+            - securityfs
+            - selinuxfs
+            - squashfs
+            - sysfs
+            - tracefs
+            - tmpfs
+          match_type: strict
+      network: {}
+
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: ${env:OTEL_COLLECTOR_MEMORY_LIMIT_MIB}
+    spike_limit_mib: ${env:OTEL_COLLECTOR_MEMORY_SPIKE_LIMIT_MIB}
+
+  # Automatically tags incoming telemetry with host level attributes.
+  resourcedetection:
+    detectors: [env, system]
+    timeout: 2s
+    override: false
+
+  # Adds common attributes when they are not set by upstream services.
+  resource/common:
+    attributes:
+      - key: service.namespace
+        value: ${env:OTEL_COLLECTOR_SERVICE_NAMESPACE}
+        action: insert
+      - key: service.instance.id
+        value: ${env:OTEL_COLLECTOR_SERVICE_INSTANCE_ID}
+        action: insert
+      - key: deployment.environment.name
+        value: ${env:OTEL_COLLECTOR_DEPLOYMENT_ENVIRONMENT}
+        action: insert
+
+  # Keep host metrics grouped under a predictable service name in Grafana.
+  resource/hostmetrics:
+    attributes:
+      - key: service.name
+        value: ${env:OTEL_COLLECTOR_HOSTMETRICS_SERVICE_NAME}
+        action: upsert
+
+  batch:
+    send_batch_size: 8192
+    timeout: 5s
+
+exporters:
+  otlp:
+    endpoint: ${env:OTEL_COLLECTOR_GATEWAY_ENDPOINT}
+    tls:
+      insecure: ${env:OTEL_COLLECTOR_GATEWAY_INSECURE}
+    headers:
+      Authorization: ${env:OTEL_COLLECTOR_GATEWAY_AUTHORIZATION_HEADER}
+    sending_queue:
+      enabled: true
+      storage: file_storage
+      num_consumers: 4
+      queue_size: 20000
+    retry_on_failure:
+      enabled: true
+      initial_interval: 1s
+      max_interval: 30s
+      max_elapsed_time: 3600s
+
+extensions:
+  health_check:
+    endpoint: 0.0.0.0:13133
+  file_storage:
+    directory: /var/lib/otelcol/file_storage
+    create_directory: true
+    timeout: 10s
+
+service:
+  extensions:
+    - health_check
+    - file_storage
+  pipelines:
+    # Pipeline for Logs (going to Loki)
+    logs:
+      receivers: [otlp]
+      processors: [memory_limiter, resourcedetection, resource/common, batch]
+      exporters: [otlp]
+    # Pipeline for application and edge metrics (Traefik/FastAPI/etc.).
+    metrics:
+      receivers: [otlp]
+      processors: [memory_limiter, resourcedetection, resource/common, batch]
+      exporters: [otlp]
+    # Pipeline for machine level metrics (cpu/memory/disk/network/filesystem).
+    metrics/host:
+      receivers: [hostmetrics]
+      processors: [memory_limiter, resourcedetection, resource/common, resource/hostmetrics, batch]
+      exporters: [otlp]
+    # Pipeline for Traefik Traces (going to Tempo)
+    traces:
+      receivers: [otlp]
+      processors: [memory_limiter, resourcedetection, resource/common, batch]
+      exporters: [otlp]

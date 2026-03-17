@@ -44,9 +44,10 @@ include:
   - ../apps/headscale.yml
   - ../apps/homepage.yml
   # - ../apps/pocket-id.yml
-  - ../apps/socket-proxy.yml
+  - ../apps/docker-socket-proxy.yml
   - ../apps/tinyauth.yml
   - ../apps/traefik.yml
+  - ../apps/otel-collector-agent.yml
   #### DESKTOP APPS ####
   # - ../apps/firefox.yml
   ###### MAINTENANCE ####

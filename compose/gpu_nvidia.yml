@@ -36,9 +36,10 @@ include:
   #### CORE ####
   - ../apps/arcane-agent-gpu.yml
   - ../apps/homepage.yml
-  - ../apps/socket-proxy.yml
+  - ../apps/docker-socket-proxy.yml
   - ../apps/tinyauth.yml
   - ../apps/traefik.yml
+  - ../apps/otel-collector-agent.yml
   #### DESKTOP APPS ####
   - ../apps/bambustudio.yml
   # - ../apps/krita.yml

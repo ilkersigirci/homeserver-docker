@@ -1,0 +1,12 @@
+http:
+  middlewares:
+    chain-rpc:
+      chain:
+        middlewares:
+          # Keep client IP detection for allowlists and logs
+          - middlewares-cf-real-ip
+{{if env "CROWDSEC_TRAEFIK_BOUNCER_API_KEY"}}
+          - middlewares-crowdsec-bouncer
+{{end}}
+          # Keep basic abuse protection for public RPC endpoints
+          - middlewares-rate-limit

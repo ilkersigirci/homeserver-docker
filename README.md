@@ -56,3 +56,17 @@ Docker Daemon Json Example
   }
 }
 ```
+
+## OpenTelemetry Pattern (Multi-Machine)
+
+- Run `apps/traefik.yml` and `apps/otel-collector-agent.yml` on every machine.
+  - `traefik.yml` exports edge telemetry over OTLP
+  - `otel-collector-agent.yml` receives local OTLP and exports host metrics (`cpu`, `memory`, `disk`, `filesystem`, `network`)
+- Run `apps/grafana-lgtm.yml` only on the central machine.
+- Point all app telemetry to the local agent on each machine:
+
+```env
+OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector-agent:4317
+OTEL_EXPORTER_OTLP_INSECURE=true
+```

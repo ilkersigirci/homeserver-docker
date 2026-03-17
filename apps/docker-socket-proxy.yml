@@ -56,6 +56,7 @@ x-socket-proxy-env-mutable: &socket_proxy_env_mutable
 
 services:
   docker-socket-proxy-read:
+    container_name: docker-socket-proxy-read
     <<: *socket_proxy_service
     networks:
       - socket_proxy
@@ -70,6 +71,7 @@ services:
   # Mutable Docker access without exec: use for automation/controllers that
   # need create/start/stop/remove/pull actions but should not run commands in containers.
   docker-socket-proxy-write:
+    container_name: docker-socket-proxy-write
     <<: *socket_proxy_service
     networks:
       - socket_proxy
@@ -78,6 +80,7 @@ services:
 
   # High-privilege proxy for workloads that require docker exec capabilities.
   docker-socket-proxy-exec:
+    container_name: docker-socket-proxy-exec
     <<: *socket_proxy_service
     networks:
       - socket_proxy

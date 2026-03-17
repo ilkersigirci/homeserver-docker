@@ -1,5 +1,4 @@
 services:
-  # Traefik 3 - Reverse Proxy
   # Touch (create empty files) acme/acme.json. Set acme.json permissions to 600.
   # touch $REPO_PATH/configs/traefik3/acme/acme.json
   # chmod 600 $REPO_PATH/configs/traefik3/acme/acme.json
@@ -23,16 +22,18 @@ services:
       - --accesslog.fields.headers.names.Authorization=drop
       - --accesslog.fields.headers.names.Cookie=drop
       - --accesslog.filePath=/logs/access.log
+      ## FIXME: not working
+      # - --accesslog.dualoutput=true # Keep file logs even when OTLP export is enabled
       - --accesslog.filters.statusCodes=${TRAEFIK_ACCESSLOG_STATUS_CODES:-204-299,400-499,500-599}
       - --accesslog.format=json
-      - --accesslog.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-false}
-      - --accesslog.otlp.grpc.endpoint=${TRAEFIK_OTEL_GRPC_ENDPOINT:-grafana-lgtm:4317}
-      - --accesslog.otlp.grpc.insecure=${TRAEFIK_OTEL_GRPC_INSECURE:-false}
-      - --accesslog.otlp.serviceName=${TRAEFIK_OTEL_SERVICE_NAME:-traefik}
+      - --accesslog.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-true}
+      - --accesslog.otlp.grpc.endpoint=otel-collector-agent:4317
+      - --accesslog.otlp.grpc.insecure=true
+      - --accesslog.otlp.serviceName=traefik
       - --api=true
       - --api.dashboard=true
       - --api.insecure=false
-      - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.delayBeforeCheck=90 # To delay DNS check and reduce LE hitrate
+      - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.propagation.delayBeforeChecks=90 # To delay DNS checks and reduce LE hitrate
       - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.provider=cloudflare
       - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.resolvers=1.1.1.1:53,1.0.0.1:53
       - --certificatesResolvers.dns-cloudflare.acme.email=$CLOUDFLARE_EMAIL
@@ -46,7 +47,8 @@ services:
       - --entrypoints.websecure.address=:443
       - --entrypoints.websecure.asDefault=true
       # Allow these IPs to set the X-Forwarded-* headers - Cloudflare IPs: https://www.cloudflare.com/ips/
-      - --entrypoints.websecure.forwardedHeaders.trustedIPs=$CLOUDFLARE_IPS,$LOCAL_IPS
+      # - --entrypoints.websecure.forwardedHeaders.trustedIPs=$CLOUDFLARE_IPS,$LOCAL_IPS
+      - --entrypoints.websecure.forwardedHeaders.trustedIPs=$CLOUDFLARE_IPS
       - --entrypoints.websecure.http.tls=true
       # Add dns-cloudflare as default certresolver for all services. Also enables TLS and no need to specify on individual services
       - --entrypoints.websecure.http.tls.certresolver=dns-cloudflare
@@ -55,47 +57,50 @@ services:
       # TLS defaults for all websecure routers
       - --entrypoints.websecure.http.tls.options=tls-max@file
       ## Enable Hub communication (open the port 9900 and 9901 by default)
+      - --experimental.abortOnPluginFailure=true
       # - --experimental.hub=true
       - --experimental.otlpLogs=${TRAEFIK_OTEL_ENABLED:-true}
       ## Plugins
       - --experimental.plugins.cf-real-ip.modulename=github.com/fma965/cloudflarewarp
       # - --experimental.plugins.cf-real-ip.modulename=github.com/jramsgz/traefik-real-ip
       - --experimental.plugins.cf-real-ip.version=v1.0.0
-      # - --experimental.plugins.cf-real-ip.version=v1.0.6
+      # - --experimental.plugins.cf-real-ip.hash=
       - --experimental.plugins.crowdsec-bouncer.modulename=github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
       - --experimental.plugins.crowdsec-bouncer.version=v1.2.1
+      # - --experimental.plugins.crowdsec-bouncer.hash=
       - --experimental.plugins.webfinger.modulename=github.com/NX211/traefik-webfinger
       - --experimental.plugins.webfinger.version=v0.3.5
+      # - --experimental.plugins.webfinger.hash=
       - --global.checkNewVersion=false
       - --global.sendAnonymousUsage=false
       # - --hub.tls.insecure=true
       - --log=true
       - --log.filePath=/logs/traefik.log
-      - --log.level=INFO # DEBUG, INFO, WARN, ERROR (default), FATAL, PANIC
+      - --log.level=${TRAEFIK_LOG_LEVEL:-INFO} # DEBUG, INFO, WARN, ERROR (default), FATAL, PANIC
       - --log.maxbackups=5 # Max number of old log files to keep
       - --log.maxsize=100 # Max size in MB of the log file
       - --log.maxage=7 # Max age in days
       - --log.compress=true
       - --log.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-true}
-      - --log.otlp.grpc.endpoint=${TRAEFIK_OTEL_GRPC_ENDPOINT:-grafana-lgtm:4317}
-      - --log.otlp.grpc.insecure=${TRAEFIK_OTEL_GRPC_INSECURE:-false}
-      - --log.otlp.serviceName=${TRAEFIK_OTEL_SERVICE_NAME:-traefik}
+      - --log.otlp.grpc.endpoint=otel-collector-agent:4317
+      - --log.otlp.grpc.insecure=true
+      - --log.otlp.serviceName=traefik
       - --metrics.otlp=${TRAEFIK_OTEL_ENABLED:-true}
       - --metrics.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-true}
-      - --metrics.otlp.grpc.endpoint=${TRAEFIK_OTEL_GRPC_ENDPOINT:-grafana-lgtm:4317}
-      - --metrics.otlp.grpc.insecure=${TRAEFIK_OTEL_GRPC_INSECURE:-false}
-      - --metrics.otlp.serviceName=${TRAEFIK_OTEL_SERVICE_NAME:-traefik}
-      - --metrics.addInternals=true
+      - --metrics.otlp.grpc.endpoint=otel-collector-agent:4317
+      - --metrics.otlp.grpc.insecure=true
+      - --metrics.otlp.serviceName=traefik
+      - --metrics.addInternals=false
       - --metrics.otlp.addEntryPointsLabels=true
-      - --metrics.otlp.addRoutersLabels=true
-      - --metrics.otlp.addServicesLabels=true
-      - --metrics.otlp.pushInterval=10s
+      - --metrics.otlp.addRoutersLabels=false
+      - --metrics.otlp.addServicesLabels=false
+      - --metrics.otlp.pushInterval=${TRAEFIK_OTEL_METRICS_PUSH_INTERVAL:-30s}
       - --ping=true
       - --providers.docker=true
       # Automatically set Host rule for services
       # - --providers.docker.defaultrule=Host(`{{ index .Labels "com.docker.compose.service" }}.$DOMAINNAME`)
       # - --providers.docker.endpoint=unix:///var/run/docker.sock # Use Docker Socket Proxy instead for improved security
-      - --providers.docker.endpoint=tcp://docker-socket-proxy:2375
+      - --providers.docker.endpoint=tcp://docker-socket-proxy-read:2375
       - --providers.docker.exposedByDefault=false
       - --providers.docker.network=t3_proxy
       - --providers.file.directory=/rules # Load dynamic configuration from one or more .toml or .yml files in a directory
@@ -106,11 +111,14 @@ services:
       - --tracing=${TRAEFIK_OTEL_ENABLED:-true}
       - --tracing.otlp=${TRAEFIK_OTEL_ENABLED:-true}
       - --tracing.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-true}
-      - --tracing.otlp.grpc.endpoint=${TRAEFIK_OTEL_GRPC_ENDPOINT:-grafana-lgtm:4317}
-      - --tracing.otlp.grpc.insecure=${TRAEFIK_OTEL_GRPC_INSECURE:-false}
-      - --tracing.addInternals=true
-      - --tracing.sampleRate=1.0
-      - --tracing.serviceName=${TRAEFIK_OTEL_SERVICE_NAME:-traefik}
+      - --tracing.otlp.grpc.endpoint=otel-collector-agent:4317
+      - --tracing.otlp.grpc.insecure=true
+      - --tracing.addInternals=false
+      - --tracing.sampleRate=${TRAEFIK_OTEL_TRACING_SAMPLE_RATE:-0.50}
+      - --tracing.serviceName=traefik
+    depends_on:
+      otel-collector-agent:
+        condition: service_healthy
     networks:
       t3_proxy:
         ipv4_address: 192.168.90.254 # You can specify a static IP
@@ -163,7 +171,7 @@ services:
       WEBFINGER_USERNAME: $WEBFINGER_USERNAME
       WEBFINGER_HREF: https://pocketid.$BASE_DOMAINNAME
       ## Shared resource attributes for traces/metrics/logs/access logs (OTEL_RESOURCE_ATTRIBUTES)
-      OTEL_RESOURCE_ATTRIBUTES: service.namespace=${TRAEFIK_OTEL_SERVICE_NAMESPACE:-edge},service.instance.id=${MY_HOSTNAME:-unknown},service.version=${TRAEFIK_OTEL_SERVICE_VERSION:-3.6},deployment.environment.name=${TRAEFIK_OTEL_DEPLOYMENT_ENVIRONMENT:-production}
+      OTEL_RESOURCE_ATTRIBUTES: service.namespace=${TRAEFIK_OTEL_SERVICE_NAMESPACE:-edge},service.instance.id=${TRAEFIK_OTEL_INSTANCE_ID:-$MY_HOSTNAME},service.version=${TRAEFIK_OTEL_SERVICE_VERSION:-3.6},deployment.environment.name=${OTEL_DEPLOYMENT_ENVIRONMENT:-production}
     # secrets:
     #   - cf_dns_api_token
     labels:
