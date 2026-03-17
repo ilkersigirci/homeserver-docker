@@ -20,7 +20,7 @@ services:
       PGID: $PGID
       APP_URL: https://arcane.$DOMAINNAME
       PORT: 3552
-      DOCKER_HOST: tcp://docker-socket-proxy:2375
+      DOCKER_HOST: tcp://docker-socket-proxy-exec:2375
       ENCRYPTION_KEY: $ARCANE_ENCRYPTION_KEY
       JWT_SECRET: $ARCANE_JWT_SECRET
       ANALYTICS_DISABLED: true

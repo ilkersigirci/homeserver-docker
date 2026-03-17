@@ -15,7 +15,7 @@ services:
       - no-new-privileges:true
     # https://tinyauth.app/docs/reference/configuration/
     environment:
-      DOCKER_HOST: tcp://docker-socket-proxy:2375
+      DOCKER_HOST: tcp://docker-socket-proxy-read:2375
       ## General Configuration
       TINYAUTH_APPURL: https://tinyauth.$DOMAINNAME
       ## Analytics Configuration

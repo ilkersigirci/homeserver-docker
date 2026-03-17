@@ -22,7 +22,7 @@ services:
       - $USERDIR:/data/home:ro
     environment:
       TZ: "${TZ}"
-      DOCKER_HOST: tcp://docker-socket-proxy:2375
+      DOCKER_HOST: tcp://docker-socket-proxy-read:2375
       # GLANCES_OPT: "-w" # "-C /glances/conf/glances.conf --export influxdb"
       GLANCES_OPT: "-C /glances/conf/glances.conf -w"
     labels:

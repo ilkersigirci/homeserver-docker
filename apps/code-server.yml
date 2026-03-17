@@ -17,7 +17,7 @@ services:
       PGID: $PGID
       TZ: $TZ
       DEFAULT_WORKSPACE: /config/workspace
-      # DOCKER_HOST: tcp://docker-socket-proxy:2375
+      # DOCKER_HOST: tcp://docker-socket-proxy-read:2375
       # PASSWORD: password
       # HASHED_PASSWORD: 
       SUDO_PASSWORD: ilker

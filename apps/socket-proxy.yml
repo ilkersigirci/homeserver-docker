@@ -1,51 +1,86 @@
+x-socket-proxy-service: &socket_proxy_service
+  image: lscr.io/linuxserver/socket-proxy:latest
+  restart: $RESTART_POLICY_CORE
+  read_only: true
+  tmpfs:
+    - /run
+  profiles:
+    - core
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  volumes:
+    - /var/run/docker.sock:/var/run/docker.sock:ro
+
+## Variables match the URL prefix (i.e. AUTH blocks access to /auth/* parts of the API, etc.).
+## 0 to revoke access. 1 to grant access.
+x-socket-proxy-env-common: &socket_proxy_env_common
+  LOG_LEVEL: info # debug,info,notice,warning,err,crit,alert,emerg
+  ALLOW_START: 0
+  ALLOW_STOP: 0
+  ALLOW_RESTARTS: 0
+  AUTH: 0
+  BUILD: 0
+  COMMIT: 0
+  CONFIGS: 0
+  CONTAINERS: 1
+  DISABLE_IPV6: 0
+  DISTRIBUTION: 0
+  EVENTS: 1
+  EXEC: 0
+  IMAGES: 1
+  INFO: 1
+  NETWORKS: 1
+  NODES: 0
+  PING: 1
+  PLUGINS: 0
+  POST: 0
+  PROXY_READ_TIMEOUT: 240
+  SECRETS: 0
+  SERVICES: 0
+  SESSION: 0
+  SWARM: 0
+  SYSTEM: 0
+  TASKS: 0
+  VERSION: 1
+  VOLUMES: 0
+
+x-socket-proxy-env-mutable: &socket_proxy_env_mutable
+  <<: *socket_proxy_env_common
+  ALLOW_START: 1
+  ALLOW_STOP: 1
+  ALLOW_RESTARTS: 1
+  POST: 1
+  VOLUMES: 1
+
 services:
-  docker-socket-proxy:
-    container_name: docker-socket-proxy
-    image: lscr.io/linuxserver/socket-proxy:latest
-    restart: unless-stopped
-    read_only: true
-    tmpfs:
-      - /run
-    profiles:
-      - core
+  docker-socket-proxy-read:
+    <<: *socket_proxy_service
     networks:
-      socket_proxy:
-        ipv4_address: 192.168.91.254 # You can specify a static IP
-    privileged: true
-    ports:
-      # - "127.0.0.1:2375:2375"
-      - "2375:2375" # NOTE: Use this if you want to expose docker socket in LAN.
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+      - socket_proxy
+    # ports:
+    #   - "127.0.0.1:2375:2375" # Keep host access local-only. Other containers use socket_proxy network.
+    #   - "2375:2375" # NOTE: Enable only if you intentionally expose Docker API in LAN.
     environment:
-      LOG_LEVEL: info # debug,info,notice,warning,err,crit,alert,emerg
-      ## Variables match the URL prefix (i.e. AUTH blocks access to /auth/* parts of the API, etc.).
-      # 0 to revoke access. 1 to grant access.
-      ALLOW_START: 0
-      ALLOW_STOP: 0
-      ALLOW_RESTARTS: 0
-      AUTH: 0
-      BUILD: 0
-      COMMIT: 0
-      CONFIGS: 0
-      CONTAINERS: 1 # For Homepage, Dozzle, Arcane
-      DISABLE_IPV6: 0
-      DISTRIBUTION: 0
-      EVENTS: 1
-      EXEC: 1 # For Arcane
-      IMAGES: 1 # For Arcane
-      INFO: 1  # For Dozzle, Arcane
-      NETWORKS: 1 # For Arcane
-      NODES: 0
-      PING: 1
-      PLUGINS: 0
-      POST: 1 # For Arcane
-      PROXY_READ_TIMEOUT: 240
-      SECRETS: 0
-      SERVICES: 0
-      SESSION: 0
-      SWARM: 0
-      SYSTEM: 0
-      TASKS: 0
-      VERSION: 1
-      VOLUMES: 1 # For Arcane
+      <<: *socket_proxy_env_common
+      CONTAINERS: 1 # Read-only consumers (Homepage, Dozzle, Tinyauth, Beszel, Glances)
+      IMAGES: 1 # Read-only image metadata for dashboards
+
+  # Mutable Docker access without exec: use for automation/controllers that
+  # need create/start/stop/remove/pull actions but should not run commands in containers.
+  docker-socket-proxy-write:
+    <<: *socket_proxy_service
+    networks:
+      - socket_proxy
+    environment:
+      <<: *socket_proxy_env_mutable
+
+  # High-privilege proxy for workloads that require docker exec capabilities.
+  docker-socket-proxy-exec:
+    <<: *socket_proxy_service
+    networks:
+      - socket_proxy
+    environment:
+      <<: *socket_proxy_env_mutable
+      EXEC: 1

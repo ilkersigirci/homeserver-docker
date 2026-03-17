@@ -19,7 +19,7 @@ services:
       ANALYTICS_DISABLED: true
       AGENT_TOKEN: $ARCANE_AGENT_BOOTSTRAP_TOKEN
       MANAGER_API_URL: https://arcane.gpu.$BASE_DOMAINNAME
-      DOCKER_HOST: tcp://docker-socket-proxy:2375
+      DOCKER_HOST: tcp://docker-socket-proxy-exec:2375
       GPU_MONITORING_ENABLED: true
       GPU_TYPE: nvidia
     labels:

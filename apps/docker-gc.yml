@@ -13,7 +13,7 @@ services:
     #   - $REPO_PATH/appdata/docker-gc/docker-gc-exclude:/etc/docker-gc-exclude
     environment:
       TZ: $TZ
-      DOCKER_HOST: tcp://docker-socket-proxy:2375
+      DOCKER_HOST: tcp://docker-socket-proxy-write:2375
       CRON: 0 0 3 * * *
       FORCE_IMAGE_REMOVAL: 1
       FORCE_CONTAINER_REMOVAL: 0

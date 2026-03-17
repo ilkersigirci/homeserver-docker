@@ -23,7 +23,7 @@
         #   hide-by-default: false
         #   # providers:
         #   #   - type: proxy
-        #   #     host: tcp://docker-socket-proxy:2375
+        #   #     host: tcp://docker-socket-proxy-read:2375
 
         - type: group
           widgets:

@@ -10,8 +10,6 @@ services:
       - maintenance
     networks:
       - socket_proxy
-    #depends_on:
-    #  - socket-proxy
     environment:
       TIMEZONE: $TZ
       TRAEFIK_VERSION: 2
@@ -21,7 +19,7 @@ services:
       DOMAIN1: $DOMAINNAME
       DOMAIN1_ZONE_ID: $CLOUDFLARE_ZONEID # Copy from Cloudflare Overview page
       DOMAIN1_PROXIED: TRUE
-      DOCKER_HOST: tcp://socket-proxy:2375
+      DOCKER_HOST: tcp://docker-socket-proxy-read:2375
     # secrets: # not working
     #   - cloudflare_api_token
     labels:

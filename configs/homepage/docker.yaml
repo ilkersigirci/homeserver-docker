@@ -3,5 +3,5 @@
 # https://github.com/benphelps/homepage/wiki/Docker-Integration
 
 my-docker:
-  host: docker-socket-proxy
+  host: docker-socket-proxy-read
   port: 2375
