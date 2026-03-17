@@ -2,6 +2,8 @@
 
 ![Services](./resources/services.png)
 
+The `apps` folder contains a collection of Docker Compose files for running various services on a home server machines.
+The `compose` folder defines which services to run on which machines, allowing for easy management of multiple hosts with different configurations.
 
 Essential commands
 
