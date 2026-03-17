@@ -23,7 +23,7 @@ services:
       - --accesslog.fields.headers.names.Authorization=drop
       - --accesslog.fields.headers.names.Cookie=drop
       - --accesslog.filePath=/logs/access.log
-      - --accesslog.filters.statusCodes=204-299,400-499,500-599
+      - --accesslog.filters.statusCodes=${TRAEFIK_ACCESSLOG_STATUS_CODES:-204-299,400-499,500-599}
       - --accesslog.format=json
       - --accesslog.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-false}
       - --accesslog.otlp.grpc.endpoint=${TRAEFIK_OTEL_GRPC_ENDPOINT:-grafana-lgtm:4317}

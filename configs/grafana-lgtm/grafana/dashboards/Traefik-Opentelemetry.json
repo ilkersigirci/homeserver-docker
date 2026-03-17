@@ -1169,7 +1169,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(20,\r\n  sum by (request_X_Real_Ip) (\r\n    count_over_time(\r\n      {service_name=\"traefik\"} |= \"RequestProtocol\"\r\n      | json | __error__=\"\"\r\n      | request_Cf_Ipcountry=~\"[A-Z]{2}\"\r\n    [$__range])\r\n  )\r\n)\r\n",
+          "expr": "topk(20,\r\n  sum by (request_X_Real_Ip) (\r\n    count_over_time(\r\n      {service_name=\"traefik\"} |= \"RequestProtocol\"\r\n      | json | __error__=\"\"\r\n      | request_X_Real_Ip=~\".+\"\r\n    [$__range])\r\n  )\r\n)\r\n",
           "legendFormat": "{{request_X_Real_Ip}}",
           "queryType": "instant",
           "refId": "A",
@@ -1348,7 +1348,6 @@
           "refId": "A"
         }
       ],
-      "timeFrom": "15m",
       "title": "Access Logs",
       "type": "logs"
     },
