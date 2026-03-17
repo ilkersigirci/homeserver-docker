@@ -61,12 +61,15 @@ services:
       GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP: true
       GF_AUTH_GENERIC_OAUTH_CLIENT_ID: $GRAFANA_CLIENT_ID
       GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET: $GRAFANA_CLIENT_SECRET
-      GF_AUTH_GENERIC_OAUTH_SCOPES: openid profile email
+      GF_AUTH_GENERIC_OAUTH_SCOPES: openid profile email groups
       GF_AUTH_GENERIC_OAUTH_AUTH_URL: https://pocketid.$BASE_DOMAINNAME/authorize
       GF_AUTH_GENERIC_OAUTH_TOKEN_URL: https://pocketid.$BASE_DOMAINNAME/api/oidc/token
       GF_AUTH_GENERIC_OAUTH_API_URL: https://pocketid.$BASE_DOMAINNAME/api/oidc/userinfo
       GF_AUTH_GENERIC_OAUTH_USE_PKCE: true
       GF_AUTH_GENERIC_OAUTH_USE_REFRESH_TOKEN: true
+      GF_AUTH_GENERIC_OAUTH_SKIP_ORG_ROLE_SYNC: false
+      GF_AUTH_GENERIC_OAUTH_ALLOW_ASSIGN_GRAFANA_ADMIN: true
+      GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "contains(groups[*], 'admin') && 'GrafanaAdmin' || 'Viewer'"
       ################ OTHER CONFIGS ##################
       LOKI_ARGS: --pattern-ingester.enabled=true
     labels:
