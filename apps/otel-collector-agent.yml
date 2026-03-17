@@ -1,17 +1,26 @@
 services:
-  # Local edge collector that receives OTLP from local services and forwards to central LGTM.
+  # NOTE: Local edge collector that receives OTLP from local services and forwards to central LGTM.
   otel-collector-agent:
     container_name: otel-collector-agent
-    image: otel/opentelemetry-collector-contrib:0.143.0
+    image: otel/opentelemetry-collector-contrib:0.147.0
     restart: $RESTART_POLICY_CORE
     profiles:
       - core
+    user: $PUID:$PGID
     command:
       - --config=/etc/otelcol/config.yaml
     security_opt:
       - no-new-privileges:true
     networks:
       - t3_proxy
+    expose:
+    - 1888 # pprof extension
+    - 4317 # OTLP gRPC receiver
+    - 4318 # OTLP http receiver
+    - 8888 # Prometheus metrics exposed by the Collector
+    - 8889 # Prometheus exporter metrics
+    - 13133 # health_check extension
+    - 55679 # zpages extension
     volumes:
       - $REPO_PATH/configs/grafana-lgtm/otelcol-agent-config.yaml:/etc/otelcol/config.yaml:ro
       - $REPO_PATH/appdata/otel-collector-agent/file_storage:/var/lib/otelcol/file_storage
