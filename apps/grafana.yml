@@ -17,7 +17,7 @@ services:
       - $REPO_PATH/configs/grafana/grafana.ini:/etc/grafana/grafana.ini
       - $REPO_PATH/configs/grafana/provisioning/:/etc/grafana/provisioning/
     environment:
-      GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource,grafana-worldmap-panel,grafana-piechart-panel"
+      GF_PLUGINS_PREINSTALL: "grafana-clock-panel,grafana-simple-json-datasource,grafana-worldmap-panel,grafana-piechart-panel"
       GF_SECURITY_ADMIN_USER: 'admin'
       GF_SECURITY_ADMIN_PASSWORD: 'admin'
       GF_USERS_ALLOW_SIGN_UP: 'false'

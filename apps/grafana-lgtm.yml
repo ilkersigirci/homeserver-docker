@@ -20,7 +20,7 @@ services:
       - no-new-privileges:true
     volumes:
       ## CONFIGS
-      - $REPO_PATH/configs/grafana-lgtm/grafana/dashboards:/otel-lgtm/grafana/conf/provisioning/dashboards/custom:ro
+      - $REPO_PATH/configs/grafana-lgtm/grafana/provisioning/dashboards:/otel-lgtm/grafana/conf/provisioning/dashboards:ro
       # - $REPO_PATH/configs/grafana-lgtm/prometheus.yaml:/otel-lgtm/prometheus.yaml:ro
       # - $REPO_PATH/configs/grafana-lgtm/loki-config.yaml:/otel-lgtm/loki-config.yaml:ro
       # - $REPO_PATH/configs/grafana-lgtm/tempo-config.yaml:/otel-lgtm/tempo-config.yaml:ro
@@ -38,13 +38,12 @@ services:
       GF_SERVER_ROOT_URL: https://grafana.$DOMAINNAME
       GF_PATHS_DATA: /data/grafana
       GF_LOG_LEVEL: 'info'
-      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /otel-lgtm/grafana/conf/provisioning/dashboards/custom/Traefik-Opentelemetry.json
-      # GF_PANELS_DISABLE_SANITIZE_HTML: true ?
-      # GF_PLUGINS_ENABLE_ALPHA: true ?
-      # GF_ALLOW_EMBEDDING: true ?
-      # GF_grafanaconThemes: true ?
-      # GF_INSTALL_PLUGINS: yesoreyeram-infinity-datasource ?
-      # GF_FEATURE_TOGGLES_ENABLE: provisioning ?
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /otel-lgtm/grafana/conf/provisioning/dashboards/OTEL/Traefik-Opentelemetry.json
+      # GF_PANELS_DISABLE_SANITIZE_HTML: "true" # Allow raw HTML/JS in text panels (XSS risk).
+      # GF_PLUGINS_ENABLE_ALPHA: "true" # Enable alpha plugins (experimental quality).
+      # GF_SECURITY_ALLOW_EMBEDDING: "true" # Allow Grafana in iframes.
+      # GF_PLUGINS_PREINSTALL: "yesoreyeram-infinity-datasource" # Preinstall Infinity datasource plugin.
+      GF_FEATURE_TOGGLES_ENABLE: "provisioning" # Enable new provisioning/Git Sync features.
       ##### AUTH CONFIGS #####
       ## Normal Auth ##
       # GF_SECURITY_ADMIN_USER: admin
