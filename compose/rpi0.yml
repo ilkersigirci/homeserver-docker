@@ -42,6 +42,7 @@ include:
   - ../apps/socket-proxy.yml
   - ../apps/tinyauth.yml
   - ../apps/traefik.yml
+  - ../apps/otel-collector-agent.yml
   - ../apps/vaultwarden.yml
   ###### MAINTENANCE ####
   - ../apps/apprise.yml

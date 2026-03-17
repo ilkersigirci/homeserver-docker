@@ -40,6 +40,7 @@ include:
   - ../apps/socket-proxy.yml
   - ../apps/tinyauth.yml
   - ../apps/traefik.yml
+  - ../apps/otel-collector-agent.yml
   #### PROGRAMMING ####
   - ../apps/doco-cd.yml
   - ../apps/forgejo.yml

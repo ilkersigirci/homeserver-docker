@@ -82,12 +82,23 @@ services:
       traefik.http.services.grafana-lgtm-svc.loadbalancer.server.port: "3000"
       ## gRPC Router (RPC)
       traefik.http.routers.grafana-lgtm-rpc-rtr.entrypoints: "websecure"
-      traefik.http.routers.grafana-lgtm-rpc-rtr.rule: "Host(`grafana-rpc.$DOMAINNAME`)"
+      traefik.http.routers.grafana-lgtm-rpc-rtr.rule: "Host(`grafana-rpc.$DOMAINNAME`) && HeadersRegexp(`Content-Type`, `(?i)^application/grpc.*`)"
       traefik.http.routers.grafana-lgtm-rpc-rtr.tls: "true"
+      traefik.http.routers.grafana-lgtm-rpc-rtr.middlewares: "middlewares-cf-real-ip@file,grafana-lgtm-rpc-allowlist"
       traefik.http.routers.grafana-lgtm-rpc-rtr.service: "grafana-lgtm-rpc-svc"
+      ## OTLP HTTP Router
+      traefik.http.routers.grafana-lgtm-rpc-http-rtr.entrypoints: "websecure"
+      traefik.http.routers.grafana-lgtm-rpc-http-rtr.rule: "Host(`grafana-rpc.$DOMAINNAME`) && PathPrefix(`/v1/`)"
+      traefik.http.routers.grafana-lgtm-rpc-http-rtr.tls: "true"
+      traefik.http.routers.grafana-lgtm-rpc-http-rtr.middlewares: "middlewares-cf-real-ip@file,grafana-lgtm-rpc-allowlist"
+      traefik.http.routers.grafana-lgtm-rpc-http-rtr.service: "grafana-lgtm-rpc-http-svc"
+      ## OTLP ingress hardening (LAN/VPN allow list)
+      traefik.http.middlewares.grafana-lgtm-rpc-allowlist.ipallowlist.sourcerange: "$LOCAL_IPS"
       ## gRPC Service (h2c)
       traefik.http.services.grafana-lgtm-rpc-svc.loadbalancer.server.port: "4317"
       traefik.http.services.grafana-lgtm-rpc-svc.loadbalancer.server.scheme: "h2c"
+      ## OTLP HTTP Service
+      traefik.http.services.grafana-lgtm-rpc-http-svc.loadbalancer.server.port: "4318"
       ####### TINYAUTH #######
       tinyauth.apps.grafana-lgtm.config.domain: "grafana.$DOMAINNAME"
       tinyauth.apps.grafana-lgtm.ip.bypass: "$LOCAL_IPS"

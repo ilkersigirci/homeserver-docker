@@ -39,6 +39,7 @@ include:
   - ../apps/socket-proxy.yml
   - ../apps/tinyauth.yml
   - ../apps/traefik.yml
+  - ../apps/otel-collector-agent.yml
   ###### MAINTENANCE ####
   - ../apps/home-assistant.yml
   - ../apps/watchyourlan.yml
