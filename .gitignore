@@ -32,4 +32,3 @@ data/*
 
 # Logs
 logs/*
-!logs/traefik
