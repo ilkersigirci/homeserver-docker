@@ -30,5 +30,8 @@ configs/glance/docs
 # Data
 data/*
 
-# Logs
-logs/*
+# Logs (keep folder structure, ignore runtime log files)
+logs/**
+!logs/
+!logs/**/
+!logs/**/.gitkeep
