@@ -16,6 +16,9 @@ networks:
     ipam:
       config:
         - subnet: 192.168.91.0/24
+  crowdsec_lapi:
+    name: crowdsec_lapi
+    driver: bridge
   dockervlan:
     name: dockervlan
     driver: macvlan

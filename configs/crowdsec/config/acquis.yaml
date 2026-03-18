@@ -1,0 +1,11 @@
+filenames:
+ - /var/log/auth.log
+ - /var/log/syslog
+ - /var/log/ufw.log
+labels:
+  type: syslog
+---
+filenames:
+  - /logs/traefik/access.log
+labels:
+  type: traefik

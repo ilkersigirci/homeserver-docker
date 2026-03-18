@@ -1,3 +1,4 @@
+# General
 acme.json
 appdata
 secrets
@@ -26,6 +27,19 @@ configs/glance/docs
 !configs/strava-statistics
 !configs/traefik3
 !configs/forgejo
+
+## CrowdSec (track only the important editable config files)
+!configs/crowdsec/
+!configs/crowdsec/config/
+configs/crowdsec/config/**
+!configs/crowdsec/config/acquis.yaml
+!configs/crowdsec/config/config.yaml
+!configs/crowdsec/config/profiles.yaml
+!configs/crowdsec/config/console.yaml
+!configs/crowdsec/config/user.yaml
+### Keep credentials out of git
+configs/crowdsec/config/local_api_credentials.yaml
+configs/crowdsec/config/online_api_credentials.yaml
 
 # Data
 data/*

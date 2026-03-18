@@ -4,7 +4,6 @@ services:
   # chmod 600 $REPO_PATH/configs/traefik3/acme/acme.json
   traefik:
     container_name: traefik
-    # image: ghcr.io/traefik/traefik:3.6
     image: ghcr.io/traefik/traefik:3.7.0-ea.1
     restart: $RESTART_POLICY_CORE
     profiles:
@@ -39,7 +38,7 @@ services:
       - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.resolvers=1.1.1.1:53,1.0.0.1:53
       - --certificatesResolvers.dns-cloudflare.acme.email=$CLOUDFLARE_EMAIL
       - --certificatesResolvers.dns-cloudflare.acme.storage=/acme.json
-      - --entrypoints.dot.address=:853
+      # - --entrypoints.dot.address=:853
       - --entrypoints.traefik.address=:8080
       - --entrypoints.web.address=:80
       - --entrypoints.web.http.redirections.entrypoint.permanent=true
@@ -124,6 +123,7 @@ services:
       t3_proxy:
         ipv4_address: 192.168.90.254 # You can specify a static IP
       socket_proxy:
+      crowdsec_lapi:
     # NOTE: To Access Docker Containers that run on Host Network. Is this working?
     # extra_hosts:
     #   - host.docker.internal:172.17.0.1
@@ -145,10 +145,10 @@ services:
         published: 443
         protocol: tcp
         mode: host
-      - target: 853
-        published: 853
-        protocol: tcp
-        mode: host
+      # - target: 853
+      #   published: 853
+      #   protocol: tcp
+      #   mode: host
       # - target: 8080  # need to enable --api.insecure=true
       #   published: 8085
       #   protocol: tcp

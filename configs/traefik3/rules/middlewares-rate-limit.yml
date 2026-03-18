@@ -4,3 +4,23 @@ http:
       rateLimit:
         average: 200
         burst: 100
+
+    middlewares-rate-limit-public-app:
+      rateLimit:
+        average: 200
+        burst: 100
+
+    middlewares-rate-limit-public-api:
+      rateLimit:
+        average: 120
+        burst: 60
+
+    middlewares-rate-limit-webfinger:
+      rateLimit:
+        average: 30
+        burst: 15
+
+    middlewares-rate-limit-redirect:
+      rateLimit:
+        average: 60
+        burst: 30

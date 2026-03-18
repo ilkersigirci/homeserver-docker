@@ -1,14 +1,14 @@
 services:
   crowdsec:
-    image: crowdsecurity/crowdsec:latest
+    image: crowdsecurity/crowdsec:v1.7.6-eacc8192
     container_name: crowdsec
     restart: $RESTART_POLICY_CORE
     profiles:
       - core
     networks:
-      - t3_proxy
+      - crowdsec_lapi
     expose:
-      - 8080 # http api for bouncers
+      - 8080 # LAPI endpoint for Traefik bouncer via crowdsec_lapi
       - 6060 # metrics endpoint for prometheus
       - 7422 # appsec waf endpoint
     security_opt:
@@ -16,6 +16,8 @@ services:
     volumes:
       - $REPO_PATH/appdata/crowdsec:/var/lib/crowdsec/data
       - $REPO_PATH/configs/crowdsec/config:/etc/crowdsec
+      - $REPO_PATH/secrets/crowdsec/local_api_credentials.yaml:/etc/crowdsec/local_api_credentials.yaml
+      - $REPO_PATH/secrets/crowdsec/online_api_credentials.yaml:/etc/crowdsec/online_api_credentials.yaml
       - /var/log:/var/log:ro
       - $REPO_PATH/logs/traefik:/logs/traefik:ro
     environment:
