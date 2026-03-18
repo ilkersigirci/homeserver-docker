@@ -1,6 +1,6 @@
 services:
   crowdsec:
-    image: crowdsecurity/crowdsec:v1.7.6-eacc8192
+    image: crowdsecurity/crowdsec:v1.7.6
     container_name: crowdsec
     restart: $RESTART_POLICY_CORE
     profiles:
