@@ -4,7 +4,8 @@ services:
   # chmod 600 $REPO_PATH/configs/traefik3/acme/acme.json
   traefik:
     container_name: traefik
-    image: ghcr.io/traefik/traefik:3.6
+    # image: ghcr.io/traefik/traefik:3.6
+    image: ghcr.io/traefik/traefik:3.7.0-ea.1
     restart: $RESTART_POLICY_CORE
     profiles:
       - core
@@ -22,9 +23,9 @@ services:
       - --accesslog.fields.headers.names.Authorization=drop
       - --accesslog.fields.headers.names.Cookie=drop
       - --accesslog.filePath=/logs/access.log
-      ## FIXME: not working
-      # - --accesslog.dualoutput=true # Keep file logs even when OTLP export is enabled
-      - --accesslog.filters.statusCodes=${TRAEFIK_ACCESSLOG_STATUS_CODES:-204-299,400-499,500-599}
+      # Keep file logs even when OTLP export is enabled. For traefik>=3.7
+      - --accesslog.dualoutput=true
+      - --accesslog.filters.statusCodes=${TRAEFIK_ACCESSLOG_STATUS_CODES:-200-299,400-499,500-599}
       - --accesslog.format=json
       - --accesslog.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-true}
       - --accesslog.otlp.grpc.endpoint=otel-collector-agent:4317
