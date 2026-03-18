@@ -1,12 +1,11 @@
+acme.json
 appdata
-logs
 secrets
 .idea
 .env*
 .github
 
 # Configs
-acme.json
 configs/*
 configs/glance/docs
 !configs/copyparty/copyparty.conf
@@ -30,3 +29,7 @@ configs/glance/docs
 
 # Data
 data/*
+
+# Logs
+logs/*
+!logs/traefik
