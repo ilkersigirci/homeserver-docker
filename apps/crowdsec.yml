@@ -5,6 +5,7 @@ services:
     restart: $RESTART_POLICY_CORE
     profiles:
       - core
+      - crowdsec
     networks:
       - crowdsec_lapi
     expose:

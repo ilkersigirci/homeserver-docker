@@ -1,0 +1,21 @@
+type: http
+name: http_victoriametrics
+
+# One of "trace", "debug", "info", "warn", "error", "off"
+log_level: info
+
+# The following template receives a list of models.Alert objects
+# and sends NDJSON samples to VictoriaMetrics /api/v1/import.
+format: |
+  {{range . -}}
+  {{$Alert := . -}}
+  {{range .Decisions -}}
+  {"metric":{"__name__":"cs_lapi_decision","instance":"{{$Alert.MachineID}}","ip":"{{.Value}}","reason":"{{.Scenario}}","country":"{{$Alert.Source.Cn}}","as_name":"{{$Alert.Source.AsName}}","as_num":"{{$Alert.Source.AsNumber}}","scope":"{{.Scope}}","value":"{{.Value}}","type":"{{.Type}}","origin":"{{.Origin}}","duration":"{{.Duration}}","event_count":"{{len $Alert.Events}}","traefik_routers":{{printf "%q" (GetMeta $Alert "traefik_router_name" | uniq | join ",")}},"service":{{printf "%q" (GetMeta $Alert "service" | uniq | join ",")}},"http_status":{{printf "%q" (GetMeta $Alert "http_status" | uniq | join ",")}},"http_path":{{printf "%q" (GetMeta $Alert "http_path" | uniq | join ",")}}},"values":[1],"timestamps":[{{ now | unixEpoch }}000]}
+  {{end -}}
+  {{end -}}
+
+url: http://victoriametrics:8428/api/v1/import
+method: POST
+
+headers:
+  Content-Type: application/json
