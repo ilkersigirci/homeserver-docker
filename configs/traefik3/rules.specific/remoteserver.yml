@@ -1,10 +1,12 @@
 http:
   routers:
     webfinger-rtr:
-      rule: "Host(`{{env "DOMAINNAME"}}`)"
+      rule: "Host(`{{env "DOMAINNAME"}}`) && PathPrefix(`/.well-known/webfinger`)"
       entryPoints:
         - websecure
       middlewares:
+        - chain-no-auth
+        - middlewares-rate-limit-webfinger
         - middlewares-webfinger
       service: webfinger-svc
 
@@ -29,6 +31,8 @@ http:
       entryPoints:
         - websecure
       middlewares:
+        - chain-no-auth
+        - middlewares-rate-limit-redirect
         - jellyfin-redirect
       service: noop@internal
 
@@ -48,6 +52,15 @@ http:
         - chain-no-auth-relaxed
         # - chain-tinyauth-relaxed
       service: splitpro-svc
+
+    public-catchall-rtr:
+      rule: "PathPrefix(`/`)"
+      priority: 1
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth
+      service: noop@internal
   
   middlewares:
     jellyfin-redirect:
