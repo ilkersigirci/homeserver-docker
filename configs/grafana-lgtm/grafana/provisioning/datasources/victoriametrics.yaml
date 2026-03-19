@@ -1,0 +1,10 @@
+apiVersion: 1
+
+datasources:
+  - name: victoriametrics
+    uid: victoriametrics
+    type: prometheus
+    access: proxy
+    url: ${CROWDSEC_VICTORIAMETRICS_URL}
+    isDefault: false
+    editable: true

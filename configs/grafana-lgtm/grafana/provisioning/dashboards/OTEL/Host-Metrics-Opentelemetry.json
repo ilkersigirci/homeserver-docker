@@ -143,7 +143,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "1 - avg(rate(system_cpu_time_seconds_total{$host_label=\"$host\",state=\"idle\"}[$__rate_interval]))",
+          "expr": "1 - avg(rate(system_cpu_time_seconds_total{host_name=\"$host\",state=\"idle\"}[$__rate_interval]))",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A",
@@ -216,7 +216,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "1 - (sum(system_memory_usage_bytes{$host_label=\"$host\",state=\"free\"}) / sum(system_memory_usage_bytes{$host_label=\"$host\"}))",
+          "expr": "1 - (sum(system_memory_usage_bytes{host_name=\"$host\",state=\"free\"}) / sum(system_memory_usage_bytes{host_name=\"$host\"}))",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A",
@@ -289,7 +289,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(system_filesystem_usage_bytes{$host_label=\"$host\",mountpoint=\"/\",state=\"used\"}) / sum(system_filesystem_usage_bytes{$host_label=\"$host\",mountpoint=\"/\"})",
+          "expr": "sum(system_filesystem_usage_bytes{host_name=\"$host\",mountpoint=\"/\",state=\"used\"}) / sum(system_filesystem_usage_bytes{host_name=\"$host\",mountpoint=\"/\"})",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A",
@@ -354,7 +354,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "system_cpu_load_average_1m{$host_label=\"$host\"}",
+          "expr": "system_cpu_load_average_1m{host_name=\"$host\"}",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A",
@@ -419,7 +419,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "count(count by (cpu) (system_cpu_time_seconds_total{$host_label=\"$host\"}))",
+          "expr": "count(count by (cpu) (system_cpu_time_seconds_total{host_name=\"$host\"}))",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A",
@@ -484,7 +484,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(system_memory_usage_bytes{$host_label=\"$host\"})",
+          "expr": "sum(system_memory_usage_bytes{host_name=\"$host\"})",
           "legendFormat": "__auto",
           "range": true,
           "refId": "A",
@@ -597,7 +597,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "1 - avg(rate(system_cpu_time_seconds_total{$host_label=\"$host\",state=\"idle\"}[$__rate_interval]))",
+          "expr": "1 - avg(rate(system_cpu_time_seconds_total{host_name=\"$host\",state=\"idle\"}[$__rate_interval]))",
           "legendFormat": "CPU Utilization",
           "range": true,
           "refId": "A",
@@ -722,7 +722,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "system_cpu_load_average_1m{$host_label=\"$host\"}",
+          "expr": "system_cpu_load_average_1m{host_name=\"$host\"}",
           "legendFormat": "1m",
           "range": true,
           "refId": "A",
@@ -733,7 +733,7 @@
         },
         {
           "editorMode": "code",
-          "expr": "system_cpu_load_average_5m{$host_label=\"$host\"}",
+          "expr": "system_cpu_load_average_5m{host_name=\"$host\"}",
           "legendFormat": "5m",
           "range": true,
           "refId": "B",
@@ -744,7 +744,7 @@
         },
         {
           "editorMode": "code",
-          "expr": "system_cpu_load_average_15m{$host_label=\"$host\"}",
+          "expr": "system_cpu_load_average_15m{host_name=\"$host\"}",
           "legendFormat": "15m",
           "range": true,
           "refId": "C",
@@ -755,7 +755,7 @@
         },
         {
           "editorMode": "code",
-          "expr": "count(count by (cpu) (system_cpu_time_seconds_total{$host_label=\"$host\"}))",
+          "expr": "count(count by (cpu) (system_cpu_time_seconds_total{host_name=\"$host\"}))",
           "legendFormat": "cores",
           "range": true,
           "refId": "D",
@@ -867,7 +867,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "system_memory_usage_bytes{$host_label=\"$host\",state=\"used\"}",
+          "expr": "system_memory_usage_bytes{host_name=\"$host\",state=\"used\"}",
           "legendFormat": "used",
           "range": true,
           "refId": "A",
@@ -878,7 +878,7 @@
         },
         {
           "editorMode": "code",
-          "expr": "system_memory_usage_bytes{$host_label=\"$host\",state=\"cached\"}",
+          "expr": "system_memory_usage_bytes{host_name=\"$host\",state=\"cached\"}",
           "legendFormat": "cached",
           "range": true,
           "refId": "B",
@@ -889,7 +889,7 @@
         },
         {
           "editorMode": "code",
-          "expr": "system_memory_usage_bytes{$host_label=\"$host\",state=\"buffered\"}",
+          "expr": "system_memory_usage_bytes{host_name=\"$host\",state=\"buffered\"}",
           "legendFormat": "buffered",
           "range": true,
           "refId": "C",
@@ -900,7 +900,7 @@
         },
         {
           "editorMode": "code",
-          "expr": "system_memory_usage_bytes{$host_label=\"$host\",state=\"free\"}",
+          "expr": "system_memory_usage_bytes{host_name=\"$host\",state=\"free\"}",
           "legendFormat": "free",
           "range": true,
           "refId": "D",
@@ -1000,7 +1000,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "1 - (sum(system_memory_usage_bytes{$host_label=\"$host\",state=\"free\"}) / sum(system_memory_usage_bytes{$host_label=\"$host\"}))",
+          "expr": "1 - (sum(system_memory_usage_bytes{host_name=\"$host\",state=\"free\"}) / sum(system_memory_usage_bytes{host_name=\"$host\"}))",
           "legendFormat": "Memory Utilization",
           "range": true,
           "refId": "A",
@@ -1124,7 +1124,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "rate(system_disk_io_bytes_total{$host_label=\"$host\",direction=\"read\"}[$__rate_interval])",
+          "expr": "rate(system_disk_io_bytes_total{host_name=\"$host\",direction=\"read\"}[$__rate_interval])",
           "legendFormat": "{{device}} read",
           "range": true,
           "refId": "A",
@@ -1135,7 +1135,7 @@
         },
         {
           "editorMode": "code",
-          "expr": "rate(system_disk_io_bytes_total{$host_label=\"$host\",direction=\"write\"}[$__rate_interval])",
+          "expr": "rate(system_disk_io_bytes_total{host_name=\"$host\",direction=\"write\"}[$__rate_interval])",
           "legendFormat": "{{device}} write",
           "range": true,
           "refId": "B",
@@ -1246,7 +1246,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "rate(system_disk_operations_total{$host_label=\"$host\",direction=\"read\"}[$__rate_interval])",
+          "expr": "rate(system_disk_operations_total{host_name=\"$host\",direction=\"read\"}[$__rate_interval])",
           "legendFormat": "{{device}} read",
           "range": true,
           "refId": "A",
@@ -1257,7 +1257,7 @@
         },
         {
           "editorMode": "code",
-          "expr": "rate(system_disk_operations_total{$host_label=\"$host\",direction=\"write\"}[$__rate_interval])",
+          "expr": "rate(system_disk_operations_total{host_name=\"$host\",direction=\"write\"}[$__rate_interval])",
           "legendFormat": "{{device}} write",
           "range": true,
           "refId": "B",
@@ -1357,7 +1357,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "rate(system_disk_io_time_seconds_total{$host_label=\"$host\"}[$__rate_interval])",
+          "expr": "rate(system_disk_io_time_seconds_total{host_name=\"$host\"}[$__rate_interval])",
           "legendFormat": "{{device}}",
           "range": true,
           "refId": "A",
@@ -1452,7 +1452,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (mountpoint) (system_filesystem_usage_bytes{$host_label=\"$host\",state=\"used\"}) / sum by (mountpoint) (system_filesystem_usage_bytes{$host_label=\"$host\",state=~\"used|free\"})",
+          "expr": "sum by (mountpoint) (system_filesystem_usage_bytes{host_name=\"$host\",state=\"used\"}) / sum by (mountpoint) (system_filesystem_usage_bytes{host_name=\"$host\",state=~\"used|free\"})",
           "legendFormat": "{{mountpoint}}",
           "range": true,
           "refId": "A",
@@ -1550,7 +1550,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "system_filesystem_usage_bytes{$host_label=\"$host\",state=\"used\"}",
+          "expr": "system_filesystem_usage_bytes{host_name=\"$host\",state=\"used\"}",
           "legendFormat": "{{mountpoint}} used",
           "range": true,
           "refId": "A",
@@ -1561,7 +1561,7 @@
         },
         {
           "editorMode": "code",
-          "expr": "system_filesystem_usage_bytes{$host_label=\"$host\",state=\"free\"}",
+          "expr": "system_filesystem_usage_bytes{host_name=\"$host\",state=\"free\"}",
           "legendFormat": "{{mountpoint}} free",
           "range": true,
           "refId": "B",
@@ -1685,7 +1685,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "rate(system_network_io_bytes_total{$host_label=\"$host\",direction=\"receive\"}[$__rate_interval]) * 8",
+          "expr": "rate(system_network_io_bytes_total{host_name=\"$host\",direction=\"receive\"}[$__rate_interval]) * 8",
           "legendFormat": "{{device}} receive",
           "range": true,
           "refId": "A",
@@ -1696,7 +1696,7 @@
         },
         {
           "editorMode": "code",
-          "expr": "rate(system_network_io_bytes_total{$host_label=\"$host\",direction=\"transmit\"}[$__rate_interval]) * 8",
+          "expr": "rate(system_network_io_bytes_total{host_name=\"$host\",direction=\"transmit\"}[$__rate_interval]) * 8",
           "legendFormat": "{{device}} transmit",
           "range": true,
           "refId": "B",
@@ -1807,7 +1807,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "rate(system_network_packets_total{$host_label=\"$host\",direction=\"receive\"}[$__rate_interval])",
+          "expr": "rate(system_network_packets_total{host_name=\"$host\",direction=\"receive\"}[$__rate_interval])",
           "legendFormat": "{{device}} receive",
           "range": true,
           "refId": "A",
@@ -1818,7 +1818,7 @@
         },
         {
           "editorMode": "code",
-          "expr": "rate(system_network_packets_total{$host_label=\"$host\",direction=\"transmit\"}[$__rate_interval])",
+          "expr": "rate(system_network_packets_total{host_name=\"$host\",direction=\"transmit\"}[$__rate_interval])",
           "legendFormat": "{{device}} transmit",
           "range": true,
           "refId": "B",
@@ -1916,7 +1916,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "rate(system_network_errors_total{$host_label=\"$host\"}[$__rate_interval])",
+          "expr": "rate(system_network_errors_total{host_name=\"$host\"}[$__rate_interval])",
           "legendFormat": "{{device}} {{direction}} errors",
           "range": true,
           "refId": "A",
@@ -2014,7 +2014,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (state) (system_network_connections{$host_label=\"$host\"})",
+          "expr": "sum by (state) (system_network_connections{host_name=\"$host\"})",
           "legendFormat": "{{state}}",
           "range": true,
           "refId": "A",
@@ -2046,38 +2046,19 @@
         "type": "datasource"
       },
       {
-        "current": {
-          "text": "service_instance_id",
-          "value": "service_instance_id"
-        },
-        "name": "host_label",
-        "options": [
-          {
-            "selected": true,
-            "text": "service_instance_id",
-            "value": "service_instance_id"
-          },
-          {
-            "selected": false,
-            "text": "host_name",
-            "value": "host_name"
-          }
-        ],
-        "query": "service_instance_id,host_name",
-        "type": "custom"
-      },
-      {
         "current": {},
         "datasource": {
           "type": "prometheus",
           "uid": "${DS_PROMETHEUS}"
         },
-        "definition": "label_values(system_cpu_time_seconds_total,$host_label)",
+        "definition": "label_values(system_cpu_time_seconds_total,host_name)",
+        "includeAll": false,
+        "multi": false,
         "name": "host",
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(system_cpu_time_seconds_total,$host_label)",
+          "query": "label_values(system_cpu_time_seconds_total,host_name)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
@@ -2097,5 +2078,5 @@
   "version": 7,
   "weekStart": "",
   "gnetId": 24638,
-  "description": "Monitor host performance using OpenTelemetry Collector hostmetrics receiver. Includes CPU utilization, system load, memory usage, disk I/O throughput/IOPS, filesystem utilization, and network traffic.\n\nThis copy is customized to use semantic OTel/Prometheus labels for host filtering: service_instance_id (default) and host_name."
+  "description": "Monitor host performance using OpenTelemetry Collector hostmetrics receiver. Includes CPU utilization, system load, memory usage, disk I/O throughput/IOPS, filesystem utilization, and network traffic.\n\nThis copy is customized to use semantic OTel/Prometheus labels for host filtering: host_name."
 }

@@ -1,0 +1,33 @@
+services:
+  victoriametrics:
+    image: victoriametrics/victoria-metrics:v1.138.0
+    container_name: victoriametrics
+    restart: $RESTART_POLICY_MAINTENANCE
+    profiles:
+      - monitoring
+      - crowdsec
+    networks:
+      - crowdsec_lapi
+    expose:
+      - 8428
+    # TODO: Should we expose this or use traefik?
+    ports:
+      - "8428:8428"
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $REPO_PATH/appdata/victoriametrics:/victoria-metrics-data
+    command:
+      - "--storageDataPath=/victoria-metrics-data"
+      - "--httpListenAddr=:8428"
+    labels:
+      ####### HOMEPAGE #######
+      homepage.group: "Monitoring"
+      homepage.name: "victoriametrics"
+      homepage.icon: "victoriametrics.png"
+      homepage.target: "_blank"
+      homepage.description: "Fast, cost-effective monitoring solution and time series database "
+      ####### GLANCE #######
+      glance.name: "victoriametrics"
+      glance.icon: "sh:victoriametrics"
+      glance.description: "Fast, cost-effective monitoring solution and time series database "

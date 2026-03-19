@@ -22,12 +22,13 @@ services:
       - no-new-privileges:true
     volumes:
       ## CONFIGS
-      - $REPO_PATH/configs/grafana-lgtm/grafana/provisioning/dashboards:/otel-lgtm/grafana/conf/provisioning/dashboards:ro
-      # - $REPO_PATH/configs/grafana-lgtm/prometheus.yaml:/otel-lgtm/prometheus.yaml:ro
-      # - $REPO_PATH/configs/grafana-lgtm/loki-config.yaml:/otel-lgtm/loki-config.yaml:ro
-      # - $REPO_PATH/configs/grafana-lgtm/tempo-config.yaml:/otel-lgtm/tempo-config.yaml:ro
-      # - $REPO_PATH/configs/grafana-lgtm/pyroscope-config.yaml:/otel-lgtm/pyroscope-config.yaml:ro
-      # - $REPO_PATH/configs/grafana-lgtm/otelcol-config.yaml:/otel-lgtm/otelcol-config.yaml:ro
+      - $REPO_PATH/configs/grafana-lgtm/loki/default_with_hostname.yaml:/otel-lgtm/loki-config.yaml:ro                # L
+      - $REPO_PATH/configs/grafana-lgtm/grafana/provisioning:/otel-lgtm/grafana/conf/provisioning:ro    # G
+      - $REPO_PATH/configs/grafana-lgtm/tempo/default.yaml:/otel-lgtm/tempo-config.yaml:ro              # T
+      - $REPO_PATH/configs/grafana-lgtm/prometheus/default.yaml:/otel-lgtm/prometheus.yaml:ro           # M
+      - $REPO_PATH/configs/grafana-lgtm/prometheus/rules:/otel-lgtm/prometheus-rules:ro
+      - $REPO_PATH/configs/grafana-lgtm/pyroscope/default.yaml:/otel-lgtm/pyroscope-config.yaml:ro
+      - $REPO_PATH/configs/grafana-lgtm/otelcol/default.yaml:/otel-lgtm/otelcol-config.yaml:ro
       ## DATA
       - $REPO_PATH/appdata/grafana-lgtm/grafana:/data/grafana
       - $REPO_PATH/appdata/grafana-lgtm/prometheus:/data/prometheus
@@ -73,14 +74,15 @@ services:
       GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "contains(groups[*], 'admin') && 'GrafanaAdmin' || 'Viewer'"
       ################ OTHER CONFIGS ##################
       LOKI_ARGS: --pattern-ingester.enabled=true
+      ################ CUSTOM ENV VARS ################
+      CROWDSEC_VICTORIAMETRICS_URL: $CROWDSEC_VICTORIAMETRICS_URL
     labels:
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.grafana-lgtm-rtr.entrypoints: "websecure"
       traefik.http.routers.grafana-lgtm-rtr.rule: "Host(`grafana.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.grafana-lgtm-rtr.middlewares: "chain-tinyauth@file"
-      # traefik.http.routers.grafana-lgtm-rtr.middlewares: "chain-tinyauth-relaxed@file" # For RSS feed in the homepage
+      traefik.http.routers.grafana-lgtm-rtr.middlewares: "chain-tinyauth-relaxed@file" # NOTE: Otherwise some fields not showing
       ## HTTP Services
       traefik.http.routers.grafana-lgtm-rtr.service: "grafana-lgtm-svc"
       traefik.http.services.grafana-lgtm-svc.loadbalancer.server.port: "3000"

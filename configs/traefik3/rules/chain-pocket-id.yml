@@ -3,5 +3,5 @@ http:
     chain-pocket-id:
       chain:
         middlewares:
-          - chain-no-auth
           - pocket-id-cors
+          - chain-no-auth

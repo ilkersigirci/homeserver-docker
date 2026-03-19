@@ -1,3 +1,4 @@
+# General
 acme.json
 appdata
 secrets
@@ -21,11 +22,28 @@ configs/glance/docs
 !configs/loggifly
 !configs/mosquitto
 !configs/quartz
+!configs/otel-collector
 !configs/oxicloud
 !configs/rybbit
 !configs/strava-statistics
 !configs/traefik3
 !configs/forgejo
+
+## CrowdSec (track only the important editable config files)
+!configs/crowdsec/
+!configs/crowdsec/config/
+configs/crowdsec/config/**
+!configs/crowdsec/config/acquis.yaml
+!configs/crowdsec/config/config.yaml
+!configs/crowdsec/config/profiles.yaml
+!configs/crowdsec/config/console.yaml
+!configs/crowdsec/config/user.yaml
+!configs/crowdsec/config/notifications/
+configs/crowdsec/config/notifications/**
+!configs/crowdsec/config/notifications/victoriametrics.yaml
+### Keep credentials out of git
+configs/crowdsec/config/local_api_credentials.yaml
+configs/crowdsec/config/online_api_credentials.yaml
 
 # Data
 data/*

@@ -4,7 +4,6 @@ services:
   # chmod 600 $REPO_PATH/configs/traefik3/acme/acme.json
   traefik:
     container_name: traefik
-    # image: ghcr.io/traefik/traefik:3.6
     image: ghcr.io/traefik/traefik:3.7.0-ea.1
     restart: $RESTART_POLICY_CORE
     profiles:
@@ -24,7 +23,7 @@ services:
       - --accesslog.fields.headers.names.Cookie=drop
       - --accesslog.filePath=/logs/access.log
       # Keep file logs even when OTLP export is enabled. For traefik>=3.7
-      - --accesslog.dualoutput=true
+      - --accesslog.dualoutput=${TRAEFIK_ACCESSLOG_FILE_ENABLED:-true}
       - --accesslog.filters.statusCodes=${TRAEFIK_ACCESSLOG_STATUS_CODES:-200-299,400-499,500-599}
       - --accesslog.format=json
       - --accesslog.otlp.grpc=${TRAEFIK_OTEL_ENABLED:-true}
@@ -39,7 +38,7 @@ services:
       - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.resolvers=1.1.1.1:53,1.0.0.1:53
       - --certificatesResolvers.dns-cloudflare.acme.email=$CLOUDFLARE_EMAIL
       - --certificatesResolvers.dns-cloudflare.acme.storage=/acme.json
-      - --entrypoints.dot.address=:853
+      # - --entrypoints.dot.address=:853
       - --entrypoints.traefik.address=:8080
       - --entrypoints.web.address=:80
       - --entrypoints.web.http.redirections.entrypoint.permanent=true
@@ -93,8 +92,8 @@ services:
       - --metrics.otlp.serviceName=traefik
       - --metrics.addInternals=false
       - --metrics.otlp.addEntryPointsLabels=true
-      - --metrics.otlp.addRoutersLabels=false
-      - --metrics.otlp.addServicesLabels=false
+      - --metrics.otlp.addRoutersLabels=true
+      - --metrics.otlp.addServicesLabels=true
       - --metrics.otlp.pushInterval=${TRAEFIK_OTEL_METRICS_PUSH_INTERVAL:-30s}
       - --ping=true
       - --providers.docker=true
@@ -124,6 +123,7 @@ services:
       t3_proxy:
         ipv4_address: 192.168.90.254 # You can specify a static IP
       socket_proxy:
+      crowdsec_lapi:
     # NOTE: To Access Docker Containers that run on Host Network. Is this working?
     # extra_hosts:
     #   - host.docker.internal:172.17.0.1
@@ -145,10 +145,10 @@ services:
         published: 443
         protocol: tcp
         mode: host
-      - target: 853
-        published: 853
-        protocol: tcp
-        mode: host
+      # - target: 853
+      #   published: 853
+      #   protocol: tcp
+      #   mode: host
       # - target: 8080  # need to enable --api.insecure=true
       #   published: 8085
       #   protocol: tcp
@@ -171,8 +171,8 @@ services:
       REMOTE_SERVER_PRIVATE_IP: ${REMOTE_SERVER_PRIVATE_IP:-dummy}
       WEBFINGER_USERNAME: $WEBFINGER_USERNAME
       WEBFINGER_HREF: https://pocketid.$BASE_DOMAINNAME
-      ## Shared resource attributes for traces/metrics/logs/access logs (OTEL_RESOURCE_ATTRIBUTES)
-      OTEL_RESOURCE_ATTRIBUTES: service.namespace=${TRAEFIK_OTEL_SERVICE_NAMESPACE:-edge},service.instance.id=${TRAEFIK_OTEL_INSTANCE_ID:-$MY_HOSTNAME},service.version=${TRAEFIK_OTEL_SERVICE_VERSION:-3.6},deployment.environment.name=${OTEL_DEPLOYMENT_ENVIRONMENT:-production}
+      ## OTEL resource attributes (semantic conventions)
+      OTEL_RESOURCE_ATTRIBUTES: service.instance.id=traefik-$MY_HOSTNAME
     # secrets:
     #   - cf_dns_api_token
     labels:

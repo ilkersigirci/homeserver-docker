@@ -79,14 +79,14 @@
       "targets": [
         {
           "datasource": {
-            "type": "loki",
-            "uid": "loki"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
-          "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(rate({service_name=\"traefik\"} | RequestProtocol=~\".+\" [1m]))",
-          "queryType": "range",
-          "refId": "A"
+          "expr": "rate(traefik:requests_total:by_host{host_name=\"$host\"}[1m])",
+          "refId": "A",
+          "instant": true,
+          "range": false
         }
       ],
       "title": "RPS (1m)",
@@ -160,9 +160,9 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "avg by (service_name) (\r\n  quantile_over_time(\r\n    0.95,\r\n    ({service_name=\"traefik\"} | RequestProtocol=~\".+\" | unwrap Duration | __error__=\"\")[5m]\r\n  )\r\n) / 1e6\r\n",
+          "expr": "avg by (service_name) (quantile_over_time(0.95, ({service_name=\"traefik\",host_name=\"$host\"} | RequestProtocol=~\".+\" | unwrap Duration | __error__=\"\")[5m])) / 1e6",
           "legendFormat": "{{service_name}}",
-          "queryType": "range",
+          "queryType": "instant",
           "refId": "A"
         }
       ],
@@ -230,13 +230,13 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "avg by (entrypoint) (traefik_open_connections_ratio)",
+          "expr": "traefik:open_connections_ratio:by_host_entrypoint{host_name=\"$host\"}",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
-          "instant": false,
+          "instant": true,
           "key": "Q-7e0fd20e-acdd-47d5-b3c6-6665e485fdfc-0",
           "legendFormat": "{{entrypoint}}",
-          "range": true,
+          "range": false,
           "refId": "A",
           "useBackend": false
         }
@@ -304,12 +304,12 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "traefik_config_reloads_total",
+          "expr": "traefik:config_reloads_total:by_host{host_name=\"$host\"}",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
-          "instant": false,
+          "instant": true,
           "legendFormat": "__auto",
-          "range": true,
+          "range": false,
           "refId": "A",
           "useBackend": false
         }
@@ -371,15 +371,15 @@
       "targets": [
         {
           "datasource": {
-            "type": "loki",
-            "uid": "loki"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
-          "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({service_name=\"traefik\"} | RequestProtocol=~\".+\" [$__interval]))",
+          "expr": "increase(traefik:requests_total:by_host{host_name=\"$host\"}[$__range])",
           "legendFormat": "",
-          "queryType": "range",
-          "refId": "A"
+          "refId": "A",
+          "instant": true,
+          "range": false
         }
       ],
       "timeFrom": "1h",
@@ -445,16 +445,15 @@
       "targets": [
         {
           "datasource": {
-            "type": "loki",
-            "uid": "loki"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
-          "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(sum_over_time(({service_name=\"traefik\"} | RequestProtocol=~\".+\" | unwrap DownstreamContentSize | __error__=\"\")[$__interval]))",
+          "expr": "increase(traefik:responses_bytes_total:by_host{host_name=\"$host\"}[$__range])",
           "legendFormat": "Bytes sent",
-          "queryType": "range",
           "refId": "A",
-          "step": "15m"
+          "instant": true,
+          "range": false
         }
       ],
       "timeFrom": "15m",
@@ -571,13 +570,14 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(method, code) (rate(traefik_service_requests_total{protocol=\"http\"}[1m])) > 0",
+          "expr": "sum by(method, code) (increase(traefik:requests_total:by_host_method_code{host_name=\"$host\"}[$__range])) > 0",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "legendFormat": "{{method}}[{{code}}]",
-          "range": true,
+          "range": false,
           "refId": "A",
-          "useBackend": false
+          "useBackend": false,
+          "instant": true
         }
       ],
       "title": "Http Code ",
@@ -647,12 +647,13 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(traefik_service_requests_total) by (service) ",
+          "expr": "sum by (service) (increase(traefik:requests_total:by_host_service{host_name=\"$host\"}[$__range]))",
           "format": "time_series",
+          "instant": true,
           "interval": "",
           "intervalFactor": 2,
           "legendFormat": "{{ service }}",
-          "range": true,
+          "range": false,
           "refId": "A"
         }
       ],
@@ -807,16 +808,15 @@
       "targets": [
         {
           "datasource": {
-            "type": "loki",
-            "uid": "loki"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
-          "direction": "backward",
           "editorMode": "code",
-          "expr": "sum by (DownstreamStatus) (\r\n  count_over_time(\r\n    {service_name=\"traefik\"}\r\n      | RequestProtocol=~\".+\"\r\n      | DownstreamStatus!=\"0\"\r\n      | DownstreamStatus!=\"\"\r\n  [$__range])\r\n)\r\n",
-          "legendFormat": "HTTP Status: {{DownstreamStatus}}",
-          "queryType": "range",
+          "expr": "sum by (code) (increase(traefik:requests_total:by_host_method_code{host_name=\"$host\"}[$__range]))",
+          "legendFormat": "HTTP Status: {{code}}",
           "refId": "A",
-          "step": "30s"
+          "instant": true,
+          "range": false
         }
       ],
       "title": "Requests per status code",
@@ -961,14 +961,14 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(20,\r\n  sum by (request_Cf_Ipcountry) (\r\n    count_over_time(\r\n      {service_name=\"traefik\"} |= \"RequestProtocol\"\r\n      | json | __error__=\"\"\r\n      | request_Cf_Ipcountry=~\"[A-Z]{2}\"\r\n    [$__range])\r\n  )\r\n)\r\n",
+          "expr": "topk(20, sum by (request_Cf_Ipcountry) (count_over_time({service_name=\"traefik\",host_name=\"$host\"} |= \"RequestProtocol\" | json | __error__=\"\" | request_Cf_Ipcountry=~\"[A-Z]{2}\" [$__range])))",
           "legendFormat": "{{request_Cf_Ipcountry}}",
           "queryType": "instant",
           "refId": "A",
           "step": ""
         }
       ],
-      "timeFrom": "24h",
+      "timeFrom": "1h",
       "title": "",
       "transformations": [
         {
@@ -1060,10 +1060,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(traefik_service_request_duration_seconds_sum)\r\n/\r\nsum(traefik_service_requests_total)",
-          "instant": false,
+          "expr": "sum(rate(traefik:request_duration_seconds_sum:by_host_service{host_name=\"$host\"}[$__rate_interval])) / sum(rate(traefik:request_duration_seconds_count:by_host_service{host_name=\"$host\"}[$__rate_interval]))",
+          "instant": true,
           "legendFormat": "__auto",
-          "range": true,
+          "range": false,
           "refId": "A"
         }
       ],
@@ -1169,14 +1169,14 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "topk(20,\r\n  sum by (request_X_Real_Ip) (\r\n    count_over_time(\r\n      {service_name=\"traefik\"} |= \"RequestProtocol\"\r\n      | json | __error__=\"\"\r\n      | request_X_Real_Ip=~\".+\"\r\n    [$__range])\r\n  )\r\n)\r\n",
+          "expr": "topk(20, sum by (request_X_Real_Ip) (count_over_time({service_name=\"traefik\",host_name=\"$host\"} |= \"RequestProtocol\" | json | __error__=\"\" | request_X_Real_Ip=~\".+\" [$__range])))",
           "legendFormat": "{{request_X_Real_Ip}}",
           "queryType": "instant",
           "refId": "A",
           "step": ""
         }
       ],
-      "timeFrom": "24h",
+      "timeFrom": "1h",
       "title": "",
       "transformations": [
         {
@@ -1292,7 +1292,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(traefik_service_request_duration_seconds_sum{}) by (service) / sum(traefik_service_request_duration_seconds_count{}) by (service)",
+          "expr": "sum by (service) (rate(traefik:request_duration_seconds_sum:by_host_service{host_name=\"$host\"}[$__rate_interval])) / sum by (service) (rate(traefik:request_duration_seconds_count:by_host_service{host_name=\"$host\"}[$__rate_interval]))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -1342,7 +1342,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{service_name=\"traefik\"} | RequestProtocol=~\".+\" | line_format \"[{{.service_instance_id}}] Status: {{.DownstreamStatus}} Client {{.ClientHost}} {{.RequestMethod}} {{.RequestAddr}}{{.RequestPath}} -> {{.ServiceAddr}}\"",
+          "expr": "{service_name=\"traefik\",host_name=\"$host\"} | RequestProtocol=~\".+\" | line_format \"Status: {{.DownstreamStatus}} Client {{.ClientHost}} {{.RequestMethod}} {{.RequestAddr}}{{.RequestPath}} -> {{.ServiceAddr}}\"",
           "legendFormat": "",
           "queryType": "range",
           "refId": "A"
@@ -1389,7 +1389,7 @@
           },
           "direction": "backward",
           "editorMode": "code",
-          "expr": "{service_name=\"traefik\"}\r\n| RequestProtocol=~\".+\"\r\n| DownstreamStatus!=\"200\"\r\n| DownstreamStatus!=\"0\"\r\n| DownstreamStatus!=\"\"\r\n| line_format \"[{{.service_instance_id}}] Status: {{.DownstreamStatus}} Client {{.ClientHost}} {{.RequestMethod}} {{.RequestAddr}}{{.RequestPath}} -> {{.ServiceAddr}}\"",
+          "expr": "{service_name=\"traefik\",host_name=\"$host\"} | RequestProtocol=~\".+\" | DownstreamStatus!=\"200\" | DownstreamStatus!=\"0\" | DownstreamStatus!=\"\" | line_format \"Status: {{.DownstreamStatus}} Client {{.ClientHost}} {{.RequestMethod}} {{.RequestAddr}}{{.RequestPath}} -> {{.ServiceAddr}}\"",
           "queryType": "range",
           "refId": "A"
         }
@@ -1508,7 +1508,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "traefik_service_requests_total",
+          "expr": "traefik:requests_total:by_host_service{host_name=\"$host\"}",
           "format": "time_series",
           "fullMetaSearch": false,
           "includeNullMetadata": false,
@@ -1620,7 +1620,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by(router) (rate(traefik_router_requests_total[$__rate_interval]))",
+          "expr": "rate(traefik:router_requests_total:by_host_router{host_name=\"$host\"}[$__rate_interval])",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -1725,7 +1725,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by(service) (rate(traefik_router_request_duration_seconds_count[$__rate_interval]))",
+          "expr": "rate(traefik:router_request_duration_seconds_sum:by_host_router{host_name=\"$host\"}[$__rate_interval]) / rate(traefik:router_request_duration_seconds_count:by_host_router{host_name=\"$host\"}[$__rate_interval])",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -1835,7 +1835,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "label_replace(sum by(service) (rate(traefik_service_responses_bytes_total[$__rate_interval])), \"service\", \"$1\", \"service\", \"([^-]+-[^-]+).*\")",
+          "expr": "label_replace(rate(traefik:responses_bytes_total:by_host_service{host_name=\"$host\"}[$__rate_interval]), \"service\", \"$1\", \"service\", \"([^-]+-[^-]+).*\")",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "legendFormat": "{{service}}",
@@ -1942,7 +1942,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by(entrypoint) (rate(traefik_entrypoint_request_duration_seconds_sum[$__rate_interval]))",
+          "expr": "rate(traefik:entrypoint_request_duration_seconds_sum:by_host_entrypoint{host_name=\"$host\"}[$__rate_interval])",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -2047,7 +2047,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by(entrypoint) (rate(traefik_entrypoint_requests_total[$__rate_interval]))",
+          "expr": "rate(traefik:entrypoint_requests_total:by_host_entrypoint{host_name=\"$host\"}[$__rate_interval])",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -2062,7 +2062,25 @@
   "schemaVersion": 42,
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "current": {},
+        "datasource": {
+          "type": "loki",
+          "uid": "loki"
+        },
+        "definition": "label_values({service_name=\"traefik\",host_name=~\".+\"},host_name)",
+        "includeAll": false,
+        "multi": false,
+        "name": "host",
+        "options": [],
+        "query": "label_values({service_name=\"traefik\",host_name=~\".+\"},host_name)",
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      }
+    ]
   },
   "time": {
     "from": "now-1h",
