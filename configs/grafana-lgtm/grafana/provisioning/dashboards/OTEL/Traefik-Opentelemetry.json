@@ -1349,8 +1349,7 @@
         }
       ],
       "title": "Access Logs",
-      "type": "logs",
-      "timeFrom": "1h"
+      "type": "logs"
     },
     {
       "datasource": {
@@ -1416,8 +1415,7 @@
           }
         }
       ],
-      "type": "logs",
-      "timeFrom": "1h"
+      "type": "logs"
     },
     {
       "datasource": {

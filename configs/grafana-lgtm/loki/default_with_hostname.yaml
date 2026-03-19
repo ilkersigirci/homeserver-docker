@@ -1,3 +1,4 @@
+# From: https://github.com/grafana/docker-otel-lgtm/blob/main/docker/loki-config.yaml
 auth_enabled: false
 
 server:
@@ -43,8 +44,7 @@ frontend:
 query_scheduler:
   use_scheduler_ring: false
 
-# Keep Loki OTLP defaults and add host.name so Grafana variable
-# label_values({service_name="traefik"}, host_name) returns values.
+# Keep Loki OTLP defaults and add host.name for fast host-scoped selectors.
 distributor:
   otlp_config:
     default_resource_attributes_as_index_labels:

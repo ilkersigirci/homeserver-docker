@@ -22,7 +22,7 @@ services:
       - no-new-privileges:true
     volumes:
       ## CONFIGS
-      - $REPO_PATH/configs/grafana-lgtm/loki/default.yaml:/otel-lgtm/loki-config.yaml:ro                # L
+      - $REPO_PATH/configs/grafana-lgtm/loki/default_with_hostname.yaml:/otel-lgtm/loki-config.yaml:ro                # L
       - $REPO_PATH/configs/grafana-lgtm/grafana/provisioning:/otel-lgtm/grafana/conf/provisioning:ro    # G
       - $REPO_PATH/configs/grafana-lgtm/tempo/default.yaml:/otel-lgtm/tempo-config.yaml:ro              # T
       - $REPO_PATH/configs/grafana-lgtm/prometheus/default.yaml:/otel-lgtm/prometheus.yaml:ro           # M
