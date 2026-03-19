@@ -79,14 +79,14 @@
       "targets": [
         {
           "datasource": {
-            "type": "loki",
-            "uid": "loki"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
-          "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(rate({service_name=\"traefik\",host_name=\"$host\"} | RequestProtocol=~\".+\" [1m]))",
-          "queryType": "range",
-          "refId": "A"
+          "expr": "sum(rate(traefik_service_requests_total{host_name=\"$host\"}[1m]))",
+          "refId": "A",
+          "instant": true,
+          "range": false
         }
       ],
       "title": "RPS (1m)",
@@ -162,7 +162,7 @@
           "editorMode": "code",
           "expr": "avg by (service_name) (quantile_over_time(0.95, ({service_name=\"traefik\",host_name=\"$host\"} | RequestProtocol=~\".+\" | unwrap Duration | __error__=\"\")[5m])) / 1e6",
           "legendFormat": "{{service_name}}",
-          "queryType": "range",
+          "queryType": "instant",
           "refId": "A"
         }
       ],
@@ -233,10 +233,10 @@
           "expr": "avg by (entrypoint) (traefik_open_connections_ratio{host_name=\"$host\"})",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
-          "instant": false,
+          "instant": true,
           "key": "Q-7e0fd20e-acdd-47d5-b3c6-6665e485fdfc-0",
           "legendFormat": "{{entrypoint}}",
-          "range": true,
+          "range": false,
           "refId": "A",
           "useBackend": false
         }
@@ -307,9 +307,9 @@
           "expr": "traefik_config_reloads_total{host_name=\"$host\"}",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
-          "instant": false,
+          "instant": true,
           "legendFormat": "__auto",
-          "range": true,
+          "range": false,
           "refId": "A",
           "useBackend": false
         }
@@ -371,15 +371,15 @@
       "targets": [
         {
           "datasource": {
-            "type": "loki",
-            "uid": "loki"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
-          "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(count_over_time({service_name=\"traefik\",host_name=\"$host\"} | RequestProtocol=~\".+\" [$__range]))",
+          "expr": "sum(increase(traefik_service_requests_total{host_name=\"$host\"}[$__range]))",
           "legendFormat": "",
-          "queryType": "instant",
-          "refId": "A"
+          "refId": "A",
+          "instant": true,
+          "range": false
         }
       ],
       "timeFrom": "1h",
@@ -445,16 +445,15 @@
       "targets": [
         {
           "datasource": {
-            "type": "loki",
-            "uid": "loki"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
-          "direction": "backward",
           "editorMode": "code",
-          "expr": "sum(sum_over_time(({service_name=\"traefik\",host_name=\"$host\"} | RequestProtocol=~\".+\" | unwrap DownstreamContentSize | __error__=\"\")[$__range]))",
+          "expr": "sum(increase(traefik_service_responses_bytes_total{host_name=\"$host\"}[$__range]))",
           "legendFormat": "Bytes sent",
-          "queryType": "instant",
           "refId": "A",
-          "step": "15m"
+          "instant": true,
+          "range": false
         }
       ],
       "timeFrom": "15m",
@@ -571,13 +570,14 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(method, code) (rate(traefik_service_requests_total{protocol=\"http\",host_name=\"$host\"}[1m])) > 0",
+          "expr": "sum by(method, code) (increase(traefik_service_requests_total{protocol=\"http\",host_name=\"$host\"}[$__range])) > 0",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "legendFormat": "{{method}}[{{code}}]",
-          "range": true,
+          "range": false,
           "refId": "A",
-          "useBackend": false
+          "useBackend": false,
+          "instant": true
         }
       ],
       "title": "Http Code ",
@@ -808,16 +808,15 @@
       "targets": [
         {
           "datasource": {
-            "type": "loki",
-            "uid": "loki"
+            "type": "prometheus",
+            "uid": "prometheus"
           },
-          "direction": "backward",
           "editorMode": "code",
-          "expr": "sum by (DownstreamStatus) (count_over_time({service_name=\"traefik\",host_name=\"$host\"} | RequestProtocol=~\".+\" | DownstreamStatus!=\"0\" | DownstreamStatus!=\"\" [$__range]))",
-          "legendFormat": "HTTP Status: {{DownstreamStatus}}",
-          "queryType": "instant",
+          "expr": "sum by (code) (increase(traefik_service_requests_total{protocol=\"http\",host_name=\"$host\",code!=\"\"}[$__range]))",
+          "legendFormat": "HTTP Status: {{code}}",
           "refId": "A",
-          "step": "30s"
+          "instant": true,
+          "range": false
         }
       ],
       "title": "Requests per status code",
@@ -969,7 +968,7 @@
           "step": ""
         }
       ],
-      "timeFrom": "24h",
+      "timeFrom": "1h",
       "title": "",
       "transformations": [
         {
@@ -1062,9 +1061,9 @@
           },
           "editorMode": "code",
           "expr": "sum(rate(traefik_service_request_duration_seconds_sum{host_name=\"$host\"}[$__rate_interval])) / sum(rate(traefik_service_request_duration_seconds_count{host_name=\"$host\"}[$__rate_interval]))",
-          "instant": false,
+          "instant": true,
           "legendFormat": "__auto",
-          "range": true,
+          "range": false,
           "refId": "A"
         }
       ],
@@ -1177,7 +1176,7 @@
           "step": ""
         }
       ],
-      "timeFrom": "24h",
+      "timeFrom": "1h",
       "title": "",
       "transformations": [
         {
@@ -1350,7 +1349,8 @@
         }
       ],
       "title": "Access Logs",
-      "type": "logs"
+      "type": "logs",
+      "timeFrom": "1h"
     },
     {
       "datasource": {
@@ -1416,7 +1416,8 @@
           }
         }
       ],
-      "type": "logs"
+      "type": "logs",
+      "timeFrom": "1h"
     },
     {
       "datasource": {
