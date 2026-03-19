@@ -83,7 +83,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(traefik_service_requests_total{host_name=\"$host\"}[1m]))",
+          "expr": "rate(traefik:requests_total:by_host{host_name=\"$host\"}[1m])",
           "refId": "A",
           "instant": true,
           "range": false
@@ -230,7 +230,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "avg by (entrypoint) (traefik_open_connections_ratio{host_name=\"$host\"})",
+          "expr": "traefik:open_connections_ratio:by_host_entrypoint{host_name=\"$host\"}",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": true,
@@ -304,7 +304,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "traefik_config_reloads_total{host_name=\"$host\"}",
+          "expr": "traefik:config_reloads_total:by_host{host_name=\"$host\"}",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": true,
@@ -375,7 +375,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(increase(traefik_service_requests_total{host_name=\"$host\"}[$__range]))",
+          "expr": "increase(traefik:requests_total:by_host{host_name=\"$host\"}[$__range])",
           "legendFormat": "",
           "refId": "A",
           "instant": true,
@@ -449,7 +449,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(increase(traefik_service_responses_bytes_total{host_name=\"$host\"}[$__range]))",
+          "expr": "increase(traefik:responses_bytes_total:by_host{host_name=\"$host\"}[$__range])",
           "legendFormat": "Bytes sent",
           "refId": "A",
           "instant": true,
@@ -570,7 +570,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "sum by(method, code) (increase(traefik_service_requests_total{protocol=\"http\",host_name=\"$host\"}[$__range])) > 0",
+          "expr": "sum by(method, code) (increase(traefik:requests_total:by_host_method_code{host_name=\"$host\"}[$__range])) > 0",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "legendFormat": "{{method}}[{{code}}]",
@@ -647,7 +647,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (service) (increase(traefik_service_requests_total{host_name=\"$host\"}[$__range]))",
+          "expr": "sum by (service) (increase(traefik:requests_total:by_host_service{host_name=\"$host\"}[$__range]))",
           "format": "time_series",
           "instant": true,
           "interval": "",
@@ -812,7 +812,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (code) (increase(traefik_service_requests_total{protocol=\"http\",host_name=\"$host\",code!=\"\"}[$__range]))",
+          "expr": "sum by (code) (increase(traefik:requests_total:by_host_method_code{host_name=\"$host\"}[$__range]))",
           "legendFormat": "HTTP Status: {{code}}",
           "refId": "A",
           "instant": true,
@@ -1060,7 +1060,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(traefik_service_request_duration_seconds_sum{host_name=\"$host\"}[$__rate_interval])) / sum(rate(traefik_service_request_duration_seconds_count{host_name=\"$host\"}[$__rate_interval]))",
+          "expr": "sum(rate(traefik:request_duration_seconds_sum:by_host_service{host_name=\"$host\"}[$__rate_interval])) / sum(rate(traefik:request_duration_seconds_count:by_host_service{host_name=\"$host\"}[$__rate_interval]))",
           "instant": true,
           "legendFormat": "__auto",
           "range": false,
@@ -1292,7 +1292,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum by (service) (rate(traefik_service_request_duration_seconds_sum{host_name=\"$host\"}[$__rate_interval])) / sum by (service) (rate(traefik_service_request_duration_seconds_count{host_name=\"$host\"}[$__rate_interval]))",
+          "expr": "sum by (service) (rate(traefik:request_duration_seconds_sum:by_host_service{host_name=\"$host\"}[$__rate_interval])) / sum by (service) (rate(traefik:request_duration_seconds_count:by_host_service{host_name=\"$host\"}[$__rate_interval]))",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
@@ -1510,7 +1510,7 @@
           "disableTextWrap": false,
           "editorMode": "code",
           "exemplar": false,
-          "expr": "traefik_service_requests_total{host_name=\"$host\"}",
+          "expr": "traefik:requests_total:by_host_service{host_name=\"$host\"}",
           "format": "time_series",
           "fullMetaSearch": false,
           "includeNullMetadata": false,
@@ -1622,7 +1622,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by(router) (rate(traefik_router_requests_total{host_name=\"$host\"}[$__rate_interval]))",
+          "expr": "rate(traefik:router_requests_total:by_host_router{host_name=\"$host\"}[$__rate_interval])",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -1727,7 +1727,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (router) (rate(traefik_router_request_duration_seconds_sum{host_name=\"$host\"}[$__rate_interval])) / sum by (router) (rate(traefik_router_request_duration_seconds_count{host_name=\"$host\"}[$__rate_interval]))",
+          "expr": "rate(traefik:router_request_duration_seconds_sum:by_host_router{host_name=\"$host\"}[$__rate_interval]) / rate(traefik:router_request_duration_seconds_count:by_host_router{host_name=\"$host\"}[$__rate_interval])",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -1837,7 +1837,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "label_replace(sum by(service) (rate(traefik_service_responses_bytes_total{host_name=\"$host\"}[$__rate_interval])), \"service\", \"$1\", \"service\", \"([^-]+-[^-]+).*\")",
+          "expr": "label_replace(rate(traefik:responses_bytes_total:by_host_service{host_name=\"$host\"}[$__rate_interval]), \"service\", \"$1\", \"service\", \"([^-]+-[^-]+).*\")",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "legendFormat": "{{service}}",
@@ -1944,7 +1944,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by(entrypoint) (rate(traefik_entrypoint_request_duration_seconds_sum{host_name=\"$host\"}[$__rate_interval]))",
+          "expr": "rate(traefik:entrypoint_request_duration_seconds_sum:by_host_entrypoint{host_name=\"$host\"}[$__rate_interval])",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -2049,7 +2049,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by(entrypoint) (rate(traefik_entrypoint_requests_total{host_name=\"$host\"}[$__rate_interval]))",
+          "expr": "rate(traefik:entrypoint_requests_total:by_host_entrypoint{host_name=\"$host\"}[$__rate_interval])",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,

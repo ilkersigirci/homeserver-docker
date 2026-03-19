@@ -26,6 +26,7 @@ services:
       - $REPO_PATH/configs/grafana-lgtm/grafana/provisioning:/otel-lgtm/grafana/conf/provisioning:ro    # G
       - $REPO_PATH/configs/grafana-lgtm/tempo/default.yaml:/otel-lgtm/tempo-config.yaml:ro              # T
       - $REPO_PATH/configs/grafana-lgtm/prometheus/default.yaml:/otel-lgtm/prometheus.yaml:ro           # M
+      - $REPO_PATH/configs/grafana-lgtm/prometheus/rules:/otel-lgtm/prometheus-rules:ro
       - $REPO_PATH/configs/grafana-lgtm/pyroscope/default.yaml:/otel-lgtm/pyroscope-config.yaml:ro
       - $REPO_PATH/configs/grafana-lgtm/otelcol/default.yaml:/otel-lgtm/otelcol-config.yaml:ro
       ## DATA

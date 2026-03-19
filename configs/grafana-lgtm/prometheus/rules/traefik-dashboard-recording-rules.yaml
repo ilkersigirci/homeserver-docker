@@ -1,0 +1,45 @@
+groups:
+  - name: traefik-dashboard-rollups
+    interval: 30s
+    rules:
+      - record: traefik:requests_total:by_host
+        expr: sum by (host_name) (traefik_service_requests_total{protocol="http"})
+
+      - record: traefik:requests_total:by_host_service
+        expr: sum by (host_name, service) (traefik_service_requests_total{protocol="http"})
+
+      - record: traefik:requests_total:by_host_method_code
+        expr: sum by (host_name, method, code) (traefik_service_requests_total{protocol="http",code!=""})
+
+      - record: traefik:responses_bytes_total:by_host
+        expr: sum by (host_name) (traefik_service_responses_bytes_total)
+
+      - record: traefik:responses_bytes_total:by_host_service
+        expr: sum by (host_name, service) (traefik_service_responses_bytes_total)
+
+      - record: traefik:request_duration_seconds_sum:by_host_service
+        expr: sum by (host_name, service) (traefik_service_request_duration_seconds_sum)
+
+      - record: traefik:request_duration_seconds_count:by_host_service
+        expr: sum by (host_name, service) (traefik_service_request_duration_seconds_count)
+
+      - record: traefik:router_requests_total:by_host_router
+        expr: sum by (host_name, router) (traefik_router_requests_total)
+
+      - record: traefik:router_request_duration_seconds_sum:by_host_router
+        expr: sum by (host_name, router) (traefik_router_request_duration_seconds_sum)
+
+      - record: traefik:router_request_duration_seconds_count:by_host_router
+        expr: sum by (host_name, router) (traefik_router_request_duration_seconds_count)
+
+      - record: traefik:entrypoint_requests_total:by_host_entrypoint
+        expr: sum by (host_name, entrypoint) (traefik_entrypoint_requests_total)
+
+      - record: traefik:entrypoint_request_duration_seconds_sum:by_host_entrypoint
+        expr: sum by (host_name, entrypoint) (traefik_entrypoint_request_duration_seconds_sum)
+
+      - record: traefik:open_connections_ratio:by_host_entrypoint
+        expr: avg by (host_name, entrypoint) (traefik_open_connections_ratio)
+
+      - record: traefik:config_reloads_total:by_host
+        expr: sum by (host_name) (traefik_config_reloads_total)
