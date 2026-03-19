@@ -171,10 +171,8 @@ services:
       REMOTE_SERVER_PRIVATE_IP: ${REMOTE_SERVER_PRIVATE_IP:-dummy}
       WEBFINGER_USERNAME: $WEBFINGER_USERNAME
       WEBFINGER_HREF: https://pocketid.$BASE_DOMAINNAME
-      ## OTEL resource attributes (semantic conventions):
-      ## - service.instance.id: unique instance id (service-scoped to avoid cross-service collisions)
-      ## - host.name: injected centrally by the local otel-collector-agent
-      OTEL_RESOURCE_ATTRIBUTES: service.namespace=${TRAEFIK_OTEL_SERVICE_NAMESPACE:-edge},service.instance.id=traefik-$MY_HOSTNAME,service.version=${TRAEFIK_OTEL_SERVICE_VERSION:-3.6}
+      ## OTEL resource attributes (semantic conventions)
+      OTEL_RESOURCE_ATTRIBUTES: service.instance.id=traefik-$MY_HOSTNAME
     # secrets:
     #   - cf_dns_api_token
     labels:
