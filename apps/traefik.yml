@@ -92,8 +92,8 @@ services:
       - --metrics.otlp.serviceName=traefik
       - --metrics.addInternals=false
       - --metrics.otlp.addEntryPointsLabels=true
-      - --metrics.otlp.addRoutersLabels=false
-      - --metrics.otlp.addServicesLabels=false
+      - --metrics.otlp.addRoutersLabels=true
+      - --metrics.otlp.addServicesLabels=true
       - --metrics.otlp.pushInterval=${TRAEFIK_OTEL_METRICS_PUSH_INTERVAL:-30s}
       - --ping=true
       - --providers.docker=true
