@@ -22,13 +22,12 @@ services:
       - no-new-privileges:true
     volumes:
       ## CONFIGS
-      - $REPO_PATH/configs/grafana-lgtm/grafana/provisioning/dashboards:/otel-lgtm/grafana/conf/provisioning/dashboards:ro
-      - $REPO_PATH/configs/grafana-lgtm/grafana/provisioning/datasources:/otel-lgtm/grafana/conf/provisioning/datasources:ro
-      # - $REPO_PATH/configs/grafana-lgtm/prometheus.yaml:/otel-lgtm/prometheus.yaml:ro
-      # - $REPO_PATH/configs/grafana-lgtm/loki-config.yaml:/otel-lgtm/loki-config.yaml:ro
-      # - $REPO_PATH/configs/grafana-lgtm/tempo-config.yaml:/otel-lgtm/tempo-config.yaml:ro
-      # - $REPO_PATH/configs/grafana-lgtm/pyroscope-config.yaml:/otel-lgtm/pyroscope-config.yaml:ro
-      # - $REPO_PATH/configs/grafana-lgtm/otelcol-config.yaml:/otel-lgtm/otelcol-config.yaml:ro
+      - $REPO_PATH/configs/grafana-lgtm/loki/default.yaml:/otel-lgtm/loki-config.yaml:ro                # L
+      - $REPO_PATH/configs/grafana-lgtm/grafana/provisioning:/otel-lgtm/grafana/conf/provisioning:ro    # G
+      - $REPO_PATH/configs/grafana-lgtm/tempo/default.yaml:/otel-lgtm/tempo-config.yaml:ro              # T
+      - $REPO_PATH/configs/grafana-lgtm/prometheus/default.yaml:/otel-lgtm/prometheus.yaml:ro           # M
+      - $REPO_PATH/configs/grafana-lgtm/pyroscope/default.yaml:/otel-lgtm/pyroscope-config.yaml:ro
+      - $REPO_PATH/configs/grafana-lgtm/otelcol/default.yaml:/otel-lgtm/otelcol-config.yaml:ro
       ## DATA
       - $REPO_PATH/appdata/grafana-lgtm/grafana:/data/grafana
       - $REPO_PATH/appdata/grafana-lgtm/prometheus:/data/prometheus

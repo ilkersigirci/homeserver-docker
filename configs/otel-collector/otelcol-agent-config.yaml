@@ -80,11 +80,12 @@ processors:
   # Adds common attributes when they are not set by upstream services.
   resource/common:
     attributes:
+      # Enforce machine identity centrally for all telemetry on this node.
+      - key: host.name
+        value: ${env:OTEL_COLLECTOR_HOST_NAME}
+        action: upsert
       - key: service.namespace
         value: ${env:OTEL_COLLECTOR_SERVICE_NAMESPACE}
-        action: insert
-      - key: service.instance.id
-        value: ${env:OTEL_COLLECTOR_SERVICE_INSTANCE_ID}
         action: insert
       - key: deployment.environment.name
         value: ${env:OTEL_COLLECTOR_DEPLOYMENT_ENVIRONMENT}
@@ -94,7 +95,7 @@ processors:
   resource/hostmetrics:
     attributes:
       - key: service.name
-        value: ${env:OTEL_COLLECTOR_HOSTMETRICS_SERVICE_NAME}
+        value: hostmetrics
         action: upsert
 
   batch:

@@ -69,10 +69,10 @@ I have a dedicated compose file for each machine in `compose/` that includes the
 
 ## OpenTelemetry Pattern (Multi-Machine)
 
-- Run `apps/traefik.yml` and `apps/otel-collector-agent.yml` on every machine.
-  - `traefik.yml` exports edge telemetry over OTLP
-  - `otel-collector-agent.yml` receives local OTLP and exports host metrics (`cpu`, `memory`, `disk`, `filesystem`, `network`)
-- Run `apps/grafana-lgtm.yml` only on the central machine.
+- Run `apps/grafana-lgtm.yml` only on the `gpu` machine.
+- Run `apps/traefik.yml` and `apps/otel-collector-agent.yml` on every machine, which receives local OTLP and exports host metrics (`cpu`, `memory`, `disk`, `filesystem`, `network`)
+- Run `traefik.yml` exports edge telemetry over OTLP on each machine.
+- Auomatically insturemented services (e.g. Fastapi) on some machines. For example: apps/homeserver-api.yml which is deployed in `gpu_coding` machine.
 - Point all app telemetry to the local agent on each machine:
 
 ```env

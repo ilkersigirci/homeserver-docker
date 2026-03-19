@@ -22,6 +22,7 @@ configs/glance/docs
 !configs/loggifly
 !configs/mosquitto
 !configs/quartz
+!configs/otel-collector
 !configs/oxicloud
 !configs/rybbit
 !configs/strava-statistics

@@ -29,7 +29,7 @@ services:
     - 13133 # health_check extension
     - 55679 # zpages extension
     volumes:
-      - $REPO_PATH/configs/grafana-lgtm/otelcol-agent-config.yaml:/etc/otelcol/config.yaml:ro
+      - $REPO_PATH/configs/otel-collector/otelcol-agent-config.yaml:/etc/otelcol/config.yaml:ro
       - $REPO_PATH/data/otel-collector-agent:/var/lib/otelcol/file_storage
       - /:/hostfs:ro
     environment:
@@ -40,6 +40,5 @@ services:
       OTEL_COLLECTOR_MEMORY_LIMIT_MIB: ${OTEL_COLLECTOR_MEMORY_LIMIT_MIB:-256}
       OTEL_COLLECTOR_MEMORY_SPIKE_LIMIT_MIB: ${OTEL_COLLECTOR_MEMORY_SPIKE_LIMIT_MIB:-64}
       OTEL_COLLECTOR_SERVICE_NAMESPACE: ${OTEL_COLLECTOR_SERVICE_NAMESPACE:-edge}
-      OTEL_COLLECTOR_SERVICE_INSTANCE_ID: $MY_HOSTNAME
+      OTEL_COLLECTOR_HOST_NAME: $MY_HOSTNAME
       OTEL_COLLECTOR_DEPLOYMENT_ENVIRONMENT: ${OTEL_DEPLOYMENT_ENVIRONMENT:-production}
-      OTEL_COLLECTOR_HOSTMETRICS_SERVICE_NAME: hostmetrics

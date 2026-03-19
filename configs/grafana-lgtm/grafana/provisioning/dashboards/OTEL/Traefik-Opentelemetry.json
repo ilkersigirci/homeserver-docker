@@ -2065,23 +2065,23 @@
     "list": [
       {
         "current": {
-          "text": "service_instance_id",
-          "value": "service_instance_id"
+          "text": "host_name",
+          "value": "host_name"
         },
         "name": "host_label",
         "options": [
           {
-            "selected": true,
+            "selected": false,
             "text": "service_instance_id",
             "value": "service_instance_id"
           },
           {
-            "selected": false,
+            "selected": true,
             "text": "host_name",
             "value": "host_name"
           }
         ],
-        "query": "service_instance_id,host_name",
+        "query": "host_name,service_instance_id",
         "type": "custom"
       },
       {
