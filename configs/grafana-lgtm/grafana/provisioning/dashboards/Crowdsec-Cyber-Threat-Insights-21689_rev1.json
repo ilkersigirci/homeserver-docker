@@ -1672,7 +1672,7 @@
             },
             "location": {
               "lookup": "Country",
-              "mode": "auto"
+              "mode": "lookup"
             },
             "name": "Markers",
             "opacity": 1,
@@ -1703,7 +1703,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum by(country,longitude,latitude) (count_over_time(cs_lapi_decision{instance=~\"${host:raw}\"}[$__range]))",
+          "expr": "sum by(country) (count_over_time(cs_lapi_decision{instance=~\"${host:raw}\",country=~\"[A-Z]{2}\"}[$__range]))",
           "format": "table",
           "instant": true,
           "legendFormat": "__auto",
