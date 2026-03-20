@@ -22,7 +22,7 @@ services:
       - no-new-privileges:true
     volumes:
       ## CONFIGS
-      - $REPO_PATH/configs/grafana-lgtm/loki/default_with_hostname.yaml:/otel-lgtm/loki-config.yaml:ro                # L
+      - $REPO_PATH/configs/grafana-lgtm/loki/default_with_hostname.yaml:/otel-lgtm/loki-config.yaml:ro  # L
       - $REPO_PATH/configs/grafana-lgtm/grafana/provisioning:/otel-lgtm/grafana/conf/provisioning:ro    # G
       - $REPO_PATH/configs/grafana-lgtm/tempo/default.yaml:/otel-lgtm/tempo-config.yaml:ro              # T
       - $REPO_PATH/configs/grafana-lgtm/prometheus/default.yaml:/otel-lgtm/prometheus.yaml:ro           # M
@@ -88,7 +88,7 @@ services:
       traefik.http.services.grafana-lgtm-svc.loadbalancer.server.port: "3000"
       ## gRPC Router (RPC)
       traefik.http.routers.grafana-lgtm-rpc-rtr.entrypoints: "websecure"
-      traefik.http.routers.grafana-lgtm-rpc-rtr.rule: "Host(`grafana-rpc.$DOMAINNAME`) && HeadersRegexp(`Content-Type`, `(?i)^application/grpc.*`)"
+      traefik.http.routers.grafana-lgtm-rpc-rtr.rule: "Host(`grafana-rpc.$DOMAINNAME`) && HeaderRegexp(`Content-Type`, `(?i)^application/grpc.*`)"
       traefik.http.routers.grafana-lgtm-rpc-rtr.tls: "true"
       traefik.http.routers.grafana-lgtm-rpc-rtr.middlewares: "chain-rpc@file,grafana-lgtm-rpc-allowlist"
       traefik.http.routers.grafana-lgtm-rpc-rtr.service: "grafana-lgtm-rpc-svc"
