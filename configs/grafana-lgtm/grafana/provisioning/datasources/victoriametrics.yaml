@@ -7,4 +7,4 @@ datasources:
     access: proxy
     url: ${CROWDSEC_VICTORIAMETRICS_URL}
     isDefault: false
-    editable: true
+    editable: false

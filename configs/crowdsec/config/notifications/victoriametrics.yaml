@@ -10,7 +10,8 @@ format: |
   {{range . -}}
   {{$Alert := . -}}
   {{range .Decisions -}}
-  {"metric":{"__name__":"cs_lapi_decision","instance":"{{$Alert.MachineID}}","ip":"{{.Value}}","reason":"{{.Scenario}}","country":"{{$Alert.Source.Cn}}","as_name":"{{$Alert.Source.AsName}}","as_num":"{{$Alert.Source.AsNumber}}","scope":"{{.Scope}}","value":"{{.Value}}","type":"{{.Type}}","origin":"{{.Origin}}","duration":"{{.Duration}}","event_count":"{{len $Alert.Events}}","traefik_routers":{{printf "%q" (GetMeta $Alert "traefik_router_name" | uniq | join ",")}},"service":{{printf "%q" (GetMeta $Alert "service" | uniq | join ",")}},"http_status":{{printf "%q" (GetMeta $Alert "http_status" | uniq | join ",")}},"http_path":{{printf "%q" (GetMeta $Alert "http_path" | uniq | join ",")}}},"values":[1],"timestamps":[{{ now | unixEpoch }}000]}
+  {"metric":{"__name__":"cs_lapi_decision_agg","instance":"{{$Alert.MachineID}}","country":"{{$Alert.Source.Cn}}","as_name":"{{$Alert.Source.AsName}}","as_num":"{{$Alert.Source.AsNumber}}","reason":"{{.Scenario}}","scope":"{{.Scope}}","type":"{{.Type}}","origin":"{{.Origin}}"},"values":[1],"timestamps":[{{ now | unixEpoch }}000]}
+  {"metric":{"__name__":"cs_lapi_decision","instance":"{{$Alert.MachineID}}","ip":"{{.Value}}","reason":"{{.Scenario}}","country":"{{$Alert.Source.Cn}}","as_name":"{{$Alert.Source.AsName}}","as_num":"{{$Alert.Source.AsNumber}}","scope":"{{.Scope}}","type":"{{.Type}}","origin":"{{.Origin}}","duration":"{{.Duration}}","event_count":"{{len $Alert.Events}}","service":{{printf "%q" (GetMeta $Alert "service" | uniq | join ",")}},"http_status":{{printf "%q" (GetMeta $Alert "http_status" | uniq | join ",")}},"http_path":{{printf "%q" (GetMeta $Alert "http_path" | uniq | join ",")}}},"values":[1],"timestamps":[{{ now | unixEpoch }}000]}
   {{end -}}
   {{end -}}
 

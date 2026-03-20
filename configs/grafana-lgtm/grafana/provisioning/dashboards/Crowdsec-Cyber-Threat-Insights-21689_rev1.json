@@ -1202,7 +1202,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "scenario"
+              "options": "reason"
             },
             "properties": [
               {
@@ -1441,7 +1441,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum by (instance,country,asname,asnumber,iprange,ip,type) (count_over_time(cs_lapi_decision{instance=~\"${host:raw}\"}[30d:1m]))",
+          "expr": "sum by (instance,country,as_name,as_num,ip,type,reason) (count_over_time(cs_lapi_decision{instance=~\"${host:raw}\"}[30d]))",
           "format": "table",
           "instant": true,
           "legendFormat": "__auto",
@@ -1459,15 +1459,15 @@
               "ip": false,
               "latitude": false,
               "longitude": false,
-              "scenario": false,
+              "reason": false,
               "scope": false
             },
             "includeByName": {},
             "indexByName": {
               "Time": 0,
               "Value": 8,
-              "asname": 4,
-              "asnumber": 3,
+              "as_name": 4,
+              "as_num": 3,
               "country": 2,
               "instance": 1,
               "ip": 6,
@@ -1477,14 +1477,14 @@
             "renameByName": {
               "Trend #A": "Count",
               "Value": "Count",
-              "asname": "AS Name",
-              "asnumber": "ASN",
+              "as_name": "AS Name",
+              "as_num": "ASN",
               "country": "Country",
               "duration": "Duration",
               "instance": "Affected Host",
               "ip": "IP",
               "iprange": "Subnet",
-              "scenario": "Scenario",
+              "reason": "Scenario",
               "scope": "Scope",
               "type": "Decision"
             }
@@ -1560,7 +1560,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "topk(10, sum by (country) (count_over_time(cs_lapi_decision{instance=~\"${host:raw}\"}[30d:1m])))",
+          "expr": "topk(10, (sum by (country) (count_over_time(cs_lapi_decision_agg{instance=~\"${host:raw}\",country=~\"[A-Z]{2}\"}[30d])) or sum by (country) (count_over_time(cs_lapi_decision{instance=~\"${host:raw}\",country=~\"[A-Z]{2}\"}[30d]))))",
           "format": "time_series",
           "instant": true,
           "legendFormat": "__auto",
@@ -1703,7 +1703,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum by(country) (count_over_time(cs_lapi_decision{instance=~\"${host:raw}\",country=~\"[A-Z]{2}\"}[$__range]))",
+          "expr": "sum by(country) (count_over_time(cs_lapi_decision_agg{instance=~\"${host:raw}\",country=~\"[A-Z]{2}\"}[$__range])) or sum by(country) (count_over_time(cs_lapi_decision{instance=~\"${host:raw}\",country=~\"[A-Z]{2}\"}[$__range]))",
           "format": "table",
           "instant": true,
           "legendFormat": "__auto",
@@ -1727,8 +1727,8 @@
             "indexByName": {
               "Time": 0,
               "Value": 13,
-              "asname": 4,
-              "asnumber": 3,
+              "as_name": 4,
+              "as_num": 3,
               "country": 2,
               "duration": 9,
               "instance": 1,
@@ -1736,14 +1736,14 @@
               "iprange": 5,
               "latitude": 10,
               "longitude": 11,
-              "scenario": 7,
+              "reason": 7,
               "scope": 12,
               "type": 8
             },
             "renameByName": {
               "Time": "Received Time",
-              "asname": "Name",
-              "asnumber": "ASN",
+              "as_name": "Name",
+              "as_num": "ASN",
               "country": "Country",
               "duration": "Duration",
               "instance": "Affected Host",
@@ -1751,7 +1751,7 @@
               "iprange": "Subnet",
               "latitude": "Lat",
               "longitude": "Long",
-              "scenario": "Scenario",
+              "reason": "Scenario",
               "scope": "",
               "type": "Type"
             }
@@ -2820,7 +2820,7 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "scenario"
+              "options": "reason"
             },
             "properties": [
               {
@@ -3117,7 +3117,7 @@
             "uid": "victoriametrics"
           },
           "editorMode": "code",
-          "expr": "cs_lapi_decision{instance=~\"${host:raw}\"}[$__range:$__interval]",
+          "expr": "cs_lapi_decision{instance=~\"${host:raw}\"}",
           "format": "table",
           "instant": false,
           "legendFormat": "__auto",
@@ -3133,7 +3133,7 @@
             "excludeByName": {
               "Value": true,
               "__name__": true,
-              "asnumber": false,
+              "as_num": false,
               "duration": true,
               "ip": false,
               "iprange": false,
@@ -3146,8 +3146,8 @@
               "Time": 0,
               "Value": 14,
               "__name__": 9,
-              "asname": 4,
-              "asnumber": 3,
+              "as_name": 4,
+              "as_num": 3,
               "country": 2,
               "duration": 10,
               "instance": 1,
@@ -3155,19 +3155,19 @@
               "iprange": 5,
               "latitude": 11,
               "longitude": 12,
-              "scenario": 8,
+              "reason": 8,
               "scope": 13,
               "type": 7
             },
             "renameByName": {
               "Time": "Timestamp",
-              "asname": "AS Name",
-              "asnumber": "ASN",
+              "as_name": "AS Name",
+              "as_num": "ASN",
               "country": "Country",
               "instance": "Affected Host",
               "ip": "IP",
               "iprange": "Subnet",
-              "scenario": "Scenario",
+              "reason": "Scenario",
               "type": "Decision"
             }
           }
