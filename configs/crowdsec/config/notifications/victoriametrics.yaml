@@ -7,11 +7,11 @@ log_level: info
 # The following template receives a list of models.Alert objects
 # and sends NDJSON samples to VictoriaMetrics /api/v1/import.
 format: |
-  {{range . -}}
-  {{$Alert := . -}}
-  {{range .Decisions -}}
-  {"metric":{"__name__":"cs_lapi_decision_agg","instance":"{{$Alert.MachineID}}","country":"{{$Alert.Source.Cn}}","as_name":"{{$Alert.Source.AsName}}","as_num":"{{$Alert.Source.AsNumber}}","reason":"{{.Scenario}}","scope":"{{.Scope}}","type":"{{.Type}}","origin":"{{.Origin}}"},"values":[1],"timestamps":[{{ now | unixEpoch }}000]}
-  {"metric":{"__name__":"cs_lapi_decision","instance":"{{$Alert.MachineID}}","ip":"{{.Value}}","reason":"{{.Scenario}}","country":"{{$Alert.Source.Cn}}","as_name":"{{$Alert.Source.AsName}}","as_num":"{{$Alert.Source.AsNumber}}","scope":"{{.Scope}}","type":"{{.Type}}","origin":"{{.Origin}}","duration":"{{.Duration}}","event_count":"{{len $Alert.Events}}","service":{{printf "%q" (GetMeta $Alert "service" | uniq | join ",")}},"http_status":{{printf "%q" (GetMeta $Alert "http_status" | uniq | join ",")}},"http_path":{{printf "%q" (GetMeta $Alert "http_path" | uniq | join ",")}}},"values":[1],"timestamps":[{{ now | unixEpoch }}000]}
+  {{range $alertIdx, $alert := . -}}
+  {{range $decisionIdx, $decision := $alert.Decisions -}}
+  {{$ts := add (mul (now | unixEpoch) 1000) (add (mul $alertIdx 10000) $decisionIdx) -}}
+  {"metric":{"__name__":"cs_lapi_decision_agg","instance":"{{$alert.MachineID}}","country":"{{$alert.Source.Cn}}","as_name":"{{$alert.Source.AsName}}","as_num":"{{$alert.Source.AsNumber}}","reason":"{{$decision.Scenario}}","scope":"{{$decision.Scope}}","type":"{{$decision.Type}}","origin":"{{$decision.Origin}}"},"values":[1],"timestamps":[{{$ts}}]}
+  {"metric":{"__name__":"cs_lapi_decision","instance":"{{$alert.MachineID}}","ip":"{{$decision.Value}}","reason":"{{$decision.Scenario}}","country":"{{$alert.Source.Cn}}","as_name":"{{$alert.Source.AsName}}","as_num":"{{$alert.Source.AsNumber}}","scope":"{{$decision.Scope}}","type":"{{$decision.Type}}","origin":"{{$decision.Origin}}","duration":"{{$decision.Duration}}","event_count":"{{len $alert.Events}}","service":{{printf "%q" (GetMeta $alert "service" | uniq | join ",")}},"http_status":{{printf "%q" (GetMeta $alert "http_status" | uniq | join ",")}},"http_path":{{printf "%q" (GetMeta $alert "http_path" | uniq | join ",")}}},"values":[1],"timestamps":[{{$ts}}]}
   {{end -}}
   {{end -}}
 

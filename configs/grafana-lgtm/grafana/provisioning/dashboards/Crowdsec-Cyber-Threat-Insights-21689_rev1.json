@@ -1560,7 +1560,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "topk(10, (sum by (country) (count_over_time(cs_lapi_decision_agg{instance=~\"${host:raw}\",country=~\"[A-Z]{2}\"}[30d])) or sum by (country) (count_over_time(cs_lapi_decision{instance=~\"${host:raw}\",country=~\"[A-Z]{2}\"}[30d]))))",
+          "expr": "topk(10, sum by (country) (sum_over_time(cs_lapi_decision_agg{instance=~\"${host:raw}\",country=~\"[A-Z]{2}\"}[30d])))",
           "format": "time_series",
           "instant": true,
           "legendFormat": "__auto",
@@ -1703,7 +1703,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum by(country) (count_over_time(cs_lapi_decision_agg{instance=~\"${host:raw}\",country=~\"[A-Z]{2}\"}[$__range])) or sum by(country) (count_over_time(cs_lapi_decision{instance=~\"${host:raw}\",country=~\"[A-Z]{2}\"}[$__range]))",
+          "expr": "sum by(country) (sum_over_time(cs_lapi_decision_agg{instance=~\"${host:raw}\",country=~\"[A-Z]{2}\"}[$__range]))",
           "format": "table",
           "instant": true,
           "legendFormat": "__auto",
@@ -1759,6 +1759,140 @@
         }
       ],
       "type": "geomap"
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Decision Events (Selected Range)",
+      "description": "Total decision samples emitted in the selected time range.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "sum(count_over_time(cs_lapi_decision{instance=~\"${host:raw}\"}[$__range])) or vector(0)",
+          "format": "time_series",
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "decimals": 0,
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "showPercentChange": false,
+        "wideLayout": true
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 12,
+        "x": 0,
+        "y": 9
+      }
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Unique Attacker IPs (Selected Range)",
+      "description": "Distinct source IPs seen in CrowdSec decisions within the selected time range.",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "victoriametrics"
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "victoriametrics"
+          },
+          "editorMode": "code",
+          "expr": "count(sum by (ip) (count_over_time(cs_lapi_decision{instance=~\"${host:raw}\"}[$__range]))) or vector(0)",
+          "format": "time_series",
+          "instant": true,
+          "legendFormat": "__auto",
+          "range": false,
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "decimals": 0,
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "values": false,
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": ""
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "showPercentChange": false,
+        "wideLayout": true
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 12,
+        "x": 12,
+        "y": 9
+      }
     },
     {
       "datasource": {
@@ -3086,13 +3220,13 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 9
+        "y": 12
       },
       "id": 3,
       "options": {
         "cellHeight": "sm",
         "footer": {
-          "countRows": true,
+          "countRows": false,
           "enablePagination": true,
           "fields": "",
           "reducer": [
@@ -3173,7 +3307,8 @@
           }
         }
       ],
-      "type": "table"
+      "type": "table",
+      "description": "Rows show decision samples in the selected range. Use the stat panels above for semantic counts."
     }
   ],
   "refresh": "5m",
@@ -3230,7 +3365,7 @@
   "timezone": "",
   "title": "Crowdsec Cyber Threat Insights",
   "uid": "cc93901e-cd55-4492-afd0-3d56e2eab00b",
-  "version": 141,
+  "version": 142,
   "weekStart": "",
   "gnetId": 21689
 }
