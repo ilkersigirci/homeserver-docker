@@ -22,22 +22,78 @@ services:
       - t3_proxy
     volumes:
       - $REPO_PATH/appdata/open-webui:/app/backend/data
+    # Docs: https://docs.openwebui.com/reference/env-configuration
     environment:
+      ENABLE_PERSISTENT_CONFIG: false
+      WEBUI_NAME: IlkerflixChat
       # WEBUI_AUTH: false
+      WEBUI_SECRET_KEY: $OPENWEBUI_WEBUI_SECRET_KEY
+      WEBUI_URL: https://chat.$DOMAINNAME
       ENABLE_OLLAMA_API: false
-      USE_OLLAMA_DOCKER: false
-      ENABLE_IMAGE_GENERATION: true
-      IMAGE_SIZE: 1024x1024
+      ENABLE_FOLLOW_UP_GENERATION: false
+      ENABLE_TAGS_GENERATION: false
+      ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS: false
+      OFFLINE_MODE: true
+      HF_HUB_OFFLINE: 1
+      #### OIDC ####
+      ENABLE_SIGNUP: false
+      ENABLE_LOGIN_FORM: false
+      ENABLE_OAUTH_SIGNUP: true
+      OAUTH_CLIENT_ID: $OPENWEBUI_CLIENT_ID
+      OAUTH_CLIENT_SECRET: $OPENWEBUI_CLIENT_SECRET
+      OPENID_PROVIDER_URL: https://pocketid.$BASE_DOMAINNAME/.well-known/openid-configuration
+      OAUTH_PROVIDER_NAME: Pocketid
+      OAUTH_SCOPES: openid email profile groups
+      OPENID_REDIRECT_URI: https://chat.$DOMAINNAME/oauth/oidc/callback
+      OAUTH_GROUP_CLAIM: groups
+      ENABLE_OAUTH_ROLE_MANAGEMENT: false
+      ENABLE_OAUTH_GROUP_MANAGEMENT: true
+      ENABLE_OAUTH_GROUP_CREATION: true
+      #### WEB SEARCH ####
       # - ENABLE_RAG_WEB_SEARCH=True
       # - RAG_WEB_SEARCH_ENGINE="searxng"
       # - RAG_WEB_SEARCH_RESULT_COUNT=3
       # - RAG_WEB_SEARCH_CONCURRENT_REQUESTS=10
       # - SEARXNG_QUERY_URL="http://searxng:8080/search?q=<query>"
       #### OPENAI API ####
-      # - OPENAI_API_BASE_URL=$CUSTOM_OPENAI_BASE_URL
-      # - OPENAI_API_KEY=DUMMY
-      OPENAI_API_BASE_URLS: https://api.openai.com/v1;$OPENROUTER_API_BASE_URL
-      OPENAI_API_KEYS: $OPENAI_API_KEY;$OPENROUTER_API_KEY
+      ENABLE_OPENAI_API: true
+      OPENAI_API_BASE_URL: $HOMESERVER_API_OPENAI_BASE_URL
+      OPENAI_API_KEY: $HOMESERVER_API_KEY
+      # OPENAI_API_BASE_URLS: https://api.openai.com/v1;$OPENROUTER_API_BASE_URL
+      # OPENAI_API_KEYS: $OPENAI_API_KEY;$OPENROUTER_API_KEY
+      #### IMAGE GENERATION ####
+      ENABLE_IMAGE_GENERATION: true
+      IMAGE_GENERATION_ENGINE: openai
+      # IMAGES_OPENAI_API_BASE_URL: $HOMESERVER_API_OPENAI_BASE_URL
+      # IMAGES_OPENAI_API_KEY: $HOMESERVER_API_KEY
+      IMAGE_GENERATION_MODEL: ${OPENAI_IMAGE_GENERATION_MODEL:-gpt-image-1.5}
+      IMAGE_SIZE: 1024x1024
+      #### CODE ####
+      ## EXECUTION ##
+      ENABLE_CODE_EXECUTION: true
+      CODE_EXECUTION_ENGINE: pyodide
+      ## INTERPRETER ##
+      ENABLE_CODE_INTERPRETER: true
+      CODE_INTERPRETER_ENGINE: pyodide
+      ## RAG ##
+      # CONTENT_EXTRACTION_ENGINE: mineru # docling
+      # DOCLING_SERVER_URL: http://docling:5000
+      #  DOCLING_PARAMS: DUMMY
+      # RAG_EMBEDDING_ENGINE: openai
+      #### USER PERMISSIONS ####
+      USER_PERMISSIONS_CHAT_CONTROLS: true
+      USER_PERMISSIONS_SETTINGS_INTERFACE: true
+      USER_PERMISSIONS_CHAT_CALL: true
+      #### OTEL ####
+      ENABLE_OTEL: false
+      ENABLE_OTEL_TRACES: true
+      ENABLE_OTEL_METRICS: true
+      ENABLE_OTEL_LOGS: true
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_INSECURE: true
+      OTEL_SERVICE_NAME: open-webui
+      OTEL_RESOURCE_ATTRIBUTES: ''
+      
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -60,52 +116,3 @@ services:
       homepage.description: "Selfhosted Chatgpt like App"
     profiles:
       - programming
-
-  # NOTE: Change ENABLE_OAUTH_SIGNUP: true for the first run
-  open-webui-betus:
-    container_name: open-webui-betus
-    image: ghcr.io/open-webui/open-webui:latest
-    restart: $RESTART_POLICY_PROGRAMMING
-    # depends_on:
-    #   - searxng
-    networks:
-      - t3_proxy
-    volumes:
-      - $REPO_PATH/appdata/open-webui-betus:/app/backend/data
-    environment:
-      # WEBUI_AUTH: false
-      ENABLE_SIGNUP: false
-      OPENAI_API_KEY: $OPENAI_API_KEY
-      WEBUI_NAME: BetusGPT
-      ## OIDC
-      ENABLE_LOGIN_FORM: true
-      ENABLE_OAUTH_SIGNUP: false
-      OAUTH_CLIENT_ID: $OPEN_WEB_UI_BETUS_CLIENT_ID
-      OAUTH_CLIENT_SECRET: $OPEN_WEB_UI_BETUS_CLIENT_SECRET
-      OPENID_PROVIDER_URL: https://pocketid.$BASE_DOMAINNAME/.well-known/openid-configuration
-      OAUTH_PROVIDER_NAME: Pocketid
-      OAUTH_SCOPES: openid email profile
-      OPENID_REDIRECT_URI: https://betuschat.$DOMAINNAME/oauth/oidc/callback
-    labels:
-      traefik.enable: "true"
-      ## HTTP Routers
-      traefik.http.routers.open-webui-betus-rtr.entrypoints: "websecure"
-      traefik.http.routers.open-webui-betus-rtr.rule: "Host(`betuschat.$DOMAINNAME`)"
-      ## Middlewares
-      traefik.http.routers.open-webui-betus-rtr.middlewares: "chain-no-auth-relaxed@file"
-      ## HTTP Services
-      traefik.http.routers.open-webui-betus-rtr.service: "open-webui-betus-svc"
-      traefik.http.services.open-webui-betus-svc.loadbalancer.server.port: "8080"
-      ####### TINYAUTH #######
-      tinyauth.apps.open-webui-betus.config.domain: "betuschat.$DOMAINNAME"
-      tinyauth.apps.open-webui-betus.ip.bypass: "$LOCAL_IPS"
-      ####### HOMEPAGE #######
-      homepage.group: "Programming"
-      homepage.name: "Open WebUI"
-      homepage.icon: "open-webui-light.webp"
-      homepage.href: "https://betuschat.$DOMAINNAME"
-      homepage.target: "_blank"
-      homepage.description: "Selfhosted Chatgpt like App for my Betus"
-    profiles:
-      # - ml
-      - not-used
