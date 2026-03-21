@@ -100,7 +100,7 @@ services:
       traefik.http.routers.open-webui-rtr.entrypoints: "websecure"
       traefik.http.routers.open-webui-rtr.rule: "Host(`chat.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.open-webui-rtr.middlewares: "chain-tinyauth@file"
+      traefik.http.routers.open-webui-rtr.middlewares: "chain-no-auth@file"
       ## HTTP Services
       traefik.http.routers.open-webui-rtr.service: "open-webui-svc"
       traefik.http.services.open-webui-svc.loadbalancer.server.port: "8080"
