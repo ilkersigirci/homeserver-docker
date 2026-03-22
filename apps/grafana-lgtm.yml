@@ -85,7 +85,7 @@ services:
       traefik.http.routers.grafana-lgtm-rtr.entrypoints: "websecure"
       traefik.http.routers.grafana-lgtm-rtr.rule: "Host(`grafana.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.grafana-lgtm-rtr.middlewares: "chain-tinyauth-relaxed@file" # NOTE: Otherwise some fields not showing
+      traefik.http.routers.grafana-lgtm-rtr.middlewares: "chain-no-auth-relaxed@file" # NOTE: Otherwise some fields not showing
       ## HTTP Services
       traefik.http.routers.grafana-lgtm-rtr.service: "grafana-lgtm-svc"
       traefik.http.services.grafana-lgtm-svc.loadbalancer.server.port: "3000"
