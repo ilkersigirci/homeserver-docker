@@ -59,7 +59,8 @@ services:
       ## Enable Hub communication (open the port 9900 and 9901 by default)
       - --experimental.abortOnPluginFailure=true
       # - --experimental.hub=true
-      - --experimental.otlpLogs=${TRAEFIK_OTEL_ENABLED:-true}
+      ## Leave it always true. Otherwise, gives error when TRAEFIK_OTEL_ENABLED=false
+      - --experimental.otlpLogs=true
       ## Plugins
       - --experimental.plugins.cf-real-ip.modulename=github.com/fma965/cloudflarewarp
       # - --experimental.plugins.cf-real-ip.modulename=github.com/jramsgz/traefik-real-ip
