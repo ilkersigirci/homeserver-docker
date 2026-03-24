@@ -46,9 +46,8 @@ services:
       - --entrypoints.web.http.redirections.entrypoint.to=websecure
       - --entrypoints.websecure.address=:443
       - --entrypoints.websecure.asDefault=true
-      # Allow these IPs to set the X-Forwarded-* headers - Cloudflare IPs: https://www.cloudflare.com/ips/
-      # - --entrypoints.websecure.forwardedHeaders.trustedIPs=$CLOUDFLARE_IPS,$LOCAL_IPS
-      - --entrypoints.websecure.forwardedHeaders.trustedIPs=$CLOUDFLARE_IPS
+      # Allow these IPs to set the X-Forwarded-* headers - Cloudflare + trusted internal ranges
+      - --entrypoints.websecure.forwardedHeaders.trustedIPs=$CLOUDFLARE_IPS,$LOCAL_IPS
       - --entrypoints.websecure.http.tls=true
       # Add dns-cloudflare as default certresolver for all services. Also enables TLS and no need to specify on individual services
       - --entrypoints.websecure.http.tls.certresolver=dns-cloudflare
@@ -163,6 +162,8 @@ services:
     environment:
       TZ: $TZ
       CF_DNS_API_TOKEN: $CLOUDFLARE_DNS_API_TOKEN
+      CLOUDFLARE_IPS: $CLOUDFLARE_IPS
+      LOCAL_IPS: $LOCAL_IPS
       # CF_DNS_API_TOKEN_FILE: /run/secrets/cf_dns_api_token
       ## Passing custom env variables to the container to be able to use this variables in the rules.
       LOCAL_STATIC_IP: $LOCAL_STATIC_IP

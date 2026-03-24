@@ -4,6 +4,20 @@ http:
       plugin:
         crowdsec-bouncer:
           enabled: true
+          # Trust X-Forwarded-For only from trusted edge nodes.
+          forwardedHeadersTrustedIPs:
+{{- range $cidr := splitList "," (env "CLOUDFLARE_IPS") }}
+{{- if ne (trim $cidr) "" }}
+            - {{ trim $cidr | quote }}
+{{- end }}
+{{- end }}
+          # Bypass CrowdSec decisions for local/LAN/VPN traffic.
+          clientTrustedIPs:
+{{- range $cidr := splitList "," (env "LOCAL_IPS") }}
+{{- if ne (trim $cidr) "" }}
+            - {{ trim $cidr | quote }}
+{{- end }}
+{{- end }}
           crowdseclapikey: {{env "CROWDSEC_TRAEFIK_BOUNCER_API_KEY"}}
           crowdseclapischeme: http
           crowdseclapihost: crowdsec:8080
