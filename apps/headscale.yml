@@ -33,15 +33,13 @@ services:
       traefik.http.routers.headscale-rtr.entrypoints: "websecure"
       traefik.http.routers.headscale-rtr.rule: "Host(`headscale.$DOMAINNAME`)"
       ## Middlewares
-      # traefik.http.routers.headscale-rtr.middlewares: chain-tinyauth@file
-      ## CORS Middleware
       traefik.http.middlewares.headscale-cors.headers.accessControlAllowMethods: "GET,POST,PUT,PATCH,DELETE,OPTIONS"
       traefik.http.middlewares.headscale-cors.headers.accessControlAllowHeaders: "Authorization,Content-Type"
       traefik.http.middlewares.headscale-cors.headers.accessControlAllowOriginList: "https://headscale.$DOMAINNAME"
       traefik.http.middlewares.headscale-cors.headers.accessControlMaxAge: "100"
       traefik.http.middlewares.headscale-cors.headers.addVaryHeader: "true"
       # Attach Middleware to Router
-      traefik.http.routers.headscale-rtr.middlewares: "headscale-cors"
+      traefik.http.routers.headscale-rtr.middlewares: "headscale-cors,chain-no-auth@file"
       ## HTTP Services
       traefik.http.routers.headscale-rtr.service: "headscale-svc"
       traefik.http.services.headscale-svc.loadbalancer.server.port: "8080"
@@ -116,6 +114,7 @@ services:
       traefik.http.routers.headplane-rtr.rule: "Host(`headscale.$DOMAINNAME`) && PathPrefix(`/admin`)"
       ## Middlewares
       # traefik.http.routers.headplane-rtr.middlewares: chain-tinyauth@file
+      traefik.http.routers.headplane-rtr.middlewares: "chain-no-auth@file"
       ## HTTP Services
       traefik.http.routers.headplane-rtr.service: "headplane-svc"
       traefik.http.services.headplane-svc.loadbalancer.server.port: "3000"
