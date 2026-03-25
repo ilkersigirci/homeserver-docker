@@ -51,7 +51,7 @@ include:
   # - ../apps/obsidian.yml
   # - ../apps/sealskin.yml
   # - ../apps/thunderbird.yml # TODO
-  # - ../apps/vscodium.yml
+  - ../apps/vscodium.yml
   # - ../apps/webtop.yml
   #### MEDIA ####
   - ../apps/immich-gpu.yml
