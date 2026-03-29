@@ -53,3 +53,5 @@ logs/**
 !logs/
 !logs/**/
 !logs/**/.gitkeep
+
+.codex
