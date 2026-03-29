@@ -1,7 +1,7 @@
 # Default user / pass is admin@example.com / Admin123!!
 services:
   hatchet-db:
-    image: postgres:16.4
+    image: postgres:18.3
     container_name: hatchet-db
     command: postgres -c 'max_connections=200'
     restart: $RESTART_POLICY_PROGRAMMING
