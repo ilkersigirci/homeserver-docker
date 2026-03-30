@@ -1,4 +1,5 @@
 {
+    "$schema": "https://www.getbifrost.ai/schema",
     "client": {
         "enable_logging": true,
         "disable_content_logging": false,
@@ -35,9 +36,6 @@
             "config": {
                 "service_name": "bifrost",
                 "collector_url": "otel-collector-agent:4317",
-                "headers": {
-                    "Authorization": "DUMMY"
-                },
                 "trace_type": "otel",
                 "protocol": "grpc",
                 "insecure": true,
