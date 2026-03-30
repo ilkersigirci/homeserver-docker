@@ -1,6 +1,8 @@
 # NOTE: When config_store is disabled, all config related UI places are also disabled
 # NOTE: Bifrost appends `/v1` into providers urls.
-# TODO: Enable OpenTelemetry metrics so that we ditch the bifrost UI completely
+# TODO: Enable username/password to add API_KEY support
+# TODO: Enable OpenTelemetry so that we ditch the bifrost UI completely
+# TODO: Research Vector Store integration for Semantic Caching
 services:
   bifrost:
     image: maximhq/bifrost:v1.4.18
@@ -17,8 +19,8 @@ services:
       - /app/render-config.sh
     volumes:
       # - $REPO_PATH/configs/bifrost/config.json:/app/data/config.json
-      # NOTE: Enables persistence for logs, vectordb and metrics
-      # - $REPO_PATH/data/bifrost:/app/data
+      # NOTE: Enables persistence for logs, NOT CONFIGS
+      - $REPO_PATH/data/bifrost:/app/data
       - $REPO_PATH/configs/bifrost/config.json:/app/data/config.template.json:ro # NOTE: For custom base_url env logic
       - $REPO_PATH/configs/bifrost/render-config.sh:/app/render-config.sh:ro # NOTE: For custom base_url env logic
     environment:

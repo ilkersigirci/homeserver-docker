@@ -17,7 +17,15 @@
         "enabled": true,
         "type": "sqlite",
         "config": {
-            "path": "./logs.db"
+            "path": "./data/logs.db"
+        }
+    },
+    "vector_store": {
+        "enabled": false,
+        "type": "qdrant",
+        "config": {
+            "host": "localhost",
+            "port": 6334
         }
     },
     "plugins": [
@@ -79,7 +87,10 @@
                     "name": "homeserver-api-key",
                     "value": "env.OPENAI_HOMESERVER_API_KEY",
                     "models": [],
-                    "weight": 1.0
+                    "weight": 1.0,
+                    "max_retries": 3,
+                    "retry_backoff_initial_ms": 1,
+                    "retry_backoff_max_ms": 10000
                 }
             ],
             "network_config": {
