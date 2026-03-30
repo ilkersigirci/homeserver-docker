@@ -1,4 +1,5 @@
 # NOTE: When config_store is disabled, all config related UI places are also disabled
+# NOTE: Bifrost appends `/v1` into providers urls.
 # TODO: Enable OpenTelemetry metrics so that we ditch the bifrost UI completely
 services:
   bifrost:
