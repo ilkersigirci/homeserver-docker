@@ -6,9 +6,13 @@ secrets
 .env*
 .github
 
+# Backups
+# backups/*
+
 # Configs
 configs/*
 configs/glance/docs
+!configs/bifrost
 !configs/copyparty/copyparty.conf
 !configs/filebrowser
 !configs/frigate/config.yml

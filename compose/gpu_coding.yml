@@ -45,6 +45,7 @@ include:
   - ../apps/traefik.yml
   - ../apps/otel-collector-agent.yml
   #### PROGRAMMING ####
+  - ../apps/bifrost.yml
   - ../apps/doco-cd.yml
   - ../apps/forgejo.yml
   - ../apps/forgejo-runner.yml

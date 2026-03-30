@@ -1,0 +1,54 @@
+# NOTE: When config_store is disabled, the UI is also disabled
+# TODO: Enable OpenTelemetry metrics so that we ditch the bifrost UI completely
+# TODO: vllm list models not supported
+services:
+  bifrost:
+    image: maximhq/bifrost:latest
+    container_name: bifrost
+    restart: $RESTART_POLICY_PROGRAMMING
+    profiles:
+      - programming
+    networks:
+      - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - $REPO_PATH/configs/bifrost/config.json:/app/data/config.json
+      # NOTE: Enables persistence for logs, vectordb and metrics
+      # - $REPO_PATH/data/bifrost:/app/data
+    environment:
+      LOG_LEVEL: info
+      LOG_STYLE: json
+      ## Providers
+      OPENROUTER_API_BASE_URL: $OPENROUTER_API_BASE_URL
+      OPENROUTER_API_KEY: $OPENROUTER_API_KEY
+      OPENAI_API_KEY: $OPENAI_API_KEY
+      OPENAI_QWEN_3_5_35B_A3B_BASE_URL: $OPENAI_QWEN_3_5_35B_A3B_BASE_URL
+      OPENAI_HOMESERVER_API_BASE_URL: $OPENAI_HOMESERVER_API_BASE_URL
+      OPENAI_HOMESERVER_API_KEY: $OPENAI_HOMESERVER_API_KEY
+
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.bifrost-rtr.entrypoints: "websecure"
+      traefik.http.routers.bifrost-rtr.rule: "Host(`aigateway.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.bifrost-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.bifrost-rtr.service: "bifrost-svc"
+      traefik.http.services.bifrost-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.bifrost.config.domain: "aigateway.$DOMAINNAME"
+      tinyauth.apps.bifrost.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "Programming"
+      homepage.name: "bifrost"
+      homepage.icon: "bifrost.png"
+      homepage.href: "https://aigateway.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "AI gateway"
+      ####### GLANCE #######
+      glance.name: "bifrost"
+      glance.icon: "sh:bifrost"
+      glance.url: "https://aigateway.$DOMAINNAME"
+      glance.description: "AI gateway"
