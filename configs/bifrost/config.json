@@ -1,4 +1,11 @@
 {
+    "client": {
+        "enable_logging": true,
+        "disable_content_logging": false,
+        "drop_excess_requests": false,
+        "initial_pool_size": 300,
+        "allow_direct_keys": false
+    },
     "config_store": {
         "enabled": false,
         "type": "sqlite",
@@ -6,8 +13,12 @@
             "path": "./config.db"
         }
     },
-    "client": {
-        "drop_excess_requests": false
+    "logs_store": {
+        "enabled": true,
+        "type": "sqlite",
+        "config": {
+            "path": "./logs.db"
+        }
     },
     "plugins": [
         {
