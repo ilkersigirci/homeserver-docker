@@ -1,0 +1,55 @@
+groups:
+  - name: bifrost-cost-rollups
+    interval: 30s
+    rules:
+      # Pre-aggregate by dashboard dimensions to reduce query-time cardinality.
+      - record: bifrost:cost_usd_total:by_provider_model_method
+        expr: |
+          sum by (provider, model, method) (
+            bifrost_cost_USD_total{
+              provider!="",
+              model!="",
+              method!=""
+            }
+          )
+      # Robust per-30s increment:
+      # - Uses counter-like diff for normal samples.
+      # - Falls back to current value when the series appears for the first time.
+      - record: bifrost:cost_usd_delta_30s:by_provider_model_method
+        expr: |
+          clamp_min(
+            sum by (provider, model, method) (
+              bifrost_cost_USD_total{
+                provider!="",
+                model!="",
+                method!=""
+              }
+            )
+            -
+            sum by (provider, model, method) (
+              bifrost_cost_USD_total{
+                provider!="",
+                model!="",
+                method!=""
+              } offset 30s
+            ),
+            0
+          )
+          or
+          (
+            sum by (provider, model, method) (
+              bifrost_cost_USD_total{
+                provider!="",
+                model!="",
+                method!=""
+              }
+            )
+            unless
+            sum by (provider, model, method) (
+              bifrost_cost_USD_total{
+                provider!="",
+                model!="",
+                method!=""
+              } offset 30s
+            )
+          )

@@ -51,7 +51,6 @@ configs/crowdsec/config/online_api_credentials.yaml
 
 # Data
 data/*
-!data/bifrost
 
 # Logs (keep folder structure, ignore runtime log files)
 logs/**
