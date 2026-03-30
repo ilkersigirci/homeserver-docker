@@ -3,7 +3,7 @@
 # TODO: vllm list models not supported
 services:
   bifrost:
-    image: maximhq/bifrost:latest
+    image: maximhq/bifrost:v1.4.18
     container_name: bifrost
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
