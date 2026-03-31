@@ -10,7 +10,7 @@ services:
       - t3_proxy
       - socket_proxy
     expose:
-      - "8000" # HTTP Fallback API communication port. 
+      - "8000" # HTTP Fallback API communication port.
       - "8001" # HTTPS Sessions and API communication port.
     ports:
       - "3000:8000"

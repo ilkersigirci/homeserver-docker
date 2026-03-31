@@ -5,7 +5,7 @@
     X-API-Key: ${SYNCTHING_API_KEY}
   # Main request: Get connections to count connected devices
   url: "${SYNCTHING_URL}/rest/system/connections"
-  
+
   subrequests:
     completion:
       url: "${SYNCTHING_URL}/rest/db/completion"
@@ -23,7 +23,7 @@
     {{ $completion := .Subrequest "completion" }}
     {{ $errors := .Subrequest "errors" }}
     {{ $notes := .Subrequest "notes" }}
-    
+
     {{ if or (ne .Response.StatusCode 200) (ne $completion.Response.StatusCode 200) }}
       <p class="text-danger">⚠️ Syncthing API unreachable</p>
     {{ else }}

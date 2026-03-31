@@ -27,56 +27,56 @@
 
         - type: group
           widgets:
-          - type: iframe
-            title: UPTIME
-            source: https://gatus.${BASE_DOMAINNAME}
-            height: 1000
+            - type: iframe
+              title: UPTIME
+              source: https://gatus.${BASE_DOMAINNAME}
+              height: 1000
 
-          - type: iframe
-            title: HOME
-            source: https://homepage.home.${BASE_DOMAINNAME}
-            height: 1000
-          - type: iframe
-            title: GPU
-            source: https://homepage.gpu.${BASE_DOMAINNAME}
-            height: 1000
+            - type: iframe
+              title: HOME
+              source: https://homepage.home.${BASE_DOMAINNAME}
+              height: 1000
+            - type: iframe
+              title: GPU
+              source: https://homepage.gpu.${BASE_DOMAINNAME}
+              height: 1000
 
-          - type: iframe
-            title: GPU2
-            source: https://homepage.gpu2.${BASE_DOMAINNAME}
-            height: 1000
+            - type: iframe
+              title: GPU2
+              source: https://homepage.gpu2.${BASE_DOMAINNAME}
+              height: 1000
 
-          - type: iframe
-            title: Coding
-            source: https://homepage.coding.${BASE_DOMAINNAME}
-            height: 1000
+            - type: iframe
+              title: Coding
+              source: https://homepage.coding.${BASE_DOMAINNAME}
+              height: 1000
 
-          - type: iframe
-            title: RPI1
-            source: https://homepage.rpi1.${BASE_DOMAINNAME}
-            height: 1000
+            - type: iframe
+              title: RPI1
+              source: https://homepage.rpi1.${BASE_DOMAINNAME}
+              height: 1000
 
-          # - type: iframe
-          #   title: NAS
-          #   source: https://homepage.nas.${BASE_DOMAINNAME}
-          #   height: 1000
+            # - type: iframe
+            #   title: NAS
+            #   source: https://homepage.nas.${BASE_DOMAINNAME}
+            #   height: 1000
 
-          - type: iframe
-            title: REMOTE
-            source: https://homepage.${BASE_DOMAINNAME}
-            height: 1000
+            - type: iframe
+              title: REMOTE
+              source: https://homepage.${BASE_DOMAINNAME}
+              height: 1000
 
-          - type: iframe
-            title: ARCANE
-            source: https://arcane.gpu.${BASE_DOMAINNAME}
-            # source: http://dozzle:8080
-            height: 1000
+            - type: iframe
+              title: ARCANE
+              source: https://arcane.gpu.${BASE_DOMAINNAME}
+              # source: http://dozzle:8080
+              height: 1000
 
     - size: small
       widgets:
         - type: group
           widgets:
-          - $include: custom-widgets/headscale.yml
+            - $include: custom-widgets/headscale.yml
 
         - $include: custom-widgets/hass-sensor-stats.yml
 

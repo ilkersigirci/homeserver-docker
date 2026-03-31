@@ -19,7 +19,7 @@ services:
       CHOWN_DIRS: true
       LOGLEVEL: ${METUBE_LOGLEVEL:-INFO}
       PORT: 8081
-      OUTPUT_TEMPLATE: '%(title)s [%(id)s].%(ext)s'
+      OUTPUT_TEMPLATE: "%(title)s [%(id)s].%(ext)s"
       # YTDL_OPTIONS: '{"writethumbnail": true, "writeinfojson": true}' # "writeinfojson": true,
       YTDL_OPTIONS: '{"cookiefile":"/cookies/cookies.txt"}'
       # Downloaded files are deleted on the server, when they are trashed from the "Completed" section of the UI

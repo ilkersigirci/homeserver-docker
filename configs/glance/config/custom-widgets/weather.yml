@@ -9,18 +9,18 @@
     color_clear: "#FFA500"
     color_partly: "#EBE387"
     color_cloud: "#A9A9A9"
-    color_smog: "#D3D3D3" 
-    color_drizzle: "#5F9EA0" 
-    color_rain: "#4682B4" 
-    color_freezing_rain: "#B0E0E6" 
-    color_snow: "#FFFFFF" 
+    color_smog: "#D3D3D3"
+    color_drizzle: "#5F9EA0"
+    color_rain: "#4682B4"
+    color_freezing_rain: "#B0E0E6"
+    color_snow: "#FFFFFF"
     color_thunderstorm: "#696969"
     color_other: "#FFFFFF"
     color_red: "#F08C46"
     color_yellow: "#F0F046"
     color_blue: "#46F0F0"
     color_white: "#FFFFFF"
-  template: | 
+  template: |
     {{/* THESE VALUES CAN BE CHANGED BY ADDING AN ENTRY TO THE OPTIONS SECTION */}}
       {{ $temp_unit := .Options.StringOr "temp_unit" "celsius" }}
       {{ $weekend_color := .Options.StringOr "weekend_color" "var(--color-separator)" }}
@@ -37,7 +37,7 @@
         {{ $color_thunderstorm := .Options.StringOr "color_thunderstorm" "var(--color-text-highlight)"}}
         {{ $color_other := .Options.StringOr "color_other" "var(--color-text-highlight)"}}
       {{/* the following variables define the temperature gradient coloring for the daily rectangles */}}
-      {{ $color_red := .Options.StringOr "color_red" "var(--color-negative)" }}  
+      {{ $color_red := .Options.StringOr "color_red" "var(--color-negative)" }}
       {{ $color_yellow := .Options.StringOr "color_yellow" "var(--color-text-subdue)" }}
       {{ $color_blue := .Options.StringOr "color_blue" "var(--color-positive)" }}
       {{ $color_white := .Options.StringOr "color_white" "var(--color-text-highlight)" }}
@@ -60,22 +60,22 @@
     {{ $longitude := $req1.JSON.String "results.0.longitude" }}
 
     {{/* Request 2: get daily weather forecast based on latitude and longitude */}}
-    {{ $url2 := printf "https://api.open-meteo.com/v1/forecast?latitude=%s&longitude=%s&temperature_unit=%s&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=America/New_York" $latitude $longitude $temp_unit}}    
+    {{ $url2 := printf "https://api.open-meteo.com/v1/forecast?latitude=%s&longitude=%s&temperature_unit=%s&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=America/New_York" $latitude $longitude $temp_unit}}
     {{ $req2 := newRequest $url2 | getResponse }}
 
     <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
-    
+
       {{/* Show abbreivated day of week */}}
       {{ $dates := $req2.JSON.Array "daily.time" }}
-      <div style="position: relative; width: 100%; height: 25px;">  
+      <div style="position: relative; width: 100%; height: 25px;">
         {{ range $index, $date := $dates }}
 
           {{/* prepare to print M Tu W Th F Sa Su */}}
           {{ $dateString := .String "" }}
           {{ $parsedDate := $dateString | parseTime "DateOnly" }}
-          {{ $dayOfWeek := $parsedDate.Format "Monday" | trimSuffix "day" | trimSuffix "on" | trimSuffix "es" | trimSuffix "edn" | 
-              trimSuffix "urs" | trimSuffix "ri" | trimSuffix "tur" | trimSuffix "n" }}  
-          
+          {{ $dayOfWeek := $parsedDate.Format "Monday" | trimSuffix "day" | trimSuffix "on" | trimSuffix "es" | trimSuffix "edn" |
+              trimSuffix "urs" | trimSuffix "ri" | trimSuffix "tur" | trimSuffix "n" }}
+
           {{/* highlight weekends (Sa Su) */}}
           {{ $day_color := "" }}
           {{ if eq $dayOfWeek "Sa" "Su" }}
@@ -83,18 +83,18 @@
           {{ end }}
 
           <div style="text-align: center; width: 10%; height: 25px; line-height: 25px; margin: 0 10% 0 3%; left: {{ mul $index 14 }}%; position: absolute; background-color: {{ $day_color | safeCSS }} ">
-            <p class="size-h4 color-paragraph">{{ $dayOfWeek }}</p> 
+            <p class="size-h4 color-paragraph">{{ $dayOfWeek }}</p>
           </div>
         {{ end }}
       </div>
 
       {{/* Show numeric day of month */}}
-      <div style="position: relative; width: 100%; height: 25px;">     
+      <div style="position: relative; width: 100%; height: 25px;">
         {{ range $index, $date := $dates }}
           {{ $dateString := .String "" }}
           {{ $trimmedDate := replaceMatches "[0-9]+-[0-9]+-" "" $dateString }}
           <div style="text-align: center; width: 10%; height: 25px; line-height: 25px; margin: 0 10% 0 3%; left: {{ mul $index 14 }}%; position: absolute;">
-            <p class="size-h4 color-paragraph">{{ $trimmedDate }}</p> 
+            <p class="size-h4 color-paragraph">{{ $trimmedDate }}</p>
           </div>
         {{ end }}
       </div>
@@ -103,14 +103,14 @@
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
       {{ $codes := $req2.JSON.Array "daily.weathercode" }}
 
-      <div style="position: relative; width: 100%; height: 30px;">     
+      <div style="position: relative; width: 100%; height: 30px;">
         {{ range $index, $thiscode := $codes }}
           {{ $code := .Int "" }}
 
           <div style="text-align: center; width: 10%; height: 25px; line-height: 25px; margin: 0 10% 0 3%; left: {{ mul $index 14 }}% ; position: absolute;">
-          {{ $wtype := "" }} 
-          {{ $wicon := "" }} 
-          {{ $wcolor := "" }} 
+          {{ $wtype := "" }}
+          {{ $wicon := "" }}
+          {{ $wcolor := "" }}
           {{ if eq $code 0 }}
             {{ $wtype = "Clear" }}
             {{ $wicon = "fas fa-sun" }}
@@ -118,7 +118,7 @@
           {{ else if eq $code 1 2 }}
             {{ $wtype = "Part Clear" }}
             {{ $wicon = "fas fa-cloud-sun" }}
-            {{ $wcolor = $color_partly }} 
+            {{ $wcolor = $color_partly }}
           {{ else if eq $code 3 }}
             {{ $wtype = "Cloudy" }}
             {{ $wicon = "fas fa-cloud" }}
@@ -160,7 +160,7 @@
 
     {{/* ===== show daily min and max temperatures ===== */}}
     {{ $maxTemps := $req2.JSON.Array "daily.temperature_2m_max" }}
-    {{ $minTemps := $req2.JSON.Array "daily.temperature_2m_min" }} 
+    {{ $minTemps := $req2.JSON.Array "daily.temperature_2m_min" }}
 
     {{/* get overall max and min temp over week's range */}}
     {{/* to determine vertical scale */}}
@@ -178,7 +178,7 @@
             {{ $min_min = (.Int "") }}
           {{ end }}
       {{ end }}
-      
+
       {{/* add a small buffer */}}
       {{ $max_max = add $max_max 1 }}
       {{ $min_min = sub $min_min 1 }}
@@ -206,7 +206,7 @@
             {{ $gradient_string := printf "%s %d%%, %s %d%%, %s %d%%, %s %d%%" $color_red $red_pos $color_yellow $yel_pos $color_blue $blu_pos $color_white $whi_pos }}
 
             {{/* output daily div */}}
-            <div style="left: {{ mul $index 14 | add 3 }}%; bottom: {{ mul $thisLowPct 100 | toInt }}%; 
+            <div style="left: {{ mul $index 14 | add 3 }}%; bottom: {{ mul $thisLowPct 100 | toInt }}%;
               height: {{ mul (sub $thisHighPct $thisLowPct) 100 | toInt }}%; position: absolute;
               background:linear-gradient({{ $gradient_string | safeCSS }}); width: 10%; text-align: center; border-radius: 10px;">
 
@@ -214,7 +214,7 @@
               {{ $top_pos := -2 }}
               {{ $bot_pos := -2 }}
               {{ $pos_thresh := 0.20 }}
-              {{ if lt (div $thisTempRange $temp_range) $pos_thresh }} 
+              {{ if lt (div $thisTempRange $temp_range) $pos_thresh }}
                 {{ $top_pos = -17 }}
                 {{ $bot_pos = -19 }}
               {{ else if and (lt (div $thisTempRange $temp_range) (mul $pos_thresh 2)) (lt (sub 1 $thisHighPct) $thisLowPct) }}
@@ -230,4 +230,4 @@
         {{ end }}
 
       </div>
-    </div>    
+    </div>

@@ -15,7 +15,11 @@ services:
       COUCHDB_USER: admin
       COUCHDB_PASSWORD: admin
     healthcheck:
-      test: ["CMD-SHELL", "curl --fail -u admin:admin -s http://localhost:5984/_up | grep -Eo '\"status\":\"ok\"' || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          'curl --fail -u admin:admin -s http://localhost:5984/_up | grep -Eo ''"status":"ok"'' || exit 1',
+        ]
       start_period: 15s
       interval: 1m
       timeout: 5s

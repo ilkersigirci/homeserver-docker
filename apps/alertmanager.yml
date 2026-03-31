@@ -10,8 +10,8 @@ services:
     volumes:
       - $REPO_PATH/configs/alertmanager/config.yml:/etc/alertmanager/config.yml
     command:
-      - '--config.file=/etc/alertmanager/config.yml'
-      - '--storage.path=/alertmanager'
+      - "--config.file=/etc/alertmanager/config.yml"
+      - "--storage.path=/alertmanager"
     # deploy:
     #   placement:
     #     constraints:

@@ -8,7 +8,7 @@ services:
     # # To use a non-root user, create the mountpoint first (mkdir data) so that it has the right permission.
     user: $PUID:$PGID
     profiles:
-      -maintenance
+      - maintenance
     network_mode: host
     # # dns is used for name resolution during network scan
     # dns:
@@ -47,9 +47,9 @@ services:
     #   - homepage.icon=upsnap.png
     #   - homepage.href=https://upsnap.$DOMAINNAME
     #   - homepage.target=_blank
-    #   - homepage.description=A simple wake on lan web app written with SvelteKit, Go and PocketBase. 
+    #   - homepage.description=A simple wake on lan web app written with SvelteKit, Go and PocketBase.
     #   ####### GLANCE #######
     #   - glance.name=upsnap
     #   - glance.icon=sh:upsnap
     #   - glance.url=https://upsnap.$DOMAINNAME
-    #   - glance.description=A simple wake on lan web app written with SvelteKit, Go and PocketBase. 
+    #   - glance.description=A simple wake on lan web app written with SvelteKit, Go and PocketBase.

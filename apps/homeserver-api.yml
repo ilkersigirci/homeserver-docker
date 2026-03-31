@@ -13,7 +13,15 @@ services:
     expose:
       - "6379"
     healthcheck:
-      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${HOMESERVER_API_REDIS_PASSWORD}", "ping"]
+      test:
+        [
+          "CMD",
+          "redis-cli",
+          "--no-auth-warning",
+          "-a",
+          "${HOMESERVER_API_REDIS_PASSWORD}",
+          "ping",
+        ]
       interval: 1s
       timeout: 3s
       retries: 50

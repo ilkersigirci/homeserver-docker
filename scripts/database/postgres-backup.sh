@@ -12,14 +12,14 @@ Required:
 
 Options:
   --compose-file PATH          Compose file path
-                               Default: compose/$MY_HOSTNAME.yml
+                                Default: compose/$MY_HOSTNAME.yml
   --env-file PATH              Env file passed to docker compose
-                               Default: $HOME/docker/.env
+                                Default: $HOME/docker/.env
   --profiles CSV               COMPOSE_PROFILES value (comma-separated)
   --db-user USER               Postgres user for pg_dumpall
-                               Default: POSTGRES_USER from container, else postgres
+                                Default: POSTGRES_USER from container, else postgres
   --backup-dir PATH            Backup directory
-                               Default: $REPO_PATH/backups/postgres (or repo-root/backups/postgres)
+                                Default: $REPO_PATH/backups/postgres (or repo-root/backups/postgres)
   --output-file PATH           Exact output file path
   --start-if-stopped           Start the DB service if it's not currently running
   --no-gzip                    Write plain .sql instead of .sql.gz

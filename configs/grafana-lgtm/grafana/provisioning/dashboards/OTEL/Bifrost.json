@@ -70,9 +70,7 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         },
         "textMode": "auto"
       }
@@ -126,9 +124,7 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         },
         "textMode": "auto"
       }
@@ -182,9 +178,7 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         },
         "textMode": "auto"
       }
@@ -246,9 +240,7 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         },
         "textMode": "auto"
       }
@@ -310,9 +302,7 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         },
         "textMode": "auto"
       }
@@ -366,9 +356,7 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         },
         "textMode": "auto"
       }
@@ -413,9 +401,7 @@
         "displayMode": "gradient",
         "orientation": "horizontal",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         },
         "showUnfilled": true
       }
@@ -460,9 +446,7 @@
         "displayMode": "gradient",
         "orientation": "horizontal",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ]
+          "calcs": ["lastNotNull"]
         },
         "showUnfilled": true
       }
@@ -510,11 +494,7 @@
       },
       "options": {
         "legend": {
-          "calcs": [
-            "mean",
-            "max",
-            "last"
-          ],
+          "calcs": ["mean", "max", "last"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -577,11 +557,7 @@
       },
       "options": {
         "legend": {
-          "calcs": [
-            "mean",
-            "max",
-            "last"
-          ],
+          "calcs": ["mean", "max", "last"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -644,11 +620,7 @@
       },
       "options": {
         "legend": {
-          "calcs": [
-            "mean",
-            "max",
-            "last"
-          ],
+          "calcs": ["mean", "max", "last"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -663,11 +635,7 @@
   "preload": false,
   "refresh": "30s",
   "schemaVersion": 42,
-  "tags": [
-    "bifrost",
-    "otel",
-    "cost"
-  ],
+  "tags": ["bifrost", "otel", "cost"],
   "templating": {
     "list": [
       {

@@ -73,7 +73,7 @@ services:
       CODE_INTERPRETER_ENGINE: pyodide
       ############# RAG #############
       BYPASS_EMBEDDING_AND_RETRIEVAL: true
-      CONTENT_EXTRACTION_ENGINE: mistral_ocr  # docling mineru
+      CONTENT_EXTRACTION_ENGINE: mistral_ocr # docling mineru
       MISTRAL_OCR_API_KEY: $MISTRAL_API_KEY
       # RAG_EMBEDDING_ENGINE: openai
       MISTRAL_API_KEY: $MISTRAL_API_KEY
@@ -89,7 +89,7 @@ services:
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
       OTEL_EXPORTER_OTLP_INSECURE: true
       OTEL_SERVICE_NAME: open-webui
-      OTEL_RESOURCE_ATTRIBUTES: ''
+      OTEL_RESOURCE_ATTRIBUTES: ""
     labels:
       traefik.enable: "true"
       ## HTTP Routers

@@ -59,44 +59,44 @@
       widgets:
         - type: split-column
           widgets:
-          - type: group
-            widgets:
-              - type: hacker-news
-                collapse-after: 7
-              - type: lobsters
-                collapse-after: 7
-          
-          - type: group
-            widgets:
-            - type: rss
-              title: T/MhaHaber
-              # style: detailed-list
-              limit: 30
-              collapse-after: 5
-              cache: 1h
-              feeds:
-                - url: https://rsshub.gpu.${BASE_DOMAINNAME}/telegram/channel//mhahabertg?limit=30 # &mode=fulltext
-                # - url: http://homeserver-api-head:8000/api/v1/telegram/messages//mhahabertg/rss?limit=10&feed_title=MHA&output_format=rss
-                # - url: http://rsshub:1200/telegram/channel//mhahabertg?limit=30 # &mode=fulltext
-                  title: " "
-            - type: rss
-              title: E/gundem
-              # style: detailed-list
-              limit: 30
-              collapse-after: 7
-              cache: 1h
-              feeds:
-                - url: http://homeserver-api-head:8000/api/v1/eksi/gundem/rss
-                  title: " "
-            - type: rss
-              title: X/pusholder
-              limit: 30
-              collapse-after: 5
-              cache: 1h
-              feeds:
-                # - url: http://rsshub:1200/twitter/user/pusholder/readable=1&limit=30&authorNameBold=1&showAuthorInTitle=1&showAuthorInDesc=1&showQuotedAuthorAvatarInDesc=1&showAuthorAvatarInDesc=1&showEmojiForRetweetAndReply=1&showRetweetTextInTitle=0&addLinkForPics=1&showTimestampInDescription=1&showQuotedInTitle=1&heightOfPics=150
-                - url: https://rsshub.gpu.${BASE_DOMAINNAME}/twitter/user/pusholder/readable=1&limit=30&authorNameBold=1&showAuthorInTitle=1&showAuthorInDesc=1&showQuotedAuthorAvatarInDesc=1&showAuthorAvatarInDesc=1&showEmojiForRetweetAndReply=1&showRetweetTextInTitle=0&addLinkForPics=1&showTimestampInDescription=1&showQuotedInTitle=1&heightOfPics=150
-                  title: " "
+            - type: group
+              widgets:
+                - type: hacker-news
+                  collapse-after: 7
+                - type: lobsters
+                  collapse-after: 7
+
+            - type: group
+              widgets:
+                - type: rss
+                  title: T/MhaHaber
+                  # style: detailed-list
+                  limit: 30
+                  collapse-after: 5
+                  cache: 1h
+                  feeds:
+                    - url: https://rsshub.gpu.${BASE_DOMAINNAME}/telegram/channel//mhahabertg?limit=30 # &mode=fulltext
+                      # - url: http://homeserver-api-head:8000/api/v1/telegram/messages//mhahabertg/rss?limit=10&feed_title=MHA&output_format=rss
+                      # - url: http://rsshub:1200/telegram/channel//mhahabertg?limit=30 # &mode=fulltext
+                      title: " "
+                - type: rss
+                  title: E/gundem
+                  # style: detailed-list
+                  limit: 30
+                  collapse-after: 7
+                  cache: 1h
+                  feeds:
+                    - url: http://homeserver-api-head:8000/api/v1/eksi/gundem/rss
+                      title: " "
+                - type: rss
+                  title: X/pusholder
+                  limit: 30
+                  collapse-after: 5
+                  cache: 1h
+                  feeds:
+                    # - url: http://rsshub:1200/twitter/user/pusholder/readable=1&limit=30&authorNameBold=1&showAuthorInTitle=1&showAuthorInDesc=1&showQuotedAuthorAvatarInDesc=1&showAuthorAvatarInDesc=1&showEmojiForRetweetAndReply=1&showRetweetTextInTitle=0&addLinkForPics=1&showTimestampInDescription=1&showQuotedInTitle=1&heightOfPics=150
+                    - url: https://rsshub.gpu.${BASE_DOMAINNAME}/twitter/user/pusholder/readable=1&limit=30&authorNameBold=1&showAuthorInTitle=1&showAuthorInDesc=1&showQuotedAuthorAvatarInDesc=1&showAuthorAvatarInDesc=1&showEmojiForRetweetAndReply=1&showRetweetTextInTitle=0&addLinkForPics=1&showTimestampInDescription=1&showQuotedInTitle=1&heightOfPics=150
+                      title: " "
 
         - type: rss
           title: News
@@ -139,7 +139,6 @@
           template: |
             <p class="size-h4 color-paragraph">{{ .JSON.String "text" }}</p>
 
-
         - type: calendar
           hide-header: true
           first-day-of-week: monday
@@ -154,8 +153,6 @@
         #   hour-format: 12h # alternatively "24h"
         #   # Optionally hide the location from being displayed in the widget
         #   # hide-location: true
-
-
 
         - type: markets
           hide-header: true
@@ -175,7 +172,7 @@
             # NOTE: Not working
             # - symbol: XAUTRYG
             #   name: Gold-TRY
-              # chart-link: https://www.tradingview.com/chart/?symbol=INDEX:XAUTRYG
+            # chart-link: https://www.tradingview.com/chart/?symbol=INDEX:XAUTRYG
             # - symbol: FX%3AUSDTRY
             #   name: USD-TRY
             #   chart-link: https://www.tradingview.com/chart/?symbol=FX%3AUSDTRY

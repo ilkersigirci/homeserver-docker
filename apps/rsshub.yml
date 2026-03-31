@@ -18,7 +18,7 @@ services:
       timeout: 10s
       retries: 3
     labels:
-        ####### GLANCE #######
+      ####### GLANCE #######
       glance.name: "rsshub-browserless"
       glance.parent: "rsshub"
 
@@ -40,7 +40,7 @@ services:
       retries: 5
       start_period: 5s
     labels:
-        ####### GLANCE #######
+      ####### GLANCE #######
       glance.name: "rsshub-redis"
       glance.parent: "rsshub"
 

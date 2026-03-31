@@ -11,8 +11,8 @@
         {{ range .JSON.Array "" }}
           {{ $id := .String "entity_id" }}
           {{ $state := .String "state" }}
-          {{ if and (or 
-                        (eq $id "sensor.homeserver_smart_plug_current_consumption") 
+          {{ if and (or
+                        (eq $id "sensor.homeserver_smart_plug_current_consumption")
                         (eq $id "sensor.kitchen_smart_plug_current_consumption")
                         (eq $id "sensor.smart_plug_nas_current_consumption")
                         (eq $id "sensor.bedroom_smart_plug_current_consumption")

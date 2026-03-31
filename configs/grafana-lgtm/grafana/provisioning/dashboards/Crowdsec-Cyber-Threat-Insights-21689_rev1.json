@@ -1416,12 +1416,8 @@
         "footer": {
           "countRows": false,
           "enablePagination": true,
-          "fields": [
-            "Value"
-          ],
-          "reducer": [
-            "sum"
-          ],
+          "fields": ["Value"],
+          "reducer": ["sum"],
           "show": true
         },
         "showHeader": true,
@@ -1529,10 +1525,7 @@
       },
       "id": 4,
       "options": {
-        "displayLabels": [
-          "name",
-          "percent"
-        ],
+        "displayLabels": ["name", "percent"],
         "legend": {
           "displayMode": "list",
           "placement": "bottom",
@@ -1540,9 +1533,7 @@
         },
         "pieType": "pie",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "",
           "values": true
         },
@@ -1807,9 +1798,7 @@
       "options": {
         "reduceOptions": {
           "values": false,
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": ""
         },
         "orientation": "auto",
@@ -1874,9 +1863,7 @@
       "options": {
         "reduceOptions": {
           "values": false,
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": ""
         },
         "orientation": "auto",
@@ -3229,9 +3216,7 @@
           "countRows": false,
           "enablePagination": true,
           "fields": "",
-          "reducer": [
-            "count"
-          ],
+          "reducer": ["count"],
           "show": true
         },
         "frameIndex": 1,
@@ -3313,10 +3298,7 @@
   ],
   "refresh": "5m",
   "schemaVersion": 39,
-  "tags": [
-    "cyberthreat",
-    "crowdsec"
-  ],
+  "tags": ["cyberthreat", "crowdsec"],
   "templating": {
     "list": [
       {

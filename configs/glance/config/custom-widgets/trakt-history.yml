@@ -83,7 +83,7 @@
             {{ if eq (.String "type") "episode" }}
             <p class="size-h5">
             {{ if $showEpisodeNumber }}
-              (S{{ .String "episode.season" }}E{{ .String "episode.number" }}) 
+              (S{{ .String "episode.season" }}E{{ .String "episode.number" }})
             {{ end }}
             {{ .String "episode.title" }}
             </p>

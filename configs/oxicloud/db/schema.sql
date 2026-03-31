@@ -12,7 +12,7 @@
 CREATE SCHEMA IF NOT EXISTS auth;
 
 -- Create UserRole enum type
-DO $BODY$ 
+DO $BODY$
 BEGIN
     IF NOT EXISTS (
         SELECT 1 FROM pg_type t
@@ -419,10 +419,10 @@ BEGIN
         -- Uses the GiST index idx_folders_lpath for the <@ operator.
         -- Does NOT touch name or parent_id, so compute_folder_path does not fire.
         UPDATE storage.folders
-           SET path  = NEW.path || substr(path, length(OLD.path) + 1),
-               lpath = NEW.lpath || subpath(lpath, nlevel(OLD.lpath))
-         WHERE lpath <@ OLD.lpath
-           AND id != NEW.id;
+            SET path  = NEW.path || substr(path, length(OLD.path) + 1),
+                lpath = NEW.lpath || subpath(lpath, nlevel(OLD.lpath))
+          WHERE lpath <@ OLD.lpath
+            AND id != NEW.id;
     END IF;
     RETURN NEW;
 END;
@@ -465,21 +465,21 @@ CREATE INDEX IF NOT EXISTS idx_files_name_search ON storage.files(user_id, name 
 -- is also trashed (they are implicitly in trash as children of a trashed folder).
 CREATE OR REPLACE VIEW storage.trash_items AS
     SELECT f.id, f.name, 'file' AS item_type, f.user_id, f.trashed_at,
-           f.original_folder_id AS original_parent_id, f.created_at
+            f.original_folder_id AS original_parent_id, f.created_at
     FROM storage.files f
     WHERE f.is_trashed = TRUE
       AND (f.folder_id IS NULL
-           OR NOT EXISTS (
-               SELECT 1 FROM storage.folders p
+            OR NOT EXISTS (
+                SELECT 1 FROM storage.folders p
                 WHERE p.id = f.folder_id AND p.is_trashed = TRUE))
     UNION ALL
     SELECT fo.id, fo.name, 'folder' AS item_type, fo.user_id, fo.trashed_at,
-           fo.original_parent_id, fo.created_at
+            fo.original_parent_id, fo.created_at
     FROM storage.folders fo
     WHERE fo.is_trashed = TRUE
       AND (fo.parent_id IS NULL
-           OR NOT EXISTS (
-               SELECT 1 FROM storage.folders p
+            OR NOT EXISTS (
+                SELECT 1 FROM storage.folders p
                 WHERE p.id = fo.parent_id AND p.is_trashed = TRUE));
 
 -- ── Trigger: auto-decrement blob ref_count when a file row is deleted ──
@@ -493,8 +493,8 @@ CREATE OR REPLACE FUNCTION storage.decrement_blob_ref()
 RETURNS trigger AS $$
 BEGIN
     UPDATE storage.blobs
-       SET ref_count = GREATEST(ref_count - 1, 0)
-     WHERE hash = OLD.blob_hash;
+        SET ref_count = GREATEST(ref_count - 1, 0)
+      WHERE hash = OLD.blob_hash;
     RETURN OLD;
 END;
 $$ LANGUAGE plpgsql;
@@ -567,7 +567,7 @@ BEGIN
     SELECT fo.lpath, nlevel(fo.lpath)
       INTO v_root_lpath, v_root_depth
       FROM storage.folders fo
-     WHERE fo.id = p_source_id AND NOT fo.is_trashed;
+      WHERE fo.id = p_source_id AND NOT fo.is_trashed;
 
     IF v_root_lpath IS NULL THEN
         RAISE EXCEPTION 'Source folder not found: %', p_source_id
@@ -584,8 +584,8 @@ BEGIN
     INSERT INTO _copy_map(old_id)
     SELECT fo.id
       FROM storage.folders fo
-     WHERE NOT fo.is_trashed
-       AND fo.lpath <@ v_root_lpath;
+      WHERE NOT fo.is_trashed
+        AND fo.lpath <@ v_root_lpath;
 
     -- Remember new root ID
     SELECT cm.new_id INTO v_new_root
@@ -604,16 +604,16 @@ BEGIN
     FOR v_level IN v_root_depth .. v_max_depth LOOP
         INSERT INTO storage.folders(id, name, parent_id, user_id)
         SELECT cm.new_id,
-               CASE WHEN fo.id = p_source_id AND p_dest_name IS NOT NULL
+                CASE WHEN fo.id = p_source_id AND p_dest_name IS NOT NULL
                     THEN p_dest_name ELSE fo.name END,
-               CASE WHEN fo.id = p_source_id THEN p_target_parent_id
+                CASE WHEN fo.id = p_source_id THEN p_target_parent_id
                     ELSE pm.new_id END,
-               fo.user_id
+                fo.user_id
           FROM storage.folders fo
           JOIN _copy_map cm ON fo.id = cm.old_id
           LEFT JOIN _copy_map pm ON fo.parent_id = pm.old_id
-         WHERE NOT fo.is_trashed
-           AND nlevel(fo.lpath) = v_level;
+          WHERE NOT fo.is_trashed
+            AND nlevel(fo.lpath) = v_level;
 
         GET DIAGNOSTICS v_inserted = ROW_COUNT;
         v_folders := v_folders + v_inserted;
@@ -624,22 +624,22 @@ BEGIN
     SELECT f.name, cm.new_id, f.user_id, f.blob_hash, f.size, f.mime_type
       FROM storage.files f
       JOIN _copy_map cm ON f.folder_id = cm.old_id
-     WHERE NOT f.is_trashed;
+      WHERE NOT f.is_trashed;
 
     GET DIAGNOSTICS v_files = ROW_COUNT;
 
     -- ── Batch increment blob ref_counts ──
     IF v_files > 0 THEN
         UPDATE storage.blobs b
-           SET ref_count = ref_count + hc.cnt
+            SET ref_count = ref_count + hc.cnt
           FROM (
               SELECT f.blob_hash, COUNT(*)::int AS cnt
                 FROM storage.files f
                 JOIN _copy_map cm ON f.folder_id = cm.new_id
-               WHERE NOT f.is_trashed
-               GROUP BY f.blob_hash
+                WHERE NOT f.is_trashed
+                GROUP BY f.blob_hash
           ) hc
-         WHERE b.hash = hc.blob_hash;
+          WHERE b.hash = hc.blob_hash;
     END IF;
 
     RETURN QUERY SELECT v_new_root::text, v_folders, v_files;

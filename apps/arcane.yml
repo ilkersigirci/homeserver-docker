@@ -39,7 +39,11 @@ services:
       OIDC_ADMIN_VALUE: admin
       OIDC_MERGE_ACCOUNTS: true
     healthcheck:
-      test: ['CMD-SHELL', 'curl -fsS http://localhost:3552/api/health >/dev/null || exit 1']
+      test:
+        [
+          "CMD-SHELL",
+          "curl -fsS http://localhost:3552/api/health >/dev/null || exit 1",
+        ]
       start_period: 15s
       interval: 1m
       timeout: 3s

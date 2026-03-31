@@ -14,7 +14,7 @@ color: slate # gray, zinc, neutral, stone, amber, yellow, lime, green, emerald, 
 # target: _blank # Possible options include _blank, _self, and _top
 # base: https://{{HOMEPAGE_VAR_DOMAINNAME}}
 
-# background: 
+# background:
 #   image: https://images.pexels.com/photos/6985260/pexels-photo-6985260.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&dpr=1
 #   # image: /images/custom_background.png
 #   blur: sm # sm, "", md... see https://tailwindcss.com/docs/backdrop-blur

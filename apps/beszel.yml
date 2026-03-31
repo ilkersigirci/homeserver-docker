@@ -16,7 +16,7 @@ services:
     profiles:
       - monitoring
     healthcheck:
-      test: ['CMD', '/beszel', 'health', '--url', 'http://localhost:8090']
+      test: ["CMD", "/beszel", "health", "--url", "http://localhost:8090"]
       start_period: 5s
       interval: 1m
     labels:

@@ -10,7 +10,6 @@ http-default: &http-default
     - type: gotify
       send-on-resolved: true
 
-
 https-default: &https-default
   group: Https-Default-Group
   interval: 30s
@@ -288,7 +287,7 @@ ui:
       background-color: hsl(96, 44%, 68%) !important; /* Catppuccin green */
       color: hsl(240, 13%, 14%) !important; /* Dark text on green background */
     }
-    
+
     .bg-green-400 {
       background-color: hsl(96, 44%, 78%) !important; /* Lighter green */
     }

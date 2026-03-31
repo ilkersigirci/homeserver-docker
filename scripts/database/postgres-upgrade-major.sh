@@ -12,19 +12,19 @@ Required:
 
 Options:
   --new-image IMAGE            New Postgres image (e.g. postgres:18.3)
-                               If omitted, script uses image from compose file.
+                                If omitted, script uses image from compose file.
   --compose-file PATH          Compose file path
-                               Default: compose/$MY_HOSTNAME.yml
+                                Default: compose/$MY_HOSTNAME.yml
   --env-file PATH              Env file passed to docker compose
-                               Default: $HOME/docker/.env
+                                Default: $HOME/docker/.env
   --profiles CSV               COMPOSE_PROFILES value (comma-separated)
   --stop-services CSV          Comma-separated writer services to stop before DB stop
-                               Example: hatchet,langfuse-web
+                                Example: hatchet,langfuse-web
   --db-user USER               Postgres user for restore and readiness checks
-                               Default: POSTGRES_USER from container, else postgres
+                                Default: POSTGRES_USER from container, else postgres
   --data-dir PATH              Host Postgres data directory. Auto-detected for bind mounts.
   --backup-dir PATH            Backup directory for logical dump
-                               Default: $REPO_PATH/backups/postgres (or repo-root/backups/postgres)
+                                Default: $REPO_PATH/backups/postgres (or repo-root/backups/postgres)
   --backup-file PATH           Reuse an existing backup file (.sql or .sql.gz)
   --skip-backup                Skip creating a new backup (requires --backup-file)
   --yes                        Non-interactive mode

@@ -27,7 +27,7 @@ services:
       POSTGRES_PASSWORD: $IMMICH_DB_PASSWORD
       POSTGRES_USER: $IMMICH_DB_USERNAME
       POSTGRES_DB: $IMMICH_DB_DATABASE_NAME
-      POSTGRES_INITDB_ARGS: '--data-checksums'
+      POSTGRES_INITDB_ARGS: "--data-checksums"
       PG_DATA: /var/lib/postgresql/data
       # Uncomment the DB_STORAGE_TYPE: 'HDD' var if your database isn't stored on SSDs
       # DB_STORAGE_TYPE: 'HDD'

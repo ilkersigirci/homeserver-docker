@@ -1,26 +1,30 @@
 /* Root variables for custom colour palette */
 :root {
-    /* Catppuccin Frappe colour palette */
-    --background-color: hsl(240, 13%, 14%); /* Main background */
-    --contrast-multiplier: 1.4;
-    --primary-color: hsl(222, 74%, 74%); /* Primary colour */
-    --positive-color: hsl(96, 44%, 68%); /* Success/Positive */
-    --negative-color: hsl(358, 100%, 68%); /* Error/Negative */
-  }
-  
-  /* Apply the font globally */
-  html, body {
-    font-family: 'JetBrains Mono', monospace !important;
-    text-rendering: optimizeLegibility !important;
-    margin: 0;
-    padding: 0;
-    background-color: var(--background-color) !important;
-    color: var(--primary-color);
-    font-size: 16px;
-    line-height: 1.6;
-  }
+  /* Catppuccin Frappe colour palette */
+  --background-color: hsl(240, 13%, 14%); /* Main background */
+  --contrast-multiplier: 1.4;
+  --primary-color: hsl(222, 74%, 74%); /* Primary colour */
+  --positive-color: hsl(96, 44%, 68%); /* Success/Positive */
+  --negative-color: hsl(358, 100%, 68%); /* Error/Negative */
+}
 
-  /* Ensure the main content area uses the same background */
-  #__next, main, .main-container, [data-theme] {
-    background-color: var(--background-color) !important;
-  }
+/* Apply the font globally */
+html,
+body {
+  font-family: "JetBrains Mono", monospace !important;
+  text-rendering: optimizeLegibility !important;
+  margin: 0;
+  padding: 0;
+  background-color: var(--background-color) !important;
+  color: var(--primary-color);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* Ensure the main content area uses the same background */
+#__next,
+main,
+.main-container,
+[data-theme] {
+  background-color: var(--background-color) !important;
+}

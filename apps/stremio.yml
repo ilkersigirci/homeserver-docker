@@ -57,7 +57,6 @@ services:
       - media
       - arr
 
-
   # In the url, change streamingServer=http to streamingServer=https
   stremio-server:
     image: stremio/server:latest

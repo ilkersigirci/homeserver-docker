@@ -49,7 +49,8 @@ services:
       CORE_SECRET: $ZIPLINE_CORE_SECRET
       DATABASE_URL: postgres://postgres:postgres@zipline-db:5432/postgres
     healthcheck:
-      test: ['CMD', 'wget', '-q', '--spider', 'http://0.0.0.0:3000/api/healthcheck']
+      test:
+        ["CMD", "wget", "-q", "--spider", "http://0.0.0.0:3000/api/healthcheck"]
       interval: 15s
       timeout: 5s
       retries: 3

@@ -75,7 +75,7 @@ services:
       FORGEJO__openid__ENABLE_OPENID_SIGNIN: false
       FORGEJO__webhook__ALLOWED_HOST_LIST: doco-cd.$DOMAINNAME
       FORGEJO__cron.cleanup_packages__SCHEDULE: "@every 6h"
-      
+
     labels:
       traefik.enable: "true"
       ## HTTP Routers

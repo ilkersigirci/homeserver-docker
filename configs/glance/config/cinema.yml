@@ -17,53 +17,53 @@
         - type: group
           title: MOVIES
           widgets:
-          - type: rss
-            title: TRENDING
-            style: horizontal-cards-2
-            limit: 20
-            cache: 2h
-            feeds:
-              - url: https://rsshub.gpu.${BASE_DOMAINNAME}/themoviedb/trending/movie/day/en-US
-                title: " "
-          
-          - type: rss
-            title: UPCOMING
-            style: horizontal-cards-2
-            limit: 20
-            cache: 2h
-            feeds:
-              - url: https://rsshub.gpu.${BASE_DOMAINNAME}/themoviedb/movie/upcoming/en-US
-                title: " "
+            - type: rss
+              title: TRENDING
+              style: horizontal-cards-2
+              limit: 20
+              cache: 2h
+              feeds:
+                - url: https://rsshub.gpu.${BASE_DOMAINNAME}/themoviedb/trending/movie/day/en-US
+                  title: " "
 
-          - type: rss
-            title: TOP.RATED
-            style: horizontal-cards-2
-            limit: 20
-            cache: 2h
-            feeds:
-              - url: https://rsshub.gpu.${BASE_DOMAINNAME}/themoviedb/movie/top-rated/en-US
-                title: " "
+            - type: rss
+              title: UPCOMING
+              style: horizontal-cards-2
+              limit: 20
+              cache: 2h
+              feeds:
+                - url: https://rsshub.gpu.${BASE_DOMAINNAME}/themoviedb/movie/upcoming/en-US
+                  title: " "
+
+            - type: rss
+              title: TOP.RATED
+              style: horizontal-cards-2
+              limit: 20
+              cache: 2h
+              feeds:
+                - url: https://rsshub.gpu.${BASE_DOMAINNAME}/themoviedb/movie/top-rated/en-US
+                  title: " "
 
         - type: group
           title: TVSHOWS
           widgets:
-          - type: rss
-            title: TRENDING
-            style: horizontal-cards-2
-            limit: 20
-            cache: 2h
-            feeds:
-              - url: https://rsshub.gpu.${BASE_DOMAINNAME}/themoviedb/trending/tv/day/en-US
-                title: " "
-          
-          - type: rss
-            title: TOP.RATED
-            style: horizontal-cards-2
-            limit: 20
-            cache: 2h
-            feeds:
-              - url: https://rsshub.gpu.${BASE_DOMAINNAME}/themoviedb/tv/top-rated/en-US
-                title: " "
+            - type: rss
+              title: TRENDING
+              style: horizontal-cards-2
+              limit: 20
+              cache: 2h
+              feeds:
+                - url: https://rsshub.gpu.${BASE_DOMAINNAME}/themoviedb/trending/tv/day/en-US
+                  title: " "
+
+            - type: rss
+              title: TOP.RATED
+              style: horizontal-cards-2
+              limit: 20
+              cache: 2h
+              feeds:
+                - url: https://rsshub.gpu.${BASE_DOMAINNAME}/themoviedb/tv/top-rated/en-US
+                  title: " "
 
         # - type: split-column
         #   widgets:

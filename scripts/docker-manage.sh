@@ -36,13 +36,13 @@ case "$1" in
         COMPOSE_PROFILES=$PROFILES $COMPOSE_CMD up -d
         echo "✅ Containers started successfully!"
         ;;
-    
+
     "down")
         echo "🔽 Stopping containers..."
         COMPOSE_PROFILES=$PROFILES $COMPOSE_CMD down --remove-orphans
         echo "✅ Containers stopped successfully!"
         ;;
-    
+
     "pull")
         echo "🔄 Updating containers..."
         COMPOSE_PROFILES=$PROFILES $COMPOSE_CMD pull
@@ -51,14 +51,14 @@ case "$1" in
         docker image prune -f || echo "⚠️  Warning: Image cleanup failed"
         echo "✅ Update complete!"
         ;;
-    
+
     "restart")
         echo "🔄 Restarting containers..."
         COMPOSE_PROFILES=$PROFILES $COMPOSE_CMD down --remove-orphans
         COMPOSE_PROFILES=$PROFILES $COMPOSE_CMD up -d
         echo "✅ Containers restarted successfully!"
         ;;
-    
+
     *)
         usage
         ;;

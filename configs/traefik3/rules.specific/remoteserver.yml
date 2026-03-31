@@ -61,14 +61,14 @@ http:
       middlewares:
         - chain-no-auth
       service: noop@internal
-  
+
   middlewares:
     jellyfin-redirect:
       redirectRegex:
         regex: "^https://jellyfin\\.(.+)"
         replacement: "https://jellyfin.gpu.${1}"
         permanent: true
-  
+
   services:
     webfinger-svc:
       loadBalancer:

@@ -15,7 +15,7 @@ http:
         sslForceHost: true
         sslProxyHeaders:
           X-Forwarded-Proto: https
-        stsSeconds: 63072000  # 2 years HSTS
+        stsSeconds: 63072000 # 2 years HSTS
         stsIncludeSubdomains: true
         stsPreload: true
         forceSTSHeader: true

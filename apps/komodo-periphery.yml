@@ -35,7 +35,7 @@ services:
       ## Specify whether to disable the terminals feature
       ## and disallow remote shell access (inside the Periphery container).
       PERIPHERY_DISABLE_TERMINALS: false
-      ## If the disk size is overreporting, can use one of these to 
+      ## If the disk size is overreporting, can use one of these to
       ## whitelist / blacklist the disks to filter them, whichever is easier.
       ## Accepts comma separated list of paths.
       ## Usually whitelisting just /etc/hostname gives correct size for single root disk.

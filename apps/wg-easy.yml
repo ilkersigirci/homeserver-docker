@@ -34,7 +34,7 @@ services:
       # - WG_POST_UP=iptables -t nat -A POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE; iptables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT; iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; ip6tables -t nat -A POSTROUTING -s fdcc:ad94:bacf:61a4::cafe:0/112 -o eth0 -j MASQUERADE; ip6tables -A INPUT -p udp -m udp --dport 51820 -j ACCEPT; ip6tables -A FORWARD -i wg0 -j ACCEPT; ip6tables -A FORWARD -o wg0 -j ACCEPT;
       # - WG_POST_DOWN=iptables -t nat -D POSTROUTING -s 10.8.0.0/24 -o eth0 -j MASQUERADE; iptables -D INPUT -p udp -m udp --dport 51820 -j ACCEPT; iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; ip6tables -t nat -D POSTROUTING -s fdcc:ad94:bacf:61a4::cafe:0/112 -o eth0 -j MASQUERADE; ip6tables -D INPUT -p udp -m udp --dport 51820 -j ACCEPT; ip6tables -D FORWARD -i wg0 -j ACCEPT; ip6tables -D FORWARD -o wg0 -j ACCEPT;
       ## Custom
-      WG_PRE_UP: "iptables -t nat -F; iptables -F;"  # Flush all rules
+      WG_PRE_UP: "iptables -t nat -F; iptables -F;" # Flush all rules
       WG_POST_UP: "iptables -A FORWARD -i wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o enp0s3 -j MASQUERADE;"
       WG_POST_DOWN: "iptables -D FORWARD -i wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o enp0s3 -j MASQUERADE;"
       WG_DEFAULT_ADDRESS: 10.8.0.x
@@ -65,7 +65,6 @@ services:
       # homepage.widget.username: "yourwgusername" # required for v15 and above
       homepage.widget.password: "DUMMY"
       homepage.widget.threshold: "2"
-
 
   # To get WG_DEVICE, run this inside the container: ip route get 8.8.8.8 | awk '{print $5}'. Default is eth0.
   # To access the machines in the host machine: ip route add 10.8.0.0/24 via 192.168.90.91

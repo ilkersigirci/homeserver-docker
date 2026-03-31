@@ -56,7 +56,6 @@ services:
       timeout: 5s
       retries: 3
 
-
   langfuse-redis:
     image: redis:7
     container_name: langfuse-redis

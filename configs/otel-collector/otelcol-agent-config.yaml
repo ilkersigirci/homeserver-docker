@@ -146,7 +146,14 @@ service:
     # Pipeline for machine level metrics (cpu/memory/disk/network/filesystem).
     metrics/host:
       receivers: [hostmetrics]
-      processors: [memory_limiter, resourcedetection, resource/common, resource/hostmetrics, batch]
+      processors:
+        [
+          memory_limiter,
+          resourcedetection,
+          resource/common,
+          resource/hostmetrics,
+          batch,
+        ]
       exporters: [otlp]
     # Pipeline for Traefik Traces (going to Tempo)
     traces:

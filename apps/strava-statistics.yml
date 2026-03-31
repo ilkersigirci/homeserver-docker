@@ -2,7 +2,7 @@
 # docker exec strava-statistics bin/console app:strava:import-data
 ## Build static files:
 # docker exec strava-statistics bin/console app:strava:build-files
-## NOTE: Everytime you import data, you need to rebuild the HTML files to see the changes. 
+## NOTE: Everytime you import data, you need to rebuild the HTML files to see the changes.
 services:
   strava-statistics:
     image: robiningelbrecht/strava-statistics:latest
@@ -25,7 +25,7 @@ services:
       TZ: $TZ
       STRAVA_CLIENT_ID: $STRAVA_CLIENT_ID
       STRAVA_CLIENT_SECRET: $STRAVA_CLIENT_SECRET
-      # You will need to obtain this token the first time you launch the app. 
+      # You will need to obtain this token the first time you launch the app.
       # Leave this unchanged for now until the app tells you otherwise.
       # Do not use the refresh token displayed on your Strava API settings page, it will not work.
       STRAVA_REFRESH_TOKEN: $STRAVA_REFRESH_TOKEN

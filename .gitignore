@@ -5,6 +5,7 @@ secrets
 .idea
 .env*
 .github
+node_modules
 
 # Backups
 # backups/*

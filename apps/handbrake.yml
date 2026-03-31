@@ -30,7 +30,7 @@ services:
       ####### TINYAUTH #######
       tinyauth.apps.handbrake.config.domain: "handbrake.$DOMAINNAME"
       tinyauth.apps.handbrake.ip.bypass: "$LOCAL_IPS"
-        ####### HOMEPAGE #######
+      ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "handbrake"
       homepage.icon: "handbrake.svg"

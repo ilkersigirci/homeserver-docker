@@ -1,27 +1,27 @@
 {
-    "ipp": {
-        "responseHeaders": {
-            "Cache-Control": "public, max-age=2592000",
-            "Access-Control-Allow-Origin": "*"
-        },
-        "singleImageGallery": false,
-        "singleItemAutoOpen": true,
-        "downloadOriginalPhoto": true,
-        "allowDownloadAll": 0,
-        "showHomePage": true,
-        "showGalleryTitle": false,
-        "showMetadata": {
-            "description": false
-        },
-        "customInvalidResponse": false
+  "ipp": {
+    "responseHeaders": {
+      "Cache-Control": "public, max-age=2592000",
+      "Access-Control-Allow-Origin": "*"
     },
-    "lightGallery": {
-        "controls": true,
-        "download": true,
-        "mobileSettings": {
-            "controls": false,
-            "showCloseIcon": true,
-            "download": true
-        }
+    "singleImageGallery": false,
+    "singleItemAutoOpen": true,
+    "downloadOriginalPhoto": true,
+    "allowDownloadAll": 0,
+    "showHomePage": true,
+    "showGalleryTitle": false,
+    "showMetadata": {
+      "description": false
+    },
+    "customInvalidResponse": false
+  },
+  "lightGallery": {
+    "controls": true,
+    "download": true,
+    "mobileSettings": {
+      "controls": false,
+      "showCloseIcon": true,
+      "download": true
     }
+  }
 }

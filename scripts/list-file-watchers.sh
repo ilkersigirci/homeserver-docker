@@ -77,7 +77,7 @@ generateData(){
     # unique instances per process is denoted by number of inotify FDs
     local INOTIFYINSTANCES="$(echo "$INOTIFY" | cut -d "/" -s --output-delimiter=" "   -f 3,5 | sed -e 's/:.*//'| uniq |awk '{print $1}' |uniq -c)"
     local INOTIFYUSERINSTANCES="$(echo "$INOTIFY" | cut -d "/" -s --output-delimiter=" "   -f 3,5 | sed -e 's/:.*//' | uniq |
-    	     while read PID FD; do echo $PID $FD $(grep -e "^\ *${PID}\ " <<< "$PSLIST"|awk '{print $2}'); done | cut -d" "  -f 3 | sort | uniq -c |sort -nr)"
+          while read PID FD; do echo $PID $FD $(grep -e "^\ *${PID}\ " <<< "$PSLIST"|awk '{print $2}'); done | cut -d" "  -f 3 | sort | uniq -c |sort -nr)"
     set -e
 
     cat <<< "$INOTIFYCNT" |
@@ -89,13 +89,13 @@ generateData(){
         grep -v ",0," |                  # remove entires without watches
         sort -n -t "," -k 2,3 -r |         # sort to begin with highest numbers
         {                                # group commands so that $TOT is visible in the printf
-	    IFS=","
+            IFS=","
             while read -rs PID CNT INSTANCES; do   # show watches and corresponding process info
                 printf "%$(( WLEN - 2 ))d  %$(( WLEN - 2 ))d     %s\n" "$CNT" "$INSTANCES" "$(grep -e "^\ *${PID}\ " <<< "$PSLIST")"
                 TOT=$(( TOT + CNT ))
-		TOTINSTANCES=$(( TOTINSTANCES + INSTANCES))
+                TOTINSTANCES=$(( TOTINSTANCES + INSTANCES))
             done
-	    # These stats should be per-user as well, since inotify limits are per-user..
+            # These stats should be per-user as well, since inotify limits are per-user..
             printf "\n%$(( WLEN - 2 ))d  %s\n" "$TOT" "WATCHES TOTAL COUNT"
 # the total across different users is somewhat meaningless, not printing for now.
 #            printf "\n%$(( WLEN - 2 ))d  %s\n" "$TOTINSTANCES" "TOTAL INSTANCES COUNT"

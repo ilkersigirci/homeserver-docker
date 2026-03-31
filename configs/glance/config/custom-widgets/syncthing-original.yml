@@ -42,7 +42,7 @@
                   {{ else if gt $comp 0.0 }}🔄
                   {{ else }}⚠️
                   {{ end }}
-                  {{ $name }} - 
+                  {{ $name }} -
                   {{ if eq $comp 100.0 }}
                     In Sync (100 %)
                   {{ else if gt $comp 0.0 }}

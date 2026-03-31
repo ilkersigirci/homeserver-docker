@@ -1,34 +1,65 @@
 {
-    "files.associations": {
-        "**/configs/traefik3/**/*.yml": "yaml",
-        "**/configs/traefik3/**/*.yaml": "yaml",
-        "**/configs/traefik3/**/*.yml.example": "yaml",
-        "**/configs/traefik3/**/*.yaml.example": "yaml",
-        "**/apps/*.yml": "dockercompose",
-        "**/compose/*.yml": "dockercompose"
-    },
-    "yaml.schemas": {
-        "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": "apps/prometheus.yml",
-        "https://json.schemastore.org/traefik-v3.json": [
-            "configs/traefik3/traefik*.yml",
-            "configs/traefik3/traefik*.yaml"
-        ],
-        "https://json.schemastore.org/traefik-v3-file-provider.json": [
-            "configs/traefik3/**/*.yml",
-            "configs/traefik3/**/*.yaml",
-            "configs/traefik3/**/*.yml.example",
-            "configs/traefik3/**/*.yaml.example"
-        ]
-    },
-    "files.watcherExclude": {
-        "**/.git/**": true,
-        "**/appdata/**": true,
-        "**/data/**": true
-    },
-    "search.exclude": {
-        "**/appdata/**": true,
-        "**/data/**": true
-    },
-    "remote.autoForwardPorts": false,
-    "remote.restoreForwardedPorts": false,
+  "files.associations": {
+    "**/configs/traefik3/**/*.yml": "yaml",
+    "**/configs/traefik3/**/*.yaml": "yaml",
+    "**/configs/traefik3/**/*.yml.example": "yaml",
+    "**/configs/traefik3/**/*.yaml.example": "yaml",
+    "**/apps/*.yml": "dockercompose",
+    "**/compose/*.yml": "dockercompose"
+  },
+  "yaml.schemas": {
+    "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": "apps/prometheus.yml",
+    "https://json.schemastore.org/traefik-v3.json": [
+      "configs/traefik3/traefik*.yml",
+      "configs/traefik3/traefik*.yaml"
+    ],
+    "https://json.schemastore.org/traefik-v3-file-provider.json": [
+      "configs/traefik3/**/*.yml",
+      "configs/traefik3/**/*.yaml",
+      "configs/traefik3/**/*.yml.example",
+      "configs/traefik3/**/*.yaml.example"
+    ]
+  },
+  "files.watcherExclude": {
+    "**/.git/**": true,
+    "**/appdata/**": true,
+    "**/data/**": true
+  },
+  "search.exclude": {
+    "**/appdata/**": true,
+    "**/data/**": true
+  },
+  "remote.autoForwardPorts": false,
+  "remote.restoreForwardedPorts": false,
+  // Formatters
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[graphql]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }

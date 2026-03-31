@@ -1,0 +1,46 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+        exclude: |
+          (?x)^(
+            LICENSE
+          )$
+      - id: mixed-line-ending
+        args: [--fix=lf]
+        exclude: |
+          (?x)^(
+            .*\.bat
+          )$
+      - id: check-merge-conflict
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+        exclude: |
+          (?x)^(
+            configs/traefik3/.*|
+            configs/glance/config/custom-widgets/syncthing(?:-original)?\.yml
+          )$
+      - id: check-json
+        exclude: |
+          (?x)^(
+            \.vscode/settings\.json|
+            configs/headscale/acl_as_file\.json
+          )$
+
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v4.0.0-alpha.8
+    hooks:
+      - id: prettier
+        files: "\\.(jsx?|tsx?|c(js|ts)|m(js|ts)|d\\.(ts|cts|mts)|jsonc?|css|svelte|vue|astro|graphql|gql)$"
+        exclude: |
+          (?x)^(
+            \.vscode/settings\.json|
+            configs/headscale/acl_as_file\.json
+          )$
+
+  - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
+    rev: 3.6.0
+    hooks:
+      - id: editorconfig-checker

@@ -11,8 +11,8 @@ services:
       - t3_proxy
       - socket_proxy
     expose:
-      - 80    # API/Webhook endpoint
-      - 9120  # Prometheus metrics
+      - 80 # API/Webhook endpoint
+      - 9120 # Prometheus metrics
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -29,7 +29,7 @@ services:
       APPRISE_API_URL: https://apprise-api.home.$BASE_DOMAINNAME/notify
       APPRISE_NOTIFY_LEVEL: success
     healthcheck:
-      test: [ "CMD", "/doco-cd", "healthcheck" ]
+      test: ["CMD", "/doco-cd", "healthcheck"]
       start_period: 15s
       interval: 30s
       timeout: 5s

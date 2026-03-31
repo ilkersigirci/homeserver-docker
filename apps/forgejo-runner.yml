@@ -4,7 +4,7 @@ networks:
     internal: true
   forgejo_dind_egress:
     name: forgejo_dind_egress
- 
+
 services:
   forgejo-dind:
     image: docker:29-dind
@@ -23,7 +23,8 @@ services:
       - $REPO_PATH/data/forgejo/dind:/var/lib/docker
     command: ["dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false"]
     healthcheck:
-      test: ["CMD-SHELL", "docker -H tcp://127.0.0.1:2375 info > /dev/null 2>&1"]
+      test:
+        ["CMD-SHELL", "docker -H tcp://127.0.0.1:2375 info > /dev/null 2>&1"]
       interval: 10s
       timeout: 5s
       retries: 6

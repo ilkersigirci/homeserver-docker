@@ -56,6 +56,5 @@ include:
   #### MEDIA ####
   - ../apps/immich-gpu.yml
 
-
 # NOTE
 # sudo nvidia-ctk runtime configure --runtime=docker --set-as-default && sudo systemctl restart docker
