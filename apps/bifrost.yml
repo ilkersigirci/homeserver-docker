@@ -41,7 +41,7 @@ services:
       traefik.http.routers.bifrost-rtr.entrypoints: "websecure"
       traefik.http.routers.bifrost-rtr.rule: "Host(`aigateway.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.bifrost-rtr.middlewares: "chain-tinyauth@file"
+      traefik.http.routers.bifrost-rtr.middlewares: "chain-tinyauth-relaxed@file" # NOTE: For `List Models Output monaco editor`
       ## HTTP Services
       traefik.http.routers.bifrost-rtr.service: "bifrost-svc"
       traefik.http.services.bifrost-svc.loadbalancer.server.port: "8080"
