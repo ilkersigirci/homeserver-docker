@@ -80,3 +80,16 @@ OTEL_EXPORTER_OTLP_PROTOCOL=grpc
 OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector-agent:4317
 OTEL_EXPORTER_OTLP_INSECURE=true
 ```
+
+## GIT
+
+`skip-workree`
+```bash
+# Mark a file as skip-workree
+git update-index --skip-worktree <path-to-file>
+
+# To see all files marked as skip-workree
+git ls-files -v | grep '^S '
+```
+Remoteserver
+- `configs/headscale/config.yaml`
