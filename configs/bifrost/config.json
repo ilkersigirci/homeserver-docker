@@ -1,144 +1,119 @@
 {
-    "$schema": "https://www.getbifrost.ai/schema",
-    "client": {
-        "enable_logging": true,
-        "disable_content_logging": false,
-        "drop_excess_requests": false,
-        "initial_pool_size": 300,
-        "allow_direct_keys": false
-    },
-    "config_store": {
-        "enabled": false,
-        "type": "sqlite",
-        "config": {
-            "path": "./config.db"
-        }
-    },
-    "logs_store": {
-        "enabled": true,
-        "type": "sqlite",
-        "config": {
-            "path": "./data/logs.db"
-        }
-    },
-    "vector_store": {
-        "enabled": false,
-        "type": "qdrant",
-        "config": {
-            "host": "localhost",
-            "port": 6334
-        }
-    },
-    "plugins": [
-        {
-            "enabled": true,
-            "name": "otel",
-            "config": {
-                "service_name": "bifrost",
-                "collector_url": "otel-collector-agent:4317",
-                "trace_type": "otel",
-                "protocol": "grpc",
-                "insecure": true,
-                "metrics_enabled": true,
-                "metrics_endpoint": "otel-collector-agent:4317",
-                "metrics_push_interval": 15
-            }
-        }
-    ],
-    "providers": {
-        "openai": {
-            "keys": [
-                {
-                    "name": "openai-key-general",
-                    "value": "env.OPENAI_API_KEY",
-                    "models": [],
-                    "weight": 1.0
-                },
-                {
-                    "name": "openai-key-model-specific",
-                    "value": "env.OPENAI_API_KEY_PREMIUM",
-                    "models": [
-                        "o1-preview",
-                        "o1-mini"
-                    ],
-                    "weight": 1.0
-                }
-            ]
-        },
-        "openrouter": {
-            "keys": [
-                {
-                    "name": "openrouter-key",
-                    "value": "env.OPENROUTER_API_KEY",
-                    "models": [],
-                    "weight": 1.0
-                }
-            ],
-            "network_config": {
-                "base_url": "env.OPENROUTER_API_BASE_URL",
-                "default_request_timeout_in_seconds": 60
-            }
-        },
-        "homeserver-api": {
-            "keys": [
-                {
-                    "name": "homeserver-api-key",
-                    "value": "env.OPENAI_HOMESERVER_API_KEY",
-                    "models": [],
-                    "weight": 1.0,
-                    "max_retries": 3,
-                    "retry_backoff_initial_ms": 1,
-                    "retry_backoff_max_ms": 10000
-                }
-            ],
-            "network_config": {
-                "base_url": "env.OPENAI_HOMESERVER_API_BASE_URL",
-                "default_request_timeout_in_seconds": 60
-            },
-            "custom_provider_config": {
-                "base_provider_type": "openai",
-                "allowed_requests": {
-                    "list_models": true,
-                    "chat_completion": true,
-                    "chat_completion_stream": true
-                }
-            }
-        },
-        "vllm-qwen": {
-            "keys": [
-                {
-                    "name": "vllm-key",
-                    "value": "dummy",
-                    "models": [
-                        "Qwen3.5-35B-A3B"
-                    ],
-                    "weight": 1.0
-                }
-            ],
-            "network_config": {
-                "base_url": "env.OPENAI_QWEN_3_5_35B_A3B_BASE_URL",
-                "default_request_timeout_in_seconds": 60
-            },
-            "custom_provider_config": {
-                "base_provider_type": "openai",
-                "allowed_requests": {
-                    "list_models": true,
-                    "chat_completion": true,
-                    "chat_completion_stream": true
-                }
-            },
-            "pricing_overrides": [
-                {
-                    "model_pattern": "Qwen3.5-35B-A3B",
-                    "match_type": "exact",
-                    "request_types": [
-                        "chat_completion",
-                        "chat_completion_stream"
-                    ],
-                    "input_cost_per_token": 0.0000002,
-                    "output_cost_per_token": 0.0000004
-                }
-            ]
-        }
+  "$schema": "https://www.getbifrost.ai/schema",
+  "client": {
+    "enable_logging": true,
+    "disable_content_logging": false,
+    "drop_excess_requests": false,
+    "initial_pool_size": 300,
+    "allow_direct_keys": false
+  },
+  "config_store": {
+    "enabled": false,
+    "type": "sqlite",
+    "config": {
+      "path": "./config.db"
     }
+  },
+  "logs_store": {
+    "enabled": true,
+    "type": "sqlite",
+    "config": {
+      "path": "./data/logs.db"
+    }
+  },
+  "vector_store": {
+    "enabled": false,
+    "type": "qdrant",
+    "config": {
+      "host": "localhost",
+      "port": 6334
+    }
+  },
+  "plugins": [
+    {
+      "enabled": true,
+      "name": "otel",
+      "config": {
+        "service_name": "bifrost",
+        "collector_url": "otel-collector-agent:4317",
+        "trace_type": "otel",
+        "protocol": "grpc",
+        "insecure": true,
+        "metrics_enabled": true,
+        "metrics_endpoint": "otel-collector-agent:4317",
+        "metrics_push_interval": 15
+      }
+    }
+  ],
+  "providers": {
+    "openai": {
+      "keys": [
+        {
+          "name": "openai-key-general",
+          "value": "env.OPENAI_API_KEY",
+          "models": [],
+          "weight": 1.0
+        },
+        {
+          "name": "openai-key-model-specific",
+          "value": "env.OPENAI_API_KEY_PREMIUM",
+          "models": [
+            "o1-preview",
+            "o1-mini"
+          ],
+          "weight": 1.0
+        }
+      ]
+    },
+    "openrouter": {
+      "keys": [
+        {
+          "name": "openrouter-key",
+          "value": "env.OPENROUTER_API_KEY",
+          "models": [],
+          "weight": 1.0
+        }
+      ],
+      "network_config": {
+        "base_url": "env.OPENROUTER_API_BASE_URL",
+        "default_request_timeout_in_seconds": 60
+      }
+    },
+    "vllm-qwen": {
+      "keys": [
+        {
+          "name": "vllm-key",
+          "value": "dummy",
+          "models": [
+            "Qwen3.5-35B-A3B"
+          ],
+          "weight": 1.0
+        }
+      ],
+      "network_config": {
+        "base_url": "env.OPENAI_QWEN_3_5_35B_A3B_BASE_URL",
+        "default_request_timeout_in_seconds": 60
+      },
+      "custom_provider_config": {
+        "base_provider_type": "openai",
+        "allowed_requests": {
+          "list_models": true,
+          "chat_completion": true,
+          "chat_completion_stream": true
+        }
+      },
+      "pricing_overrides": [
+        {
+          "model_pattern": "Qwen3.5-35B-A3B",
+          "match_type": "exact",
+          "request_types": [
+            "chat_completion",
+            "chat_completion_stream"
+          ],
+          "input_cost_per_token": 0.0000002,
+          "output_cost_per_token": 0.0000004
+        }
+      ]
+    }
+  }
 }

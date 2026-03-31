@@ -1,0 +1,30 @@
+{
+  "$schema": "https://www.getbifrost.ai/schema",
+  "providers": {
+    "homeserver-api": {
+      "keys": [
+        {
+          "name": "homeserver-api-key",
+          "value": "env.OPENAI_HOMESERVER_API_KEY",
+          "models": [],
+          "weight": 1.0,
+          "max_retries": 3,
+          "retry_backoff_initial_ms": 1,
+          "retry_backoff_max_ms": 10000
+        }
+      ],
+      "network_config": {
+        "base_url": "env.OPENAI_HOMESERVER_API_BASE_URL",
+        "default_request_timeout_in_seconds": 60
+      },
+      "custom_provider_config": {
+        "base_provider_type": "openai",
+        "allowed_requests": {
+          "list_models": true,
+          "chat_completion": true,
+          "chat_completion_stream": true
+        }
+      }
+    }
+  }
+}
