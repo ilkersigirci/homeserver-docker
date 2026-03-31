@@ -55,11 +55,13 @@
           "weight": 1.0
         },
         {
-          "name": "openai-key-model-specific",
-          "value": "env.OPENAI_API_KEY_PREMIUM",
+          "name": "openai-key-personal",
+          "value": "env.OPENAI_PERSONAL_API_KEY",
           "models": [
-            "o1-preview",
-            "o1-mini"
+            "gpt-5-codex",
+            "gpt-5.3-codex",
+            "gpt-5.3-codex-mini",
+            "gpt-5.3-codex-max"
           ],
           "weight": 1.0
         }
