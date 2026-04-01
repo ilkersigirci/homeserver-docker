@@ -38,9 +38,8 @@ include:
   ########################### SERVICES
   #### CORE ####
   - ../apps/arcane-agent.yml
-  - ../apps/filebrowser.yml
+  # - ../apps/filebrowser.yml
   - ../apps/homepage.yml
-  # - ../apps/glance.yml
   - ../apps/docker-socket-proxy.yml
   - ../apps/tinyauth.yml
   - ../apps/traefik.yml
@@ -49,4 +48,4 @@ include:
   # - ../apps/syncthing.yml
   - ../apps/whoami.yml
   #### MEDIA ####
-  # - ../apps/transmission.yml
+  # - ../apps/versitygw.yml
