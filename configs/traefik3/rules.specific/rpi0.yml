@@ -161,12 +161,12 @@ http:
     gotify-svc:
       loadBalancer:
         servers:
-          - url: "http://100.64.0.4:1005"
+          - url: "http://100.64.0.1:1005"
 
     aiostreams-svc:
       loadBalancer:
         servers:
-          - url: "http://100.64.0.4:1006"
+          - url: "http://100.64.0.1:1006"
 
     cam0-svc:
       loadBalancer:
