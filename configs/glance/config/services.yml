@@ -36,7 +36,7 @@
               title: HOME
               source: https://homepage.home.${BASE_DOMAINNAME}
               height: 1000
-              
+
             - type: iframe
               title: GPU
               source: https://homepage.gpu.${BASE_DOMAINNAME}
