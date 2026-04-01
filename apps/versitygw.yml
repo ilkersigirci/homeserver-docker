@@ -25,9 +25,9 @@ services:
       VGW_PORT: :7070
       VGW_WEBUI_PORT: :7071
       VGW_WEBUI_NO_TLS: false
-      VGW_CORS_ALLOW_ORIGIN: https://versitygw-ui.$DOMAINNAME
-      VGW_WEBUI_GATEWAYS: https://versitygw.$DOMAINNAME
-      VGW_WEBUI_ADMIN_GATEWAYS: https://versitygw.$DOMAINNAME
+      VGW_CORS_ALLOW_ORIGIN: https://s3-ui.$DOMAINNAME
+      VGW_WEBUI_GATEWAYS: https://s3.$DOMAINNAME
+      VGW_WEBUI_ADMIN_GATEWAYS: https://s3.$DOMAINNAME
       # VGW_ADMIN_PORT: 7080
       VGW_QUIET: false
       VGW_DISABLE_ACL: false
@@ -42,11 +42,11 @@ services:
       ### API Labels ###
       ## HTTP Routers
       traefik.http.routers.versitygw-api-rtr.entrypoints: "websecure"
-      traefik.http.routers.versitygw-api-rtr.rule: "Host(`versitygw.$DOMAINNAME`)"
+      traefik.http.routers.versitygw-api-rtr.rule: "Host(`s3.$DOMAINNAME`)"
       ## Middlewares
       traefik.http.routers.versitygw-api-rtr.middlewares: "versitygw-cors,chain-tinyauth@file" # They are additive. versitygw-cors explicitly sets Access-Control-Allow-Origin
       ## CORS Middleware Definition for API
-      traefik.http.middlewares.versitygw-cors.headers.accessControlAllowOriginList: "https://versitygw-ui.$DOMAINNAME"
+      traefik.http.middlewares.versitygw-cors.headers.accessControlAllowOriginList: "https://s3-ui.$DOMAINNAME"
       traefik.http.middlewares.versitygw-cors.headers.accessControlAllowMethods: "GET,POST,PUT,DELETE,HEAD,OPTIONS"
       traefik.http.middlewares.versitygw-cors.headers.accessControlAllowHeaders: "*"
       traefik.http.middlewares.versitygw-cors.headers.accessControlAllowCredentials: "true"
@@ -56,12 +56,12 @@ services:
       traefik.http.routers.versitygw-api-rtr.service: "versitygw-api-svc"
       traefik.http.services.versitygw-api-svc.loadbalancer.server.port: "7070"
       ####### TINYAUTH #######
-      tinyauth.apps.versitygw.config.domain: "versitygw.$DOMAINNAME"
+      tinyauth.apps.versitygw.config.domain: "s3.$DOMAINNAME"
       tinyauth.apps.versitygw.ip.bypass: "$LOCAL_IPS"
       ### Web UI Labels ###
       ## HTTP Routers
       traefik.http.routers.versitygw-ui-rtr.entrypoints: "websecure"
-      traefik.http.routers.versitygw-ui-rtr.rule: "Host(`versitygw-ui.$DOMAINNAME`)"
+      traefik.http.routers.versitygw-ui-rtr.rule: "Host(`s3-ui.$DOMAINNAME`)"
       ## HTTP Services
       traefik.http.routers.versitygw-ui-rtr.service: "versitygw-ui-svc"
       traefik.http.services.versitygw-ui-svc.loadbalancer.server.port: "7071"
@@ -69,11 +69,11 @@ services:
       homepage.group: "Media"
       homepage.name: "versitygw"
       homepage.icon: "versitygw.png"
-      homepage.href: "https://versitygw-ui.$DOMAINNAME"
+      homepage.href: "https://s3-ui.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "POSIX to S3 Gateway"
       ####### GLANCE #######
       glance.name: "versitygw"
       glance.icon: "sh:versitygw"
-      glance.url: "https://versitygw-ui.$DOMAINNAME"
+      glance.url: "https://s3-ui.$DOMAINNAME"
       glance.description: "POSIX to S3 Gateway"
