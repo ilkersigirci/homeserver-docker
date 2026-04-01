@@ -91,5 +91,3 @@ git update-index --skip-worktree <path-to-file>
 # To see all files marked as skip-workree
 git ls-files -v | grep '^S '
 ```
-Remoteserver
-- `configs/headscale/config.yaml`

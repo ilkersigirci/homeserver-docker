@@ -22,6 +22,7 @@ configs/glance/docs
 !configs/grafana-lgtm
 !configs/headplane
 !configs/headscale
+configs/headscale/oidc_client_secret
 !configs/homepage
 !configs/immich-public-proxy
 !configs/loggifly
