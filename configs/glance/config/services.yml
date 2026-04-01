@@ -36,6 +36,7 @@
               title: HOME
               source: https://homepage.home.${BASE_DOMAINNAME}
               height: 1000
+              
             - type: iframe
               title: GPU
               source: https://homepage.gpu.${BASE_DOMAINNAME}
@@ -56,10 +57,10 @@
               source: https://homepage.rpi1.${BASE_DOMAINNAME}
               height: 1000
 
-            # - type: iframe
-            #   title: NAS
-            #   source: https://homepage.nas.${BASE_DOMAINNAME}
-            #   height: 1000
+            - type: iframe
+              title: NAS
+              source: https://homepage.nas.${BASE_DOMAINNAME}
+              height: 1000
 
             - type: iframe
               title: REMOTE
