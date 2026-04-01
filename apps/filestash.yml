@@ -2,7 +2,7 @@ services:
   filestash-wopi-server:
     image: collabora/code:24.04.10.2.1
     container_name: filestash-wopi-server
-    restart: $RESTART_POLICY_CORE
+    restart: $RESTART_POLICY_MEDIA
     user: root
     command:
       - /bin/bash
@@ -12,7 +12,7 @@ services:
         /bin/su -s /bin/bash -c '/start-collabora-online.sh' cool
     profiles:
       - not-used
-      # - core
+      # - media
       # - filestash
     networks:
       - t3_proxy
@@ -26,20 +26,21 @@ services:
 
   # NOTE: Selfhosted Version: v0.6.20260226
   # NOTE: Enterprise Version: v0.6.20260105
+  # NOTE: filestash.bin should be executable (chmod +x)
   filestash:
     image: machines/filestash:latest
     container_name: filestash
-    restart: $RESTART_POLICY_CORE
+    restart: $RESTART_POLICY_MEDIA
     profiles:
-      - core
+      - media
       - filestash
     networks:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $REPO_PATH/data/filestash:/app/data/state/
       - $REPO_PATH/configs/filestash/filestash.bin:/app/filestash
+      - $REPO_PATH/data/filestash:/app/data/state/
     environment:
       APPLICATION_URL: filestash.$DOMAINNAME
       ADMIN_CONSOLE: $FILESTASH_ADMIN_PASSWORD_BCRYPT
@@ -61,7 +62,7 @@ services:
       tinyauth.apps.filestash.config.domain: "filestash.$DOMAINNAME"
       tinyauth.apps.filestash.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: "Core"
+      homepage.group: "Media"
       homepage.name: "filestash"
       homepage.icon: "filestash.png"
       homepage.href: "https://filestash.$DOMAINNAME"

@@ -38,7 +38,6 @@ include:
   ########################### SERVICES
   #### CORE ####
   - ../apps/arcane-agent-gpu.yml
-  - ../apps/filestash.yml
   - ../apps/homepage.yml
   - ../apps/docker-socket-proxy.yml
   - ../apps/tinyauth.yml
@@ -50,6 +49,4 @@ include:
   - ../apps/forgejo-runner.yml
   - ../apps/hatchet.yml
   - ../apps/langfuse.yml
-  - ../apps/minio.yml
-  - ../apps/versitygw.yml
   # - ../apps/pgadmin.yml # TODO

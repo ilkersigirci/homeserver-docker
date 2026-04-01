@@ -6,10 +6,10 @@ services:
     image: filebrowser/filebrowser:latest # TODO: ghcr.io/
     user: "$PUID:$PGID"
     profiles:
-      - core
+      - media
     depends_on:
       - traefik
-    restart: $RESTART_POLICY_CORE
+    restart: $RESTART_POLICY_MEDIA
     networks:
       - t3_proxy
     security_opt:
@@ -38,7 +38,7 @@ services:
       tinyauth.apps.filebrowser.config.domain: "filebrowser.$DOMAINNAME"
       tinyauth.apps.filebrowser.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: "Core"
+      homepage.group: "Media"
       homepage.name: "FileBrowser"
       homepage.icon: "filebrowser.svg"
       homepage.href: "https://filebrowser.$DOMAINNAME"
