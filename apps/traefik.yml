@@ -127,6 +127,8 @@ services:
     # NOTE: To Access Docker Containers that run on Host Network. Is this working?
     # extra_hosts:
     #   - host.docker.internal:172.17.0.1
+    user: $PUID:$PGID
+    read_only: true
     security_opt:
       - no-new-privileges:true
     healthcheck:
@@ -159,6 +161,7 @@ services:
       - $REPO_PATH/configs/traefik3/rules.specific/$MY_HOSTNAME.yml:/rules/dummy_specific.yml:ro # file provider directory
       - $REPO_PATH/configs/traefik3/acme/acme.json:/acme.json # cert location - you must touch this file and change permissions to 600
       - $REPO_PATH/logs/traefik:/logs # for fail2ban or crowdsec - make sure to touch file before starting container
+      - $REPO_PATH/appdata/traefik/plugins-storage:/plugins-storage # plugin cache/storage for non-root user
     environment:
       TZ: $TZ
       CF_DNS_API_TOKEN: $CLOUDFLARE_DNS_API_TOKEN

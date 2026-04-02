@@ -1,6 +1,10 @@
 # General
 acme.json
-appdata
+# Appdata (keep folder structure, ignore runtime files)
+appdata/**
+!appdata/
+!appdata/**/
+!appdata/**/.gitkeep
 secrets
 .idea
 .env*
@@ -52,7 +56,10 @@ configs/crowdsec/config/local_api_credentials.yaml
 configs/crowdsec/config/online_api_credentials.yaml
 
 # Data
-data/*
+data/**
+!data/
+!data/**/
+!data/**/.gitkeep
 
 # Logs (keep folder structure, ignore runtime log files)
 logs/**
