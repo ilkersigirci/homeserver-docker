@@ -1,11 +1,13 @@
-# NOTE: Enable admin UI. You must use IAM for that
 # Config Reference: https://github.com/versity/versitygw/blob/main/extra/example.conf
+# TODO: Enable admin UI. You must use IAM for that
+# TODO: Current user is root(0), change it to a non-priviledged user.
 services:
   versitygw:
     image: ghcr.io/versity/versitygw:latest
     container_name: versitygw
     restart: $RESTART_POLICY_MEDIA
     # command: --version
+    user: $PUID:$PGID
     profiles:
       - media
     networks:
@@ -17,7 +19,8 @@ services:
     security_opt:
       - no-new-privileges:true
     volumes:
-      - $REPO_PATH/data/versitygw:/data
+      - $REPO_PATH/data/versitygw/data:/data
+      - $REPO_PATH/data/versitygw/versioning:/versioning
     ## https://github.com/versity/versitygw/wiki/Global-Options
     environment:
       ROOT_ACCESS_KEY: admin
@@ -36,6 +39,9 @@ services:
       VGW_DEBUG: false
       VGW_BACKEND: posix
       VGW_BACKEND_ARG: /data
+      VGW_VERSIONING_DIR: /versioning
+      VGW_CHOWN_UID: false
+      VGW_CHOWN_GID: false
       VGW_REGION: eu-west-1
     labels:
       traefik.enable: "true"
