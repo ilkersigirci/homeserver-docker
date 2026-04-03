@@ -5,6 +5,9 @@ appdata/**
 !appdata/
 !appdata/**/
 !appdata/**/.gitkeep
+## Jellyfin bind mounts (track only folder placeholders)
+!appdata/jellyfin/.gitkeep
+!appdata/jellyfin/cache/.gitkeep
 secrets
 .idea
 .env*
@@ -60,6 +63,10 @@ data/**
 !data/
 !data/**/
 !data/**/.gitkeep
+## Jellyfin bind mounts (track only folder placeholders)
+!data/jellyfin/.gitkeep
+!data/jellyfin/metadata/.gitkeep
+!data/downloads/.gitkeep
 
 # Logs (keep folder structure, ignore runtime log files)
 logs/**
