@@ -1,6 +1,5 @@
 # Config Reference: https://github.com/versity/versitygw/blob/main/extra/example.conf
 # TODO: Enable admin UI. You must use IAM for that
-# TODO: Current user is root(0), change it to a non-priviledged user.
 services:
   versitygw:
     image: ghcr.io/versity/versitygw:latest
@@ -8,6 +7,9 @@ services:
     restart: $RESTART_POLICY_MEDIA
     # command: --version
     user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
     profiles:
       - media
     networks:
@@ -18,6 +20,9 @@ services:
       # - 7080 # Admin API
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
       - $REPO_PATH/data/versitygw/data:/data
       - $REPO_PATH/data/versitygw/versioning:/versioning

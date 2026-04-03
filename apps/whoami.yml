@@ -7,8 +7,16 @@ services:
       - maintenance
     networks:
       - t3_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
     labels:
       traefik.enable: "true"
       ## HTTP Routers

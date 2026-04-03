@@ -43,6 +43,8 @@ include:
   - ../apps/tinyauth.yml
   - ../apps/traefik.yml
   - ../apps/otel-collector-agent.yml
+  ###### MAINTENANCE ####
+  - ../apps/whoami.yml
   #### PROGRAMMING ####
   - ../apps/doco-cd.yml
   - ../apps/forgejo.yml
