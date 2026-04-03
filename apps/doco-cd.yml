@@ -13,16 +13,26 @@ services:
     expose:
       - 80 # API/Webhook endpoint
       - 9120 # Prometheus metrics
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
+      - $HOME:uid=$PUID,gid=$PGID,mode=0755
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
       - $REPO_PATH/data/doco-cd:/data
       ## Optional: To pull from your private Forgejo registry
-      - $REPO_PATH/configs/doco-cd/docker-config.json:/root/.docker/config.json:ro
+      - $REPO_PATH/configs/doco-cd/docker-config.json:/data/.docker/config.json:ro
     environment:
       TZ: $TZ
       API_SECRET: $DOCO_CD_API_SECRET
       LOG_LEVEL: INFO
+      DOCKER_CONFIG: /data/.docker
       DOCKER_HOST: tcp://docker-socket-proxy-exec:2375
       GIT_ACCESS_TOKEN: $FORGEJO_REPO_READ_TOKEN
       WEBHOOK_SECRET: $DOCO_CD_WEBHOOK_SECRET

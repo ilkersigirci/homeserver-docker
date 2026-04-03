@@ -10,9 +10,21 @@ services:
     container_name: langfuse-clickhouse
     restart: $RESTART_POLICY_PROGRAMMING
     user: "101:101"
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
+      - /var/run/clickhouse-server
+      - /etc/clickhouse-server/users.d
     profiles:
       - programming
       - langfuse
+      - custom-user
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     environment:
       CLICKHOUSE_DB: default
       CLICKHOUSE_USER: $LANGFUSE_CLICKHOUSE_USER
@@ -37,8 +49,20 @@ services:
     container_name: langfuse-db
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
+      - custom-user
       - programming
       - langfuse
+    user: "999:999"
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
+      - /run/postgresql
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -60,15 +84,28 @@ services:
     image: redis:7
     container_name: langfuse-redis
     restart: $RESTART_POLICY_PROGRAMMING
+    user: "999:999"
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
     command: >
       --requirepass $LANGFUSE_REDIS_PASSWORD
     profiles:
       - programming
       - langfuse
+      - custom-user
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     networks:
       - t3_proxy
     expose:
       - 6379
+    volumes:
+      - $REPO_PATH/data/langfuse/redis:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 3s
@@ -79,6 +116,11 @@ services:
     image: langfuse/langfuse-worker:3
     container_name: langfuse-worker
     restart: $RESTART_POLICY_PROGRAMMING
+    user: expressjs
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
     depends_on: &langfuse-depends-on
       langfuse-clickhouse:
         condition: service_healthy
@@ -87,8 +129,14 @@ services:
       langfuse-redis:
         condition: service_healthy
     profiles:
+      - custom-user
       - programming
       - langfuse
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     networks:
       - t3_proxy
     expose:
@@ -144,12 +192,25 @@ services:
     image: langfuse/langfuse:3
     container_name: langfuse-web
     restart: $RESTART_POLICY_PROGRAMMING
+    user: nextjs
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
+      - /home/nextjs/.cache
+      - /app/node_modules/.cache
     depends_on: *langfuse-depends-on
     profiles:
+      - custom-user
       - programming
       - langfuse
     networks:
       - t3_proxy
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     environment:
       <<: *langfuse-worker-env
       NEXTAUTH_URL: https://langfuse.$DOMAINNAME

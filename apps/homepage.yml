@@ -8,6 +8,17 @@ services:
     networks:
       - t3_proxy
       - socket_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
+      - /app/.next/cache
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
       - $REPO_PATH/configs/homepage:/app/config
       - $REPO_PATH/configs/homepage/icons:/app/public/icons

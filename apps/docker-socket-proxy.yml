@@ -5,6 +5,7 @@ x-socket-proxy-service: &socket_proxy_service
   tmpfs:
     - /run
   profiles:
+    - root
     - core
   security_opt:
     - no-new-privileges:true

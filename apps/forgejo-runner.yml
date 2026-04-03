@@ -12,6 +12,7 @@ services:
     privileged: true
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
+      - root
       - programming
       - forgejo
     networks:
@@ -42,11 +43,21 @@ services:
         condition: service_healthy
     networks:
       - forgejo_ci
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     environment:
       TZ: $TZ
+      HOME: /tmp
       DOCKER_HOST: tcp://forgejo-dind:2375
+      DOCKER_CONFIG: /tmp/.docker
       GC_INTERVAL_SECONDS: 21600 # 6 hours
       GC_UNTIL: 48h
       GC_DRY_RUN: 1
@@ -87,9 +98,16 @@ services:
     networks:
       - forgejo_dind_egress
       - forgejo_ci
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
+    cap_drop:
+      - ALL
+    cap_add: []
     environment:
       DOCKER_HOST: tcp://forgejo-dind:2375
       DOCKER_BUILDKIT: 1
     volumes:
       - $REPO_PATH/data/forgejo/runner:/data
-      - $REPO_PATH/configs/forgejo/runner/config.yml:/config.yml
+      - $REPO_PATH/configs/forgejo/runner/config.yml:/config.yml:ro

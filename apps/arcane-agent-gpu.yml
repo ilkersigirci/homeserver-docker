@@ -4,6 +4,7 @@ services:
     container_name: arcane-agent
     restart: $RESTART_POLICY_CORE
     profiles:
+      - root
       - core
     networks:
       - t3_proxy

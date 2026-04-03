@@ -9,8 +9,20 @@ services:
     container_name: forgejo-db
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
+      - custom-user
       - programming
       - forgejo
+    user: "999:999"
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
+      - /run/postgresql
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     environment:
       PGDATA: /pgdata
       POSTGRES_USER: postgres
@@ -50,8 +62,15 @@ services:
       - t3_proxy
     ports:
       - "2222:2222"
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
       - $REPO_PATH/data/forgejo/gitea:/var/lib/gitea
       - $REPO_PATH/data/forgejo/conf:/etc/gitea
