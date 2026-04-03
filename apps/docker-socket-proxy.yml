@@ -11,6 +11,7 @@ x-socket-proxy-service: &socket_proxy_service
     - no-new-privileges:true
   cap_drop:
     - ALL
+  cap_add: []
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock:ro
 

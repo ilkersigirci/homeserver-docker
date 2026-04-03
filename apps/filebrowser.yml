@@ -4,7 +4,10 @@ services:
   filebrowser:
     container_name: filebrowser
     image: filebrowser/filebrowser:latest # TODO: ghcr.io/
-    user: "$PUID:$PGID"
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
     profiles:
       - media
     depends_on:
@@ -14,6 +17,9 @@ services:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
       - $REPO_PATH/configs/filebrowser:/config
       - $REPO_PATH/appdata/filebrowser:/database

@@ -10,8 +10,15 @@ services:
     networks:
       - t3_proxy
       - socket_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
       - $REPO_PATH/appdata/arcane:/app/data
       # - $REPO_PATH:$REPO_PATH:ro

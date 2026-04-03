@@ -9,11 +9,19 @@ services:
     container_name: bifrost
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
+      - custom-user
       - programming
     networks:
       - t3_proxy
+    user: appuser
+    read_only: true
+    tmpfs:
+      - /tmp
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     entrypoint: # NOTE: For custom base_url env logic
       - /bin/sh
       - /app/render-config.sh
