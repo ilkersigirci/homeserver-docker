@@ -34,7 +34,7 @@ services:
   # TODO: Harden
   # FIXME: middlewares-secure-headers doesn't work for `feishin`
   jellyfin:
-    image: jellyfin/jellyfin:latest # TODO: ghcr.io
+    image: ghcr.io/jellyfin/jellyfin:latest
     container_name: jellyfin
     # cpus: "0.5"
     mem_reservation: "2048M"
