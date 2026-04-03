@@ -45,15 +45,7 @@ include:
   - ../apps/tinyauth.yml
   - ../apps/traefik.yml
   - ../apps/otel-collector-agent.yml
-  # - ../apps/traefik-log-dashboard.yml
   # - ../apps/vaultwarden.yml
-  # - ../apps/webfinger.yml
-  #### DESKTOP APPS ####
-  # - ../apps/bambustudio.yml
-  # - ../apps/krita.yml
-  # - ../apps/firefox.yml
-  # - ../apps/gimp.yml
-  # - ../apps/thunderbird.yml # TODO
   ###### MAINTENANCE ####
   # - ../apps/dozzle.yml
   # - ../apps/healthchecks.yml
@@ -70,7 +62,6 @@ include:
   - ../apps/jellyfin.yml
   - ../apps/jellyseerr.yml
   - ../apps/kiwix-serve.yml
-  # - ../apps/openarchiver.yml
   # - ../apps/oxicloud.yml
   - ../apps/pinchflat.yml
   # - ../apps/prowlarr.yml
@@ -91,7 +82,6 @@ include:
   - ../apps/immich.yml
   #### READING ####
   - ../apps/linkwarden.yml
-  # - ../apps/obsidian.yml
   - ../apps/rsshub.yml
   # - ../apps/silverbullet.yml
   # - ../apps/quartz.yml
