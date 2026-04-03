@@ -23,8 +23,8 @@ services:
       - $REPO_PATH/data/versitygw/versioning:/versioning
     ## https://github.com/versity/versitygw/wiki/Global-Options
     environment:
-      ROOT_ACCESS_KEY: admin
-      ROOT_SECRET_KEY: admin
+      ROOT_ACCESS_KEY: $VERSITYGW_ROOT_ACCESS_KEY
+      ROOT_SECRET_KEY: $VERSITYGW_ROOT_SECRET_KEY
       VGW_PORT: :7070
       VGW_WEBUI_PORT: :7071
       VGW_WEBUI_NO_TLS: false
@@ -42,7 +42,7 @@ services:
       VGW_VERSIONING_DIR: /versioning
       VGW_CHOWN_UID: false
       VGW_CHOWN_GID: false
-      VGW_REGION: eu-west-1
+      VGW_REGION: ${VERSITYGW_REGION:-eu-west-1}
     labels:
       traefik.enable: "true"
       ### API Labels ###
