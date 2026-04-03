@@ -31,7 +31,6 @@ services:
       glance.name: "jellyfin-meilisearch"
       glance.parent: "jellyfin"
 
-  # TODO: Harden
   # FIXME: middlewares-secure-headers doesn't work for `feishin`
   jellyfin:
     image: ghcr.io/jellyfin/jellyfin:latest
@@ -43,7 +42,6 @@ services:
     depends_on:
       - jellyfin-meilisearch
     profiles:
-      - root
       - media
       - jellyfin
     networks:
@@ -51,16 +49,15 @@ services:
         ipv4_address: 192.168.90.161
     ports:
       - "1002:8096"
-    user: "0:0"
-    # user: $PUID:$PGID
-    # read_only: true
-    # tmpfs:
-    #   - /tmp
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
     security_opt:
       - no-new-privileges:true
-    # cap_drop:
-    #   - ALL
-    # cap_add: []
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
       - $REPO_PATH/appdata/jellyfin:/config
       - $REPO_PATH/appdata/jellyfin/cache:/cache
