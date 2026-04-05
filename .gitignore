@@ -1,18 +1,20 @@
 # General
+.codex
+.env*
+.github
+.idea
 acme.json
-# Appdata (keep folder structure, ignore runtime files)
+node_modules
+secrets
+
+# Appdata
 appdata/**
 !appdata/
 !appdata/**/
 !appdata/**/.gitkeep
-## Jellyfin bind mounts (track only folder placeholders)
+## Jellyfin
 !appdata/jellyfin/.gitkeep
 !appdata/jellyfin/cache/.gitkeep
-secrets
-.idea
-.env*
-.github
-node_modules
 
 # Backups
 # backups/*
@@ -23,6 +25,7 @@ configs/glance/docs
 !configs/bifrost
 !configs/copyparty/copyparty.conf
 !configs/filebrowser
+!configs/forgejo
 !configs/frigate/config.yml
 !configs/gatus
 !configs/glance
@@ -34,22 +37,21 @@ configs/headscale/oidc_client_secret
 !configs/immich-public-proxy
 !configs/loggifly
 !configs/mosquitto
-!configs/quartz
 !configs/otel-collector
 !configs/oxicloud
+!configs/quartz
 !configs/rybbit
 !configs/strava-statistics
 !configs/traefik3
-!configs/forgejo
 
-## CrowdSec (track only the important editable config files)
+## CrowdSec
 !configs/crowdsec/
 !configs/crowdsec/config/
 configs/crowdsec/config/**
 !configs/crowdsec/config/acquis.yaml
 !configs/crowdsec/config/config.yaml
-!configs/crowdsec/config/profiles.yaml
 !configs/crowdsec/config/console.yaml
+!configs/crowdsec/config/profiles.yaml
 !configs/crowdsec/config/user.yaml
 !configs/crowdsec/config/notifications/
 configs/crowdsec/config/notifications/**
@@ -63,15 +65,13 @@ data/**
 !data/
 !data/**/
 !data/**/.gitkeep
-## Jellyfin bind mounts (track only folder placeholders)
+## Jellyfin
+!data/downloads/.gitkeep
 !data/jellyfin/.gitkeep
 !data/jellyfin/metadata/.gitkeep
-!data/downloads/.gitkeep
 
 # Logs (keep folder structure, ignore runtime log files)
 logs/**
 !logs/
 !logs/**/
 !logs/**/.gitkeep
-
-.codex
