@@ -41,8 +41,6 @@ include:
   - ../apps/arcane-agent.yml
   - ../apps/adguardhome.yml
   - ../apps/crowdsec.yml
-  # - ../apps/copyparty.yml
-  # - ../apps/filestash.yml
   - ../apps/gotify.yml
   - ../apps/headscale.yml
   - ../apps/homepage.yml
@@ -52,8 +50,6 @@ include:
   - ../apps/traefik.yml
   - ../apps/otel-collector-agent.yml
   # - ../apps/webfinger.yml
-  #### DESKTOP APPS ####
-  # - ../apps/firefox.yml
   ###### MAINTENANCE ####
   - ../apps/bentopdf.yml
   - ../apps/convertx.yml
