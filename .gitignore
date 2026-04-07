@@ -12,7 +12,6 @@ appdata/**
 !appdata/
 !appdata/**/
 !appdata/**/.gitkeep
-## Jellyfin
 !appdata/jellyfin/.gitkeep
 !appdata/jellyfin/cache/.gitkeep
 
@@ -20,43 +19,13 @@ appdata/**
 # backups/*
 
 # Configs
-configs/*
-configs/glance/docs
-!configs/bifrost
-!configs/copyparty/copyparty.conf
-!configs/filebrowser
-!configs/forgejo
-!configs/frigate/config.yml
-!configs/gatus
-!configs/glance
-!configs/grafana-lgtm
-!configs/headplane
-!configs/headscale
-configs/headscale/oidc_client_secret
-!configs/homepage
-!configs/immich-public-proxy
-!configs/loggifly
-!configs/mosquitto
-!configs/otel-collector
-!configs/oxicloud
-!configs/quartz
-!configs/rybbit
-!configs/strava-statistics
-!configs/traefik3
+configs/**
+!configs/
+!configs/**/
+!configs/**/.gitkeep
 
-## CrowdSec
-!configs/crowdsec/
-!configs/crowdsec/config/
-configs/crowdsec/config/**
-!configs/crowdsec/config/acquis.yaml
-!configs/crowdsec/config/config.yaml
-!configs/crowdsec/config/console.yaml
-!configs/crowdsec/config/profiles.yaml
-!configs/crowdsec/config/user.yaml
-!configs/crowdsec/config/notifications/
-configs/crowdsec/config/notifications/**
-!configs/crowdsec/config/notifications/victoriametrics.yaml
-### Keep credentials out of git
+## Keep credentials out of git
+configs/headscale/oidc_client_secret
 configs/crowdsec/config/local_api_credentials.yaml
 configs/crowdsec/config/online_api_credentials.yaml
 
@@ -65,10 +34,6 @@ data/**
 !data/
 !data/**/
 !data/**/.gitkeep
-## Jellyfin
-!data/downloads/.gitkeep
-!data/jellyfin/.gitkeep
-!data/jellyfin/metadata/.gitkeep
 
 # Logs (keep folder structure, ignore runtime log files)
 logs/**

@@ -35,7 +35,6 @@ include:
   ########################### SERVICES
   #### CORE ####
   - ../apps/homepage.yml
-  - ../apps/filebrowser.yml
   - ../apps/docker-socket-proxy.yml
   - ../apps/tinyauth.yml
   - ../apps/traefik.yml

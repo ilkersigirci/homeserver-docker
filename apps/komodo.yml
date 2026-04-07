@@ -124,7 +124,7 @@ services:
     image: ghcr.io/moghtech/komodo-periphery:${COMPOSE_KOMODO_IMAGE_TAG:-latest}
     container_name: komodo-periphery-main
     restart: $RESTART_POLICY_CORE
-    # user: $PUID:$PGID # NOTE:Get permission denied error when using this
+    # user: $PUID:$PGID # FIXME: Permission denied error
     profiles:
       - core
       - komodo

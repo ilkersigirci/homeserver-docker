@@ -6,8 +6,6 @@ services:
     image: ghcr.io/dani-garcia/vaultwarden:1.35.4
     profiles:
       - core
-    depends_on:
-      - traefik
     restart: $RESTART_POLICY_CORE
     networks:
       - t3_proxy
