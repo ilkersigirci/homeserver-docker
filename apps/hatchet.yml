@@ -48,16 +48,16 @@ services:
     profiles:
       - programming
       - hatchet
-    user: $PUID:$PGID
-    read_only: true
-    tmpfs:
-      - /tmp
-      - /run
     networks:
       - t3_proxy
     expose:
       - 8888 # HTTP UI
       - 7077 # gRPC API
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
     security_opt:
       - no-new-privileges:true
     cap_drop:

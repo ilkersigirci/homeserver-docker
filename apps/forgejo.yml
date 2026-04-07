@@ -12,6 +12,10 @@ services:
       - custom-user
       - programming
       - forgejo
+    networks:
+      - t3_proxy
+    expose:
+      - "5432"
     user: "999:999"
     read_only: true
     tmpfs:
@@ -23,17 +27,13 @@ services:
     cap_drop:
       - ALL
     cap_add: []
+    volumes:
+      - $REPO_PATH/data/forgejo/db:/pgdata
     environment:
       PGDATA: /pgdata
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
-    networks:
-      - t3_proxy
-    expose:
-      - "5432"
-    volumes:
-      - $REPO_PATH/data/forgejo/db:/pgdata
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
