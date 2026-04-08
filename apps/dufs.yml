@@ -2,19 +2,26 @@ services:
   dufs:
     container_name: dufs
     image: sigoden/dufs:latest
-    restart: $RESTART_POLICY_CORE
+    restart: $RESTART_POLICY_MEDIA
     command: /data -A
     profiles:
-      - core
+      - media
     networks:
       - t3_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
       - $REPO_PATH/appdata/dufs:/data
-      # - $REPO_PATH/appdata/dufs/Apps/Books:/data/Apps/Books # NOTE: For syncing MoonReader with webdav
       - $USERDIR:/data/Home
-      - $DIR_HARDDISKROOT:/data/Harddisk
+      # - $REPO_PATH/appdata/dufs/Apps/Books:/data/Apps/Books # NOTE: For syncing MoonReader with webdav
+      # - $DIR_HARDDISKROOT:/data/Harddisk
     # healthcheck:
     #   test: "curl http://127.0.0.1:5000/__dufs__/health" # NOTE: Not working since there is no curl
     #   interval: 10s
@@ -37,7 +44,7 @@ services:
       tinyauth.apps.dufs.config.domain: "dufs.$DOMAINNAME"
       tinyauth.apps.dufs.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: "Core"
+      homepage.group: "Media"
       homepage.name: "Dufs"
       homepage.icon: "files.svg"
       homepage.href: "https://dufs.$DOMAINNAME"

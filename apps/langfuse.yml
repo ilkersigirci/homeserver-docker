@@ -84,26 +84,26 @@ services:
     image: redis:7
     container_name: langfuse-redis
     restart: $RESTART_POLICY_PROGRAMMING
+    command: >
+      --requirepass $LANGFUSE_REDIS_PASSWORD
+    profiles:
+      - custom-user
+      - programming
+      - langfuse
+    networks:
+      - t3_proxy
+    expose:
+      - 6379
     user: "999:999"
     read_only: true
     tmpfs:
       - /tmp
       - /run
-    command: >
-      --requirepass $LANGFUSE_REDIS_PASSWORD
-    profiles:
-      - programming
-      - langfuse
-      - custom-user
     security_opt:
       - no-new-privileges:true
     cap_drop:
       - ALL
     cap_add: []
-    networks:
-      - t3_proxy
-    expose:
-      - 6379
     volumes:
       - $REPO_PATH/data/langfuse/redis:/data
     healthcheck:

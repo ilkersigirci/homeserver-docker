@@ -4,15 +4,15 @@ services:
   filebrowser:
     container_name: filebrowser
     image: filebrowser/filebrowser:latest
-    user: $PUID:$PGID
-    read_only: true
-    tmpfs:
-      - /tmp
     profiles:
       - media
     restart: $RESTART_POLICY_MEDIA
     networks:
       - t3_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
     security_opt:
       - no-new-privileges:true
     cap_drop:
