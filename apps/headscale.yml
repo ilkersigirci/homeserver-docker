@@ -5,9 +5,6 @@ services:
     image: ghcr.io/juanfont/headscale:0.28.0
     container_name: headscale
     command: serve
-    read_only: true
-    tmpfs:
-      - /var/run/headscale
     restart: $RESTART_POLICY_CORE
     profiles:
       - core
@@ -16,6 +13,10 @@ services:
     expose:
       - "8080"
       - "9090"
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /var/run/headscale
     security_opt:
       - no-new-privileges:true
     volumes:
@@ -64,18 +65,27 @@ services:
 
   # Configuration file: https://github.com/tale/headplane/blob/main/config.example.yaml
   headplane:
-    image: ghcr.io/tale/headplane:0.6.2
+    # image: ghcr.io/tale/headplane:0.6.2
+    image: ghcr.io/tale/headplane:0.7.0-beta.1
     container_name: headplane
     restart: $RESTART_POLICY_CORE
     depends_on:
       - headscale
     profiles:
+      - custom-user
       - core
     networks:
       - t3_proxy
       - socket_proxy
+    user: 65532:65532
+    read_only: true
+    tmpfs:
+      - /tmp
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
       - $REPO_PATH/configs/headplane/config.example.yml:/etc/headplane/config.yaml:ro
       - $REPO_PATH/data/headplane:/var/lib/headplane
@@ -94,16 +104,16 @@ services:
       ## HEADSCALE
       HEADPLANE_HEADSCALE__URL: http://headscale:8080
       HEADPLANE_HEADSCALE__PUBLIC_URL: https://headscale.$DOMAINNAME
+      HEADPLANE_HEADSCALE__API_KEY: $HEADSCALE_API_KEY
       ## INTEGRATION
       HEADPLANE_INTEGRATION__AGENT__ENABLED: true
-      HEADPLANE_INTEGRATION__AGENT__PRE_AUTHKEY: $HEADPLANE_AGENT_PRE_AUTHKEY
       HEADPLANE_INTEGRATION__AGENT__HOST_NAME: $HEADPLANE_AGENT_HOST_NAME
       HEADPLANE_INTEGRATION__DOCKER__ENABLED: true
       HEADPLANE_INTEGRATION__DOCKER__SOCKET: tcp://docker-socket-proxy-write:2375
       ## OIDC
       HEADPLANE_OIDC__ENABLED: true
       HEADPLANE_OIDC__ISSUER: https://pocketid.$BASE_DOMAINNAME
-      HEADPLANE_OIDC__HEADSCALE_API_KEY: $HEADSCALE_API_KEY
+      HEADPLANE_OIDC__HEADSCALE_API_KEY: $HEADSCALE_API_KEY # NOTE: Deprecated. Currently still required.
       HEADPLANE_OIDC__CLIENT_ID: $HEADSCALE_CLIENT_ID
       HEADPLANE_OIDC__CLIENT_SECRET: $HEADSCALE_CLIENT_SECRET
       HEADPLANE_OIDC__USE_PKCE: true

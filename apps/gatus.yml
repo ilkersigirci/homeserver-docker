@@ -4,7 +4,9 @@ services:
     container_name: gatus-db
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
-      - monitoring
+      - custom-user
+      - not-used
+      # - monitoring
       - gatus
     environment:
       PGDATA: /pgdata
@@ -15,6 +17,17 @@ services:
       - t3_proxy
     expose:
       - "5432"
+    user: "999:999"
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
+      - /run/postgresql
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
       - $REPO_PATH/data/gatus-db:/pgdata
     healthcheck:
@@ -27,17 +40,24 @@ services:
     image: ghcr.io/twin/gatus:stable
     container_name: gatus
     restart: $RESTART_POLICY_MAINTENANCE
-    depends_on:
-      gatus-db:
-        condition: service_healthy
+    # depends_on:
+    #   gatus-db:
+    #     condition: service_healthy
     profiles:
       - monitoring
       - gatus
     networks:
       - t3_proxy
       # - socket_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
       - $REPO_PATH/configs/gatus:/config
     environment:

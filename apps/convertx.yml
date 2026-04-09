@@ -7,13 +7,20 @@ services:
       - maintenance
     networks:
       - t3_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
     security_opt:
       - no-new-privileges:true
-    environment: # Defaults are listed below. All are optional.
-      ACCOUNT_REGISTRATION: false # true or false, doesn't matter for the first account (e.g. keep this to false if you only want one account)
-      JWT_SECRET: aLongAndSecretStringUsedToSignTheJSONWebToken1234 # will use randomUUID() by default
-      HTTP_ALLOWED: true # setting this to true is unsafe, only set this to true locally
-      ALLOW_UNAUTHENTICATED: true # allows anyone to use the service without logging in, only set this to true locally
+    cap_drop:
+      - ALL
+    cap_add: []
+    environment:
+      ACCOUNT_REGISTRATION: false
+      JWT_SECRET: $CONVERTX_JWT_SECRET
+      HTTP_ALLOWED: true
+      ALLOW_UNAUTHENTICATED: true
     volumes:
       - $REPO_PATH/appdata/convertx:/app/data
     labels:
