@@ -4,7 +4,11 @@
             "ilker@"
         ]
     },
-    "tagOwners": {},
+    "tagOwners": {
+        "tag:ilker": [
+            "group:admin"
+        ]
+    },
     "hosts": {},
     "acls": [
         {

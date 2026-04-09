@@ -102,7 +102,7 @@ services:
       HEADPLANE_SERVER__BASE_URL: https://headscale.$DOMAINNAME
       HEADPLANE_SERVER__COOKIE_SECRET: $HEADPLANE_COOKIE_SECRET
       ## HEADSCALE
-      HEADPLANE_HEADSCALE__URL: http://headscale:8080
+      HEADPLANE_HEADSCALE__URL: https://headscale.$DOMAINNAME
       HEADPLANE_HEADSCALE__PUBLIC_URL: https://headscale.$DOMAINNAME
       HEADPLANE_HEADSCALE__API_KEY: $HEADSCALE_API_KEY
       ## INTEGRATION
@@ -124,8 +124,8 @@ services:
       traefik.http.routers.headplane-rtr.entrypoints: "websecure"
       traefik.http.routers.headplane-rtr.rule: "Host(`headscale.$DOMAINNAME`) && PathPrefix(`/admin`)"
       ## Middlewares
-      # traefik.http.routers.headplane-rtr.middlewares: chain-tinyauth@file
-      traefik.http.routers.headplane-rtr.middlewares: "chain-no-auth@file"
+      # traefik.http.routers.headplane-rtr.middlewares: chain-tinyauth-relaxed@file
+      traefik.http.routers.headplane-rtr.middlewares: "chain-no-auth-relaxed@file" # NOTE: For WASM SSH in the UI.
       ## HTTP Services
       traefik.http.routers.headplane-rtr.service: "headplane-svc"
       traefik.http.services.headplane-svc.loadbalancer.server.port: "3000"
