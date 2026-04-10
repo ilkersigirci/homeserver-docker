@@ -128,6 +128,28 @@
       "custom_provider_config": {
         "base_provider_type": "openai"
       }
+    },
+    "vllm-gemma4-31b-it": {
+      "keys": [
+        {
+          "name": "vllm-key",
+          "value": "dummy",
+          "models": ["gemma-4-31B-it"],
+          "weight": 1.0
+        }
+      ],
+      "network_config": {
+        "base_url": "env.OPENAI_GEMMA4_31B_IT_BASE_URL",
+        "default_request_timeout_in_seconds": 60
+      },
+      "custom_provider_config": {
+        "base_provider_type": "openai",
+        "allowed_requests": {
+          "list_models": true,
+          "chat_completion": true,
+          "chat_completion_stream": true
+        }
+      }
     }
   }
 }
