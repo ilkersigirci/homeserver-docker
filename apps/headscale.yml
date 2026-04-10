@@ -65,8 +65,7 @@ services:
 
   # Configuration file: https://github.com/tale/headplane/blob/main/config.example.yaml
   headplane:
-    # image: ghcr.io/tale/headplane:0.6.2
-    image: ghcr.io/tale/headplane:0.7.0-beta.1
+    image: ghcr.io/tale/headplane:0.7.0-beta.2
     container_name: headplane
     restart: $RESTART_POLICY_CORE
     depends_on:
