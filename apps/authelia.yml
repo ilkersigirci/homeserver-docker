@@ -4,8 +4,6 @@ services:
   authelia:
     container_name: authelia
     image: ghcr.io/authelia/authelia:4.38.18
-    depends_on:
-      - traefik
     restart: $RESTART_POLICY_CORE
     profiles:
       - core

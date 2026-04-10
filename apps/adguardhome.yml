@@ -1,6 +1,6 @@
 services:
   adguardhome:
-    image: adguard/adguardhome:v0.107.71
+    image: adguard/adguardhome:v0.107.73
     container_name: adguardhome
     restart: $RESTART_POLICY_CORE
     profiles:
@@ -30,11 +30,20 @@ services:
       - "80"
       - "53"
       - "853"
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
     volumes:
-      - $REPO_PATH/configs/adguardhome:/opt/adguardhome/conf:rw
-      - $REPO_PATH/appdata/adguardhome/work:/opt/adguardhome/work
+      - $REPO_PATH/configs/adguardhome:/opt/adguardhome/conf:rw # TODO: Find a way to add AdGuardHome.yaml into git tracking.
+      - $REPO_PATH/appdata/adguardhome:/opt/adguardhome/work:rw
     environment:
       TZ: $TZ
     labels:

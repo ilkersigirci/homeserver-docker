@@ -10,14 +10,14 @@ config_paths:
   hub_dir: /etc/crowdsec/hub/
   index_path: /etc/crowdsec/hub/.index.json
   notification_dir: /etc/crowdsec/notifications/
-  plugin_dir: /usr/local/lib/crowdsec/plugins/
+  plugin_dir: /var/lib/crowdsec/data/plugins/
 crowdsec_service:
   acquisition_path: /etc/crowdsec/acquis.yaml
   acquisition_dir: /etc/crowdsec/acquis.d
   parser_routines: 1
 plugin_config:
-  user: nobody
-  group: nobody
+  user: crowdsec
+  group: crowdsec
 cscli:
   output: human
 db_config:

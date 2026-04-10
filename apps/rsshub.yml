@@ -4,10 +4,20 @@ services:
     container_name: rsshub-browserless
     restart: $RESTART_POLICY_OTHERS
     profiles:
+      - custom-user
       - reading
       - rsshub
     networks:
       - t3_proxy
+    user: blessuser
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     ulimits:
       core:
         hard: 0
@@ -27,10 +37,20 @@ services:
     container_name: rsshub-redis
     restart: $RESTART_POLICY_OTHERS
     profiles:
+      - custom-user
       - reading
       - rsshub
     networks:
       - t3_proxy
+    user: redis
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
       - $REPO_PATH/appdata/rsshub-redis:/data
     healthcheck:
@@ -49,12 +69,20 @@ services:
     container_name: rsshub
     restart: $RESTART_POLICY_OTHERS
     profiles:
+      - custom-user
       - reading
       - rsshub
     networks:
       - t3_proxy
+    user: node
+    read_only: true
+    tmpfs:
+      - /tmp
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     depends_on:
       - rsshub-redis
       - rsshub-browserless

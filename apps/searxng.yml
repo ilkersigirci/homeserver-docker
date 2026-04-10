@@ -4,14 +4,22 @@ services:
     container_name: searxng
     restart: $RESTART_POLICY_PROGRAMMING
     depends_on:
-      - searxng-redis
+      - searxng-valkey
     profiles:
       - programming
       - searxng
     networks:
       - t3_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
       - $REPO_PATH/configs/searxng:/etc/searxng:ro
     logging:
@@ -49,9 +57,9 @@ services:
       glance.url: "https://searxng.$DOMAINNAME"
       glance.description: "Free internet metasearch engine"
 
-  searxng-redis:
+  searxng-valkey:
     image: docker.io/valkey/valkey:8-alpine
-    container_name: searxng-redis
+    container_name: searxng-valkey
     command: valkey-server --save 30 1 --loglevel warning
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
@@ -61,10 +69,18 @@ services:
       - t3_proxy
     expose:
       - "6379"
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
-      - $REPO_PATH/appdata/searxng-redis:/data:rw
+      - $REPO_PATH/appdata/searxng-valkey:/data:rw
     logging:
       driver: "json-file"
       options:

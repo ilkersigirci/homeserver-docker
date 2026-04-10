@@ -9,12 +9,24 @@ services:
       - rybbit
     networks:
       - t3_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:uid=$PUID,gid=$PGID,mode=1777
+      - /var/run/clickhouse-server:uid=$PUID,gid=$PGID,mode=775
+      - /var/log/clickhouse-server:uid=$PUID,gid=$PGID,mode=775
+      - /etc/clickhouse-server/users.d:uid=$PUID,gid=$PGID,mode=775
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     expose:
       - "8123"
       - "9000"
     volumes:
-      - $REPO_PATH/appdata/rybbit/clickhouse:/var/lib/clickhouse
       - $REPO_PATH/configs/rybbit/clickhouse:/etc/clickhouse-server/config.d:ro
+      - $REPO_PATH/appdata/rybbit/clickhouse:/var/lib/clickhouse
     environment:
       TZ: $TZ
       CLICKHOUSE_DB: ${RYBBIT_CLICKHOUSE_DB:-analytics}
@@ -44,12 +56,21 @@ services:
       - rybbit
     networks:
       - t3_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:uid=$PUID,gid=$PGID,mode=1777
+      - /var/run/postgresql:uid=$PUID,gid=$PGID,mode=775
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     expose:
       - "5432"
     volumes:
       - $REPO_PATH/appdata/rybbit/postgres:/var/lib/postgresql/data
     environment:
-      # - TZ=$TZ # Doesn't work
       POSTGRES_USER: ${RYBBIT_POSTGRES_USER:-frog}
       POSTGRES_PASSWORD: ${RYBBIT_POSTGRES_PASSWORD:-frog}
       POSTGRES_DB: ${RYBBIT_POSTGRES_DB:-analytics}
@@ -74,6 +95,15 @@ services:
       - rybbit
     networks:
       - t3_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     environment:
       TZ: $TZ
       NODE_ENV: production
@@ -140,6 +170,16 @@ services:
       - rybbit
     networks:
       - t3_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /app/.next/cache
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     environment:
       TZ: $TZ
       NODE_ENV: production

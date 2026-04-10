@@ -9,11 +9,19 @@ services:
     container_name: bifrost
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
+      - custom-user
       - programming
     networks:
       - t3_proxy
+    user: appuser
+    read_only: true
+    tmpfs:
+      - /tmp
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     entrypoint: # NOTE: For custom base_url env logic
       - /bin/sh
       - /app/render-config.sh
@@ -33,9 +41,9 @@ services:
       OPENAI_API_KEY: $OPENAI_API_KEY
       OPENAI_PERSONAL_API_KEY: $OPENAI_PERSONAL_API_KEY
       OPENAI_QWEN_3_5_35B_A3B_BASE_URL: $OPENAI_QWEN_3_5_35B_A3B_BASE_URL
+      OPENAI_QWEN_IMAGE_2512_BASE_URL: $OPENAI_QWEN_IMAGE_2512_BASE_URL
       OPENAI_HOMESERVER_API_BASE_URL: $OPENAI_HOMESERVER_API_BASE_URL
       OPENAI_HOMESERVER_API_KEY: $OPENAI_HOMESERVER_API_KEY
-
     labels:
       traefik.enable: "true"
       ## HTTP Routers

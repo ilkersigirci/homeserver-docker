@@ -1,3 +1,4 @@
+# TODO: Harden
 services:
   apprise-api:
     image: lscr.io/linuxserver/apprise-api:latest

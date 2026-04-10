@@ -41,8 +41,6 @@ include:
   - ../apps/arcane-agent.yml
   - ../apps/adguardhome.yml
   - ../apps/crowdsec.yml
-  # - ../apps/copyparty.yml
-  # - ../apps/filestash.yml
   - ../apps/gotify.yml
   - ../apps/headscale.yml
   - ../apps/homepage.yml
@@ -51,8 +49,7 @@ include:
   - ../apps/tinyauth.yml
   - ../apps/traefik.yml
   - ../apps/otel-collector-agent.yml
-  #### DESKTOP APPS ####
-  # - ../apps/firefox.yml
+  # - ../apps/webfinger.yml
   ###### MAINTENANCE ####
   - ../apps/bentopdf.yml
   - ../apps/convertx.yml
@@ -65,6 +62,7 @@ include:
   #### MEDIA ####
   - ../apps/aiostreams.yml
   - ../apps/bitplay.yml
+  - ../apps/dufs.yml
   - ../apps/mazanoke.yml
   - ../apps/metube.yml
   - ../apps/nzbdav.yml

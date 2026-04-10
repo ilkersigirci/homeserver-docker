@@ -1,16 +1,29 @@
+# TODO: Harden
 services:
   nzbdav:
     image: nzbdav/nzbdav:latest
     container_name: nzbdav
     restart: $RESTART_POLICY_MEDIA
     profiles:
+      - root
       - media
     networks:
       - t3_proxy
     expose:
       - "3000"
+    # user: $PUID:$PGID
+    # read_only: true
+    tmpfs:
+      - /tmp
+      - /run
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETUID
+      - SETGID
     volumes:
       - $REPO_PATH/appdata/nzbdav:/config
     environment:

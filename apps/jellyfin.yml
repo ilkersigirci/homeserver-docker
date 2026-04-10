@@ -1,18 +1,27 @@
 services:
+  # TODO: Harden
   # NOTE: Install in Jellyfin UI https://github.com/arnesacnussem/jellyfin-plugin-meilisearch
   jellyfin-meilisearch:
     image: getmeili/meilisearch:v1.32.1
     container_name: jellyfin-meilisearch
     restart: $RESTART_POLICY_MEDIA
     profiles:
+      - custom-user
       - media
       - jellyfin
     networks:
       - t3_proxy
+    # user: "65534:65534"
+    # read_only: true
+    tmpfs:
+      - /tmp
     expose:
       - "7700"
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
       - $REPO_PATH/appdata/jellyfin-meilisearch:/meili_data
     environment:
@@ -24,7 +33,7 @@ services:
 
   # FIXME: middlewares-secure-headers doesn't work for `feishin`
   jellyfin:
-    image: jellyfin/jellyfin:latest # TODO: ghcr.io
+    image: ghcr.io/jellyfin/jellyfin:latest
     container_name: jellyfin
     # cpus: "0.5"
     mem_reservation: "2048M"
@@ -40,10 +49,15 @@ services:
         ipv4_address: 192.168.90.161
     ports:
       - "1002:8096"
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
     security_opt:
       - no-new-privileges:true
-    # user: $PGID:$PUID
-    user: 0:0
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
       - $REPO_PATH/appdata/jellyfin:/config
       - $REPO_PATH/appdata/jellyfin/cache:/cache

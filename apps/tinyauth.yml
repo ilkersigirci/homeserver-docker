@@ -11,8 +11,16 @@ services:
     networks:
       - t3_proxy
       - socket_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     # https://tinyauth.app/docs/reference/configuration/
     environment:
       DOCKER_HOST: tcp://docker-socket-proxy-read:2375

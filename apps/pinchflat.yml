@@ -1,15 +1,24 @@
+# TODO: Harden
 services:
   pinchflat:
     image: ghcr.io/kieraneglin/pinchflat:latest
     container_name: pinchflat
     restart: $RESTART_POLICY_MEDIA
     profiles:
+      - custom-user
       - media
       - youtube
     networks:
       - t3_proxy
+    user: $PUID:$PGID
+    # read_only: true
+    # tmpfs:
+    #   - /tmp
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
       - $REPO_PATH/appdata/pinchflat:/config
       - $DIR_MEDIA/Youtube:/downloads

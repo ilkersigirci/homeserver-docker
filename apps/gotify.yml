@@ -10,10 +10,17 @@ services:
       - t3_proxy
     ports:
       - "1005:80"
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
-      - $REPO_PATH/appdata/gotify:/app/data
+      - $REPO_PATH/data/gotify:/app/data
     environment:
       TZ: $TZ
       GOTIFY_DEFAULTUSER_PASS: $GOTIFY_DEFAULT_USER_PASS

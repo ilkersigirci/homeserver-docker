@@ -8,20 +8,42 @@ services:
       - crowdsec
     networks:
       - crowdsec_lapi
+    user: "$PUID:$PGID"
+    group_add:
+      - "${CROWDSEC_LOG_GROUP_GID:-4}"
+    entrypoint:
+      - /bin/bash
+      - -ec
+      - |
+        mkdir -p /var/lib/crowdsec/data/plugins
+        cp -f /usr/local/lib/crowdsec/plugins/* /var/lib/crowdsec/data/plugins/
+        exec /bin/bash /docker_start.sh
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m
+      - /run:rw,nosuid,nodev,size=16m
     expose:
       - 8080 # LAPI endpoint for Traefik bouncer via crowdsec_lapi
       - 6060 # metrics endpoint for prometheus
       - 7422 # appsec waf endpoint
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
+      - /var/log:/var/log:ro # NOTE: Needs adm group privileges on host to read logs
+      - $REPO_PATH/logs/traefik:/logs/traefik:ro
+      ## Configs
       - $REPO_PATH/appdata/crowdsec:/var/lib/crowdsec/data
-      - $REPO_PATH/configs/crowdsec/config:/etc/crowdsec
+      - $REPO_PATH/configs/crowdsec:/etc/crowdsec
+      - $REPO_PATH/configs/crowdsec/passwd:/etc/passwd:ro
+      - $REPO_PATH/configs/crowdsec/group:/etc/group:ro
+      ## Secrets
       - $REPO_PATH/secrets/crowdsec/local_api_credentials.yaml:/etc/crowdsec/local_api_credentials.yaml
       - $REPO_PATH/secrets/crowdsec/online_api_credentials.yaml:/etc/crowdsec/online_api_credentials.yaml
-      - /var/log:/var/log:ro
-      - $REPO_PATH/logs/traefik:/logs/traefik:ro
     environment:
+      USER: crowdsec:crowdsec
       GID: $PGID
       COLLECTIONS: "crowdsecurity/traefik crowdsecurity/http-cve crowdsecurity/base-http-scenarios crowdsecurity/whitelist-good-actors crowdsecurity/iptables crowdsecurity/linux crowdsecurity/sshd"
       CUSTOM_HOSTNAME: $MY_HOSTNAME

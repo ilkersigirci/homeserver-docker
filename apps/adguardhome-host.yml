@@ -1,21 +1,31 @@
 # NOTE: In initial configuration screen, choose dashboard port 81 to avoid conflict with traefik
 services:
   adguardhome:
-    image: adguard/adguardhome:v0.107.71
+    image: adguard/adguardhome:v0.107.73
     container_name: adguardhome
     restart: $RESTART_POLICY_CORE
     profiles:
+      - root
       - core
     network_mode: host
     expose:
       - "81"
       - "53"
       - "853"
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
     volumes:
       - $REPO_PATH/configs/adguardhome:/opt/adguardhome/conf:rw
-      - $REPO_PATH/appdata/adguardhome/work:/opt/adguardhome/work
+      - $REPO_PATH/appdata/adguardhome:/opt/adguardhome/work:rw
     environment:
       TZ: $TZ
     labels:

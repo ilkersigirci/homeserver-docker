@@ -6,13 +6,18 @@ services:
     image: ghcr.io/dani-garcia/vaultwarden:1.35.4
     profiles:
       - core
-    depends_on:
-      - traefik
     restart: $RESTART_POLICY_CORE
     networks:
       - t3_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
       - $REPO_PATH/data/vaultwarden:/data/
     environment:

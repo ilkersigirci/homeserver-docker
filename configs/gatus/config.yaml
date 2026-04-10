@@ -75,12 +75,12 @@ endpoints:
       - "[DOMAIN_EXPIRATION] > 720h"
 
   ################# REMOTESERVER #################
-  - name: Postgres
-    group: Remoteserver
-    url: "tcp://gatus-db:5432"
-    interval: 30s
-    conditions:
-      - "[CONNECTED] == true"
+  # - name: Postgres
+  #   group: Remoteserver
+  #   url: "tcp://gatus-db:5432"
+  #   interval: 5m
+  #   conditions:
+  #     - "[CONNECTED] == true"
 
   - name: AdguardHome-DNS
     group: Remoteserver

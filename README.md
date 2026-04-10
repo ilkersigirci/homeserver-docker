@@ -49,3 +49,30 @@ alias drm="docker compose --env-file $HOME/docker/.env --file $HOME/docker/compo
 alias dpull="docker compose --env-file $HOME/docker/.env --file $HOME/docker/compose/$MY_HOSTNAME.yml pull"
 alias dbuild="docker compose --env-file $HOME/docker/.env --file $HOME/docker/compose/$MY_HOSTNAME.yml build"
 ```
+
+### Volume Bind Permission Script
+
+```bash
+# Permissions bootstrap
+bash scripts/docker-manage.sh prep-perms
+```
+
+For custom compose targets, you can run the permission bootstrap directly:
+```bash
+# Check only
+bash scripts/prepare-bind-permissions.sh \
+  --compose-file compose/$MY_HOSTNAME.yml \
+  --env-file .env \
+  --check-only
+
+# Preview
+sudo bash scripts/prepare-bind-permissions.sh \
+  --compose-file compose/$MY_HOSTNAME.yml \
+  --env-file .env \
+  --dry-run
+
+# Apply
+sudo bash scripts/prepare-bind-permissions.sh \
+  --compose-file compose/$MY_HOSTNAME.yml \
+  --env-file .env
+```

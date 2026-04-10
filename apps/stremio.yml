@@ -11,12 +11,26 @@ services:
     expose:
       - "8080" # web
       - "11470" # api
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:uid=$PUID,gid=$PGID,mode=1777
+      - /run:uid=$PUID,gid=$PGID,mode=775
+      - /run/nginx:uid=$PUID,gid=$PGID,mode=775
+      - /var/lib/nginx:uid=$PUID,gid=$PGID,mode=775
+      - /var/lib/nginx/logs:uid=$PUID,gid=$PGID,mode=775
+      - /var/lib/nginx/tmp:uid=$PUID,gid=$PGID,mode=775
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     environment:
       NO_CORS: 1
+      APP_PATH: /.stremio-server
     volumes:
-      - $REPO_PATH/configs/stremio:/root/.stremio-server
+      - $REPO_PATH/configs/stremio:/.stremio-server
+      - $REPO_PATH/appdata/stremio:/srv/stremio-server
     labels:
       traefik.enable: "true"
       ## HTTP Routers Auth - Web UI
@@ -64,10 +78,20 @@ services:
     restart: $RESTART_POLICY_MEDIA
     networks:
       - t3_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    volumes:
+      - $REPO_PATH/appdata/stremio-server:/.stremio-server
     environment:
       NO_CORS: 1
+      APP_PATH: /.stremio-server
     labels:
       traefik.enable: "true"
       ## HTTP Routers Auth

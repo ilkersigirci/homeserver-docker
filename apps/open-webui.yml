@@ -9,8 +9,17 @@ services:
       - searxng
     networks:
       - t3_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
+      - /app/backend/open_webui/static:uid=$PUID,gid=$PGID,mode=0755
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
       - $REPO_PATH/appdata/open-webui:/app/backend/data
     # Docs: https://docs.openwebui.com/reference/env-configuration

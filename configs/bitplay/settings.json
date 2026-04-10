@@ -1,0 +1,10 @@
+{
+  "enableProxy": false,
+  "proxyUrl": "",
+  "enableProwlarr": false,
+  "prowlarrHost": "",
+  "prowlarrApiKey": "",
+  "enableJackett": false,
+  "jackettHost": "",
+  "jackettApiKey": ""
+}

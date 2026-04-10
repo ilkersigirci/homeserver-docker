@@ -111,6 +111,23 @@
           "output_cost_per_token": 0.0000004
         }
       ]
+    },
+    "vllm-qwen-image": {
+      "keys": [
+        {
+          "name": "vllm-key",
+          "value": "dummy",
+          "models": ["Qwen-Image-2512"],
+          "weight": 1.0
+        }
+      ],
+      "network_config": {
+        "base_url": "env.OPENAI_QWEN_IMAGE_2512_BASE_URL",
+        "default_request_timeout_in_seconds": 60
+      },
+      "custom_provider_config": {
+        "base_provider_type": "openai"
+      }
     }
   }
 }

@@ -3,9 +3,9 @@ services:
     image: ghcr.io/9001/copyparty-ac:latest
     container_name: copyparty
     user: $PUID:$PGID
-    restart: $RESTART_POLICY_CORE
+    restart: $RESTART_POLICY_MEDIA
     profiles:
-      - core
+      - media
     networks:
       - t3_proxy
     security_opt:
@@ -41,7 +41,7 @@ services:
       tinyauth.apps.copyparty.config.domain: "copyparty.$DOMAINNAME"
       tinyauth.apps.copyparty.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: "Core"
+      homepage.group: "Media"
       homepage.name: "copyparty"
       homepage.icon: "copyparty.png"
       homepage.href: "https://copyparty.$DOMAINNAME"

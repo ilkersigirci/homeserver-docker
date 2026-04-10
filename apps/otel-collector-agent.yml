@@ -9,8 +9,15 @@ services:
     user: $PUID:$PGID
     command:
       - --config=/etc/otelcol/config.yaml
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     healthcheck:
       # Distroless image (no shell/curl). Use collector binary for a lightweight health probe.
       test:

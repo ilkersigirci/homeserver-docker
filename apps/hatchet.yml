@@ -6,8 +6,20 @@ services:
     command: postgres -c 'max_connections=200'
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
+      - custom-user
       - programming
       - hatchet
+    user: "999:999"
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
+      - /run/postgresql
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     environment:
       PGDATA: /pgdata
       POSTGRES_USER: postgres
@@ -41,8 +53,16 @@ services:
     expose:
       - 8888 # HTTP UI
       - 7077 # gRPC API
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
       - $REPO_PATH/configs/hatchet:/config
     environment:

@@ -9,16 +9,30 @@ fi
 
 # Configuration
 PROFILES="core,desktop_apps,maintenance,media,monitoring,programming,reading,others"
-COMPOSE_CMD="docker compose -f compose/$MY_HOSTNAME.yml --env-file $HOME/docker/.env"
+COMPOSE_FILE="compose/$MY_HOSTNAME.yml"
+ENV_FILE="$HOME/docker/.env"
+COMPOSE_CMD="docker compose -f $COMPOSE_FILE --env-file $ENV_FILE"
 
 # Function to display usage
 usage() {
-    echo "Usage: $0 [up|down|pull|restart]"
-    echo "  up      - Start containers"
-    echo "  down    - Stop containers"
-    echo "  pull    - Update containers"
-    echo "  restart - Restart containers"
+    echo "Usage: $0 [up|down|pull|restart|prep-perms]"
+    echo "  up         - Start containers"
+    echo "  down       - Stop containers"
+    echo "  pull       - Update containers"
+    echo "  restart    - Restart containers"
+    echo "  prep-perms - Create/chown bind paths for non-root services"
     exit 1
+}
+
+prepare_permissions() {
+    local script_path="$HOME/docker/scripts/prepare-bind-permissions.sh"
+    local profile_arg="custom-user"
+
+    if [ "$(id -u)" -eq 0 ]; then
+        bash "$script_path" --compose-file "$HOME/docker/$COMPOSE_FILE" --env-file "$ENV_FILE" --profiles "$profile_arg"
+    else
+        sudo bash "$script_path" --compose-file "$HOME/docker/$COMPOSE_FILE" --env-file "$ENV_FILE" --profiles "$profile_arg"
+    fi
 }
 
 # Check if command argument is provided
@@ -57,6 +71,12 @@ case "$1" in
         COMPOSE_PROFILES=$PROFILES $COMPOSE_CMD down --remove-orphans
         COMPOSE_PROFILES=$PROFILES $COMPOSE_CMD up -d
         echo "✅ Containers restarted successfully!"
+        ;;
+
+    "prep-perms")
+        echo "🔐 Preparing bind-mount permissions for non-root services..."
+        prepare_permissions
+        echo "✅ Permission bootstrap completed!"
         ;;
 
     *)

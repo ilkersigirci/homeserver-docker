@@ -7,8 +7,18 @@ services:
       - maintenance
     networks:
       - t3_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:uid=$PUID,gid=$PGID,mode=1777
+      - /var/cache/nginx:uid=$PUID,gid=$PGID,mode=775
+      - /var/run:uid=$PUID,gid=$PGID,mode=775
+      - /var/log/nginx:uid=$PUID,gid=$PGID,mode=775
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     labels:
       traefik.enable: "true"
       ## HTTP Routers Auth

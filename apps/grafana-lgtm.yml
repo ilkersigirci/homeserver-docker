@@ -7,6 +7,10 @@ services:
       - monitoring
     networks:
       - t3_proxy
+    # user: $PUID:$PGID # TODO: Harden
+    read_only: true
+    tmpfs:
+      - /tmp
     expose:
       - 3000 # Grafana
       - 3100 # Loki
@@ -20,6 +24,9 @@ services:
       - "4317:4317" # OTLP/gRPC
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
       ## CONFIGS
       - $REPO_PATH/configs/grafana-lgtm/grafana/provisioning/dashboards:/otel-lgtm/grafana/conf/provisioning/dashboards:ro
