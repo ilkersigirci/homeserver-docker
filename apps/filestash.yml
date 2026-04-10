@@ -75,9 +75,9 @@ services:
       homepage.icon: "filestash.png"
       homepage.href: "https://filestash.$DOMAINNAME"
       homepage.target: "_blank"
-      homepage.description: "description"
+      homepage.description: "File Management Platform / Universal Data Access Layer (without FUSE)"
       ####### GLANCE #######
       glance.name: "filestash"
       glance.icon: "sh:filestash"
       glance.url: "https://filestash.$DOMAINNAME"
-      glance.description: "description"
+      glance.description: "File Management Platform / Universal Data Access Layer (without FUSE)"
