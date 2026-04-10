@@ -134,7 +134,7 @@
         {
           "name": "vllm-key",
           "value": "dummy",
-          "models": ["gemma-4-31B-it"],
+          "models": ["gemma-4-31b-it"],
           "weight": 1.0
         }
       ],
