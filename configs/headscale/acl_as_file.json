@@ -1,47 +1,25 @@
 {
-    "groups": {
-        "group:admin": [
-            "ilker@"
-        ]
-    },
-    "tagOwners": {
-        "tag:ilker": [
-            "group:admin"
-        ]
-    },
-    "hosts": {},
-    "acls": [
-        {
-            "#ha-meta": {
-                "name": "",
-                "open": true
-            },
-            "action": "accept",
-            "src": [
-                "*"
-            ],
-            "dst": [
-                "*:*"
-            ]
-        }
-    ],
-    "ssh": [
-        {
-            "action": "accept",
-            "src": [
-                "autogroup:member"
-                //"group:admin"
-            ],
-            "dst": [
-                "autogroup:self"
-                //"autogroup:member",
-                //"autogroup:tagged",
-            ],
-            "users": [
-                "ilker",
-                "ubuntu",
-                "root"
-            ]
-        }
-    ]
+  "$schema": "./tailscale-acl.json-schema.json",
+  "groups": {
+    "group:admin": ["ilker@"]
+  },
+  "tagOwners": {
+    "tag:ilker": ["group:admin"]
+  },
+  "hosts": {},
+  "acls": [
+    {
+      "action": "accept",
+      "src": ["*"],
+      "dst": ["*:*"]
+    }
+  ],
+  "ssh": [
+    {
+      "action": "accept",
+      "src": ["autogroup:member"],
+      "dst": ["autogroup:self"],
+      "users": ["ilker", "ubuntu", "root"]
+    }
+  ]
 }

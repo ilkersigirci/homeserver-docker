@@ -1,0 +1,180 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "Tailscale ACL",
+  "properties": {
+    "tagOwners": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "hosts": {
+      "type": "object",
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string",
+            "format": "ipv4"
+          },
+          {
+            "type": "string",
+            "format": "ipv6"
+          },
+          {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]+[0-9a-fA-F.]+/\\d{1,2}$"
+          },
+          {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]+[0-9a-fA-F:]+/\\d{1,2}$"
+          }
+        ]
+      }
+    },
+    "grants": {
+      "type": "array",
+      "title": "Tailscale ACL grants",
+      "description": "Each entry grants source the specified capabilities on the destination. The capabilities being granted can either be at the IP layer (ip) or at the application layer (app). These capabilities are compiled by the policy engine and pushed down to each Tailscale client and cached locally. This allows the Tailscale client to make decisions locally without having to query the coordination server.\n\nThe grants section is an array of objects, where each object must have a src and dst, and may have ip and app capabilities. The src and dst fields are arrays of selectors. The ip field is an array of of network level capabilities, and the app field is a map application level capabilities. We will walk through each of these fields in more detail below.",
+      "items": {
+        "type": "object",
+        "defaultSnippets": [
+          {
+            "label": "New Tailscale ACL grant",
+            "description": "Grants traffic from src to dst",
+            "body": { "src": "$1", "dst": "$2", "ip": "$3" }
+          }
+        ],
+        "properties": {
+          "src": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "dst": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ip": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["src", "dst", "ip"]
+      }
+    },
+    "ssh": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string"
+          },
+          "src": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "dst": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "users": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["action", "src", "dst", "users"]
+      }
+    },
+    "derpMap": {
+      "type": "object",
+      "properties": {
+        "Regions": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "RegionID": {
+                "type": "integer"
+              },
+              "RegionCode": {
+                "type": "string"
+              },
+              "RegionName": {
+                "type": "string"
+              },
+              "Nodes": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "Name": {
+                      "type": "string"
+                    },
+                    "RegionID": {
+                      "type": "integer"
+                    },
+                    "HostName": {
+                      "type": "string"
+                    },
+                    "IPv4": {
+                      "type": "string",
+                      "format": "ipv4"
+                    },
+                    "IPv6": {
+                      "type": "string",
+                      "format": "ipv6"
+                    }
+                  },
+                  "required": ["Name", "RegionID", "HostName", "IPv4", "IPv6"]
+                }
+              }
+            },
+            "required": ["RegionID", "RegionCode", "RegionName", "Nodes"]
+          }
+        }
+      },
+      "required": ["Regions"]
+    },
+    "tests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "src": {
+            "type": "string"
+          },
+          "allow": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "deny": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["src"]
+      }
+    }
+  },
+  "required": []
+}
