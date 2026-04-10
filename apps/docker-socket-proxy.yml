@@ -62,9 +62,9 @@ services:
     <<: *socket_proxy_service
     networks:
       - socket_proxy
-    # ports:
-    #   - "127.0.0.1:2375:2375" # Keep host access local-only. Other containers use socket_proxy network.
-    #   - "2375:2375" # NOTE: Enable only if you intentionally expose Docker API in LAN.
+    ports:
+      # - "127.0.0.1:2375:2375" # Keep host access local-only. Other containers use socket_proxy network.
+      - "2375:2375" # NOTE: Enable only if you intentionally expose Docker API in LAN.
     environment:
       <<: *socket_proxy_env_common
       CONTAINERS: 1 # Read-only consumers (Homepage, Dozzle, Tinyauth, Beszel, Glances)
