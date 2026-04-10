@@ -69,7 +69,8 @@ services:
     container_name: headplane
     restart: $RESTART_POLICY_CORE
     depends_on:
-      - headscale
+      headscale:
+        condition: service_healthy
     profiles:
       - custom-user
       - core
