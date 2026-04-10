@@ -26,6 +26,7 @@ services:
       - ALL
     cap_add: []
     environment:
+      TZ: $TZ
       CLICKHOUSE_DB: default
       CLICKHOUSE_USER: $LANGFUSE_CLICKHOUSE_USER
       CLICKHOUSE_PASSWORD: $LANGFUSE_CLICKHOUSE_PASSWORD

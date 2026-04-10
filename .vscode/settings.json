@@ -1,5 +1,6 @@
 {
   "files.associations": {
+    "**/*.hujson": "jsonc",
     "**/configs/traefik3/**/*.yml": "yaml",
     "**/configs/traefik3/**/*.yaml": "yaml",
     "**/configs/traefik3/**/*.yml.example": "yaml",

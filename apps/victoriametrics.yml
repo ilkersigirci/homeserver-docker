@@ -13,8 +13,15 @@ services:
     # TODO: Should we expose this or use traefik?
     ports:
       - "8428:8428"
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
       - $REPO_PATH/appdata/victoriametrics:/victoria-metrics-data
     command:
@@ -26,8 +33,8 @@ services:
       homepage.name: "victoriametrics"
       homepage.icon: "victoriametrics.png"
       homepage.target: "_blank"
-      homepage.description: "Fast, cost-effective monitoring solution and time series database "
+      homepage.description: "Fast, cost-effective monitoring solution and time series database"
       ####### GLANCE #######
       glance.name: "victoriametrics"
       glance.icon: "sh:victoriametrics"
-      glance.description: "Fast, cost-effective monitoring solution and time series database "
+      glance.description: "Fast, cost-effective monitoring solution and time series database"

@@ -1,25 +1,40 @@
 {
   "$schema": "./tailscale-acl.json-schema.json",
   "groups": {
-    "group:admin": ["ilker@"]
+    "group:admin": [
+      "ilker@"
+    ]
   },
   "tagOwners": {
-    "tag:ilker": ["group:admin"]
+    "tag:ilker": [
+      "group:admin"
+    ]
   },
   "hosts": {},
   "acls": [
     {
       "action": "accept",
-      "src": ["*"],
-      "dst": ["*:*"]
+      "src": [
+        "*"
+      ],
+      "dst": [
+        "*:*"
+      ]
     }
   ],
   "ssh": [
     {
       "action": "accept",
-      "src": ["autogroup:member"],
-      "dst": ["autogroup:self"],
-      "users": ["autogroup:nonroot", "root"]
+      "src": [
+        "autogroup:member"
+      ],
+      "dst": [
+        "autogroup:self"
+      ],
+      "users": [
+        "autogroup:nonroot",
+        "root"
+      ]
     }
   ]
 }

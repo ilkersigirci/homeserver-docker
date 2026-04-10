@@ -11,8 +11,15 @@ services:
       - t3_proxy
     ports:
       - "1006:3000"
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
       - $REPO_PATH/appdata/aiostreams:/app/data
     environment:

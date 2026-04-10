@@ -4,11 +4,30 @@ services:
     container_name: bentopdf
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
+      - custom-user
       - maintenance
     networks:
       - t3_proxy
+    user: 6969:6969
+    read_only: true
+    tmpfs:
+      - /tmp:uid=6969,gid=6969,rw,noexec,nosuid,nodev
+      - /var/cache/nginx:uid=6969,gid=6969,rw,noexec,nosuid,nodev
+      - /etc/nginx/tmp:uid=6969,gid=6969,rw,noexec,nosuid,nodev
+      - /var/lib/nginx/tmp:uid=6969,gid=6969,rw,noexec,nosuid,nodev
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    # environment:
+    #   DISABLE_IPV6: true
+    healthcheck:
+      test: ['CMD', 'wget', '--spider', '-q', 'http://localhost:8080']
+      start_period: 5s
+      interval: 1m
+      timeout: 3s
+      retries: 5
     labels:
       traefik.enable: "true"
       ## HTTP Routers

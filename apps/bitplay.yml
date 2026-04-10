@@ -8,11 +8,18 @@ services:
       - media
     networks:
       - t3_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
-      # NOTE: create the directory before running the container
       - $REPO_PATH/configs/bitplay:/app/config
+      - $REPO_PATH/appdata/bitplay:/app/torrent-data
     labels:
       traefik.enable: "true"
       ## HTTP Routers
