@@ -9,6 +9,9 @@ services:
       - rybbit
     networks:
       - t3_proxy
+    expose:
+      - "8123"
+      - "9000"
     user: $PUID:$PGID
     read_only: true
     tmpfs:
@@ -21,9 +24,6 @@ services:
     cap_drop:
       - ALL
     cap_add: []
-    expose:
-      - "8123"
-      - "9000"
     volumes:
       - $REPO_PATH/configs/rybbit/clickhouse:/etc/clickhouse-server/config.d:ro
       - $REPO_PATH/appdata/rybbit/clickhouse:/var/lib/clickhouse
@@ -42,10 +42,10 @@ services:
           "--spider",
           "http://localhost:8123/ping",
         ]
-      interval: 3s
+      interval: 30s
       timeout: 5s
       retries: 5
-      start_period: 10s
+      start_period: 5s
 
   rybbit-postgres:
     image: postgres:17.4
@@ -56,6 +56,8 @@ services:
       - rybbit
     networks:
       - t3_proxy
+    expose:
+      - 5432
     user: $PUID:$PGID
     read_only: true
     tmpfs:
@@ -66,8 +68,6 @@ services:
     cap_drop:
       - ALL
     cap_add: []
-    expose:
-      - "5432"
     volumes:
       - $REPO_PATH/appdata/rybbit/postgres:/var/lib/postgresql/data
     environment:

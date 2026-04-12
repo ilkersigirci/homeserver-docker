@@ -1,25 +1,24 @@
 # NOTE: Don't forget to create a bucket named "langfuse" in your s3 provider beforehand.
-
 services:
-  # NOTE: Create related dirs
-  ## sudo mkdir -p $REPO_PATH/data/langfuse/clickhouse/data
-  ## sudo mkdir -p $REPO_PATH/data/langfuse/clickhouse/logs
-  ## sudo chown -R 101:101 $REPO_PATH/data/langfuse/clickhouse
   langfuse-clickhouse:
-    image: clickhouse/clickhouse-server
+    image: clickhouse/clickhouse-server:latest
     container_name: langfuse-clickhouse
     restart: $RESTART_POLICY_PROGRAMMING
-    user: "101:101"
-    read_only: true
-    tmpfs:
-      - /tmp
-      - /run
-      - /var/run/clickhouse-server
-      - /etc/clickhouse-server/users.d
     profiles:
       - programming
       - langfuse
-      - custom-user
+    networks:
+      - t3_proxy
+    expose:
+      - 8123
+      - 9000
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:uid=$PUID,gid=$PGID,mode=1777
+      - /var/run/clickhouse-server:uid=$PUID,gid=$PGID,mode=775
+      - /var/log/clickhouse-server:uid=$PUID,gid=$PGID,mode=775
+      - /etc/clickhouse-server/users.d:uid=$PUID,gid=$PGID,mode=775
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -31,34 +30,40 @@ services:
       CLICKHOUSE_USER: $LANGFUSE_CLICKHOUSE_USER
       CLICKHOUSE_PASSWORD: $LANGFUSE_CLICKHOUSE_PASSWORD
     volumes:
-      - $REPO_PATH/data/langfuse/clickhouse/data:/var/lib/clickhouse
-      - $REPO_PATH/data/langfuse/clickhouse/logs:/var/log/clickhouse-server
-    networks:
-      - t3_proxy
-    expose:
-      - 8123
-      - 9000
+      - $REPO_PATH/configs/langfuse/clickhouse:/etc/clickhouse-server/config.d:ro
+      - $REPO_PATH/data/langfuse/clickhouse:/var/lib/clickhouse
+      # - $REPO_PATH/data/langfuse/clickhouse/logs:/var/log/clickhouse-server
     healthcheck:
-      test: wget --no-verbose --tries=1 --spider http://localhost:8123/ping || exit 1
-      interval: 5s
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8123/ping",
+        ]
+      interval: 30s
       timeout: 5s
-      retries: 10
-      start_period: 1s
+      retries: 5
+      start_period: 5s
 
   langfuse-db:
-    image: postgres:16.4
+    image: postgres:18.3
     container_name: langfuse-db
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
-      - custom-user
       - programming
       - langfuse
-    user: "999:999"
+    networks:
+      - t3_proxy
+    expose:
+      - 5432
+    user: $PUID:$PGID
     read_only: true
     tmpfs:
-      - /tmp
-      - /run
-      - /run/postgresql
+      - /tmp:uid=$PUID,gid=$PGID,mode=1777
+      - /var/run/postgresql:uid=$PUID,gid=$PGID,mode=775
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -68,13 +73,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
-      PGDATA: /pgdata
-    networks:
-      - t3_proxy
-    expose:
-      - 5432
     volumes:
-      - $REPO_PATH/data/langfuse/langfuse-db:/pgdata
+      - $REPO_PATH/data/langfuse/db:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -95,7 +95,7 @@ services:
       - t3_proxy
     expose:
       - 6379
-    user: "999:999"
+    user: $PUID:$PGID
     read_only: true
     tmpfs:
       - /tmp

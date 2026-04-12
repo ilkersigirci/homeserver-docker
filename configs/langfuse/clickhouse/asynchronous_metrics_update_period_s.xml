@@ -1,0 +1,3 @@
+<clickhouse>
+  <asynchronous_metrics_update_period_s>300</asynchronous_metrics_update_period_s>
+</clickhouse>
