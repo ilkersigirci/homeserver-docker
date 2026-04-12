@@ -1,7 +1,7 @@
 # NOTE: Don't forget to create a bucket named "langfuse" in your s3 provider beforehand.
 services:
   langfuse-clickhouse:
-    image: clickhouse/clickhouse-server:latest
+    image: clickhouse/clickhouse-server:26.3.7
     container_name: langfuse-clickhouse
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
@@ -31,6 +31,7 @@ services:
       CLICKHOUSE_PASSWORD: $LANGFUSE_CLICKHOUSE_PASSWORD
     volumes:
       - $REPO_PATH/configs/langfuse/clickhouse:/etc/clickhouse-server/config.d:ro
+      - $REPO_PATH/configs/langfuse/clickhouse-users/zz_disable_query_logging.xml:/etc/clickhouse-server/users.d/zz_disable_query_logging.xml:ro
       - $REPO_PATH/data/langfuse/clickhouse:/var/lib/clickhouse
       # - $REPO_PATH/data/langfuse/clickhouse/logs:/var/log/clickhouse-server
     healthcheck:
@@ -43,7 +44,7 @@ services:
           "--spider",
           "http://localhost:8123/ping",
         ]
-      interval: 30s
+      interval: 60s
       timeout: 5s
       retries: 5
       start_period: 5s
