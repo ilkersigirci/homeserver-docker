@@ -1,7 +1,7 @@
 # After first user creation, disable signup: RYBBIT_DISABLE_SIGNUP=true
 services:
   rybbit-clickhouse:
-    image: clickhouse/clickhouse-server:25.4.2
+    image: clickhouse/clickhouse-server:26.3.7
     container_name: rybbit-clickhouse
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
@@ -25,7 +25,8 @@ services:
       - ALL
     cap_add: []
     volumes:
-      - $REPO_PATH/configs/rybbit/clickhouse:/etc/clickhouse-server/config.d:ro
+      - $REPO_PATH/configs/clickhouse-optimized/clickhouse-server:/etc/clickhouse-server/config.d:ro
+      - $REPO_PATH/configs/clickhouse-optimized/clickhouse-users/zz_disable_query_logging.xml:/etc/clickhouse-server/users.d/zz_disable_query_logging.xml:ro
       - $REPO_PATH/appdata/rybbit/clickhouse:/var/lib/clickhouse
     environment:
       TZ: $TZ
@@ -42,7 +43,7 @@ services:
           "--spider",
           "http://localhost:8123/ping",
         ]
-      interval: 30s
+      interval: 60s
       timeout: 5s
       retries: 5
       start_period: 5s
