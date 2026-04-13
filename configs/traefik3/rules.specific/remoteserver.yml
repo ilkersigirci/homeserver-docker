@@ -83,7 +83,7 @@ http:
     pocket-id-svc:
       loadBalancer:
         servers:
-          - url: "http://100.64.0.17:1000"
+          - url: "http://100.64.0.12:1000"
         # healthCheck:
         #   path: "/healthz"
         #   interval: "30s"
@@ -92,14 +92,14 @@ http:
     # jellyfin-svc:
     #   loadBalancer:
     #     servers:
-    #       # - url: "http://100.64.0.19:1002"
+    #       # - url: "http://100.64.0.9:1002"
 
     immich-public-proxy-svc:
       loadBalancer:
         servers:
-          - url: "http://100.64.0.19:1003"
+          - url: "http://100.64.0.9:1003"
 
     splitpro-svc:
       loadBalancer:
         servers:
-          - url: "http://100.64.0.19:1004"
+          - url: "http://100.64.0.9:1004"

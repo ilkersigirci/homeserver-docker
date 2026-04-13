@@ -1,3 +1,4 @@
+# TODO: enable strict_sni_check: https://www.reddit.com/r/AdGuardHome/comments/1shenvp/how_i_secured_my_public_adguard_home_instance/
 services:
   adguardhome:
     image: adguard/adguardhome:v0.107.73
