@@ -88,7 +88,7 @@ services:
       FORGEJO__database__USER: postgres
       FORGEJO__database__PASSWD: postgres
       FORGEJO__service__DISABLE_REGISTRATION: false
-      FORGEJO__service__REQUIRE_SIGNIN_VIEW: true
+      FORGEJO__service__REQUIRE_SIGNIN_VIEW: false
       FORGEJO__service__ENABLE_INTERNAL_SIGNIN: false
       FORGEJO__service__ALLOW_ONLY_EXTERNAL_REGISTRATION: true
       FORGEJO__openid__ENABLE_OPENID_SIGNIN: false
