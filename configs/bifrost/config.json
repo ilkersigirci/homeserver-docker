@@ -86,12 +86,12 @@
         {
           "name": "vllm-key",
           "value": "dummy",
-          "models": ["Qwen3.5-35B-A3B"],
+          "models": ["Qwen3.6-35B-A3B"],
           "weight": 1.0
         }
       ],
       "network_config": {
-        "base_url": "env.OPENAI_QWEN_3_5_35B_A3B_BASE_URL",
+        "base_url": "env.OPENAI_QWEN_3_6_35B_A3B_BASE_URL",
         "default_request_timeout_in_seconds": 60
       },
       "custom_provider_config": {
