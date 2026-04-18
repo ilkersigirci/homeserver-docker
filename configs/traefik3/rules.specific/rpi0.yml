@@ -62,22 +62,6 @@ http:
         - chain-no-auth-relaxed
       service: home-assistant-svc
 
-    gotify-rtr:
-      rule: "Host(`gotify.{{env "BASE_DOMAINNAME"}}`)"
-      entryPoints:
-        - websecure
-      middlewares:
-        - chain-no-auth-relaxed
-      service: gotify-svc
-
-    aiostreams-rtr:
-      rule: "Host(`aiostreams.{{env "BASE_DOMAINNAME"}}`)"
-      entryPoints:
-        - websecure
-      middlewares:
-        - chain-no-auth-relaxed
-      service: aiostreams-svc
-
     cam0-rtr:
       rule: "Host(`cam0.{{env "DOMAINNAME"}}`)"
       entryPoints:
@@ -158,15 +142,7 @@ http:
         servers:
           - url: "http://192.168.2.12:8123"
 
-    gotify-svc:
-      loadBalancer:
-        servers:
-          - url: "http://100.64.0.1:1005"
 
-    aiostreams-svc:
-      loadBalancer:
-        servers:
-          - url: "http://100.64.0.1:1006"
 
     cam0-svc:
       loadBalancer:
