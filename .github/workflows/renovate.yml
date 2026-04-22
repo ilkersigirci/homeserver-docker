@@ -1,29 +1,48 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
 name: Renovate
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - renovate.json
+      - .github/workflows/renovate.yml
+  schedule:
+    - cron: "0 * * * *"
   workflow_dispatch:
     inputs:
-      dry_run:
-        description: "Run Renovate in dry-run mode (no branches, PRs, or issues)"
-        required: false
-        default: "false"
+      dryRun:
+        description: Dry Run
+        type: boolean
+        default: false
+        required: true
+      logLevel:
+        description: Log Level
         type: choice
+        default: info
         options:
-          - "false"
-          - "true"
-  schedule:
-    - cron: "23 */4 * * *"
+          - debug
+          - info
+        required: true
+      version:
+        description: Renovate Version
+        default: latest
+        required: true
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
 
 jobs:
-  renovate:
+  main:
+    name: Renovate
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Validate auth secret configuration
         shell: bash
         run: |
@@ -33,21 +52,21 @@ jobs:
             exit 1
           fi
 
-      - name: Self-hosted Renovate (dry-run)
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == 'true' }}
-        uses: renovatebot/github-action@v46.1.10
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
-          configurationFile: .github/workflows/renovate-global.js
-          token: ${{ secrets.RENOVATE_TOKEN }}
-        env:
-          LOG_LEVEL: info
-          RENOVATE_DRY_RUN: full
+          persist-credentials: false
 
-      - name: Self-hosted Renovate
-        if: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run != 'true' }}
+      - name: Run Renovate
         uses: renovatebot/github-action@v46.1.10
-        with:
-          configurationFile: .github/workflows/renovate-global.js
-          token: ${{ secrets.RENOVATE_TOKEN }}
         env:
-          LOG_LEVEL: info
+          LOG_LEVEL: ${{ inputs.logLevel || 'info' }}
+          RENOVATE_AUTODISCOVER: true
+          RENOVATE_AUTODISCOVER_FILTER: ${{ github.repository }}
+          RENOVATE_DRY_RUN: ${{ inputs.dryRun || false }}
+          RENOVATE_INTERNAL_CHECKS_FILTER: strict
+          RENOVATE_PLATFORM: github
+          RENOVATE_PLATFORM_COMMIT: true
+        with:
+          token: ${{ secrets.RENOVATE_TOKEN }}
+          renovate-version: ${{ inputs.version || 'latest' }}
