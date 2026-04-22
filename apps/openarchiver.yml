@@ -108,7 +108,7 @@ services:
       - "7700"
 
   openarchiver-tika:
-    image: apache/tika:3.2.2.0-full@sha256:ffab324253edc54706e8882dd28190b1e6559c344b5315ae8a74b9efda9e7291
+    image: apache/tika:3.3.0.0-full@sha256:ecdd37e204308266b1f8e28569f8516ebd5b96d7a4518a71d3904710b20c03b3
     container_name: openarchiver-tika
     restart: $RESTART_POLICY_MEDIA
     profiles:
