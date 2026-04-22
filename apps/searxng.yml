@@ -58,7 +58,7 @@ services:
       glance.description: "Free internet metasearch engine"
 
   searxng-valkey:
-    image: docker.io/valkey/valkey:8-alpine@sha256:1cb6b20b70d927560cc4cc5397b5f045e74aa603ff7696274778880bb6fadc75
+    image: docker.io/valkey/valkey:9-alpine@sha256:e1095c6c76ee982cb2d1e07edbb7fb2a53606630a1d810d5a47c9f646b708bf5
     container_name: searxng-valkey
     command: valkey-server --save 30 1 --loglevel warning
     restart: $RESTART_POLICY_PROGRAMMING
