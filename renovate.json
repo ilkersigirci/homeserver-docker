@@ -1,0 +1,13 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:best-practices"],
+  "enabledManagers": ["docker-compose"],
+  "includePaths": ["apps/**"],
+  "docker-compose": {
+    "managerFilePatterns": ["/^apps\\/.*\\.ya?ml$/"]
+  },
+  "major": {
+    "dependencyDashboardApproval": true
+  },
+  "labels": ["dependencies", "docker", "renovate"]
+}
