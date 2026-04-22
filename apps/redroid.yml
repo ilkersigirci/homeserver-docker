@@ -3,7 +3,7 @@ services:
   # scrcpy -s localhost:5555
   redroid:
     container_name: redroid
-    image: redroid/redroid:13.0.0-latest@sha256:41e5f0c1ff27a4a474c474e5595168cedf6c40fc5dd102c5617f48c80f511e9e
+    image: redroid/redroid:16.0.0-latest@sha256:d89f520484bd16aac244e9832a150f72a8b9296f0b4439f3667c8181d1f3b77f
     restart: unless-stopped
     profiles:
       - android
