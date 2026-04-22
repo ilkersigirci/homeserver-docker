@@ -10,6 +10,8 @@ It standardizes:
 
 Run commands from repo root: `/home/ilker/docker`.
 
+See also: [Database Script Reference](../scripts/database/README.md)
+
 ## 1) Required Inputs
 
 Set these first:
@@ -32,6 +34,48 @@ PUID="$(awk -F= '/^PUID=/{print $2}' "$ENV_FILE")"
 PGID="$(awk -F= '/^PGID=/{print $2}' "$ENV_FILE")"
 ```
 
+Safety preflight (required before any root-level `docker run` file operations):
+
+```bash
+DATA_DIR="$(realpath -m "$DATA_DIR")"
+REPO_DATA_ROOT="$(realpath -m "$REPO_PATH/data")"
+
+[[ "$DATA_DIR" == "$REPO_DATA_ROOT/"* ]] || {
+  echo "Refusing DATA_DIR outside repo data root: $DATA_DIR"
+  exit 1
+}
+[[ "$DATA_DIR" != "$REPO_DATA_ROOT" ]] || {
+  echo "Refusing DATA_DIR at repo data root: $DATA_DIR"
+  exit 1
+}
+[[ "$DATA_DIR" != "/" ]] || {
+  echo "Refusing DATA_DIR=/"
+  exit 1
+}
+[ -d "$DATA_DIR" ] || {
+  echo "Missing DATA_DIR: $DATA_DIR"
+  exit 1
+}
+
+RESOLVED_DB_BIND="$(
+  COMPOSE_PROFILES="$PROFILES" docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" config --format json \
+  | jq -r --arg svc "$SERVICE" '
+      .services[$svc].volumes[]?
+      | select(.type=="bind" and .target=="/var/lib/postgresql")
+      | .source
+    ' | head -n1
+)"
+[[ -n "$RESOLVED_DB_BIND" && "$RESOLVED_DB_BIND" != "null" ]] || {
+  echo "Could not resolve /var/lib/postgresql bind source for service: $SERVICE"
+  exit 1
+}
+RESOLVED_DB_BIND="$(realpath -m "$RESOLVED_DB_BIND")"
+[[ "$RESOLVED_DB_BIND" == "$DATA_DIR" ]] || {
+  echo "DATA_DIR mismatch. Compose resolved: $RESOLVED_DB_BIND, provided: $DATA_DIR"
+  exit 1
+}
+```
+
 ## 2) Canonical Compose Pattern for Postgres 18.3
 
 For DB services on `postgres:18.3`, use this pattern:
@@ -48,7 +92,10 @@ For DB services on `postgres:18.3`, use this pattern:
 
 ## 3) Major Upgrade Procedure (Dump/Restore)
 
-Use repository script:
+Use repository script.
+For option details and additional examples, see [Database Script Reference](../scripts/database/README.md).
+
+Run:
 
 ```bash
 scripts/database/postgres-upgrade-major.sh \
@@ -88,6 +135,7 @@ COMPOSE_PROFILES="$PROFILES" docker compose -f "$COMPOSE_FILE" --env-file "$ENV_
 Migrate layout (works for both legacy root and `data/` layouts):
 
 ```bash
+# DATA_DIR is expected to be preflight-validated above.
 [ -d "$DATA_DIR" ] || { echo "Missing DATA_DIR: $DATA_DIR"; exit 1; }
 
 docker run --rm --user 0:0 -v "$DATA_DIR":/mnt "$NEW_IMAGE" bash -lc '
@@ -130,6 +178,7 @@ COMPOSE_PROFILES="$PROFILES" docker compose -f "$COMPOSE_FILE" --env-file "$ENV_
 If logs show `Permission denied` during init (`initdb`/`chmod` on data dir), fix bind ownership:
 
 ```bash
+# DATA_DIR is expected to be preflight-validated above.
 docker run --rm --user 0:0 -v "$DATA_DIR":/mnt "$NEW_IMAGE" bash -lc '
 chown -R '"$PUID:$PGID"' /mnt
 chmod 700 /mnt
@@ -155,7 +204,7 @@ Expected:
 Also validate compose syntax after edits:
 
 ```bash
-COMPOSE_PROFILES=core,desktop_apps,maintenance,media,monitoring,programming,reading,others \
+COMPOSE_PROFILES="$PROFILES" \
 docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" config >/tmp/compose-config.yaml
 ```
 
@@ -178,3 +227,4 @@ If needed, restore from SQL backup generated in `backups/postgres/`.
 - Never use `postgres:18.3` with bind target `/var/lib/postgresql/data` in this repo.
 - For Postgres 18+, always use mount target `/var/lib/postgresql` and let container manage `18/docker`.
 - Keep `.gitkeep` inside each DB bind directory so Git tracks empty dirs.
+- Always run the DATA_DIR preflight checks before any root-level `docker run` that mutates files.
