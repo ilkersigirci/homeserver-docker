@@ -1,6 +1,6 @@
 services:
   localstack-s3:
-    image: gresau/localstack-persist:3@sha256:7750acf7089e75c9584e671d4594d54c8776b8a4bc57a0c18e4e92cff3d17267
+    image: gresau/localstack-persist:4@sha256:02045e045f1f3868c3cadef78de2a7c048840f48ffd506babf4a36f42a4845ba
     container_name: localstack-s3
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
