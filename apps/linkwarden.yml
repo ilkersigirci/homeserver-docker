@@ -1,19 +1,17 @@
 services:
-  # TODO: Move to postgres 16.4
   linkwarden-db:
     container_name: linkwarden-db
-    image: postgres:18-alpine@sha256:54451ecb8ab38c24c3ec123f2fd501303a3a1856a5c66e98cecf2460d5e1e9d7
+    image: postgres:18.3@sha256:059fa0289cc5a184034e05a1f4f6d6fd79f69dc718b8b04ab60b6b469eed411e
     restart: $RESTART_POLICY_OTHERS
     profiles:
-      - custom-user
       - reading
     networks:
       - t3_proxy
-    user: postgres
+    user: $PUID:$PGID
     read_only: true
     tmpfs:
-      - /tmp
-      - /var/run/postgresql
+      - /tmp:uid=$PUID,gid=$PGID,mode=1777
+      - /var/run/postgresql:uid=$PUID,gid=$PGID,mode=775
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -26,7 +24,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
     volumes:
-      - $REPO_PATH/data/linkwarden-db:/var/lib/postgresql/data
+      - $REPO_PATH/data/linkwarden-db:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
