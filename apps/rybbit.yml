@@ -1,7 +1,7 @@
 # After first user creation, disable signup: RYBBIT_DISABLE_SIGNUP=true
 services:
   rybbit-clickhouse:
-    image: clickhouse/clickhouse-server:26.3.7@sha256:040c496e7387398e3b504810ead7f29e1cad6f260c74b6659e3f14dd3411b1cb
+    image: clickhouse/clickhouse-server:26.3.9@sha256:537014a67ce8bf1f5c79c2e2b26fb30b8285a86ffff03875bb14ed17ea35db62
     container_name: rybbit-clickhouse
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
