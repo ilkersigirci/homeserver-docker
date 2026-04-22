@@ -25,6 +25,7 @@ services:
     environment:
       PUID: $PUID
       PGID: $PGID
+      TZ: $TZ
       APP_URL: https://arcane.$DOMAINNAME
       PORT: 3552
       DOCKER_HOST: tcp://docker-socket-proxy-exec:2375
