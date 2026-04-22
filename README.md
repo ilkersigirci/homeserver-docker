@@ -7,7 +7,8 @@ Compose-based homelab repository for running services across multiple machines (
 ## How It Works
 
 - Each machine has an entry compose file in `compose/`.
-- Machine files define shared networks and `include` service fragments from `apps/`.
+- Machine files define shared networks and `include` active service fragments from `apps/`.
+- Service fragments not currently included by any host compose file are parked in `apps-not-used/`.
 - Service fragments are grouped by compose profiles (`core`, `desktop_apps`, `maintenance`, `media`, `monitoring`, `programming`, `reading`, `others`).
 - Runtime configs live in `configs/`; persistent state lives in `appdata/` and `data/`.
 
@@ -35,7 +36,8 @@ bash scripts/docker-manage.sh prep-perms
 ## Repository Layout
 
 - `compose/` machine-level stack entrypoints
-- `apps/` service compose fragments (one file per app)
+- `apps/` active service compose fragments referenced by host files
+- `apps-not-used/` parked service compose fragments not referenced by host files
 - `configs/` service configuration files
 - `scripts/` operational scripts and maintenance tooling
 - `Dockerfiles/` custom image definitions

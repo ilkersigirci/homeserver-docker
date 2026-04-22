@@ -17,7 +17,7 @@ The core idea is to keep one source of truth while separating:
 
 Deployment is host-driven:
 - each host uses `compose/<host>.yml`
-- the host file defines networks and includes app fragments from `apps/`
+- the host file defines networks and includes active app fragments from `apps/`
 - profiles decide which groups of services are active
 
 ## Codemap
@@ -26,8 +26,11 @@ Deployment is host-driven:
   - Entry points per host (`gpu.yml`, `nas.yml`, `remoteserver.yml`, etc.).
   - Defines shared networks and the selected app fragments for that machine.
 - `apps/`
-  - One compose fragment per app/service.
+  - Active compose fragments referenced by one or more host files.
   - Holds service runtime options, labels, mounts, environment, profiles, and hardening settings.
+- `apps-not-used/`
+  - Parked compose fragments not currently referenced by host files.
+  - Keep these here instead of deleting when a service is temporarily unused.
 - `configs/`
   - Versioned service configuration mounted into containers.
 - `scripts/`
@@ -58,6 +61,7 @@ Deployment is host-driven:
 
 - Machine files compose services; app files define services.
 - Service selection is done by host includes and profiles, not by duplicating service definitions per host.
+- Host compose `include` entries should reference `apps/` only. Parked files belong in `apps-not-used/`.
 - Bind mounts should use repository-based paths (`$REPO_PATH/...`) for predictable layout.
 - Prefer hardened container defaults (`read_only`, `no-new-privileges`, dropped capabilities) unless a service documents an exception.
 - Telemetry-capable services should send OTLP to local `otel-collector-agent`.
@@ -81,6 +85,8 @@ Deployment is host-driven:
   - edit `compose/<host>.yml` include list.
 - Change runtime behavior of one service:
   - edit `apps/<service>.yml` and matching `configs/<service>/`.
+- Park or unpark a service fragment:
+  - move `apps/<service>.yml` <-> `apps-not-used/<service>.yml`, then keep compose include lists aligned.
 - Change ingress/routing/TLS behavior:
   - edit `apps/traefik.yml` and `configs/traefik3/`.
 - Change deploy/operations workflow:
