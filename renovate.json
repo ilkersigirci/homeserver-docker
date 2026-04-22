@@ -1,8 +1,8 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:best-practices"],
-  "enabledManagers": ["docker-compose"],
-  "includePaths": ["apps/**"],
+  "enabledManagers": ["docker-compose", "github-actions"],
+  "includePaths": ["apps/**", ".github/workflows/**"],
   "docker-compose": {
     "managerFilePatterns": ["/^apps\\/.*\\.ya?ml$/"]
   },

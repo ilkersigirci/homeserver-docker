@@ -1,0 +1,53 @@
+name: Renovate
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Run Renovate in dry-run mode (no branches, PRs, or issues)"
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+  schedule:
+    - cron: "23 */4 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  renovate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate auth secret configuration
+        shell: bash
+        run: |
+          if [ -z "${{ secrets.RENOVATE_TOKEN }}" ]; then
+            echo "Missing Renovate auth."
+            echo "Set RENOVATE_TOKEN (classic PAT with repo + workflow scopes)."
+            exit 1
+          fi
+
+      - name: Self-hosted Renovate (dry-run)
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run == 'true' }}
+        uses: renovatebot/github-action@v46.1.10
+        with:
+          configurationFile: .github/workflows/renovate-global.js
+          token: ${{ secrets.RENOVATE_TOKEN }}
+        env:
+          LOG_LEVEL: info
+          RENOVATE_DRY_RUN: full
+
+      - name: Self-hosted Renovate
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.dry_run != 'true' }}
+        uses: renovatebot/github-action@v46.1.10
+        with:
+          configurationFile: .github/workflows/renovate-global.js
+          token: ${{ secrets.RENOVATE_TOKEN }}
+        env:
+          LOG_LEVEL: info
