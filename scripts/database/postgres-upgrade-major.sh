@@ -358,24 +358,35 @@ done
 restore_log="$(mktemp /tmp/postgres-restore.XXXXXX.log)"
 restore_exit=0
 
+run_restore_psql() {
+  local mode="$1"
+  local psql_args=(-U "$db_user" -d postgres)
+
+  if [[ "$mode" == "strict" ]]; then
+    psql_args=(-v ON_ERROR_STOP=1 "${psql_args[@]}")
+  fi
+
+  set +e
+  if [[ "$backup_file" == *.gz ]]; then
+    gunzip -c "$backup_file" | docker exec -i "$new_container_name" psql "${psql_args[@]}" >"$restore_log" 2>&1
+    restore_exit=$?
+  else
+    cat "$backup_file" | docker exec -i "$new_container_name" psql "${psql_args[@]}" >"$restore_log" 2>&1
+    restore_exit=$?
+  fi
+  set -e
+}
+
 log "Restoring backup (strict mode): $backup_file"
-if [[ "$backup_file" == *.gz ]]; then
-  if ! gunzip -c "$backup_file" | docker exec -i "$new_container_name" psql -v ON_ERROR_STOP=1 -U "$db_user" -d postgres >"$restore_log" 2>&1; then
-    restore_exit=$?
-  fi
-else
-  if ! cat "$backup_file" | docker exec -i "$new_container_name" psql -v ON_ERROR_STOP=1 -U "$db_user" -d postgres >"$restore_log" 2>&1; then
-    restore_exit=$?
-  fi
-fi
+run_restore_psql strict
 
 if [[ "$restore_exit" -ne 0 ]]; then
   if rg -q '^ERROR:  role "postgres" already exists$|^ERROR:  database "postgres" already exists$' "$restore_log"; then
     log "Strict restore hit expected bootstrap conflicts. Retrying restore in permissive mode."
-    if [[ "$backup_file" == *.gz ]]; then
-      gunzip -c "$backup_file" | docker exec -i "$new_container_name" psql -U "$db_user" -d postgres >"$restore_log" 2>&1
-    else
-      cat "$backup_file" | docker exec -i "$new_container_name" psql -U "$db_user" -d postgres >"$restore_log" 2>&1
+    run_restore_psql permissive
+    if [[ "$restore_exit" -ne 0 ]]; then
+      tail -n 40 "$restore_log" >&2
+      err "Permissive restore failed. See log: $restore_log"
     fi
   else
     tail -n 40 "$restore_log" >&2

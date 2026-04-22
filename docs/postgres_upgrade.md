@@ -92,6 +92,11 @@ For DB services on `postgres:18.3`, use this pattern:
 
 ## 3) Major Upgrade Procedure (Dump/Restore)
 
+Critical ordering:
+- Run this workflow **before** changing the DB service image in app compose files to the new major version.
+- Keep DB service runnable on the old major so backup can be taken from a healthy source container.
+- After script success, commit/update compose image to the new major.
+
 Use repository script.
 For option details and additional examples, see [Database Script Reference](../scripts/database/README.md).
 
@@ -116,6 +121,11 @@ Script behavior:
 4. starts DB on target image
 5. restores backup
 6. restarts writers
+
+Restore behavior:
+- script first restores in strict mode (`ON_ERROR_STOP=1`)
+- if strict mode hits expected bootstrap conflicts (`role/database postgres already exists`), it retries in permissive mode
+- any other strict-mode failure aborts the upgrade
 
 ## 4) Postgres 18 Layout Migration (Critical)
 
@@ -200,6 +210,23 @@ Expected:
 - DB container is `Up` and `(healthy)` if healthcheck exists
 - logs include `database system is ready to accept connections`
 - writer logs show successful DB init/connection
+
+Home Assistant recorder check (recommended when upgrading `home-assistant-db`):
+
+```bash
+docker exec "$SERVICE" psql -U postgres -d postgres -P pager=off -c "
+SELECT to_timestamp(min(last_updated_ts)) AS min_state_ts,
+       to_timestamp(max(last_updated_ts)) AS max_state_ts,
+       count(*) AS states_total
+FROM states;
+SELECT to_timestamp(min(start_ts)) AS min_short_ts,
+       to_timestamp(max(start_ts)) AS max_short_ts,
+       count(*) AS statistics_short_term_total
+FROM statistics_short_term;
+"
+```
+
+Ensure date ranges and row counts are consistent with pre-upgrade expectations.
 
 Also validate compose syntax after edits:
 
