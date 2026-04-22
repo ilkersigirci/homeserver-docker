@@ -1,6 +1,6 @@
 services:
   filestash-wopi-server:
-    image: collabora/code:24.04.13.3.1@sha256:c918662331cbd13b28ef2f7d2d7d91055948adfcadaff21c687cbbbe08258729
+    image: collabora/code:25.04.9.4.1@sha256:fe49c08c27e102c1877ad4ef2ac1a7bd8ccd2dfaa6641d4533389c204a92bb88
     container_name: filestash-wopi-server
     restart: $RESTART_POLICY_MEDIA
     user: root
