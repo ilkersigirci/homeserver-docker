@@ -1,6 +1,6 @@
 services:
   restfox:
-    image: flawiddsouza/restfox:0.14.1@sha256:d4c7ac3d2105810394ec2bfea479380887617dc2731e34cd9f1af2ef43e6e999
+    image: flawiddsouza/restfox:0.40.0@sha256:ed62ac9830dbd0ec052e22c67c32715f0d14b8b4adb28c3d27fe020a28ae22e3
     container_name: restfox
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
