@@ -1,6 +1,6 @@
 services:
   home-assistant-db:
-    image: postgres:16.4@sha256:e62fbf9d3e2b49816a32c400ed2dba83e3b361e6833e624024309c35d334b412
+    image: postgres:16.13@sha256:86f4d9ad58cb9023f6d36ac428555680a4aac6daccce4d3e2b0768c15b1bb092
     container_name: home-assistant-db
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
