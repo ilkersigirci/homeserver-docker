@@ -3,7 +3,7 @@ services:
   # Don't forget to set `net.ipv4.ip_forward=1` in your host machine.
   # For WG_DEVICE, run the command on the host machine: ip route get 8.8.8.8 | awk '{print $5}'
   wg-easy-14:
-    image: ghcr.io/wg-easy/wg-easy:14@sha256:5f26407fd2ede54df76d63304ef184576a6c1bb73f934a58a11abdd852fab549
+    image: ghcr.io/wg-easy/wg-easy:15@sha256:cf815209439101842f81d62bb25f7d66140e4cf8c100b4de5d0e84569d38732a
     container_name: wg-easy-14
     restart: $RESTART_POLICY_CORE
     profiles:
@@ -70,7 +70,7 @@ services:
   # To access the machines in the host machine: ip route add 10.8.0.0/24 via 192.168.90.91
   # and probably add this line to /etc/network/interfaces or rc.local
   wg-easy-14-no-host:
-    image: ghcr.io/wg-easy/wg-easy:14@sha256:5f26407fd2ede54df76d63304ef184576a6c1bb73f934a58a11abdd852fab549
+    image: ghcr.io/wg-easy/wg-easy:15@sha256:cf815209439101842f81d62bb25f7d66140e4cf8c100b4de5d0e84569d38732a
     container_name: wg-easy-14-no-host
     restart: $RESTART_POLICY_CORE
     profiles:
