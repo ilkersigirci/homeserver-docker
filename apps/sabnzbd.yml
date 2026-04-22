@@ -2,7 +2,7 @@
 # NOTE: In sabnzb.ini file -> host_whitelist add: sabnzbd.$DOMAINNAME, sabnzbd
 services:
   sabnzbd:
-    image: lscr.io/linuxserver/sabnzbd:latest@sha256:7ac6fe8a521c7099e1768af90529dfee5976b87c7dccffdcc9ced00149e1aedb
+    image: lscr.io/linuxserver/sabnzbd:4.5.5-ls249@sha256:7ac6fe8a521c7099e1768af90529dfee5976b87c7dccffdcc9ced00149e1aedb
     container_name: sabnzbd
     restart: $RESTART_POLICY_MEDIA
     hostname: sabnzbd.$DOMAINNAME

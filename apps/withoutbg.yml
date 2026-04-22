@@ -1,6 +1,6 @@
 services:
   withoutbg:
-    image: withoutbg/app:latest@sha256:6aae7b11c45f2ad90fc03a57c98f9e9b80d7edf9e97f66d835ce989e1b52e4cf
+    image: withoutbg/app:1.3.1@sha256:6aae7b11c45f2ad90fc03a57c98f9e9b80d7edf9e97f66d835ce989e1b52e4cf
     container_name: withoutbg
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:

@@ -3,7 +3,7 @@ services:
   # After starting container for first time dexec and mysqladmin -u root password <password>
   mariadb:
     container_name: mariadb
-    image: linuxserver/mariadb:latest@sha256:c45132cefda1fc6e2034539631fa769070f37d9f673100dba7c0f7077c2e8b8c
+    image: linuxserver/mariadb:11.4.10-r0-ls213@sha256:c45132cefda1fc6e2034539631fa769070f37d9f673100dba7c0f7077c2e8b8c
     restart: unless-stopped
     hostname: mariadb
     profiles:
@@ -34,7 +34,7 @@ services:
   # Redis - Key-value Store
   redis:
     container_name: redis
-    image: redis:latest@sha256:125f446fbd4c4345cdbd0f60c61ed83c35a10e09436dd797e0e82377325034f5
+    image: redis:8@sha256:125f446fbd4c4345cdbd0f60c61ed83c35a10e09436dd797e0e82377325034f5
     restart: unless-stopped
     profiles:
       - nextcloud

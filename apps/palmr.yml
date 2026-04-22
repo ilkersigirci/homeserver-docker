@@ -1,6 +1,6 @@
 services:
   palmr:
-    image: kyantech/palmr:latest@sha256:043dd6cdbb4d9985b376915020fb26c2037b19876674273eac310ab04cdf16f4
+    image: kyantech/palmr:v3.3.2-beta@sha256:043dd6cdbb4d9985b376915020fb26c2037b19876674273eac310ab04cdf16f4
     container_name: palmr
     restart: $RESTART_POLICY_MEDIA
     profiles:

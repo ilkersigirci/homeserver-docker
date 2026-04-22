@@ -2,7 +2,7 @@ services:
   # NOTE: sudo chown -R 33:33 $REPO_PATH/appdata/many-notes
   many-notes:
     container_name: many-notes
-    image: brufdev/many-notes:latest@sha256:2b40c79e4e68193199f95e2d8773f98fc6a63536de135c46dcea8eb7af20cff0
+    image: brufdev/many-notes:0.15@sha256:2b40c79e4e68193199f95e2d8773f98fc6a63536de135c46dcea8eb7af20cff0
     # restart: $RESTART_POLICY_OTHERS
     restart: "no"
     profiles:

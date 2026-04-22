@@ -1,7 +1,7 @@
 services:
   chromium:
     container_name: chromium
-    image: lscr.io/linuxserver/ungoogled-chromium:latest@sha256:1a10cf258dfb276fe69ee943462dfca41e5968de55c7d03984abbb1f5f9646c0
+    image: lscr.io/linuxserver/ungoogled-chromium:147.0.7727.101-1-ls145@sha256:1a10cf258dfb276fe69ee943462dfca41e5968de55c7d03984abbb1f5f9646c0
     restart: $RESTART_POLICY_DESKTOP_IMAGES
     shm_size: "1gb"
     profiles:

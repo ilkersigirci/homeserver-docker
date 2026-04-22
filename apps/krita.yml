@@ -1,7 +1,7 @@
 services:
   krita:
     container_name: krita
-    image: lscr.io/linuxserver/krita:latest@sha256:a905efdd90f4e75471db059b68a787931228731e1aa73ed4b4482bfa2588ae04
+    image: lscr.io/linuxserver/krita:5.3.1-ls127@sha256:a905efdd90f4e75471db059b68a787931228731e1aa73ed4b4482bfa2588ae04
     restart: $RESTART_POLICY_DESKTOP_IMAGES
     networks:
       - t3_proxy

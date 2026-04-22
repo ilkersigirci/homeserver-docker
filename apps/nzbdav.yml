@@ -1,7 +1,7 @@
 # TODO: Harden
 services:
   nzbdav:
-    image: nzbdav/nzbdav:latest@sha256:fc44a9d33adceddc4397eb660b4fcaf1917e23323fb80dea0645f56db129562f
+    image: nzbdav/nzbdav:0.6.4@sha256:fc44a9d33adceddc4397eb660b4fcaf1917e23323fb80dea0645f56db129562f
     container_name: nzbdav
     restart: $RESTART_POLICY_MEDIA
     profiles:

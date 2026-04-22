@@ -1,7 +1,7 @@
 # In initial setup, go to /login/setup
 services:
   pocket-id:
-    image: ghcr.io/pocket-id/pocket-id:latest@sha256:1cc51e5b36fa7ec31368d3efb24ba362be6dce20f3cc0a2852843527bd5110f0
+    image: ghcr.io/pocket-id/pocket-id:v2.6.2@sha256:1cc51e5b36fa7ec31368d3efb24ba362be6dce20f3cc0a2852843527bd5110f0
     container_name: pocket-id
     restart: $RESTART_POLICY_CORE
     profiles:

@@ -1,6 +1,6 @@
 services:
   alertmanager:
-    image: prom/alertmanager:latest@sha256:58e117eabccebbff04e6643a3432d6315a2cc3a8c24ab5849bc628886bf08857
+    image: prom/alertmanager:v0.32.0@sha256:58e117eabccebbff04e6643a3432d6315a2cc3a8c24ab5849bc628886bf08857
     container_name: alertmanager
     restart: $RESTART_POLICY_MAINTENANCE
     networks:

@@ -1,6 +1,6 @@
 services:
   windows:
-    image: dockurr/windows:latest@sha256:20b398ab935465f97ec8ab06489f7a85a5ad58e74e036ce66cc3c9172e7dbea8
+    image: dockurr/windows:5.14@sha256:20b398ab935465f97ec8ab06489f7a85a5ad58e74e036ce66cc3c9172e7dbea8
     container_name: windows
     restart: $RESTART_POLICY_MAINTENANCE
     stop_grace_period: 2m

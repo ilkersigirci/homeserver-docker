@@ -1,6 +1,6 @@
 services:
   beets:
-    image: lscr.io/linuxserver/beets:latest@sha256:49ba964b32ee7c44256619d5fda3db677072f21a92196846e81960b86604e1ad
+    image: lscr.io/linuxserver/beets:2.10.0-ls326@sha256:49ba964b32ee7c44256619d5fda3db677072f21a92196846e81960b86604e1ad
     container_name: beets
     restart: $RESTART_POLICY_MEDIA
     networks:

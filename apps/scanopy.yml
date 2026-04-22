@@ -1,7 +1,7 @@
 # NOTE: The daemon requires host networking + privileged mode for active discovery.
 services:
   scanopy-daemon:
-    image: ghcr.io/scanopy/scanopy/daemon:latest@sha256:f17495b5fe96f83b542ea30d8a798ccfa1163c5acb756a04a28520df31240950
+    image: ghcr.io/scanopy/scanopy/daemon:v0.16.1@sha256:f17495b5fe96f83b542ea30d8a798ccfa1163c5acb756a04a28520df31240950
     container_name: scanopy-daemon
     restart: $RESTART_POLICY_MAINTENANCE
     init: true
@@ -66,7 +66,7 @@ services:
       start_period: 10s
 
   scanopy:
-    image: ghcr.io/scanopy/scanopy/server:latest@sha256:92da6d69631a80dcada04399729db650e78bc1ea4caf0274001cae26791b1b7f
+    image: ghcr.io/scanopy/scanopy/server:v0.16.1@sha256:92da6d69631a80dcada04399729db650e78bc1ea4caf0274001cae26791b1b7f
     container_name: scanopy
     restart: $RESTART_POLICY_MAINTENANCE
     init: true

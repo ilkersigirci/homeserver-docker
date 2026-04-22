@@ -2,7 +2,7 @@
 # TODO: Enable admin UI. You must use IAM for that
 services:
   versitygw:
-    image: ghcr.io/versity/versitygw:latest@sha256:6bd4d92bb27ece3097be3c930ea702ebf275288b8711ec91421ccf81d6f36a42
+    image: ghcr.io/versity/versitygw:v1.4.0@sha256:6bd4d92bb27ece3097be3c930ea702ebf275288b8711ec91421ccf81d6f36a42
     container_name: versitygw
     restart: $RESTART_POLICY_MEDIA
     # command: --version

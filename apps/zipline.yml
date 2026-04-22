@@ -35,7 +35,7 @@ services:
       retries: 3
 
   zipline:
-    image: ghcr.io/diced/zipline:latest@sha256:ac1757a5973f1dcbe015466caef9249439b6f539ea605fad6c4e00a37fdb3bf5
+    image: ghcr.io/diced/zipline:4.5.3@sha256:ac1757a5973f1dcbe015466caef9249439b6f539ea605fad6c4e00a37fdb3bf5
     container_name: zipline
     restart: $RESTART_POLICY_MEDIA
     depends_on:

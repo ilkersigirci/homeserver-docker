@@ -108,7 +108,7 @@ services:
   # https://github.com/Salvoxia/immich-folder-album-creator
   immich-folder-album-creator:
     container_name: immich-folder-album-creator
-    image: salvoxia/immich-folder-album-creator:latest@sha256:79b82f9818ded34c8dcfc5df0502126fdaff698b94ddad4b20ac1f0c3a7dcba2
+    image: salvoxia/immich-folder-album-creator:0.25.2@sha256:79b82f9818ded34c8dcfc5df0502126fdaff698b94ddad4b20ac1f0c3a7dcba2
     user: $PUID:$PGID
     security_opt:
       - no-new-privileges:true
@@ -136,7 +136,7 @@ services:
   # NOTE: On Immich -> Admin -> Settings -> Server Settings -> External Domain
   immich-public-proxy:
     container_name: immich-public-proxy
-    image: alangrainger/immich-public-proxy:latest@sha256:add80c37eb2cc6d1e9622f3590ba4ee72c94a765c51a3b5e1afc485a4ec89135
+    image: alangrainger/immich-public-proxy:1.15.5@sha256:add80c37eb2cc6d1e9622f3590ba4ee72c94a765c51a3b5e1afc485a4ec89135
     user: $PUID:$PGID
     security_opt:
       - no-new-privileges:true

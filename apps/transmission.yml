@@ -3,7 +3,7 @@ services:
   # Diffent GUIs in web home:
   # /combustion-release/ -- /transmission-web-control/ -- /kettu/ -- /flood-for-transmission/
   transmission:
-    image: lscr.io/linuxserver/transmission:latest@sha256:dd888c17f97eca1a2dda4aa7986c9080fe1b69a61aef845440f1bd9285aa3708
+    image: lscr.io/linuxserver/transmission:4.1.1-r1-ls340@sha256:dd888c17f97eca1a2dda4aa7986c9080fe1b69a61aef845440f1bd9285aa3708
     container_name: transmission
     # cpus: "0.5"
     mem_reservation: "4096M"

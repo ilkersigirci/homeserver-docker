@@ -2,7 +2,7 @@ services:
   # Traefik Certs Dumper - Extract LetsEncrypt Certificates - traefik3 Compatible
   certdumper:
     container_name: traefik_certdumper
-    image: humenius/traefik-certs-dumper:latest@sha256:a3dc8b7eb82b10520cdb039c29a6e7037d5f5db50171cfedbf7baf3df20e9b3d
+    image: humenius/traefik-certs-dumper:1.6.1@sha256:a3dc8b7eb82b10520cdb039c29a6e7037d5f5db50171cfedbf7baf3df20e9b3d
     network_mode: none
     profiles:
       - maintenance

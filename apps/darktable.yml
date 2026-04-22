@@ -1,7 +1,7 @@
 services:
   darktable:
     container_name: darktable
-    image: lscr.io/linuxserver/darktable:latest@sha256:d2ea6555c5537bf2e917abbada3256921758d758128d0973032bf1340cba5c65
+    image: lscr.io/linuxserver/darktable:25.4.1-2-ls224@sha256:d2ea6555c5537bf2e917abbada3256921758d758128d0973032bf1340cba5c65
     restart: $RESTART_POLICY_DESKTOP_IMAGES
     networks:
       - t3_proxy

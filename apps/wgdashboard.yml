@@ -7,7 +7,7 @@ services:
   # Default: PostUp = iptables -t nat -I POSTROUTING 1 -s 10.8.0.1/24 -o enp0s3 -j MASQUERADE; iptables -I FORWARD -i wg0 -o wg0 -j DROP
   # Default: PreDown = iptables -t nat -D POSTROUTING -s 10.8.0.1/24 -o enp0s3 -j MASQUERADE; iptables -D FORWARD -i wg0 -o wg0 -j DROP
   wgdashboard:
-    image: docker.io/donaldzou/wgdashboard:latest@sha256:4211067aee9ef374b2dd2a57aa6dbf8d41eeac6cddab395fbb9690a998fac572
+    image: docker.io/donaldzou/wgdashboard:v4.3.3@sha256:4211067aee9ef374b2dd2a57aa6dbf8d41eeac6cddab395fbb9690a998fac572
     container_name: wgdashboard
     restart: $RESTART_POLICY_CORE
     profiles:

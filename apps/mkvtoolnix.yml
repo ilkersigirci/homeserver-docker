@@ -1,7 +1,7 @@
 services:
   # Video Editing (Remuxing - changing media container while keeping original source quality)
   mkvtoolnix:
-    image: jlesage/mkvtoolnix:latest@sha256:c4d238f9b38d7ea23ae1df75ef7fee26c751cf3d0ab7631bb9fcb66296f66164
+    image: jlesage/mkvtoolnix:v26.04.1@sha256:c4d238f9b38d7ea23ae1df75ef7fee26c751cf3d0ab7631bb9fcb66296f66164
     container_name: mkvtoolnix
     restart: $RESTART_POLICY_MEDIA
     profiles:

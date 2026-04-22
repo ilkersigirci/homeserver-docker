@@ -4,7 +4,7 @@
 # NOTE: Add internal databases only using their docker container names (http:// shouldn't be included)
 services:
   pgadmin:
-    image: dpage/pgadmin4:latest@sha256:ff557f69d9808085dc3554f56c1b06a36ac8cddabe4485212920b9604261abdb
+    image: dpage/pgadmin4:9.14.0@sha256:ff557f69d9808085dc3554f56c1b06a36ac8cddabe4485212920b9604261abdb
     container_name: pgadmin
     restart: $RESTART_POLICY_PROGRAMMING
     user: 5050:5050

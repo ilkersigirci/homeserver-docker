@@ -1,6 +1,6 @@
 services:
   node-exporter:
-    image: prom/node-exporter:latest@sha256:e9cff4fc67b1818f8c97adb115b9f12c9a54b533de86765d4a0effc01b357205
+    image: prom/node-exporter:v1.11.1-busybox@sha256:e9cff4fc67b1818f8c97adb115b9f12c9a54b533de86765d4a0effc01b357205
     container_name: node-exporter
     restart: $RESTART_POLICY_MAINTENANCE
     networks:

@@ -19,7 +19,7 @@ services:
     # Fever api endpoint: fever/?api
   miniflux:
     container_name: miniflux
-    image: miniflux/miniflux:latest@sha256:8810dfe7f4d9979f9dc1385607695c116f049daa586c635a9a1fb3c58936b074
+    image: miniflux/miniflux:2.2.19@sha256:8810dfe7f4d9979f9dc1385607695c116f049daa586c635a9a1fb3c58936b074
     restart: $RESTART_POLICY_OTHERS
     profiles:
       - reading

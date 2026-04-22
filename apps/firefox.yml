@@ -1,7 +1,7 @@
 services:
   firefox:
     container_name: firefox
-    image: lscr.io/linuxserver/firefox:latest@sha256:b837700712b210c4830c6c821c19f088d977165960ea1a82e034bdf083b9f2eb
+    image: lscr.io/linuxserver/firefox:1149.0.2build1-1xtradeb1.2404.1-ls83@sha256:b837700712b210c4830c6c821c19f088d977165960ea1a82e034bdf083b9f2eb
     restart: $RESTART_POLICY_DESKTOP_IMAGES
     shm_size: "1gb"
     profiles:

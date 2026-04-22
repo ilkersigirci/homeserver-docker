@@ -5,7 +5,7 @@
 ## NOTE: Everytime you import data, you need to rebuild the HTML files to see the changes.
 services:
   strava-statistics:
-    image: robiningelbrecht/strava-statistics:latest@sha256:4d423cffb5faea15c926bdf4a93327c243ee08979de6e766f1218c2659d0edf3
+    image: robiningelbrecht/strava-statistics:v4.7.6@sha256:4d423cffb5faea15c926bdf4a93327c243ee08979de6e766f1218c2659d0edf3
     container_name: strava-statistics
     restart: $RESTART_POLICY_MEDIA
     profiles:

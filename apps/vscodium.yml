@@ -1,6 +1,6 @@
 services:
   vscodium:
-    image: lscr.io/linuxserver/vscodium:latest@sha256:3d67028cb8217eb266d6f3168b826fbf7f6063f681cdebc956f77ea4eefe8bce
+    image: lscr.io/linuxserver/vscodium:1.112.01907-ls270@sha256:3d67028cb8217eb266d6f3168b826fbf7f6063f681cdebc956f77ea4eefe8bce
     container_name: vscodium
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:

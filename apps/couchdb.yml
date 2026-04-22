@@ -1,6 +1,6 @@
 services:
   couchdb:
-    image: couchdb:latest@sha256:0ff2633acd380777f2c65af22eabb1d961569e05e25b12c5239b00a7f8b56d54
+    image: couchdb:3.5.1@sha256:0ff2633acd380777f2c65af22eabb1d961569e05e25b12c5239b00a7f8b56d54
     container_name: couchdb
     restart: $RESTART_POLICY_OTHERS
     profiles:

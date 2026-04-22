@@ -26,7 +26,7 @@ services:
       retries: 3
 
   oxicloud:
-    image: diocrafts/oxicloud:latest@sha256:f3311d97a599325213d01a0c2511357b6b8961d4b5340aada644b42075e70ce2
+    image: diocrafts/oxicloud:0.5.5@sha256:f3311d97a599325213d01a0c2511357b6b8961d4b5340aada644b42075e70ce2
     container_name: oxicloud
     restart: $RESTART_POLICY_MEDIA
     depends_on:

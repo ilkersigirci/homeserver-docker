@@ -1,6 +1,6 @@
 services:
   healthchecks:
-    image: lscr.io/linuxserver/healthchecks:latest@sha256:0db2f65c8cbba66e32e4b26588a7ce9cdd78b4adabf151301ce6ef9637964593
+    image: lscr.io/linuxserver/healthchecks:v4.1.1-ls342@sha256:0db2f65c8cbba66e32e4b26588a7ce9cdd78b4adabf151301ce6ef9637964593
     container_name: healthchecks
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:

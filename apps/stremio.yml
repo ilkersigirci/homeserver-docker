@@ -3,7 +3,7 @@
 # TODO: Self Host AIOmetadata
 services:
   stremio:
-    image: tsaridas/stremio-docker:latest@sha256:a97379afd8d845fa57730e908fef63359b6a7d3daf25a8f668595b188b6fe2ef
+    image: tsaridas/stremio-docker:v1.2.14@sha256:a97379afd8d845fa57730e908fef63359b6a7d3daf25a8f668595b188b6fe2ef
     container_name: stremio
     restart: $RESTART_POLICY_MEDIA
     networks:
@@ -73,7 +73,7 @@ services:
 
   # In the url, change streamingServer=http to streamingServer=https
   stremio-server:
-    image: stremio/server:latest@sha256:f8cbbc4e13cd52d914253e8e35c1c7a65b2bc6fb5aba8ae3648379f604d04218
+    image: stremio/server:v4.20.17@sha256:f8cbbc4e13cd52d914253e8e35c1c7a65b2bc6fb5aba8ae3648379f604d04218
     container_name: stremio-server
     restart: $RESTART_POLICY_MEDIA
     networks:

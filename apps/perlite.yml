@@ -1,7 +1,7 @@
 services:
   perlite-build:
     container_name: perlite-build
-    image: sec77/perlite:latest@sha256:e4912b9a014b5f68b0f29386244e5600e935de09e66906fb13e849f54d2b300c
+    image: sec77/perlite:1.6.1@sha256:e4912b9a014b5f68b0f29386244e5600e935de09e66906fb13e849f54d2b300c
     restart: $RESTART_POLICY_OTHERS
     profiles:
       - reading

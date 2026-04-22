@@ -1,7 +1,7 @@
 services:
   sshwifty:
     container_name: sshwifty
-    image: niruix/sshwifty:latest@sha256:676b4c32640183eeeb7e3785fa1d45eda756715c8c369efaceca0962e58ef605
+    image: niruix/sshwifty:0.4.5-beta-release@sha256:676b4c32640183eeeb7e3785fa1d45eda756715c8c369efaceca0962e58ef605
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - maintenance

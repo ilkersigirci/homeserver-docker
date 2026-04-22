@@ -1,7 +1,7 @@
 services:
   filerun_db:
     container_name: filerun_db
-    image: linuxserver/mariadb:latest@sha256:c45132cefda1fc6e2034539631fa769070f37d9f673100dba7c0f7077c2e8b8c
+    image: linuxserver/mariadb:11.4.10-r0-ls213@sha256:c45132cefda1fc6e2034539631fa769070f37d9f673100dba7c0f7077c2e8b8c
     restart: $MEDIA_RESTART_POLICY
     hostname: filerun_db
     profiles:

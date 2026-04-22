@@ -1,6 +1,6 @@
 services:
   openarchiver:
-    image: logiclabshq/open-archiver:latest@sha256:e57f6ad9953aa70b1d9e900d78c0b74517e102aeacb3af8f4836479926422189
+    image: logiclabshq/open-archiver:v0.5.0@sha256:e57f6ad9953aa70b1d9e900d78c0b74517e102aeacb3af8f4836479926422189
     container_name: openarchiver
     restart: $RESTART_POLICY_MEDIA
     depends_on:
