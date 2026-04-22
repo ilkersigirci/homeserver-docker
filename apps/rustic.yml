@@ -10,7 +10,7 @@ services:
   rustic:
     container_name: rustic
     hostname: ${MY_HOSTNAME}
-    image: ghcr.io/rustic-rs/rustic:latest
+    image: ghcr.io/rustic-rs/rustic:latest@sha256:fce5854a2df9fdaa1f5999df9d99d832aa8619c79eefb3e4136da46bf912a1b0
     # user: $PUID:$PGID
     # build:
     #   context: $REPO_PATH/Dockerfiles/Rustic

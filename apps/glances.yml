@@ -3,7 +3,7 @@ services:
   # FIXME: Find a way to show GPU stats
   glances:
     # image: nicolargo/glances:ubuntu-latest-full
-    image: nicolargo/glances:dev
+    image: nicolargo/glances:dev@sha256:e9e677cdec23ec2f9b613e330a8097c84f797d6634b4150f9fcfe594aa88e844
     container_name: glances
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:

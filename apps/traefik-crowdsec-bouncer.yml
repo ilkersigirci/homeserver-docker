@@ -1,6 +1,6 @@
 services:
   traefik-crowdsec-bouncer:
-    image: fbonalair/traefik-crowdsec-bouncer
+    image: fbonalair/traefik-crowdsec-bouncer@sha256:e3e8f33923d2871069de08dd2931a9eb6c6760f76d6b9e3229d3b9c84211dd94
     container_name: traefik-crowdsec-bouncer
     restart: $RESTART_POLICY_CORE
     profiles:

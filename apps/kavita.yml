@@ -1,7 +1,7 @@
 services:
   kavita:
     container_name: kavita
-    image: kizaing/kavita:latest
+    image: kizaing/kavita:latest@sha256:e07017b34ef152bb033d6f804c6ff4bbc92aa348bf32b8ed9808e405d6ffdf64
     # image: ghcr.io/kareadita/kavita:latest
     restart: $RESTART_POLICY_OTHERS
     networks:

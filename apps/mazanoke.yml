@@ -1,6 +1,6 @@
 services:
   mazanoke:
-    image: ghcr.io/civilblur/mazanoke:latest
+    image: ghcr.io/civilblur/mazanoke:latest@sha256:e43dc48de575b7a032bbefd96b890d69c1f141417e43d5d096469aa1398711d6
     container_name: mazanoke
     restart: $RESTART_POLICY_MEDIA
     profiles:

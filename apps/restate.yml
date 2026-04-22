@@ -1,7 +1,7 @@
 # NOTE: Register worker: docker exec -it restate restate deployments register http://192.168.2.21:9080 --force --use-http1.1
 services:
   restate:
-    image: ghcr.io/restatedev/restate:latest
+    image: ghcr.io/restatedev/restate:latest@sha256:110911ec7bcaf740e82d68f9ca5feee115f4ba28a68c6ea7401f4c12f8c13070
     container_name: restate
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:

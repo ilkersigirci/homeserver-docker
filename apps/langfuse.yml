@@ -1,7 +1,7 @@
 # NOTE: Don't forget to create a bucket named "langfuse" in your s3 provider beforehand.
 services:
   langfuse-clickhouse:
-    image: clickhouse/clickhouse-server:26.3.7
+    image: clickhouse/clickhouse-server:26.3.7@sha256:040c496e7387398e3b504810ead7f29e1cad6f260c74b6659e3f14dd3411b1cb
     container_name: langfuse-clickhouse
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
@@ -50,7 +50,7 @@ services:
       start_period: 5s
 
   langfuse-db:
-    image: postgres:18.3
+    image: postgres:18.3@sha256:059fa0289cc5a184034e05a1f4f6d6fd79f69dc718b8b04ab60b6b469eed411e
     container_name: langfuse-db
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
@@ -83,7 +83,7 @@ services:
       retries: 3
 
   langfuse-redis:
-    image: redis:7
+    image: redis:7@sha256:0c87e07e20a8157992ba7de345b55cfaf6853210b3423c92d1a365fe603d15e0
     container_name: langfuse-redis
     restart: $RESTART_POLICY_PROGRAMMING
     command: >
@@ -115,7 +115,7 @@ services:
       retries: 10
 
   langfuse-worker:
-    image: langfuse/langfuse-worker:3
+    image: langfuse/langfuse-worker:3@sha256:f8a9eb480b31cc513ad9ed9869eeb3416cb7bdf00c598665c008c460566115d1
     container_name: langfuse-worker
     restart: $RESTART_POLICY_PROGRAMMING
     user: expressjs
@@ -191,7 +191,7 @@ services:
       SMTP_CONNECTION_URL: ${SMTP_CONNECTION_URL:-}
 
   langfuse-web:
-    image: langfuse/langfuse:3
+    image: langfuse/langfuse:3@sha256:cdfdca609912edffd616503e43427395fcf135423422440d74c89d9d552b74f9
     container_name: langfuse-web
     restart: $RESTART_POLICY_PROGRAMMING
     user: nextjs

@@ -1,7 +1,7 @@
 services:
   whisper-api:
     container_name: whisper-api
-    image: onerahmet/openai-whisper-asr-webservice:latest-gpu
+    image: onerahmet/openai-whisper-asr-webservice:latest-gpu@sha256:1132aa08c6eb9b440408864e8c25733d22a197ffea7c6975d60a4f4b6fd7b08b
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
       - programming

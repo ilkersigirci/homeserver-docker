@@ -1,7 +1,7 @@
 # Telegram notification format: tgram://bottoken/ChatID
 services:
   changedetection:
-    image: ghcr.io/dgtlmoon/changedetection.io
+    image: ghcr.io/dgtlmoon/changedetection.io@sha256:c85fb73ce4e1986c90b9b747e0247cd67b0d4ebcce4718a5f7205dc64ccc178a
     container_name: changedetection
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:

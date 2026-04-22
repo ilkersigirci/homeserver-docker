@@ -35,7 +35,7 @@ services:
 
   immich-server:
     container_name: immich-server
-    image: ghcr.io/immich-app/immich-server:release
+    image: ghcr.io/immich-app/immich-server:release@sha256:c15bff75068effb03f4355997d03dc7e0fc58720c2b54ad6f7f10d1bc57efaa5
     restart: $RESTART_POLICY_MEDIA
     depends_on:
       - immich-redis
@@ -93,7 +93,7 @@ services:
   # https://github.com/Salvoxia/immich-folder-album-creator
   immich-folder-album-creator:
     container_name: immich-folder-album-creator
-    image: salvoxia/immich-folder-album-creator:latest
+    image: salvoxia/immich-folder-album-creator:latest@sha256:79b82f9818ded34c8dcfc5df0502126fdaff698b94ddad4b20ac1f0c3a7dcba2
     restart: "no"
     depends_on:
       - immich-server
@@ -116,7 +116,7 @@ services:
   # NOTE: On Immich -> Admin -> Settings -> Server Settings -> External Domain
   immich-public-proxy:
     container_name: immich-public-proxy
-    image: alangrainger/immich-public-proxy:latest
+    image: alangrainger/immich-public-proxy:latest@sha256:add80c37eb2cc6d1e9622f3590ba4ee72c94a765c51a3b5e1afc485a4ec89135
     restart: $RESTART_POLICY_MEDIA
     depends_on:
       - immich-server

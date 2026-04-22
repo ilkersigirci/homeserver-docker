@@ -2,7 +2,7 @@
 # From: https://github.com/excalidraw/excalidraw/issues/5188#issuecomment-3848252703
 services:
   excalidraw:
-    image: excalidraw/excalidraw:latest
+    image: excalidraw/excalidraw:latest@sha256:20ffa04668e19616bb0c1b3632849e5cd96e0bc7a1336b73d9d072667f2c2854
     container_name: excalidraw
     expose:
       - 80
@@ -38,7 +38,7 @@ services:
       - traefik.docker.network=proxy
 
   excalidraw-room:
-    image: excalidraw/excalidraw-room:latest
+    image: excalidraw/excalidraw-room:latest@sha256:2fe999f9be4379e3ee282fc45d75d84a691a6383dde33544514cc395287c7a70
     container_name: excalidraw-room
     expose:
       - 80

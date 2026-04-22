@@ -1,6 +1,6 @@
 services:
   yamtrack-redis:
-    image: redis:7-alpine
+    image: redis:7-alpine@sha256:7aec734b2bb298a1d769fd8729f13b8514a41bf90fcdd1f38ec52267fbaa8ee6
     container_name: yamtrack-redis
     restart: $RESTART_POLICY_MEDIA
     profiles:
@@ -17,7 +17,7 @@ services:
 
   # NOTE: Optional, yamtrack uses Sqlite by default
   yamtrack-postgres-db:
-    image: postgres:16-alpine
+    image: postgres:16-alpine@sha256:4e6e670bb069649261c9c18031f0aded7bb249a5b6664ddec29c013a89310d50
     container_name: yamtrack-postgres-db
     restart: $RESTART_POLICY_MEDIA
     profiles:
@@ -36,7 +36,7 @@ services:
 
   # NOTE: First REGISTRATION=True, create account using OIDC and REGISTRATION=False
   yamtrack:
-    image: ghcr.io/fuzzygrim/yamtrack
+    image: ghcr.io/fuzzygrim/yamtrack@sha256:928df13c46c9f615b37f5ef1eb5a87fc8813f5941f28c7d8227af73d291b0d19
     container_name: yamtrack
     restart: $RESTART_POLICY_MEDIA
     depends_on:

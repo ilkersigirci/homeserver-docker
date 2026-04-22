@@ -1,6 +1,6 @@
 services:
   duplicati:
-    image: lscr.io/linuxserver/duplicati
+    image: lscr.io/linuxserver/duplicati@sha256:f4690606bd04ce38490a3ccfd52fc84f0b0c74c9b2aaea9eb24026f5a1859403
     container_name: duplicati
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:

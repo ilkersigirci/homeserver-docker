@@ -1,7 +1,7 @@
 # TODO: Harden
 services:
   apprise-api:
-    image: lscr.io/linuxserver/apprise-api:latest
+    image: lscr.io/linuxserver/apprise-api:latest@sha256:2c1f4b8868450b2e5fe5562099cd6f849e330d013dfd531806e677d2da3912ed
     container_name: apprise-api
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
@@ -46,7 +46,7 @@ services:
 
   # NOTE: By default, bind volume user is 1000.
   apprise-original:
-    image: caronc/apprise:latest
+    image: caronc/apprise:latest@sha256:f901f6b51a56876ff0c7360364ae98eed63536c0f7909386698b7b9171a62d7b
     container_name: apprise
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:

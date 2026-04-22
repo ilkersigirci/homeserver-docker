@@ -1,7 +1,7 @@
 services:
   sd-next:
     container_name: sd-next
-    image: vladmandic/sdnext-cuda:latest
+    image: vladmandic/sdnext-cuda:latest@sha256:392eb4538142ebc6c2d7b6bac2e951455e016e9a8778b65991ba4a5ab2209af6
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
       - programming

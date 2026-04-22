@@ -7,7 +7,7 @@ networks:
 
 services:
   forgejo-dind:
-    image: docker:29-dind
+    image: docker:29-dind@sha256:c77e5d7912f9b137cc67051fdc2991d8f5ae22c55ddf532bb836dcb693a04940
     container_name: forgejo-dind
     privileged: true
     restart: $RESTART_POLICY_PROGRAMMING
@@ -32,7 +32,7 @@ services:
       start_period: 15s
 
   forgejo-dind-gc:
-    image: docker:29-cli
+    image: docker:29-cli@sha256:17b5c235f40be7432a7c0914c154e9278aed63bad4afe5607e4f91840696a9f8
     container_name: forgejo-dind-gc
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
@@ -81,7 +81,7 @@ services:
   # NOTE: First run without the daemon command to initialize the runner, then use the daemon command one.
   # NOTE: docker exec -it forgejo-runner /bin/sh -c "forgejo-runner register"
   forgejo-runner:
-    image: code.forgejo.org/forgejo/runner:12
+    image: code.forgejo.org/forgejo/runner:12@sha256:2860af6a7fa5521b2cdb26a14545c083ffd06b2528dbfc470cfec39a0b6bde39
     container_name: forgejo-runner
     user: $PUID:$PGID
     restart: $RESTART_POLICY_PROGRAMMING

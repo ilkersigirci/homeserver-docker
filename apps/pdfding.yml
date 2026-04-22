@@ -16,7 +16,7 @@ services:
 
   # FIXME: OIDC NOT WORKING
   pdfding:
-    image: mrmn/pdfding:latest
+    image: mrmn/pdfding:latest@sha256:1c7f65f0cf72eea7714c5f892474d803fbcaefdf91b94b509b717542b7db37c7
     container_name: pdfding
     restart: $RESTART_POLICY_OTHERS
     profiles:

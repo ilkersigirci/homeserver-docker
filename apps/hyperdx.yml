@@ -1,6 +1,6 @@
 services:
   hyperdx:
-    image: docker.hyperdx.io/hyperdx/hyperdx-all-in-one
+    image: docker.hyperdx.io/hyperdx/hyperdx-all-in-one@sha256:e30ffb98b56648f54653c1fff3759c0f676f700a2cf2b291bf72e51fe232566d
     container_name: hyperdx
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:

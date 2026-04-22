@@ -1,7 +1,7 @@
 services:
   # docker exec -u abc -it ytdl-sub /bin/bash
   ytdl-sub:
-    image: ghcr.io/jmbannon/ytdl-sub:latest
+    image: ghcr.io/jmbannon/ytdl-sub:latest@sha256:341706369c4b84cd44c9f938181283551185766b16e0894c153f4258396c1520
     container_name: ytdl-sub
     restart: $RESTART_POLICY_MEDIA
     networks:

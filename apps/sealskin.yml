@@ -1,7 +1,7 @@
 # NOTE: In browser extension, paste $REPO_PATH/appdata/sealskin/admin.json
 services:
   sealskin:
-    image: lscr.io/linuxserver/sealskin:latest
+    image: lscr.io/linuxserver/sealskin:latest@sha256:a095c257f4d5101c3f8d876913f6999cbdd5c5ae8998d5966a67764099bf8c17
     container_name: sealskin
     restart: $RESTART_POLICY_DESKTOP_IMAGES
     profiles:

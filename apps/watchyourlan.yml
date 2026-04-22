@@ -1,7 +1,7 @@
 services:
   #  Optional, local themes and icons
   wyl-node-bootstrap:
-    image: ghcr.io/aceberg/node-bootstrap:latest
+    image: ghcr.io/aceberg/node-bootstrap:latest@sha256:88d741cc99e65709e4ddb5b4164e518bc1c336526689f0f0fe58150eca88143c
     container_name: node-bootstrap
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
@@ -12,7 +12,7 @@ services:
       - 8850:8850
 
   watchyourlan:
-    image: ghcr.io/aceberg/watchyourlan:latest
+    image: ghcr.io/aceberg/watchyourlan:latest@sha256:f77532ca7c3c9a4398cb094df7674013a3d7fcf4699386f1e456c24df6fef00e
     container_name: watchyourlan
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:

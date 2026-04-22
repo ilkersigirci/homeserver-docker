@@ -1,6 +1,6 @@
 services:
   jellyfin-vue:
-    image: ghcr.io/jellyfin/jellyfin-vue:unstable
+    image: ghcr.io/jellyfin/jellyfin-vue:unstable@sha256:15c779152b4d754c0959eaae7d1bf0fdd74f44fea9c124ff7187e34c5d127d98
     container_name: jellyfin-vue
     restart: $RESTART_POLICY_MEDIA
     # depends_on:

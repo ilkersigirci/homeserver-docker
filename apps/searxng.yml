@@ -1,6 +1,6 @@
 services:
   searxng:
-    image: docker.io/searxng/searxng:latest
+    image: docker.io/searxng/searxng:latest@sha256:37c616a774b90fb5df9239eb143f1b11866ddf7b830cd1ebcca6ba11b38cc2bf
     container_name: searxng
     restart: $RESTART_POLICY_PROGRAMMING
     depends_on:
@@ -58,7 +58,7 @@ services:
       glance.description: "Free internet metasearch engine"
 
   searxng-valkey:
-    image: docker.io/valkey/valkey:8-alpine
+    image: docker.io/valkey/valkey:8-alpine@sha256:1cb6b20b70d927560cc4cc5397b5f045e74aa603ff7696274778880bb6fadc75
     container_name: searxng-valkey
     command: valkey-server --save 30 1 --loglevel warning
     restart: $RESTART_POLICY_PROGRAMMING

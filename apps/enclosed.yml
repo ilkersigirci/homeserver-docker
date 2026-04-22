@@ -1,7 +1,7 @@
 services:
   enclosed:
     container_name: enclosed
-    image: corentinth/enclosed:latest
+    image: corentinth/enclosed:latest@sha256:d1e78c34ae7027c0c7b7a9ba67f352520049b9f260560fb8a0b3b1c55488cdc8
     restart: $RESTART_POLICY_OTHERS
     networks:
       - t3_proxy

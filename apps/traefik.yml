@@ -4,7 +4,7 @@ services:
   # chmod 600 $REPO_PATH/configs/traefik3/acme/acme.json
   traefik:
     container_name: traefik
-    image: ghcr.io/traefik/traefik:3.7.0-rc.1
+    image: ghcr.io/traefik/traefik:3.7.0-rc.1@sha256:62f2a0974095d3c6ddfe66fff072c83e65a20771691cda52d34454413e8b1df9
     restart: $RESTART_POLICY_CORE
     profiles:
       - core

@@ -1,7 +1,7 @@
 # NOTE: Not working
 services:
   adguardian:
-    image: ghcr.io/lissy93/adguardian:latest
+    image: ghcr.io/lissy93/adguardian:latest@sha256:e20e54ce8c72b8d111ee5234c3050253a913034a02028029aef59d3684ebf4ac
     container_name: adguardian
     restart: $RESTART_POLICY_CORE
     profiles:

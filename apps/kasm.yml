@@ -1,7 +1,7 @@
 services:
   kasm:
     container_name: kasm
-    image: lscr.io/linuxserver/kasm:latest
+    image: lscr.io/linuxserver/kasm:latest@sha256:ebe5a902f8ebc3a59c042c97a61eb8ee82ccf6c345b17042f2753924967105da
     restart: $RESTART_POLICY_DESKTOP_IMAGES
     privileged: true
     networks:

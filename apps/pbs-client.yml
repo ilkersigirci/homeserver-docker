@@ -1,7 +1,7 @@
 # NOTE: .env.example https://github.com/Aterfax/pbs-client-docker/blob/main/docker-compose/.env.example
 services:
   pbs-client:
-    image: aterfax/pbs-client:latest
+    image: aterfax/pbs-client:latest@sha256:a9d3716dd5157f8dfb33aba787c15b159b7c9b89c8e4fb1842aa0a35dc7eb184
     container_name: pbs-client
     hostname: pbs-client-$DOMAINNAME
     restart: $RESTART_POLICY_MAINTENANCE

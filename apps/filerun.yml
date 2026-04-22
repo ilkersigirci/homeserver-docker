@@ -1,7 +1,7 @@
 services:
   filerun_db:
     container_name: filerun_db
-    image: linuxserver/mariadb:latest
+    image: linuxserver/mariadb:latest@sha256:c45132cefda1fc6e2034539631fa769070f37d9f673100dba7c0f7077c2e8b8c
     restart: $MEDIA_RESTART_POLICY
     hostname: filerun_db
     profiles:
@@ -27,7 +27,7 @@ services:
       - mysql_password
 
   filerun:
-    image: filerun/filerun
+    image: filerun/filerun@sha256:0ddfd3207d29923cfdb9c172103b33a6f78ee169a053aa6d9fea637e6eab3bb8
     container_name: filerun
     profiles:
       - core

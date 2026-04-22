@@ -1,6 +1,6 @@
 services:
   beszel-agent:
-    image: henrygd/beszel-agent
+    image: henrygd/beszel-agent@sha256:8874e2c53f9de5e063a6a80d6b617e20fa593ac5dc4eb4c6ce1f912f510f38f8
     container_name: beszel-agent
     restart: $RESTART_POLICY_MAINTENANCE
     # network_mode: host

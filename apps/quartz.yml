@@ -5,7 +5,7 @@ services:
   quartz:
     container_name: quartz
     # image: shommey/dockerized-quartz
-    image: ilkersigirci/dockerized-quartz:latest
+    image: ilkersigirci/dockerized-quartz:latest@sha256:fbb96f9d1ecb331df9fbbb158f1487f65f8ebb6d4050d2a5d84b4796bb5e3a4c
     restart: $RESTART_POLICY_OTHERS
     networks:
       - t3_proxy

@@ -1,7 +1,7 @@
 services:
   firefly:
     container_name: firefly
-    image: fireflyiii/core:latest
+    image: fireflyiii/core:latest@sha256:8134c37b14e52e97b5076fc5b859199387bc3f115ddaa5ffe5510f3f95b354d2
     restart: $RESTART_POLICY_OTHERS
     networks:
       - t3_proxy

@@ -1,6 +1,6 @@
 services:
   upsnap:
-    image: ghcr.io/seriousm4x/upsnap:5
+    image: ghcr.io/seriousm4x/upsnap:5@sha256:689851f41098d4cdbbf04261a1321d0b0f84f4695fed4ce24d67d0f6c1a275d4
     container_name: upsnap
     restart: $RESTART_POLICY_MAINTENANCE
     # # you can change the listen ip:port inside the container like this:

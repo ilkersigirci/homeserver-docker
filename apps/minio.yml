@@ -5,7 +5,7 @@
 services:
   minio:
     # image: minio/minio:RELEASE.2025-04-22T22-12-26Z
-    image: minio/minio:RELEASE.2025-04-22T22-12-26Z-cpuv1 # NOTE: For Proxmox VM
+    image: minio/minio:RELEASE.2025-04-22T22-12-26Z-cpuv1@sha256:8494c615f45cd6726f048dce162da5826582c2ce67d420428200d9d3cccf6e25 # NOTE: For Proxmox VM
     container_name: minio
     restart: $RESTART_POLICY_PROGRAMMING
     command: server /data --console-address ":9001"
