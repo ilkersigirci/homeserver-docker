@@ -1,7 +1,7 @@
 # NOTE: For docker-config auth: echo -n "username:password" | base64
 services:
   doco-cd:
-    image: ghcr.io/kimdre/doco-cd:0.70.0@sha256:95941daba03f8ad35c51dc05df28fbc14421a518cc328f6440a9fc2ea141ea47
+    image: ghcr.io/kimdre/doco-cd:0.81.0@sha256:b4da9c65b0d069c79cb54162669d70b08a3bdad2e05cb1b63557ee28697ca8ef
     container_name: doco-cd
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
