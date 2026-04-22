@@ -92,7 +92,7 @@ services:
       - "6379"
 
   openarchiver-meilisearch:
-    image: getmeili/meilisearch:v1.15@sha256:fe500cf9cca05cb9f027981583f28eccf17d35d94499c1f8b7b844e7418152fc
+    image: getmeili/meilisearch:v1.42@sha256:e13a16ddc45f66fd065b3416230c2669426cfa8907f4a43f14a9c09a17691fa4
     container_name: openarchiver-meilisearch
     restart: $RESTART_POLICY_MEDIA
     profiles:

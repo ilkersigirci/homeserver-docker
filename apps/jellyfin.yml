@@ -2,7 +2,7 @@ services:
   # TODO: Harden
   # NOTE: Install in Jellyfin UI https://github.com/arnesacnussem/jellyfin-plugin-meilisearch
   jellyfin-meilisearch:
-    image: getmeili/meilisearch:v1.32.1@sha256:54dfe0a03e81078d401a144ab6a798e4c210bea7d2ee54b7f7a6cdb456040bea
+    image: getmeili/meilisearch:v1.42.1@sha256:e13a16ddc45f66fd065b3416230c2669426cfa8907f4a43f14a9c09a17691fa4
     container_name: jellyfin-meilisearch
     restart: $RESTART_POLICY_MEDIA
     profiles:
