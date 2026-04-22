@@ -6,6 +6,24 @@
   "docker-compose": {
     "managerFilePatterns": ["/^apps\\/.*\\.ya?ml$/"]
   },
+  "packageRules": [
+    {
+      "description": "Disable Renovate updates for all images in Immich compose files by default",
+      "matchManagers": ["docker-compose"],
+      "matchFileNames": ["apps/immich*.yml"],
+      "enabled": false
+    },
+    {
+      "description": "Allow only Immich app and machine-learning images to update",
+      "matchManagers": ["docker-compose"],
+      "matchFileNames": ["apps/immich*.yml"],
+      "matchPackageNames": [
+        "ghcr.io/immich-app/immich-server",
+        "ghcr.io/immich-app/immich-machine-learning"
+      ],
+      "enabled": true
+    }
+  ],
   "major": {
     "dependencyDashboardApproval": true
   },
