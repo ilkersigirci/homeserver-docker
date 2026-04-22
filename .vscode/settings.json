@@ -6,6 +6,7 @@
     "**/configs/traefik3/**/*.yml.example": "yaml",
     "**/configs/traefik3/**/*.yaml.example": "yaml",
     "**/apps/*.yml": "dockercompose",
+    "**/apps-not-used/*.yml": "dockercompose",
     "**/compose/*.yml": "dockercompose"
   },
   "yaml.schemas": {
