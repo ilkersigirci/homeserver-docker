@@ -3,6 +3,11 @@ services:
   immich-machine-learning:
     container_name: immich-machine-learning
     image: ghcr.io/immich-app/immich-machine-learning:v2.7.5-cuda@sha256:304142175e345f0155d7642f637cfdceae60e89075ff03938cb2886d52c65a62
+    user: $PUID:$PGID
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - NET_RAW
     restart: $RESTART_POLICY_MEDIA
     profiles:
       - media
