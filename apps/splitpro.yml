@@ -1,6 +1,6 @@
 services:
   splitpro-db:
-    image: postgres:16.13@sha256:86f4d9ad58cb9023f6d36ac428555680a4aac6daccce4d3e2b0768c15b1bb092
+    image: postgres:18.3@sha256:059fa0289cc5a184034e05a1f4f6d6fd79f69dc718b8b04ab60b6b469eed411e
     container_name: splitpro-db
     restart: $RESTART_POLICY_MEDIA
     profiles:

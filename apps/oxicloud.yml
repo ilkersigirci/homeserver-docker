@@ -1,7 +1,7 @@
 # NOTE: Developer says %70 of the code is vibe coded
 services:
   oxicloud-db:
-    image: postgres:18.2-alpine3.23@sha256:035b9ab53cfa147d7202b61f5f7782b939ae815b7d6bc81c96b7b42ff1fca950
+    image: postgres:18.3-alpine3.23@sha256:54451ecb8ab38c24c3ec123f2fd501303a3a1856a5c66e98cecf2460d5e1e9d7
     container_name: oxicloud-db
     restart: $RESTART_POLICY_MEDIA
     profiles:
