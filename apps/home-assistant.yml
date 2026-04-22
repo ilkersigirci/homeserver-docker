@@ -4,7 +4,6 @@ services:
     container_name: home-assistant-db
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
-      - custom-user
       - maintenance
       - home-assistant
     networks:
@@ -13,21 +12,19 @@ services:
       - "127.0.0.1:5400:5432"
     expose:
       - "5432"
-    user: "999:999"
+    user: $PUID:$PGID
     read_only: true
     tmpfs:
-      - /tmp
-      - /run
-      - /run/postgresql
+      - /tmp:uid=$PUID,gid=$PGID,mode=1777
+      - /var/run/postgresql:uid=$PUID,gid=$PGID,mode=775
     security_opt:
       - no-new-privileges:true
     cap_drop:
       - ALL
     cap_add: []
     volumes:
-      - $REPO_PATH/data/home-assistant-db:/pgdata
+      - $REPO_PATH/data/home-assistant-db:/var/lib/postgresql
     environment:
-      PGDATA: /pgdata
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres

@@ -60,7 +60,6 @@ services:
       - media
       - openarchiver
     environment:
-      PGDATA: /pgdata
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
@@ -68,8 +67,18 @@ services:
       - t3_proxy
     expose:
       - "5432"
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:uid=$PUID,gid=$PGID,mode=1777
+      - /var/run/postgresql:uid=$PUID,gid=$PGID,mode=775
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     volumes:
-      - $REPO_PATH/data/openarchiver-db:/pgdata
+      - $REPO_PATH/data/openarchiver-db:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
