@@ -1,6 +1,6 @@
 services:
   metadata-remote:
-    image: ghcr.io/wow-signal-dev/metadata-remote:latest
+    image: ghcr.io/wow-signal-dev/metadata-remote:latest@sha256:4fcc889a80c1f380f275efcecccf8f3826dac2c7ed73eebe0fd0cddc30d527e0
     container_name: metadata-remote
     restart: $RESTART_POLICY_MEDIA
     profiles:

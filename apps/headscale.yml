@@ -2,7 +2,7 @@ services:
   # Configuration file: https://github.com/tale/headplane/blob/main/config.example.yamls
   # NOTE: docker exec headscale headscale apikeys create --expiration 360d
   headscale:
-    image: ghcr.io/juanfont/headscale:0.28.0
+    image: ghcr.io/juanfont/headscale:0.28.0@sha256:51b1b9182bb6219e97374fa89af6b9320d6f87ecc739e328d5357ea4fa7a5ce3
     container_name: headscale
     command: serve
     restart: $RESTART_POLICY_CORE
@@ -65,7 +65,7 @@ services:
 
   # Configuration file: https://github.com/tale/headplane/blob/main/config.example.yaml
   headplane:
-    image: ghcr.io/tale/headplane:0.7.0-beta.2
+    image: ghcr.io/tale/headplane:0.7.0-beta.2@sha256:f6706d3447225d3c8c1ea9057e29cc1edfe3370fc87c75c6b20189e59036a370
     container_name: headplane
     restart: $RESTART_POLICY_CORE
     depends_on:
@@ -147,7 +147,7 @@ services:
 
   # NOTE: When changing ACL in admin ui, restart the headscale container to make it take effect.
   headscale-admin:
-    image: goodieshq/headscale-admin:0.26.0
+    image: goodieshq/headscale-admin:0.26.0@sha256:f8471106e993acf80d02b9dbb38fe3c27f17e3b4af62d4fbebb8aa89ab9e5640
     container_name: headscale-admin
     restart: $RESTART_POLICY_CORE
     depends_on:

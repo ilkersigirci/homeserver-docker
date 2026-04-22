@@ -1,6 +1,6 @@
 services:
   webfinger:
-    image: nginx:latest
+    image: nginx:latest@sha256:3acc8b9cc6421db48299559e937b2ade69ddd609453b4f44c21ccb239d614535
     container_name: webfinger
     restart: $RESTART_POLICY_CORE
     profiles:

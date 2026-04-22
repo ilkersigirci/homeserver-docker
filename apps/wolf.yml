@@ -1,7 +1,7 @@
 # Docs: https://games-on-whales.github.io/wolf/stable/user/quickstart.html
 services:
   wolf:
-    image: ghcr.io/games-on-whales/wolf:stable
+    image: ghcr.io/games-on-whales/wolf:stable@sha256:a561a51b613912323285da3564ae0cd2c108dbd927720669aa84873bf75cb863
     container_name: wolf
     environment:
       - NVIDIA_DRIVER_VOLUME_NAME=nvidia-driver-vol

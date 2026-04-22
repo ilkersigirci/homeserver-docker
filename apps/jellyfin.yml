@@ -2,7 +2,7 @@ services:
   # TODO: Harden
   # NOTE: Install in Jellyfin UI https://github.com/arnesacnussem/jellyfin-plugin-meilisearch
   jellyfin-meilisearch:
-    image: getmeili/meilisearch:v1.32.1
+    image: getmeili/meilisearch:v1.32.1@sha256:54dfe0a03e81078d401a144ab6a798e4c210bea7d2ee54b7f7a6cdb456040bea
     container_name: jellyfin-meilisearch
     restart: $RESTART_POLICY_MEDIA
     profiles:
@@ -33,7 +33,7 @@ services:
 
   # FIXME: middlewares-secure-headers doesn't work for `feishin`
   jellyfin:
-    image: ghcr.io/jellyfin/jellyfin:latest
+    image: ghcr.io/jellyfin/jellyfin:latest@sha256:93227545077893cc9516f28b3adb733b67bc4691f41b6167428a2a0e3220b81c
     container_name: jellyfin
     # cpus: "0.5"
     mem_reservation: "2048M"

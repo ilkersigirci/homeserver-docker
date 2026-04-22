@@ -2,7 +2,7 @@ services:
   webtop:
     container_name: webtop
     # image: lscr.io/linuxserver/webtop:debian-i3
-    image: lscr.io/linuxserver/webtop:debian-kde
+    image: lscr.io/linuxserver/webtop:debian-kde@sha256:c43dba0a19bfa33ece51bed81c6ac3b345b046cf7c9e94b4d0c81ad33421f997
     restart: $RESTART_POLICY_DESKTOP_IMAGES
     shm_size: "1gb"
     mem_limit: 6g

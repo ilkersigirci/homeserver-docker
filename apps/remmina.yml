@@ -1,6 +1,6 @@
 services:
   remmina:
-    image: lscr.io/linuxserver/remmina
+    image: lscr.io/linuxserver/remmina@sha256:d7eda098a069aaca7c125734f02b72a67e63b6ea3911b69ca6f59198d67f8bf4
     container_name: remmina
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:

@@ -1,7 +1,7 @@
 services:
   backrest:
     container_name: backrest
-    image: garethgeorge/backrest:latest-alpine
+    image: garethgeorge/backrest:latest-alpine@sha256:f4d34bd6fa985d13bdb6c01c5d8727e07708899afa9567d800808357d77b9fb0
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - maintenance

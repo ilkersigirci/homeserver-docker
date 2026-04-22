@@ -1,7 +1,7 @@
 services:
   # RustFS volume permissions fixer service
   rustfs-volume-permission-helper:
-    image: alpine
+    image: alpine@sha256:5b10f432ef3da1b8d4c7eb6c487f2f5a8f096bc91145e68878dd4a5019afde11
     container_name: rustfs-volume-permission-helper
     restart: "no"
     profiles:
@@ -23,7 +23,7 @@ services:
       "
 
   rustfs:
-    image: rustfs/rustfs:latest
+    image: rustfs/rustfs:latest@sha256:e6a8e7e4b3703e51f95652dcd1654bc60d510d0167bdce913dd2dec94f1f0ed7
     container_name: rustfs
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:

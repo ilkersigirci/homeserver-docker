@@ -1,7 +1,7 @@
 services:
   freshrss:
     container_name: freshrss
-    image: lscr.io/linuxserver/freshrss
+    image: lscr.io/linuxserver/freshrss@sha256:4cf45b2c316286f446a3eb2d7034a300c8488147bb6deb434f196167facc46c2
     restart: $RESTART_POLICY_OTHERS
     networks:
       - t3_proxy

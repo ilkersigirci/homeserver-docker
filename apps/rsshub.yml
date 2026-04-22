@@ -1,6 +1,6 @@
 services:
   rsshub-browserless:
-    image: browserless/chrome
+    image: browserless/chrome@sha256:57d19e414d9fe4ae9d2ab12ba768c97f38d51246c5b31af55a009205c136012f
     container_name: rsshub-browserless
     restart: $RESTART_POLICY_OTHERS
     profiles:
@@ -33,7 +33,7 @@ services:
       glance.parent: "rsshub"
 
   rsshub-redis:
-    image: redis:alpine
+    image: redis:alpine@sha256:c5e375abb885e6b2021c0377879e4890bf76f9065b8922ffc113f2b226b9fc17
     container_name: rsshub-redis
     restart: $RESTART_POLICY_OTHERS
     profiles:
@@ -65,7 +65,7 @@ services:
       glance.parent: "rsshub"
 
   rsshub:
-    image: ghcr.io/diygod/rsshub:latest
+    image: ghcr.io/diygod/rsshub:latest@sha256:a2734f3b884b9cf493ccc60a80e2750165862c9ddffc2c6d4520fa6fc21096f3
     container_name: rsshub
     restart: $RESTART_POLICY_OTHERS
     profiles:

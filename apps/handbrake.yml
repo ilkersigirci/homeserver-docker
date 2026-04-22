@@ -1,7 +1,7 @@
 services:
   handbrake:
     container_name: handbrake
-    image: jlesage/handbrake:latest
+    image: jlesage/handbrake:latest@sha256:2b1eb1e34cf2edba2590c3ab768206a11cf8916fbe8a8a3391fe74d9eabcdce0
     volumes:
       - $REPO_PATH/data/downloads:/data/downloads
       - $REPO_PATH/appdata/handbrake/config:/config

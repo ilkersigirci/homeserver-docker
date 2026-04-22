@@ -1,6 +1,6 @@
 services:
   netdata:
-    image: netdata/netdata:latest
+    image: netdata/netdata:latest@sha256:fb18c47b5975f435b318f0dd97ebb03b00df0e418276154a8f1395bfe3faaddd
     container_name: netdata
     restart: $RESTART_POLICY_MAINTENANCE
     pid: host

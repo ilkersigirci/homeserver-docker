@@ -3,7 +3,7 @@ services:
   # For custom.css: change Global Settings->branding path to "config"
   filebrowser:
     container_name: filebrowser
-    image: filebrowser/filebrowser:latest
+    image: filebrowser/filebrowser:latest@sha256:4dce87308b9f9cfbcf8d0a284fc9565d2b515530a6bae2d920b388161e093f26
     profiles:
       - media
     restart: $RESTART_POLICY_MEDIA

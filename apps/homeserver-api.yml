@@ -1,6 +1,6 @@
 services:
   homeserver-api-redis:
-    image: redis:8
+    image: redis:8@sha256:125f446fbd4c4345cdbd0f60c61ed83c35a10e09436dd797e0e82377325034f5
     container_name: homeserver-api-redis
     restart: $RESTART_POLICY_OTHERS
     hostname: "homeserver-api-redis"
@@ -27,7 +27,7 @@ services:
       retries: 50
 
   homeserver-api-rabbitmq:
-    image: rabbitmq:4-management
+    image: rabbitmq:4-management@sha256:e43ca03df740d48770641b56ce1a26913c74a31e47c1ed36a58e8d91c10731b9
     container_name: homeserver-api-rabbitmq
     restart: $RESTART_POLICY_OTHERS
     hostname: "homeserver-api-rabbitmq"

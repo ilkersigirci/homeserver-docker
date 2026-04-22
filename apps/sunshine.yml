@@ -1,6 +1,6 @@
 services:
   sunshine:
-    image: ghcr.io/lizardbyte/sunshine:latest-ubuntu-22.04
+    image: ghcr.io/lizardbyte/sunshine:latest-ubuntu-22.04@sha256:3e0e7644629547f06019512259e564739bec1b0edc74f7f6f1709980261d380b
     container_name: sunshine
     restart: $RESTART_POLICY_MAINTENANCE
     networks:

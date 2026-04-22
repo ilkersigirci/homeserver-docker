@@ -1,6 +1,6 @@
 services:
   splitpro-db:
-    image: postgres:16.4
+    image: postgres:16.4@sha256:e62fbf9d3e2b49816a32c400ed2dba83e3b361e6833e624024309c35d334b412
     container_name: splitpro-db
     restart: $RESTART_POLICY_MEDIA
     profiles:
@@ -24,7 +24,7 @@ services:
       retries: 3
 
   splitpro:
-    image: ghcr.io/oss-apps/splitpro:latest
+    image: ghcr.io/oss-apps/splitpro:latest@sha256:6e3cbc88dbd4c1b64dcb39b1c24ae8da71c8a475f1e012345da1d1ed0dd2cbe9
     container_name: splitpro
     restart: $RESTART_POLICY_MEDIA
     depends_on:

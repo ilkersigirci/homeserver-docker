@@ -1,6 +1,6 @@
 services:
   grafana-lgtm:
-    image: grafana/otel-lgtm:0.22.0
+    image: grafana/otel-lgtm:0.22.0@sha256:6903a4545a4005a5cada9d44055e96d612d465f7e6d942c272ecb20e6902dec0
     container_name: grafana-lgtm
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:

@@ -1,6 +1,6 @@
 services:
   buildarr:
-    image: callum027/buildarr:latest
+    image: callum027/buildarr:latest@sha256:57e2343fefe5d5701364b5e93b4985dbf08310d7b152f70556bdaba7e9475447
     container_name: buildarr
     restart: $RESTART_POLICY_MEDIA
     depends_on:

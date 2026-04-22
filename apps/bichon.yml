@@ -1,7 +1,7 @@
 # TODO: Harden
 services:
   bichon:
-    image: rustmailer/bichon:latest
+    image: rustmailer/bichon:latest@sha256:d88d4807689dcc22358d341b5ce66cb0783e74946857a32362c021a2e8154430
     container_name: bichon
     restart: $RESTART_POLICY_MEDIA
     profiles:

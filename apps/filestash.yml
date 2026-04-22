@@ -1,6 +1,6 @@
 services:
   filestash-wopi-server:
-    image: collabora/code:24.04.10.2.1
+    image: collabora/code:24.04.10.2.1@sha256:3ee501932bda6c85f4ef116d696cf4cce92387491c764ceb9684da57913b605a
     container_name: filestash-wopi-server
     restart: $RESTART_POLICY_MEDIA
     user: root
@@ -29,7 +29,7 @@ services:
   # NOTE: Enterprise Version: v0.6.20260105
   # NOTE: filestash.bin should be executable (chmod +x)
   filestash:
-    image: machines/filestash:latest
+    image: machines/filestash:latest@sha256:b0195bec24bfb571f56954682ec35f4f965ce1070304482f4ab4d79b43c2d7f2
     container_name: filestash
     restart: $RESTART_POLICY_MEDIA
     profiles:

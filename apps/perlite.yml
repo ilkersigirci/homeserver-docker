@@ -1,7 +1,7 @@
 services:
   perlite-build:
     container_name: perlite-build
-    image: sec77/perlite:latest
+    image: sec77/perlite:latest@sha256:e4912b9a014b5f68b0f29386244e5600e935de09e66906fb13e849f54d2b300c
     restart: $RESTART_POLICY_OTHERS
     profiles:
       - reading
@@ -40,7 +40,7 @@ services:
 
   perlite:
     container_name: perlite
-    image: nginx:stable-alpine
+    image: nginx:stable-alpine@sha256:0272e4604ed93c1792f03695a033a6e8546840f86e0de20a884bb17d2c924883
     restart: $RESTART_POLICY_OTHERS
     depends_on:
       - perlite-build

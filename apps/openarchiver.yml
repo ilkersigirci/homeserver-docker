@@ -1,6 +1,6 @@
 services:
   openarchiver:
-    image: logiclabshq/open-archiver:latest
+    image: logiclabshq/open-archiver:latest@sha256:e57f6ad9953aa70b1d9e900d78c0b74517e102aeacb3af8f4836479926422189
     container_name: openarchiver
     restart: $RESTART_POLICY_MEDIA
     depends_on:
@@ -53,7 +53,7 @@ services:
       glance.description: "A self-hosted, open-source email archiving solution with full-text search capability."
 
   openarchiver-db:
-    image: postgres:16.4
+    image: postgres:16.4@sha256:e62fbf9d3e2b49816a32c400ed2dba83e3b361e6833e624024309c35d334b412
     container_name: openarchiver-db
     restart: $RESTART_POLICY_MEDIA
     profiles:
@@ -77,7 +77,7 @@ services:
       retries: 3
 
   openarchiver-valkey:
-    image: valkey/valkey:8-alpine
+    image: valkey/valkey:8-alpine@sha256:1cb6b20b70d927560cc4cc5397b5f045e74aa603ff7696274778880bb6fadc75
     container_name: openarchiver-valkey
     restart: $RESTART_POLICY_MEDIA
     profiles:
@@ -92,7 +92,7 @@ services:
       - "6379"
 
   openarchiver-meilisearch:
-    image: getmeili/meilisearch:v1.15
+    image: getmeili/meilisearch:v1.15@sha256:fe500cf9cca05cb9f027981583f28eccf17d35d94499c1f8b7b844e7418152fc
     container_name: openarchiver-meilisearch
     restart: $RESTART_POLICY_MEDIA
     profiles:
@@ -108,7 +108,7 @@ services:
       - "7700"
 
   openarchiver-tika:
-    image: apache/tika:3.2.2.0-full
+    image: apache/tika:3.2.2.0-full@sha256:ffab324253edc54706e8882dd28190b1e6559c344b5315ae8a74b9efda9e7291
     container_name: openarchiver-tika
     restart: $RESTART_POLICY_MEDIA
     profiles:

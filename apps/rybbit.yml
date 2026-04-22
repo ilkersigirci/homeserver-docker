@@ -1,7 +1,7 @@
 # After first user creation, disable signup: RYBBIT_DISABLE_SIGNUP=true
 services:
   rybbit-clickhouse:
-    image: clickhouse/clickhouse-server:26.3.7
+    image: clickhouse/clickhouse-server:26.3.7@sha256:040c496e7387398e3b504810ead7f29e1cad6f260c74b6659e3f14dd3411b1cb
     container_name: rybbit-clickhouse
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
@@ -49,7 +49,7 @@ services:
       start_period: 5s
 
   rybbit-postgres:
-    image: postgres:17.4
+    image: postgres:17.4@sha256:304ab813518754228f9f792f79d6da36359b82d8ecf418096c636725f8c930ad
     container_name: rybbit-postgres
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:

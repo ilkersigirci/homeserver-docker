@@ -1,7 +1,7 @@
 services:
   obsidian:
     container_name: obsidian
-    image: lscr.io/linuxserver/obsidian:latest
+    image: lscr.io/linuxserver/obsidian:latest@sha256:a3ca025d845f4af754266bb4dc1f748b33e39f4d9b90e838a839f812a96c6a97
     restart: $RESTART_POLICY_DESKTOP_IMAGES
     shm_size: "1gb"
     profiles:

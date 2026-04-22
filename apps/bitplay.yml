@@ -1,7 +1,7 @@
 # NOTE: Nothing is working on Firefox
 services:
   bitplay:
-    image: ghcr.io/aculix/bitplay:main
+    image: ghcr.io/aculix/bitplay:main@sha256:8c93b8df4c19325ae6034cf742b1aeb57bf2fcee21e03efd61e2076af7391d3d
     container_name: bitplay
     restart: $RESTART_POLICY_MEDIA
     profiles:

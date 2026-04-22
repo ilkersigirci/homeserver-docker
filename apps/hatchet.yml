@@ -1,7 +1,7 @@
 # Default user / pass is admin@example.com / Admin123!!
 services:
   hatchet-db:
-    image: postgres:18.3
+    image: postgres:18.3@sha256:059fa0289cc5a184034e05a1f4f6d6fd79f69dc718b8b04ab60b6b469eed411e
     container_name: hatchet-db
     command: postgres -c 'max_connections=200'
     restart: $RESTART_POLICY_PROGRAMMING
@@ -39,7 +39,7 @@ services:
       start_period: 10s
 
   hatchet:
-    image: ghcr.io/hatchet-dev/hatchet/hatchet-lite:v0.83.4
+    image: ghcr.io/hatchet-dev/hatchet/hatchet-lite:v0.83.4@sha256:393c80601874804a00234087d4e48c346d8f8b8d30412f05d7a8716fc36b24a4
     container_name: hatchet
     restart: $RESTART_POLICY_PROGRAMMING
     depends_on:

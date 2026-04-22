@@ -1,6 +1,6 @@
 services:
   home-assistant-db:
-    image: postgres:16.4
+    image: postgres:16.4@sha256:e62fbf9d3e2b49816a32c400ed2dba83e3b361e6833e624024309c35d334b412
     container_name: home-assistant-db
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
@@ -38,7 +38,7 @@ services:
       retries: 3
 
   home-assistant:
-    image: ghcr.io/home-assistant/home-assistant:stable
+    image: ghcr.io/home-assistant/home-assistant:stable@sha256:ae0800c81fea16bc1241ce03bddb9c6260566e90f58b09d3e5a629e4f68bdc0b
     container_name: home-assistant
     restart: $RESTART_POLICY_MAINTENANCE
     depends_on:
@@ -72,7 +72,7 @@ services:
       glance.description: "Home automation"
 
   home-assistant-proxied:
-    image: ghcr.io/home-assistant/home-assistant:stable
+    image: ghcr.io/home-assistant/home-assistant:stable@sha256:ae0800c81fea16bc1241ce03bddb9c6260566e90f58b09d3e5a629e4f68bdc0b
     container_name: home-assistant-proxied
     restart: $RESTART_POLICY_MAINTENANCE
     depends_on:
