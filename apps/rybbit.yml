@@ -27,7 +27,7 @@ services:
     volumes:
       - $REPO_PATH/configs/clickhouse-optimized/clickhouse-server:/etc/clickhouse-server/config.d:ro
       - $REPO_PATH/configs/clickhouse-optimized/clickhouse-users/zz_disable_query_logging.xml:/etc/clickhouse-server/users.d/zz_disable_query_logging.xml:ro
-      - $REPO_PATH/appdata/rybbit/clickhouse:/var/lib/clickhouse
+      - $REPO_PATH/data/rybbit/clickhouse:/var/lib/clickhouse
     environment:
       TZ: $TZ
       CLICKHOUSE_DB: ${RYBBIT_CLICKHOUSE_DB:-analytics}
@@ -70,7 +70,7 @@ services:
       - ALL
     cap_add: []
     volumes:
-      - $REPO_PATH/appdata/rybbit/postgres:/var/lib/postgresql
+      - $REPO_PATH/data/rybbit/postgres:/var/lib/postgresql
     environment:
       POSTGRES_USER: ${RYBBIT_POSTGRES_USER:-frog}
       POSTGRES_PASSWORD: ${RYBBIT_POSTGRES_PASSWORD:-frog}
