@@ -1,4 +1,3 @@
-# NOTE: Default username and pass: arcane / arcane-admin
 # TODO: How to set Apprise notification as env var instead of in UI?
 services:
   arcane:
@@ -20,12 +19,15 @@ services:
       - ALL
     cap_add: []
     volumes:
-      - $REPO_PATH/appdata/arcane:/app/data
+      - $REPO_PATH/appdata/arcane/data:/app/data
+      # - $REPO_PATH/appdata/arcane/backups:/backups
+      # - $REPO_PATH/appdata/arcane/builds:/builds
       # - $REPO_PATH:$REPO_PATH:ro
     environment:
       PUID: $PUID
       PGID: $PGID
       TZ: $TZ
+      ENVIRONMENT: production
       APP_URL: https://arcane.$DOMAINNAME
       PORT: 3552
       DOCKER_HOST: tcp://docker-socket-proxy-exec:2375
@@ -33,19 +35,28 @@ services:
       JWT_SECRET: $ARCANE_JWT_SECRET
       ANALYTICS_DISABLED: true
       LOG_LEVEL: info
+      LOG_JSON: false
+      ADMIN_STATIC_API_KEY: $ARCANE_API_KEY
       ## UI CONFIGS
       UI_CONFIGURATION_DISABLED: true
       PROJECTS_DIRECTORY: $REPO_PATH
       # ACCENT_COLOR: fasdfasdf # UI Accent color (oklch format)
+      OLED_MODE: true
+      ### AUTH
+      AUTH_LOCAL_ENABLED: false
+      AUTO_LOGIN_USERNAME: arcane
+      AUTO_LOGIN_PASSWORD: arcane
       ### OIDC
       OIDC_ENABLED: true
+      OIDC_PROVIDER_NAME: PocketID
+      OIDC_AUTO_REDIRECT_TO_PROVIDER: true
       OIDC_CLIENT_ID: $ARCANE_CLIENT_ID
       OIDC_CLIENT_SECRET: $ARCANE_CLIENT_SECRET
       OIDC_ISSUER_URL: https://pocketid.$BASE_DOMAINNAME
       OIDC_SCOPES: openid email profile groups
       OIDC_ADMIN_CLAIM: groups
       OIDC_ADMIN_VALUE: admin
-      OIDC_MERGE_ACCOUNTS: true
+      OIDC_MERGE_ACCOUNTS: false
     healthcheck:
       test:
         [

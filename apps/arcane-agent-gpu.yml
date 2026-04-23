@@ -23,12 +23,14 @@ services:
       - $REPO_PATH/appdata/arcane-agent:/app/data
     environment:
       AGENT_MODE: true
+      AGENT_TOKEN: $ARCANE_AGENT_TOKEN
       ANALYTICS_DISABLED: true
-      AGENT_TOKEN: $ARCANE_AGENT_BOOTSTRAP_TOKEN
-      MANAGER_API_URL: https://arcane.gpu.$BASE_DOMAINNAME
       DOCKER_HOST: tcp://docker-socket-proxy-exec:2375
+      EDGE_TRANSPORT: auto
+      ENVIRONMENT: production
       GPU_MONITORING_ENABLED: true
       GPU_TYPE: nvidia
+      MANAGER_API_URL: https://arcane.gpu.$BASE_DOMAINNAME
     labels:
       ####### HOMEPAGE #######
       homepage.group: "Core"
