@@ -115,7 +115,7 @@ services:
       retries: 10
 
   langfuse-worker:
-    image: langfuse/langfuse-worker:3@sha256:f8a9eb480b31cc513ad9ed9869eeb3416cb7bdf00c598665c008c460566115d1
+    image: langfuse/langfuse-worker:3@sha256:a6725ff2c11f10b3a2e212694f5ecacc9e48d2a59e71058a7008ff951620307c
     container_name: langfuse-worker
     restart: $RESTART_POLICY_PROGRAMMING
     user: expressjs
