@@ -2,6 +2,9 @@ networks:
   forgejo_ci:
     name: forgejo_ci
     internal: true
+    ipam:
+      config:
+        - subnet: 172.31.250.0/24
   forgejo_dind_egress:
     name: forgejo_dind_egress
 
@@ -16,16 +19,25 @@ services:
       - programming
       - forgejo
     networks:
-      - forgejo_dind_egress
-      - forgejo_ci
+      forgejo_dind_egress:
+      forgejo_ci:
+        ipv4_address: 172.31.250.10
     environment:
       DOCKER_TLS_CERTDIR: ""
     volumes:
       - $REPO_PATH/data/forgejo/dind:/var/lib/docker
-    command: ["dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false"]
+    # Bind unauthenticated Docker TCP only on the isolated CI network.
+    command: ["dockerd", "-H", "tcp://172.31.250.10:2375", "--tls=false"]
+    pids_limit: 1024
+    cpus: "4.0"
+    mem_limit: "6G"
+    ulimits:
+      nofile:
+        soft: 8192
+        hard: 16384
     healthcheck:
       test:
-        ["CMD-SHELL", "docker -H tcp://127.0.0.1:2375 info > /dev/null 2>&1"]
+        ["CMD-SHELL", "docker -H tcp://172.31.250.10:2375 info > /dev/null 2>&1"]
       interval: 10s
       timeout: 5s
       retries: 6
@@ -46,8 +58,8 @@ services:
     user: $PUID:$PGID
     read_only: true
     tmpfs:
-      - /tmp
-      - /run
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /run:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -56,7 +68,7 @@ services:
     environment:
       TZ: $TZ
       HOME: /tmp
-      DOCKER_HOST: tcp://forgejo-dind:2375
+      DOCKER_HOST: tcp://172.31.250.10:2375
       DOCKER_CONFIG: /tmp/.docker
       GC_INTERVAL_SECONDS: 21600 # 6 hours
       GC_UNTIL: 48h
@@ -100,13 +112,20 @@ services:
       - forgejo_ci
     read_only: true
     tmpfs:
-      - /tmp
-      - /run
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /run:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
+    pids_limit: 512
+    cpus: "2.0"
+    mem_limit: "2G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     cap_drop:
       - ALL
     cap_add: []
     environment:
-      DOCKER_HOST: tcp://forgejo-dind:2375
+      DOCKER_HOST: tcp://172.31.250.10:2375
       DOCKER_BUILDKIT: 1
     volumes:
       - $REPO_PATH/data/forgejo/runner:/data

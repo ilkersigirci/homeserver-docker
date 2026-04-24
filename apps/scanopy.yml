@@ -1,4 +1,7 @@
 # NOTE: The daemon requires host networking + privileged mode for active discovery.
+networks:
+  scanopy_backend:
+
 services:
   scanopy-daemon:
     image: ghcr.io/scanopy/scanopy/daemon:v0.16.1@sha256:f17495b5fe96f83b542ea30d8a798ccfa1163c5acb756a04a28520df31240950
@@ -14,8 +17,15 @@ services:
     user: "0:0"
     read_only: false
     tmpfs:
-      - /tmp
-      - /run
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,mode=1777
+      - /run:rw,noexec,nosuid,nodev,size=32m,mode=1777
+    pids_limit: 512
+    cpus: "2.0"
+    mem_limit: "2G"
+    ulimits:
+      nofile:
+        soft: 8192
+        hard: 16384
     environment:
       SCANOPY_LOG_LEVEL: info
       SCANOPY_SERVER_URL: http://127.0.0.1:60072
@@ -39,14 +49,21 @@ services:
       - maintenance
       - scanopy
     networks:
-      - t3_proxy
+      - scanopy_backend
     expose:
       - 5432
     user: $PUID:$PGID
     read_only: true
     tmpfs:
-      - /tmp:uid=$PUID,gid=$PGID,mode=1777
-      - /var/run/postgresql:uid=$PUID,gid=$PGID,mode=775
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /var/run/postgresql:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -81,6 +98,7 @@ services:
       - scanopy
     networks:
       - t3_proxy
+      - scanopy_backend
     ports:
       # Required so the host-network daemon can reach the server via 127.0.0.1.
       - "127.0.0.1:60072:60072"
@@ -89,8 +107,15 @@ services:
     user: $PUID:$PGID
     read_only: true
     tmpfs:
-      - /tmp
-      - /run
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /run:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
+    pids_limit: 512
+    cpus: "2.0"
+    mem_limit: "2G"
+    ulimits:
+      nofile:
+        soft: 8192
+        hard: 16384
     security_opt:
       - no-new-privileges:true
     cap_drop:

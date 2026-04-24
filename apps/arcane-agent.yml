@@ -7,13 +7,20 @@ services:
       - core
     networks:
       - t3_proxy
-      - socket_proxy
+      - socket_proxy_exec
     ports:
       - "3553:3553"
     user: $PUID:$PGID
     read_only: true
     tmpfs:
-      - /tmp
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     security_opt:
       - no-new-privileges:true
     cap_drop:

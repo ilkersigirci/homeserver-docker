@@ -9,16 +9,23 @@ services:
       - forgejo
     networks:
       - t3_proxy
-      - socket_proxy
+      - socket_proxy_exec
     expose:
       - 80 # API/Webhook endpoint
       - 9120 # Prometheus metrics
     user: $PUID:$PGID
     read_only: true
     tmpfs:
-      - /tmp
-      - /run
-      - $HOME:uid=$PUID,gid=$PGID,mode=0755
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /run:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
+      - $HOME:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=0755
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     security_opt:
       - no-new-privileges:true
     cap_drop:

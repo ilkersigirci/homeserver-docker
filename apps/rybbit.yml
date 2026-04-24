@@ -1,4 +1,7 @@
 # After first user creation, disable signup: RYBBIT_DISABLE_SIGNUP=true
+networks:
+  rybbit_backend:
+
 services:
   rybbit-clickhouse:
     image: clickhouse/clickhouse-server:26.3.9@sha256:537014a67ce8bf1f5c79c2e2b26fb30b8285a86ffff03875bb14ed17ea35db62
@@ -8,17 +11,24 @@ services:
       - monitoring
       - rybbit
     networks:
-      - t3_proxy
+      - rybbit_backend
     expose:
       - "8123"
       - "9000"
     user: $PUID:$PGID
     read_only: true
     tmpfs:
-      - /tmp:uid=$PUID,gid=$PGID,mode=1777
-      - /var/run/clickhouse-server:uid=$PUID,gid=$PGID,mode=775
-      - /var/log/clickhouse-server:uid=$PUID,gid=$PGID,mode=775
-      - /etc/clickhouse-server/users.d:uid=$PUID,gid=$PGID,mode=775
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /var/run/clickhouse-server:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
+      - /var/log/clickhouse-server:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=775
+      - /etc/clickhouse-server/users.d:rw,noexec,nosuid,nodev,size=16m,uid=$PUID,gid=$PGID,mode=775
+    pids_limit: 512
+    cpus: "2.0"
+    mem_limit: "4G"
+    ulimits:
+      nofile:
+        soft: 8192
+        hard: 16384
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -56,14 +66,21 @@ services:
       - monitoring
       - rybbit
     networks:
-      - t3_proxy
+      - rybbit_backend
     expose:
       - 5432
     user: $PUID:$PGID
     read_only: true
     tmpfs:
-      - /tmp:uid=$PUID,gid=$PGID,mode=1777
-      - /var/run/postgresql:uid=$PUID,gid=$PGID,mode=775
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /var/run/postgresql:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "2G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -83,7 +100,7 @@ services:
       start_period: 10s
 
   rybbit-backend:
-    image: ghcr.io/rybbit-io/rybbit-backend:${RYBBIT_IMAGE_TAG:-latest}
+    image: ghcr.io/rybbit-io/rybbit-backend:latest@sha256:fd00f61abe592f872a0e4ac13f8c7b190ab2810e72f898faea4809d7ced46eef
     container_name: rybbit-backend
     restart: $RESTART_POLICY_MAINTENANCE
     depends_on:
@@ -96,10 +113,18 @@ services:
       - rybbit
     networks:
       - t3_proxy
+      - rybbit_backend
     user: $PUID:$PGID
     read_only: true
     tmpfs:
-      - /tmp
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+    pids_limit: 512
+    cpus: "2.0"
+    mem_limit: "2G"
+    ulimits:
+      nofile:
+        soft: 8192
+        hard: 16384
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -161,7 +186,7 @@ services:
       glance.description: "OSS alternative API to Google Analytics"
 
   rybbit-client:
-    image: ghcr.io/rybbit-io/rybbit-client:${RYBBIT_IMAGE_TAG:-latest}
+    image: ghcr.io/rybbit-io/rybbit-client:latest@sha256:741908be311a23ee4e58c5f82c6740bf75bbe4f7430ff2aec420f6189b1378b8
     container_name: rybbit-client
     restart: $RESTART_POLICY_MAINTENANCE
     depends_on:
@@ -174,8 +199,15 @@ services:
     user: $PUID:$PGID
     read_only: true
     tmpfs:
-      - /tmp
-      - /app/.next/cache
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /app/.next/cache:rw,noexec,nosuid,nodev,size=128m,uid=$PUID,gid=$PGID,mode=775
+    pids_limit: 512
+    cpus: "2.0"
+    mem_limit: "2G"
+    ulimits:
+      nofile:
+        soft: 8192
+        hard: 16384
     security_opt:
       - no-new-privileges:true
     cap_drop:

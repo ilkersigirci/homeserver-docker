@@ -1,3 +1,6 @@
+networks:
+  gatus_backend:
+
 services:
   gatus-db:
     image: postgres:18.3@sha256:059fa0289cc5a184034e05a1f4f6d6fd79f69dc718b8b04ab60b6b469eed411e
@@ -12,14 +15,21 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
     networks:
-      - t3_proxy
+      - gatus_backend
     expose:
       - "5432"
     user: $PUID:$PGID
     read_only: true
     tmpfs:
-      - /tmp:uid=$PUID,gid=$PGID,mode=1777
-      - /var/run/postgresql:uid=$PUID,gid=$PGID,mode=775
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /var/run/postgresql:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -45,11 +55,19 @@ services:
       - gatus
     networks:
       - t3_proxy
+      - gatus_backend
       # - socket_proxy
     user: $PUID:$PGID
     read_only: true
     tmpfs:
-      - /tmp
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     security_opt:
       - no-new-privileges:true
     cap_drop:

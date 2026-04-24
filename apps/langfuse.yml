@@ -1,4 +1,7 @@
 # NOTE: Don't forget to create a bucket named "langfuse" in your s3 provider beforehand.
+networks:
+  langfuse_backend:
+
 services:
   langfuse-clickhouse:
     image: clickhouse/clickhouse-server:26.3.9@sha256:537014a67ce8bf1f5c79c2e2b26fb30b8285a86ffff03875bb14ed17ea35db62
@@ -8,17 +11,24 @@ services:
       - programming
       - langfuse
     networks:
-      - t3_proxy
+      - langfuse_backend
     expose:
       - 8123
       - 9000
     user: $PUID:$PGID
     read_only: true
     tmpfs:
-      - /tmp:uid=$PUID,gid=$PGID,mode=1777
-      - /var/run/clickhouse-server:uid=$PUID,gid=$PGID,mode=775
-      - /var/log/clickhouse-server:uid=$PUID,gid=$PGID,mode=775
-      - /etc/clickhouse-server/users.d:uid=$PUID,gid=$PGID,mode=775
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /var/run/clickhouse-server:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
+      - /var/log/clickhouse-server:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=775
+      - /etc/clickhouse-server/users.d:rw,noexec,nosuid,nodev,size=16m,uid=$PUID,gid=$PGID,mode=775
+    pids_limit: 512
+    cpus: "2.0"
+    mem_limit: "4G"
+    ulimits:
+      nofile:
+        soft: 8192
+        hard: 16384
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -57,14 +67,21 @@ services:
       - programming
       - langfuse
     networks:
-      - t3_proxy
+      - langfuse_backend
     expose:
       - 5432
     user: $PUID:$PGID
     read_only: true
     tmpfs:
-      - /tmp:uid=$PUID,gid=$PGID,mode=1777
-      - /var/run/postgresql:uid=$PUID,gid=$PGID,mode=775
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /var/run/postgresql:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "2G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -93,14 +110,21 @@ services:
       - programming
       - langfuse
     networks:
-      - t3_proxy
+      - langfuse_backend
     expose:
       - 6379
     user: $PUID:$PGID
     read_only: true
     tmpfs:
-      - /tmp
-      - /run
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /run:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -121,8 +145,8 @@ services:
     user: expressjs
     read_only: true
     tmpfs:
-      - /tmp
-      - /run
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,mode=1777
+      - /run:rw,noexec,nosuid,nodev,size=32m,mode=1777
     depends_on: &langfuse-depends-on
       langfuse-clickhouse:
         condition: service_healthy
@@ -140,9 +164,16 @@ services:
       - ALL
     cap_add: []
     networks:
-      - t3_proxy
+      - langfuse_backend
     expose:
       - 3030
+    pids_limit: 512
+    cpus: "2.0"
+    mem_limit: "3G"
+    ulimits:
+      nofile:
+        soft: 8192
+        hard: 16384
     environment: &langfuse-worker-env
       DATABASE_URL: postgresql://postgres:postgres@langfuse-db:5432/postgres
       SALT: $LANGFUSE_SALT
@@ -197,10 +228,10 @@ services:
     user: nextjs
     read_only: true
     tmpfs:
-      - /tmp
-      - /run
-      - /home/nextjs/.cache
-      - /app/node_modules/.cache
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,mode=1777
+      - /run:rw,noexec,nosuid,nodev,size=32m,mode=1777
+      - /home/nextjs/.cache:rw,noexec,nosuid,nodev,size=256m,mode=1777
+      - /app/node_modules/.cache:rw,noexec,nosuid,nodev,size=256m,mode=1777
     depends_on: *langfuse-depends-on
     profiles:
       - custom-user
@@ -208,11 +239,19 @@ services:
       - langfuse
     networks:
       - t3_proxy
+      - langfuse_backend
     security_opt:
       - no-new-privileges:true
     cap_drop:
       - ALL
     cap_add: []
+    pids_limit: 512
+    cpus: "2.0"
+    mem_limit: "3G"
+    ulimits:
+      nofile:
+        soft: 8192
+        hard: 16384
     environment:
       <<: *langfuse-worker-env
       NEXTAUTH_URL: https://langfuse.$DOMAINNAME

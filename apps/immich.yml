@@ -1,5 +1,8 @@
 # TODO: Harden
 # Env variables: https://immich.app/docs/install/environment-variables
+networks:
+  immich_backend:
+
 services:
   immich-redis:
     container_name: immich-redis
@@ -14,7 +17,14 @@ services:
       - media
       - immich
     networks:
-      - t3_proxy
+      - immich_backend
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     healthcheck:
       test: redis-cli ping || exit 1
 
@@ -31,7 +41,7 @@ services:
       - media
       - immich
     networks:
-      - t3_proxy
+      - immich_backend
     volumes:
       - $REPO_PATH/data/immich-db:/var/lib/postgresql/data
     environment:
@@ -42,6 +52,13 @@ services:
       PG_DATA: /var/lib/postgresql/data
       # Uncomment the DB_STORAGE_TYPE: 'HDD' var if your database isn't stored on SSDs
       # DB_STORAGE_TYPE: 'HDD'
+    pids_limit: 512
+    cpus: "2.0"
+    mem_limit: "2G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
 
   immich-server:
     container_name: immich-server
@@ -60,6 +77,7 @@ services:
       - immich
     networks:
       - t3_proxy
+      - immich_backend
     healthcheck:
       disable: false
     volumes:
@@ -75,6 +93,13 @@ services:
       DB_HOSTNAME: $IMMICH_DB_HOSTNAME
       DB_USERNAME: $IMMICH_DB_USERNAME
       DB_PASSWORD: $IMMICH_DB_PASSWORD
+    pids_limit: 1024
+    cpus: "4.0"
+    mem_limit: "6G"
+    ulimits:
+      nofile:
+        soft: 8192
+        hard: 16384
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -121,7 +146,7 @@ services:
       - media
       - immich
     networks:
-      - t3_proxy
+      - immich_backend
     environment:
       API_URL: http://immich-server:2283/api
       API_KEY: $IMMICH_API_KEY
@@ -132,6 +157,13 @@ services:
       LOG_LEVEL: INFO
       SYNC_MODE: "2" # Remove offline assets and delete empty albums after each run
       # RUN_IMMEDIATELY: "true" # Run the script immediately after start
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
 
   # NOTE: On Immich -> Admin -> Settings -> Server Settings -> External Domain
   immich-public-proxy:
@@ -149,11 +181,18 @@ services:
       - media
       - immich
     networks:
-      - t3_proxy
+      - immich_backend
     ports:
-      - "1003:3000"
+      - "127.0.0.1:1003:3000"
     environment:
       IMMICH_URL: http://immich-server:2283
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     # healthcheck:
     #   test: curl -s http://localhost:3000/share/healthcheck -o /dev/null || exit 1
     #   start_period: 10s

@@ -3,10 +3,17 @@ x-socket-proxy-service: &socket_proxy_service
   restart: $RESTART_POLICY_CORE
   read_only: true
   tmpfs:
-    - /run
+    - /run:rw,noexec,nosuid,nodev,size=16m
   profiles:
     - root
     - core
+  pids_limit: 128
+  cpus: "0.50"
+  mem_limit: "256M"
+  ulimits:
+    nofile:
+      soft: 1024
+      hard: 2048
   security_opt:
     - no-new-privileges:true
   cap_drop:
@@ -61,7 +68,7 @@ services:
     container_name: docker-socket-proxy-read
     <<: *socket_proxy_service
     networks:
-      - socket_proxy
+      - socket_proxy_read
     ports:
       # - "127.0.0.1:2375:2375" # Keep host access local-only. Other containers use socket_proxy network.
       - "2375:2375" # NOTE: Enable only if you intentionally expose Docker API in LAN.
@@ -76,7 +83,7 @@ services:
     container_name: docker-socket-proxy-write
     <<: *socket_proxy_service
     networks:
-      - socket_proxy
+      - socket_proxy_write
     environment:
       <<: *socket_proxy_env_mutable
 
@@ -85,7 +92,7 @@ services:
     container_name: docker-socket-proxy-exec
     <<: *socket_proxy_service
     networks:
-      - socket_proxy
+      - socket_proxy_exec
     environment:
       <<: *socket_proxy_env_mutable
       EXEC: 1
