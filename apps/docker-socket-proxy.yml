@@ -12,8 +12,8 @@ x-socket-proxy-service: &socket_proxy_service
   mem_limit: "256M"
   ulimits:
     nofile:
-      soft: 1024
-      hard: 2048
+      soft: 4096
+      hard: 8192
   security_opt:
     - no-new-privileges:true
   cap_drop:
