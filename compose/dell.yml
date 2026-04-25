@@ -27,6 +27,9 @@ networks:
     ipam:
       config:
         - subnet: 192.168.93.0/24
+  crowdsec_lapi:
+    name: crowdsec_lapi
+    driver: bridge
   dockervlan:
     name: dockervlan
     driver: macvlan
@@ -50,7 +53,7 @@ include:
   - ../apps/docker-socket-proxy.yml
   - ../apps/tinyauth.yml
   - ../apps/traefik.yml
-  # - ../apps/otel-collector-agent.yml
+  - ../apps/otel-collector-agent.yml
   ###### MAINTENANCE ####
   # - ../apps/home-assistant.yml
   - ../apps/watchyourlan.yml
