@@ -1,8 +1,8 @@
 tls:
-  enabled: False
+  enabled: false
 
 auth:
-  enabled: False
+  enabled: false
 
 logger:
   default: info
@@ -11,7 +11,7 @@ logger:
 
 mqtt:
   enabled: true
-  host: "{FRIGATE_MOSQUITTO_HOST}"
+  host: '{FRIGATE_MOSQUITTO_HOST}'
 
 # Hardware acceleration for Intel Xe Graphics
 ffmpeg:
@@ -59,8 +59,8 @@ go2rtc:
       - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.2.123:{FRIGATE_RTSP_PORT}/1/2
 
 cameras:
-  raylikapi: &camera_defaults
-    ffmpeg:
+  raylikapi:
+    ffmpeg: &id001
       inputs:
         - path: rtsp://127.0.0.1:8554/raylikapi_main
           roles:
@@ -69,14 +69,14 @@ cameras:
           roles:
             - detect
 
-    detect:
+    detect: &id002
       enabled: true
       # IMPORTANT: Update width and height to match your camera's sub-stream resolution exactly
       width: 704
       height: 576
       fps: 5
 
-    record:
+    record: &id003
       enabled: true
       alerts:
         retain:
@@ -84,10 +84,10 @@ cameras:
       detections:
         retain:
           days: 30
-    snapshots:
+    snapshots: &id004
       enabled: true
 
-    objects:
+    objects: &id005
       track:
         - person
         - car
@@ -99,7 +99,12 @@ cameras:
         # - cat
 
   giris:
-    <<: *camera_defaults
+    <<: &camera_defaults
+      ffmpeg: *id001
+      detect: *id002
+      record: *id003
+      snapshots: *id004
+      objects: *id005
     ffmpeg:
       inputs:
         - path: rtsp://127.0.0.1:8554/giris_main
@@ -109,6 +114,10 @@ cameras:
           roles:
             - detect
 
+    detect: *id002
+    record: *id003
+    snapshots: *id004
+    objects: *id005
   garajustu:
     <<: *camera_defaults
     ffmpeg:
@@ -120,6 +129,10 @@ cameras:
           roles:
             - detect
 
+    detect: *id002
+    record: *id003
+    snapshots: *id004
+    objects: *id005
   altbahce:
     <<: *camera_defaults
     ffmpeg:
@@ -131,6 +144,10 @@ cameras:
           roles:
             - detect
 
+    detect: *id002
+    record: *id003
+    snapshots: *id004
+    objects: *id005
   kamelya:
     <<: *camera_defaults
     ffmpeg:
@@ -142,4 +159,8 @@ cameras:
           roles:
             - detect
 
-version: 0.16-0
+    detect: *id002
+    record: *id003
+    snapshots: *id004
+    objects: *id005
+version: 0.17-0
