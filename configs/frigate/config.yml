@@ -37,6 +37,10 @@ model:
 
 go2rtc:
   streams:
+    raylikapi_main:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.2.124:{FRIGATE_RTSP_PORT}/1/1
+    raylikapi_sub:
+      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.2.124:{FRIGATE_RTSP_PORT}/1/2
     giris_main:
       - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.2.120:{FRIGATE_RTSP_PORT}/1/1
     giris_sub:
@@ -53,19 +57,15 @@ go2rtc:
       - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.2.123:{FRIGATE_RTSP_PORT}/1/1
     kamelya_sub:
       - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.2.123:{FRIGATE_RTSP_PORT}/1/2
-    raylikapi_main:
-      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.2.124:{FRIGATE_RTSP_PORT}/1/1
-    raylikapi_sub:
-      - rtsp://{FRIGATE_RTSP_USER}:{FRIGATE_RTSP_PASSWORD}@192.168.2.124:{FRIGATE_RTSP_PORT}/1/2
 
 cameras:
-  giris: &camera_defaults
+  raylikapi: &camera_defaults
     ffmpeg:
       inputs:
-        - path: rtsp://127.0.0.1:8554/giris_main
+        - path: rtsp://127.0.0.1:8554/raylikapi_main
           roles:
             - record
-        - path: rtsp://127.0.0.1:8554/giris_sub
+        - path: rtsp://127.0.0.1:8554/raylikapi_sub
           roles:
             - detect
 
@@ -98,6 +98,17 @@ cameras:
         # - face
         # - cat
 
+  giris:
+    <<: *camera_defaults
+    ffmpeg:
+      inputs:
+        - path: rtsp://127.0.0.1:8554/giris_main
+          roles:
+            - record
+        - path: rtsp://127.0.0.1:8554/giris_sub
+          roles:
+            - detect
+
   garajustu:
     <<: *camera_defaults
     ffmpeg:
@@ -128,17 +139,6 @@ cameras:
           roles:
             - record
         - path: rtsp://127.0.0.1:8554/kamelya_sub
-          roles:
-            - detect
-
-  raylikapi:
-    <<: *camera_defaults
-    ffmpeg:
-      inputs:
-        - path: rtsp://127.0.0.1:8554/raylikapi_main
-          roles:
-            - record
-        - path: rtsp://127.0.0.1:8554/raylikapi_sub
           roles:
             - detect
 

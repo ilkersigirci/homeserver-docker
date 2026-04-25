@@ -50,11 +50,13 @@ include:
   - ../apps/docker-socket-proxy.yml
   - ../apps/tinyauth.yml
   - ../apps/traefik.yml
-  - ../apps/otel-collector-agent.yml
+  # - ../apps/otel-collector-agent.yml
   ###### MAINTENANCE ####
-  - ../apps/home-assistant.yml
+  # - ../apps/home-assistant.yml
   - ../apps/watchyourlan.yml
   - ../apps/whoami.yml
   #### MEDIA ####
   - ../apps/immich.yml
   - ../apps/immich-gpu-intel.yml
+  - ../apps/frigate.yml
+  - ../apps/mosquitto.yml

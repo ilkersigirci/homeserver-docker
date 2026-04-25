@@ -22,7 +22,8 @@ services:
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - $REPO_PATH/configs/frigate:/config
-      - $REPO_PATH/data/frigate:/media/frigate
+      # - $REPO_PATH/data/frigate:/media/frigate
+      - $MEDIADIR/CamRecordings:/media/frigate
       - type: tmpfs # Optional: 1GB of memory, reduces SSD/SD Card wear
         target: /tmp/cache
         tmpfs:

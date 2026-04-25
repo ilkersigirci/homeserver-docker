@@ -78,6 +78,8 @@ services:
     networks:
       - t3_proxy
       - immich_backend
+    ports:
+      - "2283:2283"
     healthcheck:
       disable: false
     volumes:
