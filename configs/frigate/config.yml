@@ -78,6 +78,8 @@ cameras:
 
     record: &id003
       enabled: true
+      motion:
+        days: 2
       alerts:
         retain:
           days: 30
