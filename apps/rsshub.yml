@@ -81,7 +81,7 @@ services:
       glance.parent: "rsshub"
 
   rsshub:
-    image: ghcr.io/diygod/rsshub:latest@sha256:039753e1cb509d157b9da3c0d9e3fa7727a2f98d591f6331b46e353b5446c461
+    image: ghcr.io/diygod/rsshub:latest@sha256:fdc8d4f0eaf8fa370df836aeacefb1c3fcdd6581dd530d4e57bc45f3f8db06e5
     container_name: rsshub
     restart: $RESTART_POLICY_OTHERS
     profiles:
