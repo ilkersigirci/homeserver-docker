@@ -30,8 +30,8 @@ services:
     environment:
       # NOTE: https://github.com/kimdre/bitwarden-rest-api-server#getting-started
       BW_HOST: https://vaultwarden.home.$BASE_DOMAINNAME
-      BW_CLIENTID: $BW_CLIENTID
-      BW_CLIENTSECRET: $BW_CLIENTSECRET
+      BW_CLIENTID: $BW_CLIENT_ID
+      BW_CLIENTSECRET: $BW_CLIENT_SECRET
       BW_PASSWORD: $BW_PASSWORD
       VAULT_SYNC_INTERVAL: 120
     labels:
