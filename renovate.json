@@ -3,6 +3,8 @@
   "extends": ["config:best-practices"],
   "enabledManagers": ["docker-compose", "github-actions"],
   "includePaths": ["apps/**", ".github/workflows/**"],
+  "timezone": "Europe/Istanbul",
+  "schedule": ["* */6 * * 5,6,0"],
   "docker-compose": {
     "managerFilePatterns": ["/^apps\\/.*\\.ya?ml$/"]
   },
