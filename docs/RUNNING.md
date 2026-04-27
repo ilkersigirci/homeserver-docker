@@ -42,6 +42,15 @@ COMPOSE_PROFILES="$PROFILES" docker compose --env-file "$ENV_FILE" --file "$COMP
 COMPOSE_PROFILES="$PROFILES" docker compose --env-file "$ENV_FILE" --file "$COMPOSE_FILE" up -d
 ```
 
+## Image Digest Pinning
+
+When updating image versions in `apps/*.yml`, always pin to immutable digests (`image:tag@sha256:...`).
+Use `scripts/get-image-sha.sh` to resolve the digest for a tag:
+
+```bash
+scripts/get-image-sha.sh --pinned-only ghcr.io/traefik/traefik:3.7.0-rc.2
+```
+
 ## Destructive Operations
 
 - `down --volumes` and `rm -svf` are intentionally excluded from normal workflows.
