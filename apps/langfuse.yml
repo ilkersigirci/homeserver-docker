@@ -139,7 +139,7 @@ services:
       retries: 10
 
   langfuse-worker:
-    image: langfuse/langfuse-worker:3@sha256:a1ba2245d3106459b75ba01e44f2e05cd34dae964526f7cae592f5873aad1587
+    image: langfuse/langfuse-worker:3.171.0@sha256:a1ba2245d3106459b75ba01e44f2e05cd34dae964526f7cae592f5873aad1587
     container_name: langfuse-worker
     restart: $RESTART_POLICY_PROGRAMMING
     user: expressjs
@@ -222,7 +222,7 @@ services:
       SMTP_CONNECTION_URL: ${SMTP_CONNECTION_URL:-}
 
   langfuse-web:
-    image: langfuse/langfuse:3@sha256:31bf938d0e678026f39d35151771fad8854b4ec83ba7bff8c6d232760e276296
+    image: langfuse/langfuse:3.171.0@sha256:b2c50e13ff4b87ee952656453c13525d43fb21b8a51a8fccf99c3684d53f3ecb
     container_name: langfuse-web
     restart: $RESTART_POLICY_PROGRAMMING
     user: nextjs
