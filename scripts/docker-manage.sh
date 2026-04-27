@@ -15,10 +15,11 @@ COMPOSE_CMD="docker compose -f $COMPOSE_FILE --env-file $ENV_FILE"
 
 # Function to display usage
 usage() {
-    echo "Usage: $0 [up|down|pull|restart|prep-perms]"
+    echo "Usage: $0 [up|down|pull|pull_only|restart|prep-perms]"
     echo "  up         - Start containers"
     echo "  down       - Stop containers"
     echo "  pull       - Update containers"
+    echo "  pull_only  - Pull latest images without restarting"
     echo "  restart    - Restart containers"
     echo "  prep-perms - Create/chown bind paths for non-root services"
     exit 1
@@ -64,6 +65,12 @@ case "$1" in
         echo "🧹 Cleaning up dangling images..."
         docker image prune -f || echo "⚠️  Warning: Image cleanup failed"
         echo "✅ Update complete!"
+        ;;
+
+    "pull_only")
+        echo "🔄 Pulling containers..."
+        COMPOSE_PROFILES=$PROFILES $COMPOSE_CMD pull
+        echo "✅ Pull complete!"
         ;;
 
     "restart")
