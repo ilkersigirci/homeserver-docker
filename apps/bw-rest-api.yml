@@ -1,0 +1,61 @@
+services:
+  bw-rest-api:
+    image: ghcr.io/kimdre/bitwarden-rest-api-server:2026.4.1@sha256:c6a5b4444beef851cf4e8bd685169f273a643b9990aabac45e9119286fcdf053
+    container_name: bw-rest-api
+    restart: $RESTART_POLICY_CORE
+    init: true
+    profiles:
+      - core
+    networks:
+      - t3_proxy
+    expose:
+      - 8087
+    user: $PUID:$PGID
+    # user: 65532:65532
+    read_only: true
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    volumes:
+      - $REPO_PATH/appdata/bw-rest-api:/data
+    environment:
+      # NOTE: https://github.com/kimdre/bitwarden-rest-api-server#getting-started
+      BW_HOST: https://vaultwarden.home.$BASE_DOMAINNAME
+      BW_CLIENTID: $BW_CLIENTID
+      BW_CLIENTSECRET: $BW_CLIENTSECRET
+      BW_PASSWORD: $BW_PASSWORD
+      VAULT_SYNC_INTERVAL: 120
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.bw-rest-api-rtr.entrypoints: "websecure"
+      traefik.http.routers.bw-rest-api-rtr.rule: "Host(`bw-rest-api.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.bw-rest-api-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.bw-rest-api-rtr.service: "bw-rest-api-svc"
+      traefik.http.services.bw-rest-api-svc.loadbalancer.server.port: "8087"
+      ####### TINYAUTH #######
+      tinyauth.apps.bw-rest-api.config.domain: "bw-rest-api.$DOMAINNAME"
+      tinyauth.apps.bw-rest-api.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "Core"
+      homepage.name: "bw-rest-api"
+      homepage.icon: "bw-rest-api.png"
+      homepage.href: "https://bw-rest-api.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Bitwarden REST API Server"
+      ####### GLANCE #######
+      glance.name: "bw-rest-api"
+      glance.icon: "sh:bw-rest-api"
+      glance.url: "https://bw-rest-api.$DOMAINNAME"
+      glance.description: "Bitwarden REST API Server"
