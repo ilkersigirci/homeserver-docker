@@ -222,7 +222,7 @@ services:
       SMTP_CONNECTION_URL: ${SMTP_CONNECTION_URL:-}
 
   langfuse-web:
-    image: langfuse/langfuse:3@sha256:cdfdca609912edffd616503e43427395fcf135423422440d74c89d9d552b74f9
+    image: langfuse/langfuse:3@sha256:31bf938d0e678026f39d35151771fad8854b4ec83ba7bff8c6d232760e276296
     container_name: langfuse-web
     restart: $RESTART_POLICY_PROGRAMMING
     user: nextjs
