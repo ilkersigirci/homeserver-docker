@@ -27,6 +27,9 @@ runner:
   envs:
     A_TEST_ENV_NAME_1: a_test_env_value_1
     A_TEST_ENV_NAME_2: a_test_env_value_2
+    # NOTE: To make forgejo actions to use docker-dind
+    DOCKER_HOST: tcp://172.17.0.1:2375
+
   # Extra environment variables to run jobs from a file.
   # It will be ignored if it's empty or the file doesn't exist.
   env_file: .env

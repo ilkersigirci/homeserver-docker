@@ -26,8 +26,10 @@ services:
       DOCKER_TLS_CERTDIR: ""
     volumes:
       - $REPO_PATH/data/forgejo/dind:/var/lib/docker
-    # Bind unauthenticated Docker TCP only on the isolated CI network.
-    command: ["dockerd", "-H", "tcp://172.31.250.10:2375", "--tls=false"]
+    # Listen inside the DIND container so both the runner container
+    # (forgejo_ci network) and nested job containers (host-gateway) can reach it.
+    # The port is not published to the Docker host.
+    command: ["dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false"]
     pids_limit: 1024
     cpus: "4.0"
     mem_limit: "6G"
@@ -37,7 +39,7 @@ services:
         hard: 16384
     healthcheck:
       test:
-        ["CMD-SHELL", "docker -H tcp://172.31.250.10:2375 info > /dev/null 2>&1"]
+        ["CMD-SHELL", "docker -H tcp://127.0.0.1:2375 info > /dev/null 2>&1"]
       interval: 10s
       timeout: 5s
       retries: 6
