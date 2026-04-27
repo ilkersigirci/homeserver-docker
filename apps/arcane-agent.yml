@@ -1,6 +1,6 @@
 services:
   arcane-agent:
-    image: ghcr.io/getarcaneapp/arcane-headless:v1.18.0@sha256:c0a5d2dc6fbbd8e00400bdb8a03cb949d2c53b6143fd708858478812d2eee820
+    image: ghcr.io/getarcaneapp/arcane-headless:v1.18.1@sha256:bf542015de80b39ddb868328125e038d99db52672d586d07c5a85bd9256ced2a
     container_name: arcane-agent
     restart: $RESTART_POLICY_CORE
     profiles:
