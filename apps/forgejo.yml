@@ -45,10 +45,9 @@ services:
       timeout: 5s
       retries: 3
 
-  # NOTE: Create `$REPO_PATH/data/forgejo/gitea` and `$REPO_PATH/data/forgejo/conf` dirs with current user beforehand.
   # NOTE: Configuration is located in: $REPO_PATH/data/forgejo/gitea/custom/conf/app.ini
   forgejo:
-    image: codeberg.org/forgejo/forgejo:14-rootless@sha256:bca6943cdd8a50f5befaf1d654bec32c9a3b6da400d23a77a829bd41f88a7263
+    image: codeberg.org/forgejo/forgejo:15.0.0-rootless@sha256:ab6ca32ae0d5af2494b77aa22dd5cd2f24087f4325b396d09188b695ce004e24
     container_name: forgejo
     user: $PUID:$PGID
     cpus: "1.5"
@@ -84,7 +83,6 @@ services:
     cap_add: []
     volumes:
       - $REPO_PATH/data/forgejo/gitea:/var/lib/gitea
-      - $REPO_PATH/data/forgejo/conf:/etc/gitea
     environment:
       USER_UID: $PUID
       USER_GID: $PGID
@@ -105,7 +103,6 @@ services:
       FORGEJO__openid__ENABLE_OPENID_SIGNIN: false
       FORGEJO__webhook__ALLOWED_HOST_LIST: doco-cd.$DOMAINNAME
       FORGEJO__cron.cleanup_packages__SCHEDULE: "@every 6h"
-
     labels:
       traefik.enable: "true"
       ## HTTP Routers
