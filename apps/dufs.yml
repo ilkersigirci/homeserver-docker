@@ -1,7 +1,7 @@
 services:
   dufs:
-    container_name: dufs
     image: sigoden/dufs:v0.45.0@sha256:9b45a406b019921c7d2a512784a8652fc23a83c5598bf0ddc81d3c130c623f31
+    container_name: dufs
     restart: $RESTART_POLICY_MEDIA
     command: /data -A
     profiles:
@@ -17,19 +17,26 @@ services:
     cap_drop:
       - ALL
     cap_add: []
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: 1G
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     volumes:
       - $REPO_PATH/appdata/dufs:/data
       - $USERDIR:/data/Home
       # - $REPO_PATH/appdata/dufs/Apps/Books:/data/Apps/Books # NOTE: For syncing MoonReader with webdav
       # - $DIR_HARDDISKROOT:/data/Harddisk
+    environment:
+      DUFS_BIND: 0.0.0.0
+      DUFS_PORT: 5000
     # healthcheck:
     #   test: "curl http://127.0.0.1:5000/__dufs__/health" # NOTE: Not working since there is no curl
     #   interval: 10s
     #   timeout: 5s
     #   retries: 3
-    environment:
-      DUFS_BIND: 0.0.0.0
-      DUFS_PORT: 5000
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -50,3 +57,8 @@ services:
       homepage.href: "https://dufs.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "A file server that supports static serving, WEBDAV"
+      ####### GLANCE #######
+      glance.name: Dufs
+      glance.icon: sh:dufs
+      glance.url: https://dufs.$DOMAINNAME
+      glance.description: A file server that supports static serving, WEBDAV

@@ -12,8 +12,8 @@ services:
   forgejo-dind:
     image: docker:29-dind@sha256:c77e5d7912f9b137cc67051fdc2991d8f5ae22c55ddf532bb836dcb693a04940
     container_name: forgejo-dind
-    privileged: true
     restart: $RESTART_POLICY_PROGRAMMING
+    command: ["dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false"]
     profiles:
       - root
       - programming
@@ -22,14 +22,16 @@ services:
       forgejo_dind_egress:
       forgejo_ci:
         ipv4_address: 172.31.250.10
-    environment:
-      DOCKER_TLS_CERTDIR: ""
-    volumes:
-      - $REPO_PATH/data/forgejo/dind:/var/lib/docker
-    # Listen inside the DIND container so both the runner container
-    # (forgejo_ci network) and nested job containers (host-gateway) can reach it.
-    # The port is not published to the Docker host.
-    command: ["dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false"]
+    privileged: true
+    user: "0:0"
+    read_only: false
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     pids_limit: 1024
     cpus: "4.0"
     mem_limit: "6G"
@@ -37,9 +39,12 @@ services:
       nofile:
         soft: 8192
         hard: 16384
+    volumes:
+      - $REPO_PATH/data/forgejo/dind:/var/lib/docker
+    environment:
+      DOCKER_TLS_CERTDIR: ""
     healthcheck:
-      test:
-        ["CMD-SHELL", "docker -H tcp://127.0.0.1:2375 info > /dev/null 2>&1"]
+      test: ["CMD-SHELL", "docker -H tcp://127.0.0.1:2375 info > /dev/null 2>&1"]
       interval: 10s
       timeout: 5s
       retries: 6
@@ -52,9 +57,6 @@ services:
     profiles:
       - programming
       - forgejo
-    depends_on:
-      forgejo-dind:
-        condition: service_healthy
     networks:
       - forgejo_ci
     user: $PUID:$PGID
@@ -67,6 +69,13 @@ services:
     cap_drop:
       - ALL
     cap_add: []
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: 1G
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     environment:
       TZ: $TZ
       HOME: /tmp
@@ -75,6 +84,9 @@ services:
       GC_INTERVAL_SECONDS: 21600 # 6 hours
       GC_UNTIL: 48h
       GC_DRY_RUN: 1
+    depends_on:
+      forgejo-dind:
+        condition: service_healthy
     command:
       - /bin/sh
       - -ec
@@ -97,12 +109,9 @@ services:
   forgejo-runner:
     image: code.forgejo.org/forgejo/runner:12.9.0@sha256:2860af6a7fa5521b2cdb26a14545c083ffd06b2528dbfc470cfec39a0b6bde39
     container_name: forgejo-runner
-    user: $PUID:$PGID
     restart: $RESTART_POLICY_PROGRAMMING
     # command: '/bin/sh -c "while : ; do sleep 1 ; done ;"'
     command: '/bin/sh -c "sleep 5; forgejo-runner daemon --config /config.yml"'
-    security_opt:
-      - no-new-privileges:true
     depends_on:
       forgejo-dind:
         condition: service_healthy
@@ -112,10 +121,16 @@ services:
     networks:
       - forgejo_dind_egress
       - forgejo_ci
+    user: $PUID:$PGID
     read_only: true
     tmpfs:
       - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
       - /run:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     pids_limit: 512
     cpus: "2.0"
     mem_limit: "2G"
@@ -123,12 +138,9 @@ services:
       nofile:
         soft: 4096
         hard: 8192
-    cap_drop:
-      - ALL
-    cap_add: []
-    environment:
-      DOCKER_HOST: tcp://172.31.250.10:2375
-      DOCKER_BUILDKIT: 1
     volumes:
       - $REPO_PATH/data/forgejo/runner:/data
       - $REPO_PATH/configs/forgejo/runner/config.yml:/config.yml:ro
+    environment:
+      DOCKER_HOST: tcp://172.31.250.10:2375
+      DOCKER_BUILDKIT: 1

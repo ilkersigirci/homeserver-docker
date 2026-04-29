@@ -19,16 +19,23 @@ services:
       - /var/run/headscale
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: 1G
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     volumes:
       - $REPO_PATH/configs/headscale:/etc/headscale:ro
       - $REPO_PATH/data/headscale:/var/lib/headscale
     environment:
       TZ: $TZ
     healthcheck:
-      test:
-        ["CMD", "headscale", "health"]
-        # start_period: 5s
-        # interval: 1m
+      test: ["CMD", "headscale", "health"]
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -81,6 +88,11 @@ services:
     read_only: true
     tmpfs:
       - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=65532,gid=65532,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     pids_limit: 256
     cpus: "1.0"
     mem_limit: "1G"
@@ -88,11 +100,6 @@ services:
       nofile:
         soft: 4096
         hard: 8192
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    cap_add: []
     volumes:
       - $REPO_PATH/configs/headplane/config.example.yml:/etc/headplane/config.yaml:ro
       - $REPO_PATH/data/headplane:/var/lib/headplane
@@ -158,13 +165,28 @@ services:
     container_name: headscale-admin
     restart: $RESTART_POLICY_CORE
     depends_on:
-      - headscale
+      headscale:
+        condition: service_healthy
     profiles:
       - not-used
     networks:
       - t3_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: 1G
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     environment:
       ENDPOINT: "/admin"
     labels:

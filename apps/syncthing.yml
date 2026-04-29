@@ -2,9 +2,11 @@
 # NOTE: 22000:22000/tcp port is probably needed for other devices to see this device.
 services:
   syncthing:
-    container_name: syncthing
     image: lscr.io/linuxserver/syncthing:v2.0.16-ls214@sha256:de6958feb8caf81217832744ae9a4843efbb4dd432c6cea90077ed7a0cf97fc3
+    container_name: syncthing
     restart: $RESTART_POLICY_OTHERS
+    profiles:
+      - maintenance
     networks:
       - t3_proxy
     ports:
@@ -14,6 +16,13 @@ services:
     #   - 21027:21027/udp # Receive local discovery broadcasts
     security_opt:
       - no-new-privileges:true
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: 1G
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     volumes:
       - $REPO_PATH/appdata/syncthing:/config
       - $DIR_NOTES/Markdown:/notes
@@ -66,5 +75,3 @@ services:
       glance.icon: "sh:syncthing"
       glance.url: "https://syncthing.$DOMAINNAME"
       glance.description: "File Synchronization"
-    profiles:
-      - maintenance

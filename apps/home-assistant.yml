@@ -11,15 +11,20 @@ services:
       - home-assistant
     networks:
       - home_assistant_backend
+    expose:
+      - 5432
     ports:
       - "127.0.0.1:5400:5432"
-    expose:
-      - "5432"
     user: $PUID:$PGID
     read_only: true
     tmpfs:
       - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
       - /var/run/postgresql:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     pids_limit: 256
     cpus: "1.0"
     mem_limit: "2G"
@@ -27,11 +32,6 @@ services:
       nofile:
         soft: 4096
         hard: 8192
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    cap_add: []
     volumes:
       - $REPO_PATH/data/home-assistant-db:/var/lib/postgresql
     environment:
@@ -58,6 +58,13 @@ services:
     network_mode: host
     security_opt:
       - no-new-privileges:true
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: 1G
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     volumes:
       - $REPO_PATH/configs/home-assistant:/config
       - /etc/localtime:/etc/localtime:ro

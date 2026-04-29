@@ -6,14 +6,23 @@ services:
     profiles:
       - programming
       - desktop_apps
+    networks:
+      - t3_proxy
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
     # NOTE: Required for keyring functionality.
     cap_add:
       - IPC_LOCK
     shm_size: "1gb"
-    networks:
-      - t3_proxy
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: 4G
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     volumes:
       - $REPO_PATH/appdata/vscodium:/config
       - $REPO_PATH:/config/workspace/docker
@@ -47,6 +56,11 @@ services:
       homepage.href: "https://code.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Code Editor"
+      ####### GLANCE #######
+      glance.name: "VSCodium"
+      glance.icon: "sh:vscodium"
+      glance.url: "https://code.$DOMAINNAME"
+      glance.description: "Code Editor"
     # For Nvidia Zero Copy Rendering
     group_add:
       # - "44" # video

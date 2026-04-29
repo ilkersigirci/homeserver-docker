@@ -13,6 +13,11 @@ services:
     user: $PUID:$PGID
     # user: 65532:65532
     read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     pids_limit: 256
     cpus: "1.0"
     mem_limit: "1G"
@@ -20,11 +25,6 @@ services:
       nofile:
         soft: 4096
         hard: 8192
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    cap_add: []
     volumes:
       - $REPO_PATH/appdata/bw-rest-api:/data
     environment:

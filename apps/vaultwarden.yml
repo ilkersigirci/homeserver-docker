@@ -2,11 +2,11 @@
 # docker exec -it vaultwarden /vaultwarden hash
 services:
   vaultwarden:
-    container_name: vaultwarden
     image: ghcr.io/dani-garcia/vaultwarden:1.35.8@sha256:c4f6056fe0c288a052a223cecd263a90d1dda1a0177bb5b054a363a6c7b211d9
+    container_name: vaultwarden
+    restart: $RESTART_POLICY_CORE
     profiles:
       - core
-    restart: $RESTART_POLICY_CORE
     networks:
       - t3_proxy
     user: $PUID:$PGID
@@ -18,6 +18,13 @@ services:
     cap_drop:
       - ALL
     cap_add: []
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: 1G
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     volumes:
       - $REPO_PATH/data/vaultwarden:/data/
     environment:
@@ -66,3 +73,8 @@ services:
       homepage.href: "https://vaultwarden.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Password Manager"
+      ####### GLANCE #######
+      glance.name: "Vaultwarden"
+      glance.icon: "sh:vaultwarden"
+      glance.url: "https://vaultwarden.$DOMAINNAME"
+      glance.description: "Password Manager"

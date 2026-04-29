@@ -8,6 +8,9 @@ services:
     image: maximhq/bifrost:v1.4.23@sha256:4ce7dc06559eb0beebfcda9b94af13e91cb4d6d75c4fa92c3bb0f608a12b0f2f
     container_name: bifrost
     restart: $RESTART_POLICY_PROGRAMMING
+    entrypoint: # NOTE: For custom base_url env logic
+      - /bin/sh
+      - /app/render-config.sh
     profiles:
       - custom-user
       - programming
@@ -22,9 +25,13 @@ services:
     cap_drop:
       - ALL
     cap_add: []
-    entrypoint: # NOTE: For custom base_url env logic
-      - /bin/sh
-      - /app/render-config.sh
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: 1G
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     volumes:
       # - $REPO_PATH/configs/bifrost/config.json:/app/data/config.json
       # NOTE: Enables persistence for logs, NOT CONFIGS

@@ -17,5 +17,8 @@ help:
 #     export
 # endif
 
+install-pre-commit: ## Install pre-commit hooks
+	prek install
+
 pre-commit: ## Run pre-commit for all package files
-	pre-commit run --all-files
+	prek run --all-files

@@ -16,13 +16,20 @@ services:
     cap_drop:
       - ALL
     cap_add: []
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: 1G
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      - $REPO_PATH/appdata/convertx:/app/data
     environment:
       ACCOUNT_REGISTRATION: false
       JWT_SECRET: $CONVERTX_JWT_SECRET
       HTTP_ALLOWED: true
       ALLOW_UNAUTHENTICATED: true
-    volumes:
-      - $REPO_PATH/appdata/convertx:/app/data
     labels:
       traefik.enable: "true"
       ## HTTP Routers Auth
@@ -43,3 +50,8 @@ services:
       homepage.href: "https://convertx.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Online PDF Editor"
+      ####### GLANCE #######
+      glance.name: ConvertX
+      glance.icon: sh:convertx
+      glance.url: https://convertx.$DOMAINNAME
+      glance.description: Online PDF Editor

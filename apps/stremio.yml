@@ -6,6 +6,9 @@ services:
     image: tsaridas/stremio-docker:v1.2.14@sha256:a97379afd8d845fa57730e908fef63359b6a7d3daf25a8f668595b188b6fe2ef
     container_name: stremio
     restart: $RESTART_POLICY_MEDIA
+    profiles:
+      - media
+      - arr
     networks:
       - t3_proxy
     expose:
@@ -25,12 +28,19 @@ services:
     cap_drop:
       - ALL
     cap_add: []
-    environment:
-      NO_CORS: 1
-      APP_PATH: /.stremio-server
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: 1G
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     volumes:
       - $REPO_PATH/configs/stremio:/.stremio-server
       - $REPO_PATH/appdata/stremio:/srv/stremio-server
+    environment:
+      NO_CORS: 1
+      APP_PATH: /.stremio-server
     labels:
       traefik.enable: "true"
       ## HTTP Routers Auth - Web UI
@@ -67,15 +77,20 @@ services:
       homepage.href: "https://stremio.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Online Streaming Platform"
-    profiles:
-      - media
-      - arr
+      ####### GLANCE #######
+      glance.name: Stremio
+      glance.icon: sh:stremio
+      glance.url: https://stremio.$DOMAINNAME
+      glance.description: Online Streaming Platform
 
-  # In the url, change streamingServer=http to streamingServer=https
   stremio-server:
     image: stremio/server:v4.20.17@sha256:f8cbbc4e13cd52d914253e8e35c1c7a65b2bc6fb5aba8ae3648379f604d04218
     container_name: stremio-server
     restart: $RESTART_POLICY_MEDIA
+    profiles:
+      # - media
+      # - arr
+      - not-used
     networks:
       - t3_proxy
     user: $PUID:$PGID
@@ -87,6 +102,13 @@ services:
     cap_drop:
       - ALL
     cap_add: []
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: 1G
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     volumes:
       - $REPO_PATH/appdata/stremio-server:/.stremio-server
     environment:
@@ -109,7 +131,10 @@ services:
       homepage.href: "https://stremio-server.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Online Streaming Platform"
-    profiles:
-      # - media
-      # - arr
-      - not-used
+      tinyauth.apps.stremio-server.config.domain: stremio-server.$DOMAINNAME
+      tinyauth.apps.stremio-server.ip.bypass: $LOCAL_IPS
+      ####### GLANCE #######
+      glance.name: Stremio
+      glance.icon: sh:stremio-server
+      glance.url: https://stremio-server.$DOMAINNAME
+      glance.description: Online Streaming Platform

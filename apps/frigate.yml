@@ -1,3 +1,4 @@
+# TODO: Harden
 services:
   frigate:
     image: ghcr.io/blakeblackshear/frigate:stable@sha256:1724960349dad0bd2ae8ec884171a6fd5755a4dc242a0e66cadbda9c0e85c99b
@@ -17,8 +18,16 @@ services:
       - "8555:8555/udp" # WebRTC over udp
     security_opt:
       - no-new-privileges:true
-    devices:
-      - /dev/dri/renderD128:/dev/dri/renderD128 # For intel hwaccel, needs to be updated for your hardware
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: 1G
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - $REPO_PATH/configs/frigate:/config
@@ -34,6 +43,8 @@ services:
       FRIGATE_RTSP_USER: $FRIGATE_RTSP_USER
       FRIGATE_RTSP_PASSWORD: $FRIGATE_RTSP_PASSWORD
       FRIGATE_MOSQUITTO_HOST: ${FRIGATE_MOSQUITTO_HOST:-mosquitto}
+    devices:
+      - /dev/dri/renderD128:/dev/dri/renderD128 # For intel hwaccel, needs to be updated for your hardware
     labels:
       traefik.enable: "true"
       ## HTTP Routers

@@ -3,7 +3,6 @@ services:
     image: collabora/code:25.04.9.4.1@sha256:fe49c08c27e102c1877ad4ef2ac1a7bd8ccd2dfaa6641d4533389c204a92bb88
     container_name: filestash-wopi-server
     restart: $RESTART_POLICY_MEDIA
-    user: root
     command:
       - /bin/bash
       - -c
@@ -13,14 +12,27 @@ services:
     profiles:
       - root
       - not-used
-      # - media
-      # - filestash
     networks:
       - t3_proxy
     expose:
-      - "9980"
+      - 9980
+    user: root
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: 1G
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes: []
     environment:
       extra_params: "--o:ssl.enable=false"
       aliasgroup1: "https://.*:443"
@@ -46,6 +58,13 @@ services:
     cap_drop:
       - ALL
     cap_add: []
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: 1G
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     volumes:
       - $REPO_PATH/configs/filestash/filestash.bin:/app/filestash
       - $REPO_PATH/data/filestash:/app/data/state/

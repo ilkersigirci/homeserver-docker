@@ -16,6 +16,11 @@ services:
     tmpfs:
       - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
       - /run:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     pids_limit: 256
     cpus: "1.0"
     mem_limit: "1G"
@@ -23,11 +28,8 @@ services:
       nofile:
         soft: 4096
         hard: 8192
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    cap_add: []
+    volumes:
+      - $REPO_PATH/data/tinyauth:/data
     # https://tinyauth.app/docs/reference/configuration/
     environment:
       DOCKER_HOST: tcp://docker-socket-proxy-read:2375
@@ -65,8 +67,6 @@ services:
       # TINYAUTH_UI_BACKGROUNDIMAGE: ""
       ## Logging Configuration
       TINYAUTH_LOG_LEVEL: info
-    volumes:
-      - $REPO_PATH/data/tinyauth:/data
     labels:
       traefik.enable: "true"
       ## HTTP Routers
