@@ -10,9 +10,6 @@ services:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
-    cap_drop:
-      - ALL
-    cap_add: []
     pids_limit: 256
     cpus: '1.0'
     mem_limit: 1G
