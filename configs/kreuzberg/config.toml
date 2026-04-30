@@ -1,0 +1,20 @@
+[chunking]
+max_characters = 1000
+overlap = 200
+
+# Use balanced preset (default)
+[chunking.embedding]
+model = { type = "preset", name = "balanced" }
+batch_size = 32
+normalize = true
+
+# Or use fast preset
+# [chunking.embedding]
+# model = { type = "preset", name = "fast" }
+# batch_size = 16
+
+# Or use custom cache directory
+# [chunking.embedding]
+# model = { type = "preset", name = "quality" }
+# cache_dir = "/data/models"
+# show_download_progress = true

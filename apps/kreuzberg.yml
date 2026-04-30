@@ -1,0 +1,66 @@
+services:
+  kreuzberg:
+    image: ghcr.io/kreuzberg-dev/kreuzberg:4.9.5@sha256:d237f2843061e3318945f6b5ef37a9c1eaac1611923dd7236af6f56485edc1a7
+    container_name: kreuzberg
+    restart: $RESTART_POLICY_MEDIA
+    command: serve --host 0.0.0.0 --port 8000 --config /config/kreuzberg.toml
+    profiles:
+      - media
+    networks:
+      - t3_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:rw,exec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      - $REPO_PATH/appdata/kreuzberg/data:/data
+      - $REPO_PATH/appdata/kreuzberg/cache:/app/.kreuzberg
+      - $REPO_PATH/configs/kreuzberg/config.toml:/config/kreuzberg.toml:rw
+    environment:
+      KREUZBERG_CORS_ORIGINS: https://docext.$DOMAINNAME
+      KREUZBERG_MAX_UPLOAD_SIZE_MB: 500
+      KREUZBERG_CACHE_DIR: /app/.kreuzberg
+      RUST_LOG: info
+    healthcheck:
+      test: ["CMD", "kreuzberg", "--version"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.kreuzberg-rtr.entrypoints: "websecure"
+      traefik.http.routers.kreuzberg-rtr.rule: "Host(`docext.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.kreuzberg-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.kreuzberg-rtr.service: "kreuzberg-svc"
+      traefik.http.services.kreuzberg-svc.loadbalancer.server.port: "8000"
+      ####### TINYAUTH #######
+      tinyauth.apps.kreuzberg.config.domain: "docext.$DOMAINNAME"
+      tinyauth.apps.kreuzberg.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "Media"
+      homepage.name: "kreuzberg"
+      homepage.icon: "kreuzberg.png"
+      homepage.href: "https://docext.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "A polyglot document intelligence framework with a Rust core"
+      ####### GLANCE #######
+      glance.name: "kreuzberg"
+      glance.icon: "sh:kreuzberg"
+      glance.url: "https://docext.$DOMAINNAME"
+      glance.description: "A polyglot document intelligence framework with a Rust core"

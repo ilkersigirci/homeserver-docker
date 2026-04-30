@@ -72,6 +72,7 @@ include:
   - ../apps/jellyfin.yml
   - ../apps/jellyseerr.yml
   - ../apps/kiwix-serve.yml
+  - ../apps/kreuzberg.yml
   # - ../apps/oxicloud.yml
   - ../apps/pinchflat.yml
   # - ../apps/prowlarr.yml
