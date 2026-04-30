@@ -29,7 +29,7 @@ services:
       - $REPO_PATH/appdata/kreuzberg/cache:/app/.kreuzberg
       - $REPO_PATH/configs/kreuzberg/config.toml:/config/kreuzberg.toml:rw
     environment:
-      KREUZBERG_CORS_ORIGINS: https://docext.$DOMAINNAME
+      KREUZBERG_CORS_ORIGINS: https://docparse.$DOMAINNAME
       KREUZBERG_MAX_UPLOAD_SIZE_MB: 500
       KREUZBERG_CACHE_DIR: /app/.kreuzberg
       RUST_LOG: info
@@ -43,24 +43,24 @@ services:
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.kreuzberg-rtr.entrypoints: "websecure"
-      traefik.http.routers.kreuzberg-rtr.rule: "Host(`docext.$DOMAINNAME`)"
+      traefik.http.routers.kreuzberg-rtr.rule: "Host(`docparse.$DOMAINNAME`)"
       ## Middlewares
       traefik.http.routers.kreuzberg-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
       traefik.http.routers.kreuzberg-rtr.service: "kreuzberg-svc"
       traefik.http.services.kreuzberg-svc.loadbalancer.server.port: "8000"
       ####### TINYAUTH #######
-      tinyauth.apps.kreuzberg.config.domain: "docext.$DOMAINNAME"
+      tinyauth.apps.kreuzberg.config.domain: "docparse.$DOMAINNAME"
       tinyauth.apps.kreuzberg.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "kreuzberg"
       homepage.icon: "kreuzberg.png"
-      homepage.href: "https://docext.$DOMAINNAME"
+      homepage.href: "https://docparse.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "A polyglot document intelligence framework with a Rust core"
       ####### GLANCE #######
       glance.name: "kreuzberg"
       glance.icon: "sh:kreuzberg"
-      glance.url: "https://docext.$DOMAINNAME"
+      glance.url: "https://docparse.$DOMAINNAME"
       glance.description: "A polyglot document intelligence framework with a Rust core"
