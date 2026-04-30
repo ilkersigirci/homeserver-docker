@@ -1,0 +1,63 @@
+services:
+  scalar:
+    image: scalarapi/api-reference:0.5.22@sha256:f8e87263e359c4e388c2a65a8087a7a767d0f14ee9c093ca94534c828dc02290
+    container_name: scalar
+    restart: $RESTART_POLICY_PROGRAMMING
+    profiles:
+      - programming
+    networks:
+      - t3_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /data/caddy:rw,noexec,nosuid,nodev,size=16m,uid=$PUID,gid=$PGID,mode=775
+      - /config/caddy:rw,noexec,nosuid,nodev,size=16m,uid=$PUID,gid=$PGID,mode=775
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    pids_limit: 128
+    cpus: "0.5"
+    mem_limit: "256M"
+    ulimits:
+      nofile:
+        soft: 2048
+        hard: 4096
+    environment:
+      # Add more APIs by appending objects in "sources", for example:
+      # {"title":"My API","url":"https://myapi.${DOMAINNAME}/openapi.json"}
+      # Add matching entries in "servers" for APIs that publish localhost/default servers.
+      API_REFERENCE_CONFIG: >-
+        {"sources":[
+          {"title":"Kreuzberg API","url":"https://docparse.${DOMAINNAME}/openapi.json"}
+        ],"servers":[
+          {"url":"https://docparse.${DOMAINNAME}","description":"Kreuzberg via Traefik"}
+        ],"agent":{"disabled":true}}
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.scalar-rtr.entrypoints: "websecure"
+      traefik.http.routers.scalar-rtr.rule: "Host(`scalar.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.scalar-rtr.middlewares: "chain-tinyauth-relaxed@file"
+      ## HTTP Services
+      traefik.http.routers.scalar-rtr.service: "scalar-svc"
+      traefik.http.services.scalar-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.scalar.config.domain: "scalar.$DOMAINNAME"
+      tinyauth.apps.scalar.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "Programming"
+      homepage.name: "scalar"
+      homepage.icon: "sh:scalar"
+      homepage.href: "https://scalar.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Generic Scalar UI for multiple OpenAPI specs"
+      ####### GLANCE #######
+      glance.name: "scalar"
+      glance.icon: "sh:scalar"
+      glance.url: "https://scalar.$DOMAINNAME"
+      glance.description: "Generic Scalar UI for multiple OpenAPI specs"

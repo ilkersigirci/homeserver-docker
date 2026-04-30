@@ -2,10 +2,10 @@ services:
   kreuzberg:
     image: ghcr.io/kreuzberg-dev/kreuzberg:4.9.5@sha256:d237f2843061e3318945f6b5ef37a9c1eaac1611923dd7236af6f56485edc1a7
     container_name: kreuzberg
-    restart: $RESTART_POLICY_MEDIA
+    restart: $RESTART_POLICY_PROGRAMMING
     command: serve --host 0.0.0.0 --port 8000 --config /config/kreuzberg.toml
     profiles:
-      - media
+      - programming
     networks:
       - t3_proxy
     user: $PUID:$PGID
@@ -29,7 +29,7 @@ services:
       - $REPO_PATH/appdata/kreuzberg/cache:/app/.kreuzberg
       - $REPO_PATH/configs/kreuzberg/config.toml:/config/kreuzberg.toml:rw
     environment:
-      KREUZBERG_CORS_ORIGINS: https://docparse.$DOMAINNAME
+      KREUZBERG_CORS_ORIGINS: https://docparse.$DOMAINNAME, https://scalar.$DOMAINNAME
       KREUZBERG_MAX_UPLOAD_SIZE_MB: 500
       KREUZBERG_CACHE_DIR: /app/.kreuzberg
       RUST_LOG: info
@@ -53,7 +53,7 @@ services:
       tinyauth.apps.kreuzberg.config.domain: "docparse.$DOMAINNAME"
       tinyauth.apps.kreuzberg.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: "Media"
+      homepage.group: "Programming"
       homepage.name: "kreuzberg"
       homepage.icon: "kreuzberg.png"
       homepage.href: "https://docparse.$DOMAINNAME"
