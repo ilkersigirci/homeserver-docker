@@ -5,19 +5,21 @@ networks:
 
 services:
   immich-redis:
-    container_name: immich-redis
     image: docker.io/valkey/valkey:9@sha256:3b55fbaa0cd93cf0d9d961f405e4dfcc70efe325e2d84da207a0a8e6d8fde4f9
-    user: $PUID:$PGID
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - NET_RAW
+    container_name: immich-redis
     restart: $RESTART_POLICY_MEDIA
     profiles:
       - media
       - immich
     networks:
       - immich_backend
+    user: $PUID:$PGID
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - NET_RAW
+      - ALL
+    cap_add: []
     pids_limit: 256
     cpus: "1.0"
     mem_limit: "1G"
@@ -29,19 +31,29 @@ services:
       test: redis-cli ping || exit 1
 
   immich-postgres:
-    container_name: immich-postgres
     image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23
-    user: $PUID:$PGID
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - NET_RAW
+    container_name: immich-postgres
     restart: $RESTART_POLICY_MEDIA
     profiles:
       - media
       - immich
     networks:
       - immich_backend
+    user: $PUID:$PGID
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - NET_RAW
+      - ALL
+    cap_add: []
+    pids_limit: 512
+    cpus: "2.0"
+    mem_limit: "2G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+
     volumes:
       - $REPO_PATH/data/immich-db:/var/lib/postgresql/data
     environment:
@@ -52,22 +64,10 @@ services:
       PG_DATA: /var/lib/postgresql/data
       # Uncomment the DB_STORAGE_TYPE: 'HDD' var if your database isn't stored on SSDs
       # DB_STORAGE_TYPE: 'HDD'
-    pids_limit: 512
-    cpus: "2.0"
-    mem_limit: "2G"
-    ulimits:
-      nofile:
-        soft: 4096
-        hard: 8192
 
   immich-server:
-    container_name: immich-server
     image: ghcr.io/immich-app/immich-server:v2.7.5@sha256:c15bff75068effb03f4355997d03dc7e0fc58720c2b54ad6f7f10d1bc57efaa5
-    user: $PUID:$PGID
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - NET_RAW
+    container_name: immich-server
     restart: $RESTART_POLICY_MEDIA
     depends_on:
       - immich-redis
@@ -80,8 +80,20 @@ services:
       - immich_backend
     ports:
       - "2283:2283"
-    healthcheck:
-      disable: false
+    user: $PUID:$PGID
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - NET_RAW
+      - ALL
+    cap_add: []
+    pids_limit: 1024
+    cpus: "4.0"
+    mem_limit: "6G"
+    ulimits:
+      nofile:
+        soft: 8192
+        hard: 16384
     volumes:
       - $IMMICH_UPLOAD_LOCATION:/usr/src/app/upload
       - $DIR_PHOTOS/Pictures:/mnt/media/Photos/Pictures
@@ -95,13 +107,8 @@ services:
       DB_HOSTNAME: $IMMICH_DB_HOSTNAME
       DB_USERNAME: $IMMICH_DB_USERNAME
       DB_PASSWORD: $IMMICH_DB_PASSWORD
-    pids_limit: 1024
-    cpus: "4.0"
-    mem_limit: "6G"
-    ulimits:
-      nofile:
-        soft: 8192
-        hard: 16384
+    healthcheck:
+      disable: false
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -130,17 +137,17 @@ services:
       homepage.widget.url: "http://immich-server:2283"
       homepage.widget.key: "$IMMICH_API_KEY"
       homepage.widget.version: "2"
+      ####### GLANCE #######
+      glance.name: "Immich"
+      glance.icon: "sh:immich-server"
+      glance.url: "https://photos.$DOMAINNAME"
+      glance.description: "Selfhosted Photo App"
 
   ##############################################
   # https://github.com/Salvoxia/immich-folder-album-creator
   immich-folder-album-creator:
-    container_name: immich-folder-album-creator
     image: salvoxia/immich-folder-album-creator:0.25.2@sha256:79b82f9818ded34c8dcfc5df0502126fdaff698b94ddad4b20ac1f0c3a7dcba2
-    user: $PUID:$PGID
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - NET_RAW
+    container_name: immich-folder-album-creator
     restart: "no"
     depends_on:
       - immich-server
@@ -149,6 +156,20 @@ services:
       - immich
     networks:
       - immich_backend
+    user: $PUID:$PGID
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - NET_RAW
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     environment:
       API_URL: http://immich-server:2283/api
       API_KEY: $IMMICH_API_KEY
@@ -159,23 +180,11 @@ services:
       LOG_LEVEL: INFO
       SYNC_MODE: "2" # Remove offline assets and delete empty albums after each run
       # RUN_IMMEDIATELY: "true" # Run the script immediately after start
-    pids_limit: 256
-    cpus: "1.0"
-    mem_limit: "1G"
-    ulimits:
-      nofile:
-        soft: 4096
-        hard: 8192
 
   # NOTE: On Immich -> Admin -> Settings -> Server Settings -> External Domain
   immich-public-proxy:
-    container_name: immich-public-proxy
     image: alangrainger/immich-public-proxy:1.15.5@sha256:add80c37eb2cc6d1e9622f3590ba4ee72c94a765c51a3b5e1afc485a4ec89135
-    user: $PUID:$PGID
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - NET_RAW
+    container_name: immich-public-proxy
     restart: $RESTART_POLICY_MEDIA
     depends_on:
       - immich-server
@@ -186,8 +195,13 @@ services:
       - immich_backend
     ports:
       - "127.0.0.1:1003:3000"
-    environment:
-      IMMICH_URL: http://immich-server:2283
+    user: $PUID:$PGID
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - NET_RAW
+      - ALL
+    cap_add: []
     pids_limit: 256
     cpus: "1.0"
     mem_limit: "1G"
@@ -201,8 +215,13 @@ services:
     #   timeout: 5s
     volumes:
       - $REPO_PATH/configs/immich-public-proxy/config.json:/app/config.json:ro
+    environment:
+      IMMICH_URL: http://immich-server:2283
     labels:
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "Immich-Public-Proxy"
       homepage.icon: "immich.svg"
+      ####### GLANCE #######
+      glance.name: "Immich-Public-Proxy"
+      glance.icon: "sh:immich-public-proxy"

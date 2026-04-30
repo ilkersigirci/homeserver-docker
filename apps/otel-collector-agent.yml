@@ -1,36 +1,13 @@
 services:
   # NOTE: Local edge collector that receives OTLP from local services and forwards to central LGTM.
   otel-collector-agent:
-    container_name: otel-collector-agent
     image: otel/opentelemetry-collector-contrib:0.150.1@sha256:a516c26968aa1feb5e5fc0562e3338ea13755cb4f373603226bcc4e276374ad0
+    container_name: otel-collector-agent
     restart: $RESTART_POLICY_CORE
-    profiles:
-      - core
-    user: $PUID:$PGID
     command:
       - --config=/etc/otelcol/config.yaml
-    read_only: true
-    tmpfs:
-      - /tmp
-      - /run
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    cap_add: []
-    healthcheck:
-      # Distroless image (no shell/curl). Use collector binary for a lightweight health probe.
-      test:
-        [
-          "CMD",
-          "/otelcol-contrib",
-          "validate",
-          "--config=/etc/otelcol/config.yaml",
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
+    profiles:
+      - core
     networks:
       - t3_proxy
     expose:
@@ -41,6 +18,23 @@ services:
       - 8889 # Prometheus exporter metrics
       - 13133 # health_check extension
       - 55679 # zpages extension
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp
+      - /run
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: 1G
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     volumes:
       - $REPO_PATH/configs/otel-collector/otelcol-agent-config.yaml:/etc/otelcol/config.yaml:ro
       - $REPO_PATH/data/otel-collector-agent:/var/lib/otelcol/file_storage
@@ -55,3 +49,10 @@ services:
       OTEL_COLLECTOR_SERVICE_NAMESPACE: ${OTEL_COLLECTOR_SERVICE_NAMESPACE:-edge}
       OTEL_COLLECTOR_HOST_NAME: $MY_HOSTNAME
       OTEL_COLLECTOR_DEPLOYMENT_ENVIRONMENT: ${OTEL_DEPLOYMENT_ENVIRONMENT:-production}
+    healthcheck:
+      # Distroless image (no shell/curl). Use collector binary for a lightweight health probe.
+      test: ["CMD", "/otelcol-contrib", "validate", "--config=/etc/otelcol/config.yaml"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s

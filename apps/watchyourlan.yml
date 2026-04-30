@@ -2,7 +2,7 @@ services:
   #  Optional, local themes and icons
   wyl-node-bootstrap:
     image: ghcr.io/aceberg/node-bootstrap:5.3.3@sha256:88d741cc99e65709e4ddb5b4164e518bc1c336526689f0f0fe58150eca88143c
-    container_name: node-bootstrap
+    container_name: watchyourlan-node-bootstrap
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - monitoring
@@ -10,19 +10,42 @@ services:
       - t3_proxy
     ports:
       - 8850:8850
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: 1G
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
 
   watchyourlan:
     image: ghcr.io/aceberg/watchyourlan:2.1.4@sha256:f77532ca7c3c9a4398cb094df7674013a3d7fcf4699386f1e456c24df6fef00e
     container_name: watchyourlan
     restart: $RESTART_POLICY_MAINTENANCE
-    profiles:
-      - monitoring
     command: "-n https://lan.$DOMAINNAME"
     depends_on:
       - wyl-node-bootstrap
+    profiles:
+      - monitoring
     network_mode: "host"
     expose:
       - 8840
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: 1G
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     volumes:
       - $REPO_PATH/appdata/watchyourlan:/data/WatchYourLAN
     environment:

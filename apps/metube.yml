@@ -17,6 +17,13 @@ services:
     cap_drop:
       - ALL
     cap_add: []
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: 1G
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     volumes:
       - $DIR_MEDIA/Youtube:/downloads
       - $DIR_MEDIA/Youtube/cookies:/cookies
@@ -52,3 +59,8 @@ services:
       homepage.href: "https://metube.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Self-hosted YouTube downloader"
+      ####### GLANCE #######
+      glance.name: metube
+      glance.icon: sh:metube
+      glance.url: https://metube.$DOMAINNAME
+      glance.description: Self-hosted YouTube downloader

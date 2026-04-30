@@ -19,6 +19,14 @@ services:
     cap_drop:
       - ALL
     cap_add: []
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: 1G
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes: []
     labels:
       traefik.enable: "true"
       ## HTTP Routers Auth
@@ -39,3 +47,8 @@ services:
       homepage.href: "https://it-tools.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "It Tools"
+      ####### GLANCE #######
+      glance.name: It-Tools
+      glance.icon: sh:it-tools
+      glance.url: https://it-tools.$DOMAINNAME
+      glance.description: It Tools

@@ -11,17 +11,24 @@ services:
       - jellyfin
     networks:
       - t3_proxy
+    expose:
+      - 7700
     # user: "65534:65534"
     # read_only: true
     tmpfs:
       - /tmp
-    expose:
-      - "7700"
     security_opt:
       - no-new-privileges:true
     cap_drop:
       - ALL
     cap_add: []
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: 1G
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     volumes:
       - $REPO_PATH/appdata/jellyfin-meilisearch:/meili_data
     environment:
@@ -35,9 +42,6 @@ services:
   jellyfin:
     image: ghcr.io/jellyfin/jellyfin:10.11.8@sha256:93227545077893cc9516f28b3adb733b67bc4691f41b6167428a2a0e3220b81c
     container_name: jellyfin
-    # cpus: "0.5"
-    mem_reservation: "2048M"
-    mem_limit: "2048M"
     restart: $RESTART_POLICY_MEDIA
     depends_on:
       - jellyfin-meilisearch
@@ -58,13 +62,20 @@ services:
     cap_drop:
       - ALL
     cap_add: []
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: "2048M"
+    mem_reservation: "2048M"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     volumes:
       - $REPO_PATH/appdata/jellyfin:/config
       - $REPO_PATH/appdata/jellyfin/cache:/cache
       - $REPO_PATH/data/jellyfin/metadata:/config/metadata
       - $REPO_PATH/data/downloads:/media/downloads:ro
       - $DIR_MEDIA:/media/local:ro
-      # - $ONEDRIVEDIR:/media/onedrive:ro
     environment:
       MEILI_URL: http://jellyfin-meilisearch:7700
       MEILI_MASTER_KEY: "1234"

@@ -3,18 +3,25 @@ networks:
 
 services:
   linkwarden-db:
-    container_name: linkwarden-db
     image: postgres:18.3@sha256:78481659c47e862334611ccdaf7c369c986b3046da9857112f3b309114a65fb4
+    container_name: linkwarden-db
     restart: $RESTART_POLICY_OTHERS
     profiles:
       - reading
     networks:
       - linkwarden_backend
+    expose:
+      - 5432
     user: $PUID:$PGID
     read_only: true
     tmpfs:
       - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
       - /var/run/postgresql:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     pids_limit: 256
     cpus: "1.0"
     mem_limit: "1G"
@@ -22,19 +29,12 @@ services:
       nofile:
         soft: 4096
         hard: 8192
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    cap_add: []
-    expose:
-      - "5432"
+    volumes:
+      - $REPO_PATH/data/linkwarden-db:/var/lib/postgresql
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
-    volumes:
-      - $REPO_PATH/data/linkwarden-db:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -44,8 +44,8 @@ services:
 
   # TODO: Harden
   linkwarden:
-    container_name: linkwarden
     image: ghcr.io/linkwarden/linkwarden:v2.14.1@sha256:31cf4bd2a2e111991fa5c9de03174c8698869c83722105c6ce529e4c911e6861
+    container_name: linkwarden
     restart: $RESTART_POLICY_OTHERS
     depends_on:
       linkwarden-db:
@@ -62,6 +62,9 @@ services:
     #   - /tmp
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
     pids_limit: 512
     cpus: "2.0"
     mem_limit: "2G"
@@ -69,9 +72,6 @@ services:
       nofile:
         soft: 8192
         hard: 16384
-    cap_drop:
-      - ALL
-    cap_add: []
     volumes:
       - $REPO_PATH/data/linkwarden:/data/data
     environment:
@@ -110,3 +110,8 @@ services:
       homepage.widget.type: "linkwarden"
       homepage.widget.url: "http://linkwarden:3000"
       homepage.widget.key: "$LINKWARDEN_ACCESS_TOKEN"
+      ####### GLANCE #######
+      glance.name: Linkwarden
+      glance.icon: sh:linkwarden
+      glance.url: https://linkwarden.$DOMAINNAME
+      glance.description: Bookmark Manager

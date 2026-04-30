@@ -1,7 +1,7 @@
 services:
   open-webui:
-    container_name: open-webui
     image: ghcr.io/open-webui/open-webui:v0.9.2@sha256:a7e4796ae894d1e2a0c1824860ade472f35c507608a01c3581377b5c19b0ed49
+    container_name: open-webui
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
       - programming
@@ -20,6 +20,13 @@ services:
     cap_drop:
       - ALL
     cap_add: []
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: 1G
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     volumes:
       - $REPO_PATH/appdata/open-webui:/app/backend/data
     # Docs: https://docs.openwebui.com/reference/env-configuration
