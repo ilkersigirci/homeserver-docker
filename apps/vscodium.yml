@@ -1,6 +1,7 @@
+# TODO: Harden
 services:
   vscodium:
-    image: lscr.io/linuxserver/vscodium:1.112.01907-ls270@sha256:3d67028cb8217eb266d6f3168b826fbf7f6063f681cdebc956f77ea4eefe8bce
+    image: lscr.io/linuxserver/vscodium:1.116.02821@sha256:6622d56ca91288b2c099ea99fde56facd0fb3f8699ca1c333af62dde5092a183
     container_name: vscodium
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
@@ -10,8 +11,6 @@ services:
       - t3_proxy
     security_opt:
       - no-new-privileges:true
-    cap_drop:
-      - ALL
     # NOTE: Required for keyring functionality.
     cap_add:
       - IPC_LOCK

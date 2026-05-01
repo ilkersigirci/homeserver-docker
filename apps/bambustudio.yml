@@ -1,7 +1,8 @@
+# TODO: Harden
 # NOTE: Consumes +2GB RAM
 services:
   bambustudio:
-    image: lscr.io/linuxserver/bambustudio:v02.06.00.51-ls142@sha256:fb25e146392c611eaa18d08e0d42a96aceaffb37e9aa09a4a03777687be65669
+    image: lscr.io/linuxserver/bambustudio:02.06.01@sha256:cbef3b4b04368e5e7912fc43ddb01b0f39c20ea664c29e991614c4e7658a0a6c
     container_name: bambustudio
     restart: $RESTART_POLICY_DESKTOP_IMAGES
     hostname: bambustudio
@@ -14,9 +15,6 @@ services:
       - 3001 # HTTPS
     security_opt:
       - no-new-privileges:true
-    cap_drop:
-      - ALL
-    cap_add: []
     shm_size: "1gb"
     pids_limit: 256
     cpus: '1.0'
