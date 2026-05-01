@@ -1,6 +1,6 @@
 services:
   omni-tools:
-    image: iib0011/omni-tools:latest@sha256:c010553dd405ed2b8a46481ee44c18a39003fcf94323cc54619d276f6b51df1d
+    image: iib0011/omni-tools:latest@sha256:cf8367939496fd70b5107d4110dc1c8783fbf87b5dcaac9b8e59f58b5fce5570
     container_name: omni-tools
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
