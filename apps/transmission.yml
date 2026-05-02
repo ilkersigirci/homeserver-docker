@@ -5,9 +5,6 @@ services:
   transmission:
     image: lscr.io/linuxserver/transmission:4.1.1-r1-ls340@sha256:dd888c17f97eca1a2dda4aa7986c9080fe1b69a61aef845440f1bd9285aa3708
     container_name: transmission
-    # cpus: "0.5"
-    mem_reservation: "4096M"
-    mem_limit: "4096M"
     restart: $RESTART_POLICY_MEDIA
     profiles:
       - media
@@ -20,6 +17,14 @@ services:
       # - "51413:51413"
     security_opt:
       - no-new-privileges:true
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: "4096M"
+    mem_reservation: "4096M"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     volumes:
       - $REPO_PATH/appdata/transmission:/config
       - $DIR_MEDIA/Downloads:/data/downloads
@@ -53,3 +58,8 @@ services:
       homepage.description: "Torrent Client"
       homepage.widget.type: "transmission"
       homepage.widget.url: "http://transmission:9091"
+      ####### GLANCE #######
+      glance.name: Transmission
+      glance.icon: sh:transmission
+      glance.url: https://torrent.$DOMAINNAME
+      glance.description: Torrent Client
