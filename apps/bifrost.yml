@@ -5,7 +5,7 @@
 # TODO: Research Vector Store integration for Semantic Caching
 services:
   bifrost:
-    image: maximhq/bifrost:v1.4.23@sha256:4ce7dc06559eb0beebfcda9b94af13e91cb4d6d75c4fa92c3bb0f608a12b0f2f
+    image: maximhq/bifrost:v1.4.24@sha256:ef9efcf3332e559d3d6748c807006e4271860f7d256ebd6ae0f714c6929792c3
     container_name: bifrost
     restart: $RESTART_POLICY_PROGRAMMING
     entrypoint: # NOTE: For custom base_url env logic
