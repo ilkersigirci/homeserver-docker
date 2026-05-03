@@ -7,6 +7,13 @@ http:
       middlewares:
         - chain-no-auth-relaxed
       service: adguardhome-svc
+    pocket-id-rtr:
+      rule: "Host(`pocketid.{{env "BASE_DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-pocket-id
+      service: pocket-id-svc     
     gotify-rtr:
       rule: "Host(`gotify.{{env "BASE_DOMAINNAME"}}`)"
       entryPoints:
@@ -14,7 +21,6 @@ http:
       middlewares:
         - chain-no-auth-relaxed
       service: gotify-svc
-
     aiostreams-rtr:
       rule: "Host(`aiostreams.{{env "BASE_DOMAINNAME"}}`)"
       entryPoints:
@@ -28,6 +34,14 @@ http:
       loadBalancer:
         servers:
           - url: "http://192.168.2.13:81"
+    pocket-id-svc:
+      loadBalancer:
+        servers:
+          - url: "http://192.168.2.12:1000"
+        # healthCheck:
+        #   path: "/healthz"
+        #   interval: "30s"
+        #   timeout: "5s"
     gotify-svc:
       loadBalancer:
         servers:
