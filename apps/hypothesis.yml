@@ -1,6 +1,9 @@
 networks:
   hypothesis_backend:
 
+# Runbooks:
+# - scripts/hypothesis/init.md: initialize the service and bootstrap user/OAuth.
+# - scripts/hypothesis/import.md: import official hypothes.is annotations.
 services:
   # Upstream h runs as one container with nginx, gunicorn, websocket support,
   # and the Celery worker controlled by supervisord. The support services below
@@ -192,9 +195,6 @@ services:
       ENABLE_WORKER: "true"
       H_API_AUTH_COOKIE_SECRET_KEY: ${HYPOTHESIS_API_AUTH_COOKIE_SECRET_KEY:-change-me-h-api-auth-cookie-secret-key}
       H_API_AUTH_COOKIE_SALT: ${HYPOTHESIS_API_AUTH_COOKIE_SALT:-change-me-h-api-auth-cookie-salt}
-      # Legacy h deployments use this to bootstrap tables automatically. Keep
-      # the explicit init profile below for upgrades and first-user setup.
-      MODEL_CREATE_ALL: "true"
     healthcheck:
       test:
         [
@@ -228,8 +228,8 @@ services:
       glance.url: "https://hypothesis.$DOMAINNAME"
       glance.description: "Web annotation server"
 
-  # Optional one-shot helper. Run with the hypothesis-init profile after first
-  # deploy if MODEL_CREATE_ALL is not enough for your image/database state.
+  # One-shot helper for database/search initialization and local
+  # user/OAuth bootstrap. See scripts/hypothesis/init.md before running it.
   hypothesis-init:
     image: hypothesis/hypothesis:20260310-g031840e@sha256:277f47a5848569a7368ea05822760bb07da7b4536e13ca1b52bbef349322f6b3
     container_name: hypothesis-init

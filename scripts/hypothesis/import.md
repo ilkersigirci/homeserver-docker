@@ -10,55 +10,18 @@ Run all host-side commands from the repository root:
 cd $HOME/docker
 ```
 
-## 1. Bootstrap The Local User
+## 1. Initialize The Local Service
 
-Set the local bootstrap user in `.env`:
+Complete [init.md](./init.md) first. It covers database/search initialization,
+local user/password/admin bootstrap, and OAuth client setup.
 
-```env
-HYPOTHESIS_CLIENT_OAUTH_ID=<stable-uuid>
-HYPOTHESIS_BOOTSTRAP_USERNAME=<username>
-HYPOTHESIS_BOOTSTRAP_EMAIL=<email>
-HYPOTHESIS_BOOTSTRAP_PASSWORD=<password>
-HYPOTHESIS_BOOTSTRAP_ADMIN=true
-HYPOTHESIS_BOOTSTRAP_OAUTH_CLIENT_NAME=Hypothesis client
-HYPOTHESIS_BOOTSTRAP_OAUTH_REDIRECT_URI=https://hypothesis.$DOMAINNAME/app.html
-```
-
-Use any stable UUID for `HYPOTHESIS_CLIENT_OAUTH_ID`. To generate one:
-
-```bash
-uuidgen | tr '[:upper:]' '[:lower:]'
-```
-
-Run the one-shot init profile:
-
-```bash
-COMPOSE_PROFILES=reading,hypothesis,hypothesis-init docker compose \
-  --env-file .env \
-  -f compose/gpu.yml \
-  run --rm hypothesis-init
-```
-
-This initializes the database/search index, creates the user if missing, and
-grants admin when `HYPOTHESIS_BOOTSTRAP_ADMIN=true`. It also creates or updates
-the OAuth client row for `HYPOTHESIS_CLIENT_OAUTH_ID`.
-
-All listed bootstrap variables are required. If one is missing, compose or the
-init script fails before database initialization. If the user already exists,
-the init command updates its password from `HYPOTHESIS_BOOTSTRAP_PASSWORD`.
-
-Recreate the app container:
-
-```bash
-COMPOSE_PROFILES=reading,hypothesis docker compose \
-  --env-file .env \
-  -f compose/gpu.yml \
-  up -d --force-recreate hypothesis
-```
+Return here after the local app container has been recreated and you can log in
+to the self-hosted service.
 
 ## 2. Create API Tokens
 
-Log in to the local service as `<username>`, then create a local API token:
+Log in to the local service as the bootstrap user, then create a local API
+token:
 
 ```text
 https://hypothesis.$DOMAINNAME/account/developer
