@@ -1,0 +1,265 @@
+networks:
+  hypothesis_backend:
+
+services:
+  # Upstream h runs as one container with nginx, gunicorn, websocket support,
+  # and the Celery worker controlled by supervisord. The support services below
+  # mirror the current h development compose topology: Postgres, Elasticsearch,
+  # and RabbitMQ.
+  hypothesis-db:
+    image: postgres:18.3@sha256:78481659c47e862334611ccdaf7c369c986b3046da9857112f3b309114a65fb4
+    container_name: hypothesis-db
+    restart: $RESTART_POLICY_OTHERS
+    profiles:
+      - reading
+      - hypothesis
+    networks:
+      - hypothesis_backend
+    expose:
+      - 5432
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /var/run/postgresql:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: "0.5"
+    mem_limit: "512M"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      - $REPO_PATH/data/hypothesis/postgres:/var/lib/postgresql
+    environment:
+      POSTGRES_USER: ${HYPOTHESIS_POSTGRES_USER:-hypothesis}
+      POSTGRES_PASSWORD: ${HYPOTHESIS_POSTGRES_PASSWORD:-hypothesis}
+      POSTGRES_DB: ${HYPOTHESIS_POSTGRES_DB:-hypothesis}
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  hypothesis-elasticsearch:
+    image: hypothesis/elasticsearch:elasticsearch7.10@sha256:6bb6c0acca6a60d16318510fe3eddb89a44b0bda3ce98788fc594a1aa0791772
+    container_name: hypothesis-elasticsearch
+    restart: $RESTART_POLICY_OTHERS
+    profiles:
+      - reading
+      - hypothesis
+    networks:
+      - hypothesis_backend
+    expose:
+      - 9200
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
+      - SYS_CHROOT
+    pids_limit: 512
+    cpus: "1.0"
+    mem_limit: "1536M"
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - $REPO_PATH/data/hypothesis/elasticsearch:/usr/share/elasticsearch/data
+    environment:
+      discovery.type: single-node
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl --fail --silent http://127.0.0.1:9200 >/dev/null",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 1m
+
+  hypothesis-rabbitmq:
+    image: rabbitmq:3.12-management-alpine@sha256:0b44fbcc3a4bf22d00090f1353127577dbe1fcb109c41669733a9d7ecf6c3a78
+    container_name: hypothesis-rabbitmq
+    hostname: hypothesis-rabbitmq
+    restart: $RESTART_POLICY_OTHERS
+    profiles:
+      - reading
+      - hypothesis
+    networks:
+      - hypothesis_backend
+    expose:
+      - 5672
+      - 15672
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
+    pids_limit: 512
+    cpus: "0.5"
+    mem_limit: "512M"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      - $REPO_PATH/data/hypothesis/rabbitmq:/var/lib/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${HYPOTHESIS_RABBITMQ_USER:-hypothesis}
+      RABBITMQ_DEFAULT_PASS: ${HYPOTHESIS_RABBITMQ_PASSWORD:-hypothesis}
+      RABBITMQ_DISK_FREE_ABSOLUTE_LIMIT: 2GB
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+
+  hypothesis:
+    image: hypothesis/hypothesis:20260310-g031840e@sha256:277f47a5848569a7368ea05822760bb07da7b4536e13ca1b52bbef349322f6b3
+    container_name: hypothesis
+    restart: $RESTART_POLICY_OTHERS
+    depends_on:
+      hypothesis-db:
+        condition: service_healthy
+      hypothesis-elasticsearch:
+        condition: service_healthy
+      hypothesis-rabbitmq:
+        condition: service_healthy
+    profiles:
+      - reading
+      - hypothesis
+    networks:
+      - t3_proxy
+      - hypothesis_backend
+    expose:
+      - 5000
+    # The upstream image writes nginx/supervisord runtime state in image-owned
+    # paths, so keep this less strict than the simple single-process apps.
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 1024
+    cpus: "1.5"
+    mem_limit: "1536M"
+    ulimits:
+      nofile:
+        soft: 8192
+        hard: 16384
+    environment: &hypothesis-env
+      APP_URL: https://hypothesis.$DOMAINNAME
+      AUTHORITY: hypothesis.$DOMAINNAME
+      BROKER_URL: amqp://${HYPOTHESIS_RABBITMQ_USER:-hypothesis}:${HYPOTHESIS_RABBITMQ_PASSWORD:-hypothesis}@hypothesis-rabbitmq:5672//
+      CLIENT_URL: ${HYPOTHESIS_CLIENT_URL:-https://cdn.hypothes.is/hypothesis}
+      CLIENT_OAUTH_ID: ${HYPOTHESIS_CLIENT_OAUTH_ID:-}
+      CLIENT_RPC_ALLOWED_ORIGINS: ${HYPOTHESIS_CLIENT_RPC_ALLOWED_ORIGINS:-https://hypothesis.$DOMAINNAME}
+      DATABASE_URL: postgresql://${HYPOTHESIS_POSTGRES_USER:-hypothesis}:${HYPOTHESIS_POSTGRES_PASSWORD:-hypothesis}@hypothesis-db:5432/${HYPOTHESIS_POSTGRES_DB:-hypothesis}
+      ELASTICSEARCH_URL: http://hypothesis-elasticsearch:9200
+      SECRET_KEY: ${HYPOTHESIS_SECRET_KEY:-change-me}
+      ENABLE_NGINX: "true"
+      ENABLE_WEB: "true"
+      WEB_NUM_WORKERS: ${HYPOTHESIS_WEB_NUM_WORKERS:-1}
+      ENABLE_WEBSOCKET: "false"
+      ENABLE_WEBSOCKET_MONOLITHIC: "true"
+      WEBSOCKET_NUM_WORKERS: ${HYPOTHESIS_WEBSOCKET_NUM_WORKERS:-1}
+      WEBSOCKET_URL: wss://hypothesis.$DOMAINNAME/ws
+      ENABLE_WORKER: "true"
+      H_API_AUTH_COOKIE_SECRET_KEY: ${HYPOTHESIS_API_AUTH_COOKIE_SECRET_KEY:-change-me-h-api-auth-cookie-secret-key}
+      H_API_AUTH_COOKIE_SALT: ${HYPOTHESIS_API_AUTH_COOKIE_SALT:-change-me-h-api-auth-cookie-salt}
+      # Legacy h deployments use this to bootstrap tables automatically. Keep
+      # the explicit init profile below for upgrades and first-user setup.
+      MODEL_CREATE_ALL: "true"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget --no-verbose --tries=1 --spider http://127.0.0.1:5000/ || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 1m
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.hypothesis-rtr.entrypoints: "websecure"
+      traefik.http.routers.hypothesis-rtr.rule: "Host(`hypothesis.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.hypothesis-rtr.middlewares: "chain-no-auth-relaxed@file"
+      ## HTTP Services
+      traefik.http.routers.hypothesis-rtr.service: "hypothesis-svc"
+      traefik.http.services.hypothesis-svc.loadbalancer.server.port: "5000"
+      ####### HOMEPAGE #######
+      homepage.group: "Reading"
+      homepage.name: "Hypothesis"
+      homepage.icon: "hypothesis.png"
+      homepage.href: "https://hypothesis.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Web annotation server"
+      ####### GLANCE #######
+      glance.name: "Hypothesis"
+      glance.icon: "sh:hypothesis"
+      glance.url: "https://hypothesis.$DOMAINNAME"
+      glance.description: "Web annotation server"
+
+  # Optional one-shot helper. Run with the hypothesis-init profile after first
+  # deploy if MODEL_CREATE_ALL is not enough for your image/database state.
+  hypothesis-init:
+    image: hypothesis/hypothesis:20260310-g031840e@sha256:277f47a5848569a7368ea05822760bb07da7b4536e13ca1b52bbef349322f6b3
+    container_name: hypothesis-init
+    restart: "no"
+    depends_on:
+      hypothesis-db:
+        condition: service_healthy
+      hypothesis-elasticsearch:
+        condition: service_healthy
+      hypothesis-rabbitmq:
+        condition: service_healthy
+    profiles:
+      - hypothesis-init
+    networks:
+      - hypothesis_backend
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 512
+    cpus: "1.0"
+    mem_limit: "1G"
+    environment:
+      <<: *hypothesis-env
+    command:
+      - sh
+      - -lc
+      - >
+        python -m h.scripts.init_db --create --stamp &&
+        python -c 'import os; from h.cli import bootstrap; from h.search import
+        config; request = bootstrap(os.environ["APP_URL"], False);
+        config.init(request.es)'
