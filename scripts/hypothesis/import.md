@@ -10,42 +10,42 @@ Run all host-side commands from the repository root:
 cd $HOME/docker
 ```
 
-## 1. Prepare The Local Service
+## 1. Bootstrap The Local User
 
-Create the local Hypothesis user:
+Set the local bootstrap user in `.env`:
 
-```bash
-docker exec hypothesis bin/hypothesis user add \
-  --username <username> \
-  --email <email> \
-  --authority "hypothesis.$DOMAINNAME" \
-  --password '<password>'
+```env
+HYPOTHESIS_CLIENT_OAUTH_ID=<stable-uuid>
+HYPOTHESIS_BOOTSTRAP_USERNAME=<username>
+HYPOTHESIS_BOOTSTRAP_EMAIL=<email>
+HYPOTHESIS_BOOTSTRAP_PASSWORD=<password>
+HYPOTHESIS_BOOTSTRAP_ADMIN=true
+HYPOTHESIS_BOOTSTRAP_OAUTH_CLIENT_NAME=Hypothesis client
+HYPOTHESIS_BOOTSTRAP_OAUTH_REDIRECT_URI=https://hypothesis.$DOMAINNAME/app.html
 ```
 
-Make the user an admin:
+Use any stable UUID for `HYPOTHESIS_CLIENT_OAUTH_ID`. To generate one:
 
 ```bash
-docker exec hypothesis bin/hypothesis user admin \
-  --authority "hypothesis.$DOMAINNAME" \
-  <username>
+uuidgen | tr '[:upper:]' '[:lower:]'
 ```
 
-Create the OAuth client used by the Hypothesis web client:
+Run the one-shot init profile:
 
 ```bash
-docker exec hypothesis bin/hypothesis authclient add \
-  --name "Hypothesis client" \
-  --authority "hypothesis.$DOMAINNAME" \
-  --type public \
-  --grant-type authorization_code \
-  --redirect-uri "https://hypothesis.$DOMAINNAME/app.html"
+COMPOSE_PROFILES=reading,hypothesis,hypothesis-init docker compose \
+  --env-file .env \
+  -f compose/gpu.yml \
+  run --rm hypothesis-init
 ```
 
-Copy the printed client ID into `.env`:
+This initializes the database/search index, creates the user if missing, and
+grants admin when `HYPOTHESIS_BOOTSTRAP_ADMIN=true`. It also creates or updates
+the OAuth client row for `HYPOTHESIS_CLIENT_OAUTH_ID`.
 
-```bash
-HYPOTHESIS_CLIENT_OAUTH_ID=<printed-client-id>
-```
+All listed bootstrap variables are required. If one is missing, compose or the
+init script fails before database initialization. If the user already exists,
+the init command updates its password from `HYPOTHESIS_BOOTSTRAP_PASSWORD`.
 
 Recreate the app container:
 

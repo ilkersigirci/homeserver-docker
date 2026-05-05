@@ -177,7 +177,7 @@ services:
       AUTHORITY: hypothesis.$DOMAINNAME
       BROKER_URL: amqp://${HYPOTHESIS_RABBITMQ_USER:-hypothesis}:${HYPOTHESIS_RABBITMQ_PASSWORD:-hypothesis}@hypothesis-rabbitmq:5672//
       CLIENT_URL: ${HYPOTHESIS_CLIENT_URL:-https://cdn.hypothes.is/hypothesis}
-      CLIENT_OAUTH_ID: ${HYPOTHESIS_CLIENT_OAUTH_ID:-}
+      CLIENT_OAUTH_ID: ${HYPOTHESIS_CLIENT_OAUTH_ID:?set HYPOTHESIS_CLIENT_OAUTH_ID}
       CLIENT_RPC_ALLOWED_ORIGINS: ${HYPOTHESIS_CLIENT_RPC_ALLOWED_ORIGINS:-https://hypothesis.$DOMAINNAME}
       DATABASE_URL: postgresql://${HYPOTHESIS_POSTGRES_USER:-hypothesis}:${HYPOTHESIS_POSTGRES_PASSWORD:-hypothesis}@hypothesis-db:5432/${HYPOTHESIS_POSTGRES_DB:-hypothesis}
       ELASTICSEARCH_URL: http://hypothesis-elasticsearch:9200
@@ -255,11 +255,12 @@ services:
     mem_limit: "1G"
     environment:
       <<: *hypothesis-env
-    command:
-      - sh
-      - -lc
-      - >
-        python -m h.scripts.init_db --create --stamp &&
-        python -c 'import os; from h.cli import bootstrap; from h.search import
-        config; request = bootstrap(os.environ["APP_URL"], False);
-        config.init(request.es)'
+      HYPOTHESIS_BOOTSTRAP_USERNAME: ${HYPOTHESIS_BOOTSTRAP_USERNAME:?set HYPOTHESIS_BOOTSTRAP_USERNAME}
+      HYPOTHESIS_BOOTSTRAP_EMAIL: ${HYPOTHESIS_BOOTSTRAP_EMAIL:?set HYPOTHESIS_BOOTSTRAP_EMAIL}
+      HYPOTHESIS_BOOTSTRAP_PASSWORD: ${HYPOTHESIS_BOOTSTRAP_PASSWORD:?set HYPOTHESIS_BOOTSTRAP_PASSWORD}
+      HYPOTHESIS_BOOTSTRAP_ADMIN: ${HYPOTHESIS_BOOTSTRAP_ADMIN:?set HYPOTHESIS_BOOTSTRAP_ADMIN}
+      HYPOTHESIS_BOOTSTRAP_OAUTH_CLIENT_NAME: ${HYPOTHESIS_BOOTSTRAP_OAUTH_CLIENT_NAME:?set HYPOTHESIS_BOOTSTRAP_OAUTH_CLIENT_NAME}
+      HYPOTHESIS_BOOTSTRAP_OAUTH_REDIRECT_URI: ${HYPOTHESIS_BOOTSTRAP_OAUTH_REDIRECT_URI:?set HYPOTHESIS_BOOTSTRAP_OAUTH_REDIRECT_URI}
+    volumes:
+      - $REPO_PATH/configs/hypothesis/command.py:/tmp/hypothesis-command.py:ro
+    command: ["python", "/tmp/hypothesis-command.py"]
