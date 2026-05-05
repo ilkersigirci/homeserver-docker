@@ -5,10 +5,6 @@ networks:
 # - scripts/hypothesis/init.md: initialize the service and bootstrap user/OAuth.
 # - scripts/hypothesis/import.md: import official hypothes.is annotations.
 services:
-  # Upstream h runs as one container with nginx, gunicorn, websocket support,
-  # and the Celery worker controlled by supervisord. The support services below
-  # mirror the current h development compose topology: Postgres, Elasticsearch,
-  # and RabbitMQ.
   hypothesis-db:
     image: postgres:18.3@sha256:78481659c47e862334611ccdaf7c369c986b3046da9857112f3b309114a65fb4
     container_name: hypothesis-db
@@ -40,9 +36,9 @@ services:
     volumes:
       - $REPO_PATH/data/hypothesis/postgres:/var/lib/postgresql
     environment:
-      POSTGRES_USER: ${HYPOTHESIS_POSTGRES_USER:-hypothesis}
-      POSTGRES_PASSWORD: ${HYPOTHESIS_POSTGRES_PASSWORD:-hypothesis}
-      POSTGRES_DB: ${HYPOTHESIS_POSTGRES_DB:-hypothesis}
+      POSTGRES_USER: hypothesis
+      POSTGRES_PASSWORD: hypothesis
+      POSTGRES_DB: hypothesis
     healthcheck:
       test:
         [
@@ -132,8 +128,8 @@ services:
     volumes:
       - $REPO_PATH/data/hypothesis/rabbitmq:/var/lib/rabbitmq
     environment:
-      RABBITMQ_DEFAULT_USER: ${HYPOTHESIS_RABBITMQ_USER:-hypothesis}
-      RABBITMQ_DEFAULT_PASS: ${HYPOTHESIS_RABBITMQ_PASSWORD:-hypothesis}
+      RABBITMQ_DEFAULT_USER: hypothesis
+      RABBITMQ_DEFAULT_PASS: hypothesis
       RABBITMQ_DISK_FREE_ABSOLUTE_LIMIT: 2GB
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
@@ -142,6 +138,7 @@ services:
       retries: 12
       start_period: 30s
 
+  # TODO: Harden
   hypothesis:
     image: hypothesis/hypothesis:20260310-g031840e@sha256:277f47a5848569a7368ea05822760bb07da7b4536e13ca1b52bbef349322f6b3
     container_name: hypothesis
@@ -161,8 +158,6 @@ services:
       - hypothesis_backend
     expose:
       - 5000
-    # The upstream image writes nginx/supervisord runtime state in image-owned
-    # paths, so keep this less strict than the simple single-process apps.
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -178,23 +173,23 @@ services:
     environment: &hypothesis-env
       APP_URL: https://hypothesis.$DOMAINNAME
       AUTHORITY: hypothesis.$DOMAINNAME
-      BROKER_URL: amqp://${HYPOTHESIS_RABBITMQ_USER:-hypothesis}:${HYPOTHESIS_RABBITMQ_PASSWORD:-hypothesis}@hypothesis-rabbitmq:5672//
+      BROKER_URL: amqp://hypothesis:hypothesis@hypothesis-rabbitmq:5672//
       CLIENT_URL: ${HYPOTHESIS_CLIENT_URL:-https://cdn.hypothes.is/hypothesis}
-      CLIENT_OAUTH_ID: ${HYPOTHESIS_CLIENT_OAUTH_ID:?set HYPOTHESIS_CLIENT_OAUTH_ID}
-      CLIENT_RPC_ALLOWED_ORIGINS: ${HYPOTHESIS_CLIENT_RPC_ALLOWED_ORIGINS:-https://hypothesis.$DOMAINNAME}
-      DATABASE_URL: postgresql://${HYPOTHESIS_POSTGRES_USER:-hypothesis}:${HYPOTHESIS_POSTGRES_PASSWORD:-hypothesis}@hypothesis-db:5432/${HYPOTHESIS_POSTGRES_DB:-hypothesis}
+      CLIENT_OAUTH_ID: $HYPOTHESIS_CLIENT_OAUTH_ID
+      CLIENT_RPC_ALLOWED_ORIGINS: https://hypothesis.$DOMAINNAME
+      DATABASE_URL: postgresql://hypothesis:hypothesis@hypothesis-db:5432/hypothesis
       ELASTICSEARCH_URL: http://hypothesis-elasticsearch:9200
-      SECRET_KEY: ${HYPOTHESIS_SECRET_KEY:-change-me}
-      ENABLE_NGINX: "true"
-      ENABLE_WEB: "true"
+      SECRET_KEY: $HYPOTHESIS_SECRET_KEY
+      ENABLE_NGINX: true
+      ENABLE_WEB: true
       WEB_NUM_WORKERS: ${HYPOTHESIS_WEB_NUM_WORKERS:-1}
-      ENABLE_WEBSOCKET: "false"
-      ENABLE_WEBSOCKET_MONOLITHIC: "true"
+      ENABLE_WEBSOCKET: false
+      ENABLE_WEBSOCKET_MONOLITHIC: true
       WEBSOCKET_NUM_WORKERS: ${HYPOTHESIS_WEBSOCKET_NUM_WORKERS:-1}
       WEBSOCKET_URL: wss://hypothesis.$DOMAINNAME/ws
-      ENABLE_WORKER: "true"
-      H_API_AUTH_COOKIE_SECRET_KEY: ${HYPOTHESIS_API_AUTH_COOKIE_SECRET_KEY:-change-me-h-api-auth-cookie-secret-key}
-      H_API_AUTH_COOKIE_SALT: ${HYPOTHESIS_API_AUTH_COOKIE_SALT:-change-me-h-api-auth-cookie-salt}
+      ENABLE_WORKER: true
+      H_API_AUTH_COOKIE_SECRET_KEY: $HYPOTHESIS_API_AUTH_COOKIE_SECRET_KEY
+      H_API_AUTH_COOKIE_SALT: $HYPOTHESIS_API_AUTH_COOKIE_SALT
     healthcheck:
       test:
         [
@@ -255,12 +250,12 @@ services:
     mem_limit: "1G"
     environment:
       <<: *hypothesis-env
-      HYPOTHESIS_BOOTSTRAP_USERNAME: ${HYPOTHESIS_BOOTSTRAP_USERNAME:?set HYPOTHESIS_BOOTSTRAP_USERNAME}
-      HYPOTHESIS_BOOTSTRAP_EMAIL: ${HYPOTHESIS_BOOTSTRAP_EMAIL:?set HYPOTHESIS_BOOTSTRAP_EMAIL}
-      HYPOTHESIS_BOOTSTRAP_PASSWORD: ${HYPOTHESIS_BOOTSTRAP_PASSWORD:?set HYPOTHESIS_BOOTSTRAP_PASSWORD}
-      HYPOTHESIS_BOOTSTRAP_ADMIN: ${HYPOTHESIS_BOOTSTRAP_ADMIN:?set HYPOTHESIS_BOOTSTRAP_ADMIN}
-      HYPOTHESIS_BOOTSTRAP_OAUTH_CLIENT_NAME: ${HYPOTHESIS_BOOTSTRAP_OAUTH_CLIENT_NAME:?set HYPOTHESIS_BOOTSTRAP_OAUTH_CLIENT_NAME}
-      HYPOTHESIS_BOOTSTRAP_OAUTH_REDIRECT_URI: ${HYPOTHESIS_BOOTSTRAP_OAUTH_REDIRECT_URI:?set HYPOTHESIS_BOOTSTRAP_OAUTH_REDIRECT_URI}
+      HYPOTHESIS_BOOTSTRAP_USERNAME: $HYPOTHESIS_BOOTSTRAP_USERNAME
+      HYPOTHESIS_BOOTSTRAP_EMAIL: $HYPOTHESIS_BOOTSTRAP_EMAIL
+      HYPOTHESIS_BOOTSTRAP_PASSWORD: $HYPOTHESIS_BOOTSTRAP_PASSWORD
+      HYPOTHESIS_BOOTSTRAP_ADMIN: true
+      HYPOTHESIS_BOOTSTRAP_OAUTH_CLIENT_NAME: HypothesisClient
+      HYPOTHESIS_BOOTSTRAP_OAUTH_REDIRECT_URI: https://hypothesis.gpu.ilkerflix.com/app.html
     volumes:
       - $REPO_PATH/configs/hypothesis/command.py:/tmp/hypothesis-command.py:ro
     command: ["python", "/tmp/hypothesis-command.py"]
