@@ -43,6 +43,8 @@ services:
       start_period: 30s
 
   # TODO: Harden
+  # NOTE: Linkwarden bundles Playwright browsers under /root, so keep upstream root
+  # runtime while granting only the file-permission override needed for archives.
   linkwarden:
     image: ghcr.io/linkwarden/linkwarden:v2.14.1@sha256:31cf4bd2a2e111991fa5c9de03174c8698869c83722105c6ce529e4c911e6861
     container_name: linkwarden
@@ -64,7 +66,8 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
-    cap_add: []
+    cap_add:
+      - DAC_OVERRIDE
     pids_limit: 512
     cpus: "2.0"
     mem_limit: "2G"
