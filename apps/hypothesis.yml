@@ -61,17 +61,12 @@ services:
       - hypothesis_backend
     expose:
       - 9200
+    user: $PUID:$PGID
     security_opt:
       - no-new-privileges:true
     cap_drop:
       - ALL
-    cap_add:
-      - CHOWN
-      - DAC_OVERRIDE
-      - FOWNER
-      - SETGID
-      - SETUID
-      - SYS_CHROOT
+    cap_add: []
     pids_limit: 512
     cpus: "1.0"
     mem_limit: "1536M"
@@ -108,16 +103,12 @@ services:
     expose:
       - 5672
       - 15672
+    user: $PUID:$PGID
     security_opt:
       - no-new-privileges:true
     cap_drop:
       - ALL
-    cap_add:
-      - CHOWN
-      - DAC_OVERRIDE
-      - FOWNER
-      - SETGID
-      - SETUID
+    cap_add: []
     pids_limit: 512
     cpus: "0.5"
     mem_limit: "512M"
