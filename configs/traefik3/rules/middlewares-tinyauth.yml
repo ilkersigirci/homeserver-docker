@@ -7,3 +7,17 @@ http:
         ## NOTE: For traefik>=3.6.9
         # maxResponseBodySize: -1 # Disable response body size limit
         maxResponseBodySize: 1048576
+
+    middlewares-tinyauth-headers:
+      forwardAuth:
+        address: "http://tinyauth:3000/api/auth/traefik"
+        trustForwardHeader: true
+        authResponseHeaders:
+          - Remote-User
+          - Remote-Email
+          - Remote-Name
+          - Remote-Groups
+          - Remote-Sub
+        ## NOTE: For traefik>=3.6.9
+        # maxResponseBodySize: -1 # Disable response body size limit
+        maxResponseBodySize: 1048576
