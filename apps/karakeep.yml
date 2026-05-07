@@ -15,7 +15,7 @@ services:
       - --hide-scrollbars
     profiles:
       - custom-user
-      - others
+      - reading
       - karakeep
     networks:
       - karakeep_backend
@@ -47,7 +47,7 @@ services:
     restart: $RESTART_POLICY_OTHERS
     profiles:
       - custom-user
-      - others
+      - reading
       - karakeep
     networks:
       - karakeep_backend
@@ -84,7 +84,7 @@ services:
     restart: $RESTART_POLICY_OTHERS
     profiles:
       - custom-user
-      - others
+      - reading
       - karakeep
     depends_on:
       karakeep-meilisearch:
@@ -181,7 +181,7 @@ services:
       tinyauth.apps.karakeep.config.domain: "bookmark.$DOMAINNAME"
       tinyauth.apps.karakeep.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: "Others"
+      homepage.group: "Reading"
       homepage.name: "karakeep"
       homepage.icon: "karakeep.png"
       homepage.href: "https://bookmark.$DOMAINNAME"

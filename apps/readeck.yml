@@ -1,0 +1,63 @@
+services:
+  readeck:
+    image: codeberg.org/readeck/readeck:0.22.3@sha256:ed1c513f8e1d59b1d38fda324ac279eeb65afd0327907e498061ec9fd2f31c15
+    container_name: readeck
+    restart: $RESTART_POLICY_OTHERS
+    profiles:
+      - reading
+    networks:
+      - t3_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      - $REPO_PATH/data/readeck:/readeck
+    environment:
+      READECK_LOG_LEVEL: info
+      READECK_SERVER_HOST: "0.0.0.0"
+      READECK_SERVER_PORT: "8000"
+      READECK_LOG_FORMAT: text
+    healthcheck:
+      test: ["CMD", "/bin/readeck", "healthcheck", "-config", "config.toml"]
+      interval: 30s
+      timeout: 2s
+      retries: 3
+      start_period: 5s
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.readeck-rtr.entrypoints: "websecure"
+      traefik.http.routers.readeck-rtr.rule: "Host(`readeck.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.readeck-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.readeck-rtr.service: "readeck-svc"
+      traefik.http.services.readeck-svc.loadbalancer.server.port: "8000"
+      ####### TINYAUTH #######
+      tinyauth.apps.readeck.config.domain: "readeck.$DOMAINNAME"
+      tinyauth.apps.readeck.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "Reading"
+      homepage.name: "readeck"
+      homepage.icon: "readeck.png"
+      homepage.href: "https://readeck.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Read it later app"
+      ####### GLANCE #######
+      glance.name: "readeck"
+      glance.icon: "sh:readeck"
+      glance.url: "https://readeck.$DOMAINNAME"
+      glance.description: "Read it later app"

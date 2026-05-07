@@ -97,6 +97,7 @@ include:
   - ../apps/hypothesis.yml
   - ../apps/karakeep.yml
   - ../apps/linkwarden.yml
+  - ../apps/readeck.yml
   - ../apps/rsshub.yml
   # - ../apps/silverbullet.yml
   # - ../apps/quartz.yml
