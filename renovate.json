@@ -24,6 +24,13 @@
         "ghcr.io/immich-app/immich-machine-learning"
       ],
       "enabled": true
+    },
+    {
+      "description": "Disable Meilisearch updates that are version-coupled to Karakeep and Jellyfin",
+      "matchManagers": ["docker-compose"],
+      "matchFileNames": ["apps/karakeep.yml", "apps/jellyfin.yml"],
+      "matchPackageNames": ["getmeili/meilisearch"],
+      "enabled": false
     }
   ],
   "major": {

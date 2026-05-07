@@ -1,0 +1,194 @@
+networks:
+  karakeep_backend:
+
+services:
+  karakeep-chrome:
+    image: gcr.io/zenika-hub/alpine-chrome:124@sha256:1a0046448e0bb6c275c88f86e01faf0de62b02ec8572901256ada0a8c08be23f
+    container_name: karakeep-chrome
+    restart: $RESTART_POLICY_OTHERS
+    command:
+      - --no-sandbox
+      - --disable-gpu
+      - --disable-dev-shm-usage
+      - --remote-debugging-address=0.0.0.0
+      - --remote-debugging-port=9222
+      - --hide-scrollbars
+    profiles:
+      - custom-user
+      - others
+      - karakeep
+    networks:
+      - karakeep_backend
+    expose:
+      - 9222
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: 1G
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    labels:
+      ####### GLANCE #######
+      glance.name: "karakeep-chrome"
+      glance.parent: "karakeep"
+
+  # TODO: Harden
+  karakeep-meilisearch:
+    image: getmeili/meilisearch:v1.41.0@sha256:860fa4baed04ae1c235de870edab0c8006227546dea1bbb6411fbfc5e27cf1db
+    container_name: karakeep-meilisearch
+    restart: $RESTART_POLICY_OTHERS
+    profiles:
+      - custom-user
+      - others
+      - karakeep
+    networks:
+      - karakeep_backend
+    # user: "65534:65534"
+    # read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: '1.0'
+    mem_limit: 1G
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      - $REPO_PATH/data/karakeep/meilisearch:/meili_data
+    environment:
+      MEILI_NO_ANALYTICS: true
+      MEILI_MASTER_KEY: $KARAKEEP_MEILI_MASTER_KEY
+    labels:
+      ####### GLANCE #######
+      glance.name: "karakeep-meilisearch"
+      glance.parent: "karakeep"
+
+  # TODO: Harden
+  karakeep:
+    image: ghcr.io/karakeep-app/karakeep:0.31.0@sha256:20754dbdafb11dfe288bbb1c2342a7855081b08ea069e86fcf2d4a2d945d3653
+    container_name: karakeep
+    restart: $RESTART_POLICY_OTHERS
+    profiles:
+      - custom-user
+      - others
+      - karakeep
+    depends_on:
+      karakeep-meilisearch:
+        condition: service_started
+      karakeep-chrome:
+        condition: service_started
+    networks:
+      - t3_proxy
+      - karakeep_backend
+    # user: $PUID:$PGID
+    # read_only: true
+    # tmpfs:
+    #   - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    # cap_drop:
+    #   - ALL
+    # cap_add: []
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      - $REPO_PATH/data/karakeep/web:/data
+    # NOTE: https://docs.karakeep.app/configuration/environment-variables
+    environment:
+      ## General
+      LOG_LEVEL: info
+      DATA_DIR: /data
+      NEXTAUTH_URL: https://bookmark.$DOMAINNAME
+      NEXTAUTH_SECRET: $KARAKEEP_NEXTAUTH_SECRET
+      MEILI_ADDR: http://karakeep-meilisearch:7700
+      MEILI_MASTER_KEY: $KARAKEEP_MEILI_MASTER_KEY
+      MAX_ASSET_SIZE_MB: 50
+      DISABLE_NEW_RELEASE_CHECK: true
+      DB_WAL_MODE: true
+      ## Auth
+      DISABLE_SIGNUPS: false
+      DISABLE_PASSWORD_AUTH: true
+      EMAIL_VERIFICATION_REQUIRED: false
+      OAUTH_AUTO_REDIRECT: true
+      OAUTH_PROVIDER_NAME: PocketID
+      OAUTH_WELLKNOWN_URL: https://pocketid.$BASE_DOMAINNAME/.well-known/openid-configuration
+      OAUTH_CLIENT_ID: $KARAKEEP_CLIENT_ID
+      OAUTH_CLIENT_SECRET: $KARAKEEP_CLIENT_SECRET
+      OAUTH_SCOPE: openid profile email
+      OAUTH_ALLOW_DANGEROUS_EMAIL_ACCOUNT_LINKING: false
+      ## Inference
+      OPENAI_BASE_URL: $AIGATEWAY_BASE_URL
+      OPENAI_API_KEY: $AIGATEWAY_API_KEY
+      INFERENCE_TEXT_MODEL: gpt-4.1-mini
+      INFERENCE_IMAGE_MODEL: gpt-4o-mini
+      EMBEDDING_TEXT_MODEL: text-embedding-3-small
+      INFERENCE_CONTEXT_LENGTH: 2048
+      INFERENCE_USE_MAX_COMPLETION_TOKENS: false
+      INFERENCE_LANG: english
+      INFERENCE_ENABLE_AUTO_TAGGING: true
+      INFERENCE_ENABLE_AUTO_SUMMARIZATION: false
+      INFERENCE_OUTPUT_SCHEMA: structured
+      ## Crawler
+      BROWSER_WEB_URL: http://karakeep-chrome:9222
+      CRAWLER_STORE_SCREENSHOT: true
+      CRAWLER_FULL_PAGE_SCREENSHOT: false
+      CRAWLER_STORE_PDF: false
+      CRAWLER_FULL_PAGE_ARCHIVE: true
+      CRAWLER_PARSER_MEM_LIMIT_MB: 512
+      CRAWLER_VIDEO_DOWNLOAD: false
+      CRAWLER_ENABLE_ADBLOCKER: true
+      ## OCR
+      OCR_LANGS: eng,tur
+      OCR_USE_LLM: false
+      ## Monitoring
+      OTEL_TRACING_ENABLED: false
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_SERVICE_NAME: karakeep
+      OTEL_SAMPLE_RATE: 1.0
+      PROMETHEUS_AUTH_TOKEN: Random
+    # healthcheck:
+    #   disable: true
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.karakeep-rtr.entrypoints: "websecure"
+      traefik.http.routers.karakeep-rtr.rule: "Host(`bookmark.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.karakeep-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.karakeep-rtr.service: "karakeep-svc"
+      traefik.http.services.karakeep-svc.loadbalancer.server.port: "3000"
+      ####### TINYAUTH #######
+      tinyauth.apps.karakeep.config.domain: "bookmark.$DOMAINNAME"
+      tinyauth.apps.karakeep.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "Others"
+      homepage.name: "karakeep"
+      homepage.icon: "karakeep.png"
+      homepage.href: "https://bookmark.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "A bookmark-everything app"
+      ####### GLANCE #######
+      glance.name: "karakeep"
+      glance.icon: "sh:karakeep"
+      glance.url: "https://bookmark.$DOMAINNAME"
+      glance.description: "A bookmark-everything app"

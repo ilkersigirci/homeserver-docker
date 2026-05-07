@@ -95,6 +95,7 @@ include:
   - ../apps/scalar.yml
   #### READING ####
   - ../apps/hypothesis.yml
+  - ../apps/karakeep.yml
   - ../apps/linkwarden.yml
   - ../apps/rsshub.yml
   # - ../apps/silverbullet.yml

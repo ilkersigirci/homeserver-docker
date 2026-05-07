@@ -2,7 +2,7 @@ services:
   # TODO: Harden
   # NOTE: Install in Jellyfin UI https://github.com/arnesacnussem/jellyfin-plugin-meilisearch
   jellyfin-meilisearch:
-    image: getmeili/meilisearch:v1.32.1@sha256:54dfe0a03e81078d401a144ab6a798e4c210bea7d2ee54b7f7a6cdb456040bea
+    image: getmeili/meilisearch:v1.34@sha256:82767d2afc4fb6c3e4ebadb134ca6ef5687c894ae9e152928619393b1f331681
     container_name: jellyfin-meilisearch
     restart: $RESTART_POLICY_MEDIA
     profiles:
@@ -32,7 +32,7 @@ services:
     volumes:
       - $REPO_PATH/appdata/jellyfin-meilisearch:/meili_data
     environment:
-      MEILI_MASTER_KEY: "1234"
+      MEILI_MASTER_KEY: $JELLYFIN_MEILI_MASTER_KEY
     labels:
       ####### GLANCE #######
       glance.name: "jellyfin-meilisearch"
@@ -78,7 +78,7 @@ services:
       - $DIR_MEDIA:/media/local:ro
     environment:
       MEILI_URL: http://jellyfin-meilisearch:7700
-      MEILI_MASTER_KEY: "1234"
+      MEILI_MASTER_KEY: $JELLYFIN_MEILI_MASTER_KEY
     labels:
       traefik.enable: "true"
       ## HTTP Routers
