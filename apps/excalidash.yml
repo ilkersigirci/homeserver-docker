@@ -47,8 +47,8 @@ services:
       AUTH_MODE: oidc_enforced
       OIDC_PROVIDER_NAME: PocketID
       OIDC_ISSUER_URL: https://pocketid.$BASE_DOMAINNAME
-      OIDC_CLIENT_ID: $EXCALIDASH_OIDC_CLIENT_ID
-      OIDC_CLIENT_SECRET: $EXCALIDASH_OIDC_CLIENT_SECRET
+      OIDC_CLIENT_ID: $EXCALIDASH_CLIENT_ID
+      OIDC_CLIENT_SECRET: $EXCALIDASH_CLIENT_SECRET
       OIDC_REDIRECT_URI: https://draw.$DOMAINNAME/api/auth/oidc/callback
       OIDC_SCOPES: openid profile email groups
       OIDC_GROUPS_CLAIM: groups
@@ -92,16 +92,7 @@ services:
     read_only: true
     entrypoint:
       - /bin/sh
-      - -c
-      - |
-        set -e
-        export BACKEND_URL="$${BACKEND_URL:-excalidash-db:8000}"
-        echo "Configuring nginx with BACKEND_URL: $${BACKEND_URL}"
-        ESCAPED_BACKEND_URL=$$(printf '%s\n' "$$BACKEND_URL" | sed 's/[\/&]/\\&/g')
-        sed "s/__BACKEND_URL__/$$ESCAPED_BACKEND_URL/g" /etc/nginx/nginx.conf.template > /tmp/nginx.conf
-        echo "Validating nginx configuration..."
-        nginx -t -c /tmp/nginx.conf
-        exec nginx -g 'daemon off;' -c /tmp/nginx.conf
+      - /configs/excalidash/frontend-entrypoint.sh
     tmpfs:
       - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
       - /run:rw,noexec,nosuid,nodev,size=16m,uid=$PUID,gid=$PGID,mode=755
@@ -119,6 +110,7 @@ services:
         soft: 4096
         hard: 8192
     volumes:
+      - $REPO_PATH/configs/excalidash/frontend-entrypoint.sh:/configs/excalidash/frontend-entrypoint.sh:ro
       - $REPO_PATH/data/excalidash:/data/
     environment:
       PUID: $PUID
