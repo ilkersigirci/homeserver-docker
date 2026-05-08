@@ -1,0 +1,166 @@
+services:
+  excalidash-db:
+    image: zimengxiong/excalidash-backend:0.5.0@sha256:aa86b392a64e2235e3cf0c6289f5b58182b7eb8e391851e480c947b8226abce4
+    container_name: excalidash-db
+    restart: $RESTART_POLICY_OTHERS
+    profiles:
+      - custom-user
+      - others
+      - excalidash
+    networks:
+      - t3_proxy
+    expose:
+      - 8000
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /app/uploads:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=700
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      - $REPO_PATH/data/excalidash:/app/prisma
+    environment:
+      PORT: 8000
+      DATABASE_URL: file:/app/prisma/dev.db
+      FRONTEND_URL: https://draw.$DOMAINNAME
+      TRUST_PROXY: "1"
+      ENFORCE_HTTPS_REDIRECT: false
+      NODE_ENV: production
+      JWT_SECRET: $EXCALIDASH_JWT_SECRET
+      CSRF_SECRET: $EXCALIDASH_CSRF_SECRET
+      ## OIDC
+      AUTH_MODE: oidc_enforced
+      OIDC_PROVIDER_NAME: PocketID
+      OIDC_ISSUER_URL: https://pocketid.$BASE_DOMAINNAME
+      OIDC_CLIENT_ID: $EXCALIDASH_OIDC_CLIENT_ID
+      OIDC_CLIENT_SECRET: $EXCALIDASH_OIDC_CLIENT_SECRET
+      OIDC_REDIRECT_URI: https://draw.$DOMAINNAME/api/auth/oidc/callback
+      OIDC_SCOPES: openid profile email groups
+      OIDC_GROUPS_CLAIM: groups
+      OIDC_ADMIN_GROUPS: admin
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://127.0.0.1:8000/health', (r) => process.exit(r.statusCode === 200 ? 0 : 1))",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    labels:
+      ####### HOMEPAGE #######
+      homepage.group: "Others"
+      homepage.name: "excalidash-db"
+      homepage.icon: "excalidash-db.png"
+      homepage.description: "Excalidash prisma database"
+      ####### GLANCE #######
+      glance.name: "excalidash-db"
+      glance.icon: "sh:excalidash-db"
+      glance.description: "Excalidash prisma database"
+
+  excalidash:
+    image: zimengxiong/excalidash-frontend:0.5.0@sha256:8f4920ba204ac672bce8df9b963bbf749beef35e9ccaf0b108f2e3278a1aff75
+    container_name: excalidash
+    restart: $RESTART_POLICY_OTHERS
+    depends_on:
+      excalidash-db:
+        condition: service_healthy
+    profiles:
+      - others
+      - excalidash
+    networks:
+      - t3_proxy
+    user: $PUID:$PGID
+    read_only: true
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        set -e
+        export BACKEND_URL="$${BACKEND_URL:-excalidash-db:8000}"
+        echo "Configuring nginx with BACKEND_URL: $${BACKEND_URL}"
+        ESCAPED_BACKEND_URL=$$(printf '%s\n' "$$BACKEND_URL" | sed 's/[\/&]/\\&/g')
+        sed "s/__BACKEND_URL__/$$ESCAPED_BACKEND_URL/g" /etc/nginx/nginx.conf.template > /tmp/nginx.conf
+        echo "Validating nginx configuration..."
+        nginx -t -c /tmp/nginx.conf
+        exec nginx -g 'daemon off;' -c /tmp/nginx.conf
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /run:rw,noexec,nosuid,nodev,size=16m,uid=$PUID,gid=$PGID,mode=755
+      - /var/cache/nginx:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=755
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      - $REPO_PATH/data/excalidash:/data/
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      BACKEND_URL: excalidash-db:8000
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://127.0.0.1:80",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.excalidash-rtr.entrypoints: "websecure"
+      traefik.http.routers.excalidash-rtr.rule: "Host(`draw.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.excalidash-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.excalidash-rtr.service: "excalidash-svc"
+      traefik.http.services.excalidash-svc.loadbalancer.server.port: "80"
+      ####### TINYAUTH #######
+      tinyauth.apps.excalidash.config.domain: "draw.$DOMAINNAME"
+      tinyauth.apps.excalidash.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "Others"
+      homepage.name: "excalidash"
+      homepage.icon: "excalidash.png"
+      homepage.href: "https://draw.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Dashboard for Excalidraw with multi-user collaboration and scoped sharing"
+      ####### GLANCE #######
+      glance.name: "excalidash"
+      glance.icon: "sh:excalidash"
+      glance.url: "https://draw.$DOMAINNAME"
+      glance.description: "Dashboard for Excalidraw with multi-user collaboration and scoped sharing"

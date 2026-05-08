@@ -13,7 +13,7 @@ http:
         - websecure
       middlewares:
         - chain-pocket-id
-      service: pocket-id-svc     
+      service: pocket-id-svc
     gotify-rtr:
       rule: "Host(`gotify.{{env "BASE_DOMAINNAME"}}`)"
       entryPoints:

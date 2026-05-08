@@ -102,3 +102,4 @@ include:
   # - ../apps/silverbullet.yml
   # - ../apps/quartz.yml
   #### OTHERS ####
+  - ../apps/excalidash.yml
