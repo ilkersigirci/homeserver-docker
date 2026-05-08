@@ -3,7 +3,7 @@
 .ONESHELL:
 SHELL=/bin/bash
 
-.PHONY: help lint format pre-commit
+.PHONY: help install-prek install-pre-commit prek pre-commit
 .DEFAULT_GOAL=help
 
 help:
@@ -17,8 +17,12 @@ help:
 #     export
 # endif
 
-install-pre-commit: ## Install pre-commit hooks
-	prek install
+install-prek: ## Install prek hooks
+	uvx prek install
 
-pre-commit: ## Run pre-commit for all package files
-	prek run --all-files
+install-pre-commit: install-prek ## Alias for install-prek
+
+prek: ## Run prek for all files
+	uvx prek run --all-files
+
+pre-commit: prek ## Alias for prek

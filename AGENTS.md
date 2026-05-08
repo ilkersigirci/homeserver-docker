@@ -19,3 +19,11 @@ Task routing:
 - Public ingress / Cloudflare changes: [docs/EDGE_NETWORKING.md](docs/EDGE_NETWORKING.md)
 - Telemetry/OTEL changes: [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md)
 - PostgreSQL major upgrades: [docs/postgres_upgrade.md](docs/postgres_upgrade.md)
+
+Validation:
+
+- After code, config, or documentation edits, run uvx prek on the changed files
+  before handing the work back:
+  `uvx prek run --files <changed-files>`
+- If a hook cannot be run, mention the blocker and any narrower validation that was
+  completed.

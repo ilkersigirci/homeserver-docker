@@ -26,49 +26,43 @@ services:
       nofile:
         soft: 2048
         hard: 4096
+    volumes:
+      - $REPO_PATH/configs/scalar/Caddyfile:/etc/caddy/Caddyfile:ro
     environment:
-      # Add more APIs by appending objects in "sources", for example:
-      # {"title":"My API","url":"https://myapi.${DOMAINNAME}/openapi.json"}
-      # Add matching entries in "servers" for APIs that publish localhost/default servers.
+      DOMAINNAME: $DOMAINNAME
+      READECK_API_TOKEN_ALLROLES: $READECK_API_TOKEN_ALLROLES
+      # Add more APIs by appending objects in "sources".
+      # Add matching source-level "servers" for APIs that publish localhost/default servers.
       # If a target API needs browser CORS from Scalar, add
       # middlewares-scalar-openapi-cors@file before its auth chain.
       API_REFERENCE_CONFIG: |-
         {
-          sources: [
+          "sources": [
             {
-              title: 'Kreuzberg API',
-              url: 'https://docparse.${DOMAINNAME}/openapi.json',
+              "title": "Kreuzberg API",
+              "slug": "kreuzberg",
+              "url": "https://docparse.${DOMAINNAME}/openapi.json",
+              "servers": [
+                {
+                  "url": "https://docparse.${DOMAINNAME}",
+                  "description": "Kreuzberg via Traefik"
+                }
+              ]
             },
             {
-              title: 'Readeck API',
-              url: 'https://readeck.${DOMAINNAME}/docs/api.json',
-              fetch: (url, init = {}) => {
-                const headers = new Headers(init.headers || {})
-                headers.set('Authorization', 'Bearer ${READECK_API_TOKEN_ALLROLES}')
-
-                return fetch(url, { ...init, headers })
-              },
-              authentication: {
-                preferredSecurityScheme: 'bearer',
-                securitySchemes: {
-                  bearer: {
-                    token: '${READECK_API_TOKEN_ALLROLES}',
-                  },
-                },
-              },
-            },
+              "title": "Readeck API",
+              "slug": "readeck",
+              "url": "/openapi/readeck.json",
+              "servers": [
+                {
+                  "url": "https://scalar.${DOMAINNAME}/readeck-api",
+                  "description": "Readeck via Scalar token proxy"
+                }
+              ]
+            }
           ],
-          servers: [
-            {
-              url: 'https://docparse.${DOMAINNAME}',
-              description: 'Kreuzberg via Traefik',
-            },
-            {
-              url: 'https://readeck.${DOMAINNAME}',
-              description: 'Readeck via Traefik',
-            },
-          ],
-          agent: { disabled: true },
+          "agent": { "disabled": true },
+          "persistAuth": false
         }
     labels:
       traefik.enable: "true"

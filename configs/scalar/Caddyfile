@@ -1,0 +1,51 @@
+{
+	auto_https off
+	admin off
+}
+
+(readeck_proxy) {
+	reverse_proxy http://readeck:8000 {
+		header_up Host "readeck.{$DOMAINNAME}"
+		header_up Authorization "Bearer {$READECK_API_TOKEN_ALLROLES}"
+		header_up X-Forwarded-Host "readeck.{$DOMAINNAME}"
+		header_up X-Forwarded-Proto "https"
+	}
+}
+
+:8080 {
+	root /usr/share/caddy
+	templates
+	file_server {
+		precompressed gzip
+	}
+	header -Server
+	header Cache-Control "no-cache"
+
+	# Keep the docs-capable Readeck token server-side while exposing only the spec.
+	handle /openapi/readeck.json {
+		rewrite * /docs/api.json
+		import readeck_proxy
+	}
+
+	# Token-backed proxy for Scalar's Test Request panel; keep Scalar admin-only.
+	handle_path /readeck-api/* {
+		rewrite * /api{uri}
+		import readeck_proxy
+	}
+
+	# Serve mounted OpenAPI documents
+	handle_path /openapi/* {
+		root * /docs
+		file_server
+	}
+
+	# API endpoint to get dynamic configuration
+	handle /configuration.json {
+		root * /tmp
+		file_server
+	}
+
+	handle /health {
+		respond "OK" 200
+	}
+}
