@@ -1,0 +1,3 @@
+interface:
+  display_name: "Create Docker Service"
+  short_description: "Create and wire new Docker services safely"
