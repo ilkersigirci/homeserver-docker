@@ -1,6 +1,6 @@
 services:
   silverbullet-test:
-    image: ghcr.io/silverbulletmd/silverbullet@sha256:6c36ff15f2230dbe3bca7e5d0c85a59c7dc831ce694517850ed5797775824d71
+    image: ghcr.io/silverbulletmd/silverbullet@sha256:9fe276a8f2427fff8a5a6114d53b293d0ff8a4811682a28c2acc91d9b2c571ca
     container_name: silverbullet-test
     restart: $RESTART_POLICY_OTHERS
     profiles:
