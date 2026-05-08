@@ -1,0 +1,24 @@
+http:
+  middlewares:
+    middlewares-scalar-openapi-cors:
+      headers:
+        accessControlAllowCredentials: true
+        accessControlAllowHeaders:
+          - Accept
+          - Authorization
+          - Content-Type
+          - Origin
+          - Cache-Control
+          - Pragma
+          - X-Requested-With
+        accessControlAllowMethods:
+          - GET
+          - HEAD
+          - OPTIONS
+        accessControlAllowOriginList:
+          - "https://scalar.{{env "DOMAINNAME"}}"
+        accessControlExposeHeaders:
+          - Content-Length
+          - Content-Type
+        accessControlMaxAge: 86400
+        addVaryHeader: true

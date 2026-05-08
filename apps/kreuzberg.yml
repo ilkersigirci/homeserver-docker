@@ -45,7 +45,7 @@ services:
       traefik.http.routers.kreuzberg-rtr.entrypoints: "websecure"
       traefik.http.routers.kreuzberg-rtr.rule: "Host(`docparse.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.kreuzberg-rtr.middlewares: "chain-tinyauth@file"
+      traefik.http.routers.kreuzberg-rtr.middlewares: "middlewares-scalar-openapi-cors@file,chain-tinyauth@file"
       ## HTTP Services
       traefik.http.routers.kreuzberg-rtr.service: "kreuzberg-svc"
       traefik.http.services.kreuzberg-svc.loadbalancer.server.port: "8000"
