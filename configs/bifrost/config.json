@@ -4,8 +4,7 @@
     "enable_logging": true,
     "disable_content_logging": false,
     "drop_excess_requests": false,
-    "initial_pool_size": 300,
-    "allow_direct_keys": false
+    "initial_pool_size": 300
   },
   "config_store": {
     "enabled": false,
@@ -51,7 +50,7 @@
         {
           "name": "openai-key-general",
           "value": "env.OPENAI_API_KEY",
-          "models": [],
+          "models": ["*"],
           "weight": 1.0
         },
         {
@@ -72,7 +71,7 @@
         {
           "name": "openrouter-key",
           "value": "env.OPENROUTER_API_KEY",
-          "models": [],
+          "models": ["*"],
           "weight": 1.0
         }
       ],

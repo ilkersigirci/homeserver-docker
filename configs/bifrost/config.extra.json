@@ -6,7 +6,7 @@
         {
           "name": "homeserver-api-key",
           "value": "env.OPENAI_HOMESERVER_API_KEY",
-          "models": [],
+          "models": ["*"],
           "weight": 1.0,
           "max_retries": 3,
           "retry_backoff_initial_ms": 1,
