@@ -1,6 +1,6 @@
 services:
   grafana-lgtm:
-    image: grafana/otel-lgtm:0.25.0@sha256:cc97e494d697f0b45997f91ad3b350fd85a5fe51afc41783ba5fcaebe19560cf
+    image: grafana/otel-lgtm:0.27.1@sha256:f533fb9c059aad2d47658e9dc059289755d992404b62168b40b3fbcbe4623355
     container_name: grafana-lgtm
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
@@ -18,7 +18,7 @@ services:
       - 9411 # Zipkin
     ports:
       - "4317:4317" # OTLP/gRPC
-    # user: $PUID:$PGID # TODO: Harden
+    user: $PUID:$PGID # TODO: Harden
     read_only: true
     tmpfs:
       - /tmp
