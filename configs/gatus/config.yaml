@@ -39,6 +39,36 @@ maintenance-window-default: &maintenance-window-default
   #   - Saturday
   #   - Sunday
 
+ai-gateway-model-default: &ai-gateway-model-default
+  <<: *maintenance-window-default
+  group: AI
+  interval: 1h
+  url: "$AIGATEWAY_BASE_URL/chat/completions"
+  method: POST
+  client:
+    timeout: 90s
+  headers:
+    Authorization: "Bearer $AIGATEWAY_API_KEY"
+    Content-Type: "application/json"
+  body: |
+    {
+      "model": "[ENDPOINT_NAME]",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Reply with OK only."
+        }
+      ],
+      "max_tokens": 4,
+      "temperature": 0
+    }
+  conditions:
+    - "[STATUS] == 200"
+    - "[BODY].choices[0].message.content != ''"
+  alerts:
+    - type: gotify
+      send-on-resolved: true
+
 ###################################################
 
 # storage:
@@ -193,6 +223,12 @@ endpoints:
     group: GPU
     interval: 1h
     url: "https://photos.gpu.$DOMAINNAME"
+
+  - name: vllm/Qwen3.6-35B-A3B
+    <<: *ai-gateway-model-default
+
+  - name: vllm/gemma-4-31b-it
+    <<: *ai-gateway-model-default
 
 ###################################################
 
