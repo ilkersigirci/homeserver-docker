@@ -8,9 +8,9 @@ services:
     image: maximhq/bifrost:v1.5.0@sha256:42d73fff0e8296f8f2f852904ce36351242847f0ccc8ffa8ddcbeb9026f36f29
     container_name: bifrost
     restart: $RESTART_POLICY_PROGRAMMING
-    entrypoint: # NOTE: For custom base_url env logic
-      - /bin/sh
-      - /app/render-config.sh
+    # entrypoint: # NOTE: For custom base_url env logic
+    #   - /bin/sh
+    #   - /app/render-config.sh
     profiles:
       - custom-user
       - programming
@@ -33,24 +33,22 @@ services:
         soft: 4096
         hard: 8192
     volumes:
-      # - $REPO_PATH/configs/bifrost/config.json:/app/data/config.json
-      # NOTE: Enables persistence for logs, NOT CONFIGS
+      # NOTE: Enables persistence for logs and configs
       - $REPO_PATH/data/bifrost:/app/data
-      - $REPO_PATH/configs/bifrost/config.json:/app/data/config.template.json:ro # NOTE: For custom base_url env logic
-      - $REPO_PATH/configs/bifrost/render-config.sh:/app/render-config.sh:ro # NOTE: For custom base_url env logic
+      ## Config
+      - $REPO_PATH/configs/bifrost/config.json:/app/data/config.json:ro
+      # - $REPO_PATH/configs/bifrost/config.json:/app/data/config.template.json:ro # NOTE: For custom base_url env logic
+      # - $REPO_PATH/configs/bifrost/render-config.sh:/app/render-config.sh:ro # NOTE: For custom base_url env logic
     environment:
-      APP_DIR: /tmp/bifrost # NOTE: For custom base_url env logic
+      # APP_DIR: /tmp/bifrost # NOTE: For custom base_url env logic
       LOG_LEVEL: info
       LOG_STYLE: json
+      ADMIN_USERNAME: $BIFROST_ADMIN_USERNAME
+      ADMIN_PASSWORD: $BIFROST_ADMIN_PASSWORD
       ## Providers
-      OPENROUTER_API_BASE_URL: $OPENROUTER_API_BASE_URL
       OPENROUTER_API_KEY: $OPENROUTER_API_KEY
       OPENAI_API_KEY: $OPENAI_API_KEY
       OPENAI_PERSONAL_API_KEY: $OPENAI_PERSONAL_API_KEY
-      OPENAI_GEMMA4_31B_IT_BASE_URL: $OPENAI_GEMMA4_31B_IT_BASE_URL
-      OPENAI_QWEN_3_6_35B_A3B_BASE_URL: $OPENAI_QWEN_3_6_35B_A3B_BASE_URL
-      OPENAI_QWEN_IMAGE_2512_BASE_URL: $OPENAI_QWEN_IMAGE_2512_BASE_URL
-      OPENAI_HOMESERVER_API_BASE_URL: $OPENAI_HOMESERVER_API_BASE_URL
       OPENAI_HOMESERVER_API_KEY: $OPENAI_HOMESERVER_API_KEY
     labels:
       traefik.enable: "true"
