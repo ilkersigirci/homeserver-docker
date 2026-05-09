@@ -1,0 +1,8 @@
+alerting:
+  # telegram:
+  #   token: $TELEGRAM_BOT_TOKEN
+  #   id: $TELEGRAM_CHAT_ID
+  gotify:
+    server-url: https://gotify.$DOMAINNAME
+    token: $GOTIFY_NOTIFICATION_TOKEN
+    priority: 10

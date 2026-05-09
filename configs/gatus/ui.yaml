@@ -1,0 +1,175 @@
+ui:
+  title: Health Dashboard
+  description: Monitor the health of $TITLE
+  header: $TITLE
+  dashboard-heading: Uptime
+  dashboard-subheading: " "
+  custom-css: |
+    /* Root variables for Catppuccin Frappe theme to match homepage */
+    :root {
+      --background: hsl(240, 13%, 14%) !important; /* Main background */
+      --foreground: hsl(222, 74%, 74%) !important; /* Primary text color */
+      --card: hsl(240, 16%, 18%) !important; /* Card background */
+      --card-foreground: hsl(222, 74%, 74%) !important; /* Card text */
+      --popover: hsl(240, 16%, 18%) !important;
+      --popover-foreground: hsl(222, 74%, 74%) !important;
+      --primary: hsl(222, 74%, 74%) !important; /* Primary accent */
+      --primary-foreground: hsl(240, 13%, 14%) !important;
+      --secondary: hsl(240, 16%, 22%) !important;
+      --secondary-foreground: hsl(222, 74%, 74%) !important;
+      --muted: hsl(240, 16%, 22%) !important;
+      --muted-foreground: hsl(225, 27%, 51%) !important;
+      --accent: hsl(240, 16%, 22%) !important;
+      --accent-foreground: hsl(222, 74%, 74%) !important;
+      --destructive: hsl(358, 100%, 68%) !important; /* Error/Negative */
+      --destructive-foreground: hsl(240, 13%, 14%) !important;
+      --border: hsl(240, 16%, 22%) !important;
+      --input: hsl(240, 16%, 22%) !important;
+      --ring: hsl(222, 74%, 74%) !important;
+      --radius: 0.5rem;
+    }
+
+    /* Apply JetBrains Mono font globally */
+    html, body, * {
+      font-family: 'JetBrains Mono', 'Monaco', 'Menlo', 'Ubuntu Mono', monospace !important;
+      text-rendering: optimizeLegibility !important;
+    }
+
+    /* Override dark mode specific colors */
+    .dark {
+      --background: hsl(240, 13%, 14%) !important;
+      --foreground: hsl(222, 74%, 74%) !important;
+      --card: hsl(240, 16%, 18%) !important;
+      --card-foreground: hsl(222, 74%, 74%) !important;
+      --popover: hsl(240, 16%, 18%) !important;
+      --popover-foreground: hsl(222, 74%, 74%) !important;
+      --primary: hsl(222, 74%, 74%) !important;
+      --primary-foreground: hsl(240, 13%, 14%) !important;
+      --secondary: hsl(240, 16%, 22%) !important;
+      --secondary-foreground: hsl(222, 74%, 74%) !important;
+      --muted: hsl(240, 16%, 22%) !important;
+      --muted-foreground: hsl(225, 27%, 51%) !important;
+      --accent: hsl(240, 16%, 22%) !important;
+      --accent-foreground: hsl(222, 74%, 74%) !important;
+      --destructive: hsl(358, 100%, 68%) !important;
+      --destructive-foreground: hsl(240, 13%, 14%) !important;
+      --border: hsl(240, 16%, 22%) !important;
+      --input: hsl(240, 16%, 22%) !important;
+      --ring: hsl(222, 74%, 74%) !important;
+    }
+
+    /* Background color overrides */
+    body, html, #app, #global {
+      background-color: hsl(240, 13%, 14%) !important;
+      color: hsl(222, 74%, 74%) !important;
+    }
+
+    /* Header styling */
+    header {
+      background-color: hsl(240, 13%, 14%) !important;
+      border-bottom-color: hsl(240, 16%, 22%) !important;
+      display: none !important;
+    }
+
+    /* Logo area background fix */
+    header .bg-card\\/50,
+    header .bg-card,
+    .bg-card\\/50 {
+      background-color: hsl(240, 13%, 14%) !important;
+    }
+
+    /* Card styling */
+    .bg-card {
+      background-color: hsl(240, 16%, 18%) !important;
+      border-color: hsl(240, 16%, 22%) !important;
+    }
+
+    /* Status indicators - keep green for healthy, use custom red for unhealthy */
+    .bg-green-500 {
+      background-color: hsl(96, 44%, 68%) !important; /* Catppuccin green */
+      color: hsl(240, 13%, 14%) !important; /* Dark text on green background */
+    }
+
+    .bg-green-400 {
+      background-color: hsl(96, 44%, 78%) !important; /* Lighter green */
+    }
+
+    .bg-red-500 {
+      background-color: hsl(358, 100%, 68%) !important; /* Catppuccin red */
+      color: hsl(240, 13%, 14%) !important; /* Dark text on red background */
+    }
+
+    /* Status badge text visibility */
+    .border-transparent.bg-green-500.text-white {
+      color: hsl(240, 13%, 14%) !important; /* Dark text for better contrast */
+      font-weight: 600 !important;
+    }
+
+    .border-transparent.bg-red-500.text-white {
+      color: hsl(240, 13%, 14%) !important; /* Dark text for better contrast */
+      font-weight: 600 !important;
+    }
+
+    /* Status circle indicators - make them more visible */
+    .bg-green-500 .bg-green-400,
+    .border-transparent.bg-green-500 .bg-green-400 {
+      background-color: hsl(240, 13%, 14%) !important; /* Dark circle on green background */
+      width: 8px !important;
+      height: 8px !important;
+      border: 1px solid hsl(240, 13%, 14%) !important;
+    }
+
+    .bg-red-500 .bg-red-400,
+    .border-transparent.bg-red-500 .bg-red-400 {
+      background-color: hsl(240, 13%, 14%) !important; /* Dark circle on red background */
+      width: 8px !important;
+      height: 8px !important;
+      border: 1px solid hsl(240, 13%, 14%) !important;
+    }
+
+    /* Input styling */
+    input, button, select {
+      background-color: hsl(240, 16%, 18%) !important;
+      border-color: hsl(240, 16%, 22%) !important;
+      color: hsl(222, 74%, 74%) !important;
+    }
+
+    /* Hover effects */
+    .hover\\:bg-accent:hover {
+      background-color: hsl(240, 16%, 22%) !important;
+    }
+
+    /* Footer styling */
+    footer {
+      background-color: hsl(240, 13%, 14%) !important;
+      border-top-color: hsl(240, 16%, 22%) !important;
+    }
+
+    /* Link colors */
+    a {
+      color: hsl(222, 74%, 74%) !important;
+    }
+
+    a:hover {
+      color: hsl(222, 74%, 84%) !important;
+    }
+
+    /* Uptime chart bars - gray for no data, green for success, red for failure */
+    .bg-gray-200 {
+      background-color: hsl(240, 16%, 22%) !important;
+    }
+
+    .dark .bg-gray-700 {
+      background-color: hsl(240, 16%, 22%) !important;
+    }
+
+    /* Settings panel styling */
+    #settings .bg-background\\/95 {
+      background-color: hsl(240, 16%, 18%) !important;
+      border-color: hsl(240, 16%, 22%) !important;
+    }
+
+    /* Hide Powered by Gatus footer */
+    footer {
+      display: none !important;
+    }

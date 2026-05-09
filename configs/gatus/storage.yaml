@@ -1,0 +1,5 @@
+# Uncomment to persist status history in gatus-db.
+#
+# storage:
+#   type: postgres
+#   path: "postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$DB_HOST:$DB_PORT/$POSTGRES_DB?sslmode=disable"
