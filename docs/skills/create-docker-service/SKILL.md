@@ -94,6 +94,21 @@ docker compose --env-file .env --file "compose/$MY_HOSTNAME.yml" config
   - External service resolves through Traefik route.
   - Internal-only service is reachable only through intended internal network/ports.
 
+### 6) Add runtime placeholders only after permission validation
+
+- First validate the service is healthy with `user: "$PUID:$PGID"`.
+- If the service is healthy with `user: "$PUID:$PGID"`, add only the runtime directories that must exist in a fresh clone:
+
+```bash
+mkdir -p data/<service> appdata/<service>
+touch data/<service>/.gitkeep appdata/<service>/.gitkeep
+git add -f data/<service>/.gitkeep appdata/<service>/.gitkeep
+```
+
+- If the service is not healthy with `user: "$PUID:$PGID"`:
+  - Add `custom-user` to the service profiles.
+  - Do not add any `.gitkeep` files for that service.
+
 ## Routing Rules
 
 - Add Traefik labels only for externally routed services.
@@ -109,3 +124,4 @@ docker compose --env-file .env --file "compose/$MY_HOSTNAME.yml" config
   - External service: Traefik labels present and valid.
   - Internal-only service: no Traefik labels.
 - Service can be started with the workflow in `docs/RUNNING.md`.
+- Runtime `.gitkeep` files were force-added only if the service is healthy with `user: "$PUID:$PGID"`; otherwise `custom-user` profile is present and no runtime placeholders were added.

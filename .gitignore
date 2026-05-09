@@ -9,11 +9,10 @@ secrets
 
 # Appdata
 appdata/**
+# Keep only top-level service directories discoverable; force-add deeper .gitkeep files.
 !appdata/
-!appdata/**/
-!appdata/**/.gitkeep
-!appdata/jellyfin/.gitkeep
-!appdata/jellyfin/cache/.gitkeep
+!appdata/*/
+!appdata/*/.gitkeep
 
 # Backups
 # backups/*
@@ -31,9 +30,10 @@ configs/crowdsec/config/online_api_credentials.yaml
 
 # Data
 data/**
+# Keep only top-level service directories discoverable; force-add deeper .gitkeep files.
 !data/
-!data/**/
-!data/**/.gitkeep
+!data/*/
+!data/*/.gitkeep
 
 # Logs (keep folder structure, ignore runtime log files)
 logs/**
