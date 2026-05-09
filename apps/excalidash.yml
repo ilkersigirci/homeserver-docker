@@ -111,7 +111,6 @@ services:
         hard: 8192
     volumes:
       - $REPO_PATH/configs/excalidash/frontend-entrypoint.sh:/configs/excalidash/frontend-entrypoint.sh:ro
-      - $REPO_PATH/data/excalidash:/data/
     environment:
       PUID: $PUID
       PGID: $PGID
