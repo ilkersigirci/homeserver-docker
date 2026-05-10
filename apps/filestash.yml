@@ -67,9 +67,9 @@ services:
         hard: 8192
     volumes:
       - $REPO_PATH/configs/filestash/filestash.bin:/app/filestash
-      - $REPO_PATH/data/filestash:/app/data/state/
+      - $REPO_PATH/data/filestash:/app/data/state
     environment:
-      APPLICATION_URL: filestash.$DOMAINNAME
+      APPLICATION_URL: drive.$DOMAINNAME
       ADMIN_CONSOLE: $FILESTASH_ADMIN_PASSWORD_BCRYPT
       CANARY: false
       # OFFICE_URL: http://filestash-wopi-server:9980
@@ -79,24 +79,24 @@ services:
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.filestash-rtr.entrypoints: "websecure"
-      traefik.http.routers.filestash-rtr.rule: "Host(`filestash.$DOMAINNAME`)"
+      traefik.http.routers.filestash-rtr.rule: "Host(`drive.$DOMAINNAME`)"
       ## Middlewares
       traefik.http.routers.filestash-rtr.middlewares: "chain-tinyauth@file"
       ## HTTP Services
       traefik.http.routers.filestash-rtr.service: "filestash-svc"
       traefik.http.services.filestash-svc.loadbalancer.server.port: "8334"
       ####### TINYAUTH #######
-      tinyauth.apps.filestash.config.domain: "filestash.$DOMAINNAME"
+      tinyauth.apps.filestash.config.domain: "drive.$DOMAINNAME"
       tinyauth.apps.filestash.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "filestash"
       homepage.icon: "filestash.png"
-      homepage.href: "https://filestash.$DOMAINNAME"
+      homepage.href: "https://drive.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "File Management Platform / Universal Data Access Layer (without FUSE)"
       ####### GLANCE #######
       glance.name: "filestash"
       glance.icon: "sh:filestash"
-      glance.url: "https://filestash.$DOMAINNAME"
+      glance.url: "https://drive.$DOMAINNAME"
       glance.description: "File Management Platform / Universal Data Access Layer (without FUSE)"
