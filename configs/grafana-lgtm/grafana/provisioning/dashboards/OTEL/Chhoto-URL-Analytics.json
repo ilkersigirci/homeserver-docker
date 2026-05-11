@@ -76,10 +76,10 @@
           },
           "editorMode": "code",
           "expr": "sum(sum_over_time(chhoto_url:hits_delta_30s:by_slug{slug=~\"${slug:regex}\"}[$__range])) or vector(0)",
-          "instant": true,
           "legendFormat": "hits",
-          "range": false,
-          "refId": "A"
+          "refId": "A",
+          "instant": true,
+          "range": false
         }
       ],
       "title": "Total Hits",
@@ -93,6 +93,199 @@
       "fieldConfig": {
         "defaults": {
           "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "count(sum by (slug) (sum_over_time(chhoto_url:hits_delta_30s:by_slug{slug=~\"${slug:regex}\"}[$__range])) > 0) or vector(0)",
+          "legendFormat": "slugs",
+          "refId": "A",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "title": "Active Short URLs",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "id": 5,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "topk(1, sum by (slug) (sum_over_time(chhoto_url:hits_delta_30s:by_slug{slug=~\"${slug:regex}\"}[$__range]))) or (label_replace(vector(0), \"slug\", \"no hits\", \"__name__\", \".*\") unless on() sum(sum_over_time(chhoto_url:hits_delta_30s:by_slug{slug=~\"${slug:regex}\"}[$__range])))",
+          "legendFormat": "{{slug}}",
+          "refId": "A",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "title": "Top Slug",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum(sum_over_time(chhoto_url:hits_delta_30s:by_slug{slug=~\"${slug:regex}\"}[1d])) or vector(0)",
+          "legendFormat": "hits",
+          "refId": "A",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "title": "Hits Last 24h",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "Rollups are evaluated about 1 minute behind real time for stable counting.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
             "mode": "palette-classic"
           },
           "custom": {
@@ -102,9 +295,9 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 10,
+            "barWidthFactor": 0.8,
+            "drawStyle": "bars",
+            "fillOpacity": 70,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -113,7 +306,7 @@
             },
             "insertNulls": false,
             "lineInterpolation": "linear",
-            "lineWidth": 2,
+            "lineWidth": 0,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
@@ -146,15 +339,16 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 18,
-        "x": 6,
-        "y": 0
+        "w": 24,
+        "x": 0,
+        "y": 4
       },
       "id": 2,
+      "interval": "$bucket",
       "options": {
         "legend": {
-          "calcs": ["lastNotNull"],
-          "displayMode": "table",
+          "calcs": [],
+          "displayMode": "list",
           "placement": "bottom",
           "showLegend": true
         },
@@ -165,7 +359,6 @@
           "sort": "desc"
         }
       },
-      "interval": "30s",
       "pluginVersion": "12.3.0",
       "targets": [
         {
@@ -174,14 +367,83 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (slug) (sum_over_time(chhoto_url:hits_delta_30s:by_slug{slug=~\"${slug:regex}\"}[$__interval]))",
+          "expr": "sum by (slug) (sum_over_time(chhoto_url:hits_delta_30s:by_slug{slug=~\"${slug:regex}\"}[$bucket]))",
           "legendFormat": "{{slug}}",
-          "range": true,
-          "refId": "A"
+          "refId": "A",
+          "instant": false,
+          "range": true
         }
       ],
-      "title": "Hits Over Time",
+      "title": "Hits By Time Bucket",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "decimals": 0,
+          "displayName": "${__field.labels.slug}",
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 0,
+        "y": 12
+      },
+      "id": 7,
+      "options": {
+        "displayMode": "gradient",
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
+      },
+      "pluginVersion": "12.3.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "topk(10, sum by (slug) (sum_over_time(chhoto_url:hits_delta_30s:by_slug{slug=~\"${slug:regex}\"}[$__range]))) or (label_replace(vector(0), \"slug\", \"no hits\", \"__name__\", \".*\") unless on() sum(sum_over_time(chhoto_url:hits_delta_30s:by_slug{slug=~\"${slug:regex}\"}[$__range])))",
+          "legendFormat": "{{slug}}",
+          "refId": "A",
+          "instant": true,
+          "range": false
+        }
+      ],
+      "title": "Top Slugs",
+      "type": "bargauge"
     },
     {
       "datasource": {
@@ -217,13 +479,66 @@
           },
           "unit": "short"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Hits"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "short"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "custom.width",
+                "value": 160
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Share"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              },
+              {
+                "id": "custom.width",
+                "value": 140
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Slug"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 180
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 9,
-        "w": 24,
-        "x": 0,
-        "y": 8
+        "w": 16,
+        "x": 8,
+        "y": 12
       },
       "id": 3,
       "options": {
@@ -246,28 +561,50 @@
           },
           "editorMode": "code",
           "expr": "topk(20, sum by (slug) (sum_over_time(chhoto_url:hits_delta_30s:by_slug{slug=~\"${slug:regex}\"}[$__range]))) or (label_replace(vector(0), \"slug\", \"no hits\", \"__name__\", \".*\") unless on() sum(sum_over_time(chhoto_url:hits_delta_30s:by_slug{slug=~\"${slug:regex}\"}[$__range])))",
-          "instant": true,
           "legendFormat": "{{slug}}",
-          "range": false,
-          "refId": "A"
+          "refId": "A",
+          "format": "table",
+          "instant": true,
+          "range": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "topk(20, 100 * sum by (slug) (sum_over_time(chhoto_url:hits_delta_30s:by_slug{slug=~\"${slug:regex}\"}[$__range])) / scalar(clamp_min(sum(sum_over_time(chhoto_url:hits_delta_30s:by_slug{slug=~\"${slug:regex}\"}[$__range])), 1))) or (label_replace(vector(0), \"slug\", \"no hits\", \"__name__\", \".*\") unless on() sum(sum_over_time(chhoto_url:hits_delta_30s:by_slug{slug=~\"${slug:regex}\"}[$__range])))",
+          "legendFormat": "{{slug}}",
+          "refId": "B",
+          "format": "table",
+          "instant": true,
+          "range": false
         }
       ],
       "title": "Top Short URLs",
       "transformations": [
         {
+          "id": "joinByField",
+          "options": {
+            "byField": "slug",
+            "mode": "inner"
+          }
+        },
+        {
           "id": "organize",
           "options": {
             "excludeByName": {
-              "Time": true
+              "Time 1": true,
+              "Time 2": true
             },
             "indexByName": {
-              "Value": 1,
               "Value #A": 1,
+              "Value #B": 2,
               "slug": 0
             },
             "renameByName": {
-              "Value": "Hits",
               "Value #A": "Hits",
+              "Value #B": "Share",
               "slug": "Slug"
             }
           }
@@ -306,6 +643,45 @@
         "skipUrlSync": false,
         "sort": 1,
         "type": "query"
+      },
+      {
+        "current": {
+          "selected": true,
+          "text": "1h",
+          "value": "1h"
+        },
+        "definition": "30s,5m,1h,1d",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Bucket",
+        "multi": false,
+        "name": "bucket",
+        "options": [
+          {
+            "selected": false,
+            "text": "30s",
+            "value": "30s"
+          },
+          {
+            "selected": false,
+            "text": "5m",
+            "value": "5m"
+          },
+          {
+            "selected": true,
+            "text": "1h",
+            "value": "1h"
+          },
+          {
+            "selected": false,
+            "text": "1d",
+            "value": "1d"
+          }
+        ],
+        "query": "30s,5m,1h,1d",
+        "queryValue": "",
+        "skipUrlSync": false,
+        "type": "custom"
       }
     ]
   },
@@ -317,6 +693,7 @@
   "timezone": "browser",
   "title": "Chhoto URL Analytics",
   "uid": "chhoto-url-analytics",
-  "version": 4,
-  "weekStart": ""
+  "version": 5,
+  "weekStart": "",
+  "description": "Long-term Chhoto URL redirect analytics from OTEL-derived Prometheus rollups. Counts are intentionally delayed about 1 minute for stable ingestion."
 }
