@@ -50,7 +50,6 @@ include:
   ########################### SERVICES
   #### CORE ####
   - ../apps/arcane.yml
-  - ../apps/chhoto-url.yml
   - ../apps/homepage.yml
   - ../apps/docker-socket-proxy.yml
   - ../apps/tinyauth.yml

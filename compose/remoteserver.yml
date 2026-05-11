@@ -52,6 +52,7 @@ include:
   #### CORE ####
   - ../apps/arcane-agent.yml
   - ../apps/adguardhome.yml
+  - ../apps/chhoto-url.yml
   - ../apps/crowdsec.yml
   - ../apps/gotify.yml
   - ../apps/headscale.yml
