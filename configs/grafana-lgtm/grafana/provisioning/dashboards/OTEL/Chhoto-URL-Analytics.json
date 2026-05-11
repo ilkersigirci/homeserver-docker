@@ -75,7 +75,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(increase(chhoto_url_hits_total{slug=~\"${slug:regex}\"}[$__range])) or vector(0)",
+          "expr": "sum(sum_over_time(chhoto_url:hits_delta_30s:by_slug{slug=~\"${slug:regex}\"}[$__range])) or vector(0)",
           "instant": true,
           "legendFormat": "hits",
           "range": false,
@@ -153,7 +153,7 @@
       "id": 2,
       "options": {
         "legend": {
-          "calcs": ["lastNotNull", "sum"],
+          "calcs": ["lastNotNull"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -165,6 +165,7 @@
           "sort": "desc"
         }
       },
+      "interval": "30s",
       "pluginVersion": "12.3.0",
       "targets": [
         {
@@ -173,7 +174,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (slug) (increase(chhoto_url_hits_total{slug=~\"${slug:regex}\"}[$__rate_interval]))",
+          "expr": "sum by (slug) (sum_over_time(chhoto_url:hits_delta_30s:by_slug{slug=~\"${slug:regex}\"}[$__interval]))",
           "legendFormat": "{{slug}}",
           "range": true,
           "refId": "A"
@@ -244,7 +245,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "topk(20, sum by (slug) (increase(chhoto_url_hits_total{slug=~\"${slug:regex}\"}[$__range])))",
+          "expr": "topk(20, sum by (slug) (sum_over_time(chhoto_url:hits_delta_30s:by_slug{slug=~\"${slug:regex}\"}[$__range]))) or (label_replace(vector(0), \"slug\", \"no hits\", \"__name__\", \".*\") unless on() sum(sum_over_time(chhoto_url:hits_delta_30s:by_slug{slug=~\"${slug:regex}\"}[$__range])))",
           "instant": true,
           "legendFormat": "{{slug}}",
           "range": false,
@@ -292,16 +293,16 @@
           "type": "prometheus",
           "uid": "prometheus"
         },
-        "definition": "label_values(chhoto_url_hits_total, slug)",
+        "definition": "query_result(topk(500, sum by (slug) (sum_over_time(chhoto_url:hits_delta_30s:by_slug[$__range]))))",
         "hide": 0,
         "includeAll": true,
         "label": "Slug",
         "multi": true,
         "name": "slug",
         "options": [],
-        "query": "label_values(chhoto_url_hits_total, slug)",
-        "refresh": 1,
-        "regex": "",
+        "query": "query_result(topk(500, sum by (slug) (sum_over_time(chhoto_url:hits_delta_30s:by_slug[$__range]))))",
+        "refresh": 2,
+        "regex": "/slug=\"([^\"]+)\"/",
         "skipUrlSync": false,
         "sort": 1,
         "type": "query"
@@ -316,6 +317,6 @@
   "timezone": "browser",
   "title": "Chhoto URL Analytics",
   "uid": "chhoto-url-analytics",
-  "version": 3,
+  "version": 4,
   "weekStart": ""
 }

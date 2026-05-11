@@ -1,0 +1,64 @@
+groups:
+  - name: chhoto-url-analytics-rollups
+    interval: 30s
+    rules:
+      - record: chhoto_url:hits_total:by_slug
+        expr: |
+          sum by (slug) (
+            chhoto_url_hits_total{slug!=""}
+          )
+
+      # Robust per-30s increment for sparse event counters, evaluated 1m behind
+      # real time so delayed OTLP samples are visible before the rule runs:
+      # - normal case: current cumulative value minus the value 30s ago
+      # - counter reset case: current value is the increment after reset
+      # - first-seen case: current value is the first increment
+      - record: chhoto_url:hits_delta_30s:by_slug
+        expr: |
+          (
+            (
+              sum by (slug) (
+                chhoto_url_hits_total{slug!=""} offset 1m
+              )
+              -
+              sum by (slug) (
+                chhoto_url_hits_total{slug!=""} offset 90s
+              )
+            )
+            and
+            (
+              sum by (slug) (
+                chhoto_url_hits_total{slug!=""} offset 1m
+              )
+              >=
+              sum by (slug) (
+                chhoto_url_hits_total{slug!=""} offset 90s
+              )
+            )
+          )
+          or
+          (
+            sum by (slug) (
+              chhoto_url_hits_total{slug!=""} offset 1m
+            )
+            and
+            (
+              sum by (slug) (
+                chhoto_url_hits_total{slug!=""} offset 1m
+              )
+              <
+              sum by (slug) (
+                chhoto_url_hits_total{slug!=""} offset 90s
+              )
+            )
+          )
+          or
+          (
+            sum by (slug) (
+              chhoto_url_hits_total{slug!=""} offset 1m
+            )
+            unless
+            sum by (slug) (
+              chhoto_url_hits_total{slug!=""} offset 90s
+            )
+          )

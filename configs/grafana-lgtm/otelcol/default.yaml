@@ -25,13 +25,23 @@ extensions:
 processors:
   batch:
   deltatocumulative/chhoto_url:
+    max_stale: 2160h
+    max_streams: 50000
+  filter/chhoto_url_redirect:
+    error_mode: ignore
+    logs:
+      log_record:
+        - not (attributes["ServiceName"] == "chhoto-url-svc@docker" and attributes["RequestMethod"] == "GET" and attributes["DownstreamStatus"] == 308 and IsMatch(attributes["RequestHost"], "^go(\\.[a-z0-9-]+)?\\.ilkerflix\\.com$") and IsMatch(attributes["RequestPath"], "^/[a-z0-9]{4}$"))
+  interval/chhoto_url:
+    interval: 30s
   transform/chhoto_url_slug:
     error_mode: ignore
     log_statements:
       - context: log
         statements:
-          - set(attributes["slug"], ExtractPatterns(attributes["RequestPath"], "^/(?P<slug>[a-z0-9]{4})$")["slug"]) where attributes["ServiceName"] == "chhoto-url-svc@docker" and attributes["RequestMethod"] == "GET" and attributes["DownstreamStatus"] == 308 and IsMatch(attributes["RequestHost"], "^go(\\.gpu)?\\.ilkerflix\\.com$") and IsMatch(attributes["RequestPath"], "^/[a-z0-9]{4}$")
-          - set(attributes["request_host"], attributes["RequestHost"]) where attributes["slug"] != nil
+          - set(attributes["chhoto_url_hit"], true)
+          - set(attributes["slug"], ExtractPatterns(attributes["RequestPath"], "^/(?P<slug>[a-z0-9]{4})$")["slug"])
+          - set(attributes["request_host"], attributes["RequestHost"])
 
 exporters:
   otlphttp/metrics:
@@ -63,7 +73,7 @@ connectors:
       chhoto_url_hits_total:
         description: Count of Chhoto URL redirect hits by slug.
         conditions:
-          - attributes["slug"] != nil
+          - attributes["chhoto_url_hit"] == true
         attributes:
           - key: slug
           - key: request_host
@@ -84,13 +94,17 @@ service:
       #exporters: [otlphttp/metrics,debug/metrics]
     metrics/chhoto_url:
       receivers: [count/chhoto_url]
-      processors: [deltatocumulative/chhoto_url, batch]
+      processors: [deltatocumulative/chhoto_url, interval/chhoto_url, batch]
       exporters: [otlphttp/metrics]
     logs:
       receivers: [otlp]
-      processors: [transform/chhoto_url_slug, batch]
-      exporters: [otlphttp/logs, count/chhoto_url]
+      processors: [batch]
+      exporters: [otlphttp/logs]
       #exporters: [otlphttp/logs,debug/logs]
+    logs/chhoto_url:
+      receivers: [otlp]
+      processors: [filter/chhoto_url_redirect, transform/chhoto_url_slug, batch]
+      exporters: [count/chhoto_url]
     profiles:
       receivers: [otlp]
       exporters: [otlp/profiles]

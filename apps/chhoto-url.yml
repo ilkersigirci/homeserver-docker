@@ -54,7 +54,10 @@ services:
       traefik.http.routers.chhoto-url-rtr.entrypoints: "websecure"
       traefik.http.routers.chhoto-url-rtr.rule: "Host(`go.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.chhoto-url-rtr.middlewares: "chain-tinyauth-relaxed@file"
+      traefik.http.routers.chhoto-url-rtr.middlewares: "chain-tinyauth-relaxed@file,chhoto-url-no-store"
+      traefik.http.middlewares.chhoto-url-no-store.headers.customresponseheaders.Cache-Control: "no-store"
+      traefik.http.middlewares.chhoto-url-no-store.headers.customresponseheaders.Expires: "0"
+      traefik.http.middlewares.chhoto-url-no-store.headers.customresponseheaders.Pragma: "no-cache"
       ## HTTP Services
       traefik.http.routers.chhoto-url-rtr.service: "chhoto-url-svc"
       traefik.http.services.chhoto-url-svc.loadbalancer.server.port: "4567"
