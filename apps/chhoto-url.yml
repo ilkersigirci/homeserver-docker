@@ -31,7 +31,9 @@ services:
       TZ: $TZ
       CHHOTO_LISTEN_PORT: 4567
       CHHOTO_SITE_URL: https://go.$DOMAINNAME
-      CHHOTO_PASSWORD: $CHHOTO_PASSWORD
+      # Traefik exposes only 4-character slugs publicly; all admin/API paths are
+      # protected by Tinyauth, so avoid Chhoto's extra password prompt.
+      CHHOTO_PASSWORD: ""
       CHHOTO_API_KEY: $CHHOTO_API_KEY
       CHHOTO_DB_URL: /data/urls.sqlite
       CHHOTO_SQLITE_USE_WAL_MODE: "True"
@@ -52,8 +54,15 @@ services:
     labels:
       traefik.enable: "true"
       ## HTTP Routers
+      traefik.http.routers.chhoto-url-public-rtr.entrypoints: "websecure"
+      traefik.http.routers.chhoto-url-public-rtr.rule: "Host(`go.$DOMAINNAME`) && (Method(`GET`) || Method(`HEAD`)) && PathRegexp(`^/[a-z0-9]{4}$`)"
+      traefik.http.routers.chhoto-url-public-rtr.priority: "100"
+      traefik.http.routers.chhoto-url-public-rtr.middlewares: "chain-no-auth-relaxed@file"
+      traefik.http.routers.chhoto-url-public-rtr.service: "chhoto-url-svc"
+
       traefik.http.routers.chhoto-url-rtr.entrypoints: "websecure"
       traefik.http.routers.chhoto-url-rtr.rule: "Host(`go.$DOMAINNAME`)"
+      traefik.http.routers.chhoto-url-rtr.priority: "10"
       ## Middlewares
       traefik.http.routers.chhoto-url-rtr.middlewares: "chain-tinyauth-relaxed@file"
       ## HTTP Services
