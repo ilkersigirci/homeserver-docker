@@ -1,0 +1,71 @@
+services:
+  chhoto-url:
+    image: ghcr.io/sintan1729/chhoto-url:6.6.0-alpine@sha256:30b557edd89720e2a947fdee655f27ddfc9a3b818a83f210720640fed792cc9a
+    container_name: chhoto-url
+    restart: $RESTART_POLICY_CORE
+    tty: true
+    profiles:
+      - core
+    networks:
+      - t3_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "512M"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      - $REPO_PATH/data/chhoto-url:/data
+    # NOTE: For envs like True, quote them specifically for chhoto-url to parse them correctly.
+    environment:
+      TZ: $TZ
+      CHHOTO_LISTEN_PORT: 4567
+      CHHOTO_SITE_URL: https://go.$DOMAINNAME
+      CHHOTO_PASSWORD: $CHHOTO_PASSWORD
+      CHHOTO_API_KEY: $CHHOTO_API_KEY
+      CHHOTO_DB_URL: /data/urls.sqlite
+      CHHOTO_SQLITE_USE_WAL_MODE: "True"
+      CHHOTO_REDIRECT_METHOD: "PERMANENT" # TEMPORARY
+      CHHOTO_SLUG_STYLE: "UID" # Pair
+      CHHOTO_SLUG_LENGTH: 4
+      CHHOTO_TRY_LONGER_SLUG: "True"
+      CHHOTO_ALLOW_CAPITAL_LETTERS: "False"
+      # CHHOTO_DISABLE_FRONTEND: "True"
+      CHHOTO_FRONTEND_PAGE_SIZE: 20
+    healthcheck:
+      disable: true
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.chhoto-url-rtr.entrypoints: "websecure"
+      traefik.http.routers.chhoto-url-rtr.rule: "Host(`go.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.chhoto-url-rtr.middlewares: "chain-tinyauth-relaxed@file"
+      ## HTTP Services
+      traefik.http.routers.chhoto-url-rtr.service: "chhoto-url-svc"
+      traefik.http.services.chhoto-url-svc.loadbalancer.server.port: "4567"
+      ####### TINYAUTH #######
+      tinyauth.apps.chhoto-url.config.domain: "go.$DOMAINNAME"
+      tinyauth.apps.chhoto-url.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "Core"
+      homepage.name: "chhoto-url"
+      homepage.icon: "chhoto-url.png"
+      homepage.href: "https://go.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "description"
+      ####### GLANCE #######
+      glance.name: "chhoto-url"
+      glance.icon: "sh:chhoto-url"
+      glance.url: "https://go.$DOMAINNAME"
+      glance.description: "description"
