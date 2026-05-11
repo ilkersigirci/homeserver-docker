@@ -43,7 +43,11 @@ services:
       # CHHOTO_DISABLE_FRONTEND: "True"
       CHHOTO_FRONTEND_PAGE_SIZE: 20
     healthcheck:
-      disable: true
+      test: wget --no-verbose --tries=1 --spider http://chhoto-url:4567/api/whoami || exit 1
+      interval: 60s
+      retries: 3
+      timeout: 10s
+      start_period: 5s
     labels:
       traefik.enable: "true"
       ## HTTP Routers

@@ -24,6 +24,14 @@ extensions:
 
 processors:
   batch:
+  deltatocumulative/chhoto_url:
+  transform/chhoto_url_slug:
+    error_mode: ignore
+    log_statements:
+      - context: log
+        statements:
+          - set(attributes["slug"], ExtractPatterns(attributes["RequestPath"], "^/(?P<slug>[a-z0-9]{4})$")["slug"]) where attributes["ServiceName"] == "chhoto-url-svc@docker" and attributes["RequestMethod"] == "GET" and attributes["DownstreamStatus"] == 308 and IsMatch(attributes["RequestHost"], "^go(\\.gpu)?\\.ilkerflix\\.com$") and IsMatch(attributes["RequestPath"], "^/[a-z0-9]{4}$")
+          - set(attributes["request_host"], attributes["RequestHost"]) where attributes["slug"] != nil
 
 exporters:
   otlphttp/metrics:
@@ -49,6 +57,18 @@ exporters:
   debug/logs:
     verbosity: detailed
 
+connectors:
+  count/chhoto_url:
+    logs:
+      chhoto_url_hits_total:
+        description: Count of Chhoto URL redirect hits by slug.
+        conditions:
+          - attributes["slug"] != nil
+        attributes:
+          - key: slug
+          - key: request_host
+            default_value: unknown
+
 service:
   extensions: [health_check]
   pipelines:
@@ -62,10 +82,14 @@ service:
       processors: [batch]
       exporters: [otlphttp/metrics]
       #exporters: [otlphttp/metrics,debug/metrics]
+    metrics/chhoto_url:
+      receivers: [count/chhoto_url]
+      processors: [deltatocumulative/chhoto_url, batch]
+      exporters: [otlphttp/metrics]
     logs:
       receivers: [otlp]
-      processors: [batch]
-      exporters: [otlphttp/logs]
+      processors: [transform/chhoto_url_slug, batch]
+      exporters: [otlphttp/logs, count/chhoto_url]
       #exporters: [otlphttp/logs,debug/logs]
     profiles:
       receivers: [otlp]
