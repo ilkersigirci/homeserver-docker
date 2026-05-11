@@ -36,6 +36,7 @@ services:
       CHHOTO_DB_URL: /data/urls.sqlite
       CHHOTO_SQLITE_USE_WAL_MODE: "True"
       CHHOTO_REDIRECT_METHOD: "PERMANENT" # TEMPORARY
+      CHHOTO_CACHE_CONTROL_HEADER: "no-store"
       CHHOTO_SLUG_STYLE: "UID" # Pair
       CHHOTO_SLUG_LENGTH: 4
       CHHOTO_TRY_LONGER_SLUG: "True"
@@ -54,10 +55,7 @@ services:
       traefik.http.routers.chhoto-url-rtr.entrypoints: "websecure"
       traefik.http.routers.chhoto-url-rtr.rule: "Host(`go.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.chhoto-url-rtr.middlewares: "chain-tinyauth-relaxed@file,chhoto-url-no-store"
-      traefik.http.middlewares.chhoto-url-no-store.headers.customresponseheaders.Cache-Control: "no-store"
-      traefik.http.middlewares.chhoto-url-no-store.headers.customresponseheaders.Expires: "0"
-      traefik.http.middlewares.chhoto-url-no-store.headers.customresponseheaders.Pragma: "no-cache"
+      traefik.http.routers.chhoto-url-rtr.middlewares: "chain-tinyauth-relaxed@file"
       ## HTTP Services
       traefik.http.routers.chhoto-url-rtr.service: "chhoto-url-svc"
       traefik.http.services.chhoto-url-svc.loadbalancer.server.port: "4567"
