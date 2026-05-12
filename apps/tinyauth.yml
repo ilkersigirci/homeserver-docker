@@ -38,7 +38,7 @@ services:
       ## Analytics Configuration
       TINYAUTH_ANALYTICS_ENABLED: false
       ## Authentication Configuration
-      TINYAUTH_AUTH_IP_ALLOW: $LOCAL_IPS
+      # TINYAUTH_AUTH_IP_ALLOW: $LOCAL_IPS # NOTE: It doesn't bypass LOCAL_IPS
       # TINYAUTH_AUTH_IP_BLOCK: ""
       # TINYAUTH_AUTH_USERS: $TINYAUTH_USERS
       TINYAUTH_AUTH_SECURECOOKIE: true

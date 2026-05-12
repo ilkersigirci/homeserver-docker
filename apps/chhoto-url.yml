@@ -71,7 +71,6 @@ services:
       tinyauth.apps.chhoto-url.config.domain: "go.$DOMAINNAME"
       tinyauth.apps.chhoto-url.oauth.groups: "admin"
       tinyauth.apps.chhoto-url.path.allow: "^/[a-z0-9]{4}$"
-      tinyauth.apps.chhoto-url.ip.allow: "0.0.0.0/0,::/0"
       tinyauth.apps.chhoto-url.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Core"
