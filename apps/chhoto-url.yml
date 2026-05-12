@@ -45,6 +45,7 @@ services:
       CHHOTO_ALLOW_CAPITAL_LETTERS: "False"
       # CHHOTO_DISABLE_FRONTEND: "True"
       CHHOTO_FRONTEND_PAGE_SIZE: 20
+      # CHHOTO_HASH_ALGORITHM: Argon2
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://chhoto-url:4567/api/whoami || exit 1
       interval: 60s
@@ -54,15 +55,15 @@ services:
     labels:
       traefik.enable: "true"
       ## HTTP Routers
+      traefik.http.routers.chhoto-url-rtr.entrypoints: "websecure"
+      traefik.http.routers.chhoto-url-rtr.rule: "Host(`go.$DOMAINNAME`)"
+      traefik.http.routers.chhoto-url-rtr.priority: "10"
+      ### Public routers
       traefik.http.routers.chhoto-url-public-rtr.entrypoints: "websecure"
       traefik.http.routers.chhoto-url-public-rtr.rule: "Host(`go.$DOMAINNAME`) && (Method(`GET`) || Method(`HEAD`)) && PathRegexp(`^/[a-z0-9]{4}$`)"
       traefik.http.routers.chhoto-url-public-rtr.priority: "100"
       traefik.http.routers.chhoto-url-public-rtr.middlewares: "chain-no-auth-relaxed@file"
       traefik.http.routers.chhoto-url-public-rtr.service: "chhoto-url-svc"
-
-      traefik.http.routers.chhoto-url-rtr.entrypoints: "websecure"
-      traefik.http.routers.chhoto-url-rtr.rule: "Host(`go.$DOMAINNAME`)"
-      traefik.http.routers.chhoto-url-rtr.priority: "10"
       ## Middlewares
       traefik.http.routers.chhoto-url-rtr.middlewares: "chain-tinyauth-relaxed@file"
       ## HTTP Services
@@ -79,9 +80,9 @@ services:
       homepage.icon: "chhoto-url.png"
       homepage.href: "https://go.$DOMAINNAME"
       homepage.target: "_blank"
-      homepage.description: "description"
+      homepage.description: "URL shortener with no unnecessary features; written in Rust"
       ####### GLANCE #######
       glance.name: "chhoto-url"
       glance.icon: "sh:chhoto-url"
       glance.url: "https://go.$DOMAINNAME"
-      glance.description: "description"
+      glance.description: "URL shortener with no unnecessary features; written in Rust"
