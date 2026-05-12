@@ -59,6 +59,7 @@ include:
   - ../apps/homepage.yml
   # - ../apps/pocket-id.yml
   - ../apps/docker-socket-proxy.yml
+  - ../apps/filebrowser-quantum.yml
   - ../apps/tinyauth.yml
   - ../apps/traefik.yml
   - ../apps/otel-collector-agent.yml
@@ -75,7 +76,7 @@ include:
   #### MEDIA ####
   - ../apps/aiostreams.yml
   - ../apps/bitplay.yml
-  - ../apps/dufs.yml
+  # - ../apps/dufs.yml
   - ../apps/mazanoke.yml
   - ../apps/metube.yml
   - ../apps/nzbdav.yml
