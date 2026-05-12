@@ -64,6 +64,12 @@ services:
       traefik.http.routers.chhoto-url-public-rtr.priority: "100"
       traefik.http.routers.chhoto-url-public-rtr.middlewares: "chain-no-auth-relaxed@file"
       traefik.http.routers.chhoto-url-public-rtr.service: "chhoto-url-svc"
+      # ### API router for CLI usage with Chhoto's API key (No need when using Split DNS on Homeserver)
+      # traefik.http.routers.chhoto-url-api-rtr.entrypoints: "websecure"
+      # traefik.http.routers.chhoto-url-api-rtr.rule: "Host(`go.$DOMAINNAME`) && PathPrefix(`/api/`) && Header(`X-API-Key`, `$CHHOTO_API_KEY`)"
+      # traefik.http.routers.chhoto-url-api-rtr.priority: "110"
+      # traefik.http.routers.chhoto-url-api-rtr.middlewares: "chain-no-auth-relaxed@file"
+      # traefik.http.routers.chhoto-url-api-rtr.service: "chhoto-url-svc"
       ## Middlewares
       traefik.http.routers.chhoto-url-rtr.middlewares: "chain-tinyauth-relaxed@file"
       ## HTTP Services
