@@ -53,6 +53,7 @@ services:
     read_only: true
     tmpfs:
       - /tmp
+      - /app/data:rw,noexec,nosuid,nodev,size=16m,uid=$PUID,gid=$PGID,mode=0755
     security_opt:
       - no-new-privileges:true
     cap_drop:
