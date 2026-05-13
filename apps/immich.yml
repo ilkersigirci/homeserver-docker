@@ -97,7 +97,8 @@ services:
         soft: 8192
         hard: 16384
     volumes:
-      - $IMMICH_UPLOAD_LOCATION:/data
+      - $IMMICH_THUMBS_PATH:/data/thumbs
+      - $IMMICH_DATA_PATH:/data
       - $DIR_PHOTOS/Pictures:/mnt/media/Photos/Pictures:ro
       - $DIR_PHOTOS/Videos:/mnt/media/Photos/Videos:ro
     environment:
