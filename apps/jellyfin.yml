@@ -1,3 +1,6 @@
+networks:
+  jellyfin-internal-net:
+
 services:
   # TODO: Harden
   # NOTE: Install in Jellyfin UI https://github.com/arnesacnussem/jellyfin-plugin-meilisearch
@@ -6,11 +9,11 @@ services:
     container_name: jellyfin-meilisearch
     restart: $RESTART_POLICY_MEDIA
     profiles:
-      - custom-user
+      - root
       - media
       - jellyfin
     networks:
-      - t3_proxy
+      - jellyfin-internal-net
     expose:
       - 7700
     # user: "65534:65534"
@@ -32,6 +35,8 @@ services:
     volumes:
       - $REPO_PATH/appdata/jellyfin-meilisearch:/meili_data
     environment:
+      MEILI_ENV: production
+      MEILI_NO_ANALYTICS: true
       MEILI_MASTER_KEY: $JELLYFIN_MEILI_MASTER_KEY
     labels:
       ####### GLANCE #######
@@ -49,6 +54,7 @@ services:
       - media
       - jellyfin
     networks:
+      jellyfin-internal-net:
       t3_proxy:
         ipv4_address: 192.168.90.161
     ports:
