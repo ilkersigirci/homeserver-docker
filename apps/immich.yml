@@ -80,8 +80,11 @@ services:
     networks:
       - t3_proxy
       - immich_backend
-    ports:
-      - "2283:2283"
+    expose:
+      - 2283
+    # NOTE: For dell machine only
+    # ports:
+    #   - "2283:2283"
     user: $PUID:$PGID
     security_opt:
       - no-new-privileges:true
