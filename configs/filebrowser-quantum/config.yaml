@@ -3,12 +3,12 @@ server:
   database: "/home/filebrowser/data/database.db"
   cacheDir: "/home/filebrowser/data/tmp" # using the data volume so it can persist across restarts
   cacheDirCleanup: false
+  externalUrl: "https://share.ilkerflix.com" # Used by share links if set. This is the base domain that share links will use
   disableWebDAV: true
   disableUpdateCheck: true
   disablePreviews: false
   disablePreviewResize: false
   maxArchiveSize: 20   # GB; 0 = no limit (default: 20)
-  # externalUrl: "https://mydomain.com" # Used by share links if set. This is the base domain that share links will use
   logging:
     - levels: "info"                     # separated list of log levels to enable. (eg. "info|warning|error|debug")
       apiLevels: ""                       # separated list of log levels to enable for the API. (eg. "info|warning|error")

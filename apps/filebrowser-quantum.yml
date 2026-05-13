@@ -39,16 +39,20 @@ services:
       ## HTTP Routers
       traefik.http.routers.filebrowser-rtr.entrypoints: "websecure"
       traefik.http.routers.filebrowser-rtr.rule: "Host(`drive.$DOMAINNAME`)"
+      traefik.http.routers.filebrowser-share-rtr.entrypoints: "websecure"
+      traefik.http.routers.filebrowser-share-rtr.rule: "Host(`share.$DOMAINNAME`) && (Path(`/public/share`) || PathPrefix(`/public/share/`) || Path(`/public/api`) || PathPrefix(`/public/api/`) || Path(`/public/static`) || PathPrefix(`/public/static/`))"
       ## Middlewares
       traefik.http.routers.filebrowser-rtr.middlewares: "chain-tinyauth-relaxed@file"
+      traefik.http.routers.filebrowser-share-rtr.middlewares: "chain-no-auth-relaxed@file"
       ## HTTP Services
       traefik.http.routers.filebrowser-rtr.service: "filebrowser-svc"
+      traefik.http.routers.filebrowser-share-rtr.service: "filebrowser-svc"
       traefik.http.services.filebrowser-svc.loadbalancer.server.port: "80"
       ####### TINYAUTH #######
       tinyauth.apps.filebrowser.config.domain: "drive.$DOMAINNAME"
       tinyauth.apps.filebrowser.ip.bypass: "$LOCAL_IPS"
       tinyauth.apps.filebrowser.oauth.groups: "admin"
-      tinyauth.apps.filebrowser.path.allow: "^/public/(share|api|static)(/.*)?$"
+      # tinyauth.apps.filebrowser.path.allow: "^/public/(share|api|static)(/.*)?$"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "FileBrowser"

@@ -19,7 +19,7 @@ http:
       service: pocket-id-svc
 
     immich-public-proxy-rtr:
-      rule: "Host(`photos.{{env "DOMAINNAME"}}`) && PathPrefix(`/share`)"
+      rule: "Host(`share.{{env "DOMAINNAME"}}`) && PathPrefix(`/share`)"
       entryPoints:
         - websecure
       middlewares:
