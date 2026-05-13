@@ -1,11 +1,12 @@
-# TODO: Harden
+# Official compose: https://github.com/immich-app/immich/blob/main/docker/docker-compose.rootless.yml
 # Env variables: https://immich.app/docs/install/environment-variables
+
 networks:
   immich_backend:
 
 services:
   immich-redis:
-    image: docker.io/valkey/valkey:9@sha256:3b55fbaa0cd93cf0d9d961f405e4dfcc70efe325e2d84da207a0a8e6d8fde4f9
+    image: docker.io/valkey/valkey:9@sha256:8436e10bc65c94886a91d4415b6a6dfa9cb5a306fb3b996e5bb67cd2b4854193
     container_name: immich-redis
     restart: $RESTART_POLICY_MEDIA
     profiles:
@@ -25,8 +26,10 @@ services:
     mem_limit: "1G"
     ulimits:
       nofile:
-        soft: 4096
-        hard: 8192
+        soft: 16384
+        hard: 16384
+    volumes:
+      - $REPO_PATH/appdata/immich-redis:/data
     healthcheck:
       test: redis-cli ping || exit 1
 
@@ -46,6 +49,7 @@ services:
       - NET_RAW
       - ALL
     cap_add: []
+    shm_size: 128mb
     pids_limit: 512
     cpus: "2.0"
     mem_limit: "2G"
@@ -53,17 +57,15 @@ services:
       nofile:
         soft: 4096
         hard: 8192
-
     volumes:
       - $REPO_PATH/data/immich-db:/var/lib/postgresql/data
     environment:
       POSTGRES_PASSWORD: $IMMICH_DB_PASSWORD
       POSTGRES_USER: $IMMICH_DB_USERNAME
-      POSTGRES_DB: $IMMICH_DB_DATABASE_NAME
+      POSTGRES_DB: immich
       POSTGRES_INITDB_ARGS: "--data-checksums"
       PG_DATA: /var/lib/postgresql/data
-      # Uncomment the DB_STORAGE_TYPE: 'HDD' var if your database isn't stored on SSDs
-      # DB_STORAGE_TYPE: 'HDD'
+      DB_STORAGE_TYPE: "SSD" # Change to "HDD" if your database isn't stored on SSDs
 
   immich-server:
     image: ghcr.io/immich-app/immich-server:v2.7.5@sha256:c15bff75068effb03f4355997d03dc7e0fc58720c2b54ad6f7f10d1bc57efaa5
@@ -95,18 +97,40 @@ services:
         soft: 8192
         hard: 16384
     volumes:
-      - $IMMICH_UPLOAD_LOCATION:/usr/src/app/upload
-      - $DIR_PHOTOS/Pictures:/mnt/media/Photos/Pictures
+      - $IMMICH_UPLOAD_LOCATION:/data
+      - $DIR_PHOTOS/Pictures:/mnt/media/Photos/Pictures:ro
       - $DIR_PHOTOS/Videos:/mnt/media/Photos/Videos:ro
-      # - $DIR_PHOTOS/Pictures:/mnt/media/Photos/Pictures
-      # - $DIR_PHOTOS/Videos:/mnt/media/Photos/Videos
     environment:
-      UPLOAD_LOCATION: $IMMICH_UPLOAD_LOCATION
+      TZ: $TZ
+      IMMICH_ENV: production
       IMMICH_LOG_LEVEL: ${IMMICH_LOG_LEVEL:-error}
-      REDIS_HOSTNAME: $IMMICH_REDIS_HOSTNAME
-      DB_HOSTNAME: $IMMICH_DB_HOSTNAME
+      IMMICH_LOG_FORMAT: console
+      IMMICH_MEDIA_LOCATION: /data
+      # IMMICH_CONFIG_FILE: DUMMY
+      NO_COLOR: false
+      IMMICH_API_METRICS_PORT: 8081
+      IMMICH_MICROSERVICES_METRICS_PORT: 8082
+      IMMICH_PROCESS_INVALID_IMAGES: false
+      IMMICH_ALLOW_SETUP: false
+      ## Ports
+      IMMICH_HOST: 0.0.0.0
+      IMMICH_PORT: 2283
+      ## Database
+      DB_HOSTNAME: immich-postgres
+      DB_PORT: 5432
       DB_USERNAME: $IMMICH_DB_USERNAME
       DB_PASSWORD: $IMMICH_DB_PASSWORD
+      DB_DATABASE_NAME: immich
+      DB_SKIP_MIGRATIONS: false
+      ## Redis
+      REDIS_HOSTNAME: immich-redis
+      REDIS_PORT: 6379
+      # REDIS_USERNAME: DUMMY
+      # REDIS_PASSWORD: DUMMY
+      # REDIS_DBINDEX: 0
+      ## Prometheus
+      # IMMICH_TELEMETRY_INCLUDE: "all" # host, api, io, repo, job
+      # IMMICH_TELEMETRY_EXCLUDE: DUMMY # host, api, io, repo, job
     healthcheck:
       disable: false
     labels:
@@ -194,7 +218,8 @@ services:
     networks:
       - immich_backend
     ports:
-      - "127.0.0.1:1003:3000"
+      # - "127.0.0.1:1003:3000"
+      - "1003:3000"
     user: $PUID:$PGID
     security_opt:
       - no-new-privileges:true
