@@ -10,14 +10,6 @@ http:
         - middlewares-webfinger
       service: webfinger-svc
 
-    # wireguard-rtr:
-    #   rule: "Host(`wireguard.{{env "DOMAINNAME"}}`)"
-    #   entryPoints:
-    #     - websecure
-    #   middlewares:
-    #     - chain-no-auth-relaxed
-    #   service: wireguard-svc
-
     pocket-id-rtr:
       rule: "Host(`pocketid.{{env "DOMAINNAME"}}`)"
       entryPoints:
@@ -26,16 +18,6 @@ http:
         - chain-pocket-id
       service: pocket-id-svc
 
-    jellyfin-redirect-rtr:
-      rule: "Host(`jellyfin.{{env "DOMAINNAME"}}`)"
-      entryPoints:
-        - websecure
-      middlewares:
-        - chain-no-auth
-        - middlewares-rate-limit-redirect
-        - jellyfin-redirect
-      service: noop@internal
-
     immich-public-proxy-rtr:
       rule: "Host(`photos.{{env "DOMAINNAME"}}`) && PathPrefix(`/share`)"
       entryPoints:
@@ -43,15 +25,6 @@ http:
       middlewares:
         - chain-no-auth-relaxed
       service: immich-public-proxy-svc
-
-    splitpro-rtr:
-      rule: "Host(`split.{{env "DOMAINNAME"}}`)"
-      entryPoints:
-        - websecure
-      middlewares:
-        - chain-no-auth-relaxed
-        # - chain-tinyauth-relaxed
-      service: splitpro-svc
 
     public-catchall-rtr:
       rule: "PathPrefix(`/`)"
@@ -62,23 +35,13 @@ http:
         - chain-no-auth
       service: noop@internal
 
-  middlewares:
-    jellyfin-redirect:
-      redirectRegex:
-        regex: "^https://jellyfin\\.(.+)"
-        replacement: "https://jellyfin.gpu.${1}"
-        permanent: true
+  # middlewares:
 
   services:
     webfinger-svc:
       loadBalancer:
         servers:
           - url: "http://DUMMY"
-
-    # wireguard-svc:
-    #   loadBalancer:
-    #     servers:
-    #       - url: "http://{{env "REMOTE_SERVER_PRIVATE_IP"}}:51821" # IP of the host machine
 
     pocket-id-svc:
       loadBalancer:
@@ -89,17 +52,7 @@ http:
         #   interval: "30s"
         #   timeout: "5s"
 
-    # jellyfin-svc:
-    #   loadBalancer:
-    #     servers:
-    #       # - url: "http://100.64.0.9:1002"
-
     immich-public-proxy-svc:
       loadBalancer:
         servers:
           - url: "http://100.64.0.9:1003"
-
-    splitpro-svc:
-      loadBalancer:
-        servers:
-          - url: "http://100.64.0.9:1004"

@@ -47,6 +47,8 @@ services:
       ####### TINYAUTH #######
       tinyauth.apps.filebrowser.config.domain: "drive.$DOMAINNAME"
       tinyauth.apps.filebrowser.ip.bypass: "$LOCAL_IPS"
+      tinyauth.apps.filebrowser.oauth.groups: "admin"
+      tinyauth.apps.filebrowser.path.allow: "^/public/(share|api|static)(/.*)?$"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "FileBrowser"
