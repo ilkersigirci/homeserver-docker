@@ -18,6 +18,7 @@ services:
       - ALL
     cap_add: []
     volumes:
+      - $REPO_PATH/configs/filebrowser-quantum/config.yaml:/home/filebrowser/data/config.yaml:ro
       - $REPO_PATH/data/filebrowser-quantum/fb-data:/home/filebrowser/data
       - $REPO_PATH/data/filebrowser-quantum/local-data:/local-data
     environment:

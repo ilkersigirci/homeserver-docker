@@ -1,0 +1,87 @@
+server:
+  port: 80
+  database: "/home/filebrowser/data/database.db"
+  cacheDir: "/home/filebrowser/data/tmp" # using the data volume so it can persist across restarts
+  cacheDirCleanup: false
+  disableWebDAV: true
+  disableUpdateCheck: true
+  disablePreviews: false
+  disablePreviewResize: false
+  maxArchiveSize: 20   # GB; 0 = no limit (default: 20)
+  # externalUrl: "https://mydomain.com" # Used by share links if set. This is the base domain that share links will use
+  logging:
+    - levels: "info"                     # separated list of log levels to enable. (eg. "info|warning|error|debug")
+      apiLevels: ""                       # separated list of log levels to enable for the API. (eg. "info|warning|error")
+      output: "stdout"                    # output location. (eg. "stdout" or "path/to/file.log")
+      noColors: false                     # disable colors in the output
+      json: false                         # output in json format
+      utc: false                          # use UTC time in the output instead of local time
+  filesystem:
+    createFilePermission: "644"      # Unix permissions like 644, 755, 2755 (default: 644)
+    createDirectoryPermission: "755" # Unix permissions like 755, 2755, 1777 (default: 755)
+  indexSqlConfig:
+    batchSize: 1000           # Number of items to batch in a single transaction, typically 500-5000. Higher = faster but could use more memory.
+    cacheSizeMB: 32         # Size of the SQLite cache in MB
+    walMode: false          # WAL journaling mode: more memory, better for busy deployments
+    disableReuse: false       # If true, always create a new indexing database on startup
+    startupIntegrityCheck: quickCheck  # quickCheck | probe | off — how thoroughly to verify the index DB at startup (default: quickCheck)
+  # Do not use a root "/" directory or include the "/var" folder
+  sources:
+    - path: "/local-data"
+      name: "Local Data"
+      config:
+        defaultEnabled: true
+        # denyByDefault: true  # Deny all unless explicitly allowed
+    # - path: "/path/to/source2" # not default enabled!
+    #   name: "Secured Files"
+    # - path: "/shared/common"
+    #   name: "Shared Files"
+    #   config:
+    #     defaultEnabled: true
+    # - path: "/shared/users"
+    #   name: "My Files"
+    #   config:
+    #     private: true #  no sharing permitted
+    # - path: "/home/users"
+    #   config:
+    #     defaultEnabled: true
+    #     createUserDir: true
+    #     #defaultUserScope: "/" # when createUserDir is false
+
+auth:
+  methods:
+    password:
+      enabled: false
+      minLength: 5
+      signup: false
+    jwt:
+      enabled: false
+      secret: "xxx" # Use environment variable
+    oidc:
+      enabled: true
+      clientId: "xxx" # Use environment variable
+      clientSecret: "xxx"  # Use environment variable
+      issuerUrl: "https://pocketid.ilkerflix.com"
+      scopes: "openid email profile groups"
+      userIdentifier: "preferred_username"
+      adminGroup: "admin"
+      # userGroups: ["admin", "guest"] # Users not in these groups will be denied access.
+
+frontend:
+  name: "Drive Ilkerflix"
+  description: "File Browser for Ilkerflix"
+  favicon: "/path/to/favicon.png"
+  loginIcon: "/path/to/login-icon.png"
+  loginButtonText: "Sign in"
+  oidcLoginButtonText: "Sign in with PocketID"
+  externalLinks:
+    - text: "Blog Text"
+      title: "Blog Title"
+      url: "https://blog.ilkerflix.com"
+
+
+integrations:
+  office:
+    url: "https://office.yourdomain.com"       # Accessible from browser
+    internalUrl:                               # optional this should be a local network address that FileBrowser can access.
+    secret: "xxx" # Use environment variable
