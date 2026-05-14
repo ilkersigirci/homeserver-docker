@@ -1,6 +1,6 @@
 services:
   victoriametrics:
-    image: victoriametrics/victoria-metrics:v1.140.0@sha256:5ea06e3a567249f8a23181208755f36dabd3b515f7023e9eb570fd4ae6c29203
+    image: victoriametrics/victoria-metrics:v1.143.0@sha256:59b229f9b5ac32bb28c5ad94fc3019e34e82a3137f27f6ede6f73edeeefc2c64
     container_name: victoriametrics
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
