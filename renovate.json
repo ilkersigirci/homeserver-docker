@@ -4,7 +4,10 @@
   "enabledManagers": ["docker-compose", "github-actions"],
   "includePaths": ["apps/**", ".github/workflows/**"],
   "timezone": "Europe/Istanbul",
-  "schedule": ["* */6 * * 5,6,0"],
+  "schedule": ["* 10-16 * * 1-5"],
+  "prHourlyLimit": 1,
+  "prConcurrentLimit": 10,
+  "commitHourlyLimit": 2,
   "docker-compose": {
     "managerFilePatterns": ["/^apps\\/.*\\.ya?ml$/"]
   },
