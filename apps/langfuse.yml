@@ -131,7 +131,7 @@ services:
       retries: 10
 
   langfuse-worker:
-    image: langfuse/langfuse-worker:3.171.0@sha256:a1ba2245d3106459b75ba01e44f2e05cd34dae964526f7cae592f5873aad1587
+    image: langfuse/langfuse-worker:3.174.1@sha256:acd2bfe3ce3d730927c055656e620f48777b3c4638063cd0125b0dc90cc97246
     container_name: langfuse-worker
     restart: $RESTART_POLICY_PROGRAMMING
     depends_on: &langfuse-depends-on
