@@ -102,7 +102,7 @@ services:
     volumes:
       - $IMMICH_THUMBS_PATH:/data/thumbs
       - $IMMICH_DATA_PATH:/data
-      - $DIR_PHOTOS/Pictures:/mnt/media/Photos/Pictures:ro
+      - $DIR_PHOTOS/Pictures:/mnt/media/Photos/Pictures
       - $DIR_PHOTOS/Videos:/mnt/media/Photos/Videos:ro
     environment:
       TZ: $TZ
