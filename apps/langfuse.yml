@@ -214,7 +214,7 @@ services:
       SMTP_CONNECTION_URL: ${SMTP_CONNECTION_URL:-}
 
   langfuse-web:
-    image: langfuse/langfuse:3.171.0@sha256:b2c50e13ff4b87ee952656453c13525d43fb21b8a51a8fccf99c3684d53f3ecb
+    image: langfuse/langfuse:3.174.1@sha256:e54883f4535a08505e20169d51ed7cd5f8f0505294a6ba982dfa64c78edc5c0a
     container_name: langfuse-web
     restart: $RESTART_POLICY_PROGRAMMING
     depends_on: *langfuse-depends-on
