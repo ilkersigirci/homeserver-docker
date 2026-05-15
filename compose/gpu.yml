@@ -83,7 +83,7 @@ include:
   # - ../apps/ytptube.yml # TODO: restart always
   - ../apps/transmission.yml
   #### MONITORING ####
-  # - ../apps/changedetection.yml
+  - ../apps/changedetection.yml
   - ../apps/grafana-lgtm.yml
   # - ../apps/watchyourlan.yml
   #### PHOTO ####

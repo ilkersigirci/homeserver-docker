@@ -1,15 +1,31 @@
+# TODO: Can be configured with playwright+chrome
+# Compose file: https://github.com/dgtlmoon/changedetection.io/blob/master/docker-compose.yml
 # Telegram notification format: tgram://bottoken/ChatID
 services:
   changedetection:
-    image: ghcr.io/dgtlmoon/changedetection.io@sha256:c85fb73ce4e1986c90b9b747e0247cd67b0d4ebcce4718a5f7205dc64ccc178a
+    image: ghcr.io/dgtlmoon/changedetection.io:0.55.3@sha256:2d0030e12494be9ebf6a6ebbbad46afe5763f498bbfefe9ebb7f0bf6be3ca5dc
     container_name: changedetection
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - monitoring
     networks:
       - t3_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=128m,uid=$PUID,gid=$PGID,mode=1777
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 512
+    cpus: "1.0"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     volumes:
       - $REPO_PATH/appdata/changedetection:/datastore
     environment:
@@ -18,6 +34,16 @@ services:
       LOGGER_LEVEL: INFO
       DISABLE_VERSION_CHECK: true
       BASE_URL: https://changedetection.$DOMAINNAME
+      HIDE_REFERER: true
+      FETCH_WORKERS: 10
+      SCREENSHOT_MAX_HEIGHT: 16000
+      LC_ALL: en_US.UTF-8
+      ## Plugins: See https://changedetection.io/plugins for more plugins.
+      # Install additional Python packages (processor plugins, etc.)
+      # Example: Install the OSINT reconnaissance processor plugin
+      # EXTRA_PACKAGES=changedetection.io-osint-processor
+      # Multiple packages can be installed by separating with spaces:
+      # EXTRA_PACKAGES=changedetection.io-osint-processor another-plugin
     labels:
       traefik.enable: "true"
       ## HTTP Routers
