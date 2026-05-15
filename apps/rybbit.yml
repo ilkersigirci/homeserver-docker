@@ -92,7 +92,7 @@ services:
       start_period: 10s
 
   rybbit-backend:
-    image: ghcr.io/rybbit-io/rybbit-backend:latest@sha256:fd00f61abe592f872a0e4ac13f8c7b190ab2810e72f898faea4809d7ced46eef
+    image: ghcr.io/rybbit-io/rybbit-backend:latest@sha256:2eb520cf7951dd0642e15143401e5faf7f0fc2babc1dbebbf9eb9c4d1fd2f73e
     container_name: rybbit-backend
     restart: $RESTART_POLICY_MAINTENANCE
     depends_on:
