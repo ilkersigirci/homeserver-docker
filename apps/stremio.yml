@@ -41,6 +41,12 @@ services:
     environment:
       NO_CORS: 1
       APP_PATH: /.stremio-server
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --tries=1 --timeout=3 --spider http://127.0.0.1:8080/ || exit 1"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 1m
     labels:
       traefik.enable: "true"
       ## HTTP Routers Auth - Web UI
@@ -114,6 +120,12 @@ services:
     environment:
       NO_CORS: 1
       APP_PATH: /.stremio-server
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --tries=1 --timeout=3 --spider http://127.0.0.1:11470/settings || exit 1"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 1m
     labels:
       traefik.enable: "true"
       ## HTTP Routers Auth

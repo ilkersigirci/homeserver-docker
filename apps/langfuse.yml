@@ -45,11 +45,11 @@ services:
       CLICKHOUSE_USER: $LANGFUSE_CLICKHOUSE_USER
       CLICKHOUSE_PASSWORD: $LANGFUSE_CLICKHOUSE_PASSWORD
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8123/ping"]
-      interval: 60s
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:8123/ping"]
+      interval: 1m
       timeout: 5s
-      retries: 5
-      start_period: 5s
+      retries: 3
+      start_period: 1m
 
   langfuse-db:
     image: postgres:18.3@sha256:7e32e9833a6fb1c92c32552794cb6ed569d51b445a54907d35fc112ef39684db
@@ -86,10 +86,11 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} -h 127.0.0.1"]
+      interval: 1m
       timeout: 5s
       retries: 3
+      start_period: 30s
 
   langfuse-redis:
     image: redis:8@sha256:d372cf7cd5ab47fb6ad1a73c45ea1104d6f3fa11cc833ff0b3ac997890b4ccec
@@ -124,11 +125,14 @@ services:
         hard: 8192
     volumes:
       - $REPO_PATH/data/langfuse/redis:/data
+    environment:
+      LANGFUSE_REDIS_PASSWORD: $LANGFUSE_REDIS_PASSWORD
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 3s
-      timeout: 10s
-      retries: 10
+      test: ["CMD-SHELL", "redis-cli --no-auth-warning -a $${LANGFUSE_REDIS_PASSWORD} ping | grep -q PONG"]
+      interval: 1m
+      timeout: 3s
+      retries: 3
+      start_period: 10s
 
   langfuse-worker:
     image: langfuse/langfuse-worker:3.174.1@sha256:acd2bfe3ce3d730927c055656e620f48777b3c4638063cd0125b0dc90cc97246
@@ -212,6 +216,12 @@ services:
       REDIS_TLS_KEY: ${REDIS_TLS_KEY:-/certs/redis.key}
       EMAIL_FROM_ADDRESS: ${EMAIL_FROM_ADDRESS:-}
       SMTP_CONNECTION_URL: ${SMTP_CONNECTION_URL:-}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:3030/api/health || exit 1"]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 1m
 
   langfuse-web:
     image: langfuse/langfuse:3.174.1@sha256:e54883f4535a08505e20169d51ed7cd5f8f0505294a6ba982dfa64c78edc5c0a
@@ -264,6 +274,12 @@ services:
       # AUTH_CUSTOM_AUTHORIZATION_URL: dummy
       # AUTH_CUSTOM_TOKEN_URL: dummy
       # AUTH_CUSTOM_USERINFO_URL: dummy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:3000/api/public/health || exit 1"]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 1m
     labels:
       traefik.enable: "true"
       ## HTTP Routers

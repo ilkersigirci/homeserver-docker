@@ -40,10 +40,11 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres -h 127.0.0.1 -p 5432"]
+      interval: 1m
       timeout: 5s
       retries: 3
+      start_period: 30s
 
   # NOTE: Configuration is located in: $REPO_PATH/data/forgejo/gitea/custom/conf/app.ini
   forgejo:
@@ -103,6 +104,12 @@ services:
       FORGEJO__openid__ENABLE_OPENID_SIGNIN: false
       FORGEJO__webhook__ALLOWED_HOST_LIST: doco-cd.$DOMAINNAME
       FORGEJO__cron.cleanup_packages__SCHEDULE: "@every 6h"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:3000/api/healthz || exit 1"]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 1m
     labels:
       traefik.enable: "true"
       ## HTTP Routers

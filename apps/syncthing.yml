@@ -31,10 +31,11 @@ services:
       PGID: $PGID
       TZ: $TZ
     healthcheck:
-      test: curl -fkLsS -m 2 127.0.0.1:8384/rest/noauth/health | grep -o --color=never OK || exit 1
-      interval: 1m
-      timeout: 10s
+      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:8384/rest/noauth/health | grep -q OK"]
+      interval: 2m
+      timeout: 5s
       retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       ## HTTP Routers

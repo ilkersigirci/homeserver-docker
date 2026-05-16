@@ -41,6 +41,12 @@ services:
       # HOMEPAGE_VAR_CALENDAR_GMAIL_ICAL_SECRET_ADDRESS: $CALENDAR_GMAIL_ICAL_SECRET_ADDRESS
       # HOMEPAGE_VAR_BESZEL_EMAIL: $BESZEL_EMAIL
       # HOMEPAGE_VAR_BESZEL_PASSWORD: $BESZEL_PASSWORD
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:$${PORT:-3000}/api/healthcheck || exit 1"]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 45s
     labels:
       traefik.enable: "true"
       ## HTTP Routers

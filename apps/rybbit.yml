@@ -46,11 +46,11 @@ services:
       CLICKHOUSE_USER: ${RYBBIT_CLICKHOUSE_USER:-default}
       CLICKHOUSE_PASSWORD: ${RYBBIT_CLICKHOUSE_PASSWORD:-frog}
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8123/ping"]
-      interval: 60s
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:8123/ping"]
+      interval: 1m
       timeout: 5s
-      retries: 5
-      start_period: 5s
+      retries: 3
+      start_period: 1m
 
   rybbit-postgres:
     image: postgres:18.3@sha256:7e32e9833a6fb1c92c32552794cb6ed569d51b445a54907d35fc112ef39684db
@@ -87,11 +87,11 @@ services:
       POSTGRES_PASSWORD: ${RYBBIT_POSTGRES_PASSWORD:-frog}
       POSTGRES_DB: ${RYBBIT_POSTGRES_DB:-analytics}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-      interval: 3s
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 1m
       timeout: 5s
-      retries: 5
-      start_period: 10s
+      retries: 3
+      start_period: 30s
 
   rybbit-backend:
     image: ghcr.io/rybbit-io/rybbit-backend:v2.6.0@sha256:2eb520cf7951dd0642e15143401e5faf7f0fc2babc1dbebbf9eb9c4d1fd2f73e
@@ -140,11 +140,11 @@ services:
       DISABLE_SIGNUP: ${RYBBIT_DISABLE_SIGNUP:-true}
       DISABLE_TELEMETRY: true
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3001/api/health"]
-      interval: 3s
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--timeout=3", "--spider", "http://127.0.0.1:3001/api/health"]
+      interval: 2m
       timeout: 5s
-      retries: 5
-      start_period: 10s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -205,6 +205,12 @@ services:
       NODE_ENV: production
       NEXT_PUBLIC_BACKEND_URL: https://analytics.$DOMAINNAME
       NEXT_PUBLIC_DISABLE_SIGNUP: ${RYBBIT_DISABLE_SIGNUP:-true}
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--timeout=3", "--spider", "http://127.0.0.1:3002/"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       ## HTTP Routers

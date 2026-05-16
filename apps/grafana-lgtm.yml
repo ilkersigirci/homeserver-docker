@@ -93,6 +93,12 @@ services:
       # OTELCOL_EXTRA_ARGS:
       ################ CUSTOM ENV VARS ################
       CROWDSEC_VICTORIAMETRICS_URL: $CROWDSEC_VICTORIAMETRICS_URL
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:3000/api/health >/dev/null || exit 1"]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 2m
     labels:
       traefik.enable: "true"
       ## HTTP Routers

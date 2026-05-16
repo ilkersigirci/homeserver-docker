@@ -47,10 +47,10 @@ services:
       APPRISE_NOTIFY_LEVEL: success
     healthcheck:
       test: ["CMD", "/doco-cd", "healthcheck"]
-      start_period: 15s
-      interval: 30s
+      interval: 2m
       timeout: 5s
       retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       ## HTTP Routers

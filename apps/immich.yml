@@ -31,7 +31,11 @@ services:
     volumes:
       - $REPO_PATH/appdata/immich-redis:/data
     healthcheck:
-      test: redis-cli ping || exit 1
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1m
+      timeout: 3s
+      retries: 3
+      start_period: 10s
 
   immich-postgres:
     image: ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23
@@ -66,6 +70,12 @@ services:
       POSTGRES_INITDB_ARGS: "--data-checksums"
       PG_DATA: /var/lib/postgresql/data
       DB_STORAGE_TYPE: "SSD" # Change to "HDD" if your database isn't stored on SSDs
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} -h 127.0.0.1"]
+      interval: 1m
+      timeout: 5s
+      retries: 3
+      start_period: 1m
 
   immich-server:
     image: ghcr.io/immich-app/immich-server:v2.7.5@sha256:c15bff75068effb03f4355997d03dc7e0fc58720c2b54ad6f7f10d1bc57efaa5
@@ -137,6 +147,10 @@ services:
       # IMMICH_TELEMETRY_EXCLUDE: DUMMY # host, api, io, repo, job
     healthcheck:
       disable: false
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 2m
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -238,11 +252,11 @@ services:
         soft: 4096
         hard: 8192
     healthcheck:
-      test: curl -s http://localhost:3000/share/healthcheck -o /dev/null || exit 1
-      interval: 60s
+      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:3000/share/healthcheck >/dev/null || exit 1"]
+      interval: 2m
       timeout: 5s
       retries: 3
-      start_period: 5s
+      start_period: 15s
     volumes:
       - $REPO_PATH/configs/immich-public-proxy/config.json:/app/config.json:ro
     environment:

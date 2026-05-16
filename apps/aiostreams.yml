@@ -31,6 +31,12 @@ services:
       TMDB_ACCESS_TOKEN: $TMDB_API_READ_ACCESS_TOKEN
     # env_file:
     #   - $REPO_PATH/.env.aiostreams
+    healthcheck:
+      test: ["CMD", "/nodejs/bin/node", "/app/scripts/healthcheck.js"]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       ## HTTP Routers

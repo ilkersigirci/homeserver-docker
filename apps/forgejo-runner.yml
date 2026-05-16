@@ -45,10 +45,10 @@ services:
       DOCKER_TLS_CERTDIR: ""
     healthcheck:
       test: ["CMD-SHELL", "docker -H tcp://127.0.0.1:2375 info > /dev/null 2>&1"]
-      interval: 10s
+      interval: 2m
       timeout: 5s
-      retries: 6
-      start_period: 15s
+      retries: 3
+      start_period: 30s
 
   forgejo-dind-gc:
     image: docker:29-cli@sha256:51e23845f5caff1e688a2fae003b0c69d635c9200ad544731db1593731df1d3a

@@ -43,6 +43,12 @@ services:
       FRIGATE_RTSP_USER: $FRIGATE_RTSP_USER
       FRIGATE_RTSP_PASSWORD: $FRIGATE_RTSP_PASSWORD
       FRIGATE_MOSQUITTO_HOST: ${FRIGATE_MOSQUITTO_HOST:-mosquitto}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:8971/api/version >/dev/null || exit 1"]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 3m
     devices:
       - /dev/dri/renderD128:/dev/dri/renderD128 # For intel hwaccel, needs to be updated for your hardware
     labels:

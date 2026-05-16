@@ -38,6 +38,12 @@ services:
       MEILI_ENV: production
       MEILI_NO_ANALYTICS: true
       MEILI_MASTER_KEY: $JELLYFIN_MEILI_MASTER_KEY
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:7700/health || exit 1"]
+      interval: 1m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       ####### GLANCE #######
       glance.name: "jellyfin-meilisearch"
@@ -85,6 +91,12 @@ services:
     environment:
       MEILI_URL: http://jellyfin-meilisearch:7700
       MEILI_MASTER_KEY: $JELLYFIN_MEILI_MASTER_KEY
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:8096/health >/dev/null || exit 1"]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 2m
     labels:
       traefik.enable: "true"
       ## HTTP Routers

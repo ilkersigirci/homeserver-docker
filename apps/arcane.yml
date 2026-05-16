@@ -65,11 +65,11 @@ services:
       OIDC_ADMIN_VALUE: admin
       OIDC_MERGE_ACCOUNTS: false
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://localhost:3552/api/health >/dev/null || exit 1"]
-      start_period: 15s
-      interval: 1m
-      timeout: 3s
-      retries: 5
+      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:3552/api/health >/dev/null || exit 1"]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       ## HTTP Routers

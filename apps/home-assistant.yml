@@ -39,10 +39,11 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres -h 127.0.0.1 -p 5432"]
+      interval: 1m
       timeout: 5s
       retries: 3
+      start_period: 30s
 
   home-assistant:
     image: ghcr.io/home-assistant/home-assistant:2026.5.1@sha256:d4fbec16196d5c8bedf32647f0ca7165f654d92a2e81f35a373508d3226cb867
@@ -71,6 +72,16 @@ services:
       # - /run/dbus:/run/dbus:ro
     environment:
       TZ: $TZ
+    healthcheck:
+      test: >-
+        python3 -c "import sys,urllib.request as u;
+        No=type('No',(u.HTTPErrorProcessor,),{'http_response':lambda s,req,res:res,'https_response':lambda s,req,res:res});
+        r=u.build_opener(No).open('http://127.0.0.1:8123/api/',timeout=3);
+        sys.exit(0 if r.status<500 else 1)"
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 3m
     labels:
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
@@ -112,6 +123,16 @@ services:
       # - /run/dbus:/run/dbus:ro
     environment:
       TZ: $TZ
+    healthcheck:
+      test: >-
+        python3 -c "import sys,urllib.request as u;
+        No=type('No',(u.HTTPErrorProcessor,),{'http_response':lambda s,req,res:res,'https_response':lambda s,req,res:res});
+        r=u.build_opener(No).open('http://127.0.0.1:8123/api/',timeout=3);
+        sys.exit(0 if r.status<500 else 1)"
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 3m
     labels:
       traefik.enable: "true"
       ## HTTP Routers

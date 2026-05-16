@@ -35,6 +35,12 @@ services:
       PUID: $PUID
       PGID: $PGID
       TZ: $TZ
+    healthcheck:
+      test: ["CMD-SHELL", "transmission-remote 127.0.0.1:9091 --session-info >/dev/null || exit 1"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       ## HTTP Routers Auth

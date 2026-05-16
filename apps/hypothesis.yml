@@ -45,9 +45,9 @@ services:
           "CMD-SHELL",
           "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}",
         ]
-      interval: 10s
+      interval: 1m
       timeout: 5s
-      retries: 5
+      retries: 3
       start_period: 30s
 
   hypothesis-elasticsearch:
@@ -92,12 +92,12 @@ services:
       test:
         [
           "CMD-SHELL",
-          "curl --fail --silent http://127.0.0.1:9200 >/dev/null",
+          "curl -fsS --max-time 3 'http://127.0.0.1:9200/_cluster/health?local=true' >/dev/null",
         ]
-      interval: 10s
+      interval: 1m
       timeout: 5s
-      retries: 12
-      start_period: 1m
+      retries: 3
+      start_period: 2m
 
   hypothesis-rabbitmq:
     image: rabbitmq:3.13-management-alpine@sha256:606d8c0d6b3c18d1da9afc53bc7cdb2a8d5486df91b5a9830e9e07626c9ae281
@@ -136,10 +136,10 @@ services:
       RABBITMQ_DISK_FREE_ABSOLUTE_LIMIT: 2GB
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
-      interval: 10s
+      interval: 1m
       timeout: 5s
-      retries: 12
-      start_period: 30s
+      retries: 3
+      start_period: 1m
 
   # TODO: Harden
   hypothesis:
@@ -197,12 +197,12 @@ services:
       test:
         [
           "CMD-SHELL",
-          "wget --no-verbose --tries=1 --spider http://127.0.0.1:5000/ || exit 1",
+          "wget -q --tries=1 --spider http://127.0.0.1:5000/ || exit 1",
         ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 1m
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 2m
     labels:
       traefik.enable: "true"
       ## HTTP Routers

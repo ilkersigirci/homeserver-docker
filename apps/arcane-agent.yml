@@ -37,6 +37,12 @@ services:
       ENVIRONMENT: production
       GPU_MONITORING_ENABLED: false
       MANAGER_API_URL: https://arcane.gpu.$BASE_DOMAINNAME
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:3553/api/health >/dev/null || exit 1"]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       ####### HOMEPAGE #######
       homepage.group: "Core"

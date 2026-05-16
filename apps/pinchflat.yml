@@ -32,6 +32,12 @@ services:
     environment:
       TZ: $TZ
       ENABLE_PROMETHEUS: false
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:8945/ || exit 1"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 1m
     labels:
       traefik.enable: "true"
       ## HTTP Routers

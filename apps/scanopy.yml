@@ -34,11 +34,11 @@ services:
       SCANOPY_LOG_LEVEL: info
       SCANOPY_SERVER_URL: http://127.0.0.1:60072
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:60073/api/health || exit 1"]
-      interval: 5s
-      timeout: 3s
-      retries: 15
-      start_period: 10s
+      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:60073/api/health >/dev/null || exit 1"]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
   scanopy-db:
     image: postgres:18.3@sha256:7e32e9833a6fb1c92c32552794cb6ed569d51b445a54907d35fc112ef39684db
     container_name: scanopy-db
@@ -75,11 +75,11 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d scanopy"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d scanopy"]
+      interval: 1m
       timeout: 5s
-      retries: 5
-      start_period: 10s
+      retries: 3
+      start_period: 30s
 
   scanopy:
     image: ghcr.io/scanopy/scanopy/server:v0.16.2@sha256:e3c55cd639b9643c01e21c1fcc5470c6524ea5c3ac316768bf028737c656bbe6
@@ -132,11 +132,11 @@ services:
       SCANOPY_INTEGRATED_DAEMON_URL: http://host.docker.internal:60073
       SCANOPY_USE_SECURE_SESSION_COOKIES: "true"
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:60072/api/health || exit 1"]
-      interval: 10s
+      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:60072/api/health >/dev/null || exit 1"]
+      interval: 2m
       timeout: 5s
-      retries: 5
-      start_period: 15s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       ## HTTP Routers

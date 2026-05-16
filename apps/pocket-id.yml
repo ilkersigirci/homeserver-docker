@@ -41,11 +41,11 @@ services:
       MAXMIND_LICENSE_KEY: $MAXMIND_LICENSE_KEY
       #  STATIC_API_KEY: your_api_key # Useful for declerative installations
     healthcheck:
-      test: "curl -f http://localhost:1411/healthz"
-      interval: 1m30s
+      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:1411/healthz >/dev/null || exit 1"]
+      interval: 2m
       timeout: 5s
-      start_period: 10s
-      retries: 2
+      retries: 3
+      start_period: 30s
     labels:
       # traefik.enable: "true"
       # ## HTTP Routers

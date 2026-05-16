@@ -45,6 +45,10 @@ services:
       MACHINE_LEARNING_CACHE_FOLDER: /cache
     healthcheck:
       disable: false
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 1m
     deploy:
       resources:
         reservations:

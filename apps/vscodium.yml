@@ -35,6 +35,12 @@ services:
       DISABLE_ZINK: true
       DISABLE_IPV6: true
       DISABLE_DRI3: true
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:3000/ >/dev/null || exit 1"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 1m
     labels:
       traefik.enable: "true"
       ## HTTP Routers

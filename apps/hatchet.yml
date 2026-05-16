@@ -39,11 +39,11 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres -h 127.0.0.1 -p 5432"]
+      interval: 1m
       timeout: 5s
       retries: 3
-      start_period: 10s
+      start_period: 30s
 
   hatchet:
     image: ghcr.io/hatchet-dev/hatchet/hatchet-lite:v0.83.37@sha256:eee219c670d34968fd15c05641737443841a2be92207ca027a8e6452446d2e93
@@ -95,6 +95,12 @@ services:
       SERVER_DEFAULT_ENGINE_VERSION: "V1"
       SERVER_INTERNAL_CLIENT_INTERNAL_GRPC_BROADCAST_ADDRESS: localhost:7077
       SERVER_LIMITS_DEFAULT_TENANT_RETENTION_PERIOD: 720h # 30 days
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:8888/ >/dev/null || exit 1"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 1m
     labels:
       traefik.enable: "true"
       ## HTTP Routers

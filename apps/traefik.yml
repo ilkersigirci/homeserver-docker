@@ -186,11 +186,10 @@ services:
       OTEL_RESOURCE_ATTRIBUTES: service.instance.id=traefik-$MY_HOSTNAME
     healthcheck:
       test: ["CMD", "traefik", "healthcheck", "--ping"]
-      interval: 30s
+      interval: 1m
       timeout: 5s
       retries: 3
       start_period: 10s
-      start_interval: 2s
     labels:
       traefik.enable: "true"
       # HTTP Routers

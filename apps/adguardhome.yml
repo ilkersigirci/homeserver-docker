@@ -53,6 +53,12 @@ services:
       - $REPO_PATH/appdata/adguardhome:/opt/adguardhome/work:rw
     environment:
       TZ: $TZ
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:80/"]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       ## HTTP Routers
