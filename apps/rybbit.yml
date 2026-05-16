@@ -1,3 +1,5 @@
+# NOTE: https://github.com/rybbit-io/rybbit/blob/master/docker-compose.yml
+
 # After first user creation, disable signup: RYBBIT_DISABLE_SIGNUP=true
 networks:
   rybbit_backend:
@@ -92,7 +94,7 @@ services:
       start_period: 10s
 
   rybbit-backend:
-    image: ghcr.io/rybbit-io/rybbit-backend:latest@sha256:fd00f61abe592f872a0e4ac13f8c7b190ab2810e72f898faea4809d7ced46eef
+    image: ghcr.io/rybbit-io/rybbit-backend:v2.6.0@sha256:2eb520cf7951dd0642e15143401e5faf7f0fc2babc1dbebbf9eb9c4d1fd2f73e
     container_name: rybbit-backend
     restart: $RESTART_POLICY_MAINTENANCE
     depends_on:
@@ -136,6 +138,7 @@ services:
       BETTER_AUTH_SECRET: ${RYBBIT_BETTER_AUTH_SECRET:-my_random_auth_secret}
       BASE_URL: https://analytics.$DOMAINNAME
       DISABLE_SIGNUP: ${RYBBIT_DISABLE_SIGNUP:-true}
+      DISABLE_TELEMETRY: true
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3001/api/health"]
       interval: 3s
@@ -170,7 +173,7 @@ services:
       glance.description: "OSS alternative API to Google Analytics"
 
   rybbit-client:
-    image: ghcr.io/rybbit-io/rybbit-client:latest@sha256:741908be311a23ee4e58c5f82c6740bf75bbe4f7430ff2aec420f6189b1378b8
+    image: ghcr.io/rybbit-io/rybbit-client:v2.6.0@sha256:c6fc96e467ad10d6eb10a1a2140bee70919d42439a66582f3573d37e26ff7cec
     container_name: rybbit-client
     restart: $RESTART_POLICY_MAINTENANCE
     depends_on:
