@@ -37,11 +37,6 @@ services:
       SEARXNG_BASE_URL: https://searxng.$DOMAINNAME
       UWSGI_WORKERS: 4
       UWSGI_THREADS: 4
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "1m"
-        max-file: "1"
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -99,8 +94,3 @@ services:
         hard: 8192
     volumes:
       - $REPO_PATH/appdata/searxng-valkey:/data:rw
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "1m"
-        max-file: "1"
