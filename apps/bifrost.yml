@@ -51,7 +51,7 @@ services:
       OPENAI_PERSONAL_API_KEY: $OPENAI_PERSONAL_API_KEY
       OPENAI_HOMESERVER_API_KEY: $OPENAI_HOMESERVER_API_KEY
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:8080/health || exit 1"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--timeout=3", "-O", "/dev/null", "http://127.0.0.1:8080/health"]
       interval: 2m
       timeout: 5s
       retries: 3

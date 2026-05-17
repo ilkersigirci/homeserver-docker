@@ -91,7 +91,7 @@ services:
       KEYCLOAK_CLIENT_ID: $LINKWARDEN_CLIENT_ID
       KEYCLOAK_CLIENT_SECRET: $LINKWARDEN_CLIENT_SECRET
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:3000/api/v1/health || exit 1"]
+      test: ["CMD", "/usr/bin/curl", "--silent", "--fail", "--max-time", "3", "http://127.0.0.1:3000/"]
       interval: 2m
       timeout: 5s
       retries: 3
