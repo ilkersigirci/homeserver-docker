@@ -94,7 +94,7 @@ services:
       ################ CUSTOM ENV VARS ################
       CROWDSEC_VICTORIAMETRICS_URL: $CROWDSEC_VICTORIAMETRICS_URL
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:3000/api/health >/dev/null || exit 1"]
+      test: ["CMD", "curl", "-fsS", "--max-time", "3", "http://127.0.0.1:3000/api/health"]
       interval: 2m
       timeout: 5s
       retries: 3

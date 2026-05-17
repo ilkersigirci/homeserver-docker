@@ -65,7 +65,7 @@ services:
       OIDC_ADMIN_VALUE: admin
       OIDC_MERGE_ACCOUNTS: false
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:3552/api/health >/dev/null || exit 1"]
+      test: ["CMD", "curl", "-fsS", "--max-time", "3", "http://127.0.0.1:3552/api/health"]
       interval: 2m
       timeout: 5s
       retries: 3

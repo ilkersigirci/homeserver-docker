@@ -89,11 +89,7 @@ services:
       discovery.type: single-node
       ES_JAVA_OPTS: "-Xms512m -Xmx512m"
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl -fsS --max-time 3 'http://127.0.0.1:9200/_cluster/health?local=true' >/dev/null",
-        ]
+      test: ["CMD", "curl", "-fsS", "--max-time", "3", "http://127.0.0.1:9200/_cluster/health?local=true"]
       interval: 1m
       timeout: 5s
       retries: 3
@@ -194,11 +190,7 @@ services:
       H_API_AUTH_COOKIE_SECRET_KEY: $HYPOTHESIS_API_AUTH_COOKIE_SECRET_KEY
       H_API_AUTH_COOKIE_SALT: $HYPOTHESIS_API_AUTH_COOKIE_SALT
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "wget -q --tries=1 --spider http://127.0.0.1:5000/ || exit 1",
-        ]
+      test: ["CMD", "wget", "-q", "--tries=1", "--spider", "http://127.0.0.1:5000/"]
       interval: 5m
       timeout: 5s
       retries: 3

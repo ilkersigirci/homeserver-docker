@@ -36,7 +36,7 @@ services:
       PGID: $PGID
       TZ: $TZ
     healthcheck:
-      test: ["CMD-SHELL", "transmission-remote 127.0.0.1:9091 --session-info >/dev/null || exit 1"]
+      test: ["CMD", "transmission-remote", "127.0.0.1:9091", "--session-info"]
       interval: 5m
       timeout: 5s
       retries: 3

@@ -22,7 +22,7 @@ x-socket-proxy-service: &socket_proxy_service
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock:ro
   healthcheck:
-    test: ["CMD-SHELL", "wget -q -O - http://127.0.0.1:2375/_ping | grep -qx OK"]
+    test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:2375/_ping"]
     interval: 1m
     timeout: 5s
     retries: 3

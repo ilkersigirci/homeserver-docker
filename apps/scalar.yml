@@ -65,7 +65,7 @@ services:
           "persistAuth": false
         }
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:8080/ >/dev/null || exit 1"]
+      test: ["CMD", "curl", "-fsS", "--max-time", "3", "http://127.0.0.1:8080/"]
       interval: 5m
       timeout: 5s
       retries: 3

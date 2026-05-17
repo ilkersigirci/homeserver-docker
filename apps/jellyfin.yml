@@ -39,7 +39,7 @@ services:
       MEILI_NO_ANALYTICS: true
       MEILI_MASTER_KEY: $JELLYFIN_MEILI_MASTER_KEY
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:7700/health || exit 1"]
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:7700/health"]
       interval: 1m
       timeout: 5s
       retries: 3
@@ -92,7 +92,7 @@ services:
       MEILI_URL: http://jellyfin-meilisearch:7700
       MEILI_MASTER_KEY: $JELLYFIN_MEILI_MASTER_KEY
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:8096/health >/dev/null || exit 1"]
+      test: ["CMD", "curl", "-fsS", "--max-time", "3", "http://127.0.0.1:8096/health"]
       interval: 2m
       timeout: 5s
       retries: 3

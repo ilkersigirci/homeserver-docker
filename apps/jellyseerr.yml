@@ -28,7 +28,7 @@ services:
       LOG_LEVEL: debug
       PORT: 5055
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:5055/api/v1/status || exit 1"]
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:5055/api/v1/status"]
       interval: 2m
       timeout: 5s
       retries: 3

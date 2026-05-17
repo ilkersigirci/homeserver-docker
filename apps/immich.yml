@@ -147,6 +147,7 @@ services:
       # IMMICH_TELEMETRY_EXCLUDE: DUMMY # host, api, io, repo, job
     healthcheck:
       disable: false
+      test: ["CMD", "immich-healthcheck"]
       interval: 2m
       timeout: 5s
       retries: 3
