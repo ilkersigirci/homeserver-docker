@@ -42,7 +42,7 @@ services:
       NO_CORS: 1
       APP_PATH: /.stremio-server
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --tries=1 --timeout=3 --spider http://127.0.0.1:8080/ || exit 1"]
+      test: ["CMD", "wget", "-q", "--tries=1", "--timeout=3", "--spider", "http://127.0.0.1:8080/"]
       interval: 5m
       timeout: 5s
       retries: 3

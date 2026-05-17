@@ -28,7 +28,7 @@ services:
       - $REPO_PATH/configs/bitplay:/app/config
       - $REPO_PATH/appdata/bitplay:/app/torrent-data
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:3347/ || exit 1"]
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3347/"]
       interval: 5m
       timeout: 5s
       retries: 3

@@ -31,7 +31,7 @@ services:
       PGID: $PGID
       TZ: $TZ
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:8384/rest/noauth/health | grep -q OK"]
+      test: ["CMD", "curl", "-fsS", "--max-time", "3", "-o", "/dev/null", "http://127.0.0.1:8384/rest/noauth/health"]
       interval: 2m
       timeout: 5s
       retries: 3

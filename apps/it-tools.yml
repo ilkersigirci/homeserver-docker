@@ -28,7 +28,7 @@ services:
         hard: 8192
     volumes: []
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/ || exit 1"]
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1/"]
       interval: 5m
       timeout: 5s
       retries: 3

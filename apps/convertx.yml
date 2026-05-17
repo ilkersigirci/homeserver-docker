@@ -31,7 +31,7 @@ services:
       HTTP_ALLOWED: true
       ALLOW_UNAUTHENTICATED: true
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:3000/ >/dev/null || exit 1"]
+      test: ["CMD", "curl", "-fsS", "--max-time", "3", "-o", "/dev/null", "http://127.0.0.1:3000/"]
       interval: 5m
       timeout: 5s
       retries: 3

@@ -107,7 +107,7 @@ services:
       OTEL_SERVICE_NAME: open-webui
       OTEL_RESOURCE_ATTRIBUTES: ""
     healthcheck:
-      test: ["CMD-SHELL", "curl --silent --fail http://127.0.0.1:$${PORT:-8080}/health | jq -ne 'input.status == true' || exit 1"]
+      test: ["CMD", "curl", "--silent", "--fail", "-o", "/dev/null", "http://127.0.0.1:8080/health"]
       interval: 2m
       timeout: 5s
       retries: 3

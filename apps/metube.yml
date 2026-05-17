@@ -40,7 +40,7 @@ services:
       DELETE_FILE_ON_TRASHCAN: ${METUBE_DELETE_FILE_ON_TRASHCAN:-true}
       MAX_CONCURRENT_DOWNLOADS: ${METUBE_MAX_CONCURRENT_DOWNLOADS:-10}
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:$${PORT:-8081}/ >/dev/null || exit 1"]
+      test: ["CMD", "curl", "-fsS", "--max-time", "3", "-o", "/dev/null", "http://127.0.0.1:8081/"]
       interval: 5m
       timeout: 5s
       retries: 3
