@@ -222,6 +222,12 @@ services:
       LOG_LEVEL: INFO
       SYNC_MODE: "2" # Remove offline assets and delete empty albums after each run
       # RUN_IMMEDIATELY: "true" # Run the script immediately after start
+    healthcheck:
+      test: ["CMD-SHELL", "pidof supercronic >/dev/null && wget -q --spider --timeout=3 \"$${API_URL}/server/ping\" || exit 1"]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 1m
 
   # NOTE: On Immich -> Admin -> Settings -> Server Settings -> External Domain
   immich-public-proxy:
