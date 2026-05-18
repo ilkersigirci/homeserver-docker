@@ -10,7 +10,7 @@ networks:
 
 services:
   forgejo-dind:
-    image: docker:29-dind@sha256:685b91dca8eab7de1dce1c303dbb7a763e4082d6a60db10968adf3295fbd2495
+    image: docker:29-dind@sha256:8e3fae900cbfbdc14e8abca89a9e44363065cb535f34a09283c59cc0dde2de20
     container_name: forgejo-dind
     restart: $RESTART_POLICY_PROGRAMMING
     command: ["dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false"]
@@ -51,7 +51,7 @@ services:
       start_period: 30s
 
   forgejo-dind-gc:
-    image: docker:29-cli@sha256:51e23845f5caff1e688a2fae003b0c69d635c9200ad544731db1593731df1d3a
+    image: docker:29-cli@sha256:864f36643a29d212f6cc88ec3aa1ebd2d939283df933c4c5c1074a982237f9bd
     container_name: forgejo-dind-gc
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:

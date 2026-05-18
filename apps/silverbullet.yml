@@ -1,7 +1,7 @@
 # NOTE: env variables: https://silverbullet.md/Install/Configuration
 services:
   silverbullet:
-    image: ghcr.io/silverbulletmd/silverbullet:2.7.0@sha256:8653860d7e22099f84c955f7cb0bc8afc6d7bb35742958401430a06837b66b25
+    image: ghcr.io/silverbulletmd/silverbullet:2.8.0@sha256:43ec44276d809a8acb3890f63a66d7229d9a778e7b3bad12fcd379415042494e
     container_name: silverbullet
     restart: $RESTART_POLICY_OTHERS
     profiles:
@@ -36,6 +36,7 @@ services:
       # SB_READ_ONLY: true
       # SB_USER: admin:admin
       # SB_LOG_PUSH: 1
+      SB_DISABLE_SERVICE_WORKER: 1
     healthcheck:
       test: ["CMD-SHELL", "wget -q --tries=1 --timeout=3 --spider http://127.0.0.1:3000/ || exit 1"]
       interval: 5m
