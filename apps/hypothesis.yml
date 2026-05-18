@@ -126,6 +126,7 @@ services:
         hard: 8192
     volumes:
       - $REPO_PATH/data/hypothesis/rabbitmq:/var/lib/rabbitmq
+      - $REPO_PATH/configs/hypothesis/rabbitmq/20-compat.conf:/etc/rabbitmq/conf.d/20-compat.conf:ro
     environment:
       RABBITMQ_DEFAULT_USER: hypothesis
       RABBITMQ_DEFAULT_PASS: hypothesis
