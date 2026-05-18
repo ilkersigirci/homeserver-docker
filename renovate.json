@@ -56,6 +56,20 @@
       "matchDatasources": ["docker"],
       "matchPackageNames": ["ghcr.io/gtsteffaniak/filebrowser"],
       "sourceUrl": "https://github.com/gtsteffaniak/filebrowser"
+    },
+    {
+      "description": "Use GitHub releases for Kiwix Serve Docker image changelogs",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/kiwix/kiwix-serve"],
+      "sourceUrl": "https://github.com/kiwix/kiwix-tools"
+    },
+    {
+      "description": "Use GitHub releases for RabbitMQ Docker image changelogs",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["rabbitmq"],
+      "sourceUrl": "https://github.com/rabbitmq/rabbitmq-server"
     }
   ],
   "major": {
