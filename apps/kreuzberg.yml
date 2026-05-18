@@ -1,6 +1,6 @@
 services:
   kreuzberg:
-    image: ghcr.io/kreuzberg-dev/kreuzberg:4.9.7@sha256:55cf5232d38d0032686d98769db86b68052e8aa5ed281af9d191327a12769c42
+    image: ghcr.io/kreuzberg-dev/kreuzberg:4.9.8@sha256:db5429bdd023eef630b90aac737775624b3caf0e9d7402ba9c358ef693c6e01e
     container_name: kreuzberg
     restart: $RESTART_POLICY_PROGRAMMING
     command: serve --host 0.0.0.0 --port 8000 --config /config/kreuzberg.toml
