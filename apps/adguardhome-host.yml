@@ -35,6 +35,12 @@ services:
       - $REPO_PATH/appdata/adguardhome:/opt/adguardhome/work:rw
     environment:
       TZ: $TZ
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:81/"]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       ####### HOMEPAGE #######
       homepage.group: "Core"

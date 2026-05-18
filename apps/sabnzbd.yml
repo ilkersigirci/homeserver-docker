@@ -29,6 +29,12 @@ services:
       PUID: $PUID
       PGID: $PGID
       TZ: $TZ
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "--max-time", "3", "http://127.0.0.1:8080/api?mode=version"]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       ## HTTP Routers

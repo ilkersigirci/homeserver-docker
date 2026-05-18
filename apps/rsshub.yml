@@ -32,10 +32,11 @@ services:
         soft: 4096
         hard: 8192
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/pressure"]
-      interval: 1m
-      timeout: 10s
+      test: ["CMD", "curl", "-fsS", "--max-time", "3", "http://127.0.0.1:3000/pressure"]
+      interval: 2m
+      timeout: 5s
       retries: 3
+      start_period: 45s
     labels:
       ####### GLANCE #######
       glance.name: "rsshub-browserless"
@@ -70,11 +71,11 @@ services:
     volumes:
       - $REPO_PATH/appdata/rsshub-redis:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "-h", "127.0.0.1", "ping"]
       interval: 1m
-      timeout: 10s
-      retries: 5
-      start_period: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
     labels:
       ####### GLANCE #######
       glance.name: "rsshub-redis"
@@ -117,10 +118,11 @@ services:
       PUPPETEER_WS_ENDPOINT: "ws://rsshub-browserless:3000"
       TWITTER_AUTH_TOKEN: $TWITTER_AUTH_TOKEN
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:1200/healthz"]
-      interval: 1m
-      timeout: 10s
+      test: ["CMD", "curl", "-fsS", "--max-time", "3", "http://127.0.0.1:1200/healthz"]
+      interval: 2m
+      timeout: 5s
       retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       ## HTTP Routers

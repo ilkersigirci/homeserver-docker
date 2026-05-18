@@ -27,6 +27,12 @@ services:
         hard: 8192
     volumes:
       - $DIR_KIWIX:/data
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 1m
     labels:
       traefik.enable: "true"
       ## HTTP Routers

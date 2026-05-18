@@ -25,6 +25,12 @@ services:
       PGID: $PGID
       TZ: $TZ
       APPRISE_ATTACH_SIZE: 0
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:8000/ >/dev/null || exit 1"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -78,6 +84,12 @@ services:
       APPRISE_CONFIG_DIR: /config
       # SECRET_KEY: $APPRISE_SECRET_KEY
       APPRISE_WORKER_COUNT: 1
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:8000/ >/dev/null || exit 1"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       ## HTTP Routers

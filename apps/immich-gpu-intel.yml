@@ -51,3 +51,7 @@ services:
       - /dev/dri:/dev/dri
     healthcheck:
       disable: false
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 1m

@@ -43,6 +43,12 @@ services:
       # EXTRA_PACKAGES=changedetection.io-osint-processor
       # Multiple packages can be installed by separating with spaces:
       # EXTRA_PACKAGES=changedetection.io-osint-processor another-plugin
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/', timeout=3).read(1)"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 45s
     labels:
       traefik.enable: "true"
       ## HTTP Routers

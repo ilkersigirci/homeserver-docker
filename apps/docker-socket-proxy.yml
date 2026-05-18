@@ -21,6 +21,12 @@ x-socket-proxy-service: &socket_proxy_service
   cap_add: []
   volumes:
     - /var/run/docker.sock:/var/run/docker.sock:ro
+  healthcheck:
+    test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:2375/_ping"]
+    interval: 1m
+    timeout: 5s
+    retries: 3
+    start_period: 10s
 
 ## Variables match the URL prefix (i.e. AUTH blocks access to /auth/* parts of the API, etc.).
 ## 0 to revoke access. 1 to grant access.

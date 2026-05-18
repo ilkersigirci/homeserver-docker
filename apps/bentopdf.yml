@@ -28,11 +28,11 @@ services:
         soft: 4096
         hard: 8192
     healthcheck:
-      test: ['CMD', 'wget', '--spider', '-q', 'http://localhost:8080']
-      start_period: 5s
-      interval: 1m
-      timeout: 3s
-      retries: 5
+      test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:8080"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 15s
     labels:
       traefik.enable: "true"
       ## HTTP Routers

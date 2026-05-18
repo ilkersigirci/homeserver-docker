@@ -34,6 +34,12 @@ services:
       PUID: $PUID
       PGID: $PGID
       TZ: $TZ
+    healthcheck:
+      test: ["CMD", "mosquitto_pub", "-h", "127.0.0.1", "-p", "1883", "-t", "healthcheck/mosquitto", "-m", "ping", "-q", "0"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 10s
     labels:
       ####### HOMEPAGE #######
       homepage.group: "Monitoring"

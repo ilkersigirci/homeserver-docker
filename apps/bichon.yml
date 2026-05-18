@@ -27,6 +27,12 @@ services:
       BICHON_CORS_ORIGINS: https://mailarchive.$DOMAINNAME
       BICHON_ENCRYPT_PASSWORD: $BICHON_ENCRYPT_PASSWORD
       # BICHON_ENABLE_ACCESS_TOKEN: true
+    healthcheck:
+      test: ["CMD", "curl", "--silent", "--fail", "--max-time", "3", "http://127.0.0.1:15630/api/status"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       ## HTTP Routers

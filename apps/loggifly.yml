@@ -31,6 +31,13 @@ services:
       TZ: $TZ
       APPRISE_URL: $GOTIFY_LOGGIFLY_APPRISE_URL
       LOG_LEVEL: "INFO"
+      ENABLE_HEALTHCHECK: "true"
+    healthcheck:
+      test: ["CMD", "python", "/app/healthcheck.py"]
+      interval: 1m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"

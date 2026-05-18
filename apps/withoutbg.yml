@@ -23,6 +23,12 @@ services:
       nofile:
         soft: 4096
         hard: 8192
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "--max-time", "3", "-o", "/dev/null", "http://127.0.0.1:80/api/health"]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 90s
     labels:
       traefik.enable: "true"
       ## HTTP Routers

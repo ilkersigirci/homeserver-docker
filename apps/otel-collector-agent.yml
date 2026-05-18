@@ -50,9 +50,9 @@ services:
       OTEL_COLLECTOR_HOST_NAME: $MY_HOSTNAME
       OTEL_COLLECTOR_DEPLOYMENT_ENVIRONMENT: ${OTEL_DEPLOYMENT_ENVIRONMENT:-production}
     healthcheck:
-      # Distroless image (no shell/curl). Use collector binary for a lightweight health probe.
+      # Distroless image (no shell/curl). Keep validation infrequent; this is a config sanity check.
       test: ["CMD", "/otelcol-contrib", "validate", "--config=/etc/otelcol/config.yaml"]
-      interval: 30s
+      interval: 15m
       timeout: 10s
       retries: 3
-      start_period: 10s
+      start_period: 30s

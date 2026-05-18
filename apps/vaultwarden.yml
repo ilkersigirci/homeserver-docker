@@ -52,6 +52,12 @@ services:
       SSO_CLIENT_SECRET: $VAULTWARDEN_CLIENT_SECRET
       SSO_CLIENT_CACHE_EXPIRATION: 0
       SSO_DEBUG_TOKENS: false
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1/alive >/dev/null || exit 1"]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       ## HTTP Routers
