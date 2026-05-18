@@ -1,7 +1,7 @@
 # TODO: How to set Apprise notification as env var instead of in UI?
 services:
   arcane:
-    image: ghcr.io/getarcaneapp/arcane:v1.18.1@sha256:6d8a51ddca2399106ea20da9db17271a91dd97150cada449aba4edce2ae682c2
+    image: ghcr.io/getarcaneapp/arcane:v1.19.1@sha256:8f03cb1b7a877aa90d398ca07ad47a01732e73e3aefc731bc004b7187485883a
     container_name: arcane
     restart: $RESTART_POLICY_CORE
     profiles:
@@ -65,11 +65,11 @@ services:
       OIDC_ADMIN_VALUE: admin
       OIDC_MERGE_ACCOUNTS: false
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://localhost:3552/api/health >/dev/null || exit 1"]
-      start_period: 15s
-      interval: 1m
-      timeout: 3s
-      retries: 5
+      test: ["CMD", "curl", "-fsS", "--max-time", "3", "http://127.0.0.1:3552/api/health"]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       ## HTTP Routers

@@ -37,11 +37,12 @@ services:
       SEARXNG_BASE_URL: https://searxng.$DOMAINNAME
       UWSGI_WORKERS: 4
       UWSGI_THREADS: 4
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "1m"
-        max-file: "1"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--tries=1", "--timeout=3", "--spider", "http://127.0.0.1:8080/healthz"]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -99,8 +100,9 @@ services:
         hard: 8192
     volumes:
       - $REPO_PATH/appdata/searxng-valkey:/data:rw
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "1m"
-        max-file: "1"
+    healthcheck:
+      test: ["CMD", "valkey-cli", "-h", "127.0.0.1", "ping"]
+      interval: 1m
+      timeout: 3s
+      retries: 3
+      start_period: 10s

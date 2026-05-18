@@ -30,6 +30,12 @@ services:
       JWT_SECRET: $CONVERTX_JWT_SECRET
       HTTP_ALLOWED: true
       ALLOW_UNAUTHENTICATED: true
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "--max-time", "3", "-o", "/dev/null", "http://127.0.0.1:3000/"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       ## HTTP Routers Auth

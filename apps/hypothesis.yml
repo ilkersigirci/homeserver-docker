@@ -6,7 +6,7 @@ networks:
 # - scripts/hypothesis/import.md: import official hypothes.is annotations.
 services:
   hypothesis-db:
-    image: postgres:18.3@sha256:7e32e9833a6fb1c92c32552794cb6ed569d51b445a54907d35fc112ef39684db
+    image: postgres:18.4@sha256:775a0820dd34e907ec63277e388d145056d427548e461d7953a070edb5de3a3a
     container_name: hypothesis-db
     restart: $RESTART_POLICY_OTHERS
     profiles:
@@ -45,9 +45,9 @@ services:
           "CMD-SHELL",
           "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}",
         ]
-      interval: 10s
+      interval: 1m
       timeout: 5s
-      retries: 5
+      retries: 3
       start_period: 30s
 
   hypothesis-elasticsearch:
@@ -89,15 +89,11 @@ services:
       discovery.type: single-node
       ES_JAVA_OPTS: "-Xms512m -Xmx512m"
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "curl --fail --silent http://127.0.0.1:9200 >/dev/null",
-        ]
-      interval: 10s
+      test: ["CMD", "curl", "-fsS", "--max-time", "3", "http://127.0.0.1:9200/_cluster/health?local=true"]
+      interval: 1m
       timeout: 5s
-      retries: 12
-      start_period: 1m
+      retries: 3
+      start_period: 2m
 
   hypothesis-rabbitmq:
     image: rabbitmq:3.13-management-alpine@sha256:606d8c0d6b3c18d1da9afc53bc7cdb2a8d5486df91b5a9830e9e07626c9ae281
@@ -136,10 +132,10 @@ services:
       RABBITMQ_DISK_FREE_ABSOLUTE_LIMIT: 2GB
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
-      interval: 10s
+      interval: 1m
       timeout: 5s
-      retries: 12
-      start_period: 30s
+      retries: 3
+      start_period: 1m
 
   # TODO: Harden
   hypothesis:
@@ -194,15 +190,11 @@ services:
       H_API_AUTH_COOKIE_SECRET_KEY: $HYPOTHESIS_API_AUTH_COOKIE_SECRET_KEY
       H_API_AUTH_COOKIE_SALT: $HYPOTHESIS_API_AUTH_COOKIE_SALT
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "wget --no-verbose --tries=1 --spider http://127.0.0.1:5000/ || exit 1",
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 1m
+      test: ["CMD", "wget", "-q", "--tries=1", "--spider", "http://127.0.0.1:5000/"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 2m
     labels:
       traefik.enable: "true"
       ## HTTP Routers

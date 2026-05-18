@@ -36,6 +36,10 @@ services:
       TZ: $TZ
     healthcheck:
       test: ["CMD", "headscale", "health"]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -132,6 +136,12 @@ services:
       HEADPLANE_OIDC__CLIENT_SECRET: $HEADSCALE_CLIENT_SECRET
       HEADPLANE_OIDC__USE_PKCE: true
       HEADPLANE_OIDC__SCOPE: "openid email profile"
+    healthcheck:
+      test: ["CMD", "/bin/hp_healthcheck"]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -189,6 +199,12 @@ services:
         hard: 8192
     environment:
       ENDPOINT: "/admin"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:80/admin/ || exit 1"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 15s
     labels:
       traefik.enable: "true"
       ## HTTP Routers

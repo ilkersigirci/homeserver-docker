@@ -57,6 +57,12 @@ services:
       # AGENT_USERNAME: $CROWDSEC_AGENT_USERNAME
       # AGENT_PASSWORD: $CROWDSEC_AGENT_PASSWORD
       # LOCAL_API_URL: $CROWDSEC_LOCAL_API_URL
+    healthcheck:
+      test: ["CMD", "cscli", "lapi", "status"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 1m
     labels:
       ####### HOMEPAGE #######
       homepage.group: "Core"

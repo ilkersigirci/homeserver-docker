@@ -34,6 +34,28 @@
       "matchFileNames": ["apps/karakeep.yml", "apps/jellyfin.yml"],
       "matchPackageNames": ["getmeili/meilisearch"],
       "enabled": false
+    },
+    {
+      "description": "Use GitHub releases for Bichon Docker image changelogs",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["rustmailer/bichon"],
+      "sourceUrl": "https://github.com/rustmailer/bichon"
+    },
+    {
+      "description": "Use Bifrost transport GitHub releases for Docker image changelogs",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["maximhq/bifrost"],
+      "sourceUrl": "https://github.com/maximhq/bifrost",
+      "extractVersion": "^(?:transports/)?(?<version>v?\\d+\\.\\d+\\.\\d+(?:-prerelease\\d+)?)$"
+    },
+    {
+      "description": "Use GitHub releases for FileBrowser Quantum Docker image changelogs",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/gtsteffaniak/filebrowser"],
+      "sourceUrl": "https://github.com/gtsteffaniak/filebrowser"
     }
   ],
   "major": {

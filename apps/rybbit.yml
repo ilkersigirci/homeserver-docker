@@ -1,3 +1,5 @@
+# NOTE: https://github.com/rybbit-io/rybbit/blob/master/docker-compose.yml
+
 # After first user creation, disable signup: RYBBIT_DISABLE_SIGNUP=true
 networks:
   rybbit_backend:
@@ -44,14 +46,14 @@ services:
       CLICKHOUSE_USER: ${RYBBIT_CLICKHOUSE_USER:-default}
       CLICKHOUSE_PASSWORD: ${RYBBIT_CLICKHOUSE_PASSWORD:-frog}
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8123/ping"]
-      interval: 60s
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:8123/ping"]
+      interval: 1m
       timeout: 5s
-      retries: 5
-      start_period: 5s
+      retries: 3
+      start_period: 1m
 
   rybbit-postgres:
-    image: postgres:18.3@sha256:7e32e9833a6fb1c92c32552794cb6ed569d51b445a54907d35fc112ef39684db
+    image: postgres:18.4@sha256:775a0820dd34e907ec63277e388d145056d427548e461d7953a070edb5de3a3a
     container_name: rybbit-postgres
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
@@ -85,14 +87,14 @@ services:
       POSTGRES_PASSWORD: ${RYBBIT_POSTGRES_PASSWORD:-frog}
       POSTGRES_DB: ${RYBBIT_POSTGRES_DB:-analytics}
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-      interval: 3s
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 1m
       timeout: 5s
-      retries: 5
-      start_period: 10s
+      retries: 3
+      start_period: 30s
 
   rybbit-backend:
-    image: ghcr.io/rybbit-io/rybbit-backend:latest@sha256:fd00f61abe592f872a0e4ac13f8c7b190ab2810e72f898faea4809d7ced46eef
+    image: ghcr.io/rybbit-io/rybbit-backend:v2.6.0@sha256:2eb520cf7951dd0642e15143401e5faf7f0fc2babc1dbebbf9eb9c4d1fd2f73e
     container_name: rybbit-backend
     restart: $RESTART_POLICY_MAINTENANCE
     depends_on:
@@ -136,12 +138,13 @@ services:
       BETTER_AUTH_SECRET: ${RYBBIT_BETTER_AUTH_SECRET:-my_random_auth_secret}
       BASE_URL: https://analytics.$DOMAINNAME
       DISABLE_SIGNUP: ${RYBBIT_DISABLE_SIGNUP:-true}
+      DISABLE_TELEMETRY: true
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:3001/api/health"]
-      interval: 3s
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--timeout=3", "--spider", "http://127.0.0.1:3001/api/health"]
+      interval: 2m
       timeout: 5s
-      retries: 5
-      start_period: 10s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -170,7 +173,7 @@ services:
       glance.description: "OSS alternative API to Google Analytics"
 
   rybbit-client:
-    image: ghcr.io/rybbit-io/rybbit-client:latest@sha256:741908be311a23ee4e58c5f82c6740bf75bbe4f7430ff2aec420f6189b1378b8
+    image: ghcr.io/rybbit-io/rybbit-client:v2.6.0@sha256:c6fc96e467ad10d6eb10a1a2140bee70919d42439a66582f3573d37e26ff7cec
     container_name: rybbit-client
     restart: $RESTART_POLICY_MAINTENANCE
     depends_on:
@@ -202,6 +205,12 @@ services:
       NODE_ENV: production
       NEXT_PUBLIC_BACKEND_URL: https://analytics.$DOMAINNAME
       NEXT_PUBLIC_DISABLE_SIGNUP: ${RYBBIT_DISABLE_SIGNUP:-true}
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--timeout=3", "--spider", "http://127.0.0.1:3002/"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       ## HTTP Routers

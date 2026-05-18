@@ -35,6 +35,12 @@ services:
       nofile:
         soft: 4096
         hard: 8192
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:9222/json/version"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     labels:
       ####### GLANCE #######
       glance.name: "karakeep-chrome"
@@ -72,6 +78,12 @@ services:
     environment:
       MEILI_NO_ANALYTICS: true
       MEILI_MASTER_KEY: $KARAKEEP_MEILI_MASTER_KEY
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:7700/health"]
+      interval: 1m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       ####### GLANCE #######
       glance.name: "karakeep-meilisearch"
@@ -165,8 +177,12 @@ services:
       OTEL_SERVICE_NAME: karakeep
       OTEL_SAMPLE_RATE: 1.0
       PROMETHEUS_AUTH_TOKEN: Random
-    # healthcheck:
-    #   disable: true
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3000/api/health"]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 1m
     labels:
       traefik.enable: "true"
       ## HTTP Routers

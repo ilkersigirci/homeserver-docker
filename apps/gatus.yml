@@ -3,7 +3,7 @@ networks:
 
 services:
   gatus-db:
-    image: postgres:18.3@sha256:7e32e9833a6fb1c92c32552794cb6ed569d51b445a54907d35fc112ef39684db
+    image: postgres:18.4@sha256:775a0820dd34e907ec63277e388d145056d427548e461d7953a070edb5de3a3a
     container_name: gatus-db
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
@@ -38,10 +38,11 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres -h 127.0.0.1 -p 5432"]
+      interval: 1m
       timeout: 5s
       retries: 3
+      start_period: 30s
 
   gatus:
     image: ghcr.io/twin/gatus:stable@sha256:21609f31be8c4e680ce3004b24276305666239c99aff58391503f3fb6142f39d

@@ -39,6 +39,12 @@ services:
       # Downloaded files are deleted on the server, when they are trashed from the "Completed" section of the UI
       DELETE_FILE_ON_TRASHCAN: ${METUBE_DELETE_FILE_ON_TRASHCAN:-true}
       MAX_CONCURRENT_DOWNLOADS: ${METUBE_MAX_CONCURRENT_DOWNLOADS:-10}
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "--max-time", "3", "-o", "/dev/null", "http://127.0.0.1:8081/"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
     labels:
       traefik.enable: "true"
       ## HTTP Routers Auth
