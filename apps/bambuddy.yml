@@ -1,0 +1,106 @@
+services:
+  # Optional: External PostgreSQL database
+  # Uncomment to run Postgres alongside Bambuddy (or use an external Postgres host)
+  #postgres:
+  #  image: postgres:16-alpine
+  #  container_name: bambuddy-db
+  #  restart: unless-stopped
+  #  environment:
+  #    POSTGRES_USER: bambuddy
+  #    POSTGRES_PASSWORD: changeme
+  #    POSTGRES_DB: bambuddy
+  #  volumes:
+  #    - bambuddy_pgdata:/var/lib/postgresql/data
+  #  ports:
+  #    - "5432:5432"
+
+  bambuddy:
+    image: ghcr.io/maziggy/bambuddy:0.2.4.2@sha256:f05ab29a272f14e9880462e867d7f938e7deb0f9559c9b4e714d282897d4a8e8
+    container_name: bambuddy
+    restart: $RESTART_POLICY_OTHERS
+    profiles:
+      - group
+    networks:
+      - t3_proxy
+    expose:
+      - 8000
+    # ports:
+    #  - "3000:3000"                  # Virtual printer bind/detect
+    #  - "3002:3002"                  # Virtual printer bind/detect
+    #  - "8883:8883"                  # Virtual printer MQTT
+    #  - "990:990"                    # Virtual printer FTP control
+    #  - "6000:6000"                  # Virtual printer file transfer tunnel
+    #  - "322:322"                    # Virtual printer RTSP camera (X1/H2/P2; proxy mode + non-proxy modes with a target printer)
+    #  - "2024-2026:2024-2026"        # Virtual printer proprietary ports (A1/P1S)
+    #  - "50000-50100:50000-50100"    # Virtual printer FTP passive data
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    pids_limit: 256
+    cpus: "2.0"
+    mem_limit: "5G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      - $REPO_PATH/data/bambuddy:/app/data
+      - $REPO_PATH/logs/bambuddy:/app/logs
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      LOG_LEVEL: INFO
+      DEBUG: false
+      PORT: 8000
+      # USE_SYSTEM_TRUST_STORE: true # NOTE: Needs root user
+      ## Slicer API
+      # https://github.com/maziggy/bambuddy/blob/main/slicer-api/README.md
+      # Slicer API sidecar (optional — Settings → "Use Slicer API" toggles this on).
+      # Default points at the OrcaSlicer sidecar on the docker host; change if you
+      # run the sidecar on a different host/port. The matching docker-compose.yml
+      # for the sidecars lives in the orca-slicer-api fork
+      # (https://github.com/maziggy/orca-slicer-api).
+      #- SLICER_API_URL=http://localhost:3003
+      ## Home Assistant Integration
+      # HA_URL: http://homeassistant:8123
+      # HA_TOKEN: $HA_TOKEN
+      # TRUSTED_FRAME_ORIGINS: http://homeassistant:8123
+    healthcheck:
+      test: ["CMD", "curl", "--silent", "--fail", "--max-time", "3", "http://127.0.0.1:8000/health"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.bambuddy-rtr.entrypoints: "websecure"
+      traefik.http.routers.bambuddy-rtr.rule: "Host(`bambuddy.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.bambuddy-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.bambuddy-rtr.service: "bambuddy-svc"
+      traefik.http.services.bambuddy-svc.loadbalancer.server.port: "8000"
+      ####### TINYAUTH #######
+      tinyauth.apps.bambuddy.config.domain: "bambuddy.$DOMAINNAME"
+      tinyauth.apps.bambuddy.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "group"
+      homepage.name: "bambuddy"
+      homepage.icon: "bambuddy.png"
+      homepage.href: "https://bambuddy.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "description"
+      ####### GLANCE #######
+      glance.name: "bambuddy"
+      glance.icon: "sh:bambuddy"
+      glance.url: "https://bambuddy.$DOMAINNAME"
+      glance.description: "description"

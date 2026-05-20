@@ -99,7 +99,7 @@ include:
   - ../apps/linkwarden.yml
   - ../apps/readeck.yml
   - ../apps/rsshub.yml
-  # - ../apps/silverbullet.yml
   # - ../apps/quartz.yml
   #### OTHERS ####
   - ../apps/excalidash.yml
+  - ../apps/bambuddy.yml

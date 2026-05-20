@@ -70,6 +70,13 @@
       "matchDatasources": ["docker"],
       "matchPackageNames": ["rabbitmq"],
       "sourceUrl": "https://github.com/rabbitmq/rabbitmq-server"
+    },
+    {
+      "description": "Use GitHub releases for Bambubuddy Docker image changelogs",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/maziggy/bambuddy"],
+      "sourceUrl": "https://github.com/maziggy/bambuddy"
     }
   ],
   "major": {
