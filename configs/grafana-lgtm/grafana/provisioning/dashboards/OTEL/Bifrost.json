@@ -15,6 +15,7 @@
       }
     ]
   },
+  "description": "Bifrost AI Gateway cost review dashboard built on low-cardinality Prometheus recording rules.",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
@@ -22,12 +23,12 @@
   "links": [],
   "panels": [
     {
-      "id": 2,
+      "id": 1,
       "title": "Total Cost",
       "type": "stat",
       "gridPos": {
-        "h": 5,
-        "w": 4,
+        "h": 4,
+        "w": 3,
         "x": 0,
         "y": 0
       },
@@ -37,14 +38,10 @@
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "sum(sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"$provider\",model=~\"$model\",method=~\"$method\"}[$__range]))",
-          "legendFormat": "Cost",
+          "refId": "A",
           "instant": true,
-          "refId": "A"
+          "range": false,
+          "expr": "sum(sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]))"
         }
       ],
       "fieldConfig": {
@@ -63,26 +60,30 @@
               }
             ]
           }
-        }
+        },
+        "overrides": []
       },
       "options": {
         "colorMode": "value",
         "graphMode": "area",
         "justifyMode": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"]
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
         },
         "textMode": "auto"
-      }
+      },
+      "pluginVersion": "12.3.0"
     },
     {
-      "id": 3,
+      "id": 2,
       "title": "Total Requests",
       "type": "stat",
       "gridPos": {
-        "h": 5,
-        "w": 4,
-        "x": 4,
+        "h": 4,
+        "w": 3,
+        "x": 3,
         "y": 0
       },
       "datasource": {
@@ -91,14 +92,10 @@
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "sum(increase(bifrost_upstream_requests_total{provider=~\"$provider\",model=~\"$model\",method=~\"$method\"}[$__range]))",
-          "legendFormat": "Requests",
+          "refId": "A",
           "instant": true,
-          "refId": "A"
+          "range": false,
+          "expr": "sum(sum_over_time(bifrost:requests_upstream_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]))"
         }
       ],
       "fieldConfig": {
@@ -117,26 +114,30 @@
               }
             ]
           }
-        }
+        },
+        "overrides": []
       },
       "options": {
         "colorMode": "value",
         "graphMode": "area",
         "justifyMode": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"]
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
         },
         "textMode": "auto"
-      }
+      },
+      "pluginVersion": "12.3.0"
     },
     {
-      "id": 4,
-      "title": "Cost / 1k Requests",
+      "id": 3,
+      "title": "Total Tokens",
       "type": "stat",
       "gridPos": {
-        "h": 5,
-        "w": 4,
-        "x": 8,
+        "h": 4,
+        "w": 3,
+        "x": 6,
         "y": 0
       },
       "datasource": {
@@ -145,20 +146,16 @@
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "1000 * sum(sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"$provider\",model=~\"$model\",method=~\"$method\"}[$__range])) / clamp_min(sum(increase(bifrost_upstream_requests_total{provider=~\"$provider\",model=~\"$model\",method=~\"$method\"}[$__range])), 1)",
-          "legendFormat": "Cost/1k",
+          "refId": "A",
           "instant": true,
-          "refId": "A"
+          "range": false,
+          "expr": "sum(sum_over_time(bifrost:input_tokens_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range])) + sum(sum_over_time(bifrost:output_tokens_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]))"
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "currencyUSD",
-          "decimals": 4,
+          "unit": "short",
+          "decimals": 0,
           "color": {
             "mode": "thresholds"
           },
@@ -171,25 +168,83 @@
               }
             ]
           }
-        }
+        },
+        "overrides": []
       },
       "options": {
         "colorMode": "value",
         "graphMode": "area",
         "justifyMode": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"]
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
         },
         "textMode": "auto"
-      }
+      },
+      "pluginVersion": "12.3.0"
+    },
+    {
+      "id": 4,
+      "title": "Avg Cost / Request",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 9,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "expr": "sum(sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range])) / clamp_min(sum(sum_over_time(bifrost:requests_upstream_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range])), 1)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 6,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "12.3.0"
     },
     {
       "id": 5,
-      "title": "Success Rate",
+      "title": "Avg Cost / 1M Tokens",
       "type": "stat",
       "gridPos": {
-        "h": 5,
-        "w": 4,
+        "h": 4,
+        "w": 3,
         "x": 12,
         "y": 0
       },
@@ -199,14 +254,64 @@
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "100 * sum(increase(bifrost_success_requests_total{provider=~\"$provider\",model=~\"$model\",method=~\"$method\"}[$__range])) / clamp_min(sum(increase(bifrost_upstream_requests_total{provider=~\"$provider\",model=~\"$model\",method=~\"$method\"}[$__range])), 1)",
-          "legendFormat": "Success Rate",
+          "refId": "A",
           "instant": true,
-          "refId": "A"
+          "range": false,
+          "expr": "1000000 * sum(sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range])) / clamp_min(sum(sum_over_time(bifrost:input_tokens_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range])) + sum(sum_over_time(bifrost:output_tokens_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range])), 1)"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 2,
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "12.3.0"
+    },
+    {
+      "id": 6,
+      "title": "Success Rate",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 15,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "expr": "100 * sum(sum_over_time(bifrost:requests_success_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range])) / clamp_min(sum(sum_over_time(bifrost:requests_upstream_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range])), 1)"
         }
       ],
       "fieldConfig": {
@@ -233,26 +338,30 @@
               }
             ]
           }
-        }
+        },
+        "overrides": []
       },
       "options": {
         "colorMode": "value",
         "graphMode": "area",
         "justifyMode": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"]
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
         },
         "textMode": "auto"
-      }
+      },
+      "pluginVersion": "12.3.0"
     },
     {
-      "id": 6,
-      "title": "Average Latency",
+      "id": 7,
+      "title": "P95 Latency",
       "type": "stat",
       "gridPos": {
-        "h": 5,
-        "w": 4,
-        "x": 16,
+        "h": 4,
+        "w": 3,
+        "x": 18,
         "y": 0
       },
       "datasource": {
@@ -261,14 +370,10 @@
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "1000 * (sum(increase(bifrost_upstream_latency_seconds_sum{provider=~\"$provider\",model=~\"$model\",method=~\"$method\"}[$__range])) / clamp_min(sum(increase(bifrost_upstream_latency_seconds_count{provider=~\"$provider\",model=~\"$model\",method=~\"$method\"}[$__range])), 1e-9))",
-          "legendFormat": "Avg Latency",
+          "refId": "A",
           "instant": true,
-          "refId": "A"
+          "range": false,
+          "expr": "1000 * histogram_quantile(0.95, sum by (le) (increase(bifrost:upstream_latency_seconds_bucket:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range])))"
         }
       ],
       "fieldConfig": {
@@ -295,26 +400,30 @@
               }
             ]
           }
-        }
+        },
+        "overrides": []
       },
       "options": {
         "colorMode": "value",
         "graphMode": "area",
         "justifyMode": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"]
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
         },
         "textMode": "auto"
-      }
+      },
+      "pluginVersion": "12.3.0"
     },
     {
-      "id": 7,
-      "title": "Cache Hits",
+      "id": 8,
+      "title": "Unpriced Requests",
       "type": "stat",
       "gridPos": {
-        "h": 5,
-        "w": 4,
-        "x": 20,
+        "h": 4,
+        "w": 3,
+        "x": 21,
         "y": 0
       },
       "datasource": {
@@ -323,14 +432,10 @@
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "sum(increase(bifrost_cache_hits_total{provider=~\"$provider\",model=~\"$model\",method=~\"$method\"}[$__range]))",
-          "legendFormat": "Hits",
+          "refId": "A",
           "instant": true,
-          "refId": "A"
+          "range": false,
+          "expr": "sum((sum by (provider, model, method) (sum_over_time(bifrost:requests_upstream_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]))) unless on (provider, model, method) ((sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]))) > 0))"
         }
       ],
       "fieldConfig": {
@@ -344,32 +449,36 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "yellow",
+                "color": "orange",
                 "value": 0
               }
             ]
           }
-        }
+        },
+        "overrides": []
       },
       "options": {
         "colorMode": "value",
-        "graphMode": "area",
+        "graphMode": "none",
         "justifyMode": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"]
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
         },
         "textMode": "auto"
-      }
+      },
+      "pluginVersion": "12.3.0"
     },
     {
-      "id": 8,
-      "title": "Cost by Provider",
-      "type": "bargauge",
+      "id": 9,
+      "title": "USD/Hour by Provider",
+      "type": "timeseries",
       "gridPos": {
         "h": 8,
         "w": 8,
         "x": 0,
-        "y": 5
+        "y": 4
       },
       "datasource": {
         "type": "prometheus",
@@ -377,14 +486,10 @@
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "topk(10, sum by (provider) (sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"$provider\",model=~\"$model\",method=~\"$method\"}[$__range])))",
+          "refId": "A",
+          "expr": "topk(10, sum by (provider) (sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[1h])))",
           "legendFormat": "{{provider}}",
-          "instant": true,
-          "refId": "A"
+          "interval": "5m"
         }
       ],
       "fieldConfig": {
@@ -392,29 +497,41 @@
           "unit": "currencyUSD",
           "decimals": 4,
           "color": {
-            "mode": "continuous-GrYlRd"
+            "mode": "palette-classic"
           },
-          "displayName": "${__field.labels.provider}"
-        }
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 12,
+            "lineWidth": 2,
+            "showPoints": "never",
+            "spanNulls": true
+          }
+        },
+        "overrides": []
       },
       "options": {
-        "displayMode": "gradient",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"]
+        "legend": {
+          "calcs": ["mean", "max", "last"],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
         },
-        "showUnfilled": true
-      }
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.0"
     },
     {
-      "id": 9,
-      "title": "Cost by Model",
-      "type": "bargauge",
+      "id": 10,
+      "title": "Cumulative Spend by Provider",
+      "type": "timeseries",
       "gridPos": {
         "h": 8,
         "w": 8,
         "x": 8,
-        "y": 5
+        "y": 4
       },
       "datasource": {
         "type": "prometheus",
@@ -422,14 +539,10 @@
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "topk(10, sum by (model) (sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"$provider\",model=~\"$model\",method=~\"$method\"}[$__range])))",
-          "legendFormat": "{{model}}",
-          "instant": true,
-          "refId": "A"
+          "refId": "A",
+          "expr": "topk(10, sum by (provider) (clamp_min(bifrost:cost_usd_total:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"} - min_over_time(bifrost:cost_usd_total:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[${__range_s}s]), 0)))",
+          "legendFormat": "{{provider}}",
+          "interval": "5m"
         }
       ],
       "fieldConfig": {
@@ -437,29 +550,87 @@
           "unit": "currencyUSD",
           "decimals": 4,
           "color": {
-            "mode": "continuous-GrYlRd"
+            "mode": "palette-classic"
           },
-          "displayName": "${__field.labels.model}"
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "lineWidth": 2,
+            "showPoints": "never",
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "calcs": ["last", "max"],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
         }
+      },
+      "pluginVersion": "12.3.0"
+    },
+    {
+      "id": 11,
+      "title": "Cost by Method",
+      "type": "bargauge",
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 4
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "expr": "topk(12, sum by (method) (sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range])))",
+          "legendFormat": "{{method}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyUSD",
+          "decimals": 4,
+          "displayName": "${__field.labels.method}",
+          "color": {
+            "mode": "continuous-GrYlRd"
+          }
+        },
+        "overrides": []
       },
       "options": {
         "displayMode": "gradient",
         "orientation": "horizontal",
         "reduceOptions": {
-          "calcs": ["lastNotNull"]
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
         },
         "showUnfilled": true
-      }
+      },
+      "pluginVersion": "12.3.0"
     },
     {
-      "id": 10,
-      "title": "Cost Burn Rate (USD/min)",
-      "type": "timeseries",
+      "id": 12,
+      "title": "Top Providers",
+      "type": "bargauge",
       "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 5
+        "h": 10,
+        "w": 6,
+        "x": 0,
+        "y": 12
       },
       "datasource": {
         "type": "prometheus",
@@ -467,53 +638,45 @@
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "2 * sum by (provider) (avg_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"$provider\",model=~\"$model\",method=~\"$method\"}[$__rate_interval]))",
-          "legendFormat": "{{provider}}",
-          "refId": "A"
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "expr": "topk(12, sum by (provider) (sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range])))",
+          "legendFormat": "{{provider}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
           "unit": "currencyUSD",
           "decimals": 4,
+          "displayName": "${__field.labels.provider}",
           "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "drawStyle": "line",
-            "fillOpacity": 15,
-            "gradientMode": "opacity",
-            "lineWidth": 2,
-            "showPoints": "never"
+            "mode": "continuous-GrYlRd"
           }
-        }
+        },
+        "overrides": []
       },
       "options": {
-        "legend": {
-          "calcs": ["mean", "max", "last"],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      }
+        "showUnfilled": true
+      },
+      "pluginVersion": "12.3.0"
     },
     {
-      "id": 11,
-      "title": "Token Throughput (Tokens/sec)",
-      "type": "timeseries",
+      "id": 13,
+      "title": "Top Models",
+      "type": "bargauge",
       "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 13
+        "h": 10,
+        "w": 6,
+        "x": 6,
+        "y": 12
       },
       "datasource": {
         "type": "prometheus",
@@ -521,62 +684,45 @@
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "sum(rate(bifrost_input_tokens_total{provider=~\"$provider\",model=~\"$model\",method=~\"$method\"}[$__rate_interval]))",
-          "legendFormat": "Input Tokens/s",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "sum(rate(bifrost_output_tokens_total{provider=~\"$provider\",model=~\"$model\",method=~\"$method\"}[$__rate_interval]))",
-          "legendFormat": "Output Tokens/s",
-          "refId": "B"
+          "refId": "A",
+          "instant": true,
+          "range": false,
+          "expr": "topk(15, sum by (model) (sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range])))",
+          "legendFormat": "{{model}}"
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "short",
-          "decimals": 2,
+          "unit": "currencyUSD",
+          "decimals": 4,
+          "displayName": "${__field.labels.model}",
           "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "drawStyle": "line",
-            "fillOpacity": 15,
-            "gradientMode": "opacity",
-            "lineWidth": 2,
-            "showPoints": "never"
+            "mode": "continuous-GrYlRd"
           }
-        }
+        },
+        "overrides": []
       },
       "options": {
-        "legend": {
-          "calcs": ["mean", "max", "last"],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
         },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      }
+        "showUnfilled": true
+      },
+      "pluginVersion": "12.3.0"
     },
     {
-      "id": 12,
-      "title": "Request Volume (Req/sec)",
-      "type": "timeseries",
+      "id": 14,
+      "title": "Provider / Model / Method Spend Table",
+      "type": "table",
       "gridPos": {
-        "h": 8,
+        "h": 10,
         "w": 12,
         "x": 12,
-        "y": 13
+        "y": 12
       },
       "datasource": {
         "type": "prometheus",
@@ -584,22 +730,172 @@
       },
       "targets": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "sum(rate(bifrost_success_requests_total{provider=~\"$provider\",model=~\"$model\",method=~\"$method\"}[$__rate_interval]))",
-          "legendFormat": "Success",
-          "refId": "A"
+          "refId": "A",
+          "format": "table",
+          "instant": true,
+          "range": false,
+          "expr": "label_join(topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "expr": "sum(rate(bifrost_error_requests_total{provider=~\"$provider\",model=~\"$model\",method=~\"$method\"}[$__rate_interval]))",
-          "legendFormat": "Error",
-          "refId": "B"
+          "refId": "B",
+          "format": "table",
+          "instant": true,
+          "range": false,
+          "expr": "label_join(100 * topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]))) / scalar(clamp_min(sum(sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range])), 1)), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
+        },
+        {
+          "refId": "C",
+          "format": "table",
+          "instant": true,
+          "range": false,
+          "expr": "label_join((sum by (provider, model, method) (sum_over_time(bifrost:requests_upstream_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]))) and on (provider, model, method) topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
+        },
+        {
+          "refId": "D",
+          "format": "table",
+          "instant": true,
+          "range": false,
+          "expr": "label_join((sum by (provider, model, method) (sum_over_time(bifrost:input_tokens_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]))) and on (provider, model, method) topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
+        },
+        {
+          "refId": "E",
+          "format": "table",
+          "instant": true,
+          "range": false,
+          "expr": "label_join((sum by (provider, model, method) (sum_over_time(bifrost:output_tokens_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]))) and on (provider, model, method) topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
+        },
+        {
+          "refId": "F",
+          "format": "table",
+          "instant": true,
+          "range": false,
+          "expr": "label_join((sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range])) / clamp_min(sum by (provider, model, method) (sum_over_time(bifrost:requests_upstream_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range])), 1)) and on (provider, model, method) topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
+        },
+        {
+          "refId": "G",
+          "format": "table",
+          "instant": true,
+          "range": false,
+          "expr": "label_join((1000000 * sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range])) / clamp_min(sum by (provider, model, method) (sum_over_time(bifrost:input_tokens_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range])) + sum by (provider, model, method) (sum_over_time(bifrost:output_tokens_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range])), 1)) and on (provider, model, method) topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
+        },
+        {
+          "refId": "H",
+          "format": "table",
+          "instant": true,
+          "range": false,
+          "expr": "label_join((100 * sum by (provider, model, method) (sum_over_time(bifrost:requests_success_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range])) / clamp_min(sum by (provider, model, method) (sum_over_time(bifrost:requests_upstream_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range])), 1)) and on (provider, model, method) topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
+        },
+        {
+          "refId": "I",
+          "format": "table",
+          "instant": true,
+          "range": false,
+          "expr": "label_join((1000 * increase(bifrost:upstream_latency_seconds_sum:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]) / clamp_min(increase(bifrost:upstream_latency_seconds_count:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]), 1e-9)) and on (provider, model, method) topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "pmm",
+            "mode": "inner"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Time 1": true,
+              "Time 2": true,
+              "Time 3": true,
+              "Time 4": true,
+              "Time 5": true,
+              "Time 6": true,
+              "Time 7": true,
+              "Time 8": true,
+              "Time 9": true,
+              "pmm": true
+            },
+            "indexByName": {
+              "provider": 0,
+              "model": 1,
+              "method": 2,
+              "Value #A": 3,
+              "Value #B": 4,
+              "Value #C": 5,
+              "Value #D": 6,
+              "Value #E": 7,
+              "Value #F": 8,
+              "Value #G": 9,
+              "Value #H": 10,
+              "Value #I": 11
+            },
+            "renameByName": {
+              "provider": "Provider",
+              "model": "Model",
+              "method": "Method",
+              "Value #A": "Cost (USD)",
+              "Value #B": "Spend Share %",
+              "Value #C": "Requests",
+              "Value #D": "Input Tokens",
+              "Value #E": "Output Tokens",
+              "Value #F": "Cost / Request",
+              "Value #G": "Cost / 1M Tokens",
+              "Value #H": "Success Rate %",
+              "Value #I": "Avg Latency (ms)"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Cost (USD)"
+          }
+        ]
+      },
+      "pluginVersion": "12.3.0"
+    },
+    {
+      "id": 15,
+      "title": "Request Outcome Rate",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 0,
+        "y": 22
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(bifrost:requests_success_total:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__rate_interval]))",
+          "legendFormat": "Success req/s",
+          "interval": "5m"
+        },
+        {
+          "refId": "B",
+          "expr": "sum(rate(bifrost:requests_error_total:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__rate_interval]))",
+          "legendFormat": "Error req/s",
+          "interval": "5m"
         }
       ],
       "fieldConfig": {
@@ -611,12 +907,13 @@
           },
           "custom": {
             "drawStyle": "line",
-            "fillOpacity": 15,
-            "gradientMode": "opacity",
+            "fillOpacity": 12,
             "lineWidth": 2,
-            "showPoints": "never"
+            "showPoints": "never",
+            "spanNulls": true
           }
-        }
+        },
+        "overrides": []
       },
       "options": {
         "legend": {
@@ -629,11 +926,295 @@
           "mode": "multi",
           "sort": "desc"
         }
-      }
+      },
+      "pluginVersion": "12.3.0"
+    },
+    {
+      "id": 16,
+      "title": "Token Throughput",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 8,
+        "y": 22
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(bifrost:input_tokens_total:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__rate_interval]))",
+          "legendFormat": "Input tokens/s",
+          "interval": "5m"
+        },
+        {
+          "refId": "B",
+          "expr": "sum(rate(bifrost:output_tokens_total:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__rate_interval]))",
+          "legendFormat": "Output tokens/s",
+          "interval": "5m"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 2,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 12,
+            "lineWidth": 2,
+            "showPoints": "never",
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "calcs": ["mean", "max", "last"],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.0"
+    },
+    {
+      "id": 17,
+      "title": "P95 Latency by Provider / Model",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 16,
+        "y": 22
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(12, 1000 * histogram_quantile(0.95, sum by (provider, model, le) (rate(bifrost:upstream_latency_seconds_bucket:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__rate_interval]))))",
+          "legendFormat": "{{provider}} / {{model}}",
+          "interval": "5m"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "decimals": 0,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "lineWidth": 2,
+            "showPoints": "never",
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "calcs": ["mean", "max", "last"],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.0"
+    },
+    {
+      "id": 18,
+      "title": "Cache Hits",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 31
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(bifrost:cache_hits_total:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__rate_interval]))",
+          "legendFormat": "Cache hits/s",
+          "interval": "5m"
+        },
+        {
+          "refId": "B",
+          "expr": "100 * sum(rate(bifrost:cache_hits_total:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__rate_interval])) / clamp_min(sum(rate(bifrost:requests_upstream_total:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__rate_interval])), 1e-9)",
+          "legendFormat": "Cache hit rate %",
+          "interval": "5m"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 12,
+            "lineWidth": 2,
+            "showPoints": "never",
+            "spanNulls": true
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Cache hits/s"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "short"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Cache hit rate %"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "calcs": ["mean", "max", "last"],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.0"
+    },
+    {
+      "id": 19,
+      "title": "Unpriced Traffic",
+      "type": "table",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 31
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "format": "table",
+          "instant": true,
+          "range": false,
+          "expr": "label_join(topk(30, (sum by (provider, model, method) (sum_over_time(bifrost:requests_upstream_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]))) unless on (provider, model, method) ((sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]))) > 0))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
+        },
+        {
+          "refId": "B",
+          "format": "table",
+          "instant": true,
+          "range": false,
+          "expr": "label_join((sum by (provider, model, method) (sum_over_time(bifrost:input_tokens_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range])) and on (provider, model, method) topk(30, (sum by (provider, model, method) (sum_over_time(bifrost:requests_upstream_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]))) unless on (provider, model, method) ((sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]))) > 0))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
+        },
+        {
+          "refId": "C",
+          "format": "table",
+          "instant": true,
+          "range": false,
+          "expr": "label_join((sum by (provider, model, method) (sum_over_time(bifrost:output_tokens_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range])) and on (provider, model, method) topk(30, (sum by (provider, model, method) (sum_over_time(bifrost:requests_upstream_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]))) unless on (provider, model, method) ((sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_30s:by_provider_model_method{provider=~\"${provider:regex}\",model=~\"${model:regex}\",method=~\"${method:regex}\"}[$__range]))) > 0))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "joinByField",
+          "options": {
+            "byField": "pmm",
+            "mode": "inner"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Time 1": true,
+              "Time 2": true,
+              "pmm": true
+            },
+            "indexByName": {
+              "provider": 0,
+              "model": 1,
+              "method": 2,
+              "Value #A": 3,
+              "Value #B": 4,
+              "Value #C": 5
+            },
+            "renameByName": {
+              "provider": "Provider",
+              "model": "Model",
+              "method": "Method",
+              "Value #A": "Requests",
+              "Value #B": "Input Tokens",
+              "Value #C": "Output Tokens"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {},
+        "overrides": []
+      },
+      "options": {
+        "cellHeight": "sm",
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Requests"
+          }
+        ]
+      },
+      "pluginVersion": "12.3.0"
     }
   ],
   "preload": false,
-  "refresh": "30s",
+  "refresh": "",
   "schemaVersion": 42,
   "tags": ["bifrost", "otel", "cost"],
   "templating": {
@@ -649,13 +1230,13 @@
           "type": "prometheus",
           "uid": "prometheus"
         },
-        "definition": "label_values(bifrost_upstream_requests_total, provider)",
+        "definition": "label_values(bifrost:requests_upstream_total:by_provider_model_method, provider)",
         "includeAll": true,
         "multi": true,
         "name": "provider",
         "options": [],
-        "query": "label_values(bifrost_upstream_requests_total, provider)",
-        "refresh": 1,
+        "query": "label_values(bifrost:requests_upstream_total:by_provider_model_method, provider)",
+        "refresh": 2,
         "regex": "",
         "sort": 1,
         "type": "query"
@@ -671,13 +1252,13 @@
           "type": "prometheus",
           "uid": "prometheus"
         },
-        "definition": "label_values(bifrost_upstream_requests_total, method)",
+        "definition": "label_values(bifrost:requests_upstream_total:by_provider_model_method{provider=~\"${provider:regex}\"}, method)",
         "includeAll": true,
         "multi": true,
         "name": "method",
         "options": [],
-        "query": "label_values(bifrost_upstream_requests_total, method)",
-        "refresh": 1,
+        "query": "label_values(bifrost:requests_upstream_total:by_provider_model_method{provider=~\"${provider:regex}\"}, method)",
+        "refresh": 2,
         "regex": "",
         "sort": 1,
         "type": "query"
@@ -693,13 +1274,13 @@
           "type": "prometheus",
           "uid": "prometheus"
         },
-        "definition": "label_values(bifrost_upstream_requests_total{provider=~\"$provider\"}, model)",
+        "definition": "label_values(bifrost:requests_upstream_total:by_provider_model_method{provider=~\"${provider:regex}\",method=~\"${method:regex}\"}, model)",
         "includeAll": true,
         "multi": true,
         "name": "model",
         "options": [],
-        "query": "label_values(bifrost_upstream_requests_total{provider=~\"$provider\"}, model)",
-        "refresh": 1,
+        "query": "label_values(bifrost:requests_upstream_total:by_provider_model_method{provider=~\"${provider:regex}\",method=~\"${method:regex}\"}, model)",
+        "refresh": 2,
         "regex": "",
         "sort": 1,
         "type": "query"
@@ -707,12 +1288,13 @@
     ]
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-7d",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Bifrost OTel Cost Tracking",
+  "title": "Bifrost Cost Tracking",
   "uid": "bifrost-otel-cost",
-  "version": 1
+  "version": 2,
+  "weekStart": ""
 }

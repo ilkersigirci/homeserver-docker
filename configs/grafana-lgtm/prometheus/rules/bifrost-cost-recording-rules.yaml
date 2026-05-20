@@ -2,40 +2,133 @@ groups:
   - name: bifrost-cost-rollups
     interval: 30s
     rules:
-      # Pre-aggregate by dashboard dimensions to reduce query-time cardinality.
-      - record: bifrost:cost_usd_total:by_provider_model_method
+      # Pre-aggregate Bifrost counters by dashboard dimensions only.
+      # This intentionally strips high-cardinality key labels such as:
+      # virtual_key_*, selected_key_*, and IDs.
+      - record: bifrost:requests_upstream_total:by_provider_model_method
         expr: |
           sum by (provider, model, method) (
-            bifrost_cost_USD_total{
+            bifrost_upstream_requests_total{
               provider!="",
               model!="",
               method!=""
             }
           )
-      # Robust per-30s increment:
-      # - Uses counter-like diff for normal samples.
-      # - Falls back to current value when the series appears for the first time.
-      - record: bifrost:cost_usd_delta_30s:by_provider_model_method
+      - record: bifrost:requests_upstream_delta_30s:by_provider_model_method
         expr: |
           clamp_min(
-            sum by (provider, model, method) (
-              bifrost_cost_USD_total{
-                provider!="",
-                model!="",
-                method!=""
-              }
-            )
+            bifrost:requests_upstream_total:by_provider_model_method
             -
-            sum by (provider, model, method) (
-              bifrost_cost_USD_total{
-                provider!="",
-                model!="",
-                method!=""
-              } offset 30s
-            ),
+            bifrost:requests_upstream_total:by_provider_model_method offset 30s,
             0
           )
           or
+          (
+            bifrost:requests_upstream_total:by_provider_model_method
+            unless
+            bifrost:requests_upstream_total:by_provider_model_method offset 30s
+          )
+
+      - record: bifrost:requests_success_total:by_provider_model_method
+        expr: |
+          sum by (provider, model, method) (
+            bifrost_success_requests_total{
+              provider!="",
+              model!="",
+              method!=""
+            }
+          )
+      - record: bifrost:requests_success_delta_30s:by_provider_model_method
+        expr: |
+          clamp_min(
+            bifrost:requests_success_total:by_provider_model_method
+            -
+            bifrost:requests_success_total:by_provider_model_method offset 30s,
+            0
+          )
+          or
+          (
+            bifrost:requests_success_total:by_provider_model_method
+            unless
+            bifrost:requests_success_total:by_provider_model_method offset 30s
+          )
+
+      - record: bifrost:requests_error_total:by_provider_model_method
+        expr: |
+          sum by (provider, model, method) (
+            bifrost_error_requests_total{
+              provider!="",
+              model!="",
+              method!=""
+            }
+          )
+      - record: bifrost:requests_error_delta_30s:by_provider_model_method
+        expr: |
+          clamp_min(
+            bifrost:requests_error_total:by_provider_model_method
+            -
+            bifrost:requests_error_total:by_provider_model_method offset 30s,
+            0
+          )
+          or
+          (
+            bifrost:requests_error_total:by_provider_model_method
+            unless
+            bifrost:requests_error_total:by_provider_model_method offset 30s
+          )
+
+      - record: bifrost:input_tokens_total:by_provider_model_method
+        expr: |
+          sum by (provider, model, method) (
+            bifrost_input_tokens_total{
+              provider!="",
+              model!="",
+              method!=""
+            }
+          )
+      - record: bifrost:input_tokens_delta_30s:by_provider_model_method
+        expr: |
+          clamp_min(
+            bifrost:input_tokens_total:by_provider_model_method
+            -
+            bifrost:input_tokens_total:by_provider_model_method offset 30s,
+            0
+          )
+          or
+          (
+            bifrost:input_tokens_total:by_provider_model_method
+            unless
+            bifrost:input_tokens_total:by_provider_model_method offset 30s
+          )
+
+      - record: bifrost:output_tokens_total:by_provider_model_method
+        expr: |
+          sum by (provider, model, method) (
+            bifrost_output_tokens_total{
+              provider!="",
+              model!="",
+              method!=""
+            }
+          )
+      - record: bifrost:output_tokens_delta_30s:by_provider_model_method
+        expr: |
+          clamp_min(
+            bifrost:output_tokens_total:by_provider_model_method
+            -
+            bifrost:output_tokens_total:by_provider_model_method offset 30s,
+            0
+          )
+          or
+          (
+            bifrost:output_tokens_total:by_provider_model_method
+            unless
+            bifrost:output_tokens_total:by_provider_model_method offset 30s
+          )
+
+      # Canonical cost rollup. Prefer observed metric name (`bifrost_cost_USD_total`)
+      # and fall back to the documented alternative (`bifrost_cost_total`) when needed.
+      - record: bifrost:cost_usd_total:by_provider_model_method
+        expr: |
           (
             sum by (provider, model, method) (
               bifrost_cost_USD_total{
@@ -44,12 +137,90 @@ groups:
                 method!=""
               }
             )
-            unless
+          )
+          or
+          (
             sum by (provider, model, method) (
-              bifrost_cost_USD_total{
+              bifrost_cost_total{
                 provider!="",
                 model!="",
                 method!=""
-              } offset 30s
+              }
             )
+          )
+
+      - record: bifrost:cost_usd_delta_30s:by_provider_model_method
+        expr: |
+          clamp_min(
+            bifrost:cost_usd_total:by_provider_model_method
+            -
+            bifrost:cost_usd_total:by_provider_model_method offset 30s,
+            0
+          )
+          or
+          (
+            bifrost:cost_usd_total:by_provider_model_method
+            unless
+            bifrost:cost_usd_total:by_provider_model_method offset 30s
+          )
+
+      - record: bifrost:upstream_latency_seconds_bucket:by_provider_model_method
+        expr: |
+          sum by (provider, model, method, le) (
+            bifrost_upstream_latency_seconds_bucket{
+              provider!="",
+              model!="",
+              method!=""
+            }
+          )
+      - record: bifrost:upstream_latency_seconds_sum:by_provider_model_method
+        expr: |
+          sum by (provider, model, method) (
+            bifrost_upstream_latency_seconds_sum{
+              provider!="",
+              model!="",
+              method!=""
+            }
+          )
+      - record: bifrost:upstream_latency_seconds_count:by_provider_model_method
+        expr: |
+          sum by (provider, model, method) (
+            bifrost_upstream_latency_seconds_count{
+              provider!="",
+              model!="",
+              method!=""
+            }
+          )
+
+      # Optional cache counter rollup. While cache metric is absent, expose zero
+      # for active request dimensions so dashboard panels stay stable.
+      - record: bifrost:cache_hits_total:by_provider_model_method
+        expr: |
+          (
+            sum by (provider, model, method) (
+              bifrost_cache_hits_total{
+                provider!="",
+                model!="",
+                method!=""
+              }
+            )
+          )
+          or
+          on (provider, model, method)
+          (
+            0 * bifrost:requests_upstream_total:by_provider_model_method
+          )
+      - record: bifrost:cache_hits_delta_30s:by_provider_model_method
+        expr: |
+          clamp_min(
+            bifrost:cache_hits_total:by_provider_model_method
+            -
+            bifrost:cache_hits_total:by_provider_model_method offset 30s,
+            0
+          )
+          or
+          (
+            bifrost:cache_hits_total:by_provider_model_method
+            unless
+            bifrost:cache_hits_total:by_provider_model_method offset 30s
           )
