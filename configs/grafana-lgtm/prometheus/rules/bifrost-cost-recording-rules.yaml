@@ -3,12 +3,15 @@ groups:
     interval: 30s
     rules:
       # Pre-aggregate Bifrost counters by dashboard dimensions only.
+      # Record names are kept stable for existing panels; host_name is retained
+      # as a low-cardinality selector for multi-host LGTM data.
       # This intentionally strips high-cardinality key labels such as:
       # virtual_key_*, selected_key_*, and IDs.
       - record: bifrost:requests_upstream_total:by_provider_model_method
         expr: |
-          sum by (provider, model, method) (
+          sum by (host_name, provider, model, method) (
             bifrost_upstream_requests_total{
+              host_name!="",
               provider!="",
               model!="",
               method!=""
@@ -31,8 +34,9 @@ groups:
 
       - record: bifrost:requests_success_total:by_provider_model_method
         expr: |
-          sum by (provider, model, method) (
+          sum by (host_name, provider, model, method) (
             bifrost_success_requests_total{
+              host_name!="",
               provider!="",
               model!="",
               method!=""
@@ -55,8 +59,9 @@ groups:
 
       - record: bifrost:requests_error_total:by_provider_model_method
         expr: |
-          sum by (provider, model, method) (
+          sum by (host_name, provider, model, method) (
             bifrost_error_requests_total{
+              host_name!="",
               provider!="",
               model!="",
               method!=""
@@ -79,8 +84,9 @@ groups:
 
       - record: bifrost:input_tokens_total:by_provider_model_method
         expr: |
-          sum by (provider, model, method) (
+          sum by (host_name, provider, model, method) (
             bifrost_input_tokens_total{
+              host_name!="",
               provider!="",
               model!="",
               method!=""
@@ -103,8 +109,9 @@ groups:
 
       - record: bifrost:output_tokens_total:by_provider_model_method
         expr: |
-          sum by (provider, model, method) (
+          sum by (host_name, provider, model, method) (
             bifrost_output_tokens_total{
+              host_name!="",
               provider!="",
               model!="",
               method!=""
@@ -130,8 +137,9 @@ groups:
       - record: bifrost:cost_usd_total:by_provider_model_method
         expr: |
           (
-            sum by (provider, model, method) (
+            sum by (host_name, provider, model, method) (
               bifrost_cost_USD_total{
+                host_name!="",
                 provider!="",
                 model!="",
                 method!=""
@@ -140,8 +148,9 @@ groups:
           )
           or
           (
-            sum by (provider, model, method) (
+            sum by (host_name, provider, model, method) (
               bifrost_cost_total{
+                host_name!="",
                 provider!="",
                 model!="",
                 method!=""
@@ -166,8 +175,9 @@ groups:
 
       - record: bifrost:upstream_latency_seconds_bucket:by_provider_model_method
         expr: |
-          sum by (provider, model, method, le) (
+          sum by (host_name, provider, model, method, le) (
             bifrost_upstream_latency_seconds_bucket{
+              host_name!="",
               provider!="",
               model!="",
               method!=""
@@ -175,8 +185,9 @@ groups:
           )
       - record: bifrost:upstream_latency_seconds_sum:by_provider_model_method
         expr: |
-          sum by (provider, model, method) (
+          sum by (host_name, provider, model, method) (
             bifrost_upstream_latency_seconds_sum{
+              host_name!="",
               provider!="",
               model!="",
               method!=""
@@ -184,8 +195,9 @@ groups:
           )
       - record: bifrost:upstream_latency_seconds_count:by_provider_model_method
         expr: |
-          sum by (provider, model, method) (
+          sum by (host_name, provider, model, method) (
             bifrost_upstream_latency_seconds_count{
+              host_name!="",
               provider!="",
               model!="",
               method!=""
@@ -197,8 +209,9 @@ groups:
       - record: bifrost:cache_hits_total:by_provider_model_method
         expr: |
           (
-            sum by (provider, model, method) (
+            sum by (host_name, provider, model, method) (
               bifrost_cache_hits_total{
+                host_name!="",
                 provider!="",
                 model!="",
                 method!=""
@@ -206,7 +219,7 @@ groups:
             )
           )
           or
-          on (provider, model, method)
+          on (host_name, provider, model, method)
           (
             0 * bifrost:requests_upstream_total:by_provider_model_method
           )
@@ -223,4 +236,127 @@ groups:
             bifrost:cache_hits_total:by_provider_model_method
             unless
             bifrost:cache_hits_total:by_provider_model_method offset 30s
+          )
+
+  - name: bifrost-cost-rollups-5m
+    interval: 5m
+    rules:
+      # Dashboard totals use these coarser deltas to keep 7d/30d/90d ranges
+      # responsive while preserving host/provider/model/method drill-down.
+      - record: bifrost:requests_upstream_delta_5m:by_provider_model_method
+        expr: |
+          sum by (host_name, provider, model, method) (
+            increase(
+              bifrost_upstream_requests_total{
+                host_name!="",
+                provider!="",
+                model!="",
+                method!=""
+              }[5m]
+            )
+          )
+      - record: bifrost:requests_success_delta_5m:by_provider_model_method
+        expr: |
+          sum by (host_name, provider, model, method) (
+            increase(
+              bifrost_success_requests_total{
+                host_name!="",
+                provider!="",
+                model!="",
+                method!=""
+              }[5m]
+            )
+          )
+      - record: bifrost:requests_error_delta_5m:by_provider_model_method
+        expr: |
+          sum by (host_name, provider, model, method) (
+            increase(
+              bifrost_error_requests_total{
+                host_name!="",
+                provider!="",
+                model!="",
+                method!=""
+              }[5m]
+            )
+          )
+      - record: bifrost:input_tokens_delta_5m:by_provider_model_method
+        expr: |
+          sum by (host_name, provider, model, method) (
+            increase(
+              bifrost_input_tokens_total{
+                host_name!="",
+                provider!="",
+                model!="",
+                method!=""
+              }[5m]
+            )
+          )
+      - record: bifrost:output_tokens_delta_5m:by_provider_model_method
+        expr: |
+          sum by (host_name, provider, model, method) (
+            increase(
+              bifrost_output_tokens_total{
+                host_name!="",
+                provider!="",
+                model!="",
+                method!=""
+              }[5m]
+            )
+          )
+      - record: bifrost:cost_usd_delta_5m:by_provider_model_method
+        expr: |
+          (
+            sum by (host_name, provider, model, method) (
+              increase(
+                bifrost_cost_USD_total{
+                  host_name!="",
+                  provider!="",
+                  model!="",
+                  method!=""
+                }[5m]
+              )
+            )
+          )
+          or
+          (
+            sum by (host_name, provider, model, method) (
+              increase(
+                bifrost_cost_total{
+                  host_name!="",
+                  provider!="",
+                  model!="",
+                  method!=""
+                }[5m]
+              )
+            )
+          )
+      - record: bifrost:cache_hits_delta_5m:by_provider_model_method
+        expr: |
+          (
+            sum by (host_name, provider, model, method) (
+              increase(
+                bifrost_cache_hits_total{
+                  host_name!="",
+                  provider!="",
+                  model!="",
+                  method!=""
+                }[5m]
+              )
+            )
+          )
+          or
+          on (host_name, provider, model, method)
+          (
+            0
+            *
+            sum by (host_name, provider, model, method) (
+              increase(
+                bifrost_upstream_requests_total{
+                  host_name!="",
+                  provider!="",
+                  model!="",
+                  method!=""
+                }[5m]
+              )
+            )
           )
