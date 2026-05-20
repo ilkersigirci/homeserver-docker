@@ -275,6 +275,8 @@ services:
       # AUTH_CUSTOM_AUTHORIZATION_URL: dummy
       # AUTH_CUSTOM_TOKEN_URL: dummy
       # AUTH_CUSTOM_USERINFO_URL: dummy
+      ## LLM Connection
+      LANGFUSE_LLM_CONNECTION_WHITELISTED_HOST: aigateway.gpu.$BASE_DOMAINNAME # NOTE: It shouldn't have https prefix
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3000/api/public/health"]
       interval: 2m
