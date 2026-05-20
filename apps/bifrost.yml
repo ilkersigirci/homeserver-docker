@@ -1,8 +1,7 @@
 # NOTE: When config_store is disabled, all config related UI places are also disabled
 # NOTE: Bifrost appends `/v1` into providers urls.
-# TODO: Enable username/password to add API_KEY support
-# TODO: Enable OpenTelemetry so that we ditch the bifrost UI completely
 # TODO: Research Vector Store integration for Semantic Caching
+# NOTE: OTEL docker-compose: https://github.com/maximhq/bifrost/blob/dev/plugins/otel/docker-compose.yml
 services:
   bifrost:
     image: maximhq/bifrost:v1.5.2@sha256:c13f2da2fb9209debe385a38241630e1d4a1734a8fa236ec8205e4a58a3985c0
