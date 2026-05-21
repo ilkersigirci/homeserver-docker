@@ -1,3 +1,5 @@
+# NOTE: Compose file: https://github.com/maziggy/bambuddy/blob/main/docker-compose.yml
+
 services:
   # Optional: External PostgreSQL database
   # Uncomment to run Postgres alongside Bambuddy (or use an external Postgres host)
