@@ -100,9 +100,9 @@ services:
       homepage.icon: "bambuddy.png"
       homepage.href: "https://bambuddy.$DOMAINNAME"
       homepage.target: "_blank"
-      homepage.description: "description"
+      homepage.description: "No cloud command center for Bambu Lab Printers"
       ####### GLANCE #######
       glance.name: "bambuddy"
       glance.icon: "sh:bambuddy"
       glance.url: "https://bambuddy.$DOMAINNAME"
-      glance.description: "description"
+      glance.description: "No cloud command center for Bambu Lab Printers"
