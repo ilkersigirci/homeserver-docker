@@ -1,0 +1,122 @@
+networks:
+  mediamanager_backend:
+
+services:
+  mediamanager-db:
+    image: postgres:18.4@sha256:f7ce845ee6873dd84be93c9828fe0d1fab0f9707dc9ac569694657398b290bce
+    container_name: mediamanager-db
+    restart: $RESTART_POLICY_MEDIA
+    profiles:
+      - media
+      - mediamanager
+    networks:
+      - mediamanager_backend
+    expose:
+      - 5432
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /var/run/postgresql:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "2G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      - $REPO_PATH/data/mediamanager-db:/var/lib/postgresql
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    healthcheck:
+      test:
+        ["CMD-SHELL", "pg_isready -U postgres -d postgres -h 127.0.0.1 -p 5432"]
+      interval: 1m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  mediamanager:
+    image: quay.io/maxdorninger/mediamanager:1.12.3@sha256:83b80dce26f8cdbbf8afec06784a85e7eedcba05ad4be57d2f70b006304d7a8c
+    container_name: mediamanager
+    restart: $RESTART_POLICY_MEDIA
+    depends_on:
+      - mediamanager-db
+    profiles:
+      - media
+      - mediamanager
+    networks:
+      - mediamanager_backend
+      - t3_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /home/mediamanager:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      - $REPO_PATH/configs/mediamanager/config.toml:/app/config/config.toml:ro
+      - $REPO_PATH/logs/mediamanager/media_manager.log:/app/config/media_manager.log # TODO: Add empty file to git tracking
+      # - $REPO_PATH/data/downloads:/media/downloads:ro
+      - $DIR_MEDIA/MediaManager:/data:rw
+      - $DIR_MEDIA/MediaManager/images/:/data/images/
+    environment:
+      CONFIG_DIR: /app/config
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "-fsS",
+          "--max-time",
+          "3",
+          "http://127.0.0.1:8000/api/v1/health",
+        ]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 2m
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.mediamanager-rtr.entrypoints: "websecure"
+      traefik.http.routers.mediamanager-rtr.rule: "Host(`mediamanager.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.mediamanager-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.mediamanager-rtr.service: "mediamanager-svc"
+      traefik.http.services.mediamanager-svc.loadbalancer.server.port: "8000"
+      ####### TINYAUTH #######
+      tinyauth.apps.mediamanager.config.domain: "mediamanager.$DOMAINNAME"
+      tinyauth.apps.mediamanager.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "Media"
+      homepage.name: "mediamanager"
+      homepage.icon: "mediamanager.svg"
+      homepage.href: "https://mediamanager.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Media Manager"
+      ####### GLANCE #######
+      glance.name: "mediamanager"
+      glance.icon: "sh:mediamanager"
+      glance.url: "https://mediamanager.$DOMAINNAME"
+      glance.description: "Media Manager"
