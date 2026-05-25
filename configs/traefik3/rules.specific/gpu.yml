@@ -1,13 +1,5 @@
 http:
   routers:
-    aiostreams-rtr:
-      rule: "Host(`aiostreams.{{env "BASE_DOMAINNAME"}}`)"
-      entryPoints:
-        - websecure
-      middlewares:
-        - chain-no-auth-relaxed
-      service: aiostreams-svc
-
     obsidian-rtr:
       rule: "Host(`obsidian.{{env "DOMAINNAME"}}`)"
       entryPoints:
@@ -25,11 +17,6 @@ http:
       service: bambustudio-svc
 
   services:
-    aiostreams-svc:
-      loadBalancer:
-        servers:
-          - url: "http://{{env "LOCAL_STATIC_IP"}}:1006"
-
     obsidian-svc:
       loadBalancer:
         servers:

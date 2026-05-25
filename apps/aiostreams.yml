@@ -9,8 +9,6 @@ services:
       - media
     networks:
       - t3_proxy
-    ports:
-      - "1006:3000"
     user: $PUID:$PGID
     read_only: true
     tmpfs:
@@ -22,15 +20,15 @@ services:
     cap_add: []
     volumes:
       - $REPO_PATH/data/aiostreams:/app/data
+    # NOTE: https://docs.aiostreams.viren070.me/configuration/environment-variables
     environment:
       ADDON_NAME: AIOStreams
-      ADDON_ID: aiostreams.$DOMAINNAME
-      BASE_URL: https://aiostreams.$DOMAINNAME
+      ADDON_ID: aiostreams.$BASE_DOMAINNAME
+      BASE_URL: https://aiostreams.$BASE_DOMAINNAME
+      AIOSTREAMS_AUTH_REQUIRED: true
       AIOSTREAMS_AUTH: $AIOSTREAMS_AUTH
       SECRET_KEY: $AIOSTREAMS_SECRET_KEY
       TMDB_ACCESS_TOKEN: $TMDB_API_READ_ACCESS_TOKEN
-    # env_file:
-    #   - $REPO_PATH/.env.aiostreams
     healthcheck:
       test: ["CMD", "/nodejs/bin/node", "/app/scripts/healthcheck.js"]
       interval: 2m
@@ -41,24 +39,24 @@ services:
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.aiostreams-rtr.entrypoints: "websecure"
-      traefik.http.routers.aiostreams-rtr.rule: "Host(`aiostreams.$DOMAINNAME`)"
+      traefik.http.routers.aiostreams-rtr.rule: "Host(`aiostreams.$BASE_DOMAINNAME`)"
       ## Middlewares
       traefik.http.routers.aiostreams-rtr.middlewares: "chain-tinyauth-relaxed@file"
       ## HTTP Services
       traefik.http.routers.aiostreams-rtr.service: "aiostreams-svc"
       traefik.http.services.aiostreams-svc.loadbalancer.server.port: "3000"
       ####### TINYAUTH #######
-      tinyauth.apps.aiostreams.config.domain: "aiostreams.$DOMAINNAME"
+      tinyauth.apps.aiostreams.config.domain: "aiostreams.$BASE_DOMAINNAME"
       tinyauth.apps.aiostreams.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "aiostreams"
       homepage.icon: "aiostreams.png"
-      homepage.href: "https://aiostreams.$DOMAINNAME"
+      homepage.href: "https://aiostreams.$BASE_DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Consolidates multiple Stremio addons and debrid services into a single addon"
       ####### GLANCE #######
       glance.name: "aiostreams"
       glance.icon: "sh:aiostreams"
-      glance.url: "https://aiostreams.$DOMAINNAME"
+      glance.url: "https://aiostreams.$BASE_DOMAINNAME"
       glance.description: "Consolidates multiple Stremio addons and debrid services into a single addon"
