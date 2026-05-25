@@ -52,6 +52,7 @@ include:
   - ../apps/arcane.yml
   - ../apps/homepage.yml
   - ../apps/docker-socket-proxy.yml
+  - ../apps/logrotate.yml
   - ../apps/tinyauth.yml
   - ../apps/traefik.yml
   - ../apps/otel-collector-agent.yml

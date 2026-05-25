@@ -1,0 +1,42 @@
+services:
+  logrotate:
+    image: samuelrunggaldier/logrotate:latest@sha256:ebac86167a1285857cb997c463fd38f7ab742b5621871eecb62e15b56bd13a51
+    container_name: logrotate
+    restart: $RESTART_POLICY_CORE
+    profiles:
+      - core
+    network_mode: "none"
+    read_only: true
+    tmpfs:
+      - /etc/crontabs:rw,noexec,nosuid,nodev,size=1m
+      - /etc/logrotate.d:rw,noexec,nosuid,nodev,size=1m
+      - /tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777
+      - /var/lib:rw,noexec,nosuid,nodev,size=4m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+    pids_limit: 64
+    cpus: "0.10"
+    mem_limit: 64M
+    volumes:
+      - $REPO_PATH/logs:/logs
+    environment:
+      TZ: $TZ
+      LOGS_PATH: /logs/*/*.log
+      TRIGGER_INTERVAL: daily
+      MAX_SIZE: 100M
+      MAX_BACKUPS: 10
+      DELAYCOMPRESS: true
+      SU_USER: root
+      SU_GROUP: root
+    healthcheck:
+      test: ["CMD-SHELL", "test -r /etc/logrotate.d/docker-logs && pidof crond >/dev/null"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
