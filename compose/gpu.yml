@@ -68,14 +68,14 @@ include:
   - ../apps/whoami.yml
   # - ../apps/watchtower.yml
   #### MEDIA ####
-  # - ../apps/aiostreams.yml # TODO
+  - ../apps/aiostreams.yml
   - ../apps/bichon.yml
   # - ../apps/feishin.yml
   - ../apps/jellyfin.yml
   - ../apps/jellyseerr.yml
   - ../apps/kiwix-serve.yml
   - ../apps/mediamanager.yml
-  # - ../apps/nzbdav.yml # TODO
+  - ../apps/nzbdav.yml
   # - ../apps/oxicloud.yml
   - ../apps/pinchflat.yml
   - ../apps/prowlarr.yml

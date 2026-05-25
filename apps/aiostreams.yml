@@ -1,6 +1,6 @@
 services:
   aiostreams:
-    image: ghcr.io/viren070/aiostreams:v2.29.6@sha256:4b0e529664354382d4a496b168ecfbd1973d4dc33e1de3e652adf79f35ec1285
+    image: ghcr.io/viren070/aiostreams:v2.30.2@sha256:a2ab5a7ce8f474de894f1bd079c6d7f73b235857d9f2ba3d8b1ba51829a01b51
     container_name: aiostreams
     restart: $RESTART_POLICY_MEDIA
     depends_on:
@@ -21,7 +21,7 @@ services:
       - ALL
     cap_add: []
     volumes:
-      - $REPO_PATH/appdata/aiostreams:/app/data
+      - $REPO_PATH/data/aiostreams:/app/data
     environment:
       ADDON_NAME: AIOStreams
       ADDON_ID: aiostreams.$DOMAINNAME
