@@ -23,7 +23,7 @@ services:
       - ALL
     cap_add: []
     pids_limit: 256
-    cpus: '1.0'
+    cpus: "1.0"
     mem_limit: 1G
     ulimits:
       nofile:
@@ -39,7 +39,7 @@ services:
       interval: 2m
       timeout: 5s
       retries: 3
-      start_period: 30s
+      start_period: 1m
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -191,7 +191,7 @@ services:
       - ALL
     cap_add: []
     pids_limit: 256
-    cpus: '1.0'
+    cpus: "1.0"
     mem_limit: 1G
     ulimits:
       nofile:
@@ -200,7 +200,8 @@ services:
     environment:
       ENDPOINT: "/admin"
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1:80/admin/ || exit 1"]
+      test:
+        ["CMD-SHELL", "wget -q --spider http://127.0.0.1:80/admin/ || exit 1"]
       interval: 5m
       timeout: 5s
       retries: 3
