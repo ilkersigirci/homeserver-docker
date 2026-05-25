@@ -10,8 +10,8 @@ on:
       - renovate.json
       - .github/workflows/renovate.yml
   schedule:
-  - cron: "7 10-16 * * 1-5"
-    timezone: "Europe/Istanbul"
+    - cron: "17 9-17 * * 1-5"
+      timezone: "Europe/Istanbul"
   workflow_dispatch:
     inputs:
       dryRun:
