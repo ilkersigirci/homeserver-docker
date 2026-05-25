@@ -1,4 +1,5 @@
 # NOTE: Nothing is working on Firefox
+# NOTE: The app might be hacked. Its github commits with docker image sha don't match
 services:
   bitplay:
     image: ghcr.io/aculix/bitplay:main@sha256:b20c2c959e0c312c02575725dd3068391aa28c4d2b2781bcd5808e7b520b4171
@@ -18,7 +19,7 @@ services:
       - ALL
     cap_add: []
     pids_limit: 256
-    cpus: '1.0'
+    cpus: "1.0"
     mem_limit: 1G
     ulimits:
       nofile:

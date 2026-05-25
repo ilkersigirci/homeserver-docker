@@ -75,7 +75,6 @@ include:
   - ../apps/withoutbg.yml
   #### MEDIA ####
   - ../apps/aiostreams.yml
-  - ../apps/bitplay.yml
   # - ../apps/dufs.yml
   - ../apps/mazanoke.yml
   - ../apps/metube.yml
