@@ -1,12 +1,13 @@
 # Architecture
 
-This document is a high-level map of the repository.
-It should answer:
-- where to change something
-- how the main parts relate
-- which constraints should remain true
+High-level repository map: change locations, boundaries, and invariants only.
 
-Implementation details and one-off procedures belong in runbooks and inline comments.
+## Documentation Rules
+
+- Keep docs concise: include only current commands, paths, invariants, and failure handling.
+- Do not add narrative, history, duplicate examples, or one-off notes.
+- Prefer linking to scripts/runbooks over copying long command blocks.
+- Remove obsolete or unnecessary doc text when touching related docs.
 
 ## Bird's-Eye View
 
@@ -42,7 +43,7 @@ Deployment is host-driven:
 - `appdata/`, `data/`, `logs/`, `backups/`
   - Persistent runtime state and operational artifacts.
 - `docs/`
-  - Runbooks and architecture/operational documentation.
+  - Concise runbooks and architecture/operational documentation.
 
 ## System Boundaries
 

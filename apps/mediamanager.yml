@@ -3,7 +3,7 @@ networks:
 
 services:
   mediamanager-db:
-    image: postgres:18.4@sha256:f7ce845ee6873dd84be93c9828fe0d1fab0f9707dc9ac569694657398b290bce
+    image: postgres:18.4@sha256:8ff36f3c66371cba71d20ceedccfc3de9669a68737607888c4ef0af93abe8e39
     container_name: mediamanager-db
     restart: $RESTART_POLICY_MEDIA
     profiles:
@@ -76,7 +76,7 @@ services:
     volumes:
       - $REPO_PATH/configs/mediamanager/config.toml:/app/config/config.toml:ro
       - $REPO_PATH/logs/mediamanager/media_manager.log:/app/config/media_manager.log # TODO: Add empty file to git tracking
-      # - $REPO_PATH/data/downloads:/media/downloads:ro
+      - $DIR_MEDIA/Downloads:/media/downloads
       - $DIR_MEDIA/MediaManager:/data:rw
       - $DIR_MEDIA/MediaManager/images/:/data/images/
     environment:

@@ -42,6 +42,11 @@ COMPOSE_PROFILES="$PROFILES" docker compose --env-file "$ENV_FILE" --file "$COMP
 COMPOSE_PROFILES="$PROFILES" docker compose --env-file "$ENV_FILE" --file "$COMPOSE_FILE" up -d
 ```
 
+## Service Log Rotation
+
+`apps/logrotate.yml` rotates bind-mounted service logs under `logs/*/*.log`.
+Use it for file logs; Docker daemon rotation only covers container stdout/stderr.
+
 ## Image Digest Pinning
 
 When updating image versions in `apps/*.yml`, always pin to immutable digests (`image:tag@sha256:...`).

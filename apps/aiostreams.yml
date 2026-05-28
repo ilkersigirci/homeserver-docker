@@ -1,6 +1,6 @@
 services:
   aiostreams:
-    image: ghcr.io/viren070/aiostreams:v2.29.6@sha256:4b0e529664354382d4a496b168ecfbd1973d4dc33e1de3e652adf79f35ec1285
+    image: ghcr.io/viren070/aiostreams:v2.30.2@sha256:a2ab5a7ce8f474de894f1bd079c6d7f73b235857d9f2ba3d8b1ba51829a01b51
     container_name: aiostreams
     restart: $RESTART_POLICY_MEDIA
     depends_on:
@@ -9,8 +9,6 @@ services:
       - media
     networks:
       - t3_proxy
-    ports:
-      - "1006:3000"
     user: $PUID:$PGID
     read_only: true
     tmpfs:
@@ -21,44 +19,44 @@ services:
       - ALL
     cap_add: []
     volumes:
-      - $REPO_PATH/appdata/aiostreams:/app/data
+      - $REPO_PATH/data/aiostreams:/app/data
+    # NOTE: https://docs.aiostreams.viren070.me/configuration/environment-variables
     environment:
       ADDON_NAME: AIOStreams
-      ADDON_ID: aiostreams.$DOMAINNAME
-      BASE_URL: https://aiostreams.$DOMAINNAME
+      ADDON_ID: aiostreams.$BASE_DOMAINNAME
+      BASE_URL: https://aiostreams.$BASE_DOMAINNAME
+      AIOSTREAMS_AUTH_REQUIRED: true
       AIOSTREAMS_AUTH: $AIOSTREAMS_AUTH
       SECRET_KEY: $AIOSTREAMS_SECRET_KEY
       TMDB_ACCESS_TOKEN: $TMDB_API_READ_ACCESS_TOKEN
-    # env_file:
-    #   - $REPO_PATH/.env.aiostreams
     healthcheck:
       test: ["CMD", "/nodejs/bin/node", "/app/scripts/healthcheck.js"]
       interval: 2m
       timeout: 5s
       retries: 3
-      start_period: 30s
+      start_period: 1m
     labels:
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.aiostreams-rtr.entrypoints: "websecure"
-      traefik.http.routers.aiostreams-rtr.rule: "Host(`aiostreams.$DOMAINNAME`)"
+      traefik.http.routers.aiostreams-rtr.rule: "Host(`aiostreams.$BASE_DOMAINNAME`)"
       ## Middlewares
       traefik.http.routers.aiostreams-rtr.middlewares: "chain-tinyauth-relaxed@file"
       ## HTTP Services
       traefik.http.routers.aiostreams-rtr.service: "aiostreams-svc"
       traefik.http.services.aiostreams-svc.loadbalancer.server.port: "3000"
       ####### TINYAUTH #######
-      tinyauth.apps.aiostreams.config.domain: "aiostreams.$DOMAINNAME"
+      tinyauth.apps.aiostreams.config.domain: "aiostreams.$BASE_DOMAINNAME"
       tinyauth.apps.aiostreams.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "aiostreams"
       homepage.icon: "aiostreams.png"
-      homepage.href: "https://aiostreams.$DOMAINNAME"
+      homepage.href: "https://aiostreams.$BASE_DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Consolidates multiple Stremio addons and debrid services into a single addon"
       ####### GLANCE #######
       glance.name: "aiostreams"
       glance.icon: "sh:aiostreams"
-      glance.url: "https://aiostreams.$DOMAINNAME"
+      glance.url: "https://aiostreams.$BASE_DOMAINNAME"
       glance.description: "Consolidates multiple Stremio addons and debrid services into a single addon"

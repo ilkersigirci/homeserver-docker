@@ -142,8 +142,6 @@ http:
         servers:
           - url: "http://192.168.2.12:8123"
 
-
-
     cam0-svc:
       loadBalancer:
         servers:

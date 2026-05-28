@@ -31,6 +31,7 @@ This document defines how internet-facing traffic is handled.
 - `apps/traefik.yml` is the edge ingress definition.
 - Trusted forwarded headers are restricted via `CLOUDFLARE_IPS` and `LOCAL_IPS`.
 - New public services should be routed through Traefik instead of direct container port exposure.
+- Traefik writes `logs/traefik/access.log` for CrowdSec acquisition.
 
 ## Public Service Checklist
 
