@@ -55,6 +55,8 @@
       "matchManagers": ["docker-compose"],
       "matchDatasources": ["docker"],
       "matchPackageNames": ["ghcr.io/gtsteffaniak/filebrowser"],
+      "versionCompatibility": "^(?<version>\\d+\\.\\d+\\.\\d+)(?<compatibility>-stable)$",
+      "versioning": "semver",
       "sourceUrl": "https://github.com/gtsteffaniak/filebrowser"
     },
     {
