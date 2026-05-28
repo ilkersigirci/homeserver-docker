@@ -1,7 +1,7 @@
 # TODO: Harden
 services:
   vscodium:
-    image: lscr.io/linuxserver/vscodium:1.116.02821@sha256:5db09ef55a62175a848a848efe9d7e645608a73c796f11c761e24e246f3ca6a8
+    image: lscr.io/linuxserver/vscodium:1.121.03429@sha256:659313427a6c9abd12b7cf2d6cdab04e14e35ad9a7ea53fea6c1a65568c54af2
     container_name: vscodium
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:

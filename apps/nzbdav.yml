@@ -25,20 +25,30 @@ services:
       - SETUID
       - SETGID
     pids_limit: 256
-    cpus: '1.0'
+    cpus: "1.0"
     mem_limit: 1G
     ulimits:
       nofile:
         soft: 4096
         hard: 8192
     volumes:
-      - $REPO_PATH/appdata/nzbdav:/config
+      - $REPO_PATH/data/nzbdav:/config
     environment:
       PUID: $PUID
       PGID: $PGID
       TZ: $TZ
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "--max-time", "3", "-o", "/dev/null", "http://127.0.0.1:3000/"]
+      test:
+        [
+          "CMD",
+          "curl",
+          "-fsS",
+          "--max-time",
+          "3",
+          "-o",
+          "/dev/null",
+          "http://127.0.0.1:3000/",
+        ]
       interval: 5m
       timeout: 5s
       retries: 3

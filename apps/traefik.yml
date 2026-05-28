@@ -19,6 +19,7 @@ services:
       - --accesslog.fields.headers.names.User-Agent=keep
       - --accesslog.fields.headers.names.Authorization=drop
       - --accesslog.fields.headers.names.Cookie=drop
+      # CrowdSec tails this file; the generic logrotate service bounds its size with copytruncate.
       - --accesslog.filePath=/logs/access.log
       # Keep file logs even when OTLP export is enabled. For traefik>=3.7
       - --accesslog.dualoutput=${TRAEFIK_ACCESSLOG_FILE_ENABLED:-true}

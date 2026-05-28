@@ -21,13 +21,6 @@ http:
       middlewares:
         - chain-no-auth-relaxed
       service: gotify-svc
-    aiostreams-rtr:
-      rule: "Host(`aiostreams.{{env "BASE_DOMAINNAME"}}`)"
-      entryPoints:
-        - websecure
-      middlewares:
-        - chain-no-auth-relaxed
-      service: aiostreams-svc
 
   services:
     adguardhome-svc:
@@ -46,7 +39,3 @@ http:
       loadBalancer:
         servers:
           - url: "http://100.64.0.1:1005"
-    aiostreams-svc:
-      loadBalancer:
-        servers:
-          - url: "http://100.64.0.1:1006"

@@ -59,6 +59,7 @@ include:
   - ../apps/homepage.yml
   # - ../apps/pocket-id.yml
   - ../apps/docker-socket-proxy.yml
+  - ../apps/logrotate.yml
   - ../apps/filebrowser-quantum.yml
   - ../apps/tinyauth.yml
   - ../apps/traefik.yml
