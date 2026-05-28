@@ -1,6 +1,6 @@
 services:
   kiwix-serve:
-    image: ghcr.io/kiwix/kiwix-serve:3.8.2@sha256:293ef2e7876ece349d4d73a5a1af012ff9e84ad73df9561f4ac5ffed440223dc
+    image: ghcr.io/kiwix/kiwix-serve:3.8.2@sha256:31f592534b602f673b201f88ec2cca823fe3c1b31598b8acb94a580557b56e16
     container_name: kiwix-serve
     restart: $RESTART_POLICY_MEDIA
     # command: wikipedia.zim wiktionary.zim
