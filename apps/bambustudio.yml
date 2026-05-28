@@ -2,7 +2,7 @@
 # NOTE: Consumes +2GB RAM
 services:
   bambustudio:
-    image: lscr.io/linuxserver/bambustudio:02.07.00@sha256:3972e222f1e6b3087ededc30a20c726ce1e7b08f760e82d9395b724dae07c6e7
+    image: lscr.io/linuxserver/bambustudio:02.07.00@sha256:e995fcc16483e62ff9c083f363349a856469b58e811f19d79a55704e78cecee9
     container_name: bambustudio
     restart: $RESTART_POLICY_DESKTOP_IMAGES
     hostname: bambustudio
