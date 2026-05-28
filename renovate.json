@@ -36,6 +36,14 @@
       "enabled": false
     },
     {
+      "description": "Use GitHub releases for Jellyfin Docker image changelogs",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/jellyfin/jellyfin"],
+      "versioning": "semver",
+      "sourceUrl": "https://github.com/jellyfin/jellyfin"
+    },
+    {
       "description": "Use GitHub releases for Bichon Docker image changelogs",
       "matchManagers": ["docker-compose"],
       "matchDatasources": ["docker"],
