@@ -1,0 +1,29 @@
+{
+  "file_types": {
+    "Docker Compose": ["apps/*.yml", "apps-not-used/*.yml", "compose/*.yml"],
+    "YAML": [
+      "configs/traefik3/**/*.yml.example",
+      "configs/traefik3/**/*.yaml.example"
+    ]
+  },
+  "lsp": {
+    "yaml-language-server": {
+      "settings": {
+        "yaml": {
+          "schemas": {
+            "https://json.schemastore.org/traefik-v3.json": [
+              "configs/traefik3/traefik*.yml",
+              "configs/traefik3/traefik*.yaml"
+            ],
+            "https://json.schemastore.org/traefik-v3-file-provider.json": [
+              "configs/traefik3/**/*.yml",
+              "configs/traefik3/**/*.yaml",
+              "configs/traefik3/**/*.yml.example",
+              "configs/traefik3/**/*.yaml.example"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
