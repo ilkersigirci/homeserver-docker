@@ -24,7 +24,8 @@
       "matchFileNames": ["apps/immich*.yml"],
       "matchPackageNames": [
         "ghcr.io/immich-app/immich-server",
-        "ghcr.io/immich-app/immich-machine-learning"
+        "ghcr.io/immich-app/immich-machine-learning",
+        "alangrainger/immich-public-proxy"
       ],
       "enabled": true
     },
