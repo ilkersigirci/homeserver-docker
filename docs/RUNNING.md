@@ -56,6 +56,15 @@ Use `scripts/get-image-sha.sh` to resolve the digest for a tag:
 scripts/get-image-sha.sh --pinned-only ghcr.io/traefik/traefik:3.7.0-rc.2
 ```
 
+## Renovate Local Checks
+
+```bash
+make renovate-validate
+
+# lookup-only; it does not create branches or PRs.
+make renovate-local
+```
+
 ## Destructive Operations
 
 - `down --volumes` and `rm -svf` are intentionally excluded from normal workflows.
