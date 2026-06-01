@@ -107,7 +107,7 @@ services:
   # NOTE: First run without the daemon command to initialize the runner, then use the daemon command one.
   # NOTE: docker exec -it forgejo-runner /bin/sh -c "forgejo-runner register"
   forgejo-runner:
-    image: code.forgejo.org/forgejo/runner:12.10.1@sha256:3d49075f9115054ae2485d8cea2819296a904dfd4f00017285168028615d8533
+    image: code.forgejo.org/forgejo/runner:12.10.2@sha256:379b324d6942824b7487706c0a06be4d63e546c17b62bece4ae18c74364a8fae
     container_name: forgejo-runner
     restart: $RESTART_POLICY_PROGRAMMING
     # command: '/bin/sh -c "while : ; do sleep 1 ; done ;"'
