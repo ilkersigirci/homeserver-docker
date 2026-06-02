@@ -107,3 +107,4 @@ include:
   #### OTHERS ####
   - ../apps/excalidash.yml
   - ../apps/bambuddy.yml
+  - ../apps/presenton.yml
