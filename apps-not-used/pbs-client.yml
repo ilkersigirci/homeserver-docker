@@ -3,12 +3,11 @@ services:
   pbs-client:
     image: aterfax/pbs-client:latest@sha256:a9d3716dd5157f8dfb33aba787c15b159b7c9b89c8e4fb1842aa0a35dc7eb184
     container_name: pbs-client
-    hostname: pbs-client-$DOMAINNAME
+    hostname: pbs-client-$MY_HOSTNAME
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
       - maintenance
-    networks:
-      - t3_proxy
+    # Keep this off t3_proxy; enforce PBS-only egress with host firewall rules.
     security_opt:
       - no-new-privileges:true
     tmpfs:
@@ -18,24 +17,24 @@ services:
         target: /tmp
         tmpfs:
           size: 1073741824
-      - ./pbsconfig/:/root/.config/proxmox-backup/
+      - $REPO_PATH/secrets/pbs-client/$MY_HOSTNAME:/root/.config/proxmox-backup/
       # Note - if you want to restore backups make sure to change to read write below.
       # See the 'restore-backup' command inside the container.
-      - ./backups/test1:/backups/test1:ro
-      - ./backups/test2:/backups/test2:ro
-      - ./backups/test3:/backups/test3:ro
+      - $REPO_PATH:/backups/docker:ro
     environment:
       TZ: $TZ
       PBS_ENDPOINT: pbs.home.$BASE_DOMAINNAME
-      PBS_DATASTORE: FILL_IT
-      PBS_ENCRYPTION_PASSWORD: FILL_IT
-      CRON_SCHEDULE: 0 */4 * * *
+      PBS_DATASTORE: ${PBS_DATASTORE:-FILL_IT}
+      PBS_DATASTORE_NS: ${PBS_DATASTORE_NS:-hosts/${MY_HOSTNAME}}
+      PBS_ENCRYPTION_PASSWORD: ${PBS_ENCRYPTION_PASSWORD:-FILL_IT}
+      # Keep container cron effectively dormant; schedule a host script instead.
+      CRON_SCHEDULE: ${PBS_CRON_SCHEDULE:-0 0 1 1 *}
       UNENCRYPTED: 0
-      # If you want to skip backup on startup, set CRON_BACKUP_ONLY=1
-      CRON_BACKUP_ONLY: 0
-      PBS_API_KEY_NAME: username@pam!test
-      PBS_API_KEY_SECRET: FILL_IT
-      # PBS_BACKUP_CMD_APPEND_EXTRA_OPTS: --include-dev
+      CRON_BACKUP_ONLY: 1 # Skip backup on startup
+      PBS_API_KEY_NAME: ${PBS_API_KEY_NAME:-username@pam!test}
+      PBS_API_KEY_SECRET: ${PBS_API_KEY_SECRET:-FILL_IT}
+      PBS_FINGERPRINT: ${PBS_FINGERPRINT:-}
+      PBS_BACKUP_CMD_APPEND_EXTRA_OPTS: "${PBS_BACKUP_CMD_APPEND_EXTRA_OPTS:---change-detection-mode=metadata}"
       # PBS_RESTORE_CMD_APPEND_EXTRA_OPTS: --include-dev
     labels:
       ####### HOMEPAGE #######
