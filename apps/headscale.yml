@@ -19,7 +19,7 @@ services:
     user: $PUID:$PGID
     read_only: true
     tmpfs:
-      - /var/run/headscale
+      - /var/run/headscale:rw,noexec,nosuid,nodev,size=16m,uid=$PUID,gid=$PGID,mode=0770
     security_opt:
       - no-new-privileges:true
     cap_drop:

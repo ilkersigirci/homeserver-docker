@@ -66,7 +66,7 @@ Deployment is host-driven:
 - Machine files compose services; app files define services.
 - Service selection is done by host includes and profiles, not by duplicating service definitions per host.
 - Shared Docker network definitions and host-specific app overlays belong in `compose/fragments/`.
-- Include a base app fragment before any `compose/fragments/` overlay that augments the same service.
+- Merge a base app fragment and any `compose/fragments/` service overlay in one long-form `include.path` list before importing it into the host model.
 - Host compose `include` entries should reference `compose/` fragments or `apps/` service fragments. Parked service files belong in `apps-not-used/`.
 - Bind mounts should use repository-based paths (`$REPO_PATH/...`) for predictable layout.
 - Prefer hardened container defaults (`read_only`, `no-new-privileges`, dropped capabilities) unless a service documents an exception.

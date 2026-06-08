@@ -1,3 +1,6 @@
+# NOTE
+# sudo nvidia-ctk runtime configure --runtime=docker --set-as-default && sudo systemctl restart docker
+
 name: gpu_nvidia
 
 networks:
@@ -40,8 +43,6 @@ include:
   # - ../apps/vscodium.yml
   # - ../apps/webtop.yml
   #### MEDIA ####
-  - ../apps/immich-machine-learning.yml
-  - ./fragments/immich-machine-learning/nvidia.yml
-
-# NOTE
-# sudo nvidia-ctk runtime configure --runtime=docker --set-as-default && sudo systemctl restart docker
+  - path:
+      - ../apps/immich-machine-learning.yml
+      - ./fragments/immich-machine-learning/nvidia.yml
