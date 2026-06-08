@@ -6,8 +6,11 @@ services:
     profiles:
       - root
       - others
+    depends_on:
+      egress-proxy:
+        condition: service_healthy
     networks:
-      - t3_proxy
+      - app_internal
     # ports:
     # # Required for Codex OAuth callback (OpenAI redirects browser directly to localhost:1455)
     #   - "1455:1455"
@@ -25,6 +28,11 @@ services:
     volumes:
       - $REPO_PATH/appdata/presenton:/app_data
     environment:
+      ## Egress Proxy Start ##
+      http_proxy: http://egress-proxy:3128
+      https_proxy: http://egress-proxy:3128
+      no_proxy: 127.0.0.1,localhost,::1,presenton
+      ## Egress Proxy End ##
       AUTH_USERNAME: admin
       AUTH_PASSWORD: adminadmin
       ENSURE_PRESENTATION_EXPORT_RUNTIME: false
@@ -68,6 +76,7 @@ services:
       start_period: 45s
     labels:
       traefik.enable: "true"
+      traefik.docker.network: "app_internal"
       ## HTTP Routers
       traefik.http.routers.presenton-rtr.entrypoints: "websecure"
       traefik.http.routers.presenton-rtr.rule: "Host(`presenton.$DOMAINNAME`)"

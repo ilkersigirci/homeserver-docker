@@ -1,0 +1,75 @@
+services:
+  egress-proxy:
+    image: ubuntu/squid:6.6-24.04_edge@sha256:8a3baed477e2c282ab8aa5edad442f69873246964f225c5c2ae8364b6610963c
+    container_name: egress-proxy
+    restart: $RESTART_POLICY_CORE
+    profiles:
+      - core
+      - programming
+    networks:
+      app_internal:
+      egress:
+        ipv4_address: 192.168.95.10
+    read_only: true
+    tmpfs:
+      - /run
+      - /tmp
+      - /var/log/squid:rw,noexec,nosuid,nodev,size=64m,uid=13,gid=13,mode=0755
+      - /var/spool/squid:rw,noexec,nosuid,nodev,size=64m,uid=13,gid=13,mode=0755
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - SETGID
+      - SETUID
+    pids_limit: 256
+    cpus: "0.5"
+    mem_limit: 512M
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      - $REPO_PATH/configs/egress-proxy/squid.conf:/etc/squid/squid.conf:ro
+      - $REPO_PATH/configs/egress-proxy/allow-domains.txt:/etc/squid/allow-domains.txt:ro
+      - $REPO_PATH/configs/egress-proxy/allow-ips.txt:/etc/squid/allow-ips.txt:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pidof squid >/dev/null"]
+      interval: 1m
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+
+  egress-proxy-test:
+    image: curlimages/curl:8.16.0@sha256:463eaf6072688fe96ac64fa623fe73e1dbe25d8ad6c34404a669ad3ce1f104b6
+    container_name: egress-proxy-test
+    restart: "no"
+    profiles:
+      - testing
+    depends_on:
+      egress-proxy:
+        condition: service_healthy
+    networks:
+      - app_internal
+    environment:
+      ALLOWED_DOMAIN_URL: $AIGATEWAY_BASE_URL/models
+      http_proxy: http://egress-proxy:3128
+      https_proxy: http://egress-proxy:3128
+      no_proxy: 127.0.0.1,localhost,::1,egress-proxy
+    entrypoint:
+      - /bin/sh
+      - /usr/local/bin/egress-proxy-test
+    volumes:
+      - $REPO_PATH/scripts/egress-proxy-test.sh:/usr/local/bin/egress-proxy-test:ro
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 64
+    cpus: "0.25"
+    mem_limit: 128M

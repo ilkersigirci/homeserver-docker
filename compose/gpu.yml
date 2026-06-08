@@ -1,35 +1,6 @@
 name: gpu
 
 networks:
-  default:
-    driver: bridge
-  t3_proxy:
-    name: t3_proxy
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 192.168.90.0/24
-  socket_proxy_read:
-    name: socket_proxy_read
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 192.168.91.0/24
-  socket_proxy_write:
-    name: socket_proxy_write
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 192.168.92.0/24
-  socket_proxy_exec:
-    name: socket_proxy_exec
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 192.168.93.0/24
-  crowdsec_lapi:
-    name: crowdsec_lapi
-    driver: bridge
   dockervlan:
     name: dockervlan
     driver: macvlan
@@ -47,6 +18,8 @@ networks:
 #     file: $REPO_PATH/secrets/cf_dns_api_token
 
 include:
+  ########################### NETWORKS
+  - ./fragments/common-networks.yml
   ########################### SERVICES
   #### CORE ####
   - ../apps/arcane.yml
@@ -55,6 +28,7 @@ include:
   - ../apps/logrotate.yml
   - ../apps/tinyauth.yml
   - ../apps/traefik.yml
+  - ../apps/egress-proxy.yml
   - ../apps/otel-collector-agent.yml
   # - ../apps/vaultwarden.yml
   ###### MAINTENANCE ####
@@ -91,8 +65,9 @@ include:
   - ../apps/grafana-lgtm.yml
   # - ../apps/watchyourlan.yml
   #### PHOTO ####
-  # - ../apps/immich-gpu.yml
   - ../apps/immich.yml
+  # - ../apps/immich-machine-learning.yml
+  # - ./fragments/immich-machine-learning/nvidia.yml
   #### PROGRAMMING ####
   - ../apps/bifrost.yml
   - ../apps/kreuzberg.yml

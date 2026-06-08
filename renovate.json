@@ -2,26 +2,32 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:best-practices"],
   "enabledManagers": ["docker-compose", "github-actions"],
-  "includePaths": ["apps/**", ".github/workflows/**"],
+  "includePaths": ["apps/**", "compose/fragments/**", ".github/workflows/**"],
   "timezone": "Europe/Istanbul",
   "schedule": ["* 10-16 * * 1-5"],
   "prHourlyLimit": 1,
   "prConcurrentLimit": 10,
   "commitHourlyLimit": 2,
   "docker-compose": {
-    "managerFilePatterns": ["/^apps\\/.*\\.ya?ml$/"]
+    "managerFilePatterns": ["/^(?:apps|compose\\/fragments)\\/.*\\.ya?ml$/"]
   },
   "packageRules": [
     {
       "description": "Disable Renovate updates for all images in Immich compose files by default",
       "matchManagers": ["docker-compose"],
-      "matchFileNames": ["apps/immich*.yml"],
+      "matchFileNames": [
+        "apps/immich*.yml",
+        "compose/fragments/immich-machine-learning/*.yml"
+      ],
       "enabled": false
     },
     {
       "description": "Allow only Immich app and machine-learning images to update",
       "matchManagers": ["docker-compose"],
-      "matchFileNames": ["apps/immich*.yml"],
+      "matchFileNames": [
+        "apps/immich*.yml",
+        "compose/fragments/immich-machine-learning/*.yml"
+      ],
       "matchPackageNames": [
         "ghcr.io/immich-app/immich-server",
         "ghcr.io/immich-app/immich-machine-learning",

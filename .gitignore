@@ -1,7 +1,7 @@
 # General
 .codex
 .env*
-.github/prompts
+.agents/prompts
 .idea
 acme.json
 node_modules

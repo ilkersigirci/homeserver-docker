@@ -6,6 +6,9 @@ services:
     container_name: headscale
     command: serve
     restart: $RESTART_POLICY_CORE
+    depends_on:
+      traefik:
+        condition: service_healthy
     profiles:
       - core
     networks:

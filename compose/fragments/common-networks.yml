@@ -1,0 +1,47 @@
+networks:
+  default:
+    driver: bridge
+  edge:
+    name: edge
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.89.0/24
+  app_internal:
+    name: app_internal
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 192.168.94.0/24
+  egress:
+    name: egress
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.95.0/24
+  t3_proxy:
+    name: t3_proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.90.0/24
+        - subnet: fdcc:ad94:bacf:61a3::/64
+  socket_proxy_read:
+    name: socket_proxy_read
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.91.0/24
+  socket_proxy_write:
+    name: socket_proxy_write
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.92.0/24
+  socket_proxy_exec:
+    name: socket_proxy_exec
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.93.0/24
