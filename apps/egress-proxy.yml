@@ -5,7 +5,6 @@ services:
     restart: $RESTART_POLICY_CORE
     profiles:
       - core
-      - programming
     networks:
       app_internal:
       egress:
