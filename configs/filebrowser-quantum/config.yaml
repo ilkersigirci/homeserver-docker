@@ -8,23 +8,23 @@ server:
   disableUpdateCheck: true
   disablePreviews: false
   disablePreviewResize: false
-  maxArchiveSize: 20   # GB; 0 = no limit (default: 20)
+  maxArchiveSize: 20 # GB; 0 = no limit (default: 20)
   logging:
-    - levels: "info"                     # separated list of log levels to enable. (eg. "info|warning|error|debug")
-      apiLevels: ""                       # separated list of log levels to enable for the API. (eg. "info|warning|error")
-      output: "stdout"                    # output location. (eg. "stdout" or "path/to/file.log")
-      noColors: false                     # disable colors in the output
-      json: false                         # output in json format
-      utc: false                          # use UTC time in the output instead of local time
+    - levels: "info" # separated list of log levels to enable. (eg. "info|warning|error|debug")
+      apiLevels: "" # separated list of log levels to enable for the API. (eg. "info|warning|error")
+      output: "stdout" # output location. (eg. "stdout" or "path/to/file.log")
+      noColors: false # disable colors in the output
+      json: false # output in json format
+      utc: false # use UTC time in the output instead of local time
   filesystem:
-    createFilePermission: "644"      # Unix permissions like 644, 755, 2755 (default: 644)
+    createFilePermission: "644" # Unix permissions like 644, 755, 2755 (default: 644)
     createDirectoryPermission: "755" # Unix permissions like 755, 2755, 1777 (default: 755)
   indexSqlConfig:
-    batchSize: 1000           # Number of items to batch in a single transaction, typically 500-5000. Higher = faster but could use more memory.
-    cacheSizeMB: 32         # Size of the SQLite cache in MB
-    walMode: false          # WAL journaling mode: more memory, better for busy deployments
-    disableReuse: false       # If true, always create a new indexing database on startup
-    startupIntegrityCheck: quickCheck  # quickCheck | probe | off — how thoroughly to verify the index DB at startup (default: quickCheck)
+    batchSize: 1000 # Number of items to batch in a single transaction, typically 500-5000. Higher = faster but could use more memory.
+    cacheSizeMB: 32 # Size of the SQLite cache in MB
+    walMode: false # WAL journaling mode: more memory, better for busy deployments
+    disableReuse: false # If true, always create a new indexing database on startup
+    startupIntegrityCheck: quickCheck # quickCheck | probe | off — how thoroughly to verify the index DB at startup (default: quickCheck)
   # Do not use a root "/" directory or include the "/var" folder
   sources:
     - path: "/local-data"
@@ -60,7 +60,7 @@ auth:
     oidc:
       enabled: true
       clientId: "xxx" # Use environment variable
-      clientSecret: "xxx"  # Use environment variable
+      clientSecret: "xxx" # Use environment variable
       issuerUrl: "https://pocketid.ilkerflix.com"
       scopes: "openid email profile groups"
       userIdentifier: "preferred_username"
@@ -79,9 +79,29 @@ frontend:
       title: "Blog Title"
       url: "https://blog.ilkerflix.com"
 
-
 integrations:
   office:
-    url: "https://office.yourdomain.com"       # Accessible from browser
-    internalUrl:                               # optional this should be a local network address that FileBrowser can access.
+    url: "https://office.ilkerflix.com" # Accessible from browser
+    internalUrl: "http://euro-office-documentserver" # optional this should be a local network address that FileBrowser can access.
     secret: "xxx" # Use environment variable
+    viewOnly: false
+
+userDefaults:
+  # preview:
+  #   highQuality: true
+  #   image: true
+  #   video: true
+  #   motionVideoPreview: true
+  #   office: true
+  #   popup: true
+  #   folder: true
+  # permissions:
+  #   api: false
+  #   admin: false
+  #   modify: false
+  #   share: false
+  #   realtime: false
+  #   delete: false
+  #   create: false
+  #   download: true
+  disableOnlyOfficeExt: ".md .txt .pdf .html .xml"
