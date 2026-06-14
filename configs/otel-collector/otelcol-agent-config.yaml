@@ -127,6 +127,12 @@ extensions:
     directory: /var/lib/otelcol/file_storage
     create_directory: true
     timeout: 10s
+    compaction:
+      on_rebound: true
+      cleanup_on_start: true
+      rebound_needed_threshold_mib: 100
+      rebound_trigger_threshold_mib: 10
+      check_interval: 5s
 
 service:
   extensions:
