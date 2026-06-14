@@ -46,7 +46,7 @@ services:
       start_period: 30s
 
   gatus:
-    image: ghcr.io/twin/gatus:v5.36.0@sha256:c5f210d095fa78e6efaa20ffeb14803f2ba4f10615e16a6d12087697149617f0
+    image: ghcr.io/ilkersigirci/homeserver-gatus:v5.36.0@sha256:629cedba3d0667881d398fce43bde97a72ade2d061b970c6b9c5be3c9d580aff
     container_name: gatus
     restart: $RESTART_POLICY_MAINTENANCE
     # depends_on:
