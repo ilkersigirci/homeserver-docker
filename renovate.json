@@ -1,8 +1,13 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:best-practices"],
-  "enabledManagers": ["docker-compose", "github-actions"],
-  "includePaths": ["apps/**", "compose/fragments/**", ".github/workflows/**"],
+  "enabledManagers": ["docker-compose", "dockerfile", "github-actions"],
+  "includePaths": [
+    "apps/**",
+    "compose/fragments/**",
+    "Dockerfiles/**",
+    ".github/workflows/**"
+  ],
   "timezone": "Europe/Istanbul",
   "schedule": ["* 10-16 * * 1-5"],
   "prHourlyLimit": 1,
@@ -12,6 +17,12 @@
     "managerFilePatterns": ["/^(?:apps|compose\\/fragments)\\/.*\\.ya?ml$/"]
   },
   "packageRules": [
+    {
+      "description": "Update and pin versioned homeserver images",
+      "matchManagers": ["docker-compose"],
+      "matchPackageNames": ["/^ghcr\\.io\\/ilkersigirci\\/homeserver-/"],
+      "pinDigests": true
+    },
     {
       "description": "Disable Renovate updates for all images in Immich compose files by default",
       "matchManagers": ["docker-compose"],
