@@ -28,7 +28,7 @@ services:
       - ALL
     cap_add: []
     pids_limit: 256
-    cpus: '2.0'
+    cpus: "2.0"
     mem_limit: 2G
     ulimits:
       nofile:
@@ -94,7 +94,15 @@ services:
       ################ CUSTOM ENV VARS ################
       CROWDSEC_VICTORIAMETRICS_URL: $CROWDSEC_VICTORIAMETRICS_URL
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "--max-time", "3", "http://127.0.0.1:3000/api/health"]
+      test:
+        [
+          "CMD",
+          "curl",
+          "-fsS",
+          "--max-time",
+          "3",
+          "http://127.0.0.1:3000/api/health",
+        ]
       interval: 2m
       timeout: 5s
       retries: 3

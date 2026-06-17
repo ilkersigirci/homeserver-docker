@@ -1,0 +1,102 @@
+services:
+  presenton:
+    image: ghcr.io/presenton/presenton:v0.8.6-beta@sha256:55d166b1ae64ecea060072e0b1a727dc20dfae199ccd7c1f1067274b7a5ee7ad
+    container_name: presenton
+    restart: $RESTART_POLICY_OTHERS
+    profiles:
+      - root
+      - others
+    depends_on:
+      egress-proxy:
+        condition: service_healthy
+    networks:
+      - app_internal
+    # ports:
+    # # Required for Codex OAuth callback (OpenAI redirects browser directly to localhost:1455)
+    #   - "1455:1455"
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=512m,uid=$PUID,gid=$PGID,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "2G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      - $REPO_PATH/appdata/presenton:/app_data
+    environment:
+      ## Egress Proxy Start ##
+      http_proxy: http://egress-proxy:3128
+      https_proxy: http://egress-proxy:3128
+      no_proxy: 127.0.0.1,localhost,::1,presenton
+      ## Egress Proxy End ##
+      AUTH_USERNAME: admin
+      AUTH_PASSWORD: adminadmin
+      ENSURE_PRESENTATION_EXPORT_RUNTIME: false
+      PRESENTON_FASTEMBED_ICON_CACHE_DIR: /app_data/.cache/presenton/fastembed-icons
+      FASTEMBED_CACHE_PATH: /app_data/.cache/fastembed
+      XDG_CACHE_HOME: /app_data/.cache
+      HF_HOME: /app_data/.cache/huggingface
+      HF_XET_CACHE: /app_data/.cache/huggingface/xet
+      HF_HUB_DISABLE_XET: 1
+      TMPDIR: /app_data/tmp
+      TEMP: /app_data/tmp
+      TMP: /app_data/tmp
+      ## Openai Compatible
+      CAN_CHANGE_KEYS: false
+      LLM: custom
+      CUSTOM_LLM_URL: $AIGATEWAY_BASE_URL
+      CUSTOM_LLM_API_KEY: $AIGATEWAY_API_KEY
+      # CUSTOM_MODEL: vllm/Qwen3.6-35B-A3B
+      CUSTOM_MODEL: openai/gpt-4o-mini
+      IMAGE_PROVIDER: openai_compatible
+      DISABLE_IMAGE_GENERATION: false
+      OPENAI_COMPAT_IMAGE_BASE_URL: $AIGATEWAY_BASE_URL
+      OPENAI_COMPAT_IMAGE_API_KEY: $AIGATEWAY_API_KEY
+      # OPENAI_COMPAT_IMAGE_MODEL: vllm-image/Qwen-Image-2512
+      OPENAI_COMPAT_IMAGE_MODEL: openai/gpt-image-1-mini
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "-fsS",
+          "--max-time",
+          "5",
+          "-o",
+          "/dev/null",
+          "http://127.0.0.1/api/v1/auth/status",
+        ]
+      interval: 2m
+      timeout: 10s
+      retries: 3
+      start_period: 45s
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "app_internal"
+      ## HTTP Routers
+      traefik.http.routers.presenton-rtr.entrypoints: "websecure"
+      traefik.http.routers.presenton-rtr.rule: "Host(`presenton.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.presenton-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.presenton-rtr.service: "presenton-svc"
+      traefik.http.services.presenton-svc.loadbalancer.server.port: "80"
+      ####### TINYAUTH #######
+      tinyauth.apps.presenton.config.domain: "presenton.$DOMAINNAME"
+      tinyauth.apps.presenton.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "Others"
+      homepage.name: "presenton"
+      homepage.icon: "presenton.png"
+      homepage.href: "https://presenton.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "AI Presentation Generator and API"
+      ####### GLANCE #######
+      glance.name: "presenton"
+      glance.icon: "sh:presenton"
+      glance.url: "https://presenton.$DOMAINNAME"
+      glance.description: "AI Presentation Generator and API"

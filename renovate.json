@@ -1,27 +1,44 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:best-practices"],
-  "enabledManagers": ["docker-compose", "github-actions"],
-  "includePaths": ["apps/**", ".github/workflows/**"],
+  "enabledManagers": ["docker-compose", "dockerfile", "github-actions"],
+  "includePaths": [
+    "apps/**",
+    "compose/fragments/**",
+    "Dockerfiles/**",
+    ".github/workflows/**"
+  ],
   "timezone": "Europe/Istanbul",
   "schedule": ["* 10-16 * * 1-5"],
   "prHourlyLimit": 1,
   "prConcurrentLimit": 10,
   "commitHourlyLimit": 2,
   "docker-compose": {
-    "managerFilePatterns": ["/^apps\\/.*\\.ya?ml$/"]
+    "managerFilePatterns": ["/^(?:apps|compose\\/fragments)\\/.*\\.ya?ml$/"]
   },
   "packageRules": [
     {
+      "description": "Update and pin versioned homeserver images",
+      "matchManagers": ["docker-compose"],
+      "matchPackageNames": ["/^ghcr\\.io\\/ilkersigirci\\/homeserver-/"],
+      "pinDigests": true
+    },
+    {
       "description": "Disable Renovate updates for all images in Immich compose files by default",
       "matchManagers": ["docker-compose"],
-      "matchFileNames": ["apps/immich*.yml"],
+      "matchFileNames": [
+        "apps/immich*.yml",
+        "compose/fragments/immich-machine-learning/*.yml"
+      ],
       "enabled": false
     },
     {
       "description": "Allow only Immich app and machine-learning images to update",
       "matchManagers": ["docker-compose"],
-      "matchFileNames": ["apps/immich*.yml"],
+      "matchFileNames": [
+        "apps/immich*.yml",
+        "compose/fragments/immich-machine-learning/*.yml"
+      ],
       "matchPackageNames": [
         "ghcr.io/immich-app/immich-server",
         "ghcr.io/immich-app/immich-machine-learning",
@@ -35,6 +52,13 @@
       "matchFileNames": ["apps/karakeep.yml", "apps/jellyfin.yml"],
       "matchPackageNames": ["getmeili/meilisearch"],
       "enabled": false
+    },
+    {
+      "description": "Use GitHub releases for Glance Docker image changelogs",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["glanceapp/glance"],
+      "sourceUrl": "https://github.com/glanceapp/glance"
     },
     {
       "description": "Use GitHub releases for Jellyfin Docker image changelogs",

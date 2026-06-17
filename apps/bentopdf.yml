@@ -31,7 +31,7 @@ services:
       # PUID: $PUID
       # PGID: $PGID
       PORT: 8080
-      DISABLE_IPV6: true
+      # DISABLE_IPV6: true
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://127.0.0.1:8080"]
       interval: 5m

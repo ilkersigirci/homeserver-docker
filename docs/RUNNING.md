@@ -56,6 +56,46 @@ Use `scripts/get-image-sha.sh` to resolve the digest for a tag:
 scripts/get-image-sha.sh --pinned-only ghcr.io/traefik/traefik:3.7.0-rc.2
 ```
 
+## Custom Images
+
+Custom images are defined under `Dockerfiles/<Name>/Dockerfile` and published by
+`.github/workflows/homeserver-images.yml` to
+`ghcr.io/ilkersigirci/homeserver-<name>`.
+
+To add an image:
+
+1. Add its Dockerfile with `ARG IMAGE_VERSION=<tag>` and use
+    `${IMAGE_VERSION}` in the upstream `FROM` instruction.
+2. Pin every `FROM` image to an immutable digest.
+3. Add the image context, GHCR repository, and platforms to the workflow matrix.
+4. Reference the published image from Compose as `tag@sha256:digest`.
+
+Pull requests validate each matrix build without publishing. Merges to `main` and
+manual workflow runs publish the version read from `IMAGE_VERSION`.
+
+### Renovate Update Flow
+
+Renovate handles an upstream release in two runs:
+
+1. The Dockerfile manager updates `IMAGE_VERSION` and the upstream image digest.
+2. After that PR is merged, the workflow publishes the new custom image tag.
+3. A later Renovate run updates the custom image tag and digest in the Compose file.
+
+The Compose update cannot be created before the workflow publishes the new custom
+image tag.
+
+### Public Package Bootstrap
+
+GitHub creates each new GHCR package as private, and package visibility cannot be
+changed through the supported Packages REST API.
+
+1. Merge the Dockerfile and image workflow while services still use their existing
+    pinned image.
+2. Let the workflow publish the first image, then set the new package visibility to
+    Public in GitHub.
+3. Resolve the public image digest and switch the service to
+    `ghcr.io/ilkersigirci/homeserver-<name>:<tag>@sha256:<digest>`.
+
 ## Renovate Local Checks
 
 ```bash

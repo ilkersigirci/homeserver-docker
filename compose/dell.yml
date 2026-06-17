@@ -1,35 +1,6 @@
 name: dell
 
 networks:
-  default:
-    driver: bridge
-  t3_proxy:
-    name: t3_proxy
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 192.168.90.0/24
-  socket_proxy_read:
-    name: socket_proxy_read
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 192.168.91.0/24
-  socket_proxy_write:
-    name: socket_proxy_write
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 192.168.92.0/24
-  socket_proxy_exec:
-    name: socket_proxy_exec
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 192.168.93.0/24
-  crowdsec_lapi:
-    name: crowdsec_lapi
-    driver: bridge
   dockervlan:
     name: dockervlan
     driver: macvlan
@@ -47,6 +18,8 @@ networks:
 #     file: $REPO_PATH/secrets/cf_dns_api_token
 
 include:
+  ########################### NETWORKS
+  - ./fragments/common-networks.yml
   ########################### SERVICES
   #### CORE ####
   - ../apps/homepage.yml
@@ -61,6 +34,8 @@ include:
   - ../apps/whoami.yml
   #### MEDIA ####
   - ../apps/immich.yml
-  - ../apps/immich-gpu-intel.yml
+  - path:
+      - ../apps/immich-machine-learning.yml
+      - ./fragments/immich-machine-learning/intel.yml
   - ../apps/frigate.yml
   - ../apps/mosquitto.yml

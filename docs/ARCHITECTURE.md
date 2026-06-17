@@ -54,6 +54,9 @@ Deployment is host-driven:
   - Most workloads are inside private LAN/Tailscale networks.
 - Docker API boundary:
   - Containers should use socket-proxy services rather than raw Docker socket access.
+- Egress boundary:
+  - Normal web app outbound HTTP(S) should use the controlled Squid proxy path.
+  - Detailed policy: [`docs/EGRESS_CONTROL.md`](./EGRESS_CONTROL.md).
 - Observability boundary:
   - Each host runs a local OTEL collector agent; telemetry is forwarded to centralized backends.
   - Detailed pattern: [`docs/OBSERVABILITY.md`](./OBSERVABILITY.md).
@@ -62,7 +65,9 @@ Deployment is host-driven:
 
 - Machine files compose services; app files define services.
 - Service selection is done by host includes and profiles, not by duplicating service definitions per host.
-- Host compose `include` entries should reference `apps/` only. Parked files belong in `apps-not-used/`.
+- Shared Docker network definitions and host-specific app overlays belong in `compose/fragments/`.
+- Merge a base app fragment and any `compose/fragments/` service overlay in one long-form `include.path` list before importing it into the host model.
+- Host compose `include` entries should reference `compose/` fragments or `apps/` service fragments. Parked service files belong in `apps-not-used/`.
 - Bind mounts should use repository-based paths (`$REPO_PATH/...`) for predictable layout.
 - Prefer hardened container defaults (`read_only`, `no-new-privileges`, dropped capabilities) unless a service documents an exception.
 - Telemetry-capable services should send OTLP to local `otel-collector-agent`.

@@ -1,0 +1,4 @@
+services:
+  traefik:
+    networks:
+      crowdsec_lapi:

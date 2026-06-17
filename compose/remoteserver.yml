@@ -1,33 +1,6 @@
 name: remoteserver
 
 networks:
-  default:
-    driver: bridge
-  t3_proxy:
-    name: t3_proxy
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 192.168.90.0/24
-        - subnet: fdcc:ad94:bacf:61a3::/64
-  socket_proxy_read:
-    name: socket_proxy_read
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 192.168.91.0/24
-  socket_proxy_write:
-    name: socket_proxy_write
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 192.168.92.0/24
-  socket_proxy_exec:
-    name: socket_proxy_exec
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 192.168.93.0/24
   crowdsec_lapi:
     name: crowdsec_lapi
     driver: bridge
@@ -48,6 +21,8 @@ networks:
 #     file: $REPO_PATH/secrets/cf_dns_api_token
 
 include:
+  ########################### NETWORKS
+  - ./fragments/common-networks.yml
   ########################### SERVICES
   #### CORE ####
   - ../apps/arcane-agent.yml
@@ -62,7 +37,9 @@ include:
   - ../apps/logrotate.yml
   - ../apps/filebrowser-quantum.yml
   - ../apps/tinyauth.yml
-  - ../apps/traefik.yml
+  - path:
+      - ../apps/traefik.yml
+      - ./fragments/traefik/crowdsec_network.yml
   - ../apps/otel-collector-agent.yml
   # - ../apps/webfinger.yml
   ###### MAINTENANCE ####
