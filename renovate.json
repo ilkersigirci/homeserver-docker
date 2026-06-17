@@ -112,6 +112,20 @@
       "matchDatasources": ["docker"],
       "matchPackageNames": ["ghcr.io/maziggy/bambuddy"],
       "sourceUrl": "https://github.com/maziggy/bambuddy"
+    },
+    {
+      "description": "Use GitHub releases for Presenton Docker image changelogs",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/presenton/presenton"],
+      "sourceUrl": "https://github.com/presenton/presenton"
+    },
+    {
+      "description": "Use GitHub releases for Headscale Docker image changelogs",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/juanfont/headscale"],
+      "sourceUrl": "https://github.com/juanfont/headscale"
     }
   ],
   "major": {
