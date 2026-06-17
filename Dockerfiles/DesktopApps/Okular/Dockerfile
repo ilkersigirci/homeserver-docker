@@ -1,4 +1,4 @@
-FROM ghcr.io/linuxserver/baseimage-kasmvnc:alpine317
+FROM ghcr.io/linuxserver/baseimage-kasmvnc:alpine317@sha256:e67ff31da12e6908fc6acbeaba499f9339794b1b622bcb2d945286a7257b755d
 
 RUN apk add --no-cache okular
 

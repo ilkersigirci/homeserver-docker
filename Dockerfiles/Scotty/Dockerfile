@@ -1,5 +1,5 @@
 # Multi-stage build for minimal final image
-FROM golang:1.24-alpine AS builder
+FROM golang:1.24-alpine@sha256:8bee1901f1e530bfb4a7850aa7a479d17ae3a18beb6e09064ed54cfd245b7191 AS builder
 
 # Install git (required for go install)
 RUN apk add --no-cache git ca-certificates
@@ -14,7 +14,7 @@ WORKDIR /build
 RUN go install go.uploadedlobster.com/scotty@latest
 
 # Final minimal image
-FROM alpine:latest
+FROM alpine:latest@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b
 
 # Install ca-certificates and shadow (for usermod/groupmod)
 RUN apk --no-cache add ca-certificates shadow su-exec
