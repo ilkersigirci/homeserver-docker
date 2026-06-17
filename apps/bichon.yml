@@ -2,7 +2,7 @@
 # NOTE: Indices benefit from SSD storage; blob storage can use HDD
 services:
   bichon:
-    image: rustmailer/bichon:1.4.3@sha256:08003f7a53ab404d6b9a28a187fe19891088b6db13d2e7efcf0c0a92b0d9029e
+    image: rustmailer/bichon:1.5.2@sha256:e10a3bdbc5ae9e52f29174d66ccc3dea537ce2353d362f28cb83609c93f82dd3
     container_name: bichon
     restart: $RESTART_POLICY_MEDIA
     profiles:
