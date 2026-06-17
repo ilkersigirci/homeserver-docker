@@ -3,7 +3,7 @@
 # TODO: Self Host AIOmetadata
 services:
   stremio:
-    image: tsaridas/stremio-docker:v1.3.3@sha256:92f559d95ff7757da3a85509f2af92345145aa83c038a0d9dcd2ac63e5078db2
+    image: tsaridas/stremio-docker:v1.3.4@sha256:89d4a95d8df58765caea6c2ca7a762a5e33eea16b4580120e14531e40f7df918
     container_name: stremio
     restart: $RESTART_POLICY_MEDIA
     profiles:
