@@ -54,6 +54,13 @@
       "enabled": false
     },
     {
+      "description": "Use GitHub releases for Glance Docker image changelogs",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["glanceapp/glance"],
+      "sourceUrl": "https://github.com/glanceapp/glance"
+    },
+    {
       "description": "Use GitHub releases for Jellyfin Docker image changelogs",
       "matchManagers": ["docker-compose"],
       "matchDatasources": ["docker"],
