@@ -51,7 +51,7 @@ services:
 
   # FIXME: middlewares-secure-headers doesn't work for `feishin`
   jellyfin:
-    image: ghcr.io/jellyfin/jellyfin:10.11.8@sha256:93227545077893cc9516f28b3adb733b67bc4691f41b6167428a2a0e3220b81c
+    image: ghcr.io/jellyfin/jellyfin:10.11.11@sha256:45f648c382a0c8b552582fcea40e95cb17c5d475473a891cba0eb7523fb92112
     container_name: jellyfin
     restart: $RESTART_POLICY_MEDIA
     depends_on:
