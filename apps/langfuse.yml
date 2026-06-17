@@ -135,7 +135,7 @@ services:
       start_period: 10s
 
   langfuse-worker:
-    image: langfuse/langfuse-worker:3.175.0@sha256:cf7ac3d5d29bce3d2f4626d5b3231665c5585a81599b5f54fd8e30f648874403
+    image: langfuse/langfuse-worker:3.177.0@sha256:93304e276d1ba1ea9a9b311b09986ccb696e8092a82b9dce91fb41f703223a10
     container_name: langfuse-worker
     restart: $RESTART_POLICY_PROGRAMMING
     depends_on: &langfuse-depends-on
