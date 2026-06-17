@@ -37,6 +37,7 @@ services:
       - $REPO_PATH/configs/doco-cd/docker-config.json:/data/.docker/config.json:ro
     environment:
       TZ: $TZ
+      DATA_MOUNT_PATH: /data # TODO: Make Internal and external paths identical
       API_SECRET: $DOCO_CD_API_SECRET
       LOG_LEVEL: INFO
       DOCKER_CONFIG: /data/.docker
