@@ -41,7 +41,7 @@ services:
       start_period: 20s
 
   egress-proxy-test:
-    image: curlimages/curl:8.16.0@sha256:463eaf6072688fe96ac64fa623fe73e1dbe25d8ad6c34404a669ad3ce1f104b6
+    image: curlimages/curl:8.20.0@sha256:b3f1fb2a51d923260350d21b8654bbc607164a987e2f7c84a0ac199a67df812a
     container_name: egress-proxy-test
     restart: "no"
     profiles:
