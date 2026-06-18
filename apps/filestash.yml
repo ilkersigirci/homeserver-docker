@@ -47,7 +47,7 @@ services:
   # NOTE: Enterprise Version: v0.6.20260105
   # NOTE: filestash.bin should be executable (chmod +x)
   filestash:
-    image: machines/filestash:latest@sha256:d083abd3342242d8a61fdcb31d804c742c9022c7061508bd57a14a429127e5db
+    image: machines/filestash:latest@sha256:ca9e31e36c145430056f3fb992fd802b9be01f6505a340826e642b3ab42f7596
     container_name: filestash
     restart: $RESTART_POLICY_MEDIA
     profiles:
