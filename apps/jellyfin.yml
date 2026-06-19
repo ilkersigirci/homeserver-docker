@@ -75,8 +75,8 @@ services:
       - ALL
     cap_add: []
     pids_limit: 256
-    cpus: "1.0"
-    mem_limit: "2G"
+    cpus: "4.0"
+    mem_limit: "4G"
     mem_reservation: "2G"
     ulimits:
       nofile:
