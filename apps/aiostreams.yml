@@ -18,6 +18,13 @@ services:
     cap_drop:
       - ALL
     cap_add: []
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 16384
+        hard: 16384
     volumes:
       - $REPO_PATH/data/aiostreams:/app/data
     # NOTE: https://docs.aiostreams.viren070.me/configuration/environment-variables

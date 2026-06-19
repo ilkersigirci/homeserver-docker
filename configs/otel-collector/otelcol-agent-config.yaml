@@ -65,6 +65,51 @@ receivers:
           match_type: strict
       network: {}
 
+  docker_stats:
+    endpoint: tcp://docker-socket-proxy-read:2375
+    collection_interval: 30s
+    timeout: 10s
+    container_labels_to_metric_labels:
+      com.docker.compose.project: compose_project
+      com.docker.compose.service: compose_service
+    metrics:
+      container.blockio.io_service_bytes_recursive:
+        enabled: false
+      container.cpu.usage.kernelmode:
+        enabled: false
+      container.cpu.usage.total:
+        enabled: false
+      container.cpu.usage.usermode:
+        enabled: false
+      container.cpu.utilization:
+        enabled: false
+      container.cpu.throttling_data.periods:
+        enabled: true
+      container.cpu.throttling_data.throttled_periods:
+        enabled: true
+      container.cpu.throttling_data.throttled_time:
+        enabled: true
+      container.memory.fails:
+        enabled: true
+      container.memory.file:
+        enabled: false
+      container.memory.percent:
+        enabled: false
+      container.memory.total_cache:
+        enabled: false
+      container.memory.usage.limit:
+        enabled: false
+      container.memory.usage.total:
+        enabled: false
+      container.network.io.usage.rx_bytes:
+        enabled: false
+      container.network.io.usage.rx_dropped:
+        enabled: false
+      container.network.io.usage.tx_bytes:
+        enabled: false
+      container.network.io.usage.tx_dropped:
+        enabled: false
+
 processors:
   batch:
     send_batch_size: 8192
@@ -100,6 +145,12 @@ processors:
     attributes:
       - key: service.name
         value: hostmetrics
+        action: upsert
+
+  resource/dockerstats:
+    attributes:
+      - key: service.name
+        value: dockerstats
         action: upsert
 
 exporters:
@@ -158,6 +209,19 @@ service:
           resourcedetection,
           resource/common,
           resource/hostmetrics,
+          batch,
+        ]
+      exporters: [otlp]
+    # Pipeline for Docker container resource counters, including CPU throttling
+    # and memory limit hits.
+    metrics/docker:
+      receivers: [docker_stats]
+      processors:
+        [
+          memory_limiter,
+          resourcedetection,
+          resource/common,
+          resource/dockerstats,
           batch,
         ]
       exporters: [otlp]
