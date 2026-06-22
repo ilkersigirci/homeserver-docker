@@ -1,51 +1,83 @@
 services:
+  # NOTE: To fix json parse error: Bitwarden extension → Settings → Autofill → Blocked domains → add: filestash.example.com
   filestash-wopi-server:
+    # NOTE: After 24.04.10.2.1, support for custom command with css with root user is removed
     image: collabora/code:26.04.1.4.1@sha256:75859dc9f9084d1877ce36cf96ec86600f495bade33289c9cbc27e0a0ee23b81
     container_name: filestash-wopi-server
     restart: $RESTART_POLICY_MEDIA
-    command:
-      - /bin/bash
-      - -c
-      - |
-        curl -o /usr/share/coolwsd/browser/dist/branding-desktop.css https://gist.githubusercontent.com/mickael-kerjean/bc1f57cd312cf04731d30185cc4e7ba2/raw/d706dcdf23c21441e5af289d871b33defc2770ea/destop.css
-        /bin/su -s /bin/bash -c '/start-collabora-online.sh' cool
     profiles:
       - root
-      - not-used
+      - media
+      - filestash
     networks:
       - t3_proxy
-    expose:
-      - 9980
-    user: root
-    read_only: true
+    user: cool
+    read_only: false # NOTE: /opt/cool should be writable
     tmpfs:
-      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=1001,gid=1001,mode=1777
     security_opt:
       - no-new-privileges:true
     cap_drop:
       - ALL
-    cap_add: []
+    cap_add:
+      - SYS_ADMIN
+      - SYS_CHROOT
     pids_limit: 256
-    cpus: '1.0'
+    cpus: "1.0"
     mem_limit: 1G
     ulimits:
       nofile:
         soft: 4096
         hard: 8192
-    volumes: []
+    # Filestash custom css: https://gist.githubusercontent.com/mickael-kerjean/bc1f57cd312cf04731d30185cc4e7ba2/raw/d706dcdf23c21441e5af289d871b33defc2770ea/destop.css
+    # volumes:
+    #   - $REPO_PATH/configs/filestash/filestash_collabora_branding.css:/usr/share/coolwsd/browser/dist/branding-desktop.css:ro
+    #   - $REPO_PATH/configs/filestash/filestash_collabora_branding.css:/usr/share/coolwsd/browser/dist/nextcloud/branding-desktop.css:ro
     environment:
-      extra_params: "--o:ssl.enable=false"
-      aliasgroup1: "https://.*:443"
+      TZ: $TZ
+      # username: admin
+      # password: admin
+      aliasgroup1: https://drive.$DOMAINNAME:443
+      DONT_GEN_SSL_CERT: "YES"
+      extra_params: |
+        --o:ssl.enable=false \
+        --o:ssl.ssl_verification=true \
+        --o:ssl.termination=true \
+        --o:welcome.enable=false \
+        --o:net.frame_ancestors=drive.$DOMAINNAME
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:9980/hosting/discovery >/dev/null || exit 1"]
+      test: ["CMD", "pidof", "coolwsd"]
       interval: 5m
       timeout: 5s
       retries: 3
       start_period: 2m
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.office-rtr.entrypoints: "websecure"
+      traefik.http.routers.office-rtr.rule: "Host(`office.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.office-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.office-rtr.service: "office-svc"
+      traefik.http.services.office-svc.loadbalancer.server.port: "9980"
+      ####### TINYAUTH #######
+      tinyauth.apps.office.config.domain: "office.$DOMAINNAME"
+      tinyauth.apps.office.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "Media"
+      homepage.name: "collabora"
+      homepage.icon: "collabora.png"
+      homepage.href: "https://office.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Collaborative Open-Source Document Editing"
+      ####### GLANCE #######
+      glance.name: "office"
+      glance.icon: "sh:office"
+      glance.url: "https://office.$DOMAINNAME"
+      glance.description: "Collaborative Open-Source Document Editing"
 
-  # NOTE: Selfhosted Version: v0.6.20260226
-  # NOTE: Enterprise Version: v0.6.20260105
-  # NOTE: filestash.bin should be executable (chmod +x)
+  # NOTE: Selfhosted Version: v0.6.20260617
   filestash:
     image: machines/filestash:latest@sha256:d083abd3342242d8a61fdcb31d804c742c9022c7061508bd57a14a429127e5db
     container_name: filestash
@@ -66,24 +98,34 @@ services:
       - ALL
     cap_add: []
     pids_limit: 256
-    cpus: '1.0'
+    cpus: "1.0"
     mem_limit: 1G
     ulimits:
       nofile:
         soft: 4096
         hard: 8192
     volumes:
-      - $REPO_PATH/configs/filestash/filestash.bin:/app/filestash
+      # - $REPO_PATH/configs/filestash/filestash.bin:/app/filestash # NOTE: Enterprise binary v0.6.20260105. should be executable (chmod +x)
       - $REPO_PATH/data/filestash:/app/data/state
     environment:
       APPLICATION_URL: drive.$DOMAINNAME
       ADMIN_CONSOLE: $FILESTASH_ADMIN_PASSWORD_BCRYPT
       CANARY: false
-      # OFFICE_URL: http://filestash-wopi-server:9980
-      # OFFICE_FILESTASH_URL: http://app:8334
-      # OFFICE_REWRITE_URL: http://127.0.0.1:9980
+      OFFICE_URL: https://office.$DOMAINNAME
+      OFFICE_FILESTASH_URL: https://drive.$DOMAINNAME
+      # OFFICE_REWRITE_URL: https://office.$DOMAINNAME
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "--max-time", "3", "-o", "/dev/null", "http://127.0.0.1:8334/"]
+      test:
+        [
+          "CMD",
+          "curl",
+          "-fsS",
+          "--max-time",
+          "3",
+          "-o",
+          "/dev/null",
+          "http://127.0.0.1:8334/",
+        ]
       interval: 5m
       timeout: 5s
       retries: 3
@@ -94,7 +136,19 @@ services:
       traefik.http.routers.filestash-rtr.entrypoints: "websecure"
       traefik.http.routers.filestash-rtr.rule: "Host(`drive.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.filestash-rtr.middlewares: "chain-tinyauth@file"
+      traefik.http.routers.filestash-rtr.middlewares: "filestash-wopi-csp,chain-tinyauth@file"
+      traefik.http.middlewares.filestash-wopi-csp.headers.customResponseHeaders.Content-Security-Policy:
+        >-
+        default-src 'self';
+        script-src 'self' 'unsafe-inline';
+        style-src 'self' 'unsafe-inline';
+        img-src 'self' data: https:;
+        font-src 'self' data:;
+        object-src 'none';
+        frame-src 'self' https://*.$DOMAINNAME;
+        frame-ancestors 'self' https://*.$DOMAINNAME;
+        form-action 'self' https://office.$DOMAINNAME;
+        base-uri 'self';
       ## HTTP Services
       traefik.http.routers.filestash-rtr.service: "filestash-svc"
       traefik.http.services.filestash-svc.loadbalancer.server.port: "8334"
