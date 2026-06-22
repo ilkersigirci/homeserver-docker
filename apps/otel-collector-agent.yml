@@ -10,6 +10,7 @@ services:
       - core
     networks:
       - t3_proxy
+      - socket_proxy_read
     expose:
       - 1888 # pprof extension
       - 4317 # OTLP gRPC receiver

@@ -55,7 +55,7 @@ services:
     cap_add: []
     shm_size: 128mb
     pids_limit: 512
-    cpus: "2.0"
+    cpus: "3.0"
     mem_limit: "2G"
     ulimits:
       nofile:
