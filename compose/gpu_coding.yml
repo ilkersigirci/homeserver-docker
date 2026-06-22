@@ -38,4 +38,6 @@ include:
   - ../apps/forgejo-runner.yml
   - ../apps/hatchet.yml
   - ../apps/langfuse.yml
+  - ../apps/cloudbeaver.yml
+  - ../apps/pgweb.yml
   # - ../apps/pgadmin.yml # TODO

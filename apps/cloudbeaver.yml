@@ -1,0 +1,65 @@
+services:
+  cloudbeaver:
+    image: dbeaver/cloudbeaver:26.1.1@sha256:9e5fbd45cae0e8715106a64d82efeac99ed070e8461ffca00bab1bf5ac7504ad
+    container_name: cloudbeaver
+    restart: $RESTART_POLICY_PROGRAMMING
+    profiles:
+      - programming
+    networks:
+      - t3_proxy
+      - hatchet_backend
+    expose:
+      - 8978
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /home/ubuntu:rw,noexec,nosuid,nodev,size=128m,uid=$PUID,gid=$PGID,mode=0755
+      - /opt/cloudbeaver/configuration:rw,noexec,nosuid,nodev,size=128m,uid=$PUID,gid=$PGID,mode=0755
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      - $REPO_PATH/appdata/cloudbeaver:/opt/cloudbeaver/workspace
+    environment:
+      TZ: $TZ
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "--max-time", "3", "http://127.0.0.1:8978/"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.cloudbeaver-rtr.entrypoints: "websecure"
+      traefik.http.routers.cloudbeaver-rtr.rule: "Host(`cloudbeaver.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.cloudbeaver-rtr.middlewares: "chain-tinyauth@file"
+      ## HTTP Services
+      traefik.http.routers.cloudbeaver-rtr.service: "cloudbeaver-svc"
+      traefik.http.services.cloudbeaver-svc.loadbalancer.server.port: "8978"
+      ####### TINYAUTH #######
+      tinyauth.apps.cloudbeaver.config.domain: "cloudbeaver.$DOMAINNAME"
+      tinyauth.apps.cloudbeaver.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "Programming"
+      homepage.name: "cloudbeaver"
+      homepage.icon: "sh:cloudbeaver"
+      homepage.href: "https://cloudbeaver.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Web database client"
+      ####### GLANCE #######
+      glance.name: "cloudbeaver"
+      glance.icon: "sh:cloudbeaver"
+      glance.url: "https://cloudbeaver.$DOMAINNAME"
+      glance.description: "Web database client"
