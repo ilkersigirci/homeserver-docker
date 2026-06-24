@@ -36,3 +36,5 @@ include:
   # - ../apps/filebrowser.yml
   - ../apps/filestash.yml
   - ../apps/versitygw.yml
+  #### READING ####
+  - ../apps/silverbullet.yml

@@ -41,4 +41,3 @@ include:
   - ../apps/whoami.yml
   #### READING ####
   - ../apps/silverbullet.yml
-  # - ../apps/silverbullet-test.yml
