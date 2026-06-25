@@ -1,6 +1,6 @@
 services:
   presenton:
-    image: ghcr.io/presenton/presenton:v0.8.8-beta@sha256:9f97b512cc5dbdc9afdf28f852dda11f9ebdbc41d43b1c1ad879c9c4f6a69d93
+    image: ghcr.io/presenton/presenton:v0.8.9-beta@sha256:673e992ae74ac723f27ca92e802b1e58d8929e453d5b1a6321d66820a28e720d
     container_name: presenton
     restart: $RESTART_POLICY_OTHERS
     profiles:
