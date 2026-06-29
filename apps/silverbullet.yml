@@ -54,6 +54,12 @@ services:
       traefik.http.routers.silverbullet-rtr.rule: "Host(`notes.$DOMAINNAME`)"
       ## Middlewares
       traefik.http.routers.silverbullet-rtr.middlewares: "chain-silverbullet-tinyauth@file"
+      ## Fullscreen PWA manifest router
+      traefik.http.routers.silverbullet-manifest-rtr.entrypoints: "websecure"
+      traefik.http.routers.silverbullet-manifest-rtr.rule: "Host(`notes.$DOMAINNAME`) && Path(`/.client/manifest.json`)"
+      traefik.http.routers.silverbullet-manifest-rtr.priority: "100"
+      traefik.http.routers.silverbullet-manifest-rtr.middlewares: "chain-silverbullet-tinyauth@file,middlewares-silverbullet-fullscreen@file"
+      traefik.http.routers.silverbullet-manifest-rtr.service: "silverbullet-svc"
       ## HTTP Services
       traefik.http.routers.silverbullet-rtr.service: "silverbullet-svc"
       traefik.http.services.silverbullet-svc.loadbalancer.server.port: "3000"

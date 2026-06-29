@@ -1,5 +1,12 @@
 http:
   middlewares:
+    middlewares-silverbullet-fullscreen:
+      plugin:
+        rewritebody:
+          rewrites:
+            - regex: '"display"\s*:\s*"standalone"'
+              replacement: '"display":"fullscreen"'
+
     middlewares-silverbullet-headers:
       headers:
         accessControlAllowMethods:
