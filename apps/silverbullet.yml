@@ -66,6 +66,9 @@ services:
       ####### TINYAUTH #######
       tinyauth.apps.silverbullet.config.domain: "notes.$DOMAINNAME"
       tinyauth.apps.silverbullet.ip.bypass: "$LOCAL_IPS"
+      tinyauth.apps.silverbullet.oauth.groups: "admin"
+      # https://silverbullet.md/Authentication%20Proxy
+      tinyauth.apps.silverbullet.path.allow: "^/(service_worker[.]js|[.]client/.*)([?].*)?$"
       ####### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "silverbullet"

@@ -1,0 +1,11 @@
+name: local/silverbullet-http-classification
+description: "Classify expected SilverBullet workspace reads as static resources"
+filter: >-
+  evt.Meta.service == 'http' &&
+  evt.Meta.traefik_router_name == 'silverbullet-rtr@docker' &&
+  evt.Meta.http_status == '200' &&
+  evt.Meta.http_verb in ['GET', 'HEAD'] &&
+  evt.Meta.http_path startsWith '/.fs/'
+statics:
+  - target: evt.Parsed.static_ressource
+    value: "true"

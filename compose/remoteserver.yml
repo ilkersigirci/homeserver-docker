@@ -65,3 +65,5 @@ include:
   #### PROGRAMMING ####
   - ../apps/open-webui.yml
   - ../apps/searxng.yml
+  #### READING ####
+  - ../apps/silverbullet.yml
