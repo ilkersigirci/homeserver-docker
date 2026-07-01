@@ -20,3 +20,9 @@ http:
           - middlewares-rate-limit
           - middlewares-silverbullet-headers
           - middlewares-tinyauth
+
+    chain-silverbullet-manifest:
+      chain:
+        middlewares:
+          - middlewares-silverbullet-manifest-identity
+          - middlewares-silverbullet-fullscreen

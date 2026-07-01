@@ -1,4 +1,5 @@
 # NOTE: env variables: https://silverbullet.md/Install/Configuration
+# TODO: Simplify middleware architecture
 services:
   silverbullet:
     image: ghcr.io/silverbulletmd/silverbullet:2.9.0@sha256:82e76a800920370d83e2f50c6946d3c420954b0bd417dbb96f7911513fa05620
@@ -58,7 +59,7 @@ services:
       traefik.http.routers.silverbullet-manifest-rtr.entrypoints: "websecure"
       traefik.http.routers.silverbullet-manifest-rtr.rule: "Host(`notes.$DOMAINNAME`) && Path(`/.client/manifest.json`)"
       traefik.http.routers.silverbullet-manifest-rtr.priority: "100"
-      traefik.http.routers.silverbullet-manifest-rtr.middlewares: "chain-silverbullet-tinyauth@file,middlewares-silverbullet-fullscreen@file"
+      traefik.http.routers.silverbullet-manifest-rtr.middlewares: "chain-silverbullet-tinyauth@file,chain-silverbullet-manifest@file"
       traefik.http.routers.silverbullet-manifest-rtr.service: "silverbullet-svc"
       ## HTTP Services
       traefik.http.routers.silverbullet-rtr.service: "silverbullet-svc"
