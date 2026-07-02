@@ -1,82 +1,124 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
-set -e  # Exit on error
+set -euo pipefail
 
-if [ -z "$MY_HOSTNAME" ]; then
-    echo "⚠️  MY_HOSTNAME is not set. Please export it in your or .bashrc .zshrc file"
-    exit 1
-fi
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-# Configuration
-PROFILES="core,desktop_apps,maintenance,media,monitoring,programming,reading,others"
-COMPOSE_FILE="compose/$MY_HOSTNAME.yml"
-ENV_FILE="$HOME/docker/.env"
-COMPOSE_CMD="docker compose -f $COMPOSE_FILE --env-file $ENV_FILE"
+ACTION="${1:-}"
+PROFILES="${COMPOSE_PROFILES:-core,desktop_apps,maintenance,media,monitoring,programming,reading,others}"
+ENV_FILE="${REPO_ROOT}/.env"
 
 # Function to display usage
 usage() {
-    echo "Usage: $0 [up|down|pull|pull_only|restart|prep-perms]"
+    echo "Usage: $0 [up|down|update|pull|prune|restart|prep-perms]"
     echo "  up         - Start containers"
     echo "  down       - Stop containers"
-    echo "  pull       - Update containers"
-    echo "  pull_only  - Pull latest images without restarting"
+    echo "  update     - Update containers"
+    echo "  pull       - Pull latest images without restarting"
+    echo "  prune      - Remove dangling images"
     echo "  restart    - Restart containers"
     echo "  prep-perms - Create/chown bind paths for non-root services"
     exit 1
 }
 
+validate_action() {
+    case "$ACTION" in
+        "up"|"down"|"update"|"pull"|"prune"|"restart"|"prep-perms")
+            ;;
+        *)
+            usage
+            ;;
+    esac
+}
+
+validate_config() {
+    if [ -z "${MY_HOSTNAME:-}" ]; then
+        echo "⚠️  MY_HOSTNAME is not set. Please export it in your .bashrc or .zshrc file"
+        exit 1
+    fi
+
+    COMPOSE_FILE="${REPO_ROOT}/compose/${MY_HOSTNAME}.yml"
+
+    if [ ! -f "$COMPOSE_FILE" ]; then
+        echo "⚠️  Compose file not found: $COMPOSE_FILE"
+        exit 1
+    fi
+
+    if [ ! -f "$ENV_FILE" ]; then
+        echo "⚠️  Env file not found: $ENV_FILE"
+        exit 1
+    fi
+}
+
+run_compose() {
+    COMPOSE_PROFILES="$PROFILES" docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" "$@"
+}
+
+prune_images() {
+    echo "🧹 Cleaning up dangling images..."
+    docker image prune -f
+}
+
 prepare_permissions() {
-    local script_path="$HOME/docker/scripts/prepare-bind-permissions.sh"
+    local script_path="$REPO_ROOT/scripts/prepare-bind-permissions.sh"
     local profile_arg="custom-user"
 
     if [ "$(id -u)" -eq 0 ]; then
-        bash "$script_path" --compose-file "$HOME/docker/$COMPOSE_FILE" --env-file "$ENV_FILE" --profiles "$profile_arg"
+        bash "$script_path" --compose-file "$COMPOSE_FILE" --env-file "$ENV_FILE" --profiles "$profile_arg"
     else
-        sudo bash "$script_path" --compose-file "$HOME/docker/$COMPOSE_FILE" --env-file "$ENV_FILE" --profiles "$profile_arg"
+        sudo bash "$script_path" --compose-file "$COMPOSE_FILE" --env-file "$ENV_FILE" --profiles "$profile_arg"
     fi
 }
 
 # Check if command argument is provided
-if [ $# -eq 0 ]; then
+if [ $# -ne 1 ]; then
     usage
 fi
 
-# Change directory to  docker folder
-cd $HOME/docker
+validate_action
+validate_config
+
+# Change directory to docker folder
+cd "$REPO_ROOT"
 
 # Handle commands
-case "$1" in
+case "$ACTION" in
     "up")
         echo "🚀 Starting containers..."
-        COMPOSE_PROFILES=$PROFILES $COMPOSE_CMD up -d
+        run_compose up -d
         echo "✅ Containers started successfully!"
         ;;
 
     "down")
         echo "🔽 Stopping containers..."
-        COMPOSE_PROFILES=$PROFILES $COMPOSE_CMD down --remove-orphans
+        run_compose down --remove-orphans
         echo "✅ Containers stopped successfully!"
         ;;
 
-    "pull")
+    "update")
         echo "🔄 Updating containers..."
-        COMPOSE_PROFILES=$PROFILES $COMPOSE_CMD pull
-        COMPOSE_PROFILES=$PROFILES $COMPOSE_CMD up -d
-        echo "🧹 Cleaning up dangling images..."
-        docker image prune -f || echo "⚠️  Warning: Image cleanup failed"
+        run_compose pull
+        run_compose up -d
+        prune_images
         echo "✅ Update complete!"
         ;;
 
-    "pull_only")
+    "pull")
         echo "🔄 Pulling containers..."
-        COMPOSE_PROFILES=$PROFILES $COMPOSE_CMD pull
+        run_compose pull
         echo "✅ Pull complete!"
+        ;;
+
+    "prune")
+        prune_images
+        echo "✅ Image cleanup complete!"
         ;;
 
     "restart")
         echo "🔄 Restarting containers..."
-        COMPOSE_PROFILES=$PROFILES $COMPOSE_CMD down --remove-orphans
-        COMPOSE_PROFILES=$PROFILES $COMPOSE_CMD up -d
+        run_compose down --remove-orphans
+        run_compose up -d
         echo "✅ Containers restarted successfully!"
         ;;
 

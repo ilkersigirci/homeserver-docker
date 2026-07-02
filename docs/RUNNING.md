@@ -17,8 +17,14 @@ bash scripts/docker-manage.sh up
 # Stop stack
 bash scripts/docker-manage.sh down
 
-# Pull and recreate
+# Pull, recreate, and prune dangling images
+bash scripts/docker-manage.sh update
+
+# Pull latest images without restarting
 bash scripts/docker-manage.sh pull
+
+# Remove dangling images
+bash scripts/docker-manage.sh prune
 
 # Restart
 bash scripts/docker-manage.sh restart
