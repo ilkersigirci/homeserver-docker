@@ -3,7 +3,7 @@ services:
   # touch $REPO_PATH/configs/traefik3/acme/acme.json
   # chmod 600 $REPO_PATH/configs/traefik3/acme/acme.json
   traefik:
-    image: ghcr.io/traefik/traefik:v3.7.0-rc.2@sha256:f9924d371c3f7acae79e2619b7555b666bd7264070761da986836f3d079b315b
+    image: ghcr.io/traefik/traefik:v3.7.6@sha256:21a3d83696379bac6434bb32e1dde0aff0e84ef2abd053ed3db87d3f45e749b2
     container_name: traefik
     restart: $RESTART_POLICY_CORE
     command: # CLI arguments. OTEL / OTLP Export (env-gated; local file logs stay enabled)
@@ -40,6 +40,7 @@ services:
       # - --entrypoints.dot.address=:853
       - --entrypoints.traefik.address=:8080
       - --entrypoints.web.address=:80
+      - --entrypoints.web.http.underscoreHeadersStrategy=delete
       - --entrypoints.web.http.redirections.entrypoint.permanent=true
       - --entrypoints.web.http.redirections.entrypoint.scheme=https
       - --entrypoints.web.http.redirections.entrypoint.to=websecure
@@ -47,6 +48,7 @@ services:
       - --entrypoints.websecure.asDefault=true
       # Allow these IPs to set the X-Forwarded-* headers - Cloudflare + trusted internal ranges
       - --entrypoints.websecure.forwardedHeaders.trustedIPs=$CLOUDFLARE_IPS,$LOCAL_IPS
+      - --entrypoints.websecure.http.underscoreHeadersStrategy=delete
       - --entrypoints.websecure.http.tls=true
       # Add dns-cloudflare as default certresolver for all services. Also enables TLS and no need to specify on individual services
       - --entrypoints.websecure.http.tls.certresolver=dns-cloudflare
