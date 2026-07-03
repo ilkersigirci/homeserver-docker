@@ -68,9 +68,13 @@ jobs:
         env:
           CONTEXT: ${{ matrix.context }}
         run: |
-          version="$(sed -n 's/^ARG IMAGE_VERSION=//p' "$CONTEXT/Dockerfile")"
+          if [[ -x "$CONTEXT/version_tagging.sh" ]]; then
+            version="$("$CONTEXT/version_tagging.sh")"
+          else
+            version="$(sed -n 's/^ARG IMAGE_VERSION=//p' "$CONTEXT/Dockerfile")"
+          fi
           if [[ "$version" == "latest" || ! "$version" =~ ^[0-9A-Za-z_][0-9A-Za-z_.-]{0,127}$ ]]; then
-            echo "Invalid or missing IMAGE_VERSION in $CONTEXT/Dockerfile" >&2
+            echo "Invalid or missing image version in $CONTEXT" >&2
             exit 1
           fi
           printf 'value=%s\n' "$version" >> "$GITHUB_OUTPUT"

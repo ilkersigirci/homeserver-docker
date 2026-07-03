@@ -1,7 +1,12 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:best-practices"],
-  "enabledManagers": ["docker-compose", "dockerfile", "github-actions"],
+  "enabledManagers": [
+    "docker-compose",
+    "dockerfile",
+    "github-actions",
+    "pep621"
+  ],
   "includePaths": [
     "apps/**",
     "compose/fragments/**",
@@ -22,6 +27,23 @@
       "matchManagers": ["docker-compose"],
       "matchPackageNames": ["/^ghcr\\.io\\/ilkersigirci\\/homeserver-/"],
       "pinDigests": true
+    },
+    {
+      "description": "Use JupyterLab GitHub releases for Python dependency changelogs",
+      "matchManagers": ["pep621"],
+      "matchDatasources": ["pypi"],
+      "matchPackageNames": ["jupyterlab"],
+      "sourceUrl": "https://github.com/jupyterlab/jupyterlab",
+      "changelogUrl": "https://github.com/jupyterlab/jupyterlab/releases"
+    },
+    {
+      "description": "Use JupyterLab GitHub releases for homeserver Jupyter image changelogs",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchFileNames": ["apps/jupyterlab.yml"],
+      "matchPackageNames": ["ghcr.io/ilkersigirci/homeserver-jupyter"],
+      "sourceUrl": "https://github.com/jupyterlab/jupyterlab",
+      "changelogUrl": "https://github.com/jupyterlab/jupyterlab/releases"
     },
     {
       "description": "Disable Renovate updates for all images in Immich compose files by default",

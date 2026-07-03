@@ -68,22 +68,29 @@ Custom images are defined under `Dockerfiles/<Name>/Dockerfile` and published by
 `.github/workflows/homeserver-images.yml` to
 `ghcr.io/ilkersigirci/homeserver-<name>`.
 
+Images publish the version read from `ARG IMAGE_VERSION` by default. If
+`Dockerfiles/<Name>/version_tagging.sh` exists and is executable, the workflow
+uses its stdout as the image tag instead.
+
 To add an image:
 
 1. Add its Dockerfile with `ARG IMAGE_VERSION=<tag>` and use
     `${IMAGE_VERSION}` in the upstream `FROM` instruction.
 2. Pin every `FROM` image to an immutable digest.
 3. Add the image context, GHCR repository, and platforms to the workflow matrix.
-4. Reference the published image from Compose as `tag@sha256:digest`.
+4. For dependency-derived tags, add an executable `version_tagging.sh` and keep
+    it out of the build context with `.dockerignore`.
+5. Reference the published image from Compose as `tag@sha256:digest`.
 
 Pull requests validate each matrix build without publishing. Merges to `main` and
-manual workflow runs publish the version read from `IMAGE_VERSION`.
+manual workflow runs publish the resolved image version.
 
 ### Renovate Update Flow
 
 Renovate handles an upstream release in two runs:
 
-1. The Dockerfile manager updates `IMAGE_VERSION` and the upstream image digest.
+1. Renovate updates `IMAGE_VERSION`, or a dependency and lockfile used by
+    `version_tagging.sh`.
 2. After that PR is merged, the workflow publishes the new custom image tag.
 3. A later Renovate run updates the custom image tag and digest in the Compose file.
 
