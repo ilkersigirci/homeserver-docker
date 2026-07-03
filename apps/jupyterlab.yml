@@ -1,9 +1,6 @@
 services:
   jupyterlab:
-    image: ghcr.io/ilkersigirci/homeserver-jupyter:0.11.26-python3.13-trixie-slim
-    # NOTE: Will be removed. For testing
-    build:
-      context: $REPO_PATH/Dockerfiles/Jupyter
+    image: ghcr.io/ilkersigirci/homeserver-jupyter:0.11.26-python3.13-trixie-slim@sha256:bfad8e917792eaeed47d9f3a8e8915bc1da227cca1d89b0f485fa53924fe94c3
     container_name: jupyterlab
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
@@ -44,7 +41,8 @@ services:
       XDG_CACHE_HOME: /workspace/.cache
       TZ: $TZ
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "--max-time", "3", "http://127.0.0.1:8888/api/"]
+      test:
+        ["CMD", "curl", "-fsS", "--max-time", "3", "http://127.0.0.1:8888/api/"]
       interval: 5m
       timeout: 5s
       retries: 3
@@ -69,9 +67,9 @@ services:
       homepage.icon: "sh:jupyter"
       homepage.href: "https://jupyterlab.$DOMAINNAME"
       homepage.target: "_blank"
-      homepage.description: "uv-managed browser notebooks and Python workspace"
+      homepage.description: "Custom build Jupyterlab with native multiple uv project support"
       ####### GLANCE #######
       glance.name: "JupyterLab uv"
       glance.icon: "sh:jupyter"
       glance.url: "https://jupyterlab.$DOMAINNAME"
-      glance.description: "uv-managed browser notebooks and Python workspace"
+      glance.description: "Custom build Jupyterlab with native multiple uv project support"
