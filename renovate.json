@@ -26,6 +26,8 @@
       "description": "Update and pin versioned homeserver images",
       "matchManagers": ["docker-compose"],
       "matchPackageNames": ["/^ghcr\\.io\\/ilkersigirci\\/homeserver-/"],
+      "groupName": "homeserver custom images",
+      "groupSlug": "homeserver-custom-images",
       "pinDigests": true
     },
     {

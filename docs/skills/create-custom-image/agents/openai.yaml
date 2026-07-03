@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create Custom Image"
+  short_description: "Add custom Docker image workflows"
+  default_prompt: "Use $create-custom-image to add a new custom image to this repository."

@@ -40,7 +40,7 @@ bash scripts/docker-manage.sh prep-perms
 - `apps-not-used/` parked service compose fragments not referenced by host files
 - `configs/` service configuration files
 - `scripts/` operational scripts and maintenance tooling
-- `Dockerfiles/` custom image definitions
+- `Dockerfiles/` custom image definitions built by per-image custom image workflows
 - `docs/` runbooks and architecture notes
 - `appdata/`, `data/`, `logs/`, `backups/` runtime state and artifacts
 

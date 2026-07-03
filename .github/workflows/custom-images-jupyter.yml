@@ -1,0 +1,43 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Build Jupyter Image
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - Dockerfiles/Jupyter/**
+  pull_request:
+    paths:
+      - Dockerfiles/Jupyter/**
+      - .github/workflows/custom-images-build.yml
+      - .github/workflows/custom-images-jupyter.yml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/custom-images-build.yml
+    with:
+      name: Jupyter
+      context: Dockerfiles/Jupyter
+      repository: homeserver-jupyter
+      publish: false
+
+  publish:
+    if: github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/custom-images-build.yml
+    with:
+      name: Jupyter
+      context: Dockerfiles/Jupyter
+      repository: homeserver-jupyter
+      publish: true
