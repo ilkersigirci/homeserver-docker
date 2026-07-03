@@ -1,0 +1,77 @@
+services:
+  jupyterlab:
+    image: ghcr.io/ilkersigirci/homeserver-jupyter:0.11.26-python3.13-trixie-slim
+    # NOTE: Will be removed. For testing
+    build:
+      context: $REPO_PATH/Dockerfiles/Jupyter
+    container_name: jupyterlab
+    restart: $RESTART_POLICY_PROGRAMMING
+    profiles:
+      - programming
+    networks:
+      - t3_proxy
+    expose:
+      - 8888
+    user: "${PUID}:${PGID}"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,size=512m,uid=${PUID},gid=${PGID},mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 512
+    cpus: "2.0"
+    mem_limit: "4G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      - $REPO_PATH/data/jupyterlab/workspace:/workspace
+      - $REPO_PATH/data/jupyterlab/jupyter:/jupyter
+    environment:
+      HOME: /tmp/jupyter-home
+      IPYTHONDIR: /jupyter/ipython
+      JUPYTER_CONFIG_DIR: /jupyter/config
+      JUPYTER_DATA_DIR: /jupyter/data
+      JUPYTERLAB_SETTINGS_DIR: /jupyter/lab/user-settings
+      JUPYTERLAB_WORKSPACES_DIR: /jupyter/lab/workspaces
+      JUPYTER_PORT: 8888
+      JUPYTER_RUNTIME_DIR: /tmp/jupyter-runtime
+      UV_CACHE_DIR: /workspace/.cache/uv
+      XDG_CACHE_HOME: /workspace/.cache
+      TZ: $TZ
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "--max-time", "3", "http://127.0.0.1:8888/api/"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 45s
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.jupyterlab-rtr.entrypoints: "websecure"
+      traefik.http.routers.jupyterlab-rtr.rule: "Host(`jupyterlab.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.jupyterlab-rtr.middlewares: "chain-tinyauth-relaxed@file"
+      ## HTTP Services
+      traefik.http.routers.jupyterlab-rtr.service: "jupyterlab-svc"
+      traefik.http.services.jupyterlab-svc.loadbalancer.server.port: "8888"
+      ####### TINYAUTH #######
+      tinyauth.apps.jupyterlab.config.domain: "jupyterlab.$DOMAINNAME"
+      tinyauth.apps.jupyterlab.ip.bypass: "$LOCAL_IPS"
+      tinyauth.apps.jupyterlab.oauth.groups: "admin"
+      ####### HOMEPAGE #######
+      homepage.group: "Programming"
+      homepage.name: "JupyterLab uv"
+      homepage.icon: "sh:jupyter"
+      homepage.href: "https://jupyterlab.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "uv-managed browser notebooks and Python workspace"
+      ####### GLANCE #######
+      glance.name: "JupyterLab uv"
+      glance.icon: "sh:jupyter"
+      glance.url: "https://jupyterlab.$DOMAINNAME"
+      glance.description: "uv-managed browser notebooks and Python workspace"

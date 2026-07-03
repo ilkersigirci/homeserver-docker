@@ -38,6 +38,10 @@ jobs:
             context: Dockerfiles/Gatus
             repository: homeserver-gatus
             platforms: linux/amd64,linux/arm64
+          - name: Jupyter
+            context: Dockerfiles/Jupyter
+            repository: homeserver-jupyter
+            platforms: linux/amd64,linux/arm64
     steps:
       - name: Checkout
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
