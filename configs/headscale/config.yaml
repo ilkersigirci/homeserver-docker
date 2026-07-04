@@ -39,6 +39,10 @@ grpc_listen_addr: 0.0.0.0:50443
 # are doing.
 grpc_allow_insecure: false
 
+# Only trust forwarded client IP headers from Traefik's fixed address.
+trusted_proxies:
+  - 192.168.90.254/32
+
 # The Noise section includes specific configuration for the
 # TS2021 Noise protocol
 noise:
@@ -136,8 +140,15 @@ derp:
 # Disables the automatic check for headscale updates on startup
 disable_check_updates: true
 
-# Time before an inactive ephemeral node is deleted?
-ephemeral_node_inactivity_timeout: 30m
+# Node lifecycle configuration.
+node:
+  # Default key expiry for non-tagged nodes, regardless of registration method.
+  # Setting this to "0" preserves the previous OIDC no-expiry behavior.
+  expiry: 0
+
+  ephemeral:
+    # Time before an inactive ephemeral node is deleted.
+    inactivity_timeout: 30m
 
 database:
   # Database type. Available options: sqlite, postgres
@@ -342,15 +353,10 @@ oidc:
   # Read the client secret from file (mounted into the container at /etc/headscale).
   client_secret_path: "/etc/headscale/oidc_client_secret"
 
-  # The amount of time a node is authenticated with OpenID until it expires
-  # and needs to reauthenticate.
-  # Setting the value to "0" will mean no expiry.
-  expiry: 0
-
   # Use the expiry from the token received from OpenID when the user logged
   # in. This will typically lead to frequent need to reauthenticate and should
   # only be enabled if you know what you are doing.
-  # Note: enabling this will cause `oidc.expiry` to be ignored.
+  # Note: enabling this will cause `node.expiry` to be ignored.
   use_expiry_from_token: false
 
   # The OIDC scopes to use, defaults to "openid", "profile" and "email".
@@ -405,11 +411,6 @@ logtail:
   # As there is currently no support for overriding the log server in Headscale, this is
   # disabled by default. Enabling this will make your clients send logs to Tailscale Inc.
   enabled: false
-
-# Enabling this option makes devices prefer a random port for WireGuard traffic over the
-# default static port 41641. This option is intended as a workaround for some buggy
-# firewall devices. See https://tailscale.com/kb/1181/firewalls/ for more information.
-randomize_client_port: false
 
 # Taildrop configuration
 # Taildrop is the file sharing feature of Tailscale, allowing nodes to send files to each other.
