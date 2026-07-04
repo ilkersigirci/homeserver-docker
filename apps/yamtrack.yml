@@ -1,53 +1,119 @@
+networks:
+  yamtrack_backend:
+
 services:
   yamtrack-redis:
-    image: redis:8-alpine@sha256:c5e375abb885e6b2021c0377879e4890bf76f9065b8922ffc113f2b226b9fc17
+    image: docker.io/valkey/valkey:9@sha256:4963247afc4cd33c7d3b2d2816b9f7f8eeebab148d29056c2ca4d7cbc966f2d9
     container_name: yamtrack-redis
     restart: $RESTART_POLICY_MEDIA
     profiles:
       - media
       - yamtrack
     networks:
-      - t3_proxy
+      - yamtrack_backend
     expose:
-      - "6379"
+      - 6379
+    user: $PUID:$PGID
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - NET_RAW
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 16384
+        hard: 16384
     volumes:
-      - $REPO_PATH/appdata/yamtrack/redis:/data
+      - $REPO_PATH/data/yamtrack/redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1m
+      timeout: 3s
+      retries: 3
+      start_period: 10s
 
   # NOTE: Optional, yamtrack uses Sqlite by default
   yamtrack-postgres-db:
-    image: postgres:18-alpine@sha256:54451ecb8ab38c24c3ec123f2fd501303a3a1856a5c66e98cecf2460d5e1e9d7
+    image: postgres:18.4@sha256:29ee7bb30d804447dc9a91fd0d74322ae1dc3a4072cc6346f70a5ed6e783b565
     container_name: yamtrack-postgres-db
     restart: $RESTART_POLICY_MEDIA
     profiles:
       - not-used
       - yamtrack
     networks:
-      - t3_proxy
+      - yamtrack_backend
+    expose:
+      - 5432
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /var/run/postgresql:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "2G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      - $REPO_PATH/data/yamtrack/postgres:/var/lib/postgresql
     environment:
       POSTGRES_DB: yamtrack
       POSTGRES_USER: yamtrack
       POSTGRES_PASSWORD: yamtrack
-    volumes:
-      - $REPO_PATH/data/yamtrack:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        ["CMD-SHELL", "pg_isready -U yamtrack -d yamtrack -h 127.0.0.1 -p 5432"]
+      interval: 1m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
-  # NOTE: First REGISTRATION=True, create account using OIDC and REGISTRATION=False
+  # NOTE: No user is admin by default. To make user `ilker` to admin, use below command
+  # docker exec yamtrack python manage.py shell -c "from django.contrib.auth import get_user_model; get_user_model().objects.filter(username='ilker').update(is_staff=True, is_superuser=True)"
   yamtrack:
-    image: ghcr.io/fuzzygrim/yamtrack@sha256:928df13c46c9f615b37f5ef1eb5a87fc8813f5941f28c7d8227af73d291b0d19
+    image: ghcr.io/fuzzygrim/yamtrack:0.25.3@sha256:00acf008bca8171226063bc0f8f08ef7ffe24a10bcebf8676cce335ce312c307
     container_name: yamtrack
     restart: $RESTART_POLICY_MEDIA
     depends_on:
-      - yamtrack-redis
+      yamtrack-redis:
+        condition: service_healthy
+      # yamtrack-postgres-db:
+      #   condition: service_healthy
     profiles:
+      - custom-user
       - media
       - yamtrack
     networks:
       - t3_proxy
+      - yamtrack_backend
+    # The upstream entrypoint must start as root to remap abc to PUID/PGID and chown runtime paths.
     security_opt:
       - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - SETGID
+      - SETUID
+    pids_limit: 512
+    cpus: "2.0"
+    mem_limit: "2G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
     volumes:
       - $REPO_PATH/data/yamtrack:/yamtrack/db
     environment:
@@ -58,17 +124,49 @@ services:
       SECRET: $YAMTRACK_SECRET
       REDIS_URL: redis://yamtrack-redis:6379
       ADMIN_ENABLED: true
-      REGISTRATION: false
+      REGISTRATION: true
+      SOCIALACCOUNT_ONLY: true
       REDIRECT_LOGIN_TO_SSO: true
       # ACCOUNT_DEFAULT_HTTP_PROTOCOL: https
       SOCIAL_PROVIDERS: allauth.socialaccount.providers.openid_connect
-      SOCIALACCOUNT_PROVIDERS: '{"openid_connect":{"OAUTH_PKCE_ENABLED":true,"APPS":[{"provider_id":"pocketid","name":"Pocket-ID","client_id":"$YAMTRACK_CLIENT_ID","secret":"$YAMTRACK_CLIENT_SECRET","settings":{"server_url":"https://pocketid.$BASE_DOMAINNAME/.well-known/openid-configuration"}}]}}'
-      # (Optional) For Postgres
-      # DB_HOST: db
+      SOCIALACCOUNT_PROVIDERS: >-
+        {
+          "openid_connect": {
+            "OAUTH_PKCE_ENABLED": true,
+            "APPS": [
+              {
+                "provider_id": "pocketid",
+                "name": "Pocket-ID",
+                "client_id": "$YAMTRACK_CLIENT_ID",
+                "secret": "$YAMTRACK_CLIENT_SECRET",
+                "settings": {
+                  "server_url": "https://pocketid.$BASE_DOMAINNAME/.well-known/openid-configuration"
+                }
+              }
+            ]
+          }
+        }
+      ### (Optional) Postgres ###
+      # DB_HOST: yamtrack-postgres-db
       # DB_NAME: yamtrack
       # DB_USER: yamtrack
       # DB_PASSWORD: yamtrack
       # DB_PORT: 5432
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "-q",
+          "--tries=1",
+          "--timeout=3",
+          "--spider",
+          "http://127.0.0.1:8000/health/",
+        ]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 1m
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -76,7 +174,6 @@ services:
       traefik.http.routers.yamtrack-rtr.rule: "Host(`mediatrack.$DOMAINNAME`)"
       ## Middlewares
       traefik.http.routers.yamtrack-rtr.middlewares: "chain-tinyauth-relaxed@file"
-      # traefik.http.routers.yamtrack-rtr.middlewares: chain-no-auth-relaxed@file
       ## HTTP Services
       traefik.http.routers.yamtrack-rtr.service: "yamtrack-svc"
       traefik.http.services.yamtrack-svc.loadbalancer.server.port: "8000"

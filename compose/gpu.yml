@@ -57,7 +57,7 @@ include:
   # - ../apps/scotty.yml
   # - ../apps/splitpro.yml
   # - ../apps/strava-statistics.yml
-  # - ../apps/yamtrack.yml
+  - ../apps/yamtrack.yml
   # - ../apps/ytptube.yml # TODO: restart always
   - ../apps/transmission.yml
   #### MONITORING ####
