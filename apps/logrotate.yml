@@ -4,6 +4,7 @@ services:
     container_name: logrotate
     restart: $RESTART_POLICY_CORE
     profiles:
+      - root
       - core
     network_mode: "none"
     read_only: true

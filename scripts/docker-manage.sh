@@ -11,20 +11,19 @@ ENV_FILE="${REPO_ROOT}/.env"
 
 # Function to display usage
 usage() {
-    echo "Usage: $0 [up|down|update|pull|prune|restart|prep-perms]"
+    echo "Usage: $0 [up|down|update|pull|prune|restart]"
     echo "  up         - Start containers"
     echo "  down       - Stop containers"
     echo "  update     - Update containers"
     echo "  pull       - Pull latest images without restarting"
     echo "  prune      - Remove dangling images"
     echo "  restart    - Restart containers"
-    echo "  prep-perms - Create/chown bind paths for non-root services"
     exit 1
 }
 
 validate_action() {
     case "$ACTION" in
-        "up"|"down"|"update"|"pull"|"prune"|"restart"|"prep-perms")
+        "up"|"down"|"update"|"pull"|"prune"|"restart")
             ;;
         *)
             usage
@@ -58,17 +57,6 @@ run_compose() {
 prune_images() {
     echo "🧹 Cleaning up dangling images..."
     docker image prune -f
-}
-
-prepare_permissions() {
-    local script_path="$REPO_ROOT/scripts/prepare-bind-permissions.sh"
-    local profile_arg="custom-user"
-
-    if [ "$(id -u)" -eq 0 ]; then
-        bash "$script_path" --compose-file "$COMPOSE_FILE" --env-file "$ENV_FILE" --profiles "$profile_arg"
-    else
-        sudo bash "$script_path" --compose-file "$COMPOSE_FILE" --env-file "$ENV_FILE" --profiles "$profile_arg"
-    fi
 }
 
 # Check if command argument is provided
@@ -120,12 +108,6 @@ case "$ACTION" in
         run_compose down --remove-orphans
         run_compose up -d
         echo "✅ Containers restarted successfully!"
-        ;;
-
-    "prep-perms")
-        echo "🔐 Preparing bind-mount permissions for non-root services..."
-        prepare_permissions
-        echo "✅ Permission bootstrap completed!"
         ;;
 
     *)

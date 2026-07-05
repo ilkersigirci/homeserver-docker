@@ -6,7 +6,6 @@ services:
     container_name: filestash-wopi-server
     restart: $RESTART_POLICY_MEDIA
     profiles:
-      - root
       - media
       - filestash
     networks:

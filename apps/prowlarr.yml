@@ -8,6 +8,7 @@ services:
       - sabnzbd
     restart: $RESTART_POLICY_MEDIA
     profiles:
+      - root
       - media
       - arr
     networks:

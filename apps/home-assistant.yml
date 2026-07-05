@@ -53,10 +53,14 @@ services:
       home-assistant-db:
         condition: service_healthy
     profiles:
-      - root
       - maintenance
       - home-assistant
     network_mode: host
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /run:rw,exec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=755
+      - /tmp:rw,noexec,nosuid,nodev,size=256m,uid=$PUID,gid=$PGID,mode=1777
     security_opt:
       - no-new-privileges:true
     pids_limit: 256
@@ -73,11 +77,7 @@ services:
     environment:
       TZ: $TZ
     healthcheck:
-      test: >-
-        python3 -c "import sys,urllib.request as u;
-        No=type('No',(u.HTTPErrorProcessor,),{'http_response':lambda s,req,res:res,'https_response':lambda s,req,res:res});
-        r=u.build_opener(No).open('http://127.0.0.1:8123/api/',timeout=3);
-        sys.exit(0 if r.status<500 else 1)"
+      test: ["CMD", "curl", "-fsS", "--max-time", "3", "-o", "/dev/null", "http://127.0.0.1:8123/manifest.json"]
       interval: 5m
       timeout: 5s
       retries: 3
@@ -108,6 +108,11 @@ services:
     networks:
       - t3_proxy
       - home_assistant_backend
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /run:rw,exec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=755
+      - /tmp:rw,noexec,nosuid,nodev,size=256m,uid=$PUID,gid=$PGID,mode=1777
     security_opt:
       - no-new-privileges:true
     pids_limit: 512
@@ -124,11 +129,7 @@ services:
     environment:
       TZ: $TZ
     healthcheck:
-      test: >-
-        python3 -c "import sys,urllib.request as u;
-        No=type('No',(u.HTTPErrorProcessor,),{'http_response':lambda s,req,res:res,'https_response':lambda s,req,res:res});
-        r=u.build_opener(No).open('http://127.0.0.1:8123/api/',timeout=3);
-        sys.exit(0 if r.status<500 else 1)"
+      test: ["CMD", "curl", "-fsS", "--max-time", "3", "-o", "/dev/null", "http://127.0.0.1:8123/manifest.json"]
       interval: 5m
       timeout: 5s
       retries: 3

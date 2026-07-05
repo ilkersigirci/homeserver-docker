@@ -7,6 +7,7 @@ services:
     restart: $RESTART_POLICY_MEDIA
     hostname: sabnzbd.$DOMAINNAME
     profiles:
+      - root
       - media
       - arr
     networks:

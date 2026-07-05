@@ -92,7 +92,6 @@ services:
       scanopy-daemon:
         condition: service_healthy
     profiles:
-      - custom-user
       - maintenance
       - scanopy
     networks:

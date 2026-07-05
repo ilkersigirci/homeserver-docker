@@ -35,7 +35,7 @@ Deployment is host-driven:
 - `configs/`
   - Versioned service configuration mounted into containers.
 - `scripts/`
-  - Operational entrypoints (`docker-manage.sh`, permission prep, helpers).
+  - Operational entrypoints (`docker-manage.sh`) and maintenance helpers.
 - `scripts/database/`
   - Database backup and major-upgrade automation.
 - `Dockerfiles/`

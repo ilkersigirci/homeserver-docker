@@ -41,6 +41,7 @@ services:
     depends_on:
       - wyl-node-bootstrap
     profiles:
+      - root
       - monitoring
     network_mode: "host"
     expose:

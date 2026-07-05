@@ -4,7 +4,8 @@ This is the operator quick reference for humans and coding agents.
 
 ## Prerequisites
 
-- Docker + Docker Compose installed
+- Docker installed
+- Docker Compose 5.3.0 or later
 - Repo `.env` exists at `$HOME/docker/.env`
 - `MY_HOSTNAME` is set and matches a file in `compose/` (example: `gpu`, `remoteserver`)
 
@@ -28,9 +29,6 @@ bash scripts/docker-manage.sh prune
 
 # Restart
 bash scripts/docker-manage.sh restart
-
-# Prepare bind-mount permissions for services in profile 'custom-user'
-bash scripts/docker-manage.sh prep-perms
 ```
 
 ## Direct Docker Compose Commands

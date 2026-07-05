@@ -11,11 +11,10 @@ services:
     #   - /bin/sh
     #   - /app/render-config.sh
     profiles:
-      - custom-user
       - programming
     networks:
       - t3_proxy
-    user: appuser
+    user: $PUID:$PGID
     read_only: true
     tmpfs:
       - /tmp

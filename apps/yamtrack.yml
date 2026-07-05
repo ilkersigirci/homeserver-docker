@@ -14,6 +14,7 @@ services:
     expose:
       - 6379
     user: $PUID:$PGID
+    read_only: true
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -81,6 +82,7 @@ services:
 
   # NOTE: No user is admin by default. To make user `ilker` to admin, use below command
   # docker exec yamtrack python manage.py shell -c "from django.contrib.auth import get_user_model; get_user_model().objects.filter(username='ilker').update(is_staff=True, is_superuser=True)"
+  # NOTE: The upstream entrypoint must start as root to remap abc to PUID/PGID and chown runtime paths.
   yamtrack:
     image: ghcr.io/fuzzygrim/yamtrack:0.25.3@sha256:00acf008bca8171226063bc0f8f08ef7ffe24a10bcebf8676cce335ce312c307
     container_name: yamtrack
@@ -91,13 +93,12 @@ services:
       # yamtrack-postgres-db:
       #   condition: service_healthy
     profiles:
-      - custom-user
+      - root
       - media
       - yamtrack
     networks:
       - t3_proxy
       - yamtrack_backend
-    # The upstream entrypoint must start as root to remap abc to PUID/PGID and chown runtime paths.
     security_opt:
       - no-new-privileges:true
     cap_drop:

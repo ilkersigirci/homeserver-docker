@@ -15,7 +15,8 @@ Compose-based homelab repository for running services across multiple machines (
 ## Quick Start
 
 Prerequisites:
-- Docker + Docker Compose
+- Docker
+- Docker Compose 5.3.0 or later for `pre_start` init containers
 - A configured `.env`
 - `MY_HOSTNAME` set to a host with a matching file in `compose/`
 
@@ -28,9 +29,6 @@ bash scripts/docker-manage.sh down
 
 # Pull images and recreate
 bash scripts/docker-manage.sh pull
-
-# Prepare bind-mount permissions for services using profile 'custom-user'
-bash scripts/docker-manage.sh prep-perms
 ```
 
 ## Repository Layout

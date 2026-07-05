@@ -53,7 +53,7 @@ services:
       linkwarden-db:
         condition: service_healthy
     profiles:
-      - custom-user
+      - root
       - reading
     networks:
       - t3_proxy

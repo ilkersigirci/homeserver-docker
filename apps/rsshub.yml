@@ -7,7 +7,6 @@ services:
     container_name: rsshub-browserless
     restart: $RESTART_POLICY_OTHERS
     profiles:
-      - custom-user
       - reading
       - rsshub
     networks:
@@ -43,22 +42,20 @@ services:
       glance.parent: "rsshub"
 
   rsshub-redis:
-    image: redis:alpine@sha256:09160599abd229764c0fb44cb6be640294e1d360a54b19985ab4843dcf2d90f1
+    image: docker.io/valkey/valkey:9@sha256:8436e10bc65c94886a91d4415b6a6dfa9cb5a306fb3b996e5bb67cd2b4854193
     container_name: rsshub-redis
     restart: $RESTART_POLICY_OTHERS
     profiles:
-      - custom-user
       - reading
       - rsshub
     networks:
       - rsshub_backend
-    user: redis
+    user: $PUID:$PGID
     read_only: true
-    tmpfs:
-      - /tmp:rw,noexec,nosuid,nodev,size=64m,mode=1777
     security_opt:
       - no-new-privileges:true
     cap_drop:
+      - NET_RAW
       - ALL
     cap_add: []
     pids_limit: 256
@@ -69,9 +66,9 @@ services:
         soft: 4096
         hard: 8192
     volumes:
-      - $REPO_PATH/appdata/rsshub-redis:/data
+      - $REPO_PATH/appdata/rsshub-valkey:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "-h", "127.0.0.1", "ping"]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 1m
       timeout: 3s
       retries: 3
@@ -89,7 +86,6 @@ services:
       - rsshub-redis
       - rsshub-browserless
     profiles:
-      - custom-user
       - reading
       - rsshub
     networks:

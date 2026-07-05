@@ -4,7 +4,6 @@ services:
     container_name: bentopdf
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
-      - custom-user
       - maintenance
     networks:
       - t3_proxy

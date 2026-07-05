@@ -6,6 +6,7 @@ services:
     container_name: syncthing
     restart: $RESTART_POLICY_OTHERS
     profiles:
+      - root
       - maintenance
     networks:
       - t3_proxy

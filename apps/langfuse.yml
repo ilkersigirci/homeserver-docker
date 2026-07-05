@@ -99,7 +99,6 @@ services:
     command: >
       --requirepass $LANGFUSE_REDIS_PASSWORD
     profiles:
-      - custom-user
       - programming
       - langfuse
     networks:
@@ -146,7 +145,6 @@ services:
       langfuse-redis:
         condition: service_healthy
     profiles:
-      - custom-user
       - programming
       - langfuse
     networks:
@@ -230,7 +228,6 @@ services:
     restart: $RESTART_POLICY_PROGRAMMING
     depends_on: *langfuse-depends-on
     profiles:
-      - custom-user
       - programming
       - langfuse
     networks:

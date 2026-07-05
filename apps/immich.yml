@@ -15,6 +15,7 @@ services:
     networks:
       - immich_backend
     user: $PUID:$PGID
+    read_only: true
     security_opt:
       - no-new-privileges:true
     cap_drop:

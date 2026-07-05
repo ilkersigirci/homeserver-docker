@@ -5,7 +5,6 @@ services:
     container_name: pinchflat
     restart: $RESTART_POLICY_MEDIA
     profiles:
-      - custom-user
       - media
       - youtube
     networks:
