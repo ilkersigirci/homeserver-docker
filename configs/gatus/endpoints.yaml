@@ -143,6 +143,12 @@ endpoints:
     interval: 1h
     url: "http://100.64.0.12:1000"
 
+  - name: Smarthome - home
+    <<: *https-default
+    group: Home
+    interval: 1h
+    url: "https://smarthome.home.$DOMAINNAME"
+
   ################# RPI1 #################
   - name: LocalDNS - home
     group: RPI1
