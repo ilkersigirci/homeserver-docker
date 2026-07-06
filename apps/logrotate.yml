@@ -1,6 +1,6 @@
 services:
   logrotate:
-    image: samuelrunggaldier/logrotate:latest@sha256:266ec8732d5f67220982bf14b08948d2acff933478c0b2d6e726bf55f5ceec82
+    image: samuelrunggaldier/logrotate:latest@sha256:ef726584d80a1b1df2ac8768f1ef3916eac58e16191b138d0b0d27af816f011d
     container_name: logrotate
     restart: $RESTART_POLICY_CORE
     profiles:
