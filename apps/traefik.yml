@@ -121,6 +121,8 @@ services:
       - --tracing.sampleRate=${TRAEFIK_OTEL_TRACING_SAMPLE_RATE:-0.50}
       - --tracing.serviceName=traefik
     depends_on:
+      docker-socket-proxy-read:
+        condition: service_healthy
       otel-collector-agent:
         condition: service_healthy
     profiles:

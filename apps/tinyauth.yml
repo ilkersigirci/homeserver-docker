@@ -1,11 +1,14 @@
-# Create user: docker run -i -t --rm ghcr.io/steveiliop56/tinyauth:v5 user create --interactive
+# Create user: docker run -i -t --rm ghcr.io/tinyauthapp/tinyauth:v5.0.7 user create --interactive
 # Create SECRET: openssl rand -base64 32 | tr -dc 'a-zA-Z0-9' | head -c 32
-# Create TOTP: docker run -i -t --rm ghcr.io/steveiliop56/tinyauth:v5 totp generate --interactive
+# Create TOTP: docker run -i -t --rm ghcr.io/tinyauthapp/tinyauth:v5.0.7 totp generate --interactive
 services:
   tinyauth:
-    image: ghcr.io/steveiliop56/tinyauth:v5@sha256:0793c71c49906e079d90c7e693cded9df569217a92d717dc9b171f2116fcd1c6
+    image: ghcr.io/tinyauthapp/tinyauth:v5.0.7@sha256:0793c71c49906e079d90c7e693cded9df569217a92d717dc9b171f2116fcd1c6
     container_name: tinyauth
     restart: $RESTART_POLICY_CORE
+    depends_on:
+      docker-socket-proxy-read:
+        condition: service_healthy
     profiles:
       - core
     networks:
