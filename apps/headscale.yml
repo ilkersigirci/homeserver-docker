@@ -2,7 +2,7 @@ services:
   # Configuration file: https://github.com/tale/headplane/blob/main/config.example.yamls
   # NOTE: docker exec headscale headscale apikeys create --expiration 360d
   headscale:
-    image: ghcr.io/juanfont/headscale:0.28.0@sha256:51b1b9182bb6219e97374fa89af6b9320d6f87ecc739e328d5357ea4fa7a5ce3
+    image: ghcr.io/juanfont/headscale:0.29.2@sha256:d337f1be4a9155b330aa9077bf6c82d24ff0581b8e69390ebc6d7c623bb339ce
     container_name: headscale
     command: serve
     restart: $RESTART_POLICY_CORE
@@ -79,20 +79,23 @@ services:
 
   # Configuration file: https://github.com/tale/headplane/blob/main/config.example.yaml
   headplane:
-    image: ghcr.io/tale/headplane:0.7.0-beta.4@sha256:3e93fe1501d78c8fa88f7938353c34e2ac041ff5e452ea1ead350cc073cb0e7b
+    image: ghcr.io/tale/headplane:0.7.0@sha256:7bd6523a14567a43eb4ffa1e95e3d95456b8539c9d081757df3f228b9e836fb5
     container_name: headplane
     restart: $RESTART_POLICY_CORE
     depends_on:
       headscale:
         condition: service_healthy
     profiles:
-      - custom-user
       - core
     networks:
       - t3_proxy
       - socket_proxy_write
     user: 65532:65532
     read_only: true
+    pre_start:
+      - image: busybox:1.37.0@sha256:9532d8c39891ca2ecde4d30d7710e01fb739c87a8b9299685c63704296b16028
+        user: root
+        command: ["chown", "-R", "65532:65532", "/var/lib/headplane"]
     tmpfs:
       - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=65532,gid=65532,mode=1777
     security_opt:
@@ -134,11 +137,12 @@ services:
       ## OIDC
       HEADPLANE_OIDC__ENABLED: true
       HEADPLANE_OIDC__ISSUER: https://pocketid.$BASE_DOMAINNAME
-      HEADPLANE_OIDC__HEADSCALE_API_KEY: $HEADSCALE_API_KEY # NOTE: Deprecated. Currently still required.
       HEADPLANE_OIDC__CLIENT_ID: $HEADSCALE_CLIENT_ID
       HEADPLANE_OIDC__CLIENT_SECRET: $HEADSCALE_CLIENT_SECRET
       HEADPLANE_OIDC__USE_PKCE: true
-      HEADPLANE_OIDC__SCOPE: "openid email profile"
+      HEADPLANE_OIDC__SCOPE: "openid email profile groups"
+      HEADPLANE_OIDC__DEFAULT_ROLE: member
+      HEADPLANE_OIDC__ROLE_CLAIM: groups
     healthcheck:
       test: ["CMD", "/bin/hp_healthcheck"]
       interval: 2m

@@ -4,6 +4,7 @@ services:
     container_name: egress-proxy
     restart: $RESTART_POLICY_CORE
     profiles:
+      - root
       - core
     networks:
       app_internal:

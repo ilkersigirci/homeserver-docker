@@ -1,11 +1,18 @@
 http:
   middlewares:
+    middlewares-silverbullet-manifest-identity:
+      headers:
+        customRequestHeaders:
+          Accept-Encoding: identity
+
     middlewares-silverbullet-fullscreen:
       plugin:
         rewritebody:
           rewrites:
             - regex: '"display"\s*:\s*"standalone"'
               replacement: '"display":"fullscreen"'
+            - regex: '"window-controls-overlay"'
+              replacement: '"fullscreen"'
 
     middlewares-silverbullet-headers:
       headers:

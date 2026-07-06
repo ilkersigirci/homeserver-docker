@@ -76,17 +76,27 @@ bash scripts/docker-manage.sh up
 - Confirm Traefik/internal reachability matches the access model.
 - Confirm healthcheck reaches `healthy` in expected startup time.
 
-### 6) Add Runtime Placeholders
+### 6) Initialize Writable Bind Mounts
 
-Only after the service is healthy with `user: "$PUID:$PGID"`, add runtime directories needed by a fresh clone:
+For a non-root service whose writable bind-mount ownership is not guaranteed,
+use a root `pre_start` hook to set ownership before the service starts:
 
-```bash
-mkdir -p data/<service> appdata/<service>
-touch data/<service>/.gitkeep appdata/<service>/.gitkeep
-git add -f data/<service>/.gitkeep appdata/<service>/.gitkeep
+```yaml
+pre_start:
+  - image: busybox:1.37.0@sha256:9532d8c39891ca2ecde4d30d7710e01fb739c87a8b9299685c63704296b16028
+    user: root
+    command: ["chown", "-R", "<uid>:<gid>", "<writable-container-path>"]
 ```
 
-If the service is not healthy with `user: "$PUID:$PGID"`, add `custom-user` and do not add runtime `.gitkeep` files.
+- Resolve named image users to numeric UID/GID values for the BusyBox hook.
+- Target only paths the service must write.
+- For repository bind mounts used by `PUID:PGID`, prefer a tracked `.gitkeep` so the clone creates the source with the correct ownership.
+- Do not add a hook when a tracked `.gitkeep` creates the bind source with ownership matching `PUID:PGID`.
+- Never recursively chown read-only mounts, shared external media, or repository roots.
+- For a shared external mount, chown only the mount root when the service must create children.
+- Exclude nested read-only mounts from recursive traversal.
+- Do not add runtime `.gitkeep` files for bind paths initialized by `pre_start`.
+- If the service cannot run with `user: "$PUID:$PGID"`, document the required runtime identity or root-entrypoint behavior.
 
 ## Done Criteria
 
@@ -97,4 +107,5 @@ If the service is not healthy with `user: "$PUID:$PGID"`, add `custom-user` and 
   - Internal-only service: no Traefik labels.
 - Service has an active healthcheck (not `disable: true`) unless an inline comment explains why a probe is not feasible.
 - Service can be started with the workflow in `docs/RUNNING.md`.
-- Runtime `.gitkeep` files were force-added only if the service is healthy with `user: "$PUID:$PGID"`; otherwise `custom-user` profile is present and no runtime placeholders were added.
+- Writable non-root bind mounts with unmanaged ownership have narrowly scoped `pre_start` hooks.
+- Services that require a different identity or a root entrypoint document why.

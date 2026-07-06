@@ -5,7 +5,6 @@ services:
     container_name: adguardhome
     restart: $RESTART_POLICY_CORE
     profiles:
-      - root
       - core
     network_mode: host
     expose:

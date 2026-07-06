@@ -1,30 +1,42 @@
 services:
   homeserver-api-redis:
-    image: redis:8@sha256:125f446fbd4c4345cdbd0f60c61ed83c35a10e09436dd797e0e82377325034f5
+    image: docker.io/valkey/valkey:9@sha256:8436e10bc65c94886a91d4415b6a6dfa9cb5a306fb3b996e5bb67cd2b4854193
     container_name: homeserver-api-redis
     restart: $RESTART_POLICY_OTHERS
-    hostname: "homeserver-api-redis"
-    command: redis-server --requirepass "${HOMESERVER_API_REDIS_PASSWORD}"
+    command: --requirepass "${HOMESERVER_API_REDIS_PASSWORD}"
     profiles:
       - others
       - homeserver-api
     networks:
       - t3_proxy
     expose:
-      - "6379"
+      - 6379
+    user: $PUID:$PGID
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    environment:
+      HOMESERVER_API_REDIS_PASSWORD: $HOMESERVER_API_REDIS_PASSWORD
     healthcheck:
       test:
         [
-          "CMD",
-          "redis-cli",
-          "--no-auth-warning",
-          "-a",
-          "${HOMESERVER_API_REDIS_PASSWORD}",
-          "ping",
+          "CMD-SHELL",
+          "valkey-cli --no-auth-warning -a $${HOMESERVER_API_REDIS_PASSWORD} ping | grep -q PONG",
         ]
-      interval: 1s
+      interval: 1m
       timeout: 3s
-      retries: 50
+      retries: 3
+      start_period: 10s
 
   homeserver-api-rabbitmq:
     image: rabbitmq:4-management@sha256:e43ca03df740d48770641b56ce1a26913c74a31e47c1ed36a58e8d91c10731b9

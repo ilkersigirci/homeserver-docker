@@ -39,5 +39,6 @@ include:
   - ../apps/hatchet.yml
   - ../apps/langfuse.yml
   - ../apps/cloudbeaver.yml
+  - ../apps/jupyterlab.yml
   # - ../apps/pgweb.yml
   # - ../apps/pgadmin.yml # TODO

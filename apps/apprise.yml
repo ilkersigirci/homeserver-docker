@@ -5,6 +5,7 @@ services:
     container_name: apprise-api
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
+      - root
       - maintenance
     networks:
       - t3_proxy
@@ -63,6 +64,7 @@ services:
     container_name: apprise
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
+      - root
       - not-used
     networks:
       - t3_proxy

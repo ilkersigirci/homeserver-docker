@@ -21,6 +21,7 @@ Task routing:
 - Docker egress policy changes: [docs/EGRESS_CONTROL.md](docs/EGRESS_CONTROL.md)
 - Telemetry/OTEL changes: [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md)
 - PostgreSQL major upgrades: [docs/postgres_upgrade.md](docs/postgres_upgrade.md)
+- Custom image additions: [docs/skills/create-custom-image/SKILL.md](docs/skills/create-custom-image/SKILL.md)
 
 Validation:
 

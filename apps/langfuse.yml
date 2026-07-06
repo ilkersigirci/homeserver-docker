@@ -45,7 +45,15 @@ services:
       CLICKHOUSE_USER: $LANGFUSE_CLICKHOUSE_USER
       CLICKHOUSE_PASSWORD: $LANGFUSE_CLICKHOUSE_PASSWORD
     healthcheck:
-      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:8123/ping"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://127.0.0.1:8123/ping",
+        ]
       interval: 1m
       timeout: 5s
       retries: 3
@@ -86,20 +94,22 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} -h 127.0.0.1"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} -h 127.0.0.1",
+        ]
       interval: 1m
       timeout: 5s
       retries: 3
       start_period: 30s
 
   langfuse-redis:
-    image: redis:8@sha256:0a972391db0b24ec336e35d1bc98b237237e26f82bf5120cf2f6b1688d1df973
+    image: docker.io/valkey/valkey:9@sha256:8436e10bc65c94886a91d4415b6a6dfa9cb5a306fb3b996e5bb67cd2b4854193
     container_name: langfuse-redis
     restart: $RESTART_POLICY_PROGRAMMING
-    command: >
-      --requirepass $LANGFUSE_REDIS_PASSWORD
+    command: --requirepass "${LANGFUSE_REDIS_PASSWORD}"
     profiles:
-      - custom-user
       - programming
       - langfuse
     networks:
@@ -108,9 +118,6 @@ services:
       - 6379
     user: $PUID:$PGID
     read_only: true
-    tmpfs:
-      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
-      - /run:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -128,14 +135,18 @@ services:
     environment:
       LANGFUSE_REDIS_PASSWORD: $LANGFUSE_REDIS_PASSWORD
     healthcheck:
-      test: ["CMD-SHELL", "redis-cli --no-auth-warning -a $${LANGFUSE_REDIS_PASSWORD} ping | grep -q PONG"]
+      test:
+        [
+          "CMD-SHELL",
+          "valkey-cli --no-auth-warning -a $${LANGFUSE_REDIS_PASSWORD} ping | grep -q PONG",
+        ]
       interval: 1m
       timeout: 3s
       retries: 3
       start_period: 10s
 
   langfuse-worker:
-    image: langfuse/langfuse-worker:3.188.0@sha256:d6077f9b21d56f44464eb2a426b559479cad33792b0f0037927ac6b8aa1d3e4c
+    image: langfuse/langfuse-worker:3.197.1@sha256:e73427f0c0899f877bef3367103ff1f4c1a64015415616f6ea42befb15a175f6
     container_name: langfuse-worker
     restart: $RESTART_POLICY_PROGRAMMING
     depends_on: &langfuse-depends-on
@@ -146,7 +157,6 @@ services:
       langfuse-redis:
         condition: service_healthy
     profiles:
-      - custom-user
       - programming
       - langfuse
     networks:
@@ -218,19 +228,19 @@ services:
       EMAIL_FROM_ADDRESS: ${EMAIL_FROM_ADDRESS:-}
       SMTP_CONNECTION_URL: ${SMTP_CONNECTION_URL:-}
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3030/api/health"]
+      test:
+        ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3030/api/health"]
       interval: 2m
       timeout: 5s
       retries: 3
       start_period: 10s
 
   langfuse-web:
-    image: langfuse/langfuse:3.188.0@sha256:cb38a6f3bd6884054d19bf2658244a4b198597158579b7cd1e728e993d8f9655
+    image: langfuse/langfuse:3.197.1@sha256:d7ba1e9a7d77929dab8b5a268cc3ea7732cfe350b49448ee439d81831f618604
     container_name: langfuse-web
     restart: $RESTART_POLICY_PROGRAMMING
     depends_on: *langfuse-depends-on
     profiles:
-      - custom-user
       - programming
       - langfuse
     networks:
@@ -278,7 +288,14 @@ services:
       ## LLM Connection
       LANGFUSE_LLM_CONNECTION_WHITELISTED_HOST: aigateway.gpu.$BASE_DOMAINNAME # NOTE: It shouldn't have https prefix
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3000/api/public/health"]
+      test:
+        [
+          "CMD",
+          "wget",
+          "-q",
+          "--spider",
+          "http://127.0.0.1:3000/api/public/health",
+        ]
       interval: 2m
       timeout: 5s
       retries: 3

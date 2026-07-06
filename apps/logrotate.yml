@@ -1,9 +1,10 @@
 services:
   logrotate:
-    image: samuelrunggaldier/logrotate:latest@sha256:eefd33cc1186b8a79b8d756951b430e61d5761325058a642fa84b02ae413f1e7
+    image: samuelrunggaldier/logrotate:latest@sha256:266ec8732d5f67220982bf14b08948d2acff933478c0b2d6e726bf55f5ceec82
     container_name: logrotate
     restart: $RESTART_POLICY_CORE
     profiles:
+      - root
       - core
     network_mode: "none"
     read_only: true

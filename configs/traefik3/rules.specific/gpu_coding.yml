@@ -8,6 +8,14 @@ http:
         - chain-no-auth
       service: t3code-svc
 
+    marimo-rtr:
+      rule: "Host(`marimo.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: marimo-svc
+
     homeserver-api-rtr:
       rule: "Host(`api-backend.{{env "DOMAINNAME"}}`)"
       entryPoints:
@@ -29,6 +37,11 @@ http:
       loadBalancer:
         servers:
           - url: "http://{{env "LOCAL_STATIC_IP"}}:3773"
+
+    marimo-svc:
+      loadBalancer:
+        servers:
+          - url: "http://{{env "LOCAL_STATIC_IP"}}:2718"
 
     homeserver-api-svc:
       loadBalancer:

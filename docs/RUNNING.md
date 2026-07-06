@@ -4,7 +4,8 @@ This is the operator quick reference for humans and coding agents.
 
 ## Prerequisites
 
-- Docker + Docker Compose installed
+- Docker installed
+- Docker Compose 5.3.0 or later
 - Repo `.env` exists at `$HOME/docker/.env`
 - `MY_HOSTNAME` is set and matches a file in `compose/` (example: `gpu`, `remoteserver`)
 
@@ -17,14 +18,17 @@ bash scripts/docker-manage.sh up
 # Stop stack
 bash scripts/docker-manage.sh down
 
-# Pull and recreate
+# Pull, recreate, and prune dangling images
+bash scripts/docker-manage.sh update
+
+# Pull latest images without restarting
 bash scripts/docker-manage.sh pull
+
+# Remove dangling images
+bash scripts/docker-manage.sh prune
 
 # Restart
 bash scripts/docker-manage.sh restart
-
-# Prepare bind-mount permissions for services in profile 'custom-user'
-bash scripts/docker-manage.sh prep-perms
 ```
 
 ## Direct Docker Compose Commands
@@ -59,30 +63,54 @@ scripts/get-image-sha.sh --pinned-only ghcr.io/traefik/traefik:3.7.0-rc.2
 ## Custom Images
 
 Custom images are defined under `Dockerfiles/<Name>/Dockerfile` and published by
-`.github/workflows/homeserver-images.yml` to
+per-image workflows named `.github/workflows/custom-images-<name>.yml` to
 `ghcr.io/ilkersigirci/homeserver-<name>`.
+
+Each per-image workflow filters on its own `Dockerfiles/<Name>/**` path and
+calls the shared `.github/workflows/custom-images-build.yml` workflow.
+GitHub requires workflow files directly under `.github/workflows`; workflow
+subdirectories are not supported.
+
+Pull requests validate image and workflow changes. Pushes to `main` publish only
+when the matching `Dockerfiles/<Name>/**` context changes, so shared workflow
+maintenance does not republish unchanged image tags.
+PR validation uses read-only repository permissions; only publish jobs get
+`packages: write`.
+
+Images publish the version read from `ARG IMAGE_VERSION` by default. If
+`Dockerfiles/<Name>/version_tagging.sh` exists and is executable, the workflow
+uses its stdout as the image tag instead.
 
 To add an image:
 
 1. Add its Dockerfile with `ARG IMAGE_VERSION=<tag>` and use
     `${IMAGE_VERSION}` in the upstream `FROM` instruction.
 2. Pin every `FROM` image to an immutable digest.
-3. Add the image context, GHCR repository, and platforms to the workflow matrix.
-4. Reference the published image from Compose as `tag@sha256:digest`.
+3. Copy an existing per-image workflow and update only its trigger path plus
+    `name`, `context`, and `repository` inputs.
+4. For dependency-derived tags, add an executable `version_tagging.sh` and keep
+    it out of the build context with `.dockerignore`.
+5. Reference the published image from Compose as `tag@sha256:digest`.
 
-Pull requests validate each matrix build without publishing. Merges to `main` and
-manual workflow runs publish the version read from `IMAGE_VERSION`.
+Keep Docker build steps in `custom-images-build.yml`; per-image workflows should
+only declare triggers and inputs.
+Coding agents adding custom images should follow
+`docs/skills/create-custom-image/SKILL.md`.
 
 ### Renovate Update Flow
 
 Renovate handles an upstream release in two runs:
 
-1. The Dockerfile manager updates `IMAGE_VERSION` and the upstream image digest.
+1. Renovate updates `IMAGE_VERSION`, or a dependency and lockfile used by
+    `version_tagging.sh`.
 2. After that PR is merged, the workflow publishes the new custom image tag.
 3. A later Renovate run updates the custom image tag and digest in the Compose file.
 
 The Compose update cannot be created before the workflow publishes the new custom
 image tag.
+
+Custom image Compose updates are grouped by Renovate under `homeserver custom
+images`.
 
 ### Public Package Bootstrap
 
