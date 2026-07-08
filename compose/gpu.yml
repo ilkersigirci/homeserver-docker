@@ -66,6 +66,7 @@ include:
   # - ../apps/watchyourlan.yml
   #### PHOTO ####
   - ../apps/immich.yml
+  - ../apps/immich-public-proxy.yml
   # - ../apps/immich-machine-learning.yml
   # - ./fragments/immich-machine-learning/nvidia.yml
   #### PROGRAMMING ####

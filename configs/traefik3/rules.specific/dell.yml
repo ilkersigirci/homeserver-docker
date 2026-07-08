@@ -1,5 +1,19 @@
 http:
+  serversTransports:
+    # NOTE: Proxmox redirect requests to https which causes redirect loop with traefik. This fixes it.
+    proxmox-transport:
+      serverName: ""
+      insecureSkipVerify: true
+
   routers:
+    proxmox-rtr:
+      rule: "Host(`proxmox.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: proxmox-svc
+
     home-assistant-rtr:
       rule: "Host(`smarthome.{{env "DOMAINNAME"}}`)"
       entryPoints:
@@ -7,6 +21,14 @@ http:
       middlewares:
         - chain-no-auth-relaxed
       service: home-assistant-svc
+
+    adguardhome-rtr:
+      rule: "Host(`adguardhome.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: adguardhome-svc
 
     watchyourlan-rtr:
       rule: "Host(`lan.{{env "DOMAINNAME"}}`)"
@@ -25,10 +47,21 @@ http:
       service: watchyourlan-assets-svc
 
   services:
+    proxmox-svc:
+      loadBalancer:
+        servers:
+          - url: "https://192.168.2.119:8006"
+        serversTransport: proxmox-transport
+
     home-assistant-svc:
       loadBalancer:
         servers:
           - url: "http://{{env "LOCAL_STATIC_IP"}}:8123"
+
+    adguardhome-svc:
+      loadBalancer:
+        servers:
+          - url: "http://{{env "LOCAL_STATIC_IP"}}:81"
 
     watchyourlan-svc:
       loadBalancer:

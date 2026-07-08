@@ -1,0 +1,25 @@
+services:
+  immich-redis:
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
+
+  immich-postgres:
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
+
+  immich-server:
+    ports:
+      - "2283:2283"
+    volumes: !override
+      - $IMMICH_THUMBS_PATH:/data/thumbs
+      - $IMMICH_DATA_PATH:/data
+      - $DIR_PHOTOS/Pictures:/mnt/hdd/Photos/Pictures
+      - $DIR_PHOTOS/Videos:/mnt/hdd/Photos/Videos:ro

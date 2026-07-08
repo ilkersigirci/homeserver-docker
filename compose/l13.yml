@@ -33,5 +33,7 @@ include:
   - ../apps/syncthing.yml
   - ../apps/whoami.yml
   #### MONITORING ####
-  - ../apps/frigate.yml
+  - path:
+      - ../apps/frigate.yml
+      - ./fragments/frigate/intel.yml
   - ../apps/mosquitto.yml

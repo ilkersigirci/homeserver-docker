@@ -1,0 +1,5 @@
+services:
+  frigate:
+    devices:
+      # Intel QSV hwaccel uses renderD128; PMU stats errors are expected in unprivileged LXC.
+      - /dev/dri/renderD128:/dev/dri/renderD128

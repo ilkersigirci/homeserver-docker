@@ -1,7 +1,7 @@
 # TODO: Harden
 services:
   frigate:
-    image: ghcr.io/blakeblackshear/frigate:stable@sha256:1724960349dad0bd2ae8ec884171a6fd5755a4dc242a0e66cadbda9c0e85c99b
+    image: ghcr.io/blakeblackshear/frigate:0.17.2@sha256:d4351369984d4a9e2a49ac59736f6490856a7ea11f7790040746d21496967010
     container_name: frigate
     restart: $RESTART_POLICY_MEDIA
     stop_grace_period: 30s # allow enough time to shut down the various services
@@ -21,10 +21,14 @@ services:
       - no-new-privileges:true
     cap_drop:
       - ALL
-    cap_add: []
-    pids_limit: 256
-    cpus: '1.0'
-    mem_limit: 1G
+    cap_add:
+      - CHOWN
+      - FOWNER
+      - SETGID
+      - SETUID
+    pids_limit: 1024
+    cpus: "1.0"
+    mem_limit: 4G
     ulimits:
       nofile:
         soft: 4096
@@ -45,13 +49,15 @@ services:
       FRIGATE_RTSP_PASSWORD: $FRIGATE_RTSP_PASSWORD
       FRIGATE_MOSQUITTO_HOST: ${FRIGATE_MOSQUITTO_HOST:-mosquitto}
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:8971/api/version >/dev/null || exit 1"]
+      test:
+        [
+          "CMD-SHELL",
+          "curl -fsS --max-time 3 http://127.0.0.1:8971/api/version >/dev/null || exit 1",
+        ]
       interval: 2m
       timeout: 5s
       retries: 3
       start_period: 3m
-    devices:
-      - /dev/dri/renderD128:/dev/dri/renderD128 # For intel hwaccel, needs to be updated for your hardware
     labels:
       traefik.enable: "true"
       ## HTTP Routers
@@ -77,10 +83,3 @@ services:
       glance.icon: "sh:frigate"
       glance.url: "https://frigate.$DOMAINNAME"
       glance.description: "description"
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu, compute, utility, video, graphics]

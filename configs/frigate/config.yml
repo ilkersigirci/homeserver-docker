@@ -82,10 +82,10 @@ cameras:
         days: 2
       alerts:
         retain:
-          days: 30
+          days: 7
       detections:
         retain:
-          days: 30
+          days: 7
     snapshots: &id004
       enabled: true
 
