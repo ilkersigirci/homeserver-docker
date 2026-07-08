@@ -64,7 +64,7 @@ services:
       traefik.http.routers.frigate-rtr.entrypoints: "websecure"
       traefik.http.routers.frigate-rtr.rule: "Host(`frigate.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.frigate-rtr.middlewares: "chain-tinyauth@file"
+      traefik.http.routers.frigate-rtr.middlewares: "chain-tinyauth-relaxed@file"
       ## HTTP Services
       traefik.http.routers.frigate-rtr.service: "frigate-svc"
       traefik.http.services.frigate-svc.loadbalancer.server.port: "8971"
