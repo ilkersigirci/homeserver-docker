@@ -62,24 +62,24 @@ services:
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.frigate-rtr.entrypoints: "websecure"
-      traefik.http.routers.frigate-rtr.rule: "Host(`frigate.$DOMAINNAME`)"
+      traefik.http.routers.frigate-rtr.rule: "Host(`kamera.$DOMAINNAME`)"
       ## Middlewares
       traefik.http.routers.frigate-rtr.middlewares: "chain-tinyauth-relaxed@file"
       ## HTTP Services
       traefik.http.routers.frigate-rtr.service: "frigate-svc"
       traefik.http.services.frigate-svc.loadbalancer.server.port: "8971"
       ####### TINYAUTH #######
-      tinyauth.apps.frigate.config.domain: "frigate.$DOMAINNAME"
+      tinyauth.apps.frigate.config.domain: "kamera.$DOMAINNAME"
       tinyauth.apps.frigate.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "frigate"
       homepage.icon: "frigate.png"
-      homepage.href: "https://frigate.$DOMAINNAME"
+      homepage.href: "https://kamera.$DOMAINNAME"
       homepage.target: "_blank"
-      homepage.description: "description"
+      homepage.description: "NVR with realtime local object detection for IP cameras"
       ####### GLANCE #######
       glance.name: "frigate"
       glance.icon: "sh:frigate"
-      glance.url: "https://frigate.$DOMAINNAME"
-      glance.description: "description"
+      glance.url: "https://kamera.$DOMAINNAME"
+      glance.description: "NVR with realtime local object detection for IP cameras"
