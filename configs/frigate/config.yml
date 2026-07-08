@@ -20,7 +20,7 @@ proxy:
 logger:
   default: info
   logs:
-    frigate.event: debug
+    frigate.event: info
 
 mqtt:
   enabled: true
@@ -47,6 +47,18 @@ model:
   input_pixel_format: bgr
   path: /openvino-model/ssdlite_mobilenet_v2.xml
   labelmap_path: /openvino-model/coco_91cl_bkgr.txt
+
+semantic_search:
+  enabled: false
+  model_size: small
+face_recognition:
+  enabled: true
+  model_size: large
+lpr:
+  enabled: true
+classification:
+  bird:
+    enabled: false
 
 go2rtc:
   streams:
@@ -104,15 +116,19 @@ cameras:
 
     objects: &id005
       track:
+        # - face # NOTE: Don't enable with `person` at the same time
         - person
         - car
         - motorcycle
         - horse
-        - suitcase
-        - knife
-        # - face
+        # - suitcase
+        # - knife
         # - cat
 
+    motion:
+      threshold: 50
+      contour_area: 30
+      improve_contrast: true
   giris:
     <<: &camera_defaults
       ffmpeg: *id001
@@ -133,6 +149,10 @@ cameras:
     record: *id003
     snapshots: *id004
     objects: *id005
+    motion:
+      threshold: 50
+      contour_area: 30
+      improve_contrast: true
   garajustu:
     <<: *camera_defaults
     ffmpeg:
@@ -148,6 +168,10 @@ cameras:
     record: *id003
     snapshots: *id004
     objects: *id005
+    motion:
+      threshold: 50
+      contour_area: 30
+      improve_contrast: true
   altbahce:
     <<: *camera_defaults
     ffmpeg:
@@ -163,6 +187,10 @@ cameras:
     record: *id003
     snapshots: *id004
     objects: *id005
+    motion:
+      threshold: 50
+      contour_area: 30
+      improve_contrast: true
   kamelya:
     <<: *camera_defaults
     ffmpeg:
@@ -178,4 +206,8 @@ cameras:
     record: *id003
     snapshots: *id004
     objects: *id005
+    motion:
+      threshold: 50
+      contour_area: 30
+      improve_contrast: true
 version: 0.17-0

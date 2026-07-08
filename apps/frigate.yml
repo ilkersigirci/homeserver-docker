@@ -27,8 +27,8 @@ services:
       - SETGID
       - SETUID
     pids_limit: 1024
-    cpus: "1.0"
-    mem_limit: 4G
+    cpus: "4.0"
+    mem_limit: 6G
     ulimits:
       nofile:
         soft: 4096
