@@ -33,6 +33,17 @@ http:
           - middlewares-secure-headers-relaxed
           - middlewares-tinyauth
 
+    chain-tinyauth-headers-relaxed:
+      chain:
+        middlewares:
+{{if env "CROWDSEC_TRAEFIK_BOUNCER_API_KEY"}}
+          - middlewares-cf-real-ip
+          - middlewares-crowdsec-bouncer
+{{end}}
+          - middlewares-rate-limit
+          - middlewares-secure-headers-relaxed
+          - middlewares-tinyauth-headers
+
     chain-tinyauth-original:
       chain:
         middlewares:

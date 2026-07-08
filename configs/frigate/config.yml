@@ -4,6 +4,19 @@ tls:
 auth:
   enabled: false
 
+proxy:
+  default_role: admin
+
+## NOTE: For tinyauth proxy auth
+# proxy:
+#   default_role: viewer
+#   header_map:
+#     user: Remote-User
+#     role: Remote-Groups
+#     role_map:
+#       admin:
+#         - family
+
 logger:
   default: info
   logs:
@@ -11,7 +24,7 @@ logger:
 
 mqtt:
   enabled: true
-  host: '{FRIGATE_MOSQUITTO_HOST}'
+  host: "{FRIGATE_MOSQUITTO_HOST}"
 
 # Hardware acceleration for Intel Xe Graphics
 ffmpeg:
