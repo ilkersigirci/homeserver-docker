@@ -1,27 +1,13 @@
 # NOTE: Compose file: https://github.com/maziggy/bambuddy/blob/main/docker-compose.yml
 
 services:
-  # Optional: External PostgreSQL database
-  # Uncomment to run Postgres alongside Bambuddy (or use an external Postgres host)
-  #postgres:
-  #  image: postgres:16-alpine
-  #  container_name: bambuddy-db
-  #  restart: unless-stopped
-  #  environment:
-  #    POSTGRES_USER: bambuddy
-  #    POSTGRES_PASSWORD: changeme
-  #    POSTGRES_DB: bambuddy
-  #  volumes:
-  #    - bambuddy_pgdata:/var/lib/postgresql/data
-  #  ports:
-  #    - "5432:5432"
-
+  # NOTE: It uses sqlite by default but supports PostgreSQL database also
   bambuddy:
     image: ghcr.io/maziggy/bambuddy:0.2.4.8@sha256:b1ef7231005c246d33b1f1e85e7d3466180aab185692c28f1d050aad09c0bcbe
     container_name: bambuddy
     restart: $RESTART_POLICY_OTHERS
     profiles:
-      - group
+      - others
     networks:
       - t3_proxy
     expose:
@@ -95,7 +81,7 @@ services:
       tinyauth.apps.bambuddy.config.domain: "bambuddy.$DOMAINNAME"
       tinyauth.apps.bambuddy.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
-      homepage.group: "group"
+      homepage.group: "Others"
       homepage.name: "bambuddy"
       homepage.icon: "bambuddy.png"
       homepage.href: "https://bambuddy.$DOMAINNAME"
