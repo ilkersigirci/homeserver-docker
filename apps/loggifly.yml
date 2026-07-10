@@ -1,6 +1,6 @@
 services:
   loggifly:
-    image: ghcr.io/clemcer/loggifly:v2.0.1@sha256:5eae87a3fd141dd7af12a53bb470bd6902d8dc6c8d6ec1d5017d5abdd4c64930
+    image: ghcr.io/clemcer/loggifly:v2.1.0@sha256:9f141d01602dffb9238fd39ece7bef845914297bc5eeb9c985e7525cb8abaf8c
     container_name: loggifly
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
