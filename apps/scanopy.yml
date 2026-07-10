@@ -82,7 +82,7 @@ services:
       start_period: 30s
 
   scanopy:
-    image: ghcr.io/scanopy/scanopy/server:v0.16.2@sha256:e3c55cd639b9643c01e21c1fcc5470c6524ea5c3ac316768bf028737c656bbe6
+    image: ghcr.io/scanopy/scanopy/server:v0.17.3@sha256:c55180ea9865f49566ac5670bc2e2beb900f86def777c2754381f87cdc97dce7
     container_name: scanopy
     restart: $RESTART_POLICY_MAINTENANCE
     init: true
