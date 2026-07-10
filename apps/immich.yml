@@ -188,19 +188,17 @@ services:
       glance.description: "Selfhosted Photo App"
 
   ##############################################
-  # FIXME: Doesn't support immich v3 currently. Update when it does
   # https://github.com/Salvoxia/immich-folder-album-creator
   immich-folder-album-creator:
-    image: salvoxia/immich-folder-album-creator:0.25.2@sha256:79b82f9818ded34c8dcfc5df0502126fdaff698b94ddad4b20ac1f0c3a7dcba2
+    image: salvoxia/immich-folder-album-creator:1.0.0@sha256:0bfc95b501209d158bca089135efb236f276a8a4f4ec6b16ca8455ea562764ad
     container_name: immich-folder-album-creator
     restart: "no"
     depends_on:
       immich-server:
         condition: service_healthy
     profiles:
-      # - media
-      # - immich
-      - not-used
+      - media
+      - immich
     networks:
       - immich_backend
     user: $PUID:$PGID
