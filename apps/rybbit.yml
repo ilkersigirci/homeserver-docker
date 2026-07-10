@@ -6,7 +6,7 @@ networks:
 
 services:
   rybbit-clickhouse:
-    image: clickhouse/clickhouse-server:26.5.1@sha256:07afc18d8a9706eb9d85c5c5d2752e5270f91bbc2894caeaecb73e4d0f603bf5
+    image: clickhouse/clickhouse-server:26.6.1@sha256:fb3fef87331930795d3f96e9788b5bd6bcb39b70ab2df9169c03610eafc9c655
     container_name: rybbit-clickhouse
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
