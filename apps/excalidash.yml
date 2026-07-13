@@ -12,7 +12,7 @@ services:
       - t3_proxy
     expose:
       - 8000
-    read_only: true
+    read_only: false # NOTE: It doesn't work otherwise
     tmpfs:
       - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
       - /app/uploads:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=700
