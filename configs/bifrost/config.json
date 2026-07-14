@@ -43,5 +43,25 @@
         "metrics_push_interval": 15
       }
     }
-  ]
+  ],
+  "providers": {
+    "lgos": {
+      "keys": [],
+      "network_config": {
+        "base_url": "http://192.168.2.21:8000",
+        "allow_private_network": true
+      },
+      "custom_provider_config": {
+        "base_provider_type": "openai",
+        "is_key_less": true,
+        "allowed_requests": {
+          "list_models": true,
+          "chat_completion": true,
+          "chat_completion_stream": true,
+          "passthrough": true,
+          "passthrough_stream": true
+        }
+      }
+    }
+  }
 }
