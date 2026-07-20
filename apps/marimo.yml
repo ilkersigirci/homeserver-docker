@@ -1,7 +1,6 @@
 services:
   marimo:
-    image: homeserver-marimo:test
-    pull_policy: never # Remove after switching to the published GHCR image.
+    image: ghcr.io/ilkersigirci/homeserver-marimo:0.23.14@sha256:adfd3cd44af1834e36638ac980870fa87860814df1833cd5739cbdd67b7a2ad2
     container_name: marimo
     restart: $RESTART_POLICY_PROGRAMMING
     init: true
@@ -84,8 +83,7 @@ services:
       glance.description: "Sandboxed notebooks with isolated uv environments"
 
   codex-acp:
-    image: homeserver-codex-acp:test
-    pull_policy: never # Remove after switching to the published GHCR image.
+    image: ghcr.io/ilkersigirci/homeserver-codex-acp:1.1.4-ws0.2.0@sha256:4542676b0f10f337eefc9eae132fd61bd96da144367be688b12b5244f2b1144b
     container_name: codex-acp
     restart: $RESTART_POLICY_PROGRAMMING
     init: true
