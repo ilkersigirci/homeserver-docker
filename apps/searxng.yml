@@ -70,7 +70,7 @@ services:
       glance.description: "Free internet metasearch engine"
 
   searxng-valkey:
-    image: docker.io/valkey/valkey:9@sha256:8436e10bc65c94886a91d4415b6a6dfa9cb5a306fb3b996e5bb67cd2b4854193
+    image: docker.io/valkey/valkey:9@sha256:8e8d64b405ce18f41b8e5ee20aa4687a8ed0022d1298f2ce31cdcf3a76e09411
     container_name: searxng-valkey
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
