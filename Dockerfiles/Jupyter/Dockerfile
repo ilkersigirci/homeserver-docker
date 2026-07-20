@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.25@sha256:0adf442eae370b6087e08edc7c50b552d80ddf261576f4ebd6421006b2461f12
-ARG IMAGE_VERSION=0.11.26-python3.13-trixie-slim
+ARG IMAGE_VERSION=0.11.29-python3.13-trixie-slim
 
-FROM ghcr.io/astral-sh/uv:${IMAGE_VERSION}@sha256:d8a45a30929a5bfedd8b09d630538ca1ab30041154d2a6cb2e4fee3cffd3ea4c
+FROM ghcr.io/astral-sh/uv:${IMAGE_VERSION}@sha256:0b973c14a35cb0dc8fe63a2e8c9919fd797ac566de13090fcf0df4a6b3994b78
 
 ENV HOME=/tmp/jupyter-home \
     IPYTHONDIR=/jupyter/ipython \

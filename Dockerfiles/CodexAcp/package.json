@@ -1,0 +1,11 @@
+{
+  "name": "homeserver-codex-acp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pinned runtime for the Codex ACP adapter",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@agentclientprotocol/codex-acp": "1.1.4",
+    "stdio-to-ws": "0.2.0"
+  }
+}

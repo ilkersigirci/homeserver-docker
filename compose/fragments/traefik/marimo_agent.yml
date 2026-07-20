@@ -1,0 +1,9 @@
+services:
+  traefik:
+    ports:
+      - name: marimo-agent
+        target: 3021
+        published: "3021"
+        host_ip: $LOCAL_STATIC_IP
+        protocol: tcp
+        mode: host

@@ -38,6 +38,8 @@ services:
       - --certificatesResolvers.dns-cloudflare.acme.email=$CLOUDFLARE_EMAIL
       - --certificatesResolvers.dns-cloudflare.acme.storage=/acme.json
       # - --entrypoints.dot.address=:853
+      # Only gpu_coding publishes this listener on the host for Marimo ACP.
+      - --entrypoints.marimoagent.address=:3021
       - --entrypoints.traefik.address=:8080
       - --entrypoints.web.address=:80
       - --entrypoints.web.http.underscoreHeadersStrategy=delete

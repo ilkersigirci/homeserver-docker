@@ -1,0 +1,12 @@
+.venv/
+.cache/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+version_tagging.sh
+README.md
+docs/
+
+.env
+.marimo.toml

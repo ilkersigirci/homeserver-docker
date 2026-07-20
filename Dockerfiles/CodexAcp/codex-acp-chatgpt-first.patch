@@ -1,0 +1,15 @@
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -24913,10 +24913,11 @@
+   }
+ };
+ function getCodexAuthMethods(clientCapabilities, env = process.env) {
+-  const authMethods = [ApiKeyAuthMethod];
++  const authMethods = [];
+   if (!env["NO_BROWSER"]) {
+     authMethods.push(ChatGptAuthMethod);
+   }
++  authMethods.push(ApiKeyAuthMethod);
+   const supportsGatewayAuth = clientCapabilities?.auth?._meta?.["gateway"] === true;
+   if (supportsGatewayAuth) {
+     authMethods.push(GatewayAuthMethod);

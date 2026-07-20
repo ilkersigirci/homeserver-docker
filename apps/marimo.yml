@@ -1,0 +1,151 @@
+services:
+  marimo:
+    image: homeserver-marimo:test
+    pull_policy: never # Remove after switching to the published GHCR image.
+    container_name: marimo
+    restart: $RESTART_POLICY_PROGRAMMING
+    init: true
+    stop_grace_period: 30s
+    profiles:
+      - programming
+    depends_on:
+      codex-acp:
+        condition: service_healthy
+    networks:
+      - t3_proxy
+    expose:
+      - 8080
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      # Keep the rendered config and home state ephemeral.
+      - /tmp:rw,exec,nosuid,nodev,size=1g,uid=${PUID},gid=${PGID},mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    secrets:
+      - source: marimo_ai
+        target: marimo_ai
+    pids_limit: 1024
+    cpus: "4.0"
+    mem_limit: "8G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      - $REPO_PATH/configs/marimo/marimo.toml:/etc/marimo/marimo.toml:ro
+      - $REPO_PATH/data/marimo:/workspace
+    environment:
+      HOME: /tmp/marimo-home
+      MARIMO_CONFIG_FILE: /etc/marimo/marimo.toml
+      MARIMO_SECRETS_FILE: /run/secrets/marimo_ai
+      TOKEN: ${TOKEN:-}
+      # Keep sandbox venvs on the uv-cache filesystem so packages can be linked.
+      TMPDIR: /workspace/.cache/marimo/tmp
+      UV_CACHE_DIR: /workspace/.cache/uv
+      UV_PYTHON_BIN_DIR: /workspace/.local/bin
+      UV_PYTHON_INSTALL_DIR: /workspace/.local/share/uv/python
+      XDG_CACHE_HOME: /workspace/.cache
+      XDG_CONFIG_HOME: /tmp/marimo-home/.config
+      XDG_DATA_HOME: /workspace/.local/share
+      TZ: $TZ
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/marimo-healthcheck"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 45s
+      start_interval: 5s
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.marimo-rtr.entrypoints: "websecure"
+      traefik.http.routers.marimo-rtr.rule: "Host(`marimo.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.marimo-rtr.middlewares: "chain-tinyauth-relaxed@file"
+      ## HTTP Services
+      traefik.http.routers.marimo-rtr.service: "marimo-svc"
+      traefik.http.services.marimo-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.marimo.config.domain: "marimo.$DOMAINNAME"
+      tinyauth.apps.marimo.ip.bypass: "$LOCAL_IPS"
+      ####### HOMEPAGE #######
+      homepage.group: "Programming"
+      homepage.name: "Marimo"
+      homepage.href: "https://marimo.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Sandboxed notebooks with isolated uv environments"
+      ####### GLANCE #######
+      glance.name: "Marimo"
+      glance.url: "https://marimo.$DOMAINNAME"
+      glance.description: "Sandboxed notebooks with isolated uv environments"
+
+  codex-acp:
+    image: homeserver-codex-acp:test
+    pull_policy: never # Remove after switching to the published GHCR image.
+    container_name: codex-acp
+    restart: $RESTART_POLICY_PROGRAMMING
+    init: true
+    stop_grace_period: 30s
+    profiles:
+      - programming
+    networks:
+      - t3_proxy
+    expose:
+      - 3021
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,size=512m,uid=${PUID},gid=${PGID},mode=1777
+      - /codex-home:rw,nosuid,nodev,size=512m,uid=${PUID},gid=${PGID},mode=0700
+    security_opt:
+      - no-new-privileges:true
+      # Codex's Bubblewrap sandbox needs unprivileged user namespaces and
+      # syscalls blocked by Docker's default seccomp profile.
+      - seccomp=unconfined
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 1024
+    cpus: "4.0"
+    mem_limit: "8G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      # Keep the same absolute workspace path Marimo sends in ACP sessions.
+      - $REPO_PATH/data/marimo:/workspace
+      - type: bind
+        source: $REPO_PATH/configs/codex-acp/auth.json
+        target: /codex-home/auth.json
+        read_only: false
+        bind:
+          create_host_path: false
+    environment:
+      CODEX_HOME: /codex-home
+      HOME: /tmp/codex-user
+      TZ: $TZ
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/codex-acp-healthcheck"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+      start_interval: 5s
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.marimo-agent-rtr.entrypoints: "marimoagent"
+      traefik.http.routers.marimo-agent-rtr.rule: "Host(`marimo.$DOMAINNAME`) && Path(`/message`)"
+      traefik.http.routers.marimo-agent-rtr.middlewares: "chain-tinyauth-relaxed@file"
+      traefik.http.routers.marimo-agent-rtr.service: "marimo-agent-svc"
+      traefik.http.routers.marimo-agent-rtr.tls: "true"
+      traefik.http.routers.marimo-agent-rtr.tls.options: "tls-max@file"
+      traefik.http.services.marimo-agent-svc.loadbalancer.server.port: "3021"
+
+secrets:
+  marimo_ai:
+    file: $REPO_PATH/configs/marimo/secrets.toml
