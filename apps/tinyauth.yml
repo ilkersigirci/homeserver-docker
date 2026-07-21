@@ -3,7 +3,7 @@
 # Create TOTP: docker run -i -t --rm ghcr.io/tinyauthapp/tinyauth:v5.0.7 totp generate --interactive
 services:
   tinyauth:
-    image: ghcr.io/tinyauthapp/tinyauth:v5.1.0@sha256:b16837b6b88dcfdc43881a1efb30b913bb5a82ae6a3f85486841f817f6f6649d
+    image: ghcr.io/tinyauthapp/tinyauth:v5.1.2@sha256:910f84801dc9597398458d45f8d305eb232dc583d6927c87cc29626527947d35
     container_name: tinyauth
     restart: $RESTART_POLICY_CORE
     depends_on:
@@ -43,9 +43,11 @@ services:
       ## Authentication Configuration
       # TINYAUTH_AUTH_IP_ALLOW: $LOCAL_IPS # NOTE: It doesn't bypass LOCAL_IPS
       # TINYAUTH_AUTH_IP_BLOCK: ""
+      TINYAUTH_AUTH_IP_BYPASS: $LOCAL_IPS
       # TINYAUTH_AUTH_USERS: $TINYAUTH_USERS
       TINYAUTH_AUTH_SECURECOOKIE: true
       TINYAUTH_AUTH_LOGINMAXRETRIES: 3
+      TINYAUTH_AUTH_TRUSTEDPROXIES: "192.168.90.254" # NOTE: Address of traefik container
       ## ACLs Configuration
       # TINYAUTH_APPS_WHOAMI_CONFIG_DOMAIN: whoami.example.com
       # TINYAUTH_APPS_WHOAMI_USERS_ALLOW: john
