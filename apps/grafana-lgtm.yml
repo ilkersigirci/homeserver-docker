@@ -1,6 +1,6 @@
 services:
   grafana-lgtm:
-    image: grafana/otel-lgtm:0.28.0@sha256:10f48eb2f8670134df542177bb19536c55421b089e43f9dfc2a27d4c078204d8
+    image: grafana/otel-lgtm:0.29.0@sha256:6e14b923e0130b8b294ca5bcc7c94d54e899d150817e6c3ed82d9b665afe5499
     container_name: grafana-lgtm
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
@@ -136,9 +136,6 @@ services:
       traefik.http.services.grafana-lgtm-rpc-svc.loadbalancer.server.scheme: "h2c"
       ## OTLP HTTP Service
       traefik.http.services.grafana-lgtm-rpc-http-svc.loadbalancer.server.port: "4318"
-      ####### TINYAUTH #######
-      tinyauth.apps.grafana-lgtm.config.domain: "grafana.$DOMAINNAME"
-      tinyauth.apps.grafana-lgtm.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Monitoring"
       homepage.name: "grafana-lgtm"

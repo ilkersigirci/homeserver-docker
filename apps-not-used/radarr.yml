@@ -42,9 +42,6 @@ services:
       traefik.http.routers.radarr-rtr.service: "radarr-svc"
       traefik.http.routers.radarr-rtr-bypass.service: "radarr-svc"
       traefik.http.services.radarr-svc.loadbalancer.server.port: "7878"
-      ####### TINYAUTH #######
-      tinyauth.apps.radarr.config.domain: "radarr.$DOMAINNAME"
-      tinyauth.apps.radarr.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "Radarr"

@@ -51,9 +51,6 @@ services:
       ## HTTP Services
       traefik.http.routers.vscodium-rtr.service: "vscodium-svc"
       traefik.http.services.vscodium-svc.loadbalancer.server.port: "3000"
-      ####### TINYAUTH #######
-      tinyauth.apps.vscodium.config.domain: "code.$DOMAINNAME"
-      tinyauth.apps.vscodium.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Programming"
       homepage.name: "VSCodium"

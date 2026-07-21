@@ -60,9 +60,6 @@ services:
       ## HTTP Services
       traefik.http.routers.office-rtr.service: "office-svc"
       traefik.http.services.office-svc.loadbalancer.server.port: "9980"
-      ####### TINYAUTH #######
-      tinyauth.apps.office.config.domain: "office.$DOMAINNAME"
-      tinyauth.apps.office.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "collabora"
@@ -78,7 +75,7 @@ services:
 
   # NOTE: Selfhosted Version: v0.6.20260617
   filestash:
-    image: machines/filestash:latest@sha256:820c082f3353f611d0ea87a4d0d5ac075dd4203f7fb39a106b3490a5455f2037
+    image: machines/filestash:latest@sha256:2213e6ebf2ada795e7dce5b6524e6ce1406deea2d1b2d89e3b4e0b9bf2d17329
     container_name: filestash
     restart: $RESTART_POLICY_MEDIA
     profiles:
@@ -151,9 +148,6 @@ services:
       ## HTTP Services
       traefik.http.routers.filestash-rtr.service: "filestash-svc"
       traefik.http.services.filestash-svc.loadbalancer.server.port: "8334"
-      ####### TINYAUTH #######
-      tinyauth.apps.filestash.config.domain: "drive.$DOMAINNAME"
-      tinyauth.apps.filestash.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "filestash"

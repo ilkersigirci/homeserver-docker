@@ -3,7 +3,7 @@
 # TODO: Self Host AIOmetadata
 services:
   stremio:
-    image: tsaridas/stremio-docker:v1.3.7@sha256:92cb1be2da2299bf3ea9bc41730918a57af4de62b4360f34b7bfce4935868d1e
+    image: tsaridas/stremio-docker:v1.3.8@sha256:fc38cf30d4228ef4bd58d27e1f6ddbdb4e33e0f0dab969322f8d0a619ec71252
     container_name: stremio
     restart: $RESTART_POLICY_MEDIA
     profiles:
@@ -57,9 +57,6 @@ services:
       ## HTTP Services - Web UI
       traefik.http.routers.stremio-rtr.service: "stremio-svc"
       traefik.http.services.stremio-svc.loadbalancer.server.port: "8080"
-      ####### TINYAUTH #######
-      tinyauth.apps.stremio.config.domain: "stremio.$DOMAINNAME"
-      tinyauth.apps.stremio.ip.bypass: "$LOCAL_IPS"
       ## HTTP Routers - API
       traefik.http.routers.stremio-api-rtr.entrypoints: "websecure"
       traefik.http.routers.stremio-api-rtr.rule: "Host(`stremio-api.$DOMAINNAME`)"
@@ -143,8 +140,6 @@ services:
       homepage.href: "https://stremio-server.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Online Streaming Platform"
-      tinyauth.apps.stremio-server.config.domain: stremio-server.$DOMAINNAME
-      tinyauth.apps.stremio-server.ip.bypass: $LOCAL_IPS
       ####### GLANCE #######
       glance.name: Stremio
       glance.icon: sh:stremio-server

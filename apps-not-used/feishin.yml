@@ -21,9 +21,6 @@ services:
       ## HTTP Services
       traefik.http.routers.feishin-rtr.service: "feishin-svc"
       traefik.http.services.feishin-svc.loadbalancer.server.port: "9180"
-      ####### TINYAUTH #######
-      tinyauth.apps.feishin.config.domain: "feishin.$DOMAINNAME"
-      tinyauth.apps.feishin.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "Feishin"

@@ -34,9 +34,6 @@ services:
       ## HTTP Services
       traefik.http.routers.many-notes-rtr.service: "many-notes-svc"
       traefik.http.services.many-notes-svc.loadbalancer.server.port: "8080"
-      ####### TINYAUTH #######
-      tinyauth.apps.many-notes.config.domain: "many-notes.$DOMAINNAME"
-      tinyauth.apps.many-notes.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "many-notes"

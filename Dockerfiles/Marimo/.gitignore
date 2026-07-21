@@ -1,0 +1,17 @@
+.env
+
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+.cache/
+
+# Marimo files
+__marimo__
+.marimo.toml

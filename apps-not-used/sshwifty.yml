@@ -25,9 +25,6 @@ services:
       ## HTTP Services
       traefik.http.routers.sshwifty-rtr.service: "sshwifty-svc"
       traefik.http.services.sshwifty-svc.loadbalancer.server.port: "8182"
-      ####### TINYAUTH #######
-      tinyauth.apps.ssh.config.domain: "ssh.$DOMAINNAME"
-      tinyauth.apps.ssh.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "Sshwifty"

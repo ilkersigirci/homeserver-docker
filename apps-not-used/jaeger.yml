@@ -25,9 +25,6 @@ services:
       ## HTTP Services
       traefik.http.routers.jaeger-rtr.service: "jaeger-svc"
       traefik.http.services.jaeger-svc.loadbalancer.server.port: "16686"
-      ####### TINYAUTH #######
-      tinyauth.apps.jaeger.config.domain: "jaeger.$DOMAINNAME"
-      tinyauth.apps.jaeger.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Others"
       homepage.name: "jaeger"

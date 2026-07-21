@@ -48,9 +48,6 @@ services:
       ## HTTP Services
       traefik.http.routers.cloudbeaver-rtr.service: "cloudbeaver-svc"
       traefik.http.services.cloudbeaver-svc.loadbalancer.server.port: "8978"
-      ####### TINYAUTH #######
-      tinyauth.apps.cloudbeaver.config.domain: "cloudbeaver.$DOMAINNAME"
-      tinyauth.apps.cloudbeaver.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Programming"
       homepage.name: "cloudbeaver"

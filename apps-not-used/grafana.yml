@@ -36,9 +36,6 @@ services:
       ## HTTP Services
       traefik.http.routers.grafana-rtr.service: "grafana-svc"
       traefik.http.services.grafana-svc.loadbalancer.server.port: "3000"
-      ####### TINYAUTH #######
-      tinyauth.apps.grafana.config.domain: "grafana.$DOMAINNAME"
-      tinyauth.apps.grafana.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Monitoring"
       homepage.name: "Grafana"

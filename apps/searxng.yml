@@ -53,9 +53,6 @@ services:
       ## HTTP Services
       traefik.http.routers.searxng-rtr.service: "searxng-svc"
       traefik.http.services.searxng-svc.loadbalancer.server.port: "8080"
-      ####### TINYAUTH #######
-      tinyauth.apps.searxng.config.domain: "searxng.$DOMAINNAME"
-      tinyauth.apps.searxng.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Programming"
       homepage.name: "searxng"
@@ -70,22 +67,16 @@ services:
       glance.description: "Free internet metasearch engine"
 
   searxng-valkey:
-    image: docker.io/valkey/valkey:9-alpine@sha256:a35428eba9043cc0b79dbe54100f0c92784f2de00ad09b01182bfb1c5c83d1bd
+    image: docker.io/valkey/valkey:9@sha256:8e8d64b405ce18f41b8e5ee20aa4687a8ed0022d1298f2ce31cdcf3a76e09411
     container_name: searxng-valkey
-    command: valkey-server --save 30 1 --loglevel warning
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
       - programming
       - searxng
     networks:
       - searxng_backend
-    expose:
-      - "6379"
     user: $PUID:$PGID
     read_only: true
-    tmpfs:
-      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
-      - /run:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -99,9 +90,9 @@ services:
         soft: 4096
         hard: 8192
     volumes:
-      - $REPO_PATH/appdata/searxng-valkey:/data:rw
+      - $REPO_PATH/appdata/searxng-valkey:/data
     healthcheck:
-      test: ["CMD", "valkey-cli", "-h", "127.0.0.1", "ping"]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 1m
       timeout: 3s
       retries: 3

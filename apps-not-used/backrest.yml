@@ -34,9 +34,6 @@ services:
       ## HTTP Services
       traefik.http.routers.backrest-rtr.service: "backrest-svc"
       traefik.http.services.backrest-svc.loadbalancer.server.port: "9898"
-      ####### TINYAUTH #######
-      tinyauth.apps.backrest.config.domain: "backrest.$DOMAINNAME"
-      tinyauth.apps.backrest.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "Backrest"

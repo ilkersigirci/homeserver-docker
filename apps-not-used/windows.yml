@@ -45,9 +45,6 @@ services:
       ## HTTP Services
       traefik.http.routers.windows-rtr.service: "windows-svc"
       traefik.http.services.windows-svc.loadbalancer.server.port: "8006"
-      ####### TINYAUTH #######
-      tinyauth.apps.windows.config.domain: "windows.$DOMAINNAME"
-      tinyauth.apps.windows.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "windows"

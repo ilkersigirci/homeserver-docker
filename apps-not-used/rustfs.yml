@@ -75,9 +75,6 @@ services:
       ## HTTP Services
       traefik.http.routers.rustfs-rtr.service: "rustfs-svc"
       traefik.http.services.rustfs-svc.loadbalancer.server.port: "9000"
-      ####### TINYAUTH #######
-      tinyauth.apps.rustfs.config.domain: "rustfs.$DOMAINNAME"
-      tinyauth.apps.rustfs.ip.bypass: "$LOCAL_IPS"
       ### Web UI Labels ###
       ## HTTP Routers
       traefik.http.routers.rustfs-ui-rtr.entrypoints: "websecure"

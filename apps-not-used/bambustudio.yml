@@ -52,9 +52,6 @@ services:
       ## HTTP Services
       traefik.http.routers.bambustudio-rtr.service: "bambustudio-svc"
       traefik.http.services.bambustudio-svc.loadbalancer.server.port: "3000"
-      ####### TINYAUTH #######
-      tinyauth.apps.bambustudio.config.domain: "bambustudio.$DOMAINNAME"
-      tinyauth.apps.bambustudio.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "DesktopApps"
       homepage.name: "bambustudio"

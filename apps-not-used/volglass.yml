@@ -29,9 +29,6 @@ services:
       ## HTTP Services
       traefik.http.routers.volglass-rtr.service: "volglass-svc"
       traefik.http.services.volglass-svc.loadbalancer.server.port: "3000"
-      ####### TINYAUTH #######
-      tinyauth.apps.volglass.config.domain: "volglass.$DOMAINNAME"
-      tinyauth.apps.volglass.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "Volglass"

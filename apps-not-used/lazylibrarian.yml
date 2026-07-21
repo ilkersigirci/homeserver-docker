@@ -31,9 +31,6 @@ services:
       ## HTTP Services
       traefik.http.routers.lazylibrarian-rtr.service: "lazylibrarian-svc"
       traefik.http.services.lazylibrarian-svc.loadbalancer.server.port: "5299"
-      ####### TINYAUTH #######
-      tinyauth.apps.lazy.config.domain: "lazy.$DOMAINNAME"
-      tinyauth.apps.lazy.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "LazyLibrarian"

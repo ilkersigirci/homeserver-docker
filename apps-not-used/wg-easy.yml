@@ -49,9 +49,6 @@ services:
       timeout: 5s
       retries: 3
     labels:
-      ####### TINYAUTH #######
-      tinyauth.apps.wg-easy-14.config.domain: "wireguard.$DOMAINNAME"
-      tinyauth.apps.wg-easy-14.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "Wg-Easy"
@@ -112,9 +109,6 @@ services:
       ## HTTP Services
       traefik.http.routers.wg-easy-14-no-host-rtr.service: "wg-easy-14-no-host-svc"
       traefik.http.services.wg-easy-14-no-host-svc.loadbalancer.server.port: "51821"
-      ####### TINYAUTH #######
-      tinyauth.apps.wg-easy-14-no-host.config.domain: "wireguard.$DOMAINNAME"
-      tinyauth.apps.wg-easy-14-no-host.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "Wireguard"
@@ -166,9 +160,6 @@ services:
       # - "traefik.udp.routers.wg-easy-rtr.entrypoints=wireguard"
       # - "traefik.udp.routers.wg-easy-rtr.service-wg-easy-svc"
       # - "traefik.udp.services.wg-easy-svc.loadbalancer.server.port=51820"
-      ####### TINYAUTH #######
-      tinyauth.apps.wg-easy.config.domain: "wireguard.$DOMAINNAME"
-      tinyauth.apps.wg-easy.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "Wireguard"

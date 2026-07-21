@@ -6,3 +6,9 @@ dependencies = [
   "ipykernel>=7.1.0",
   "jupyterlab==4.6.1",
 ]
+
+[tool.uv]
+environments = [
+  "sys_platform == 'linux' and platform_machine == 'aarch64'",
+  "sys_platform == 'linux' and platform_machine == 'x86_64'",
+]

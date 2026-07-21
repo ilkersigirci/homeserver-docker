@@ -61,9 +61,6 @@ services:
       ## HTTP Services
       traefik.http.routers.pdfding-rtr.service: "pdfding-svc"
       traefik.http.services.pdfding-svc.loadbalancer.server.port: "8000"
-      ####### TINYAUTH #######
-      tinyauth.apps.pdfding.config.domain: "pdfding.$DOMAINNAME"
-      tinyauth.apps.pdfding.ip.bypass: "$LOCAL_IPS"
       ### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "pdfding"

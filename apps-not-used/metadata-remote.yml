@@ -26,9 +26,6 @@ services:
       ## HTTP Services
       traefik.http.routers.metadata-remote-rtr.service: "metadata-remote-svc"
       traefik.http.services.metadata-remote-svc.loadbalancer.server.port: "8338"
-      ####### TINYAUTH #######
-      tinyauth.apps.music-metadata.config.domain: "music-metadata.$DOMAINNAME"
-      tinyauth.apps.music-metadata.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "metadata-remote"

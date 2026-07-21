@@ -32,9 +32,6 @@ services:
       ## HTTP Services
       traefik.http.routers.flatnotes-rtr.service: "flatnotes-svc"
       traefik.http.services.flatnotes-svc.loadbalancer.server.port: "8080"
-      ####### TINYAUTH #######
-      tinyauth.apps.flatnotes.config.domain: "flatnotes.$DOMAINNAME"
-      tinyauth.apps.flatnotes.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "Flatnotes"

@@ -33,9 +33,6 @@ services:
       ## HTTP Services
       traefik.http.routers.code-server-rtr.service: "code-server-svc"
       traefik.http.services.code-server-svc.loadbalancer.server.port: "8443"
-      ####### TINYAUTH #######
-      tinyauth.apps.code-server.config.domain: "code.$DOMAINNAME"
-      tinyauth.apps.code-server.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Programming"
       homepage.name: "Vscode"

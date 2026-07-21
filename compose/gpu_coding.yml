@@ -27,7 +27,9 @@ include:
   - ../apps/docker-socket-proxy.yml
   - ../apps/logrotate.yml
   - ../apps/tinyauth.yml
-  - ../apps/traefik.yml
+  - path:
+      - ../apps/traefik.yml
+      - ./fragments/traefik/marimo_agent.yml
   - ../apps/otel-collector-agent.yml
   ###### MAINTENANCE ####
   - ../apps/scanopy.yml
@@ -40,5 +42,6 @@ include:
   - ../apps/langfuse.yml
   - ../apps/cloudbeaver.yml
   - ../apps/jupyterlab.yml
+  - ../apps/marimo.yml
   # - ../apps/pgweb.yml
   # - ../apps/pgadmin.yml # TODO

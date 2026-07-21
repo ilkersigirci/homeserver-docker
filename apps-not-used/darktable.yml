@@ -23,9 +23,6 @@ services:
       ## HTTP Services
       traefik.http.routers.darktable-rtr.service: "darktable-svc"
       traefik.http.services.darktable-svc.loadbalancer.server.port: "3000"
-      ####### TINYAUTH #######
-      tinyauth.apps.darktable.config.domain: "darktable.$DOMAINNAME"
-      tinyauth.apps.darktable.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "DesktopApps"
       homepage.name: "Darktable"

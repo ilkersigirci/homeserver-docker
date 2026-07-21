@@ -50,9 +50,6 @@ services:
       ## HTTP Services
       traefik.http.routers.excalidraw-rtr.service: "excalidraw-svc"
       traefik.http.services.excalidraw-svc.loadbalancer.server.port: "80"
-      ####### TINYAUTH #######
-      tinyauth.apps.excalidraw.config.domain: "draw.$DOMAINNAME"
-      tinyauth.apps.excalidraw.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Others"
       homepage.name: "Excalidraw"
@@ -101,6 +98,3 @@ services:
       ## HTTP Services
       traefik.http.routers.excalidraw-room-rtr.service: "excalidraw-room-svc"
       traefik.http.services.excalidraw-room-svc.loadbalancer.server.port: "80"
-      ####### TINYAUTH #######
-      tinyauth.apps.excalidraw-room.config.domain: "draw2gether.$DOMAINNAME"
-      tinyauth.apps.excalidraw-room.ip.bypass: "$LOCAL_IPS"

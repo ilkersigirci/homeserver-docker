@@ -1,0 +1,17 @@
+[project]
+name = "marimo-home"
+version = "0.1.0"
+description = "Minimal Marimo Sandboxed Home launcher"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "marimo[sandbox]==0.23.14",
+    "pydantic-ai-slim[openai]>=1.107.0,<3.0.0",
+    "ty==0.0.55",
+]
+
+[tool.uv]
+environments = [
+    "sys_platform == 'linux' and platform_machine == 'aarch64'",
+    "sys_platform == 'linux' and platform_machine == 'x86_64'",
+]

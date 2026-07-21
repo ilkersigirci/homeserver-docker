@@ -70,8 +70,6 @@ services:
       traefik.http.routers.frigate-rtr.service: "frigate-svc"
       traefik.http.services.frigate-svc.loadbalancer.server.port: "8971"
       ####### TINYAUTH #######
-      tinyauth.apps.frigate.config.domain: "kamera.$DOMAINNAME"
-      tinyauth.apps.frigate.ip.bypass: "$LOCAL_IPS"
       # tinyauth.apps.frigate.oauth.groups: "family" # NOTE: For tinyauth proxy auth
       ####### HOMEPAGE #######
       homepage.group: "Media"

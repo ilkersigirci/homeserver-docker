@@ -5,6 +5,7 @@
     "docker-compose",
     "dockerfile",
     "github-actions",
+    "npm",
     "pep621"
   ],
   "includePaths": [
@@ -31,12 +32,86 @@
       "pinDigests": true
     },
     {
-      "description": "Use JupyterLab GitHub releases for Python dependency changelogs",
+      "description": "Disable non-release-driver updates for package-derived custom images",
+      "matchFileNames": [
+        "Dockerfiles/CodexAcp/**",
+        "Dockerfiles/Jupyter/**",
+        "Dockerfiles/Marimo/**"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "Use Codex ACP as the Codex ACP custom image release driver",
+      "matchManagers": ["npm"],
+      "matchDatasources": ["npm"],
+      "matchFileNames": ["Dockerfiles/CodexAcp/package.json"],
+      "matchPackageNames": ["@agentclientprotocol/codex-acp"],
+      "enabled": true,
+      "sourceUrl": "https://github.com/agentclientprotocol/codex-acp",
+      "changelogUrl": "https://github.com/agentclientprotocol/codex-acp/releases"
+    },
+    {
+      "description": "Ignore non-final images in the Gatus Dockerfile",
+      "matchManagers": ["dockerfile"],
+      "matchFileNames": ["Dockerfiles/Gatus/Dockerfile"],
+      "matchDepTypes": ["stage", "syntax"],
+      "enabled": false
+    },
+    {
+      "description": "Track Gatus releases only",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": [
+        "ghcr.io/ilkersigirci/homeserver-gatus",
+        "ghcr.io/twin/gatus"
+      ],
+      "sourceUrl": "https://github.com/TwiN/gatus",
+      "changelogUrl": "https://github.com/TwiN/gatus/releases",
+      "digest": {
+        "enabled": false
+      }
+    },
+    {
+      "description": "Use JupyterLab as the Jupyter custom image release driver",
       "matchManagers": ["pep621"],
       "matchDatasources": ["pypi"],
+      "matchFileNames": ["Dockerfiles/Jupyter/pyproject.toml"],
       "matchPackageNames": ["jupyterlab"],
+      "enabled": true,
       "sourceUrl": "https://github.com/jupyterlab/jupyterlab",
       "changelogUrl": "https://github.com/jupyterlab/jupyterlab/releases"
+    },
+    {
+      "description": "Use Marimo as the Marimo custom image release driver",
+      "matchManagers": ["pep621"],
+      "matchDatasources": ["pypi"],
+      "matchFileNames": ["Dockerfiles/Marimo/pyproject.toml"],
+      "matchPackageNames": ["marimo"],
+      "enabled": true,
+      "sourceUrl": "https://github.com/marimo-team/marimo",
+      "changelogUrl": "https://github.com/marimo-team/marimo/releases"
+    },
+    {
+      "description": "Disable standalone lock-file maintenance for package-derived custom images",
+      "matchManagers": ["npm", "pep621"],
+      "matchFileNames": [
+        "Dockerfiles/CodexAcp/package.json",
+        "Dockerfiles/CodexAcp/package-lock.json",
+        "Dockerfiles/Jupyter/pyproject.toml",
+        "Dockerfiles/Jupyter/uv.lock",
+        "Dockerfiles/Marimo/pyproject.toml",
+        "Dockerfiles/Marimo/uv.lock"
+      ],
+      "matchUpdateTypes": ["lockFileMaintenance"],
+      "enabled": false
+    },
+    {
+      "description": "Use Codex ACP GitHub releases for homeserver Codex ACP image changelogs",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchFileNames": ["apps/marimo.yml"],
+      "matchPackageNames": ["ghcr.io/ilkersigirci/homeserver-codex-acp"],
+      "sourceUrl": "https://github.com/agentclientprotocol/codex-acp",
+      "changelogUrl": "https://github.com/agentclientprotocol/codex-acp/releases"
     },
     {
       "description": "Use JupyterLab GitHub releases for homeserver Jupyter image changelogs",
@@ -48,59 +123,20 @@
       "changelogUrl": "https://github.com/jupyterlab/jupyterlab/releases"
     },
     {
-      "description": "Disable Renovate updates for all images in Immich compose files by default",
-      "matchManagers": ["docker-compose"],
-      "matchFileNames": [
-        "apps/immich*.yml",
-        "compose/fragments/immich-machine-learning/*.yml"
-      ],
-      "enabled": false
-    },
-    {
-      "description": "Allow only Immich app and machine-learning images to update",
-      "matchManagers": ["docker-compose"],
-      "matchFileNames": [
-        "apps/immich*.yml",
-        "compose/fragments/immich-machine-learning/*.yml"
-      ],
-      "matchPackageNames": [
-        "ghcr.io/immich-app/immich-server",
-        "ghcr.io/immich-app/immich-machine-learning",
-        "alangrainger/immich-public-proxy"
-      ],
-      "enabled": true
-    },
-    {
-      "description": "Disable Meilisearch updates that are version-coupled to Karakeep and Jellyfin",
-      "matchManagers": ["docker-compose"],
-      "matchFileNames": ["apps/karakeep.yml", "apps/jellyfin.yml"],
-      "matchPackageNames": ["getmeili/meilisearch"],
-      "enabled": false
-    },
-    {
-      "description": "Use GitHub releases for Glance Docker image changelogs",
+      "description": "Use Marimo GitHub releases for homeserver Marimo image changelogs",
       "matchManagers": ["docker-compose"],
       "matchDatasources": ["docker"],
-      "matchPackageNames": ["glanceapp/glance"],
-      "sourceUrl": "https://github.com/glanceapp/glance"
+      "matchFileNames": ["apps/marimo.yml"],
+      "matchPackageNames": ["ghcr.io/ilkersigirci/homeserver-marimo"],
+      "sourceUrl": "https://github.com/marimo-team/marimo",
+      "changelogUrl": "https://github.com/marimo-team/marimo/releases"
     },
     {
-      "description": "Use GitHub releases for ExcaliDash Docker image changelogs",
+      "description": "Use GitHub releases for Bambubuddy Docker image changelogs",
       "matchManagers": ["docker-compose"],
       "matchDatasources": ["docker"],
-      "matchPackageNames": [
-        "zimengxiong/excalidash-backend",
-        "zimengxiong/excalidash-frontend"
-      ],
-      "sourceUrl": "https://github.com/ZimengXiong/ExcaliDash"
-    },
-    {
-      "description": "Use GitHub releases for Jellyfin Docker image changelogs",
-      "matchManagers": ["docker-compose"],
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["ghcr.io/jellyfin/jellyfin"],
-      "versioning": "semver",
-      "sourceUrl": "https://github.com/jellyfin/jellyfin"
+      "matchPackageNames": ["ghcr.io/maziggy/bambuddy"],
+      "sourceUrl": "https://github.com/maziggy/bambuddy"
     },
     {
       "description": "Use GitHub releases for Bichon Docker image changelogs",
@@ -118,6 +154,16 @@
       "extractVersion": "^(?:transports/)?(?<version>v?\\d+\\.\\d+\\.\\d+(?:-prerelease\\d+)?)$"
     },
     {
+      "description": "Use GitHub releases for ExcaliDash Docker image changelogs",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": [
+        "zimengxiong/excalidash-backend",
+        "zimengxiong/excalidash-frontend"
+      ],
+      "sourceUrl": "https://github.com/ZimengXiong/ExcaliDash"
+    },
+    {
       "description": "Use GitHub releases for FileBrowser Quantum Docker image changelogs",
       "matchManagers": ["docker-compose"],
       "matchDatasources": ["docker"],
@@ -127,6 +173,37 @@
       "sourceUrl": "https://github.com/gtsteffaniak/filebrowser"
     },
     {
+      "description": "Use GitHub releases for Glance Docker image changelogs",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["glanceapp/glance"],
+      "sourceUrl": "https://github.com/glanceapp/glance"
+    },
+    {
+      "description": "Use GitHub releases for Headscale Docker image changelogs",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/juanfont/headscale"],
+      "sourceUrl": "https://github.com/juanfont/headscale"
+    },
+    {
+      "description": "Disable Renovate updates for Immich Redis and PostgreSQL images",
+      "matchFileNames": ["apps/immich.yml"],
+      "matchPackageNames": [
+        "docker.io/valkey/valkey",
+        "ghcr.io/immich-app/postgres"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "Use GitHub releases for Jellyfin Docker image changelogs",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/jellyfin/jellyfin"],
+      "versioning": "semver",
+      "sourceUrl": "https://github.com/jellyfin/jellyfin"
+    },
+    {
       "description": "Use GitHub releases for Kiwix Serve Docker image changelogs",
       "matchManagers": ["docker-compose"],
       "matchDatasources": ["docker"],
@@ -134,18 +211,11 @@
       "sourceUrl": "https://github.com/kiwix/kiwix-tools"
     },
     {
-      "description": "Use GitHub releases for RabbitMQ Docker image changelogs",
+      "description": "Disable Meilisearch updates that are version-coupled to Karakeep and Jellyfin",
       "matchManagers": ["docker-compose"],
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["rabbitmq"],
-      "sourceUrl": "https://github.com/rabbitmq/rabbitmq-server"
-    },
-    {
-      "description": "Use GitHub releases for Bambubuddy Docker image changelogs",
-      "matchManagers": ["docker-compose"],
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["ghcr.io/maziggy/bambuddy"],
-      "sourceUrl": "https://github.com/maziggy/bambuddy"
+      "matchFileNames": ["apps/karakeep.yml", "apps/jellyfin.yml"],
+      "matchPackageNames": ["getmeili/meilisearch"],
+      "enabled": false
     },
     {
       "description": "Use GitHub releases for Presenton Docker image changelogs",
@@ -155,11 +225,11 @@
       "sourceUrl": "https://github.com/presenton/presenton"
     },
     {
-      "description": "Use GitHub releases for Headscale Docker image changelogs",
+      "description": "Use GitHub releases for RabbitMQ Docker image changelogs",
       "matchManagers": ["docker-compose"],
       "matchDatasources": ["docker"],
-      "matchPackageNames": ["ghcr.io/juanfont/headscale"],
-      "sourceUrl": "https://github.com/juanfont/headscale"
+      "matchPackageNames": ["rabbitmq"],
+      "sourceUrl": "https://github.com/rabbitmq/rabbitmq-server"
     }
   ],
   "major": {

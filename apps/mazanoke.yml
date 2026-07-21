@@ -43,9 +43,6 @@ services:
       ## HTTP Services
       traefik.http.routers.mazanoke-rtr.service: "mazanoke-svc"
       traefik.http.services.mazanoke-svc.loadbalancer.server.port: "80"
-      ####### TINYAUTH #######
-      tinyauth.apps.mazanoke.config.domain: "mazanoke.$DOMAINNAME"
-      tinyauth.apps.mazanoke.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "mazanoke"

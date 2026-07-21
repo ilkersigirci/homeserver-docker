@@ -3,7 +3,7 @@ networks:
 
 services:
   yamtrack-redis:
-    image: docker.io/valkey/valkey:9@sha256:4963247afc4cd33c7d3b2d2816b9f7f8eeebab148d29056c2ca4d7cbc966f2d9
+    image: docker.io/valkey/valkey:9@sha256:8e8d64b405ce18f41b8e5ee20aa4687a8ed0022d1298f2ce31cdcf3a76e09411
     container_name: yamtrack-redis
     restart: $RESTART_POLICY_MEDIA
     profiles:
@@ -39,7 +39,7 @@ services:
 
   # NOTE: Optional, yamtrack uses Sqlite by default
   yamtrack-postgres-db:
-    image: postgres:18.4@sha256:4aabea78cf39b90e834caf3af7d602a18565f6fe2508705c8d01aa63245c2e20
+    image: postgres:18.4@sha256:22c89fe0d0f507606260237fd55e51f6137f58b2d5bcf6152242b96d9fe8f9a4
     container_name: yamtrack-postgres-db
     restart: $RESTART_POLICY_MEDIA
     profiles:
@@ -178,9 +178,6 @@ services:
       ## HTTP Services
       traefik.http.routers.yamtrack-rtr.service: "yamtrack-svc"
       traefik.http.services.yamtrack-svc.loadbalancer.server.port: "8000"
-      ####### TINYAUTH #######
-      tinyauth.apps.mediatrack.config.domain: "mediatrack.$DOMAINNAME"
-      tinyauth.apps.mediatrack.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "yamtrack"

@@ -1,7 +1,7 @@
 # TODO: How to set Apprise notification as env var instead of in UI?
 services:
   arcane:
-    image: ghcr.io/getarcaneapp/arcane:v2.3.2@sha256:5ce589ebe440d41fe78b1af4df0e0050f6345014e80520691150c1948e822ad8
+    image: ghcr.io/getarcaneapp/arcane:v2.4.0@sha256:91fa94e50d53f0dbb5f66ff287a74920b87cdb233dbb1904a725d1c25b49e885
     container_name: arcane
     restart: $RESTART_POLICY_CORE
     profiles:
@@ -80,9 +80,6 @@ services:
       ## HTTP Services
       traefik.http.routers.arcane-rtr.service: "arcane-svc"
       traefik.http.services.arcane-svc.loadbalancer.server.port: "3552"
-      ####### TINYAUTH #######
-      tinyauth.apps.arcane.config.domain: "arcane.$DOMAINNAME"
-      tinyauth.apps.arcane.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "arcane"

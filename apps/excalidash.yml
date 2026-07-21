@@ -12,7 +12,7 @@ services:
       - t3_proxy
     expose:
       - 8000
-    read_only: true
+    read_only: false # NOTE: It doesn't work otherwise
     tmpfs:
       - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
       - /app/uploads:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=700
@@ -141,9 +141,6 @@ services:
       ## HTTP Services
       traefik.http.routers.excalidash-rtr.service: "excalidash-svc"
       traefik.http.services.excalidash-svc.loadbalancer.server.port: "80"
-      ####### TINYAUTH #######
-      tinyauth.apps.excalidash.config.domain: "draw.$DOMAINNAME"
-      tinyauth.apps.excalidash.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Others"
       homepage.name: "excalidash"

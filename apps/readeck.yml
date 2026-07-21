@@ -57,9 +57,6 @@ services:
       ## HTTP Services
       traefik.http.routers.readeck-rtr.service: "readeck-svc"
       traefik.http.services.readeck-svc.loadbalancer.server.port: "8000"
-      ####### TINYAUTH #######
-      tinyauth.apps.readeck.config.domain: "readeck.$DOMAINNAME"
-      tinyauth.apps.readeck.ip.bypass: "$LOCAL_IPS" # NOTE: Comment this to enable External Auth
       ####### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "readeck"

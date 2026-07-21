@@ -1,6 +1,6 @@
 services:
   metube:
-    image: ghcr.io/alexta69/metube:2026.07.05@sha256:48c8700bccd51f828606464ad12147b76f5ce7ef1d9ed935bd933f5e8c816fe9
+    image: ghcr.io/alexta69/metube:2026.07.12@sha256:eca2c82993604c2c4a0d7db7f39a685870c9893775836c7cd4e78cd2d2c8fc4c
     container_name: metube
     restart: $RESTART_POLICY_MEDIA
     profiles:
@@ -55,9 +55,6 @@ services:
       ## HTTP Services
       traefik.http.routers.metube-rtr.service: "metube-svc"
       traefik.http.services.metube-svc.loadbalancer.server.port: "8081"
-      ####### TINYAUTH #######
-      tinyauth.apps.metube.config.domain: "metube.$DOMAINNAME"
-      tinyauth.apps.metube.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "metube"

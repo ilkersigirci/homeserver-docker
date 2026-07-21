@@ -110,7 +110,35 @@ The Compose update cannot be created before the workflow publishes the new custo
 image tag.
 
 Custom image Compose updates are grouped by Renovate under `homeserver custom
-images`.
+images`. Package-derived images map each published image to its release-driving
+upstream so the Compose PR shows that project's release notes instead of this
+repository's. Thin wrappers can use Dockerfile dependency types to ignore helper
+stages while tracking the final base image.
+
+Package-derived custom images use one explicit release-driver rule per image in
+`renovate.json`. Renovate disables every other dependency and base-image update
+in those image contexts. For a thin wrapper driven by its final `FROM` image,
+disable the `stage` and `syntax` dependency types in that Dockerfile. A single
+package rule can then match both the upstream and published custom-image names,
+set their release URLs, and disable digest-only updates with `digest.enabled`.
+
+### Renovate Package Rule Placement
+
+Keep `packageRules` in the root `renovate.json` ordered as follows:
+
+1. Shared homeserver custom-image group and package-derived context deny rule.
+2. Per-image release rules, alphabetically by image name.
+3. Shared package-derived lock-file maintenance rule.
+4. Remaining custom-image Compose rules, alphabetically by image name.
+5. All other app rules, alphabetically by app name.
+
+For a package-derived custom image, update the shared context and lock-file
+denylists, add one exact release-driver rule, and add its Compose upstream rule.
+For a final-stage-driven wrapper, add one non-final dependency rule and one rule
+for its upstream and published package names. Do not combine unrelated files and
+packages in one release-driver rule: list matchers form an allow set, not
+one-to-one pairs. Preserve broad disable rules before their narrow allow rules
+because later matching rules override earlier values.
 
 ### Public Package Bootstrap
 

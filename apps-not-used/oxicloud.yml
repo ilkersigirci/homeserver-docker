@@ -54,9 +54,6 @@ services:
       ## HTTP Services
       traefik.http.routers.oxicloud-rtr.service: "oxicloud-svc"
       traefik.http.services.oxicloud-svc.loadbalancer.server.port: "8086"
-      ####### TINYAUTH #######
-      tinyauth.apps.oxicloud.config.domain: "oxicloud.$DOMAINNAME"
-      tinyauth.apps.oxicloud.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "group"
       homepage.name: "oxicloud"

@@ -27,9 +27,6 @@ services:
       ## HTTP Services
       traefik.http.routers.readarr-rtr.service: "readarr-svc"
       traefik.http.services.readarr-svc.loadbalancer.server.port: "8787"
-      ####### TINYAUTH #######
-      tinyauth.apps.readarr.config.domain: "readarr.$DOMAINNAME"
-      tinyauth.apps.readarr.ip.bypass: "$LOCAL_IPS"
     profiles:
       - media
       - arr

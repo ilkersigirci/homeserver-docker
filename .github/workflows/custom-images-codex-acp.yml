@@ -1,0 +1,43 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Build Codex ACP Image
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - Dockerfiles/CodexAcp/**
+  pull_request:
+    paths:
+      - Dockerfiles/CodexAcp/**
+      - .github/workflows/custom-images-build.yml
+      - .github/workflows/custom-images-codex-acp.yml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/custom-images-build.yml
+    with:
+      name: CodexAcp
+      context: Dockerfiles/CodexAcp
+      repository: homeserver-codex-acp
+      publish: false
+
+  publish:
+    if: github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/custom-images-build.yml
+    with:
+      name: CodexAcp
+      context: Dockerfiles/CodexAcp
+      repository: homeserver-codex-acp
+      publish: true
