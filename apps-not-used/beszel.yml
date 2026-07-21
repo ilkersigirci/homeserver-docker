@@ -29,9 +29,6 @@ services:
       ## HTTP Services
       traefik.http.routers.beszel-rtr.service: "beszel-svc"
       traefik.http.services.beszel-svc.loadbalancer.server.port: "8090"
-      ####### TINYAUTH #######
-      tinyauth.apps.beszel.config.domain: "beszel.$DOMAINNAME"
-      tinyauth.apps.beszel.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Monitoring"
       homepage.name: "Beszel"

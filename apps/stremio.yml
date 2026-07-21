@@ -57,9 +57,6 @@ services:
       ## HTTP Services - Web UI
       traefik.http.routers.stremio-rtr.service: "stremio-svc"
       traefik.http.services.stremio-svc.loadbalancer.server.port: "8080"
-      ####### TINYAUTH #######
-      tinyauth.apps.stremio.config.domain: "stremio.$DOMAINNAME"
-      tinyauth.apps.stremio.ip.bypass: "$LOCAL_IPS"
       ## HTTP Routers - API
       traefik.http.routers.stremio-api-rtr.entrypoints: "websecure"
       traefik.http.routers.stremio-api-rtr.rule: "Host(`stremio-api.$DOMAINNAME`)"
@@ -143,8 +140,6 @@ services:
       homepage.href: "https://stremio-server.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Online Streaming Platform"
-      tinyauth.apps.stremio-server.config.domain: stremio-server.$DOMAINNAME
-      tinyauth.apps.stremio-server.ip.bypass: $LOCAL_IPS
       ####### GLANCE #######
       glance.name: Stremio
       glance.icon: sh:stremio-server

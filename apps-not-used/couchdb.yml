@@ -40,9 +40,6 @@ services:
       ## HTTP Services
       traefik.http.routers.couchdb-rtr.service: "couchdb-svc"
       traefik.http.services.couchdb-svc.loadbalancer.server.port: "5984"
-      ####### TINYAUTH #######
-      tinyauth.apps.couchdb.config.domain: "couchdb.$DOMAINNAME"
-      tinyauth.apps.couchdb.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Others"
       homepage.name: "couchdb"

@@ -30,9 +30,6 @@ services:
       ## HTTP Services
       traefik.http.routers.chromium-rtr.service: "chromium-svc"
       traefik.http.services.chromium-svc.loadbalancer.server.port: "3000"
-      ####### TINYAUTH #######
-      tinyauth.apps.chromium.config.domain: "chromium.$DOMAINNAME"
-      tinyauth.apps.chromium.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "DesktopApps"
       homepage.name: "Ungoogled Chromium"

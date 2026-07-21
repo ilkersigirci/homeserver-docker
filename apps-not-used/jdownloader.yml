@@ -30,9 +30,6 @@ services:
       ## HTTP Services
       traefik.http.routers.jdownloader-rtr.service: "jdownloader-svc"
       traefik.http.services.jdownloader-svc.loadbalancer.server.port: "5800"
-      ####### TINYAUTH #######
-      tinyauth.apps.jdownloader.config.domain: "jdownloader.$DOMAINNAME"
-      tinyauth.apps.jdownloader.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "Jdownloader"

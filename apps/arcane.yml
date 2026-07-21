@@ -80,9 +80,6 @@ services:
       ## HTTP Services
       traefik.http.routers.arcane-rtr.service: "arcane-svc"
       traefik.http.services.arcane-svc.loadbalancer.server.port: "3552"
-      ####### TINYAUTH #######
-      tinyauth.apps.arcane.config.domain: "arcane.$DOMAINNAME"
-      tinyauth.apps.arcane.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "arcane"

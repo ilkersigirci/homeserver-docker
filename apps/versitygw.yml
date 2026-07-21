@@ -79,9 +79,6 @@ services:
       ## HTTP Services
       traefik.http.routers.versitygw-api-rtr.service: "versitygw-api-svc"
       traefik.http.services.versitygw-api-svc.loadbalancer.server.port: "7070"
-      ####### TINYAUTH #######
-      tinyauth.apps.versitygw.config.domain: "s3.$DOMAINNAME"
-      tinyauth.apps.versitygw.ip.bypass: "$LOCAL_IPS"
       ### Web UI Labels ###
       ## HTTP Routers
       traefik.http.routers.versitygw-ui-rtr.entrypoints: "websecure"

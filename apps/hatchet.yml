@@ -120,9 +120,6 @@ services:
       ## gRPC Service (h2c)
       traefik.http.services.hatchet-rpc-svc.loadbalancer.server.port: "7077"
       traefik.http.services.hatchet-rpc-svc.loadbalancer.server.scheme: "h2c"
-      ####### TINYAUTH #######
-      tinyauth.apps.hatchet.config.domain: "hatchet.$DOMAINNAME"
-      tinyauth.apps.hatchet.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Programming"
       homepage.name: "hatchet"

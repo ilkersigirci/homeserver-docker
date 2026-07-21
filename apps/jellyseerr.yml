@@ -55,9 +55,6 @@ services:
       ## HTTP Services
       traefik.http.routers.jellyseerr-rtr.service: "jellyseerr-svc"
       traefik.http.services.jellyseerr-svc.loadbalancer.server.port: "5055"
-      ####### TINYAUTH #######
-      tinyauth.apps.jellyseerr.config.domain: "jellyseerr.$DOMAINNAME"
-      tinyauth.apps.jellyseerr.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "Jellyseerr"

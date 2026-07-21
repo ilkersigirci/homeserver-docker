@@ -85,9 +85,6 @@ services:
       ## HTTP Services
       traefik.http.routers.presenton-rtr.service: "presenton-svc"
       traefik.http.services.presenton-svc.loadbalancer.server.port: "80"
-      ####### TINYAUTH #######
-      tinyauth.apps.presenton.config.domain: "presenton.$DOMAINNAME"
-      tinyauth.apps.presenton.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Others"
       homepage.name: "presenton"

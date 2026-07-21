@@ -46,9 +46,6 @@ services:
       ## HTTP Services
       traefik.http.routers.sabnzbd-rtr.service: "sabnzbd-svc"
       traefik.http.services.sabnzbd-svc.loadbalancer.server.port: "8080"
-      ####### TINYAUTH #######
-      tinyauth.apps.sabnzbd.config.domain: "sabnzbd.$DOMAINNAME"
-      tinyauth.apps.sabnzbd.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "sabnzbd"

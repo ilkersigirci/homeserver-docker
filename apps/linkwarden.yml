@@ -106,9 +106,6 @@ services:
       ## HTTP Services
       traefik.http.routers.linkwarden-rtr.service: "linkwarden-svc"
       traefik.http.services.linkwarden-svc.loadbalancer.server.port: "3000"
-      ####### TINYAUTH #######
-      tinyauth.apps.linkwarden.config.domain: "linkwarden.$DOMAINNAME"
-      tinyauth.apps.linkwarden.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "Linkwarden"

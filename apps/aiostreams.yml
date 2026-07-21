@@ -52,9 +52,6 @@ services:
       ## HTTP Services
       traefik.http.routers.aiostreams-rtr.service: "aiostreams-svc"
       traefik.http.services.aiostreams-svc.loadbalancer.server.port: "3000"
-      ####### TINYAUTH #######
-      tinyauth.apps.aiostreams.config.domain: "aiostreams.$BASE_DOMAINNAME"
-      tinyauth.apps.aiostreams.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "aiostreams"

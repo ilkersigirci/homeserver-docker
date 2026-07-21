@@ -22,9 +22,6 @@ services:
       ## HTTP Services
       traefik.http.routers.krita-rtr.service: "krita-svc"
       traefik.http.services.krita-svc.loadbalancer.server.port: "3000"
-      ####### TINYAUTH #######
-      tinyauth.apps.krita.config.domain: "krita.$DOMAINNAME"
-      tinyauth.apps.krita.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "DesktopApps"
       homepage.name: "Krita"

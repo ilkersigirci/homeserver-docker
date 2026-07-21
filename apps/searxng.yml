@@ -53,9 +53,6 @@ services:
       ## HTTP Services
       traefik.http.routers.searxng-rtr.service: "searxng-svc"
       traefik.http.services.searxng-svc.loadbalancer.server.port: "8080"
-      ####### TINYAUTH #######
-      tinyauth.apps.searxng.config.domain: "searxng.$DOMAINNAME"
-      tinyauth.apps.searxng.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Programming"
       homepage.name: "searxng"

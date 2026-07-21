@@ -29,9 +29,6 @@ services:
       ## HTTP Services
       traefik.http.routers.hyperdx-rtr.service: "hyperdx-svc"
       traefik.http.services.hyperdx-svc.loadbalancer.server.port: "8080"
-      ####### TINYAUTH #######
-      tinyauth.apps.hyperdx.config.domain: "hyperdx.$DOMAINNAME"
-      tinyauth.apps.hyperdx.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Programming"
       homepage.name: "hyperdx"

@@ -43,9 +43,6 @@ services:
       ## HTTP Services
       traefik.http.routers.omni-tools-rtr.service: "omni-tools-svc"
       traefik.http.services.omni-tools-svc.loadbalancer.server.port: "80"
-      ####### TINYAUTH #######
-      tinyauth.apps.omni-tools.config.domain: "omni-tools.$DOMAINNAME"
-      tinyauth.apps.omni-tools.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "omni-tools"

@@ -120,9 +120,6 @@ services:
       ## HTTP Services
       traefik.http.routers.forgejo-rtr.service: "forgejo-svc"
       traefik.http.services.forgejo-svc.loadbalancer.server.port: "3000"
-      ####### TINYAUTH #######
-      tinyauth.apps.forgejo.config.domain: "git.$DOMAINNAME"
-      tinyauth.apps.forgejo.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Programming"
       homepage.name: "forgejo"

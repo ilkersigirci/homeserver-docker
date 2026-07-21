@@ -42,9 +42,6 @@ services:
       ## HTTP Services
       traefik.http.routers.webtop-rtr.service: "webtop-svc"
       traefik.http.services.webtop-svc.loadbalancer.server.port: "3000"
-      ####### TINYAUTH #######
-      tinyauth.apps.webtop.config.domain: "kde.$DOMAINNAME"
-      tinyauth.apps.webtop.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "DesktopApps"
       homepage.name: "Webtop"

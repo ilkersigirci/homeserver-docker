@@ -42,9 +42,6 @@ services:
       ## HTTP Services
       traefik.http.routers.sealskin-rtr.service: "sealskin-svc"
       traefik.http.services.sealskin-svc.loadbalancer.server.port: "8000"
-      ####### TINYAUTH #######
-      tinyauth.apps.sealskin.config.domain: "sealskin.$DOMAINNAME"
-      tinyauth.apps.sealskin.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "DesktopApps"
       homepage.name: "sealskin"

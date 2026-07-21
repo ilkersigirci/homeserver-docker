@@ -50,9 +50,6 @@ services:
       ## HTTP Services
       traefik.http.routers.bw-rest-api-rtr.service: "bw-rest-api-svc"
       traefik.http.services.bw-rest-api-svc.loadbalancer.server.port: "8087"
-      ####### TINYAUTH #######
-      tinyauth.apps.bw-rest-api.config.domain: "bw-rest-api.$DOMAINNAME"
-      tinyauth.apps.bw-rest-api.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "bw-rest-api"

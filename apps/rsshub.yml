@@ -129,9 +129,6 @@ services:
       ## HTTP Services
       traefik.http.routers.rsshub-rtr.service: "rsshub-svc"
       traefik.http.services.rsshub-svc.loadbalancer.server.port: "1200"
-      ####### TINYAUTH #######
-      tinyauth.apps.rsshub.config.domain: "rsshub.$DOMAINNAME"
-      tinyauth.apps.rsshub.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "rsshub"

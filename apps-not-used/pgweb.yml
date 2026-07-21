@@ -43,9 +43,6 @@ services:
       ## HTTP Services
       traefik.http.routers.pgweb-rtr.service: "pgweb-svc"
       traefik.http.services.pgweb-svc.loadbalancer.server.port: "8081"
-      ####### TINYAUTH #######
-      tinyauth.apps.pgweb.config.domain: "pgweb.$DOMAINNAME"
-      tinyauth.apps.pgweb.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Programming"
       homepage.name: "pgweb"

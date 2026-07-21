@@ -41,9 +41,6 @@ services:
       traefik.http.routers.lidarr-rtr.service: "lidarr-svc"
       traefik.http.routers.lidarr-rtr-bypass.service: "lidarr-svc"
       traefik.http.services.lidarr-svc.loadbalancer.server.port: "8686"
-      ####### TINYAUTH #######
-      tinyauth.apps.lidarr.config.domain: "lidarr.$DOMAINNAME"
-      tinyauth.apps.lidarr.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "Lidarr"

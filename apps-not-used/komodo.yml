@@ -97,9 +97,6 @@ services:
       ## HTTP Services
       traefik.http.routers.komodo-core-rtr.service: "komodo-core-svc"
       traefik.http.services.komodo-core-svc.loadbalancer.server.port: "9120"
-      ####### TINYAUTH #######
-      tinyauth.apps.komodo.config.domain: "komodo.$DOMAINNAME"
-      tinyauth.apps.komodo.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "komodo"

@@ -53,9 +53,6 @@ services:
       ## HTTP Services
       traefik.http.routers.transmission-rtr.service: "transmission-svc"
       traefik.http.services.transmission-svc.loadbalancer.server.port: "9091"
-      ####### TINYAUTH #######
-      tinyauth.apps.transmission.config.domain: "torrent.$DOMAINNAME"
-      tinyauth.apps.transmission.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "Transmission"

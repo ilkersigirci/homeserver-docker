@@ -64,9 +64,6 @@ services:
       ## HTTP Services
       traefik.http.routers.bichon-rtr.service: "bichon-svc"
       traefik.http.services.bichon-svc.loadbalancer.server.port: "15630"
-      ####### TINYAUTH #######
-      tinyauth.apps.bichon.config.domain: "mailarchive.$DOMAINNAME"
-      tinyauth.apps.bichon.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "Bichon"

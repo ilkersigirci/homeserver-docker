@@ -37,9 +37,6 @@ services:
       ## HTTP Services
       traefik.http.routers.copyparty-rtr.service: "copyparty-svc"
       traefik.http.services.copyparty-svc.loadbalancer.server.port: "8000"
-      ####### TINYAUTH #######
-      tinyauth.apps.copyparty.config.domain: "copyparty.$DOMAINNAME"
-      tinyauth.apps.copyparty.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "copyparty"

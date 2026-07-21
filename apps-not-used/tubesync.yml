@@ -27,8 +27,5 @@ services:
       ## HTTP Services
       traefik.http.routers.tubesync-rtr.service: "tubesync-svc"
       traefik.http.services.tubesync-svc.loadbalancer.server.port: "4848"
-      ####### TINYAUTH #######
-      tinyauth.apps.tubesync.config.domain: "tubesync.$DOMAINNAME"
-      tinyauth.apps.tubesync.ip.bypass: "$LOCAL_IPS"
     profiles:
       - media

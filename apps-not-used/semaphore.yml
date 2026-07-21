@@ -48,9 +48,6 @@ services:
       ## HTTP Services
       traefik.http.routers.semaphore-rtr.service: "semaphore-svc"
       traefik.http.services.semaphore-svc.loadbalancer.server.port: "3000"
-      ####### TINYAUTH #######
-      tinyauth.apps.semaphore.config.domain: "semaphore.$DOMAINNAME"
-      tinyauth.apps.semaphore.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "semaphore"

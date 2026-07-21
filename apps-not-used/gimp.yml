@@ -22,9 +22,6 @@ services:
       ## HTTP Services
       traefik.http.routers.gimp-rtr.service: "gimp-svc"
       traefik.http.services.gimp-svc.loadbalancer.server.port: "3000"
-      ####### TINYAUTH #######
-      tinyauth.apps.gimp.config.domain: "gimp.$DOMAINNAME"
-      tinyauth.apps.gimp.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "DesktopApps"
       homepage.name: "Gimp"

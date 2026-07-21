@@ -49,7 +49,6 @@ services:
       TINYAUTH_AUTH_LOGINMAXRETRIES: 3
       TINYAUTH_AUTH_TRUSTEDPROXIES: "192.168.90.254" # NOTE: Address of traefik container
       ## ACLs Configuration
-      # TINYAUTH_APPS_WHOAMI_CONFIG_DOMAIN: whoami.example.com
       # TINYAUTH_APPS_WHOAMI_USERS_ALLOW: john
       ## OAuth Configuration
       # TINYAUTH_OAUTH_WHITELIST: $POCKETID_WHITELIST_USERS

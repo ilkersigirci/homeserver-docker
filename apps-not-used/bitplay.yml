@@ -44,9 +44,6 @@ services:
       ## HTTP Services
       traefik.http.routers.bitplay-rtr.service: "bitplay-svc"
       traefik.http.services.bitplay-svc.loadbalancer.server.port: "3347"
-      ####### TINYAUTH #######
-      tinyauth.apps.bitplay.config.domain: "bitplay.$DOMAINNAME"
-      tinyauth.apps.bitplay.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "bitplay"

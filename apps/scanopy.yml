@@ -146,9 +146,6 @@ services:
       ## HTTP Services
       traefik.http.routers.scanopy-rtr.service: "scanopy-svc"
       traefik.http.services.scanopy-svc.loadbalancer.server.port: "60072"
-      ####### TINYAUTH #######
-      tinyauth.apps.scanopy.config.domain: "scanopy.$DOMAINNAME"
-      tinyauth.apps.scanopy.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "scanopy"

@@ -47,9 +47,6 @@ services:
       ## HTTP Services
       traefik.http.routers.bentopdf-rtr.service: "bentopdf-svc"
       traefik.http.services.bentopdf-svc.loadbalancer.server.port: "8080"
-      ####### TINYAUTH #######
-      tinyauth.apps.bentopdf.config.domain: "pdftool.$DOMAINNAME"
-      tinyauth.apps.bentopdf.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "bentopdf"

@@ -27,8 +27,5 @@ services:
       ## HTTP Services
       traefik.http.routers.tubearchivist-rtr.service: "tubearchivist-svc"
       traefik.http.services.tubearchivist-svc.loadbalancer.server.port: "8000"
-      ####### TINYAUTH #######
-      tinyauth.apps.tubearch.config.domain: "tubearch.$DOMAINNAME"
-      tinyauth.apps.tubearch.ip.bypass: "$LOCAL_IPS"
     profiles:
       - media

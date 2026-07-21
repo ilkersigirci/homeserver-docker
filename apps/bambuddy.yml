@@ -77,9 +77,6 @@ services:
       ## HTTP Services
       traefik.http.routers.bambuddy-rtr.service: "bambuddy-svc"
       traefik.http.services.bambuddy-svc.loadbalancer.server.port: "8000"
-      ####### TINYAUTH #######
-      tinyauth.apps.bambuddy.config.domain: "bambuddy.$DOMAINNAME"
-      tinyauth.apps.bambuddy.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Others"
       homepage.name: "bambuddy"

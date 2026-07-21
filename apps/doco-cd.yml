@@ -62,9 +62,6 @@ services:
       ## HTTP Services
       traefik.http.routers.doco-cd-rtr.service: "doco-cd-svc"
       traefik.http.services.doco-cd-svc.loadbalancer.server.port: "80"
-      ####### TINYAUTH #######
-      tinyauth.apps.doco-cd.config.domain: "doco-cd.$DOMAINNAME"
-      tinyauth.apps.doco-cd.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Programming"
       homepage.name: "doco-cd"

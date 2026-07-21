@@ -59,9 +59,6 @@ services:
       ## HTTP Services
       traefik.http.routers.changedetection-rtr.service: "changedetection-svc"
       traefik.http.services.changedetection-svc.loadbalancer.server.port: "5000"
-      ####### TINYAUTH #######
-      tinyauth.apps.changedetection.config.domain: "changedetection.$DOMAINNAME"
-      tinyauth.apps.changedetection.ip.bypass: "$LOCAL_IPS"
       ## Homepage
       homepage.group: "Monitoring"
       homepage.name: "changedetection"

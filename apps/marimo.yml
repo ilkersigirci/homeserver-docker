@@ -68,9 +68,6 @@ services:
       ## HTTP Services
       traefik.http.routers.marimo-rtr.service: "marimo-svc"
       traefik.http.services.marimo-svc.loadbalancer.server.port: "8080"
-      ####### TINYAUTH #######
-      tinyauth.apps.marimo.config.domain: "marimo.$DOMAINNAME"
-      tinyauth.apps.marimo.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Programming"
       homepage.name: "Marimo"

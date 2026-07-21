@@ -73,9 +73,6 @@ services:
       ## HTTP Services
       traefik.http.routers.zipline-rtr.service: "zipline-svc"
       traefik.http.services.zipline-svc.loadbalancer.server.port: "3000"
-      ####### TINYAUTH #######
-      # tinyauth.apps.zipline.config.domain: share.$DOMAINNAME
-      # tinyauth.apps.zipline.ip.bypass: $LOCAL_IPS
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "zipline"

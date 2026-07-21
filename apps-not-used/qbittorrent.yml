@@ -30,9 +30,6 @@ services:
       traefik.http.routers.qbittorrent-rtr.service: "qbittorrent-svc"
       traefik.http.services.qbittorrent-svc.loadbalancer.server.port: "8080"
       # - traefik.http.services.qbittorrent-svc.loadbalancer.passhostheader=false # Not needed
-      ####### TINYAUTH #######
-      tinyauth.apps.qbittorrent.config.domain: "torrent.$DOMAINNAME"
-      tinyauth.apps.qbittorrent.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "qBittorrent"

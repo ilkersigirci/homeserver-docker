@@ -63,9 +63,6 @@ services:
       ## HTTP Services
       traefik.http.routers.nzbdav-rtr.service: "nzbdav-svc"
       traefik.http.services.nzbdav-svc.loadbalancer.server.port: "3000"
-      ####### TINYAUTH #######
-      tinyauth.apps.nzbdav.config.domain: "nzbdav.$DOMAINNAME"
-      tinyauth.apps.nzbdav.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "nzbdav"

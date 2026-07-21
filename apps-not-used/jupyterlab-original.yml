@@ -56,8 +56,6 @@ services:
       traefik.http.routers.jupyterlab-rtr.service: "jupyterlab-svc"
       traefik.http.services.jupyterlab-svc.loadbalancer.server.port: "8888"
       ####### TINYAUTH #######
-      tinyauth.apps.jupyterlab.config.domain: "jupyterlab.$DOMAINNAME"
-      tinyauth.apps.jupyterlab.ip.bypass: "$LOCAL_IPS"
       tinyauth.apps.jupyterlab.oauth.groups: "admin"
       ####### HOMEPAGE #######
       homepage.group: "Programming"

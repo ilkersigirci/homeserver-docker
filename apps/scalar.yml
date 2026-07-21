@@ -80,9 +80,6 @@ services:
       ## HTTP Services
       traefik.http.routers.scalar-rtr.service: "scalar-svc"
       traefik.http.services.scalar-svc.loadbalancer.server.port: "8080"
-      ####### TINYAUTH #######
-      tinyauth.apps.scalar.config.domain: "scalar.$DOMAINNAME"
-      tinyauth.apps.scalar.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Programming"
       homepage.name: "scalar"

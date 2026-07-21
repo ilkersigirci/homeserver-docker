@@ -30,9 +30,6 @@ services:
       ## HTTP Services
       traefik.http.routers.pgadmin-rtr.service: "pgadmin-svc"
       traefik.http.services.pgadmin-svc.loadbalancer.server.port: "80"
-      ####### TINYAUTH #######
-      tinyauth.apps.pgadmin.config.domain: "pgadmin.$DOMAINNAME"
-      tinyauth.apps.pgadmin.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Programming"
       homepage.name: "pgadmin"

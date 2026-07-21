@@ -105,9 +105,6 @@ services:
       ## HTTP Services
       traefik.http.routers.mediamanager-rtr.service: "mediamanager-svc"
       traefik.http.services.mediamanager-svc.loadbalancer.server.port: "8000"
-      ####### TINYAUTH #######
-      tinyauth.apps.mediamanager.config.domain: "mediamanager.$DOMAINNAME"
-      tinyauth.apps.mediamanager.ip.bypass: "$LOCAL_IPS"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "mediamanager"
