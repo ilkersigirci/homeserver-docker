@@ -1,6 +1,6 @@
 services:
   metube:
-    image: ghcr.io/alexta69/metube:2026.07.12@sha256:eca2c82993604c2c4a0d7db7f39a685870c9893775836c7cd4e78cd2d2c8fc4c
+    image: ghcr.io/alexta69/metube:2026.07.21@sha256:b0a27dc1505460d2eaf9a6713b486a01d11733043622e49a2572ee5cbe9f0503
     container_name: metube
     restart: $RESTART_POLICY_MEDIA
     profiles:
