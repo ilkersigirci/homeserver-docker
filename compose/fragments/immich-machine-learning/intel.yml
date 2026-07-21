@@ -1,6 +1,6 @@
 services:
   immich-machine-learning:
-    image: ghcr.io/immich-app/immich-machine-learning:v3.0.2-openvino@sha256:6b3c1f779df2e0f93be57bb2ad15681a43b7731cb325e8e66be7d984eca1949d
+    image: ghcr.io/immich-app/immich-machine-learning:v3.0.3-openvino@sha256:42295f06067186ee62f8bc20379c72a263e600b8ad22dc9fb22385712d00944e
     mem_limit: 1G
     volumes:
       - /dev/bus/usb:/dev/bus/usb
