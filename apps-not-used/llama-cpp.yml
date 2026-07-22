@@ -37,6 +37,8 @@ services:
       ## HTTP Services
       traefik.http.routers.llama-cpp-rtr.service: "llama-cpp-svc"
       traefik.http.services.llama-cpp-svc.loadbalancer.server.port: "8000"
+      ####### TINYAUTH #######
+      tinyauth.apps.llamapi.config.domain: "llamapi.$DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "Programming"
       homepage.name: "Llama-cpp"

@@ -73,6 +73,7 @@ services:
       traefik.http.routers.chhoto-url-public-rtr.service: "chhoto-url-svc"
       traefik.http.services.chhoto-url-svc.loadbalancer.server.port: "4567"
       ####### TINYAUTH #######
+      tinyauth.apps.chhoto-url.config.domain: "go-admin.$DOMAINNAME"
       tinyauth.apps.chhoto-url.oauth.groups: "admin"
       # tinyauth.apps.chhoto-url.path.allow: "^/[a-z0-9]{4}$"
       ####### HOMEPAGE #######

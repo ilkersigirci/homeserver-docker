@@ -30,6 +30,8 @@ services:
       ## HTTP Services
       traefik.http.routers.jellysearch-rtr.service: "jellysearch-svc"
       traefik.http.services.jellysearch-svc.loadbalancer.server.port: "5000"
+      ####### TINYAUTH #######
+      tinyauth.apps.jellyfin.config.domain: "jellyfin.$DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "jellysearch"

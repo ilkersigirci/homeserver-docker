@@ -70,6 +70,8 @@ services:
       # ## HTTP Services
       # traefik.http.routers.splitpro-rtr.service: splitpro-svc
       # traefik.http.services.splitpro-svc.loadbalancer.server.port: "3000"
+      ####### TINYAUTH #######
+      tinyauth.apps.splitpro.config.domain: "split.$BASE_DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "splitpro"

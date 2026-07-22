@@ -86,6 +86,8 @@ services:
       ## HTTP Services
       traefik.http.routers.versitygw-ui-rtr.service: "versitygw-ui-svc"
       traefik.http.services.versitygw-ui-svc.loadbalancer.server.port: "7071"
+      ####### TINYAUTH #######
+      tinyauth.apps.versitygw.config.domain: "s3.$DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "versitygw"

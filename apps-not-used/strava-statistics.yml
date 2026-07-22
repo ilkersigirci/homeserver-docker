@@ -39,6 +39,8 @@ services:
       ## HTTP Services
       traefik.http.routers.strava-statistics-rtr.service: "strava-statistics-svc"
       traefik.http.services.strava-statistics-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.strava.config.domain: "strava.$DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "strava-statistics"

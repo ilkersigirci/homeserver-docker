@@ -136,6 +136,8 @@ services:
       traefik.http.services.grafana-lgtm-rpc-svc.loadbalancer.server.scheme: "h2c"
       ## OTLP HTTP Service
       traefik.http.services.grafana-lgtm-rpc-http-svc.loadbalancer.server.port: "4318"
+      ####### TINYAUTH #######
+      tinyauth.apps.grafana-lgtm.config.domain: "grafana.$DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "Monitoring"
       homepage.name: "grafana-lgtm"

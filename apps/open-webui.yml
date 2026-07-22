@@ -122,6 +122,8 @@ services:
       ## HTTP Services
       traefik.http.routers.open-webui-rtr.service: "open-webui-svc"
       traefik.http.services.open-webui-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.open-webui.config.domain: "chat.$DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "Programming"
       homepage.name: "Open WebUI"

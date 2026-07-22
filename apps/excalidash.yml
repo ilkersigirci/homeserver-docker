@@ -141,6 +141,8 @@ services:
       ## HTTP Services
       traefik.http.routers.excalidash-rtr.service: "excalidash-svc"
       traefik.http.services.excalidash-svc.loadbalancer.server.port: "80"
+      ####### TINYAUTH #######
+      tinyauth.apps.excalidash.config.domain: "draw.$DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "Others"
       homepage.name: "excalidash"

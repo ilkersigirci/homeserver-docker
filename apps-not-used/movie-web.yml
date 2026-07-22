@@ -18,5 +18,7 @@ services:
       ## HTTP Services
       traefik.http.routers.movieweb-rtr.service: "movieweb-svc"
       traefik.http.services.movieweb-svc.loadbalancer.server.port: "80"
+      ####### TINYAUTH #######
+      tinyauth.apps.movieweb.config.domain: "movieweb.$DOMAINNAME"
     profiles:
       - media

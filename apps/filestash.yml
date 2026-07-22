@@ -60,6 +60,8 @@ services:
       ## HTTP Services
       traefik.http.routers.office-rtr.service: "office-svc"
       traefik.http.services.office-svc.loadbalancer.server.port: "9980"
+      ####### TINYAUTH #######
+      tinyauth.apps.office.config.domain: "office.$DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "collabora"
@@ -148,6 +150,8 @@ services:
       ## HTTP Services
       traefik.http.routers.filestash-rtr.service: "filestash-svc"
       traefik.http.services.filestash-svc.loadbalancer.server.port: "8334"
+      ####### TINYAUTH #######
+      tinyauth.apps.filestash.config.domain: "drive.$DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "filestash"

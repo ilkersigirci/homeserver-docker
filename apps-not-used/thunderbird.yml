@@ -26,6 +26,8 @@ services:
       ## HTTP Services
       traefik.http.routers.thunderbird-rtr.service: "thunderbird-svc"
       traefik.http.services.thunderbird-svc.loadbalancer.server.port: "3000"
+      ####### TINYAUTH #######
+      tinyauth.apps.mail.config.domain: "mail.$DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "DesktopApps"
       homepage.name: "Thunderbird"

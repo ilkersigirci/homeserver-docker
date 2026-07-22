@@ -67,6 +67,7 @@ services:
       traefik.http.routers.filebrowser-share-rtr.service: "filebrowser-svc"
       traefik.http.services.filebrowser-svc.loadbalancer.server.port: "80"
       ####### TINYAUTH #######
+      tinyauth.apps.filebrowser.config.domain: "drive.$DOMAINNAME"
       tinyauth.apps.filebrowser.oauth.groups: "admin"
       # tinyauth.apps.filebrowser.path.allow: "^/public/(share|api|static)(/.*)?$"
       ####### HOMEPAGE #######
@@ -150,6 +151,8 @@ services:
       ## HTTP Services
       traefik.http.routers.euro-office-documentserver-rtr.service: "euro-office-documentserver-svc"
       traefik.http.services.euro-office-documentserver-svc.loadbalancer.server.port: "80"
+      ####### TINYAUTH #######
+      tinyauth.apps.euro-office-documentserver.config.domain: "office.$DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "euro-office-documentserver"

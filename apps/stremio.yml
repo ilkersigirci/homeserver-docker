@@ -73,6 +73,8 @@ services:
       traefik.http.middlewares.cors-stremio.headers.accessControlAllowOriginList: "https://stremio.$DOMAINNAME"
       traefik.http.middlewares.cors-stremio.headers.accessControlMaxAge: "86400"
       traefik.http.middlewares.cors-stremio.headers.addVaryHeader: "true"
+      ####### TINYAUTH #######
+      tinyauth.apps.stremio-api.config.domain: "stremio-api.$DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "Stremio"

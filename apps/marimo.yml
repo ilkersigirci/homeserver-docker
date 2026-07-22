@@ -140,6 +140,8 @@ services:
       traefik.http.routers.marimo-agent-rtr.tls: "true"
       traefik.http.routers.marimo-agent-rtr.tls.options: "tls-max@file"
       traefik.http.services.marimo-agent-svc.loadbalancer.server.port: "3021"
+      ####### TINYAUTH #######
+      tinyauth.apps.codex-acp.config.domain: "marimo.$DOMAINNAME"
 
 secrets:
   marimo_ai:

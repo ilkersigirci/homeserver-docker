@@ -23,6 +23,8 @@ services:
       ## HTTP Services
       traefik.http.routers.termix-rtr.service: "termix-svc"
       traefik.http.services.termix-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.termix.config.domain: "ssh.$DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "termix"

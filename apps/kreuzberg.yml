@@ -49,6 +49,8 @@ services:
       ## HTTP Services
       traefik.http.routers.kreuzberg-rtr.service: "kreuzberg-svc"
       traefik.http.services.kreuzberg-svc.loadbalancer.server.port: "8000"
+      ####### TINYAUTH #######
+      tinyauth.apps.kreuzberg.config.domain: "docparse.$DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "Programming"
       homepage.name: "kreuzberg"

@@ -167,6 +167,8 @@ services:
       ## HTTP Services
       traefik.http.routers.immich-server-rtr.service: "immich-server-svc"
       traefik.http.services.immich-server-svc.loadbalancer.server.port: "2283"
+      ####### TINYAUTH #######
+      tinyauth.apps.photos.config.domain: "photos.$DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "Immich"

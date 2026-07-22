@@ -43,6 +43,8 @@ services:
       ## HTTP Services
       traefik.http.routers.kiwix-serve-rtr.service: "kiwix-serve-svc"
       traefik.http.services.kiwix-serve-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.kiwix-serve.config.domain: "kiwix.$DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "kiwix-serve"

@@ -28,6 +28,8 @@ services:
       public_ip: $REMOTE_SERVER_PUBLIC_IP
       wgd_port: 51821
     labels:
+      ####### TINYAUTH #######
+      tinyauth.apps.wgdashboard.config.domain: "wireguard.$DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "Wg-Dashboard"

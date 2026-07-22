@@ -64,6 +64,8 @@ services:
       ## HTTP Services
       traefik.http.routers.bifrost-rtr.service: "bifrost-svc"
       traefik.http.services.bifrost-svc.loadbalancer.server.port: "8080"
+      ####### TINYAUTH #######
+      tinyauth.apps.bifrost.config.domain: "aigateway.$DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "Programming"
       homepage.name: "bifrost"

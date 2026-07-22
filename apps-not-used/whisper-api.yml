@@ -23,6 +23,8 @@ services:
       ## HTTP Services
       traefik.http.routers.whisper-api-rtr.service: "whisper-api-svc"
       traefik.http.services.whisper-api-svc.loadbalancer.server.port: "9000"
+      ####### TINYAUTH #######
+      tinyauth.apps.whisperapi.config.domain: "whisperapi.$DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "Programming"
       homepage.name: "Whisper API"

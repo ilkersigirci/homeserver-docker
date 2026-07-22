@@ -31,6 +31,8 @@ services:
       ## HTTP Services
       # - "traefik.http.routers.ytdl-rtr.service=ytdl-svc"
       # - "traefik.http.services.ytdl-svc.loadbalancer.server.port=8081"
+      ####### TINYAUTH #######
+      tinyauth.apps.ytdl-sub.config.domain: "ytdl.$DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "Media"
       homepage.name: "YtdlSub"

@@ -196,6 +196,8 @@ services:
       ## HTTP Services
       traefik.http.routers.karakeep-rtr.service: "karakeep-svc"
       traefik.http.services.karakeep-svc.loadbalancer.server.port: "3000"
+      ####### TINYAUTH #######
+      tinyauth.apps.karakeep.config.domain: "bookmark.$DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "Reading"
       homepage.name: "karakeep"

@@ -156,6 +156,8 @@ services:
       traefik.http.routers.rybbit-api-rtr.service: "rybbit-api-svc"
       traefik.http.routers.rybbit-api-rtr.priority: "2"
       traefik.http.services.rybbit-api-svc.loadbalancer.server.port: "3001"
+      ####### TINYAUTH #######
+      tinyauth.apps.rybbit-backend.config.domain: "analytics.$DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "Monitoring"
       homepage.name: "rybbit-api"
@@ -219,6 +221,8 @@ services:
       traefik.http.routers.rybbit-rtr.service: "rybbit-svc"
       traefik.http.routers.rybbit-rtr.priority: "1"
       traefik.http.services.rybbit-svc.loadbalancer.server.port: "3002"
+      ####### TINYAUTH #######
+      tinyauth.apps.rybbit-client.config.domain: "analytics.$DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "Monitoring"
       homepage.name: "rybbit"
