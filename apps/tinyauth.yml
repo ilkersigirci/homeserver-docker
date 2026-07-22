@@ -12,8 +12,11 @@ services:
     profiles:
       - core
     networks:
-      - t3_proxy
-      - socket_proxy_read
+      t3_proxy:
+        aliases:
+          # Keep ForwardAuth on t3_proxy so Traefik uses its trusted static IP.
+          - tinyauth-forwardauth
+      socket_proxy_read:
     user: $PUID:$PGID
     read_only: true
     tmpfs:
@@ -85,6 +88,9 @@ services:
       traefik.http.routers.tinyauth-rtr.middlewares: "chain-no-auth@file"
       ## Forward Auth - Commented out because it is handled inside treafik middleware chain file
       # - "traefik.http.middlewares.tinyauth.forwardauth.address=http://tinyauth:3000/api/auth/traefik"
+      ## DOCKER SOCKET PROXY ##
+      socket-proxy.allow.get: /v1\..*/(version|containers/.*|events.*)|/_ping
+      socket-proxy.allow.head: /_ping
       ####### HOMEPAGE #######
       homepage.group: "Core"
       homepage.name: "tinyauth"

@@ -65,6 +65,7 @@ services:
       traefik.http.routers.silverbullet-rtr.service: "silverbullet-svc"
       traefik.http.services.silverbullet-svc.loadbalancer.server.port: "3000"
       ####### TINYAUTH #######
+      tinyauth.apps.silverbullet.config.domain: "notes.$DOMAINNAME"
       tinyauth.apps.silverbullet.oauth.groups: "admin"
       # https://silverbullet.md/Authentication%20Proxy
       tinyauth.apps.silverbullet.path.allow: "^/(service_worker[.]js|[.]client/.*)([?].*)?$"

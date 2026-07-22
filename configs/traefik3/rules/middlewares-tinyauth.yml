@@ -2,7 +2,7 @@ http:
   middlewares:
     middlewares-tinyauth:
       forwardAuth:
-        address: "http://tinyauth:3000/api/auth/traefik"
+        address: "http://tinyauth-forwardauth:3000/api/auth/traefik"
         trustForwardHeader: true
         ## NOTE: For traefik>=3.6.9
         # maxResponseBodySize: -1 # Disable response body size limit
@@ -10,7 +10,7 @@ http:
 
     middlewares-tinyauth-headers:
       forwardAuth:
-        address: "http://tinyauth:3000/api/auth/traefik"
+        address: "http://tinyauth-forwardauth:3000/api/auth/traefik"
         trustForwardHeader: true
         authResponseHeaders:
           - Remote-User
