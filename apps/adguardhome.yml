@@ -1,7 +1,7 @@
 # TODO: enable strict_sni_check: https://www.reddit.com/r/AdGuardHome/comments/1shenvp/how_i_secured_my_public_adguard_home_instance/
 services:
   adguardhome:
-    image: adguard/adguardhome:v0.107.75@sha256:50ac5916778faa06ad4adcff606c7aaf806cb55dc1995160dbf50633c9bda94d
+    image: adguard/adguardhome:v0.107.77@sha256:e6f2b8bcda06064ab055b44933a4f0e983c35558b9cdb8d2e7ab1efcee36d890
     container_name: adguardhome
     restart: $RESTART_POLICY_CORE
     profiles:
