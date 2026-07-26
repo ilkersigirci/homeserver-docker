@@ -1,4 +1,4 @@
-# NOTE: Defeault username is `admin`
+# NOTE: Gotify 3 does not support disabling local authentication; the existing password is recovery-only.
 services:
   gotify:
     image: ghcr.io/gotify/server:3.0.0@sha256:d75e89e0e28389c00c2556afe01282a37ee9756b0285799aa25214243aebd5e5
@@ -30,7 +30,20 @@ services:
       - $REPO_PATH/data/gotify:/app/data
     environment:
       TZ: $TZ
+      GOTIFY_DEFAULTUSER_NAME: $GOTIFY_DEFAULT_USER_NAME
       GOTIFY_DEFAULTUSER_PASS: $GOTIFY_DEFAULT_USER_PASS
+      GOTIFY_REGISTRATION: false
+      GOTIFY_SERVER_SECURECOOKIE: true
+      ## OIDC
+      GOTIFY_OIDC_ENABLED: true
+      GOTIFY_OIDC_ISSUER: https://pocketid.$BASE_DOMAINNAME
+      GOTIFY_OIDC_CLIENTID: $GOTIFY_CLIENT_ID
+      GOTIFY_OIDC_CLIENTSECRET: $GOTIFY_CLIENT_SECRET
+      GOTIFY_OIDC_REDIRECTURL: https://gotify.$DOMAINNAME/auth/oidc/callback
+      GOTIFY_OIDC_AUTOREGISTER: false
+      GOTIFY_OIDC_USERNAMECLAIM: preferred_username
+      GOTIFY_OIDC_LINK_BY_USERNAME: true
+      GOTIFY_OIDC_SCOPES: openid,profile,email
     healthcheck:
       test: ["CMD", "curl", "-fsS", "--max-time", "3", "-o", "/dev/null", "http://127.0.0.1:80/health"]
       interval: 2m
