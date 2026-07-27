@@ -56,7 +56,6 @@ include:
   # - ../apps/dufs.yml
   - ../apps/mazanoke.yml
   - ../apps/metube.yml
-  - ../apps/nzbdav.yml
   - ../apps/stremio.yml
   # - ../apps/transmission.yml
   #### MONITORING ####

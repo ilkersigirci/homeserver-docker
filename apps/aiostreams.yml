@@ -1,10 +1,11 @@
 services:
   aiostreams:
-    image: ghcr.io/viren070/aiostreams:v2.31.0@sha256:84033635dbebd8cb6687b9fca21dbed0630050a083cdefa6f019b8b2c9c32a61
+    image: ghcr.io/viren070/aiostreams:v2.31.1@sha256:26d93653c3a5d0835db9189d6aca21d05614e68107c4d4a3ec7196b60c88c3bc
     container_name: aiostreams
     restart: $RESTART_POLICY_MEDIA
-    depends_on:
-      - nzbdav
+    # NOTE: Not needed after v2.30.0
+    # depends_on:
+    #   - nzbdav
     profiles:
       - media
     networks:
@@ -19,8 +20,8 @@ services:
       - ALL
     cap_add: []
     pids_limit: 256
-    cpus: "1.0"
-    mem_limit: "1G"
+    cpus: "2.0"
+    mem_limit: "4G"
     ulimits:
       nofile:
         soft: 16384
@@ -34,6 +35,7 @@ services:
       BASE_URL: https://aiostreams.$BASE_DOMAINNAME
       AIOSTREAMS_AUTH_REQUIRED: true
       AIOSTREAMS_AUTH: $AIOSTREAMS_AUTH
+      # AIOSTREAMS_AUTH_PERMISSIONS: $AIOSTREAMS_USER_NAME=admin
       SECRET_KEY: $AIOSTREAMS_SECRET_KEY
       TMDB_ACCESS_TOKEN: $TMDB_API_READ_ACCESS_TOKEN
     healthcheck:
