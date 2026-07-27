@@ -4,7 +4,7 @@ networks:
 
 services:
   scanopy-daemon:
-    image: ghcr.io/scanopy/scanopy/daemon:v0.17.4@sha256:e3865d79fd81f87b4aebaa15fa441059fd348a47c718e40756c62c492048012b
+    image: ghcr.io/scanopy/scanopy/daemon:v0.17.5@sha256:d68db98db01f1c4fe5362acce5fceb7fe7d01e378596a92a4eb8639fbc8545b3
     container_name: scanopy-daemon
     restart: $RESTART_POLICY_MAINTENANCE
     init: true
