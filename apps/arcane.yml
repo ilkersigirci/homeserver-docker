@@ -49,6 +49,7 @@ services:
       PROJECTS_DIRECTORY: $REPO_PATH
       # ACCENT_COLOR: fasdfasdf # UI Accent color (oklch format)
       OLED_MODE: true
+      GLASS_EFFECTS_ENABLED: false
       ### AUTH
       AUTH_LOCAL_ENABLED: false
       AUTO_LOGIN_USERNAME: arcane
