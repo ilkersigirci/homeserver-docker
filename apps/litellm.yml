@@ -2,6 +2,55 @@ networks:
   litellm_backend:
     internal: true
 
+x-litellm-service: &litellm_service
+  image: ghcr.io/nathanael-h/litellm-libre:1.92.0-libre.1@sha256:ed3a32a346fa670db402ee5b8be5f5364c8a5e730974d3b85811a810468a9e95
+  depends_on:
+    litellm-db:
+      condition: service_healthy
+  networks:
+    - t3_proxy
+    - litellm_backend
+  expose:
+    - 4000
+  # Upstream runs its migration entrypoint as root and writes Prisma engine
+  # files inside the image before starting the proxy.
+  user: root
+  read_only: false
+  tmpfs:
+    - /tmp:rw,noexec,nosuid,nodev,size=256m,mode=1777
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  cap_add: []
+  pids_limit: 512
+  cpus: "2.0"
+  mem_limit: "2G"
+  ulimits:
+    nofile:
+      soft: 4096
+      hard: 8192
+  healthcheck:
+    test:
+      [
+        "CMD",
+        "python3",
+        "-c",
+        "import urllib.request; urllib.request.urlopen('http://127.0.0.1:4000/health/liveliness', timeout=3)",
+      ]
+    interval: 2m
+    timeout: 5s
+    retries: 3
+    start_period: 2m
+
+x-litellm-environment: &litellm_environment
+  LITELLM_MASTER_KEY: $LITELLM_MASTER_KEY
+  LITELLM_SALT_KEY: $LITELLM_SALT_KEY
+  STORE_MODEL_IN_DB: "true"
+  STORE_PROMPTS_IN_SPEND_LOGS: "true"
+  DATABASE_URL: postgresql://litellm:${LITELLM_DATABASE_PASSWORD}@litellm-db:5432/litellm
+  ENFORCE_PRISMA_MIGRATION_CHECK: "true"
+
 services:
   litellm-db:
     image: postgres:18.4@sha256:3a82e1f56c8f0f5616a11103ac3d47e632c3938698946a7ad26da0df1334744a
@@ -10,6 +59,7 @@ services:
     profiles:
       - programming
       - litellm
+      - litellm-admin
     networks:
       - litellm_backend
     expose:
@@ -48,53 +98,21 @@ services:
       retries: 3
       start_period: 30s
 
-  litellm:
-    image: ghcr.io/nathanael-h/litellm-libre:1.92.0-libre.1@sha256:ed3a32a346fa670db402ee5b8be5f5364c8a5e730974d3b85811a810468a9e95
+  litellm-admin:
+    <<: *litellm_service
     command:
       - --port
       - "4000"
       - --telemetry
       - "False"
       - --use_v2_migration_resolver
-    container_name: litellm
-    restart: $RESTART_POLICY_PROGRAMMING
-    depends_on:
-      litellm-db:
-        condition: service_healthy
+    container_name: litellm-admin
+    restart: "no"
     profiles:
-      - programming
-      - litellm
-    networks:
-      - t3_proxy
-      - litellm_backend
-    expose:
-      - 4000
-    # Upstream runs its migration entrypoint as root and writes Prisma engine
-    # files inside the image before starting the proxy.
-    user: root
-    read_only: false
-    tmpfs:
-      - /tmp:rw,noexec,nosuid,nodev,size=256m,mode=1777
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    cap_add: []
-    pids_limit: 512
-    cpus: "2.0"
-    mem_limit: "2G"
-    ulimits:
-      nofile:
-        soft: 4096
-        hard: 8192
+      - litellm-admin
     environment:
-      LITELLM_MASTER_KEY: $LITELLM_MASTER_KEY
-      LITELLM_SALT_KEY: $LITELLM_SALT_KEY
-      PROXY_BASE_URL: https://litellm.$DOMAINNAME
-      STORE_MODEL_IN_DB: "true"
-      STORE_PROMPTS_IN_SPEND_LOGS: "true"
-      DATABASE_URL: postgresql://litellm:${LITELLM_DATABASE_PASSWORD}@litellm-db:5432/litellm
-      ENFORCE_PRISMA_MIGRATION_CHECK: "true"
+      <<: *litellm_environment
+      PROXY_BASE_URL: https://litellm-admin.$DOMAINNAME
       ## SSO
       AUTO_REDIRECT_UI_LOGIN_TO_SSO: "true"
       GENERIC_AUTHORIZATION_ENDPOINT: https://pocketid.$BASE_DOMAINNAME/authorize
@@ -108,39 +126,62 @@ services:
       GENERIC_TOKEN_ENDPOINT: https://pocketid.$BASE_DOMAINNAME/api/oidc/token
       GENERIC_USER_DISPLAY_NAME_ATTRIBUTE: name
       GENERIC_USER_EMAIL_ATTRIBUTE: email
-      GENERIC_USER_ID_ATTRIBUTE: preferred_username
+      GENERIC_USER_ID_ATTRIBUTE: sub
       GENERIC_USERINFO_ENDPOINT: https://pocketid.$BASE_DOMAINNAME/api/oidc/userinfo
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "python3",
-          "-c",
-          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:4000/health/liveliness', timeout=3)",
-        ]
-      interval: 2m
-      timeout: 5s
-      retries: 3
-      start_period: 2m
     labels:
       traefik.enable: "true"
       ## HTTP Routers
-      traefik.http.routers.litellm-rtr.entrypoints: "websecure"
-      traefik.http.routers.litellm-rtr.rule: "Host(`litellm.$DOMAINNAME`)"
+      traefik.http.routers.litellm-admin-rtr.entrypoints: "websecure"
+      traefik.http.routers.litellm-admin-rtr.rule: "Host(`litellm-admin.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.litellm-rtr.middlewares: "chain-no-auth-relaxed@file"
+      traefik.http.routers.litellm-admin-rtr.middlewares: "chain-no-auth-relaxed@file"
       ## HTTP Services
-      traefik.http.routers.litellm-rtr.service: "litellm-svc"
-      traefik.http.services.litellm-svc.loadbalancer.server.port: "4000"
+      traefik.http.routers.litellm-admin-rtr.service: "litellm-admin-svc"
+      traefik.http.services.litellm-admin-svc.loadbalancer.server.port: "4000"
       ####### HOMEPAGE #######
       homepage.group: "Programming"
       homepage.name: "LiteLLM Libre"
       homepage.icon: "litellm.png"
-      homepage.href: "https://litellm.$DOMAINNAME/ui"
+      homepage.href: "https://litellm-admin.$DOMAINNAME/ui"
       homepage.target: "_blank"
       homepage.description: "Fully libre AI gateway"
       ####### GLANCE #######
       glance.name: "LiteLLM Libre"
       glance.icon: "sh:litellm"
-      glance.url: "https://litellm.$DOMAINNAME/ui"
+      glance.url: "https://litellm-admin.$DOMAINNAME/ui"
       glance.description: "Fully libre AI gateway"
+
+  litellm-sso:
+    <<: *litellm_service
+    command:
+      - --port
+      - "4000"
+      - --telemetry
+      - "False"
+      - --use_v2_migration_resolver
+      - --config
+      - /app/litellm-config/config.yaml
+    container_name: litellm-sso
+    restart: $RESTART_POLICY_PROGRAMMING
+    profiles:
+      - programming
+      - litellm
+    volumes:
+      - $REPO_PATH/configs/litellm:/app/litellm-config:ro
+    environment:
+      <<: *litellm_environment
+      LITELLM_OIDC_AUDIENCE: https://llm.$BASE_DOMAINNAME
+      LITELLM_OIDC_REQUIRED_SCOPE: llm:invoke
+      POCKETID_ISSUER: https://pocketid.$BASE_DOMAINNAME
+      POCKETID_JWKS_URL: https://pocketid.$BASE_DOMAINNAME/.well-known/jwks.json
+      POCKETID_USERINFO_URL: https://pocketid.$BASE_DOMAINNAME/api/oidc/userinfo
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.litellm-sso-rtr.entrypoints: "websecure"
+      traefik.http.routers.litellm-sso-rtr.rule: "Host(`litellm.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.litellm-sso-rtr.middlewares: "chain-no-auth-relaxed@file"
+      ## HTTP Services
+      traefik.http.routers.litellm-sso-rtr.service: "litellm-sso-svc"
+      traefik.http.services.litellm-sso-svc.loadbalancer.server.port: "4000"

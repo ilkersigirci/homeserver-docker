@@ -61,8 +61,6 @@ include:
   #### MONITORING ####
   - ../apps/rybbit.yml
   - ../apps/victoriametrics.yml
-  #### PROGRAMMING ####
-  # - ../apps/open-webui.yml
-  # - ../apps/searxng.yml
+
   #### READING ####
   - ../apps/silverbullet.yml

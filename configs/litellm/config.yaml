@@ -1,0 +1,9 @@
+general_settings:
+  custom_auth: pocketid_auth.user_api_key_auth
+  custom_auth_run_common_checks: true
+
+litellm_settings:
+  # First-use provisioning creates a visible but fail-closed user record.
+  # Assign a positive budget and allowed models in the normal LiteLLM UI.
+  default_internal_user_params:
+    max_budget: 0
