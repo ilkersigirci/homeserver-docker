@@ -49,9 +49,7 @@ services:
       start_period: 30s
 
   litellm:
-    # Local build. Add the published digest, then remove pull_policy.
-    image: ghcr.io/ilkersigirci/homeserver-litellm:1.92.0-libre.1
-    pull_policy: never
+    image: ghcr.io/ilkersigirci/homeserver-litellm:1.92.0-libre.1@sha256:e13ef33f4bd242da235d1ce81009aad4242f4306ce5b0209e86c8d815c4f1c9e
     container_name: litellm
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
@@ -100,6 +98,7 @@ services:
       STORE_PROMPTS_IN_SPEND_LOGS: "true"
       DATABASE_URL: postgresql://litellm:${LITELLM_DATABASE_PASSWORD}@litellm-db:5432/litellm
       ENFORCE_PRISMA_MIGRATION_CHECK: "true"
+      FORWARDED_ALLOW_IPS: 192.168.90.254 # NOTE: Traefik's IP
       PROXY_BASE_URL: https://litellm.$DOMAINNAME
       ## Admin UI OIDC login
       AUTO_REDIRECT_UI_LOGIN_TO_SSO: "true"
