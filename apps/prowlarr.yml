@@ -1,7 +1,7 @@
 # TODO: Harden
 services:
   prowlarr:
-    image: lscr.io/linuxserver/prowlarr:2.5.2-develop@sha256:8a0501025d6039c8c335415ee9aad499cb0d196b79d8cae7a66a566e6bcf6cd0
+    image: lscr.io/linuxserver/prowlarr:2.6.0-develop@sha256:2df9ae57c475bf4341abd833e56a9268bb02167cc5f3f828a8347d2d8628f652
     container_name: prowlarr
     depends_on:
       - transmission
