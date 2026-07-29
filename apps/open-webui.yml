@@ -79,7 +79,7 @@ services:
       ## OPENAI_API_KEYS: $OPENAI_API_KEY;$OPENROUTER_API_KEY
       ############# OPENAI API - LiteLLM SSO #############
       ENABLE_OPENAI_API: true
-      OPENAI_API_BASE_URL: https://litellm.gpu.$BASE_DOMAINNAME/v1
+      OPENAI_API_BASE_URL: https://litellm-sso.gpu.$BASE_DOMAINNAME/v1
       OPENAI_API_KEY: ""
       OPENAI_API_CONFIGS: '{"0":{"auth_type":"system_oauth"}}'
       ENABLE_BASE_MODELS_CACHE: false

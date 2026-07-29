@@ -81,6 +81,26 @@
       "changelogUrl": "https://github.com/jupyterlab/jupyterlab/releases"
     },
     {
+      "description": "Ignore non-final images in the LiteLLM Dockerfile",
+      "matchManagers": ["dockerfile"],
+      "matchFileNames": ["Dockerfiles/LiteLLM/Dockerfile"],
+      "matchDepTypes": ["stage", "syntax"],
+      "enabled": false
+    },
+    {
+      "description": "Track LiteLLM Libre releases only",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": [
+        "ghcr.io/ilkersigirci/homeserver-litellm",
+        "ghcr.io/nathanael-h/litellm-libre"
+      ],
+      "sourceUrl": "https://github.com/nathanael-h/litellm-libre",
+      "changelogUrl": "https://github.com/nathanael-h/litellm-libre/releases",
+      "digest": {
+        "enabled": false
+      }
+    },
+    {
       "description": "Use Marimo as the Marimo custom image release driver",
       "matchManagers": ["pep621"],
       "matchDatasources": ["pypi"],
@@ -121,6 +141,15 @@
       "matchPackageNames": ["ghcr.io/ilkersigirci/homeserver-jupyter"],
       "sourceUrl": "https://github.com/jupyterlab/jupyterlab",
       "changelogUrl": "https://github.com/jupyterlab/jupyterlab/releases"
+    },
+    {
+      "description": "Use LiteLLM Libre GitHub releases for homeserver LiteLLM image changelogs",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchFileNames": ["apps/litellm.yml"],
+      "matchPackageNames": ["ghcr.io/ilkersigirci/homeserver-litellm"],
+      "sourceUrl": "https://github.com/nathanael-h/litellm-libre",
+      "changelogUrl": "https://github.com/nathanael-h/litellm-libre/releases"
     },
     {
       "description": "Use Marimo GitHub releases for homeserver Marimo image changelogs",
