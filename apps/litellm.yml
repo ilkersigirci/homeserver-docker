@@ -49,7 +49,7 @@ services:
       start_period: 30s
 
   litellm:
-    image: ghcr.io/ilkersigirci/homeserver-litellm:1.92.0-libre.1@sha256:e13ef33f4bd242da235d1ce81009aad4242f4306ce5b0209e86c8d815c4f1c9e
+    image: ghcr.io/ilkersigirci/homeserver-litellm:1.92.0-libre.1@sha256:736e8d22f93b1664e3e68b88633a6f23f0b761f1d464c7063ab962b36a20b8fd
     container_name: litellm
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
