@@ -212,6 +212,22 @@ the fail-closed `max_budget: 0` default from
 [`config.yaml`](../../configs/litellm/config.yaml). An administrator must then
 assign a positive budget and explicit allowed models.
 
+`OIDC_REQUIRE_VERIFIED_EMAIL` defaults to `true`. When UserInfo includes an
+email, the default requires `email_verified` to be the JSON boolean `true`.
+Set the variable to `false` to provision by OIDC subject without blocking on an
+unverified email. The verifier discards that email, so only a verified email can
+participate in LiteLLM's
+[email fallback lookup](https://github.com/BerriAI/litellm/blob/v1.92.0/litellm/proxy/auth/auth_checks.py#L1415-L1451).
+Invalid values fail configuration loading.
+
+Pocket ID defaults `EMAILS_VERIFIED` and `EMAIL_VERIFICATION_ENABLED` to
+`false`. Prefer configuring its
+[email verification settings](https://pocket-id.org/docs/configuration/environment-variables)
+when email ownership is part of the deployment's identity policy. OpenID
+Connect defines email claims as optional, while the UserInfo `sub` match remains
+mandatory; the verifier always enforces that
+[subject match](https://openid.net/specs/openid-connect-core-1_0.html#UserInfoResponse).
+
 Verified email can link a pre-existing UI SSO record during first use.
 Subsequent authentication resolves by immutable OIDC `sub`.
 

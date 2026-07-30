@@ -118,6 +118,7 @@ def _configure_hook() -> None:
             "OIDC_REQUIRED_SCOPE": "llm:invoke",
             "OIDC_TOKEN_PROFILE": "pocket-id",
             "OIDC_SIGNING_ALGORITHM": "RS256",
+            "OIDC_REQUIRE_VERIFIED_EMAIL": "true",
         }
     )
 
@@ -164,6 +165,59 @@ async def _verify_hook() -> None:
     )
     assert callable(custom_auth)
     hook_globals = custom_auth.__globals__
+    validate_user_profile = hook_globals["_validate_user_profile"]
+
+    assert hook_globals["_REQUIRE_VERIFIED_EMAIL"] is True
+    hook_globals["_REQUIRE_VERIFIED_EMAIL"] = True
+    verified_profile = validate_user_profile(
+        {
+            "sub": "oidc-user",
+            "email": "Person@Example.com",
+            "email_verified": True,
+        },
+        "oidc-user",
+    )
+    assert verified_profile["email"] == "person@example.com"
+    _expect_proxy_error(
+        "403",
+        lambda: validate_user_profile(
+            {
+                "sub": "oidc-user",
+                "email": "person@example.com",
+                "email_verified": False,
+            },
+            "oidc-user",
+        ),
+    )
+    for invalid_email in ("not-an-email", {"unexpected": "value"}):
+        _expect_proxy_error(
+            "401",
+            lambda: validate_user_profile(
+                {
+                    "sub": "oidc-user",
+                    "email": invalid_email,
+                    "email_verified": True,
+                },
+                "oidc-user",
+            ),
+        )
+
+    hook_globals["_REQUIRE_VERIFIED_EMAIL"] = False
+    for unverified_email in (
+        "person@example.com",
+        "not-an-email",
+        {"unexpected": "value"},
+    ):
+        unverified_profile = validate_user_profile(
+            {
+                "sub": "oidc-user",
+                "email": unverified_email,
+                "email_verified": False,
+            },
+            "oidc-user",
+        )
+        assert "email" not in unverified_profile
+    hook_globals["_REQUIRE_VERIFIED_EMAIL"] = True
 
     private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
     public_key = private_key.public_key()

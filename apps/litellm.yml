@@ -124,6 +124,7 @@ services:
       OIDC_REQUIRED_SCOPE: llm:invoke
       OIDC_TOKEN_PROFILE: pocket-id
       OIDC_SIGNING_ALGORITHM: RS256
+      OIDC_REQUIRE_VERIFIED_EMAIL: "true"
     healthcheck:
       test:
         [

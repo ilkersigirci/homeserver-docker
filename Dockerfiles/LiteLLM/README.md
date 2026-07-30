@@ -19,6 +19,18 @@ The build is fail-closed. It pins the Libre base by digest, checks the exact
 upstream source hashes before patching, applies the patch without fuzz, verifies
 that Enterprise modules are absent, and compiles and tests the installed code.
 
+## Configuration
+
+`OIDC_REQUIRE_VERIFIED_EMAIL` controls first-use delegated-user provisioning.
+It defaults to `true`, which rejects a UserInfo email unless
+`email_verified` is the JSON boolean `true`. Set it to `false` to allow the
+OIDC subject through when its email is unverified; the unverified email is
+discarded and cannot participate in LiteLLM account linking.
+
+Only `true` and `false` are accepted, case-insensitively. Any other value stops
+the process during configuration loading. For this repository's Compose
+deployment, set `OIDC_REQUIRE_VERIFIED_EMAIL=false` in `.env` to opt out.
+
 ## Updating
 
 When changing `IMAGE_VERSION` or its digest:

@@ -14,6 +14,8 @@ from litellm.proxy._types import (
     UserAPIKeyAuth,
 )
 from litellm.proxy.auth.auth_checks import get_user_object
+from litellm.secret_managers.main import get_secret_bool
+from pydantic import EmailStr, TypeAdapter, ValidationError
 
 _ISSUER = os.environ.get("OIDC_ISSUER", "").rstrip("/")
 _JWKS_URL = os.environ.get("OIDC_JWKS_URL", "")
@@ -22,6 +24,12 @@ _AUDIENCE = os.environ.get("OIDC_AUDIENCE", "")
 _REQUIRED_SCOPE = os.environ.get("OIDC_REQUIRED_SCOPE", "")
 _TOKEN_PROFILE = os.environ.get("OIDC_TOKEN_PROFILE", "")
 _SIGNING_ALGORITHM = os.environ.get("OIDC_SIGNING_ALGORITHM", "")
+_REQUIRE_VERIFIED_EMAIL = get_secret_bool("OIDC_REQUIRE_VERIFIED_EMAIL")
+if _REQUIRE_VERIFIED_EMAIL is None:
+    if "OIDC_REQUIRE_VERIFIED_EMAIL" in os.environ:
+        raise RuntimeError("OIDC_REQUIRE_VERIFIED_EMAIL must be true or false")
+    _REQUIRE_VERIFIED_EMAIL = True
+_EMAIL_ADAPTER = TypeAdapter(EmailStr)
 
 _POCKET_ID_PROFILE = "pocket-id"
 _KEYCLOAK_PROFILE = "keycloak"
@@ -199,6 +207,13 @@ async def _fetch_user_profile(
     except ValueError:
         _deny("OIDC UserInfo lookup failed")
 
+    return _validate_user_profile(profile, expected_subject)
+
+
+def _validate_user_profile(
+    profile: Any,
+    expected_subject: str,
+) -> dict[str, Any]:
     if not isinstance(profile, dict):
         _deny("OIDC UserInfo returned an invalid profile")
     if profile.get("sub") != expected_subject:
@@ -207,13 +222,19 @@ async def _fetch_user_profile(
     email = profile.get("email")
     if email is not None:
         if profile.get("email_verified") is not True:
-            _deny(
-                "OIDC email is not verified",
-                code=status.HTTP_403_FORBIDDEN,
-            )
-        if not isinstance(email, str) or "@" not in email or len(email) > 320:
-            _deny("OIDC UserInfo returned an invalid email")
-        profile["email"] = email.strip().casefold()
+            if not _REQUIRE_VERIFIED_EMAIL:
+                profile.pop("email")
+            else:
+                _deny(
+                    "OIDC email is not verified",
+                    code=status.HTTP_403_FORBIDDEN,
+                )
+        else:
+            try:
+                normalized_email = _EMAIL_ADAPTER.validate_python(email, strict=True)
+            except ValidationError:
+                _deny("OIDC UserInfo returned an invalid email")
+            profile["email"] = str(normalized_email).casefold()
 
     return profile
 
