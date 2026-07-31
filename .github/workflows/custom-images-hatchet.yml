@@ -1,0 +1,45 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Build Hatchet Image
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - Dockerfiles/Hatchet/**
+  pull_request:
+    paths:
+      - Dockerfiles/Hatchet/**
+      - .github/workflows/custom-images-build.yml
+      - .github/workflows/custom-images-hatchet.yml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/custom-images-build.yml
+    with:
+      name: Hatchet
+      context: Dockerfiles/Hatchet
+      repository: homeserver-hatchet
+      platforms: linux/amd64
+      publish: false
+
+  publish:
+    if: github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/custom-images-build.yml
+    with:
+      name: Hatchet
+      context: Dockerfiles/Hatchet
+      repository: homeserver-hatchet
+      platforms: linux/amd64
+      publish: true
