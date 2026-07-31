@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.25@sha256:0adf442eae370b6087e08edc7c50b552d80ddf261576f4ebd6421006b2461f12
-ARG IMAGE_VERSION=v0.98.7-oidc.933e581
-ARG HATCHET_REVISION=933e581feee314d3ede8b712117247aa4ce020bc
+ARG IMAGE_VERSION=v0.100.0-oidc.c06cf50
+ARG HATCHET_REVISION=c06cf50c8385733ce3d283c421d9766c4986f0a6
 
 FROM golang:1.26-alpine@sha256:0178a641fbb4858c5f1b48e34bdaabe0350a330a1b1149aabd498d0699ff5fb2 AS server-build
 
@@ -9,6 +9,7 @@ ARG HATCHET_REVISION
 WORKDIR /src
 ENV CGO_ENABLED=0
 
+# Pin the PR source by commit so historical releases remain rebuildable.
 ADD --checksum=${HATCHET_REVISION} https://github.com/hatchet-dev/hatchet.git#${HATCHET_REVISION} .
 
 RUN apk add --no-cache git python3 \
