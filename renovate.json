@@ -209,6 +209,13 @@
       "sourceUrl": "https://github.com/glanceapp/glance"
     },
     {
+      "description": "Use GitHub releases for Hatchet Docker image changelogs",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/hatchet-dev/hatchet/hatchet-lite"],
+      "sourceUrl": "https://github.com/hatchet-dev/hatchet"
+    },
+    {
       "description": "Use GitHub releases for Headscale Docker image changelogs",
       "matchManagers": ["docker-compose"],
       "matchDatasources": ["docker"],
