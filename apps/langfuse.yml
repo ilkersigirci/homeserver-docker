@@ -36,12 +36,11 @@ services:
         hard: 16384
     volumes:
       - $REPO_PATH/configs/clickhouse-optimized/clickhouse-server:/etc/clickhouse-server/config.d:ro
-      - $REPO_PATH/configs/clickhouse-optimized/clickhouse-users/zz_disable_query_logging.xml:/etc/clickhouse-server/users.d/zz_disable_query_logging.xml:ro
       - $REPO_PATH/data/langfuse/clickhouse:/var/lib/clickhouse
       # - $REPO_PATH/data/langfuse/clickhouse/logs:/var/log/clickhouse-server
     environment:
-      TZ: $TZ
-      CLICKHOUSE_DB: default
+      TZ: "UTC" # NOTE: Langfuse requires UTC; other zones break timestamp-bounded ClickHouse reads.
+      CLICKHOUSE_DB: "default"
       CLICKHOUSE_USER: $LANGFUSE_CLICKHOUSE_USER
       CLICKHOUSE_PASSWORD: $LANGFUSE_CLICKHOUSE_PASSWORD
     healthcheck:
@@ -146,7 +145,7 @@ services:
       start_period: 10s
 
   langfuse-worker:
-    image: langfuse/langfuse-worker:4.1.0@sha256:61e9f83f5f1e5b6f8745215db193f5d201b4cba9ed543e539104552c1b3dc106
+    image: langfuse/langfuse-worker:4.4.0@sha256:0efc56f424044db9cf7bc9c0881d104b28d31764fda956be2238d1ed269124f1
     container_name: langfuse-worker
     restart: $RESTART_POLICY_PROGRAMMING
     depends_on: &langfuse-depends-on
@@ -187,6 +186,7 @@ services:
       ENCRYPTION_KEY: $LANGFUSE_ENCRYPTION_KEY
       TELEMETRY_ENABLED: false
       LANGFUSE_ENABLE_EXPERIMENTAL_FEATURES: true
+      LANGFUSE_BACKGROUND_MIGRATION_V4_DROP_PID_TID_SORTING_TABLES: true
       CLICKHOUSE_MIGRATION_URL: ${CLICKHOUSE_MIGRATION_URL:-clickhouse://langfuse-clickhouse:9000}
       CLICKHOUSE_URL: ${CLICKHOUSE_URL:-http://langfuse-clickhouse:8123}
       CLICKHOUSE_USER: $LANGFUSE_CLICKHOUSE_USER
@@ -236,7 +236,7 @@ services:
       start_period: 10s
 
   langfuse-web:
-    image: langfuse/langfuse:4.1.0@sha256:cff59a366f9773f9e1d7060655cc63441b1e4ad27e8ad40ebdaebe2151a014cb
+    image: langfuse/langfuse:4.4.0@sha256:434f228500ba1e1e0f3deaa6dc412827330c5e9f01fba841c6122ff8c46a9323
     container_name: langfuse-web
     restart: $RESTART_POLICY_PROGRAMMING
     depends_on: *langfuse-depends-on

@@ -7,14 +7,15 @@
   <asynchronous_insert_log remove="remove" />
   <asynchronous_metric_log remove="remove" />
   <backup_log remove="remove" />
-  <error_log remove="remove" />
   <histogram_metric_log remove="remove" />
   <metric_log remove="remove" />
   <query_metric_log remove="remove" />
   <query_thread_log remove="remove" />
-  <query_log remove="remove" />
+  <query_log>
+    <!-- Langfuse v4 uses system.query_log for background-query tracking and transition diagnostics. -->
+    <ttl>event_date + INTERVAL 7 DAY DELETE</ttl>
+  </query_log>
   <query_views_log remove="remove" />
-  <part_log remove="remove" />
   <session_log remove="remove" />
   <text_log remove="remove" />
   <trace_log remove="remove" />
