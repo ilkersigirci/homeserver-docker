@@ -161,6 +161,21 @@
       "changelogUrl": "https://github.com/marimo-team/marimo/releases"
     },
     {
+      "description": "Group Arcane server and agent Docker image updates",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchFileNames": [
+        "apps/arcane.yml",
+        "apps/arcane-agent.yml",
+        "apps/arcane-agent-gpu.yml"
+      ],
+      "matchPackageNames": [
+        "ghcr.io/getarcaneapp/arcane",
+        "ghcr.io/getarcaneapp/arcane-headless"
+      ],
+      "groupName": "Arcane"
+    },
+    {
       "description": "Use GitHub releases for Bambubuddy Docker image changelogs",
       "matchManagers": ["docker-compose"],
       "matchDatasources": ["docker"],
@@ -247,6 +262,14 @@
       "sourceUrl": "https://github.com/kiwix/kiwix-tools"
     },
     {
+      "description": "Group Langfuse web and worker Docker image updates",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchFileNames": ["apps/langfuse.yml"],
+      "matchPackageNames": ["langfuse/langfuse", "langfuse/langfuse-worker"],
+      "groupName": "Langfuse"
+    },
+    {
       "description": "Disable Meilisearch updates that are version-coupled to Karakeep and Jellyfin",
       "matchManagers": ["docker-compose"],
       "matchFileNames": ["apps/karakeep.yml", "apps/jellyfin.yml"],
@@ -266,6 +289,17 @@
       "matchDatasources": ["docker"],
       "matchPackageNames": ["rabbitmq"],
       "sourceUrl": "https://github.com/rabbitmq/rabbitmq-server"
+    },
+    {
+      "description": "Group Rybbit backend and client Docker image updates",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchFileNames": ["apps/rybbit.yml"],
+      "matchPackageNames": [
+        "ghcr.io/rybbit-io/rybbit-backend",
+        "ghcr.io/rybbit-io/rybbit-client"
+      ],
+      "groupName": "Rybbit"
     }
   ],
   "major": {
