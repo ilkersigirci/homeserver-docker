@@ -39,5 +39,7 @@ include:
   - ../apps/syncthing.yml
   - ../apps/watchyourlan.yml
   - ../apps/whoami.yml
+  #### MEDIA ####
+  - ../apps/aiostreams.yml
   #### READING ####
   - ../apps/silverbullet.yml

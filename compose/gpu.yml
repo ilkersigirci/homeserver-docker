@@ -42,7 +42,6 @@ include:
   - ../apps/whoami.yml
   # - ../apps/watchtower.yml
   #### MEDIA ####
-  - ../apps/aiostreams.yml
   - ../apps/bichon.yml
   # - ../apps/feishin.yml
   - ../apps/jellyfin.yml
