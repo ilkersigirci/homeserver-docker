@@ -5,7 +5,7 @@
   "description": "Pinned runtime for the Codex ACP adapter",
   "license": "UNLICENSED",
   "dependencies": {
-    "@agentclientprotocol/codex-acp": "1.1.4",
+    "@agentclientprotocol/codex-acp": "1.1.7",
     "stdio-to-ws": "0.2.0"
   }
 }

@@ -22,9 +22,7 @@ configs/**
 !configs/
 !configs/**/
 !configs/**/.gitkeep
-!configs/litellm/README.md
 !configs/litellm/config.yaml
-!configs/litellm/pocketid_auth.py
 
 ## Keep credentials out of git
 configs/headscale/oidc_client_secret

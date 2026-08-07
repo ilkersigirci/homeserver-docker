@@ -1,5 +1,14 @@
 http:
   middlewares:
+    # Use only on permanent HTTPS hosts: browsers cache this for 2 years and reject certificate-error bypasses.
+    # includeSubDomains expands coverage; preload requires separate browser-list submission.
+    middlewares-hsts:
+      headers:
+        stsSeconds: 63072000
+        stsIncludeSubdomains: true
+        stsPreload: true
+        forceSTSHeader: true
+
     middlewares-secure-headers-original:
       headers:
         # CORS is handled by route-specific middlewares (for example pocket-id-cors).

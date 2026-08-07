@@ -65,3 +65,14 @@ http:
           - middlewares-rate-limit
           - middlewares-secure-headers-arcane
           - middlewares-tinyauth
+
+    chain-tinyauth-hsts:
+      chain:
+        middlewares:
+{{if env "CROWDSEC_TRAEFIK_BOUNCER_API_KEY"}}
+          - middlewares-cf-real-ip
+          - middlewares-crowdsec-bouncer
+{{end}}
+          - middlewares-rate-limit
+          - middlewares-hsts
+          - middlewares-tinyauth

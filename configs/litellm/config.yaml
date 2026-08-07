@@ -1,6 +1,7 @@
 general_settings:
-  custom_auth: pocketid_auth.user_api_key_auth
+  custom_auth: oidc_delegated_auth.user_api_key_auth
   custom_auth_run_common_checks: true
+  ui_access_mode: admin_only
 
 litellm_settings:
   # First-use provisioning creates a visible but fail-closed user record.

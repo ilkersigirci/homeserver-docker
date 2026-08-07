@@ -46,7 +46,7 @@ services:
       start_period: 30s
 
   hatchet:
-    image: ghcr.io/hatchet-dev/hatchet/hatchet-lite:v0.95.4@sha256:275e1ccf11472476ec62f06444c9f6c0256d844568de3bd348fc2cd40c70686d
+    image: ghcr.io/ilkersigirci/homeserver-hatchet:v0.100.0-oidc.c06cf50@sha256:3597f4592a6ffcc43b09e175c24a16e75cca1f25fe4ec17e0e7d5f99b776867c
     container_name: hatchet
     restart: $RESTART_POLICY_PROGRAMMING
     depends_on:
@@ -86,6 +86,11 @@ services:
       DATABASE_URL: "postgresql://postgres:postgres@hatchet-db:5432/postgres?sslmode=disable"
       SERVER_AUTH_COOKIE_DOMAIN: $DOMAINNAME
       SERVER_AUTH_COOKIE_INSECURE: "t"
+      SERVER_AUTH_OIDC_ENABLED: "t"
+      SERVER_AUTH_OIDC_CLIENT_ID: $HATCHET_CLIENT_ID
+      SERVER_AUTH_OIDC_CLIENT_SECRET: $HATCHET_CLIENT_SECRET
+      SERVER_AUTH_OIDC_ISSUER_URL: https://pocketid.$BASE_DOMAINNAME
+      SERVER_AUTH_OIDC_SCOPES: "openid profile email"
       SERVER_GRPC_BIND_ADDRESS: "0.0.0.0"
       SERVER_GRPC_INSECURE: "t"
       SERVER_GRPC_BROADCAST_ADDRESS: hatchet-rpc.$DOMAINNAME:443
@@ -107,7 +112,7 @@ services:
       traefik.http.routers.hatchet-rtr.entrypoints: "websecure"
       traefik.http.routers.hatchet-rtr.rule: "Host(`hatchet.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.hatchet-rtr.middlewares: "chain-tinyauth-relaxed@file" # NOTE: For task input loading
+      traefik.http.routers.hatchet-rtr.middlewares: "chain-no-auth-relaxed@file" # NOTE: For task input loading
       ## HTTP Services
       traefik.http.routers.hatchet-rtr.service: "hatchet-svc"
       traefik.http.services.hatchet-svc.loadbalancer.server.port: "8888"
