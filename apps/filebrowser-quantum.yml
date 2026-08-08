@@ -85,7 +85,7 @@ services:
 
   euro-office-documentserver:
     container_name: euro-office-documentserver
-    image: ghcr.io/euro-office/documentserver:v9.3.2@sha256:5a1a8b7083856b309f09a5b06aa96f80182cbdfccddcae6c082ecf7a2b3cbf2b
+    image: ghcr.io/euro-office/documentserver:v9.3.3@sha256:6068075cc247f9283d337b2cf9a105d9df49fcd8cd6b5e82fa90640df1552e80
     profiles:
       - root
       - media
