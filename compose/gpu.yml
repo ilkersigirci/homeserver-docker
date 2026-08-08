@@ -71,8 +71,6 @@ include:
   - ../apps/bifrost.yml
   - ../apps/kreuzberg.yml
   - ../apps/litellm.yml
-  - ../apps/open-webui.yml
-  - ../apps/searxng.yml
   - ../apps/scalar.yml
   #### READING ####
   # - ../apps/hypothesis.yml
