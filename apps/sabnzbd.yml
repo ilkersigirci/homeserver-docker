@@ -1,10 +1,16 @@
 # TODO: Harden
-# NOTE: In sabnzb.ini file -> host_whitelist add: sabnzbd.$DOMAINNAME, sabnzbd
+# Required SABnzbd settings (stored in ignored /config/sabnzbd.ini):
+# - download_dir=Downloads/incomplete: use the SSD for download and repair work.
+# - download_free=200G: reserve SSD headroom for large jobs and repair data.
+# - complete_dir=Downloads/complete: place completed data on the HDD array.
+# - direct_unpack=1: unpack to the HDD while downloading to shorten post-processing.
+# - host_whitelist=sabnzbd.$DOMAINNAME,sabnzbd: allow proxy and service hostnames.
 services:
   sabnzbd:
     image: lscr.io/linuxserver/sabnzbd:4.5.5-ls249@sha256:7ac6fe8a521c7099e1768af90529dfee5976b87c7dccffdcc9ced00149e1aedb
     container_name: sabnzbd
     restart: $RESTART_POLICY_MEDIA
+    stop_grace_period: 30s
     hostname: sabnzbd.$DOMAINNAME
     profiles:
       - root
@@ -17,15 +23,23 @@ services:
       - no-new-privileges:true
     pids_limit: 256
     cpus: '1.0'
-    mem_limit: 1G
+    mem_limit: 2G
     ulimits:
       nofile:
         soft: 4096
         hard: 8192
     volumes:
       - $REPO_PATH/appdata/sabnzbd:/config
-      - $DIR_MEDIA/Downloads/complete:/config/Downloads/complete
-      - $DIR_MEDIA/Downloads/incomplete:/config/Downloads/incomplete
+      - type: bind
+        source: $DIR_MEDIA/Downloads/complete
+        target: /config/Downloads/complete
+        bind:
+          create_host_path: false
+      - type: bind
+        source: $DIR_SABNZBD_INCOMPLETE
+        target: /config/Downloads/incomplete
+        bind:
+          create_host_path: false
     environment:
       PUID: $PUID
       PGID: $PGID
