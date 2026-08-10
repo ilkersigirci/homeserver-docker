@@ -37,7 +37,11 @@ validate_config() {
         exit 1
     fi
 
-    COMPOSE_FILE="${REPO_ROOT}/compose/${MY_HOSTNAME}.yml"
+    # Maintenance scripts can override this to manage standalone Compose files such as PBS.
+    COMPOSE_FILE="${COMPOSE_FILE:-${REPO_ROOT}/compose/${MY_HOSTNAME}.yml}"
+    if [[ "$COMPOSE_FILE" != /* ]]; then
+        COMPOSE_FILE="${REPO_ROOT}/${COMPOSE_FILE}"
+    fi
 
     if [ ! -f "$COMPOSE_FILE" ]; then
         echo "⚠️  Compose file not found: $COMPOSE_FILE"
