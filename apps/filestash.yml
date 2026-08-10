@@ -77,7 +77,7 @@ services:
 
   # NOTE: Selfhosted Version: v0.6.20260617
   filestash:
-    image: machines/filestash:latest@sha256:69a1caff90ace092af1ad2755ac580b06864c12d6245fd02dba0c7b939403fb5
+    image: machines/filestash:latest@sha256:07b1d0e59a313073974cf851e180e008224ef1192eb7439a6ba47be80093ad7c
     container_name: filestash
     restart: $RESTART_POLICY_MEDIA
     profiles:
