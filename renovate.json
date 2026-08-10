@@ -270,6 +270,15 @@
       "groupName": "Langfuse"
     },
     {
+      "description": "Track LinuxServer application and image build versions",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": [
+        "/^(?:(?:docker\\.io|ghcr\\.io|lscr\\.io)\\/)?linuxserver\\//"
+      ],
+      "matchCurrentValue": "/^v?\\d+\\.\\d+\\.\\d+(?:\\.\\d+)?(?:-r?\\d+)?-ls\\d+$/",
+      "versioning": "regex:^v?(?<major>\\d+)\\.(?<minor>\\d+)\\.(?<patch>\\d+)(?:\\.(?<build>\\d+))?(?:-r?\\d+)?-ls(?<revision>\\d+)$"
+    },
+    {
       "description": "Disable Meilisearch updates that are version-coupled to Karakeep and Jellyfin",
       "matchManagers": ["docker-compose"],
       "matchFileNames": ["apps/karakeep.yml", "apps/jellyfin.yml"],
