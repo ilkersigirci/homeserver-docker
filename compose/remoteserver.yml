@@ -52,7 +52,7 @@ include:
   - ../apps/whoami.yml
   - ../apps/withoutbg.yml
   #### MEDIA ####
-  - ../apps/aiostreams.yml
+  # - ../apps/aiostreams.yml
   # - ../apps/dufs.yml
   - ../apps/mazanoke.yml
   - ../apps/metube.yml
