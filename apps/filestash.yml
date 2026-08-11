@@ -45,7 +45,7 @@ services:
         --o:welcome.enable=false \
         --o:net.frame_ancestors=drive.$DOMAINNAME
     healthcheck:
-      test: ["CMD", "pidof", "coolwsd"]
+      test: ["CMD", "/usr/bin/coolwsd", "--probe", "--use-env-vars"]
       interval: 5m
       timeout: 5s
       retries: 3
