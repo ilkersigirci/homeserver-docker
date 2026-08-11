@@ -49,7 +49,6 @@ services:
       traefik.http.routers.transmission-rtr.rule: "Host(`torrent.$DOMAINNAME`)"
       ## Middlewares
       traefik.http.routers.transmission-rtr.middlewares: "chain-tinyauth@file"
-      # traefik.http.routers.transmission-rtr.middlewares: "chain-no-auth@file"
       ## HTTP Services
       traefik.http.routers.transmission-rtr.service: "transmission-svc"
       traefik.http.services.transmission-svc.loadbalancer.server.port: "9091"

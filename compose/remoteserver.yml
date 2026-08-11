@@ -57,7 +57,6 @@ include:
   - ../apps/mazanoke.yml
   - ../apps/metube.yml
   - ../apps/stremio.yml
-  # - ../apps/transmission.yml
   #### MONITORING ####
   - ../apps/rybbit.yml
   - ../apps/victoriametrics.yml

@@ -23,7 +23,7 @@ services:
       traefik.http.routers.tubearchivist-rtr.rule: "Host(`tubearch.$DOMAINNAME`)"
       ## Middlewares
       traefik.http.routers.tubearchivist-rtr.middlewares: "chain-tinyauth@file"
-      #  - "traefik.http.routers.transmission-rtr.middlewares=middlewares-rate-limit@file"
+      #  - "traefik.http.routers.tubearchivist-rtr.middlewares=middlewares-rate-limit@file"
       ## HTTP Services
       traefik.http.routers.tubearchivist-rtr.service: "tubearchivist-svc"
       traefik.http.services.tubearchivist-svc.loadbalancer.server.port: "8000"

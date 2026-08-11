@@ -30,13 +30,15 @@ services:
         hard: 8192
     volumes:
       - $REPO_PATH/appdata/sabnzbd:/config
+      # NOTE: Complete files goes to HDD
       - type: bind
         source: $DIR_MEDIA/Downloads/complete
         target: /config/Downloads/complete
         bind:
           create_host_path: false
+      # NOTE: Incomplete files goes to SSD
       - type: bind
-        source: $DIR_SABNZBD_INCOMPLETE
+        source: $DIR_NAS_JET_SERVICES/nas/sabnzbd/incomplete
         target: /config/Downloads/incomplete
         bind:
           create_host_path: false

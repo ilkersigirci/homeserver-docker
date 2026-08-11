@@ -51,13 +51,11 @@ include:
   # - ../apps/oxicloud.yml
   - ../apps/pinchflat.yml
   - ../apps/prowlarr.yml
-  - ../apps/sabnzbd.yml
   # - ../apps/scotty.yml
   # - ../apps/splitpro.yml
   # - ../apps/strava-statistics.yml
   - ../apps/yamtrack.yml
   # - ../apps/ytptube.yml # TODO: restart always
-  - ../apps/transmission.yml
   #### MONITORING ####
   - ../apps/changedetection.yml
   - ../apps/grafana-lgtm.yml

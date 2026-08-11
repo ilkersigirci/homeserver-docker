@@ -3,9 +3,9 @@ services:
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:2.6.0-develop@sha256:2df9ae57c475bf4341abd833e56a9268bb02167cc5f3f828a8347d2d8628f652
     container_name: prowlarr
-    depends_on:
-      - transmission
-      - sabnzbd
+    # depends_on:
+    #   - transmission
+    #   - sabnzbd
     restart: $RESTART_POLICY_MEDIA
     profiles:
       - root
