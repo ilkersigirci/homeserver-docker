@@ -1,10 +1,6 @@
 services:
   pbs-client:
-    # Bootstrap from the local context until the first public GHCR image can be
-    # pinned as ghcr.io/ilkersigirci/homeserver-proxmox-backup-client:<tag>@<digest>.
-    pull_policy: build
-    build:
-      context: ../Dockerfiles/ProxmoxBackupClient
+    image: ghcr.io/ilkersigirci/homeserver-proxmox-backup-client:4.2.4-1@sha256:6c57dfeedff8b53eb7ccd1680e81c33941cc7d44dc71c2791efcc4738bb5e91c
     container_name: pbs-client
     hostname: pbs-client-$MY_HOSTNAME
     profiles:
