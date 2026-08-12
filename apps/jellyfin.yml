@@ -90,7 +90,12 @@ services:
       - $REPO_PATH/appdata/jellyfin/cache:/cache
       - $REPO_PATH/data/jellyfin/metadata:/config/metadata
       - $REPO_PATH/data/downloads:/media/downloads:ro
-      - $DIR_MEDIA:/media/local:ro
+      - type: bind
+        source: $DIR_MEDIA
+        target: /media/local
+        read_only: true
+        bind:
+          create_host_path: false
     environment:
       MEILI_URL: http://jellyfin-meilisearch:7700
       MEILI_MASTER_KEY: $JELLYFIN_MEILI_MASTER_KEY

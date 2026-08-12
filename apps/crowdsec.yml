@@ -37,7 +37,12 @@ services:
         soft: 4096
         hard: 8192
     volumes:
-      - /var/log:/var/log:ro # NOTE: Needs adm group privileges on host to read logs
+      - type: bind # NOTE: Needs adm group privileges on host to read logs
+        source: /var/log
+        target: /var/log
+        read_only: true
+        bind:
+          create_host_path: false
       - $REPO_PATH/logs/traefik:/logs/traefik:ro
       ## Configs
       - $REPO_PATH/appdata/crowdsec:/var/lib/crowdsec/data

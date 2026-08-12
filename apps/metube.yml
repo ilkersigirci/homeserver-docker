@@ -25,8 +25,16 @@ services:
         soft: 4096
         hard: 8192
     volumes:
-      - $DIR_MEDIA/Youtube:/downloads
-      - $DIR_MEDIA/Youtube/cookies:/cookies
+      - type: bind
+        source: $DIR_MEDIA/Youtube
+        target: /downloads
+        bind:
+          create_host_path: false
+      - type: bind
+        source: $DIR_MEDIA/Youtube/cookies
+        target: /cookies
+        bind:
+          create_host_path: false
     environment:
       UID: $PUID
       GID: $PGID

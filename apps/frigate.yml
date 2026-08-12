@@ -34,10 +34,19 @@ services:
         soft: 4096
         hard: 8192
     volumes:
-      - /etc/localtime:/etc/localtime:ro
+      - type: bind
+        source: /etc/localtime
+        target: /etc/localtime
+        read_only: true
+        bind:
+          create_host_path: false
       - $REPO_PATH/configs/frigate:/config
       # - $REPO_PATH/data/frigate:/media/frigate
-      - $DIR_MEDIA/CamRecordings:/media/frigate
+      - type: bind
+        source: $DIR_MEDIA/CamRecordings
+        target: /media/frigate
+        bind:
+          create_host_path: false
       - type: tmpfs # Optional: 1GB of memory, reduces SSD/SD Card wear
         target: /tmp/cache
         tmpfs:

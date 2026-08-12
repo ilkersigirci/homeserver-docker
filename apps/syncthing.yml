@@ -26,7 +26,11 @@ services:
         hard: 8192
     volumes:
       - $REPO_PATH/appdata/syncthing:/config
-      - $DIR_NOTES/Markdown:/notes
+      - type: bind
+        source: $DIR_NOTES/Markdown
+        target: /notes
+        bind:
+          create_host_path: false
     environment:
       PUID: $PUID
       PGID: $PGID

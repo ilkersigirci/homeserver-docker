@@ -26,7 +26,11 @@ services:
         soft: 4096
         hard: 8192
     volumes:
-      - $DIR_KIWIX:/data
+      - type: bind
+        source: $DIR_KIWIX
+        target: /data
+        bind:
+          create_host_path: false
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/"]
       interval: 5m

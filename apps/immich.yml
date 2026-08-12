@@ -111,10 +111,27 @@ services:
         soft: 8192
         hard: 16384
     volumes:
-      - $IMMICH_THUMBS_PATH:/data/thumbs
-      - $IMMICH_DATA_PATH:/data
-      - $DIR_PHOTOS/Pictures:/mnt/media/Photos/Pictures
-      - $DIR_PHOTOS/Videos:/mnt/media/Photos/Videos:ro
+      - type: bind
+        source: $IMMICH_THUMBS_PATH
+        target: /data/thumbs
+        bind:
+          create_host_path: false
+      - type: bind
+        source: $IMMICH_DATA_PATH
+        target: /data
+        bind:
+          create_host_path: false
+      - type: bind
+        source: $DIR_PHOTOS/Pictures
+        target: /mnt/media/Photos/Pictures
+        bind:
+          create_host_path: false
+      - type: bind
+        source: $DIR_PHOTOS/Videos
+        target: /mnt/media/Photos/Videos
+        read_only: true
+        bind:
+          create_host_path: false
     environment:
       TZ: $TZ
       IMMICH_ENV: production

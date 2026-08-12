@@ -90,6 +90,11 @@ pre_start:
 
 - Resolve named image users to numeric UID/GID values for the BusyBox hook.
 - Target only paths the service must write.
+- Provision every bind source outside `$REPO_PATH` before starting Compose, with
+  the intended ownership and permissions.
+- Declare external binds using long syntax with `bind.create_host_path: false`.
+- For mount-backed storage, verify the filesystem with `findmnt` or `mountpoint`;
+  path existence alone does not prove the storage is mounted.
 - For repository bind mounts used by `PUID:PGID`, prefer a tracked `.gitkeep` so the clone creates the source with the correct ownership.
 - Do not add a hook when a tracked `.gitkeep` creates the bind source with ownership matching `PUID:PGID`.
 - Never recursively chown read-only mounts, shared external media, or repository roots.
@@ -108,4 +113,5 @@ pre_start:
 - Service has an active healthcheck (not `disable: true`) unless an inline comment explains why a probe is not feasible.
 - Service can be started with the workflow in `docs/RUNNING.md`.
 - Writable non-root bind mounts with unmanaged ownership have narrowly scoped `pre_start` hooks.
+- External bind sources are pre-provisioned and use `create_host_path: false`.
 - Services that require a different identity or a root entrypoint document why.

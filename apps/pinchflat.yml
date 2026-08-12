@@ -27,7 +27,11 @@ services:
         hard: 8192
     volumes:
       - $REPO_PATH/appdata/pinchflat:/config
-      - $DIR_MEDIA/Youtube:/downloads
+      - type: bind
+        source: $DIR_MEDIA/Youtube
+        target: /downloads
+        bind:
+          create_host_path: false
     environment:
       TZ: $TZ
       ENABLE_PROMETHEUS: false

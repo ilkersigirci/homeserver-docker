@@ -24,7 +24,11 @@ services:
         hard: 8192
     volumes:
       - $REPO_PATH/data/prowlarr:/config
-      - $DIR_MEDIA/Downloads:/data/downloads
+      - type: bind
+        source: $DIR_MEDIA/Downloads
+        target: /data/downloads
+        bind:
+          create_host_path: false
     environment:
       PUID: $PUID
       PGID: $PGID

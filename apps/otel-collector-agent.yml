@@ -42,7 +42,12 @@ services:
     volumes:
       - $REPO_PATH/configs/otel-collector/otelcol-agent-config.yaml:/etc/otelcol/config.yaml:ro
       - $REPO_PATH/data/otel-collector-agent:/var/lib/otelcol/file_storage
-      - /:/hostfs:ro
+      - type: bind
+        source: /
+        target: /hostfs
+        read_only: true
+        bind:
+          create_host_path: false
     environment:
       TZ: $TZ
       OTEL_COLLECTOR_GATEWAY_ENDPOINT: $OTEL_COLLECTOR_GATEWAY_ENDPOINT

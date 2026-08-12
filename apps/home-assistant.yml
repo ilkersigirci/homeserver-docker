@@ -72,7 +72,12 @@ services:
         hard: 8192
     volumes:
       - $REPO_PATH/configs/home-assistant:/config
-      - /etc/localtime:/etc/localtime:ro
+      - type: bind
+        source: /etc/localtime
+        target: /etc/localtime
+        read_only: true
+        bind:
+          create_host_path: false
       # - /run/dbus:/run/dbus:ro
     environment:
       TZ: $TZ
@@ -124,7 +129,12 @@ services:
         hard: 16384
     volumes:
       - $REPO_PATH/configs/home-assistant:/config
-      - /etc/localtime:/etc/localtime:ro
+      - type: bind
+        source: /etc/localtime
+        target: /etc/localtime
+        read_only: true
+        bind:
+          create_host_path: false
       # - /run/dbus:/run/dbus:ro
     environment:
       TZ: $TZ

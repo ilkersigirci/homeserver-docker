@@ -19,9 +19,14 @@ repos:
         args: [--allow-multiple-documents]
         exclude: |
           (?x)^(
+            compose/fragments/immich/dell\.yml|
             configs/traefik3/.*|
             configs/glance/config/custom-widgets/syncthing(?:-original)?\.yml
           )$
+      - id: check-yaml
+        name: check yaml with Compose extensions
+        args: [--unsafe]
+        files: ^compose/fragments/immich/dell\.yml$
       - id: check-json
         exclude: |
           (?x)^(

@@ -1,4 +1,9 @@
 # TODO: Harden
+#
+# Storage layout: keep incomplete jobs on SSD so article assembly, verification,
+# and PAR2 repair benefit from fast random I/O. Direct Unpack reads from SSD and
+# writes completed files sequentially to the larger HDD dataset.
+#
 # Required SABnzbd settings (stored in ignored /config/sabnzbd.ini):
 # - download_dir=Downloads/incomplete: use the SSD for download and repair work.
 # - download_free=200G: reserve SSD headroom for large jobs and repair data.

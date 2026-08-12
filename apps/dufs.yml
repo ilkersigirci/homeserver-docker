@@ -26,7 +26,11 @@ services:
         hard: 8192
     volumes:
       - $REPO_PATH/appdata/dufs:/data
-      - $USERDIR:/data/Home
+      - type: bind
+        source: $USERDIR
+        target: /data/Home
+        bind:
+          create_host_path: false
       # - $REPO_PATH/appdata/dufs/Apps/Books:/data/Apps/Books # NOTE: For syncing MoonReader with webdav
       # - $DIR_HARDDISKROOT:/data/Harddisk
     environment:

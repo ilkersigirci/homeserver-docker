@@ -28,10 +28,18 @@ services:
         hard: 8192
     volumes:
       - $REPO_PATH/appdata/transmission:/config
-      - $DIR_MEDIA/Downloads:/data/downloads
+      - type: bind
+        source: $DIR_MEDIA/Downloads
+        target: /data/downloads
+        bind:
+          create_host_path: false
       # - $DIR_MEDIA/Downloads/test:/downloads
       # If not set, tranmission creates reduntant volumes
-      - $DIR_MEDIA/Downloads/torrent_files:/watch
+      - type: bind
+        source: $DIR_MEDIA/Downloads/torrent_files
+        target: /watch
+        bind:
+          create_host_path: false
     environment:
       PUID: $PUID
       PGID: $PGID

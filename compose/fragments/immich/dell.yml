@@ -19,7 +19,24 @@ services:
     ports:
       - "2283:2283"
     volumes: !override
-      - $IMMICH_THUMBS_PATH:/data/thumbs
-      - $IMMICH_DATA_PATH:/data
-      - $DIR_PHOTOS/Pictures:/mnt/hdd/Photos/Pictures
-      - $DIR_PHOTOS/Videos:/mnt/hdd/Photos/Videos:ro
+      - type: bind
+        source: $IMMICH_THUMBS_PATH
+        target: /data/thumbs
+        bind:
+          create_host_path: false
+      - type: bind
+        source: $IMMICH_DATA_PATH
+        target: /data
+        bind:
+          create_host_path: false
+      - type: bind
+        source: $DIR_PHOTOS/Pictures
+        target: /mnt/hdd/Photos/Pictures
+        bind:
+          create_host_path: false
+      - type: bind
+        source: $DIR_PHOTOS/Videos
+        target: /mnt/hdd/Photos/Videos
+        read_only: true
+        bind:
+          create_host_path: false
