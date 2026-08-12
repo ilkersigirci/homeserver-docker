@@ -2,6 +2,7 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:best-practices"],
   "enabledManagers": [
+    "custom.regex",
     "docker-compose",
     "dockerfile",
     "github-actions",
@@ -22,6 +23,17 @@
   "docker-compose": {
     "managerFilePatterns": ["/^(?:apps|compose\\/fragments)\\/.*\\.ya?ml$/"]
   },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^Dockerfiles/ProxmoxBackupClient/Dockerfile$/"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\s+ARG IMAGE_VERSION=(?<currentValue>\\S+)"
+      ],
+      "registryUrlTemplate": "http://download.proxmox.com/debian/pbs-client?suite=trixie&components=test&binaryArch=arm64",
+      "versioningTemplate": "deb"
+    }
+  ],
   "packageRules": [
     {
       "description": "Update and pin versioned homeserver images",
@@ -36,7 +48,8 @@
       "matchFileNames": [
         "Dockerfiles/CodexAcp/**",
         "Dockerfiles/Jupyter/**",
-        "Dockerfiles/Marimo/**"
+        "Dockerfiles/Marimo/**",
+        "Dockerfiles/ProxmoxBackupClient/**"
       ],
       "enabled": false
     },
@@ -111,6 +124,15 @@
       "changelogUrl": "https://github.com/marimo-team/marimo/releases"
     },
     {
+      "description": "Use Proxmox Backup Client as the Proxmox Backup Client custom image release driver",
+      "matchManagers": ["custom.regex"],
+      "matchDatasources": ["deb"],
+      "matchFileNames": ["Dockerfiles/ProxmoxBackupClient/Dockerfile"],
+      "matchPackageNames": ["proxmox-backup-client"],
+      "enabled": true,
+      "sourceUrl": "https://git.proxmox.com/?p=proxmox-backup.git;a=summary"
+    },
+    {
       "description": "Disable standalone lock-file maintenance for package-derived custom images",
       "matchManagers": ["npm", "pep621"],
       "matchFileNames": [
@@ -159,6 +181,16 @@
       "matchPackageNames": ["ghcr.io/ilkersigirci/homeserver-marimo"],
       "sourceUrl": "https://github.com/marimo-team/marimo",
       "changelogUrl": "https://github.com/marimo-team/marimo/releases"
+    },
+    {
+      "description": "Use Proxmox Backup Client releases for homeserver Proxmox Backup Client image changelogs",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchFileNames": ["apps/pbs-client-hs.yml"],
+      "matchPackageNames": [
+        "ghcr.io/ilkersigirci/homeserver-proxmox-backup-client"
+      ],
+      "sourceUrl": "https://git.proxmox.com/?p=proxmox-backup.git;a=summary"
     },
     {
       "description": "Group Arcane server and agent Docker image updates",

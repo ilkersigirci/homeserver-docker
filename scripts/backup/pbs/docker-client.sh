@@ -6,23 +6,32 @@ usage() {
   cat <<USAGE
 Usage: ${0##*/}
 
-Stops the host stack, runs backupnow through apps/pbs-client.yml,
+Stops the host stack, runs the backup defined in apps/pbs-client-hs.yml,
 and restarts the stack.
 USAGE
+}
+
+run_pbs_compose() {
+  docker compose \
+    --project-name pbs-client \
+    --profile maintenance \
+    --env-file "$REPO_ROOT/.env" \
+    --file "$PBS_COMPOSE_FILE" \
+    "$@"
 }
 
 cleanup() {
   local status="$?"
 
   trap - EXIT
-  COMPOSE_FILE="$PBS_COMPOSE_FILE" bash "$DOCKER_MANAGE" down || status="$?"
+  run_pbs_compose down --remove-orphans || status="$?"
   bash "$DOCKER_MANAGE" up || status="$?"
   exit "$status"
 }
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 DOCKER_MANAGE="$REPO_ROOT/scripts/docker-manage.sh"
-PBS_COMPOSE_FILE="$REPO_ROOT/apps/pbs-client.yml"
+PBS_COMPOSE_FILE="$REPO_ROOT/apps/pbs-client-hs.yml"
 
 if [[ "${1:-}" == -h || "${1:-}" == --help ]]; then
   usage
@@ -37,7 +46,6 @@ fi
 bash "$DOCKER_MANAGE" down
 trap cleanup EXIT
 
-COMPOSE_FILE="$PBS_COMPOSE_FILE" bash "$DOCKER_MANAGE" up
-docker exec pbs-client backupnow
+run_pbs_compose run --rm pbs-client
 
 cleanup

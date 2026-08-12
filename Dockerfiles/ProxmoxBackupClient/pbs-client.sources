@@ -1,0 +1,15 @@
+Types: deb
+URIs: http://download.proxmox.com/debian/pbs
+Suites: trixie
+Components: pbs-no-subscription
+# Proxmox publishes the stable client packages for amd64 here.
+Architectures: amd64
+Signed-By: /usr/share/keyrings/proxmox-archive-keyring.gpg
+
+Types: deb
+URIs: http://download.proxmox.com/debian/pbs-client
+Suites: trixie
+Components: test
+# Proxmox currently publishes its signed arm64 client packages here.
+Architectures: arm64
+Signed-By: /usr/share/keyrings/proxmox-archive-keyring.gpg

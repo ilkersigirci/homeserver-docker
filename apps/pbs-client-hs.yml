@@ -1,0 +1,58 @@
+services:
+  pbs-client:
+    # Bootstrap from the local context until the first public GHCR image can be
+    # pinned as ghcr.io/ilkersigirci/homeserver-proxmox-backup-client:<tag>@<digest>.
+    pull_policy: build
+    build:
+      context: ../Dockerfiles/ProxmoxBackupClient
+    container_name: pbs-client
+    hostname: pbs-client-$MY_HOSTNAME
+    profiles:
+      - maintenance
+    command:
+      - backup
+      - docker.pxar:/backups/docker/
+      - --change-detection-mode=metadata
+    # Keep this off t3_proxy; enforce PBS-only egress with host firewall rules.
+    user: "${PUID}:${PGID}"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=1g,uid=${PUID},gid=${PGID},mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    volumes:
+      - type: bind
+        source: $REPO_PATH/secrets/pbs-client/$MY_HOSTNAME
+        target: /home/pbs/.config/proxmox-backup
+        bind:
+          create_host_path: false
+      # Change this mount to read-write only for an intentional restore.
+      - type: bind
+        source: $REPO_PATH
+        target: /backups/docker
+        read_only: true
+        bind:
+          create_host_path: false
+    environment:
+      TZ: $TZ
+      PBS_SERVER: pbs.home.$BASE_DOMAINNAME
+      PBS_PORT: ${PBS_PORT:-8007}
+      PBS_DATASTORE: ${PBS_DATASTORE:-FILL_IT}
+      PBS_NAMESPACE: ${PBS_NAMESPACE:-hosts/${MY_HOSTNAME}}
+      PBS_AUTH_ID: ${PBS_AUTH_ID:-username@pam!test}
+      PBS_PASSWORD: ${PBS_PASSWORD:-FILL_IT}
+      PBS_ENCRYPTION_PASSWORD: ${PBS_ENCRYPTION_PASSWORD:-FILL_IT}
+      PBS_FINGERPRINT: ${PBS_FINGERPRINT:-}
+    labels:
+      ####### HOMEPAGE #######
+      homepage.group: "Maintenance"
+      homepage.name: "pbs-client"
+      homepage.icon: "pbs-client.png"
+      homepage.description: "Proxmox Backup Client"
+      ####### GLANCE #######
+      glance.name: "pbs-client"
+      glance.icon: "sh:pbs-client"
+      glance.description: "Proxmox Backup Client"
