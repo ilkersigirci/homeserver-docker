@@ -44,6 +44,7 @@ include:
   - ../apps/langfuse.yml
   - ../apps/cloudbeaver.yml
   - ../apps/jupyterlab.yml
+  - ../apps/zed-web.yml
   - ../apps/marimo.yml
   - ../apps/open-webui.yml
   - ../apps/searxng.yml

@@ -1,0 +1,69 @@
+services:
+  zed-web:
+    image: docker.io/zee295/zed-web:1.13.0-web.18@sha256:b54e60d97183ccd5254d64e627c831626678967b6fff2bb0b6a237db8b0a2a4f
+    container_name: zed-web
+    restart: $RESTART_POLICY_PROGRAMMING
+    profiles:
+      - programming
+    networks:
+      - t3_proxy
+    expose:
+      - 8090
+    user: "$PUID:$PGID"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=512m,uid=$PUID,gid=$PGID,mode=1777
+      - /home/zed:rw,nosuid,nodev,size=1g,uid=$PUID,gid=$PGID,mode=0700
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 1024
+    cpus: "4.0"
+    mem_limit: "8G"
+    ulimits:
+      nofile:
+        soft: 16384
+        hard: 32768
+    volumes:
+      - $REPO_PATH/data/zed-web:/workspace
+    environment:
+      HOME: /home/zed
+      TZ: $TZ
+      ZED_WEB_PORT: 8090
+      ZED_WEB_RESTRICT_PATHS: true
+      ZED_WEB_SECURE_COOKIE: true
+      ZED_WEB_TOKEN: $ZED_WEB_TOKEN
+    healthcheck:
+      test:
+        ["CMD", "curl", "-fsS", "--max-time", "3", "http://127.0.0.1:8090/favicon.ico"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.zed-web-rtr.entrypoints: "websecure"
+      traefik.http.routers.zed-web-rtr.rule: "Host(`zed.$DOMAINNAME`)"
+      ## Authenticate first, then replace any client Authorization header with Zed's token.
+      traefik.http.routers.zed-web-rtr.middlewares: "chain-tinyauth-original@file,zed-web-auth@docker"
+      traefik.http.middlewares.zed-web-auth.headers.customrequestheaders.Authorization: "Bearer $ZED_WEB_TOKEN"
+      ## HTTP Services
+      traefik.http.routers.zed-web-rtr.service: "zed-web-svc"
+      traefik.http.services.zed-web-svc.loadbalancer.server.port: "8090"
+      ####### TINYAUTH #######
+      tinyauth.apps.zed-web.oauth.groups: "admin"
+      ####### HOMEPAGE #######
+      homepage.group: "Programming"
+      homepage.name: "Zed Web"
+      homepage.icon: "sh:zed-industries"
+      homepage.href: "https://zed.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Unofficial browser port of the Zed editor"
+      ####### GLANCE #######
+      glance.name: "Zed Web"
+      glance.icon: "sh:zed-industries"
+      glance.url: "https://zed.$DOMAINNAME"
+      glance.description: "Unofficial browser port of the Zed editor"
