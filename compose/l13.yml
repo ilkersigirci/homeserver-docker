@@ -36,4 +36,5 @@ include:
   - path:
       - ../apps/frigate.yml
       - ./fragments/frigate/intel.yml
+  - ../apps/gatus-container-health.yml
   - ../apps/mosquitto.yml

@@ -34,6 +34,8 @@ include:
   ###### MAINTENANCE ####
   - ../apps/scanopy.yml
   - ../apps/whoami.yml
+  #### MONITORING ####
+  - ../apps/gatus-container-health.yml
   #### PROGRAMMING ####
   - ../apps/doco-cd.yml
   - ../apps/forgejo.yml

@@ -38,5 +38,7 @@ include:
   - ../apps/sabnzbd.yml
   - ../apps/transmission.yml
   - ../apps/versitygw.yml
+  #### MONITORING ####
+  - ../apps/gatus-container-health.yml
   #### READING ####
   - ../apps/silverbullet.yml

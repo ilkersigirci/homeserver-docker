@@ -46,3 +46,5 @@ include:
   - path:
       - ../apps/immich-machine-learning.yml
       - ./fragments/immich-machine-learning/nvidia.yml
+  #### MONITORING ####
+  - ../apps/gatus-container-health.yml

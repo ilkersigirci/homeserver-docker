@@ -44,3 +44,5 @@ include:
       - ../apps/frigate.yml
       - ./fragments/frigate/intel.yml
   - ../apps/mosquitto.yml
+  #### MONITORING ####
+  - ../apps/gatus-container-health.yml

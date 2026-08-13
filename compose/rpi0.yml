@@ -41,5 +41,7 @@ include:
   - ../apps/whoami.yml
   #### MEDIA ####
   - ../apps/aiostreams.yml
+  #### MONITORING ####
+  - ../apps/gatus-container-health.yml
   #### READING ####
   - ../apps/silverbullet.yml

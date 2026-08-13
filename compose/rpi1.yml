@@ -32,3 +32,5 @@ include:
   - ../apps/otel-collector-agent.yml
   ###### MAINTENANCE ####
   - ../apps/whoami.yml
+  #### MONITORING ####
+  - ../apps/gatus-container-health.yml
