@@ -39,7 +39,7 @@ services:
       GPU_TYPE: nvidia
       MANAGER_API_URL: https://arcane.gpu.$BASE_DOMAINNAME
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:3553/api/health >/dev/null || exit 1"]
+      test: ["CMD", "/usr/bin/curl", "-fsS", "--max-time", "3", "-o", "/dev/null", "http://127.0.0.1:3553/api/health"]
       interval: 2m
       timeout: 5s
       retries: 3

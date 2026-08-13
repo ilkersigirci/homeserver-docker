@@ -33,7 +33,15 @@ services:
     environment:
       TZ: $TZ
     healthcheck:
-      test: ["CMD", "curl", "-fsS", "--max-time", "3", "http://127.0.0.1:8978/"]
+      test:
+        - CMD
+        - /usr/bin/bash
+        - -c
+        - >-
+          exec 3<>/dev/tcp/127.0.0.1/8978 &&
+          printf 'GET /status HTTP/1.0\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3 &&
+          IFS= read -r status <&3 &&
+          [[ "$$status" == *' 200 '* ]]
       interval: 5m
       timeout: 5s
       retries: 3
