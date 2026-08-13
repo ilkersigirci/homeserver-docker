@@ -1,3 +1,7 @@
+# NOTE: GPUI Web cannot discover host or container system fonts, so custom fonts are
+# injected into Zed's raw, gzip, and Brotli asset archives and mounted below.
+# These files replace the image's complete asset bundle; after every image update,
+# rerun scripts/zed-web/build-font-assets.sh and recreate this service.
 services:
   zed-web:
     image: ghcr.io/zee295/zed-web:1.13.0-web.18@sha256:b54e60d97183ccd5254d64e627c831626678967b6fff2bb0b6a237db8b0a2a4f
@@ -30,12 +34,32 @@ services:
         soft: 16384
         hard: 32768
     volumes:
+      # - $REPO_PATH/configs/zed-web/config:/workspace/.config
       - $REPO_PATH/data/zed-web:/workspace
-      # - $REPO_PATH/configs/zed-web:/workspace/.config
+      ####### codex-acp ######
       - type: bind
         source: $HOME/.codex
         target: /home/zed/.codex
         read_only: false
+        bind:
+          create_host_path: false
+      ###### Custom fonts ######
+      - type: bind
+        source: $REPO_PATH/configs/zed-web/assets/zed-assets.tar
+        target: /opt/zed-web/static/zed-assets.tar
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: $REPO_PATH/configs/zed-web/assets/zed-assets.tar.gz
+        target: /opt/zed-web/static/zed-assets.tar.gz
+        read_only: true
+        bind:
+          create_host_path: false
+      - type: bind
+        source: $REPO_PATH/configs/zed-web/assets/zed-assets.tar.br
+        target: /opt/zed-web/static/zed-assets.tar.br
+        read_only: true
         bind:
           create_host_path: false
     environment:
