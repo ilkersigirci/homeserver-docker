@@ -1,0 +1,27 @@
+alerting:
+  gotify:
+    server-url: "https://gotify.$BASE_DOMAINNAME"
+    token: "$GOTIFY_NOTIFICATION_TOKEN"
+    priority: 10
+
+ui:
+  title: "Docker Health - $HOST_NAME"
+  header: "$HOST_NAME"
+  dashboard-heading: Docker Health
+  dashboard-subheading: " "
+  default-sort-by: health
+
+endpoints:
+  - name: Unhealthy containers
+    group: "$HOST_NAME"
+    url: "http://gatus-container-health-adapter:8080/unhealthy"
+    interval: 30s
+    client:
+      timeout: 10s
+    conditions:
+      - "[STATUS] == 200"
+      - "[BODY] == []"
+    alerts:
+      - type: gotify
+        failure-threshold: 2
+        send-on-resolved: true

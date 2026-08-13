@@ -1,0 +1,110 @@
+networks:
+  gatus_container_health:
+    internal: true
+
+services:
+  # NOTE: Reduce Docker's container response to names so Gatus alerts stay concise.
+  gatus-container-health-adapter:
+    image: python:3.14.2-alpine3.23@sha256:31da4cb527055e4e3d7e9e006dffe9329f84ebea79eaca0a1f1c27ce61e40ca5
+    container_name: gatus-container-health-adapter
+    command:
+      - python
+      - /adapter.py
+    restart: $RESTART_POLICY_MAINTENANCE
+    depends_on:
+      docker-socket-proxy-read:
+        condition: service_healthy
+    profiles:
+      - monitoring
+      - gatus
+    networks:
+      - gatus_container_health
+      - socket_proxy_read
+    expose:
+      - 8080
+    user: $PUID:$PGID
+    read_only: true
+    volumes:
+      - $REPO_PATH/configs/gatus-container-health/adapter.py:/adapter.py:ro
+    environment:
+      COMPOSE_PROJECT_NAME: $COMPOSE_PROJECT_NAME
+      DOCKER_HOST: tcp://docker-socket-proxy-read:2375
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - --quiet
+        - --output-document=/dev/null
+        - http://127.0.0.1:8080/unhealthy
+      interval: 1m
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 64
+    cpus: "0.25"
+    mem_limit: "64M"
+    ulimits:
+      nofile:
+        soft: 1024
+        hard: 2048
+
+  gatus:
+    image: ghcr.io/ilkersigirci/homeserver-gatus:v5.36.0@sha256:c7e2ec74d8f0fc302f8c150e92a800047e13344079b7c54fe7d12944095e5adc
+    container_name: gatus
+    restart: $RESTART_POLICY_MAINTENANCE
+    depends_on:
+      gatus-container-health-adapter:
+        condition: service_healthy
+    profiles:
+      - monitoring
+      - gatus
+    networks:
+      - gatus_container_health
+      - t3_proxy
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: "0.50"
+    mem_limit: "256M"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      - $REPO_PATH/configs/gatus-container-health:/config:ro
+    environment:
+      GATUS_CONFIG_PATH: /config
+      HOST_NAME: $MY_HOSTNAME
+      BASE_DOMAINNAME: $BASE_DOMAINNAME
+      GOTIFY_NOTIFICATION_TOKEN: $GOTIFY_GATUS_NOTIFICATION_TOKEN
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.gatus-rtr.entrypoints: "websecure"
+      traefik.http.routers.gatus-rtr.rule: "Host(`gatus.$DOMAINNAME`)"
+      traefik.http.routers.gatus-rtr.middlewares: "chain-tinyauth@file"
+      traefik.http.routers.gatus-rtr.service: "gatus-svc"
+      traefik.http.services.gatus-svc.loadbalancer.server.port: "8080"
+      homepage.group: "Monitoring"
+      homepage.name: "Gatus"
+      homepage.icon: "gatus.svg"
+      homepage.href: "https://gatus.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Docker container health"
+      homepage.widget.type: "gatus"
+      homepage.widget.url: "http://gatus:8080"
+      glance.name: "gatus"
+      glance.icon: "sh:gatus"
+      glance.url: "https://gatus.$DOMAINNAME"
+      glance.description: "Docker container health"

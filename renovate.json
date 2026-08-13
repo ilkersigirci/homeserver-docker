@@ -256,6 +256,14 @@
       "sourceUrl": "https://github.com/glanceapp/glance"
     },
     {
+      "description": "Disable Python image updates for the Gatus container health adapter",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchFileNames": ["apps/gatus-container-health.yml"],
+      "matchPackageNames": ["python"],
+      "enabled": false
+    },
+    {
       "description": "Use GitHub releases for Hatchet Docker image changelogs",
       "matchManagers": ["docker-compose"],
       "matchDatasources": ["docker"],
