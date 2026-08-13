@@ -84,7 +84,7 @@ services:
   # docker exec yamtrack python manage.py shell -c "from django.contrib.auth import get_user_model; get_user_model().objects.filter(username='ilker').update(is_staff=True, is_superuser=True)"
   # NOTE: The upstream entrypoint must start as root to remap abc to PUID/PGID and chown runtime paths.
   yamtrack:
-    image: ghcr.io/fuzzygrim/yamtrack:0.25.3@sha256:00acf008bca8171226063bc0f8f08ef7ffe24a10bcebf8676cce335ce312c307
+    image: ghcr.io/fuzzygrim/yamtrack:0.26.1@sha256:2c4c8ef6b73ba00aeb3e7cda5a34751f01448034a23d2fbcc98e48e44d377bb8
     container_name: yamtrack
     restart: $RESTART_POLICY_MEDIA
     depends_on:
