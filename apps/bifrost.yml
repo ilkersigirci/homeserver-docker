@@ -4,7 +4,7 @@
 # NOTE: OTEL docker-compose: https://github.com/maximhq/bifrost/blob/dev/plugins/otel/docker-compose.yml
 services:
   bifrost:
-    image: maximhq/bifrost:v1.6.6@sha256:0c0e6f498944d2896867fd9a5e51a79bb9cc82b845763fc4ababe0a6d2ab4402
+    image: maximhq/bifrost:v1.6.10@sha256:866d756018ddbe3e088873179815fca38b94b5c20d65d65ba3734d446ab22deb
     container_name: bifrost
     restart: $RESTART_POLICY_PROGRAMMING
     # entrypoint: # NOTE: For custom base_url env logic
