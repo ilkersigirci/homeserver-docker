@@ -1,0 +1,14 @@
+services:
+  arcane-agent:
+    cpus: "2.0"
+    mem_limit: "2G"
+    environment:
+      GPU_MONITORING_ENABLED: true
+      GPU_TYPE: nvidia
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

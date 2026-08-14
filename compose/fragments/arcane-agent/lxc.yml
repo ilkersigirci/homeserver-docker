@@ -1,0 +1,10 @@
+services:
+  arcane-agent:
+    pid: host
+    volumes:
+      - type: bind
+        source: /proc
+        target: /proc
+        read_only: true
+        bind:
+          create_host_path: false

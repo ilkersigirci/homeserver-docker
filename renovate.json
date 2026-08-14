@@ -196,11 +196,7 @@
       "description": "Group Arcane server and agent Docker image updates",
       "matchManagers": ["docker-compose"],
       "matchDatasources": ["docker"],
-      "matchFileNames": [
-        "apps/arcane.yml",
-        "apps/arcane-agent.yml",
-        "apps/arcane-agent-gpu.yml"
-      ],
+      "matchFileNames": ["apps/arcane.yml", "apps/arcane-agent.yml"],
       "matchPackageNames": [
         "ghcr.io/getarcaneapp/arcane",
         "ghcr.io/getarcaneapp/arcane-headless"

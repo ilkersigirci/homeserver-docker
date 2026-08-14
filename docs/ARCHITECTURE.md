@@ -21,6 +21,13 @@ Deployment is host-driven:
 - the host file defines networks and includes active app fragments from `apps/`
 - profiles decide which groups of services are active
 
+## Host Inventory
+
+- Proxmox LXC: `dell.yml`, `gpu_coding.yml`, `gpu_nvidia.yml`, `nas.yml`
+- Proxmox VM: `gpu.yml`
+- Bare metal: `l13.yml` (Lenovo laptop), `rpi0.yml` and `rpi1.yml` (Raspberry Pi 4)
+- Oracle VM: `remoteserver.yml`
+
 ## Codemap
 
 - `compose/`

@@ -25,7 +25,10 @@ include:
   - ./fragments/common-networks.yml
   ########################### SERVICES
   #### CORE ####
-  - ../apps/arcane-agent-gpu.yml
+  - path:
+      - ../apps/arcane-agent.yml
+      - ./fragments/arcane-agent/nvidia.yml
+      - ./fragments/arcane-agent/lxc.yml
   - ../apps/homepage.yml
   - ../apps/docker-socket-proxy.yml
   - ../apps/logrotate.yml
