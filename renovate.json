@@ -223,6 +223,7 @@
       "matchDatasources": ["docker"],
       "matchPackageNames": ["maximhq/bifrost"],
       "sourceUrl": "https://github.com/maximhq/bifrost",
+      "allowedVersions": "/^v\\d+\\.\\d+\\.\\d+(?:-prerelease\\d+)?$/",
       "extractVersion": "^(?:transports/)?(?<version>v?\\d+\\.\\d+\\.\\d+(?:-prerelease\\d+)?)$"
     },
     {
