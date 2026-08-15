@@ -7,7 +7,7 @@ This is the operator quick reference for humans and coding agents.
 - Docker installed
 - Docker Compose 5.3.0 or later
 - Repo `.env` exists at `$HOME/docker/.env`
-- `MY_HOSTNAME` is set and matches a file in `compose/` (example: `gpu`, `remoteserver`)
+- `MY_HOSTNAME` is set and matches a file in `compose/` (examples: `gpu`, `remoteserver`, `remoteserver2`, `rpi3`)
 
 ## Preferred Commands (Repository Script)
 

@@ -4,14 +4,14 @@ This document defines how internet-facing traffic is handled.
 
 ## Intent
 
-- Keep a single public edge.
+- Keep public ingress limited to designated edge hosts.
 - Minimize exposed ports.
 - Hide origin hosts behind Cloudflare.
 
 ## Model
 
-- `compose/remoteserver.yml` is the public edge machine.
-- Ingress services such as Traefik and CrowdSec run on that edge host.
+- `compose/remoteserver.yml` and `compose/remoteserver2.yml` are the public edge machines.
+- Ingress services such as Traefik and CrowdSec run on those edge hosts.
 - Other machines stay private in LAN and are accessed internally or via Tailscale.
 
 ## Cloudflare Rules
@@ -22,7 +22,7 @@ This document defines how internet-facing traffic is handled.
 
 ## Port Exposure Rules
 
-- Only necessary public ports should be published on the edge.
+- Only necessary public ports should be published on edge hosts.
 - Default public web entrypoints are `80` and `443`.
 - Avoid ad hoc public port publishing from non-edge hosts.
 

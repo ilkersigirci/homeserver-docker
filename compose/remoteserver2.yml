@@ -1,21 +1,19 @@
-name: rpi1
+name: remoteserver2
 
 networks:
+  crowdsec_lapi:
+    name: crowdsec_lapi
+    driver: bridge
   dockervlan:
     name: dockervlan
     driver: macvlan
     driver_opts:
-      parent: eth0
+      parent: enp0s3
     ipam:
       config:
         - subnet: "192.168.1.0/24"
           ip_range: "192.168.1.19/32"
           gateway: "192.168.1.1"
-
-########################### SECRETS
-# secrets:
-#   cf_dns_api_token:
-#     file: $REPO_PATH/secrets/cf_dns_api_token
 
 include:
   ########################### NETWORKS
@@ -23,14 +21,15 @@ include:
   ########################### SERVICES
   #### CORE ####
   - ../apps/arcane-agent.yml
-  - ../apps/adguardhome-host.yml
+  - ../apps/crowdsec.yml
+  - ../apps/gotify.yml
   - ../apps/homepage.yml
   - ../apps/docker-socket-proxy.yml
   - ../apps/logrotate.yml
   - ../apps/tinyauth.yml
-  - ../apps/traefik.yml
+  - path:
+      - ../apps/traefik.yml
+      - ./fragments/traefik/crowdsec_network.yml
   - ../apps/otel-collector-agent.yml
   ###### MAINTENANCE ####
   - ../apps/whoami.yml
-  #### MONITORING ####
-  - ../apps/gatus-container-health.yml
