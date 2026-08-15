@@ -1,7 +1,4 @@
 services:
-  # Touch (create empty files) acme/acme.json. Set acme.json permissions to 600.
-  # touch $REPO_PATH/configs/traefik3/acme/acme.json
-  # chmod 600 $REPO_PATH/configs/traefik3/acme/acme.json
   traefik:
     image: ghcr.io/traefik/traefik:v3.7.10@sha256:9c3b91d5fb7770853ca5c1124a23c34bf2d9b47ffaebeab2614cbaf410dcb2ac
     container_name: traefik
@@ -36,7 +33,7 @@ services:
       - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.provider=cloudflare
       - --certificatesResolvers.dns-cloudflare.acme.dnsChallenge.resolvers=1.1.1.1:53,1.0.0.1:53
       - --certificatesResolvers.dns-cloudflare.acme.email=$CLOUDFLARE_EMAIL
-      - --certificatesResolvers.dns-cloudflare.acme.storage=/acme.json
+      - --certificatesResolvers.dns-cloudflare.acme.storage=/acme/acme.json
       # - --entrypoints.dot.address=:853
       # Only gpu_coding publishes this listener on the host for Marimo ACP.
       - --entrypoints.marimoagent.address=:3021
@@ -176,7 +173,7 @@ services:
       # - /etc/localtime:/etc/localtime:ro # Set timezone
       - $REPO_PATH/configs/traefik3/rules:/rules:ro # file provider directory
       - $REPO_PATH/configs/traefik3/rules.specific/$MY_HOSTNAME.yml:/rules/dummy_specific.yml:ro # file provider directory
-      - $REPO_PATH/configs/traefik3/acme/acme.json:/acme.json # cert location - you must touch this file and change permissions to 600
+      - $REPO_PATH/configs/traefik3/acme:/acme # for certs
       - $REPO_PATH/logs/traefik:/logs # for fail2ban or crowdsec - make sure to touch file before starting container
       - $REPO_PATH/appdata/traefik/plugins-storage:/plugins-storage # plugin cache/storage for non-root user
     environment:
