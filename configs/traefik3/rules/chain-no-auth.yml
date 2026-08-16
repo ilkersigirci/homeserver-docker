@@ -21,3 +21,14 @@ http:
 {{end}}
           - middlewares-rate-limit-public-app
           - middlewares-secure-headers-relaxed
+
+    chain-no-auth-home-assistant:
+      chain:
+        middlewares:
+{{if env "CROWDSEC_TRAEFIK_BOUNCER_API_KEY"}}
+          - middlewares-cf-real-ip
+          # - middlewares-origin-allow-cloudflare-trusted
+          - middlewares-crowdsec-bouncer
+{{end}}
+          - middlewares-rate-limit-public-app
+          - middlewares-secure-headers-home-assistant

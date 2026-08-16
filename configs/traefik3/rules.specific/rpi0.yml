@@ -59,7 +59,7 @@ http:
       entryPoints:
         - websecure
       middlewares:
-        - chain-no-auth-relaxed
+        - chain-no-auth-home-assistant
       service: home-assistant-svc
 
     cam0-rtr:

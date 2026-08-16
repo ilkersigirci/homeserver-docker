@@ -86,6 +86,11 @@ http:
         customRequestHeaders:
           X-Forwarded-Proto: https
 
+    middlewares-secure-headers-home-assistant:
+      headers:
+        <<: *headers-relaxed
+        permissionsPolicy: "camera=(self), microphone=(self), geolocation=(), payment=(), usb=()"
+
     # Specific headers for Arcane (disables nosniff)
     middlewares-secure-headers-arcane:
       headers:
