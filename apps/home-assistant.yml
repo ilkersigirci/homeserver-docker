@@ -80,6 +80,9 @@ services:
           create_host_path: false
       # - /run/dbus:/run/dbus:ro
     environment:
+      # Persist HACS deps (currently mini-racer for Dreame) while remaining read-only/non-root.
+      # This path can shadow HA packages; review or clear it after Python/HA upgrades.
+      PYTHONPATH: /config/deps
       TZ: $TZ
     healthcheck:
       test: ["CMD", "curl", "-fsS", "--max-time", "3", "-o", "/dev/null", "http://127.0.0.1:8123/manifest.json"]
@@ -137,6 +140,9 @@ services:
           create_host_path: false
       # - /run/dbus:/run/dbus:ro
     environment:
+      # Persist HACS deps (currently mini-racer for Dreame) while remaining read-only/non-root.
+      # This path can shadow HA packages; review or clear it after Python/HA upgrades.
+      PYTHONPATH: /config/deps
       TZ: $TZ
     healthcheck:
       test: ["CMD", "curl", "-fsS", "--max-time", "3", "-o", "/dev/null", "http://127.0.0.1:8123/manifest.json"]
