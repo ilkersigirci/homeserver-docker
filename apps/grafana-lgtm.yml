@@ -22,6 +22,7 @@ services:
     read_only: true
     tmpfs:
       - /tmp
+      - /var/tempo:rw,noexec,nosuid,nodev,size=256m,uid=$PUID,gid=$PGID,mode=0755
     security_opt:
       - no-new-privileges:true
     cap_drop:
