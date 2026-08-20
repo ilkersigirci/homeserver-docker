@@ -23,6 +23,10 @@ extensions:
     path: "/ready"
 
 processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_mib: 512
+    spike_limit_mib: 128
   batch:
   deltatocumulative/chhoto_url:
     max_stale: 2160h
@@ -84,26 +88,26 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [batch]
+      processors: [memory_limiter, batch]
       exporters: [otlphttp/traces]
       #exporters: [otlphttp/traces,debug/traces]
     metrics:
       receivers: [otlp, prometheus/collector]
-      processors: [batch]
+      processors: [memory_limiter, batch]
       exporters: [otlphttp/metrics]
       #exporters: [otlphttp/metrics,debug/metrics]
     metrics/chhoto_url:
       receivers: [count/chhoto_url]
-      processors: [deltatocumulative/chhoto_url, interval/chhoto_url, batch]
+      processors: [memory_limiter, deltatocumulative/chhoto_url, interval/chhoto_url, batch]
       exporters: [otlphttp/metrics]
     logs:
       receivers: [otlp]
-      processors: [batch]
+      processors: [memory_limiter, batch]
       exporters: [otlphttp/logs]
       #exporters: [otlphttp/logs,debug/logs]
     logs/chhoto_url:
       receivers: [otlp]
-      processors: [filter/chhoto_url_redirect, transform/chhoto_url_slug, batch]
+      processors: [memory_limiter, filter/chhoto_url_redirect, transform/chhoto_url_slug, batch]
       exporters: [count/chhoto_url]
     profiles:
       receivers: [otlp]

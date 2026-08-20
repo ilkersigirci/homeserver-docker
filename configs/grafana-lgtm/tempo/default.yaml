@@ -27,14 +27,30 @@ storage:
       path: /data/tempo/wal
     local:
       path: /data/tempo/blocks
+    block:
+      # Keep TraceQL's environment and host filters on dedicated columns.
+      parquet_dedicated_columns:
+        - name: service.namespace
+          type: string
+          scope: resource
+        - name: deployment.environment.name
+          type: string
+          scope: resource
+        - name: host.name
+          type: string
+          scope: resource
+
+backend_worker:
+  compaction:
+    # Keep this explicit so trace retention is not an undocumented default.
+    block_retention: 336h
 
 metrics_generator:
   processor:
     span_metrics:
       dimensions:
-        - service_name
-        - operation
-        - status_code
+        - service.namespace
+        - deployment.environment.name
   storage:
     path: /data/tempo/generator/wal
     remote_write:
