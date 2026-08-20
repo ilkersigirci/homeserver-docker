@@ -42,7 +42,7 @@
           "showLineNumbers": false,
           "showMiniMap": false
         },
-        "content": "## LGOS request tracing\n\nChoose a **Trace ID** from **Recent UI requests** to render its nested span waterfall below. A prompt is one distributed trace; login and model-catalog requests are separate HTTP traces.",
+        "content": "## LGOS request tracing\n\nChoose a **Trace ID** from **Recent prompt requests**, then select **Show nested trace** or **Open in Langfuse**. Each prompt trace starts at the UI backend's outbound OpenAI-compatible request and continues through Traefik, Bifrost, LGOS, and LangGraph. Browser login, page-load, model-catalog, and WebSocket connection traces are separate operational traces. Bifrost preserves the W3C trace, but its span and the downstream LGOS server span can appear as siblings because the current gateway forwards the inbound parent unchanged.",
         "mode": "markdown"
       },
       "pluginVersion": "13.1.1",
@@ -80,6 +80,11 @@
                     "targetBlank": false,
                     "title": "Show nested trace",
                     "url": "/d/lgos-e2e-otel/lgos-e2e-opentelemetry?orgId=1&var-trace_id=${__value.raw}&from=${__from}&to=${__to}"
+                  },
+                  {
+                    "targetBlank": true,
+                    "title": "Open in Langfuse",
+                    "url": "https://langfuse.coding.ilkerflix.com/project/cmrj3dxni0001o707wmozkilk/traces/${__value.raw}"
                   }
                 ]
               }
@@ -119,13 +124,13 @@
             "uid": "tempo"
           },
           "limit": 50,
-          "query": "{ resource.service.name =~ \"lgos-(chainlit|openwebui)\" } && { resource.service.name = \"lgos-bifrost\" }",
+          "query": "{ resource.service.name =~ \"lgos-(chainlit|openwebui)\" } && { resource.service.name = \"lgos-bifrost\" } && { resource.service.name = \"lgos-demo-api\" } && { resource.service.name = \"traefik\" } && { name = \"lgos.chat_completion\" }",
           "queryType": "traceql",
           "refId": "A",
           "tableType": "traces"
         }
       ],
-      "title": "Recent UI requests",
+      "title": "Recent prompt requests",
       "transformations": [],
       "type": "table"
     },
@@ -171,7 +176,7 @@
           "refId": "A"
         }
       ],
-      "title": "Nested request flow — $trace_id",
+      "title": "Distributed request flow — $trace_id",
       "type": "traces"
     }
   ],
