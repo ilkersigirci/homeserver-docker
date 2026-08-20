@@ -54,6 +54,7 @@ services:
       GF_DEFAULT_INSTANCE_NAME: $DOMAINNAME
       GF_SERVER_ROOT_URL: https://grafana.$DOMAINNAME
       GF_PATHS_DATA: /data/grafana
+      GF_PATHS_PROVISIONING: /otel-lgtm/grafana/conf/provisioning
       GF_LOG_LEVEL: "info"
       GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /otel-lgtm/grafana/conf/provisioning/dashboards/OTEL/Traefik-Opentelemetry.json
       # GF_PANELS_DISABLE_SANITIZE_HTML: "true" # Allow raw HTML/JS in text panels (XSS risk).

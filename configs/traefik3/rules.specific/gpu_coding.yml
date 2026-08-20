@@ -32,6 +32,30 @@ http:
         - chain-no-auth-relaxed
       service: homeserver-api-ui-svc
 
+    lgos-chainlit-rtr:
+      rule: "Host(`lgos-chainlit.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: lgos-chainlit-svc
+
+    lgos-bifrost-rtr:
+      rule: "Host(`lgos-bifrost.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: lgos-bifrost-svc
+
+    lgos-openwebui-rtr:
+      rule: "Host(`lgos-openwebui.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth
+      service: lgos-openwebui-svc
+
   services:
     t3code-svc:
       loadBalancer:
@@ -52,3 +76,18 @@ http:
       loadBalancer:
         servers:
           - url: "http://{{env "LOCAL_STATIC_IP"}}:5002"
+
+    lgos-chainlit-svc:
+      loadBalancer:
+        servers:
+          - url: "http://{{env "LOCAL_STATIC_IP"}}:3002"
+
+    lgos-bifrost-svc:
+      loadBalancer:
+        servers:
+          - url: "http://{{env "LOCAL_STATIC_IP"}}:3000"
+
+    lgos-openwebui-svc:
+      loadBalancer:
+        servers:
+          - url: "http://{{env "LOCAL_STATIC_IP"}}:3003"
