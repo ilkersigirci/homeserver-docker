@@ -15,7 +15,7 @@
       }
     ]
   },
-  "description": "End-to-end request traces from Chainlit or Open WebUI through Traefik and Bifrost into LGOS/LangGraph.",
+  "description": "Distributed request traces entering Chainlit or Open WebUI and continuing through the services that were reached.",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
@@ -76,7 +76,7 @@
           "showLineNumbers": false,
           "showMiniMap": false
         },
-        "content": "# LGOS graph observability\n\n**Health → trends → trace.** Metrics cover LGOS chat-completion attempts and graph execution. The trace table shows complete UI → Traefik → Bifrost → LGOS → LangGraph flows. Select a **Trace ID** to open the Grafana waterfall or the matching Langfuse trace.",
+        "content": "# LGOS request observability\n\n**Health → trends → trace.** Native HTTP metrics cover chat requests and failures; trace metrics cover graph execution. The trace table lists requests entering Chainlit or Open WebUI, including partial and failed traces. Open the Grafana waterfall to inspect the services reached and use **Logs for this span** for correlated logs. Select a **Trace ID** to open the waterfall or the matching Langfuse trace.",
         "mode": "markdown"
       },
       "pluginVersion": "13.1.1",
@@ -89,7 +89,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "Chat-completion API attempts during the selected time range, including failures.",
+      "description": "Chat-completion API requests during the selected time range, including failures.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -131,13 +131,13 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "round(sum(increase(traces_spanmetrics_calls_total{service=\"lgos-demo-api\",span_name=\"POST /chat/completions\"}[$__range])))",
+          "expr": "round(sum(increase(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=~\"$environment\",http_route=\"/chat/completions\",http_request_method=\"POST\"}[$__range])))",
           "instant": true,
           "range": false,
           "refId": "A"
         }
       ],
-      "title": "Prompt attempts",
+      "title": "Chat requests",
       "type": "stat"
     },
     {
@@ -145,7 +145,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "Chat-completion API attempts whose LGOS request span ended with an error.",
+      "description": "Chat-completion API requests returning an HTTP 5xx response.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -199,13 +199,13 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "round(sum(increase(traces_spanmetrics_calls_total{service=\"lgos-demo-api\",span_name=\"POST /chat/completions\",status_code=\"STATUS_CODE_ERROR\"}[$__range]))) or vector(0)",
+          "expr": "round(sum(increase(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=~\"$environment\",http_route=\"/chat/completions\",http_request_method=\"POST\",http_response_status_code=~\"5..\"}[$__range]))) or vector(0)",
           "instant": true,
           "range": false,
           "refId": "A"
         }
       ],
-      "title": "Failed attempts",
+      "title": "HTTP failures",
       "type": "stat"
     },
     {
@@ -255,7 +255,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum by (le) (increase(traces_spanmetrics_latency_bucket{service=\"lgos-demo-api\",span_name=\"lgos.chat_completion\"}[$__range])))",
+          "expr": "histogram_quantile(0.50, sum by (le) (increase(traces_spanmetrics_latency_bucket{service=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=~\"$environment\",span_name=\"lgos.chat_completion\"}[$__range])))",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -311,7 +311,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le) (increase(traces_spanmetrics_latency_bucket{service=\"lgos-demo-api\",span_name=\"lgos.chat_completion\"}[$__range])))",
+          "expr": "histogram_quantile(0.95, sum by (le) (increase(traces_spanmetrics_latency_bucket{service=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=~\"$environment\",span_name=\"lgos.chat_completion\"}[$__range])))",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -325,7 +325,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "LGOS chat-completion traffic and failures derived from Tempo span metrics.",
+      "description": "Authoritative LGOS chat-completion request rate and HTTP failures.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -422,7 +422,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum(rate(traces_spanmetrics_calls_total{service=\"lgos-demo-api\",span_name=\"POST /chat/completions\"}[$__rate_interval])) * 60",
+          "expr": "sum(rate(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=~\"$environment\",http_route=\"/chat/completions\",http_request_method=\"POST\"}[$__rate_interval])) * 60",
           "instant": false,
           "legendFormat": "Attempts",
           "range": true,
@@ -435,14 +435,14 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "sum(rate(traces_spanmetrics_calls_total{service=\"lgos-demo-api\",span_name=\"POST /chat/completions\",status_code=\"STATUS_CODE_ERROR\"}[$__rate_interval])) * 60",
+          "expr": "sum(rate(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=~\"$environment\",http_route=\"/chat/completions\",http_request_method=\"POST\",http_response_status_code=~\"5..\"}[$__rate_interval])) * 60",
           "instant": false,
           "legendFormat": "Failures",
           "range": true,
           "refId": "B"
         }
       ],
-      "title": "Prompt traffic",
+      "title": "Chat-completion traffic",
       "type": "timeseries"
     },
     {
@@ -450,7 +450,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "Median and tail latency of successful LGOS graph execution. Exemplars link metric points back to traces.",
+      "description": "Median and tail latency of LGOS graph execution. Exemplars link metric points back to traces.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -554,7 +554,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "histogram_quantile(0.50, sum by (le) (rate(traces_spanmetrics_latency_bucket{service=\"lgos-demo-api\",span_name=\"lgos.chat_completion\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.50, sum by (le) (rate(traces_spanmetrics_latency_bucket{service=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=~\"$environment\",span_name=\"lgos.chat_completion\"}[$__rate_interval])))",
           "instant": false,
           "legendFormat": "Median",
           "range": true,
@@ -567,7 +567,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(traces_spanmetrics_latency_bucket{service=\"lgos-demo-api\",span_name=\"lgos.chat_completion\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(traces_spanmetrics_latency_bucket{service=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=~\"$environment\",span_name=\"lgos.chat_completion\"}[$__rate_interval])))",
           "instant": false,
           "legendFormat": "P95",
           "range": true,
@@ -651,13 +651,13 @@
             "uid": "tempo"
           },
           "limit": 50,
-          "query": "{ resource.service.name =~ \"lgos-(chainlit|openwebui)\" } && { resource.service.name = \"lgos-bifrost\" } && { resource.service.name = \"lgos-demo-api\" } && { resource.service.name = \"traefik\" } && { name = \"lgos.chat_completion\" }",
+          "query": "{ resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && ((resource.service.name = \"lgos-openwebui\" && name = \"POST /api/chat/completions\") || (resource.service.name = \"lgos-chainlit\" && name =~ \"POST.*\")) }",
           "queryType": "traceql",
           "refId": "A",
           "tableType": "traces"
         }
       ],
-      "title": "Recent end-to-end traces",
+      "title": "Recent UI request traces",
       "transformations": [],
       "type": "table"
     },
@@ -712,6 +712,31 @@
   "tags": ["opentelemetry", "tempo", "lgos"],
   "templating": {
     "list": [
+      {
+        "current": {
+          "text": "production",
+          "value": "production"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\"},deployment_environment_name)",
+        "description": "Deployment environment included in the LGOS telemetry.",
+        "hide": 0,
+        "includeAll": false,
+        "label": "Environment",
+        "name": "environment",
+        "options": [],
+        "query": {
+          "query": "label_values(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\"},deployment_environment_name)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 1,
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
       {
         "current": {
           "text": "",
