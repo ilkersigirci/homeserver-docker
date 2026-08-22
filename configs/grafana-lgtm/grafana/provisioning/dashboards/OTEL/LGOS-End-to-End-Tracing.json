@@ -76,7 +76,7 @@
           "showLineNumbers": false,
           "showMiniMap": false
         },
-        "content": "# LGOS request observability\n\n**Health → trends → trace.** Native HTTP metrics cover chat requests and failures; trace metrics cover graph execution. The trace table lists requests entering Chainlit or Open WebUI, including partial and failed traces. Open the Grafana waterfall to inspect the services reached and use **Logs for this span** for correlated logs. Select a **Trace ID** to open the waterfall or the matching Langfuse trace.",
+        "content": "# LGOS request observability\n\n**Health → trends → trace.** Native HTTP metrics cover chat requests and failures; trace metrics cover graph execution. The request tables list Chainlit and Open WebUI requests with a session ID. Select a **Session ID** to open the UI conversation, the Grafana waterfall, or the matching Langfuse trace. Use **Logs for this span** in the waterfall for correlated logs.",
         "mode": "markdown"
       },
       "pluginVersion": "13.1.1",
@@ -597,21 +597,30 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Trace ID"
+              "options": "session.id"
             },
             "properties": [
+              {
+                "id": "displayName",
+                "value": "Session ID"
+              },
               {
                 "id": "links",
                 "value": [
                   {
+                    "targetBlank": true,
+                    "title": "Open Chainlit thread",
+                    "url": "https://lgos-chainlit.coding.ilkerflix.com/thread/${__value.raw}"
+                  },
+                  {
                     "targetBlank": false,
                     "title": "Show nested trace",
-                    "url": "/d/lgos-e2e-otel/lgos-e2e-opentelemetry?orgId=1&var-trace_id=${__value.raw}&from=${__from}&to=${__to}"
+                    "url": "/d/lgos-e2e-otel/lgos-e2e-opentelemetry?orgId=1&var-trace_id=${__data.fields.traceIdHidden}&from=${__from}&to=${__to}"
                   },
                   {
                     "targetBlank": true,
                     "title": "Open in Langfuse",
-                    "url": "https://langfuse.coding.ilkerflix.com/project/cmrj3dxni0001o707wmozkilk/traces/${__value.raw}"
+                    "url": "https://langfuse.coding.ilkerflix.com/project/cmrj3dxni0001o707wmozkilk/traces/${__data.fields.traceIdHidden}"
                   }
                 ]
               }
@@ -621,7 +630,7 @@
       },
       "gridPos": {
         "h": 10,
-        "w": 24,
+        "w": 12,
         "x": 0,
         "y": 17
       },
@@ -651,14 +660,141 @@
             "uid": "tempo"
           },
           "limit": 50,
-          "query": "{ resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && ((resource.service.name = \"lgos-openwebui\" && name = \"POST /api/chat/completions\") || (resource.service.name = \"lgos-chainlit\" && name =~ \"POST.*\")) }",
+          "query": "({ resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-chainlit\" && name =~ \"POST.*\" } && { resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-demo-api\" && name = \"POST /chat/completions\" && span.session.id != nil }) | { resource.service.name = \"lgos-demo-api\" && span.session.id != nil } | select(span.session.id)",
           "queryType": "traceql",
           "refId": "A",
-          "tableType": "traces"
+          "tableType": "spans"
         }
       ],
-      "title": "Recent UI request traces",
-      "transformations": [],
+      "title": "Recent Chainlit requests",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "name": true,
+              "service.name": true,
+              "service.namespace": true,
+              "spanID": true,
+              "traceName": true,
+              "traceService": true
+            },
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {}
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "tempo",
+        "uid": "tempo"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": false
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "session.id"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Session ID"
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "Open Open WebUI chat",
+                    "url": "https://lgos-openwebui.coding.ilkerflix.com/c/${__value.raw}"
+                  },
+                  {
+                    "targetBlank": false,
+                    "title": "Show nested trace",
+                    "url": "/d/lgos-e2e-otel/lgos-e2e-opentelemetry?orgId=1&var-trace_id=${__data.fields.traceIdHidden}&from=${__from}&to=${__to}"
+                  },
+                  {
+                    "targetBlank": true,
+                    "title": "Open in Langfuse",
+                    "url": "https://langfuse.coding.ilkerflix.com/project/cmrj3dxni0001o707wmozkilk/traces/${__data.fields.traceIdHidden}"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 17
+      },
+      "id": 10,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "enablePagination": true,
+          "fields": "",
+          "reducer": ["sum"],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Start time"
+          }
+        ]
+      },
+      "pluginVersion": "13.1.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "tempo",
+            "uid": "tempo"
+          },
+          "limit": 50,
+          "query": "({ resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-openwebui\" && name = \"POST /api/chat/completions\" } && { resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-demo-api\" && name = \"POST /chat/completions\" && span.session.id != nil }) | { resource.service.name = \"lgos-demo-api\" && span.session.id != nil } | select(span.session.id)",
+          "queryType": "traceql",
+          "refId": "A",
+          "tableType": "spans"
+        }
+      ],
+      "title": "Recent Open WebUI requests",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "name": true,
+              "service.name": true,
+              "service.namespace": true,
+              "spanID": true,
+              "traceName": true,
+              "traceService": true
+            },
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {}
+          }
+        }
+      ],
       "type": "table"
     },
     {
