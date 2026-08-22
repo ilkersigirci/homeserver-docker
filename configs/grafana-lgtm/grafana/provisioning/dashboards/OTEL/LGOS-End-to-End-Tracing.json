@@ -131,7 +131,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "round(sum(increase(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=~\"$environment\",http_route=\"/chat/completions\",http_request_method=\"POST\"}[$__range])))",
+          "expr": "round(sum(increase(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",http_route=\"/chat/completions\",http_request_method=\"POST\"}[$__range])))",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -199,7 +199,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "round(sum(increase(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=~\"$environment\",http_route=\"/chat/completions\",http_request_method=\"POST\",http_response_status_code=~\"5..\"}[$__range]))) or vector(0)",
+          "expr": "round(sum(increase(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",http_route=\"/chat/completions\",http_request_method=\"POST\",http_response_status_code=~\"5..\"}[$__range])) or (0 * sum(increase(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",http_route=\"/chat/completions\",http_request_method=\"POST\"}[$__range]))))",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -255,7 +255,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum by (le) (increase(traces_spanmetrics_latency_bucket{service=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=~\"$environment\",span_name=\"lgos.chat_completion\"}[$__range])))",
+          "expr": "histogram_quantile(0.50, sum by (le) (increase(traces_spanmetrics_latency_bucket{service=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",span_name=\"lgos.chat_completion\"}[$__range])))",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -311,7 +311,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le) (increase(traces_spanmetrics_latency_bucket{service=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=~\"$environment\",span_name=\"lgos.chat_completion\"}[$__range])))",
+          "expr": "histogram_quantile(0.95, sum by (le) (increase(traces_spanmetrics_latency_bucket{service=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",span_name=\"lgos.chat_completion\"}[$__range])))",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -421,8 +421,8 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "exemplar": true,
-          "expr": "sum(rate(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=~\"$environment\",http_route=\"/chat/completions\",http_request_method=\"POST\"}[$__rate_interval])) * 60",
+          "exemplar": false,
+          "expr": "sum(rate(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",http_route=\"/chat/completions\",http_request_method=\"POST\"}[$__rate_interval])) * 60",
           "instant": false,
           "legendFormat": "Attempts",
           "range": true,
@@ -434,8 +434,8 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "exemplar": true,
-          "expr": "sum(rate(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=~\"$environment\",http_route=\"/chat/completions\",http_request_method=\"POST\",http_response_status_code=~\"5..\"}[$__rate_interval])) * 60",
+          "exemplar": false,
+          "expr": "sum(rate(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",http_route=\"/chat/completions\",http_request_method=\"POST\",http_response_status_code=~\"5..\"}[$__rate_interval])) * 60",
           "instant": false,
           "legendFormat": "Failures",
           "range": true,
@@ -554,7 +554,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "histogram_quantile(0.50, sum by (le) (rate(traces_spanmetrics_latency_bucket{service=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=~\"$environment\",span_name=\"lgos.chat_completion\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.50, sum by (le) (rate(traces_spanmetrics_latency_bucket{service=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",span_name=\"lgos.chat_completion\"}[$__rate_interval])))",
           "instant": false,
           "legendFormat": "Median",
           "range": true,
@@ -567,7 +567,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(traces_spanmetrics_latency_bucket{service=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=~\"$environment\",span_name=\"lgos.chat_completion\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(traces_spanmetrics_latency_bucket{service=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",span_name=\"lgos.chat_completion\"}[$__rate_interval])))",
           "instant": false,
           "legendFormat": "P95",
           "range": true,
@@ -666,7 +666,8 @@
           "tableType": "spans"
         }
       ],
-      "title": "Recent Chainlit requests",
+      "description": "Requests matching the selected dashboard time range. Limited to 50 results.",
+      "title": "Chainlit requests",
       "transformations": [
         {
           "id": "organize",
@@ -776,7 +777,8 @@
           "tableType": "spans"
         }
       ],
-      "title": "Recent Open WebUI requests",
+      "description": "Requests matching the selected dashboard time range. Limited to 50 results.",
+      "title": "Open WebUI requests",
       "transformations": [
         {
           "id": "organize",
@@ -857,7 +859,7 @@
           "type": "prometheus",
           "uid": "prometheus"
         },
-        "definition": "label_values(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\"},deployment_environment_name)",
+        "definition": "label_values(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\"},deployment_environment_name)",
         "description": "Deployment environment included in the LGOS telemetry.",
         "hide": 0,
         "includeAll": false,
@@ -865,7 +867,7 @@
         "name": "environment",
         "options": [],
         "query": {
-          "query": "label_values(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\"},deployment_environment_name)",
+          "query": "label_values(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\"},deployment_environment_name)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 1,

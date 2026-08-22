@@ -60,4 +60,6 @@ metrics_generator:
 overrides:
   defaults:
     metrics_generator:
+      # Match the OpenTelemetry Prometheus exemplar label convention.
+      trace_id_label_name: trace_id
       processors: [service-graphs, span-metrics]
