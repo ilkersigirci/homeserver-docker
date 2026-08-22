@@ -57,7 +57,6 @@ include:
   - ../apps/yamtrack.yml
   # - ../apps/ytptube.yml # TODO: restart always
   #### MONITORING ####
-  - ../apps/changedetection.yml
   - ../apps/gatus-container-health.yml
   - ../apps/grafana-lgtm.yml
   # - ../apps/watchyourlan.yml

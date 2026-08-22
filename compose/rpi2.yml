@@ -32,4 +32,6 @@ include:
   ###### MAINTENANCE ####
   - ../apps/whoami.yml
   #### MONITORING ####
+  - ../apps/changedetection.yml
   - ../apps/gatus-container-health.yml
+
