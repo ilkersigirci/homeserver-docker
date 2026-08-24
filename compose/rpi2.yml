@@ -30,6 +30,8 @@ include:
   - ../apps/traefik.yml
   - ../apps/otel-collector-agent.yml
   ###### MAINTENANCE ####
+  # - ../apps/dozzle.yml
+  - ../apps/loggifly.yml
   - ../apps/whoami.yml
   #### MONITORING ####
   - ../apps/changedetection.yml

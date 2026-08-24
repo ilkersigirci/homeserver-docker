@@ -32,13 +32,10 @@ include:
   - ../apps/otel-collector-agent.yml
   # - ../apps/vaultwarden.yml
   ###### MAINTENANCE ####
-  # - ../apps/dozzle.yml
   # - ../apps/healthchecks.yml
-  - ../apps/loggifly.yml
   # - ../apps/rustic.yml
   # - ../apps/syncthing.yml
   # - ../apps/termix.yml
-  # - ../apps/uptime-kuma.yml
   - ../apps/whoami.yml
   # - ../apps/watchtower.yml
   #### MEDIA ####
