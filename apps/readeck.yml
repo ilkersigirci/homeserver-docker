@@ -29,17 +29,16 @@ services:
       READECK_LOG_LEVEL: info
       READECK_SERVER_HOST: "0.0.0.0"
       READECK_SERVER_PORT: "8000"
+      READECK_SERVER_BASE_URL: https://readeck.$DOMAINNAME
       READECK_LOG_FORMAT: text
-      # READECK_SERVER_BASE_URL: https://readeck.$DOMAINNAME # NOTE: It is working without this.
       # READECK_ALLOWED_HOSTS: readeck.$DOMAINNAME # NOTE: It is working without this.
-      ## External Auth
-      # READECK_USE_X_FORWARDED: true
-      # READECK_TRUSTED_PROXIES: "192.168.90.254/32"
-      # READECK_AUTH_FORWARDED_ENABLED: true
-      # READECK_AUTH_FORWARDED_HEADER_USER: "Remote-User"
-      # READECK_AUTH_FORWARDED_HEADER_EMAIL: "Remote-Email"
-      # READECK_AUTH_FORWARDED_HEADER_GROUP: "Remote-Groups"
-      # READECK_AUTH_FORWARDED_PROVISIONING: true # Creates new users if they don't exist
+      ## OIDC
+      READECK_AUTH_OIDC_PROVIDERS_0_NAME: Pocket ID
+      READECK_AUTH_OIDC_PROVIDERS_0_URL: https://pocketid.$BASE_DOMAINNAME
+      READECK_AUTH_OIDC_PROVIDERS_0_CLIENT_ID: $READECK_CLIENT_ID
+      READECK_AUTH_OIDC_PROVIDERS_0_CLIENT_SECRET: $READECK_CLIENT_SECRET
+      READECK_AUTH_OIDC_PROVIDERS_0_GROUPS: "admin=admin"
+      READECK_AUTH_OIDC_PROVIDERS_0_PROVISIONING: false
     healthcheck:
       test: ["CMD", "/bin/readeck", "healthcheck", "-config", "config.toml"]
       interval: 2m
@@ -53,7 +52,6 @@ services:
       traefik.http.routers.readeck-rtr.rule: "Host(`readeck.$DOMAINNAME`)"
       ## Middlewares
       traefik.http.routers.readeck-rtr.middlewares: "middlewares-scalar-openapi-cors@file,chain-tinyauth@file"
-      # traefik.http.routers.readeck-rtr.middlewares: "chain-tinyauth-headers@file" # NOTE: For External Auth
       ## HTTP Services
       traefik.http.routers.readeck-rtr.service: "readeck-svc"
       traefik.http.services.readeck-svc.loadbalancer.server.port: "8000"
