@@ -337,6 +337,13 @@
       "sourceUrl": "https://github.com/rabbitmq/rabbitmq-server"
     },
     {
+      "description": "Use Codeberg releases for Readeck Docker image changelogs",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["codeberg.org/readeck/readeck"],
+      "sourceUrl": "https://codeberg.org/readeck/readeck"
+    },
+    {
       "description": "Group Rybbit backend and client Docker image updates",
       "matchManagers": ["docker-compose"],
       "matchDatasources": ["docker"],
