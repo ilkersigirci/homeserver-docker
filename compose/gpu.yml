@@ -22,7 +22,7 @@ include:
   - ./fragments/common-networks.yml
   ########################### SERVICES
   #### CORE ####
-  - ../apps/arcane.yml
+  - ../apps/arcane-agent.yml
   - ../apps/homepage.yml
   - ../apps/docker-socket-proxy.yml
   - ../apps/logrotate.yml
