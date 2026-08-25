@@ -186,6 +186,12 @@ services:
     labels:
       traefik.enable: "true"
       traefik.docker.network: "t3_proxy"
+      ## Machine clients bypass OIDC only for Responses API requests carrying a Langflow API key.
+      traefik.http.routers.langflow-responses-rtr.entrypoints: "websecure"
+      traefik.http.routers.langflow-responses-rtr.rule: "Host(`langflow.$DOMAINNAME`) && Path(`/api/v1/responses`) && HeaderRegexp(`x-api-key`, `.+`)"
+      traefik.http.routers.langflow-responses-rtr.middlewares: "chain-no-auth@file"
+      traefik.http.routers.langflow-responses-rtr.priority: "200"
+      traefik.http.routers.langflow-responses-rtr.service: "langflow-api-svc"
       ## API router takes precedence over the frontend catch-all router.
       traefik.http.routers.langflow-api-rtr.entrypoints: "websecure"
       traefik.http.routers.langflow-api-rtr.rule: "Host(`langflow.$DOMAINNAME`) && (PathPrefix(`/api`) || PathPrefix(`/docs`) || Path(`/openapi.json`) || Path(`/health`) || Path(`/health_check`))"
