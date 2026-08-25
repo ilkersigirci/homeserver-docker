@@ -63,7 +63,6 @@ include:
   # - ../apps/immich-machine-learning.yml
   # - ./fragments/immich-machine-learning/nvidia.yml
   #### PROGRAMMING ####
-  - ../apps/bifrost.yml
   - ../apps/kreuzberg.yml
   - ../apps/litellm.yml
   - ../apps/scalar.yml

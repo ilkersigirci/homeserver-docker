@@ -62,7 +62,7 @@ services:
       VGW_VERSIONING_DIR: /versioning
       VGW_CHOWN_UID: false
       VGW_CHOWN_GID: false
-      VGW_REGION: ${VERSITYGW_REGION:-eu-west-1}
+      VGW_REGION: $S3_REGION
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:7070/health"]
       interval: 2m

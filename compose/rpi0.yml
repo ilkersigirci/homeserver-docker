@@ -43,5 +43,7 @@ include:
   - ../apps/aiostreams.yml
   #### MONITORING ####
   - ../apps/gatus-container-health.yml
+  #### PROGRAMMING ####
+  - ../apps/bifrost.yml
   #### READING ####
   - ../apps/silverbullet.yml
