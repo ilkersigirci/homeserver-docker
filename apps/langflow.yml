@@ -1,3 +1,5 @@
+# NOTE: Multiple worker setup: https://docs.langflow.org/deployment-multi-worker
+
 networks:
   langflow_backend:
     internal: true
@@ -48,12 +50,52 @@ services:
       retries: 3
       start_period: 30s
 
+  # Shares build events so polling and streaming work across backend replicas.
+  langflow-redis:
+    image: docker.io/valkey/valkey:9@sha256:8436e10bc65c94886a91d4415b6a6dfa9cb5a306fb3b996e5bb67cd2b4854193
+    container_name: langflow-redis
+    restart: $RESTART_POLICY_PROGRAMMING
+    profiles:
+      - programming
+      - langflow
+    networks:
+      - langflow_backend
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /data:rw,noexec,nosuid,nodev,size=256m,uid=$PUID,gid=$PGID,mode=770
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 16384
+        hard: 16384
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1m
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+
+  # NOTE: LANGFLOW_SECRET_KEY: Generate with: python3 -c 'from secrets import token_urlsafe; print(token_urlsafe(32))'
+  # NOTE: Create a bucket named "langflow" in the S3 provider beforehand.
   langflow-backend:
     image: langflowai/langflow-backend:1.11.4@sha256:f90962a3abfa693d8ddd9b479e12aec6c9e4cbfd6e8050729f21ee92c11ce8a4
-    # Intentionally omit container_name so the backend can be scaled later.
+    # container_name: langflow-backend # NOTE: Omit container_name so Compose can run multiple backend replicas.
     restart: $RESTART_POLICY_PROGRAMMING
+    deploy:
+      replicas: 2
     depends_on:
       langflow-db:
+        condition: service_healthy
+      langflow-redis:
         condition: service_healthy
     profiles:
       - programming
@@ -68,6 +110,7 @@ services:
     tmpfs:
       - /tmp:rw,noexec,nosuid,nodev,size=256m,uid=$PUID,gid=$PGID,mode=1777
       - /run:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
+      - /app/data:rw,noexec,nosuid,nodev,size=512m,uid=$PUID,gid=$PGID,mode=770
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -80,9 +123,11 @@ services:
       nofile:
         soft: 8192
         hard: 16384
-    volumes:
-      - $REPO_PATH/data/langflow-backend:/app/data
     environment:
+      AWS_ACCESS_KEY_ID: $VERSITYGW_ROOT_ACCESS_KEY
+      AWS_DEFAULT_REGION: $S3_REGION
+      AWS_ENDPOINT_URL_S3: $S3_URL
+      AWS_SECRET_ACCESS_KEY: $VERSITYGW_ROOT_SECRET_KEY
       DO_NOT_TRACK: "true"
       LANGFLOW_ACCESS_SECURE: "true"
       LANGFLOW_ALEMBIC_LOG_TO_STDOUT: "true"
@@ -100,15 +145,20 @@ services:
       LANGFLOW_EXTERNAL_AUTH_JWKS_URL: https://pocketid.$BASE_DOMAINNAME/.well-known/jwks.json
       LANGFLOW_EXTERNAL_AUTH_PROVIDER: pocketid
       LANGFLOW_EXTERNAL_AUTH_TOKEN_HEADER: Authorization
+      LANGFLOW_JOB_QUEUE_TYPE: redis
       LANGFLOW_LOG_ENV: container_json
       LANGFLOW_OPEN_BROWSER: "false"
+      LANGFLOW_OBJECT_STORAGE_BUCKET_NAME: langflow
+      LANGFLOW_OBJECT_STORAGE_PREFIX: files
+      LANGFLOW_REDIS_QUEUE_URL: redis://langflow-redis:6379/1
       LANGFLOW_REFRESH_SECURE: "true"
       LANGFLOW_SECRET_KEY: $LANGFLOW_SECRET_KEY
-      # Required by Langflow startup; keep this as a break-glass credential.
       LANGFLOW_SUPERUSER: bootstrap-admin
       LANGFLOW_SUPERUSER_PASSWORD: $LANGFLOW_SUPERUSER_PASSWORD
+      LANGFLOW_STORAGE_TYPE: s3
       LANGFLOW_WEBHOOK_AUTH_ENABLE: "true"
-      LANGFLOW_WORKERS: "1"
+      # Processes per replica; 2 replicas × 2 workers = 4 workers sharing the Valkey job queue.
+      LANGFLOW_WORKERS: "2"
       PYTHONDONTWRITEBYTECODE: "1"
       TZ: $TZ
     healthcheck:
@@ -139,7 +189,7 @@ services:
 
   langflow-frontend:
     image: langflowai/langflow-frontend:1.11.4@sha256:067af6d3a22ae33565a0760b175bcb27d02d0307c607fe5d40097249a4d6bf2b
-    # Intentionally omit container_name so the frontend can be scaled independently.
+    container_name: langflow-frontend
     restart: $RESTART_POLICY_PROGRAMMING
     depends_on:
       langflow-backend:
