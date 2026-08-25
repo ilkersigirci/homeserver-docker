@@ -56,6 +56,30 @@ http:
         - chain-no-auth
       service: lgos-openwebui-svc
 
+  middlewares:
+    langflow-oidc:
+      plugin:
+        traefik-oidc-auth:
+          Secret: '{{env "LANGFLOW_OIDC_SESSION_SECRET"}}'
+          Provider:
+            Url: 'https://pocketid.{{env "BASE_DOMAINNAME"}}'
+            ClientId: '{{env "LANGFLOW_CLIENT_ID"}}'
+            ClientSecret: '{{env "LANGFLOW_CLIENT_SECRET"}}'
+            TokenValidation: AccessToken
+            UsePkce: false
+          Scopes:
+            - openid
+            - profile
+            - email
+            - offline_access
+          CallbackUri: /oidc/callback
+          CookieNamePrefix: LangflowOidc
+          SessionCookie:
+            SameSite: lax
+          Headers:
+            - Name: Authorization
+              Value: "{{`Bearer {{ .accessToken }}`}}"
+
   services:
     t3code-svc:
       loadBalancer:

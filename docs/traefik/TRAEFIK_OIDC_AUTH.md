@@ -31,9 +31,9 @@ Unauthenticated browser requests are redirected. API-style requests receive
 ## How It Is Configured
 
 The plugin and its version are registered in `apps/traefik.yml`.
-The middleware is defined under `configs/traefik3/rules/`. Its Go templates read
-the selected container variables with `{{env "VARIABLE"}}`. Application routers
-enable it with:
+The middleware is defined in the Traefik rules for the host that runs the
+application. Its Go templates read the selected container variables with
+`{{env "VARIABLE"}}`. Application routers enable it with:
 
 ```yaml
 traefik.http.routers.app-rtr.middlewares: "chain-no-auth@file,app-oidc@file"
@@ -45,10 +45,10 @@ requests to the application.
 ## Langflow Example
 
 Langflow uses `langflow-oidc@file`, configured in
-`configs/traefik3/rules/middlewares-langflow-oidc.yml`. Traefik reads the
-PocketID client ID, client secret, and session secret from its container
-environment, then forwards the PocketID access token to Langflow. Langflow
-validates the JWT and creates a local user on first login.
+`configs/traefik3/rules.specific/gpu_coding.yml`. Traefik reads the PocketID
+client ID, client secret, and session secret from its container environment,
+then forwards the PocketID access token to Langflow. Langflow validates the JWT
+and creates a local user on first login.
 
 The registered PocketID callback is:
 
