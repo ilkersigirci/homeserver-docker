@@ -299,6 +299,18 @@
       "sourceUrl": "https://github.com/kiwix/kiwix-tools"
     },
     {
+      "description": "Group Langflow frontend and backend Docker image updates",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchFileNames": ["apps/langflow.yml"],
+      "matchPackageNames": [
+        "langflowai/langflow-backend",
+        "langflowai/langflow-frontend"
+      ],
+      "groupName": "Langflow",
+      "sourceUrl": "https://github.com/langflow-ai/langflow"
+    },
+    {
       "description": "Group Langfuse web and worker Docker image updates",
       "matchManagers": ["docker-compose"],
       "matchDatasources": ["docker"],

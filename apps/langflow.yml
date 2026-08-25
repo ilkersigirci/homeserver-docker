@@ -1,0 +1,211 @@
+networks:
+  langflow_backend:
+    internal: true
+
+services:
+  langflow-db:
+    image: postgres:18.4@sha256:a02db8cac496f15b094798a38254f14d6e00741f709360e5e00bb6668ea31636
+    container_name: langflow-db
+    restart: $RESTART_POLICY_PROGRAMMING
+    profiles:
+      - programming
+      - langflow
+    networks:
+      - langflow_backend
+    expose:
+      - 5432
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /var/run/postgresql:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "2G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      - $REPO_PATH/data/langflow-db:/var/lib/postgresql
+    environment:
+      POSTGRES_USER: langflow
+      POSTGRES_PASSWORD: $LANGFLOW_DATABASE_PASSWORD
+      POSTGRES_DB: langflow
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} -h 127.0.0.1",
+        ]
+      interval: 1m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  langflow-backend:
+    image: langflowai/langflow-backend:1.11.4@sha256:f90962a3abfa693d8ddd9b479e12aec6c9e4cbfd6e8050729f21ee92c11ce8a4
+    # Intentionally omit container_name so the backend can be scaled later.
+    restart: $RESTART_POLICY_PROGRAMMING
+    depends_on:
+      langflow-db:
+        condition: service_healthy
+    profiles:
+      - programming
+      - langflow
+    networks:
+      - t3_proxy
+      - langflow_backend
+    expose:
+      - 7860
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=256m,uid=$PUID,gid=$PGID,mode=1777
+      - /run:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 512
+    cpus: "2.0"
+    mem_limit: "4G"
+    ulimits:
+      nofile:
+        soft: 8192
+        hard: 16384
+    volumes:
+      - $REPO_PATH/data/langflow-backend:/app/data
+    environment:
+      DO_NOT_TRACK: "true"
+      LANGFLOW_ACCESS_SECURE: "true"
+      LANGFLOW_ALEMBIC_LOG_TO_STDOUT: "true"
+      LANGFLOW_AUTO_LOGIN: "false"
+      LANGFLOW_BACKEND_ONLY: "true"
+      LANGFLOW_CONFIG_DIR: /app/data/langflow
+      LANGFLOW_DATABASE_CONNECTION_RETRY: "true"
+      LANGFLOW_DATABASE_URL: postgresql://langflow:${LANGFLOW_DATABASE_PASSWORD}@langflow-db:5432/langflow
+      LANGFLOW_ENABLE_SIGNUP: "false"
+      LANGFLOW_ENABLE_SUPERUSER_CLI: "false"
+      # Traefik obtains the PocketID access token; Langflow independently validates it.
+      LANGFLOW_EXTERNAL_AUTH_AUDIENCE: $LANGFLOW_CLIENT_ID
+      LANGFLOW_EXTERNAL_AUTH_ENABLED: "true"
+      LANGFLOW_EXTERNAL_AUTH_ISSUER: https://pocketid.$BASE_DOMAINNAME
+      LANGFLOW_EXTERNAL_AUTH_JWKS_URL: https://pocketid.$BASE_DOMAINNAME/.well-known/jwks.json
+      LANGFLOW_EXTERNAL_AUTH_PROVIDER: pocketid
+      LANGFLOW_EXTERNAL_AUTH_TOKEN_HEADER: Authorization
+      LANGFLOW_LOG_ENV: container_json
+      LANGFLOW_OPEN_BROWSER: "false"
+      LANGFLOW_REFRESH_SECURE: "true"
+      LANGFLOW_SECRET_KEY: $LANGFLOW_SECRET_KEY
+      # Required by Langflow startup; keep this as a break-glass credential.
+      LANGFLOW_SUPERUSER: bootstrap-admin
+      LANGFLOW_SUPERUSER_PASSWORD: $LANGFLOW_SUPERUSER_PASSWORD
+      LANGFLOW_WEBHOOK_AUTH_ENABLE: "true"
+      LANGFLOW_WORKERS: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+      TZ: $TZ
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "curl",
+          "-fsS",
+          "--max-time",
+          "3",
+          "http://127.0.0.1:7860/health_check",
+        ]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 2m
+      start_interval: 5s
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "t3_proxy"
+      ## API router takes precedence over the frontend catch-all router.
+      traefik.http.routers.langflow-api-rtr.entrypoints: "websecure"
+      traefik.http.routers.langflow-api-rtr.rule: "Host(`langflow.$DOMAINNAME`) && (PathPrefix(`/api`) || PathPrefix(`/docs`) || Path(`/openapi.json`) || Path(`/health`) || Path(`/health_check`))"
+      traefik.http.routers.langflow-api-rtr.middlewares: "chain-no-auth@file,langflow-oidc@file"
+      traefik.http.routers.langflow-api-rtr.priority: "100"
+      traefik.http.routers.langflow-api-rtr.service: "langflow-api-svc"
+      traefik.http.services.langflow-api-svc.loadbalancer.server.port: "7860"
+
+  langflow-frontend:
+    image: langflowai/langflow-frontend:1.11.4@sha256:067af6d3a22ae33565a0760b175bcb27d02d0307c607fe5d40097249a4d6bf2b
+    # Intentionally omit container_name so the frontend can be scaled independently.
+    restart: $RESTART_POLICY_PROGRAMMING
+    depends_on:
+      langflow-backend:
+        condition: service_healthy
+    profiles:
+      - programming
+      - langflow
+    networks:
+      - t3_proxy
+    expose:
+      - 8080
+    # The upstream unprivileged Nginx image is built for uid/gid 101.
+    user: "101:101"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=101,gid=101,mode=1777
+      - /var/cache/nginx:rw,noexec,nosuid,nodev,size=64m,uid=101,gid=101,mode=755
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: "0.5"
+    mem_limit: "512M"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    environment:
+      BACKEND_URL: http://langflow-backend:7860
+      FRONTEND_PORT: "8080"
+      LANGFLOW_MAX_FILE_SIZE_UPLOAD: "100"
+      TZ: $TZ
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "perl",
+          "-MHTTP::Tiny",
+          "-e",
+          "exit(HTTP::Tiny->new(timeout=>3)->get(q(http://127.0.0.1:8080/))->{success} ? 0 : 1)",
+        ]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "t3_proxy"
+      ## Frontend catch-all router.
+      traefik.http.routers.langflow-rtr.entrypoints: "websecure"
+      traefik.http.routers.langflow-rtr.rule: "Host(`langflow.$DOMAINNAME`)"
+      traefik.http.routers.langflow-rtr.middlewares: "chain-no-auth@file,langflow-oidc@file"
+      traefik.http.routers.langflow-rtr.priority: "10"
+      traefik.http.routers.langflow-rtr.service: "langflow-svc"
+      traefik.http.services.langflow-svc.loadbalancer.server.port: "8080"
+      ####### HOMEPAGE #######
+      homepage.group: "Programming"
+      homepage.name: "Langflow"
+      homepage.icon: "langflow.png"
+      homepage.href: "https://langflow.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Build and deploy AI-powered agents and workflows"
+      ####### GLANCE #######
+      glance.name: "Langflow"
+      glance.icon: "sh:langflow"
+      glance.url: "https://langflow.$DOMAINNAME"
+      glance.description: "Build and deploy AI-powered agents and workflows"

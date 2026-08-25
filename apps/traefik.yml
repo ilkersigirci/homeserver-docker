@@ -68,6 +68,8 @@ services:
       - --experimental.plugins.crowdsec-bouncer.modulename=github.com/maxlerebourg/crowdsec-bouncer-traefik-plugin
       - --experimental.plugins.crowdsec-bouncer.version=v1.2.1
       # - --experimental.plugins.crowdsec-bouncer.hash=
+      - --experimental.plugins.traefik-oidc-auth.modulename=github.com/sevensolutions/traefik-oidc-auth
+      - --experimental.plugins.traefik-oidc-auth.version=v0.21.0
       - --experimental.plugins.rewritebody.modulename=github.com/traefik/plugin-rewritebody
       - --experimental.plugins.rewritebody.version=v0.3.1
       - --experimental.plugins.webfinger.modulename=github.com/NX211/traefik-webfinger
@@ -192,6 +194,10 @@ services:
       WEBFINGER_HREF: https://pocketid.$BASE_DOMAINNAME
       ## OTEL resource attributes (semantic conventions)
       OTEL_RESOURCE_ATTRIBUTES: service.instance.id=traefik-$MY_HOSTNAME
+      ######## TRAEFIK OIDC PLUGIN ########
+      LANGFLOW_CLIENT_ID: ${LANGFLOW_CLIENT_ID:-}
+      LANGFLOW_CLIENT_SECRET: ${LANGFLOW_CLIENT_SECRET:-}
+      LANGFLOW_OIDC_SESSION_SECRET: ${LANGFLOW_OIDC_SESSION_SECRET:-}
     healthcheck:
       test: ["CMD", "traefik", "healthcheck", "--ping"]
       interval: 1m
