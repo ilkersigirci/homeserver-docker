@@ -86,6 +86,9 @@ services:
 
   # NOTE: LANGFLOW_SECRET_KEY: Generate with: python3 -c 'from secrets import token_urlsafe; print(token_urlsafe(32))'
   # NOTE: Create a bucket named "langflow" in the S3 provider beforehand.
+  # NOTE: The backend image includes LFX core only; provider bundles and Torch are not installed.
+  # NOTE: Install/update LFX packages on the host, then restart Langflow:
+  # uv pip install --target data/langflow-backend/packages --no-deps "lfx-openai-compatible==0.1.0" "langchain-openai==1.4.1"
   langflow-backend:
     image: langflowai/langflow-backend:1.11.4@sha256:f90962a3abfa693d8ddd9b479e12aec6c9e4cbfd6e8050729f21ee92c11ce8a4
     # container_name: langflow-backend # NOTE: Omit container_name so Compose can run multiple backend replicas.
@@ -111,6 +114,8 @@ services:
       - /tmp:rw,noexec,nosuid,nodev,size=256m,uid=$PUID,gid=$PGID,mode=1777
       - /run:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
       - /app/data:rw,noexec,nosuid,nodev,size=512m,uid=$PUID,gid=$PGID,mode=770
+    volumes:
+      - $REPO_PATH/data/langflow-backend/packages:/app/packages:ro
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -153,12 +158,14 @@ services:
       LANGFLOW_REDIS_QUEUE_URL: redis://langflow-redis:6379/1
       LANGFLOW_REFRESH_SECURE: "true"
       LANGFLOW_SECRET_KEY: $LANGFLOW_SECRET_KEY
+      LANGFLOW_SSRF_ALLOWED_HOSTS: $AIGATEWAY_HOST
       LANGFLOW_SUPERUSER: bootstrap-admin
       LANGFLOW_SUPERUSER_PASSWORD: $LANGFLOW_SUPERUSER_PASSWORD
       LANGFLOW_STORAGE_TYPE: s3
       LANGFLOW_WEBHOOK_AUTH_ENABLE: "true"
       # Processes per replica; 2 replicas × 2 workers = 4 workers sharing the Valkey job queue.
       LANGFLOW_WORKERS: "2"
+      PYTHONPATH: /app/packages
       PYTHONDONTWRITEBYTECODE: "1"
       TZ: $TZ
     healthcheck:
