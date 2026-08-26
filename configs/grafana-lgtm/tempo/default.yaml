@@ -27,6 +27,10 @@ storage:
       path: /data/tempo/wal
     local:
       path: /data/tempo/blocks
+    # Discover backend blocks even when the tenant index is stale.
+    blocklist_poll: 5m
+    blocklist_poll_stale_tenant_index: 10m
+    blocklist_poll_fallback: true
     block:
       # Keep TraceQL's environment and host filters on dedicated columns.
       parquet_dedicated_columns:
@@ -40,10 +44,16 @@ storage:
           type: string
           scope: resource
 
+backend_scheduler:
+  provider:
+    compaction:
+      compaction:
+        block_retention: 2160h
+
 backend_worker:
   compaction:
-    # Keep this explicit so trace retention is not an undocumented default.
-    block_retention: 336h
+    # Keep 90 days of trace blocks.
+    block_retention: 2160h
 
 metrics_generator:
   processor:
