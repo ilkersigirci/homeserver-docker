@@ -131,7 +131,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "round(sum(increase(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",http_route=\"/chat/completions\",http_request_method=\"POST\"}[$__range])))",
+          "expr": "round(sum(increase(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",http_route=\"/chat/completions\",http_request_method=\"POST\"}[$__range])) or vector(0))",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -659,14 +659,14 @@
             "type": "tempo",
             "uid": "tempo"
           },
-          "limit": 50,
-          "query": "({ resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-chainlit\" && name =~ \"POST.*\" } && { resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-demo-api\" && name = \"POST /chat/completions\" && span.session.id != nil }) | { resource.service.name = \"lgos-demo-api\" && span.session.id != nil } | select(span.session.id)",
+          "limit": 10,
+          "query": "{ resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-demo-api\" && name = \"POST /chat/completions\" && span.user_agent.original = \"lgos-chainlit\" && span.session.id != nil } | select(span.session.id) with (most_recent=true)",
           "queryType": "traceql",
           "refId": "A",
           "tableType": "spans"
         }
       ],
-      "description": "Requests matching the selected dashboard time range. Limited to 50 results.",
+      "description": "The 10 newest client-attributed requests matching the selected dashboard time range. Client attribution is available for traces created after 2026-08-26.",
       "title": "Chainlit requests",
       "transformations": [
         {
@@ -770,14 +770,14 @@
             "type": "tempo",
             "uid": "tempo"
           },
-          "limit": 50,
-          "query": "({ resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-openwebui\" && name = \"POST /api/chat/completions\" } && { resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-demo-api\" && name = \"POST /chat/completions\" && span.session.id != nil }) | { resource.service.name = \"lgos-demo-api\" && span.session.id != nil } | select(span.session.id)",
+          "limit": 10,
+          "query": "{ resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-demo-api\" && name = \"POST /chat/completions\" && span.user_agent.original = \"lgos-openwebui\" && span.session.id != nil } | select(span.session.id) with (most_recent=true)",
           "queryType": "traceql",
           "refId": "A",
           "tableType": "spans"
         }
       ],
-      "description": "Requests matching the selected dashboard time range. Limited to 50 results.",
+      "description": "The 10 newest client-attributed requests matching the selected dashboard time range. Client attribution is available for traces created after 2026-08-26.",
       "title": "Open WebUI requests",
       "transformations": [
         {
@@ -845,7 +845,7 @@
       "type": "traces"
     }
   ],
-  "refresh": "30s",
+  "refresh": "",
   "schemaVersion": 42,
   "tags": ["opentelemetry", "tempo", "lgos"],
   "templating": {
@@ -898,7 +898,7 @@
     ]
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-1h",
     "to": "now"
   },
   "timepicker": {},

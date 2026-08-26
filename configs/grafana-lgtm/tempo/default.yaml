@@ -12,6 +12,11 @@ distributor:
         http:
           endpoint: "127.0.0.1:4418"
 
+query_frontend:
+  search:
+    # The dashboard retains traces for 90 days and must be able to search that range.
+    max_duration: 2160h
+
 memberlist:
   bind_addr: [127.0.0.1]
   bind_port: 7947
@@ -32,7 +37,8 @@ storage:
     blocklist_poll_stale_tenant_index: 10m
     blocklist_poll_fallback: true
     block:
-      # Keep TraceQL's environment and host filters on dedicated columns.
+      # Keep the dashboard's common TraceQL filters and projected values on
+      # dedicated columns.
       parquet_dedicated_columns:
         - name: service.namespace
           type: string
@@ -43,6 +49,12 @@ storage:
         - name: host.name
           type: string
           scope: resource
+        - name: user_agent.original
+          type: string
+          scope: span
+        - name: session.id
+          type: string
+          scope: span
 
 backend_scheduler:
   provider:
