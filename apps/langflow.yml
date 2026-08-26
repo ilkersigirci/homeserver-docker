@@ -50,7 +50,7 @@ services:
       retries: 3
       start_period: 30s
 
-  # Shares build events so polling and streaming work across backend replicas.
+  # NOTE: Shares build events so polling and streaming work across backend replicas.
   langflow-redis:
     image: docker.io/valkey/valkey:9@sha256:8436e10bc65c94886a91d4415b6a6dfa9cb5a306fb3b996e5bb67cd2b4854193
     container_name: langflow-redis
@@ -165,6 +165,9 @@ services:
       LANGFLOW_WEBHOOK_AUTH_ENABLE: "true"
       # Processes per replica; 2 replicas × 2 workers = 4 workers sharing the Valkey job queue.
       LANGFLOW_WORKERS: "2"
+      LANGFUSE_BASE_URL: $LANGFUSE_BASE_URL
+      LANGFUSE_PUBLIC_KEY: $LANGFUSE_PUBLIC_KEY_LANGFLOW
+      LANGFUSE_SECRET_KEY: $LANGFUSE_SECRET_KEY_LANGFLOW
       PYTHONPATH: /app/packages
       PYTHONDONTWRITEBYTECODE: "1"
       TZ: $TZ
