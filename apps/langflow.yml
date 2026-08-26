@@ -90,7 +90,7 @@ services:
   # NOTE: Install/update LFX packages on the host, then restart Langflow:
   # uv pip install --target data/langflow-backend/packages --no-deps "lfx-openai-compatible==0.1.0" "langchain-openai==1.4.1"
   langflow-backend:
-    image: langflowai/langflow-backend:1.11.4@sha256:f90962a3abfa693d8ddd9b479e12aec6c9e4cbfd6e8050729f21ee92c11ce8a4
+    image: ghcr.io/ilkersigirci/homeserver-langflow-backend:1.11.4@sha256:0855770cccc8bca28152c968b4d2910aefbbf9150db503ed5f38f2f4fcd0a1fa
     # container_name: langflow-backend # NOTE: Omit container_name so Compose can run multiple backend replicas.
     restart: $RESTART_POLICY_PROGRAMMING
     deploy:
