@@ -1,7 +1,7 @@
 services:
   # NOTE: The upstream entrypoint owns /app/prisma, runs migrations, then drops to nodejs.
   excalidash-db:
-    image: zimengxiong/excalidash-backend:0.5.1@sha256:f37cd418bcad543add138c16cdb5e6301c3065b77344125458ab462adde99f15
+    image: zimengxiong/excalidash-backend:0.6.0@sha256:cbdab75f31b21e342b464d6404a454791e5da7452e3614b137021a800fc4cac6
     container_name: excalidash-db
     restart: $RESTART_POLICY_OTHERS
     profiles:
