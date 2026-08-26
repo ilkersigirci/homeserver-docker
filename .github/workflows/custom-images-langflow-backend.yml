@@ -1,0 +1,45 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Build Langflow Backend Image
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - Dockerfiles/LangflowBackend/**
+  pull_request:
+    paths:
+      - Dockerfiles/LangflowBackend/**
+      - .github/workflows/custom-images-build.yml
+      - .github/workflows/custom-images-langflow-backend.yml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/custom-images-build.yml
+    with:
+      name: Langflow Backend
+      context: Dockerfiles/LangflowBackend
+      repository: homeserver-langflow-backend
+      platforms: linux/amd64
+      publish: false
+
+  publish:
+    if: github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/custom-images-build.yml
+    with:
+      name: Langflow Backend
+      context: Dockerfiles/LangflowBackend
+      repository: homeserver-langflow-backend
+      platforms: linux/amd64
+      publish: true

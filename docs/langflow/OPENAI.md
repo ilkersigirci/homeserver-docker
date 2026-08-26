@@ -1,37 +1,110 @@
-# Langflow OpenAI Compatibility
+# Langflow through the OpenAI API
 
-Langflow exposes `POST /api/v1/responses`, but implements only a subset of the
-OpenAI Responses API:
+Bifrost is the only public OpenAI-compatible API. Langflow keeps its existing
+`POST /api/v1/responses` route behind Bifrost; it does not expose parallel
+`/v1` routes or reimplement Chat Completions and model discovery.
 
-- `model` must be a flow UUID or its endpoint name, configured under
-  **Share → API access → Endpoint Name** in the flow.
-- `input` must be a string; message arrays are rejected.
-- The flow must contain Chat Input and Chat Output components.
-- Custom `tools` are not supported.
-- Authentication uses the Langflow `x-api-key` header.
+```text
+OpenAI client or Open WebUI
+        |
+        | /v1/responses
+        v
+      Bifrost
+        |
+        | /api/v1/responses
+        v
+      Langflow
+```
 
-See the [Langflow Responses API documentation](https://docs.langflow.org/api-openai-responses).
+## Why a custom image
 
-## Bifrost incompatibility
+Stock Langflow 1.11.4 exposes a Responses-shaped endpoint but is not wire
+compatible with OpenAI clients:
 
-Bifrost's normal `/v1/responses` route converts string input into a message
-array before sending it to an OpenAI-compatible provider. Langflow consequently
-returns `422 Input should be a valid string`. A Bifrost request path override
-changes only the URL and cannot prevent this body conversion.
+- `input` accepts only a string, so canonical message arrays forwarded by
+  Bifrost fail with HTTP 422;
+- authentication accepts `x-api-key`, not the standard Bearer header;
+- streaming emits legacy `response.chunk` data, duplicates the first text
+  delta, and terminates with `[DONE]` instead of canonical typed events.
 
-## Stream
+A Bifrost path override changes only the URL, while passthrough forwards these
+incompatibilities unchanged. The thin custom image therefore patches Langflow's
+existing endpoint instead of adding another API facade.
 
-Bifrost passthrough streams Langflow's SSE response without buffering when
-`stream` is `true`, ending with a completed chunk and `[DONE]`. Langflow 1.11.4
-uses noncanonical `response.chunk` events with `delta.content` and duplicates
-the first non-empty token. The duplication also occurs when calling Langflow
-directly. This is a Langflow limitation, not a Bifrost limitation; Bifrost
-forwards the stream unchanged.
+The custom backend image applies
+[`openai-responses.patch`](../../Dockerfiles/LangflowBackend/patches/openai-responses.patch)
+to Langflow's existing endpoint. The patch is limited to two upstream modules
+and adds only what the gateway needs:
 
-## OpenAI client
+- canonical string or text-message-array `input`, plus `instructions`;
+- OpenAI-standard `Authorization: Bearer` authentication in addition to
+  Langflow's `x-api-key`;
+- canonical Responses SSE events with monotonic sequence numbers;
+- token events as the authoritative text stream, preventing the duplicated
+  first delta described in
+  [langflow-ai/langflow#10719](https://github.com/langflow-ai/langflow/issues/10719).
 
-The native Python client works for non-streaming Responses calls through
-Bifrost passthrough:
+The flow must contain Chat Input and Chat Output components. Input is text-only,
+and caller-provided tools are not supported by Langflow's endpoint.
+
+## Bifrost provider
+
+Create an OpenAI-based custom provider named `Langflow`. Keep the Langflow API
+key in Bifrost's environment and configure both Responses request types to use
+Langflow's actual path:
+
+```json
+{
+  "providers": {
+    "Langflow": {
+      "keys": [
+        {
+          "name": "langflow-key",
+          "value": "env.LANGFLOW_API_KEY",
+          "models": ["FirstFlow"],
+          "weight": 1.0
+        }
+      ],
+      "network_config": {
+        "base_url": "https://langflow.example.com"
+      },
+      "custom_provider_config": {
+        "base_provider_type": "openai",
+        "allowed_requests": {
+          "responses": true,
+          "responses_stream": true
+        },
+        "request_path_overrides": {
+          "responses": "/api/v1/responses",
+          "responses_stream": "/api/v1/responses"
+        }
+      }
+    }
+  }
+}
+```
+
+The path overrides are normal custom provider configuration; no passthrough
+route, compatibility conversion, or per-request passthrough header is needed.
+
+Use an explicit provider/model prefix so routing does not depend on model
+catalog discovery:
+
+```bash
+curl -fsS "https://aigateway.example.com/v1/responses" \
+  --no-buffer \
+  -H "Authorization: Bearer $BIFROST_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "Langflow/FirstFlow",
+    "input": "Who are you?",
+    "stream": true
+  }'
+```
+
+## OpenAI client and Open WebUI
+
+Point the standard OpenAI client at Bifrost, not Langflow:
 
 ```python
 import os
@@ -40,95 +113,21 @@ from openai import OpenAI
 
 client = OpenAI(
     api_key=os.environ["BIFROST_API_KEY"],
-    base_url="https://bifrost.example.com/openai_passthrough/v1",
-    default_headers={"x-model-provider": "Langflow"},
+    base_url="https://aigateway.example.com/v1",
 )
 
-response = client.responses.create(model="FirstFlow", input="Hello")
-print(response.output_text)
+for event in client.responses.create(
+    model="Langflow/FirstFlow",
+    input="Who are you?",
+    stream=True,
+):
+    if event.type == "response.output_text.delta":
+        print(event.delta, end="", flush=True)
 ```
 
-Use `responses.create`, not `chat.completions.create`, and use the flow endpoint
-name without the provider prefix. Native client streaming is incompatible with
-Langflow's noncanonical events; consume the raw SSE stream instead:
-
-```python
-import os
-
-import httpx
-
-with httpx.stream(
-    "POST",
-    "https://bifrost.example.com/openai_passthrough/v1/responses",
-    headers={
-        "Authorization": f"Bearer {os.environ['BIFROST_API_KEY']}",
-        "x-model-provider": "Langflow",
-    },
-    json={"model": "FirstFlow", "input": "Hello", "stream": True},
-) as response:
-    response.raise_for_status()
-    for line in response.iter_lines():
-        if line.startswith("data: "):
-            print(line[6:])
-```
-
-## Native Bifrost passthrough
-
-Use Bifrost's [OpenAI passthrough](https://docs.getbifrost.ai/integrations/passthrough)
-instead of its normal Responses route. Configure the `Langflow` custom provider
-with:
-
-- base provider: `openai`
-- base URL: the Langflow URL ending in `/api`
-- extra header: `x-api-key: <LANGFLOW_API_KEY>`
-- allowed requests: `passthrough` and `passthrough_stream`
-- normal `responses` and `responses_stream` disabled
-- no Responses path override
-
-Example Bifrost `config.json`:
-
-```json
-{
-  "$schema": "https://www.getbifrost.ai/schema",
-  "providers": {
-    "Langflow": {
-      "keys": [],
-      "network_config": {
-        "base_url": "https://langflow.example.com/api",
-        "extra_headers": {
-          "x-api-key": "<LANGFLOW_API_KEY>"
-        }
-      },
-      "custom_provider_config": {
-        "base_provider_type": "openai",
-        "is_key_less": true,
-        "allowed_requests": {
-          "passthrough": true,
-          "passthrough_stream": true
-        }
-      }
-    }
-  }
-}
-```
-
-Call it with:
-
-```bash
-BIFROST_URL=https://bifrost.example.com
-FLOW_NAME=FirstFlow
-
-curl -fsS "$BIFROST_URL/openai_passthrough/v1/responses" \
-  -H "Authorization: Bearer $BIFROST_API_KEY" \
-  -H "x-model-provider: Langflow" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "'${FLOW_NAME}'",
-    "input": "Who are you?",
-    "stream": false
-  }'
-```
-
-Passthrough forwards the body unchanged. Use `FirstFlow`, not
-`Langflow/FirstFlow`; the `x-model-provider` header selects Bifrost's provider.
-Use the flow UUID if `FirstFlow` has not been saved as the flow endpoint name.
+For Open WebUI 0.11 or newer, add an OpenAI connection with the same Bifrost
+`/v1` URL and Bifrost API key, set **API type** to **Responses**, and add
+`Langflow/FirstFlow` as an explicit model ID. Bifrost cannot discover flows
+through Langflow's Responses-only endpoint, so configure model IDs instead of
+calling upstream model discovery. Disable tool calling and image input for this
+text-only model.
