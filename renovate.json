@@ -94,6 +94,26 @@
       "changelogUrl": "https://github.com/jupyterlab/jupyterlab/releases"
     },
     {
+      "description": "Ignore non-final images in the Langflow Backend Dockerfile",
+      "matchManagers": ["dockerfile"],
+      "matchFileNames": ["Dockerfiles/LangflowBackend/Dockerfile"],
+      "matchDepTypes": ["stage", "syntax"],
+      "enabled": false
+    },
+    {
+      "description": "Track Langflow Backend releases only",
+      "matchDatasources": ["docker"],
+      "matchPackageNames": [
+        "ghcr.io/ilkersigirci/homeserver-langflow-backend",
+        "langflowai/langflow-backend"
+      ],
+      "sourceUrl": "https://github.com/langflow-ai/langflow",
+      "changelogUrl": "https://github.com/langflow-ai/langflow/releases",
+      "digest": {
+        "enabled": false
+      }
+    },
+    {
       "description": "Ignore non-final images in the LiteLLM Dockerfile",
       "matchManagers": ["dockerfile"],
       "matchFileNames": ["Dockerfiles/LiteLLM/Dockerfile"],
@@ -163,6 +183,15 @@
       "matchPackageNames": ["ghcr.io/ilkersigirci/homeserver-jupyter"],
       "sourceUrl": "https://github.com/jupyterlab/jupyterlab",
       "changelogUrl": "https://github.com/jupyterlab/jupyterlab/releases"
+    },
+    {
+      "description": "Use Langflow releases for homeserver Langflow Backend image changelogs",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchFileNames": ["apps/langflow.yml"],
+      "matchPackageNames": ["ghcr.io/ilkersigirci/homeserver-langflow-backend"],
+      "sourceUrl": "https://github.com/langflow-ai/langflow",
+      "changelogUrl": "https://github.com/langflow-ai/langflow/releases"
     },
     {
       "description": "Use LiteLLM Libre GitHub releases for homeserver LiteLLM image changelogs",

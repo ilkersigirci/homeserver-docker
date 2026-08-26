@@ -50,7 +50,7 @@ services:
       retries: 3
       start_period: 30s
 
-  # Shares build events so polling and streaming work across backend replicas.
+  # NOTE: Shares build events so polling and streaming work across backend replicas.
   langflow-redis:
     image: docker.io/valkey/valkey:9@sha256:8436e10bc65c94886a91d4415b6a6dfa9cb5a306fb3b996e5bb67cd2b4854193
     container_name: langflow-redis
@@ -86,8 +86,11 @@ services:
 
   # NOTE: LANGFLOW_SECRET_KEY: Generate with: python3 -c 'from secrets import token_urlsafe; print(token_urlsafe(32))'
   # NOTE: Create a bucket named "langflow" in the S3 provider beforehand.
+  # NOTE: The backend image includes LFX core only; provider bundles and Torch are not installed.
+  # NOTE: Install/update LFX packages on the host, then restart Langflow:
+  # uv pip install --target data/langflow-backend/packages --no-deps "lfx-openai-compatible==0.1.0" "langchain-openai==1.4.1"
   langflow-backend:
-    image: langflowai/langflow-backend:1.11.4@sha256:f90962a3abfa693d8ddd9b479e12aec6c9e4cbfd6e8050729f21ee92c11ce8a4
+    image: ghcr.io/ilkersigirci/homeserver-langflow-backend:1.11.4@sha256:0855770cccc8bca28152c968b4d2910aefbbf9150db503ed5f38f2f4fcd0a1fa
     # container_name: langflow-backend # NOTE: Omit container_name so Compose can run multiple backend replicas.
     restart: $RESTART_POLICY_PROGRAMMING
     deploy:
@@ -111,6 +114,8 @@ services:
       - /tmp:rw,noexec,nosuid,nodev,size=256m,uid=$PUID,gid=$PGID,mode=1777
       - /run:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
       - /app/data:rw,noexec,nosuid,nodev,size=512m,uid=$PUID,gid=$PGID,mode=770
+    volumes:
+      - $REPO_PATH/data/langflow-backend/packages:/app/packages:ro
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -153,12 +158,17 @@ services:
       LANGFLOW_REDIS_QUEUE_URL: redis://langflow-redis:6379/1
       LANGFLOW_REFRESH_SECURE: "true"
       LANGFLOW_SECRET_KEY: $LANGFLOW_SECRET_KEY
+      LANGFLOW_SSRF_ALLOWED_HOSTS: $AIGATEWAY_HOST
       LANGFLOW_SUPERUSER: bootstrap-admin
       LANGFLOW_SUPERUSER_PASSWORD: $LANGFLOW_SUPERUSER_PASSWORD
       LANGFLOW_STORAGE_TYPE: s3
       LANGFLOW_WEBHOOK_AUTH_ENABLE: "true"
       # Processes per replica; 2 replicas × 2 workers = 4 workers sharing the Valkey job queue.
       LANGFLOW_WORKERS: "2"
+      LANGFUSE_BASE_URL: $LANGFUSE_BASE_URL
+      LANGFUSE_PUBLIC_KEY: $LANGFUSE_PUBLIC_KEY_LANGFLOW
+      LANGFUSE_SECRET_KEY: $LANGFUSE_SECRET_KEY_LANGFLOW
+      PYTHONPATH: /app/packages
       PYTHONDONTWRITEBYTECODE: "1"
       TZ: $TZ
     healthcheck:
@@ -179,6 +189,12 @@ services:
     labels:
       traefik.enable: "true"
       traefik.docker.network: "t3_proxy"
+      ## Bifrost bypasses OIDC only for Responses requests carrying a Langflow API key.
+      traefik.http.routers.langflow-responses-rtr.entrypoints: "websecure"
+      traefik.http.routers.langflow-responses-rtr.rule: "Host(`langflow.$DOMAINNAME`) && Path(`/api/v1/responses`) && (HeaderRegexp(`Authorization`, `(?i)^Bearer .+`) || HeaderRegexp(`x-api-key`, `.+`))"
+      traefik.http.routers.langflow-responses-rtr.middlewares: "chain-no-auth@file"
+      traefik.http.routers.langflow-responses-rtr.priority: "200"
+      traefik.http.routers.langflow-responses-rtr.service: "langflow-api-svc"
       ## API router takes precedence over the frontend catch-all router.
       traefik.http.routers.langflow-api-rtr.entrypoints: "websecure"
       traefik.http.routers.langflow-api-rtr.rule: "Host(`langflow.$DOMAINNAME`) && (PathPrefix(`/api`) || PathPrefix(`/docs`) || Path(`/openapi.json`) || Path(`/health`) || Path(`/health_check`))"

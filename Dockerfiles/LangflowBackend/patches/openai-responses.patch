@@ -1,0 +1,471 @@
+--- a/src/lfx/src/lfx/schema/openai_responses_schemas.py
++++ b/src/lfx/src/lfx/schema/openai_responses_schemas.py
+@@ -7,7 +7,8 @@
+     """OpenAI-compatible responses request with flow_id as model parameter."""
+
+     model: str = Field(..., description="The flow ID to execute (used instead of OpenAI model)")
+-    input: str = Field(..., description="The input text to process")
++    input: str | list[Any] = Field(..., description="The input text or message items to process")
++    instructions: str | None = Field(default=None, description="A system or developer message for the flow")
+     stream: bool = Field(default=False, description="Whether to stream the response")
+     background: bool = Field(default=False, description="Whether to process in background")
+     tools: list[Any] | None = Field(default=None, description="Tools are not supported yet")
+@@ -18,6 +19,55 @@
+         default=None, description="Additional response data to include, e.g., ['tool_call.results']"
+     )
+
++    def to_input_text(self) -> str:
++        """Flatten supported Responses input into the text accepted by ChatInput."""
++        if isinstance(self.input, str):
++            messages = [("user", self.input)]
++        else:
++            messages = []
++            for item in self.input:
++                if not isinstance(item, dict) or "role" not in item:
++                    msg = "Only message items are supported in Responses input arrays"
++                    raise ValueError(msg)
++                role = str(item["role"]).lower()
++                if role not in {"developer", "system", "user", "assistant"}:
++                    msg = f"Unsupported message role: {role}"
++                    raise ValueError(msg)
++                messages.append((role, _input_content_text(item.get("content"))))
++
++        if self.instructions:
++            messages.insert(0, ("system", self.instructions))
++        if not messages:
++            msg = "At least one input message is required"
++            raise ValueError(msg)
++        if len(messages) == 1 and messages[0][0] == "user":
++            return messages[0][1]
++        return "\n\n".join(f"{role.upper()}: {content}" for role, content in messages)
++
++
++def _input_content_text(content: Any) -> str:
++    if isinstance(content, str):
++        return content
++    if not isinstance(content, list):
++        msg = "Only text message content is supported"
++        raise ValueError(msg)
++
++    text_parts = []
++    for part in content:
++        if isinstance(part, str):
++            text_parts.append(part)
++        elif (
++            isinstance(part, dict)
++            and part.get("type") in {"input_text", "output_text", "text"}
++            and isinstance(part.get("text"), str)
++        ):
++            text_parts.append(part["text"])
++        else:
++            content_type = part.get("type", "unknown") if isinstance(part, dict) else "unknown"
++            msg = f"Unsupported message content type: {content_type}"
++            raise ValueError(msg)
++    return "\n".join(text_parts)
++
+
+ class OpenAIResponsesResponse(BaseModel):
+     """OpenAI-compatible responses response."""
+--- a/src/backend/base/langflow/api/v1/openai_responses.py
++++ b/src/backend/base/langflow/api/v1/openai_responses.py
+@@ -7,8 +7,9 @@
+
+ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
+ from fastapi.responses import StreamingResponse
++from fastapi.security.utils import get_authorization_scheme_param
+ from lfx.log.logger import logger
+-from lfx.schema.openai_responses_schemas import create_openai_error, create_openai_error_chunk
++from lfx.schema.openai_responses_schemas import create_openai_error
+ from lfx.utils.flow_validation import CustomComponentValidationError
+
+ from langflow.api.utils import extract_global_variables_from_headers
+@@ -20,7 +21,6 @@
+     OpenAIErrorResponse,
+     OpenAIResponsesRequest,
+     OpenAIResponsesResponse,
+-    OpenAIResponsesStreamChunk,
+ )
+ from langflow.schema.content_types import ToolContent
+ from langflow.services.auth.utils import api_key_security
+@@ -50,6 +50,17 @@
+     return any(node.get("data", {}).get("type") in ["ChatOutput", "Chat Output"] for node in flow_data["nodes"])
+
+
++async def openai_api_key_security(request: Request) -> UserRead | None:
++    """Accept Langflow's x-api-key or the OpenAI-standard bearer token."""
++    query_key = request.query_params.get("x-api-key")
++    header_key = request.headers.get("x-api-key")
++    if not query_key and not header_key:
++        scheme, credentials = get_authorization_scheme_param(request.headers.get("authorization"))
++        if scheme.lower() == "bearer":
++            header_key = credentials
++    return await api_key_security(query_key, header_key)
++
++
+ async def run_flow_for_openai_responses(
+     flow: FlowRead,
+     request: OpenAIResponsesRequest,
+@@ -81,7 +92,7 @@
+     # Convert OpenAI request to SimplifiedAPIRequest
+     # Note: We're moving away from tweaks to a context-based approach
+     simplified_request = SimplifiedAPIRequest(
+-        input_value=request.input,
++        input_value=request.to_input_text(),
+         input_type="chat",  # Use chat input type for better compatibility
+         output_type="chat",  # Use chat output type for better compatibility
+         tweaks={},  # Empty tweaks, using context instead
+@@ -116,20 +127,53 @@
+             )
+
+             try:
++                sequence_number = 0
++                message_id = f"msg_{response_id}"
++
++                def stream_event(payload: dict[str, Any]) -> str:
++                    nonlocal sequence_number
++                    payload["sequence_number"] = sequence_number
++                    sequence_number += 1
++                    event_type = payload["type"]
++                    return f"event: {event_type}\ndata: {json.dumps(payload, separators=(',', ':'))}\n\n"
++
+                 await logger.adebug(
+                     "[OpenAIResponses][stream] start: response_id=%s model=%s session_id=%s",
+                     response_id,
+                     request.model,
+                     session_id,
+                 )
+-                # Send initial chunk to establish connection
+-                initial_chunk = OpenAIResponsesStreamChunk(
++                in_progress_response = OpenAIResponsesResponse(
+                     id=response_id,
+-                    created=created_timestamp,
++                    created_at=created_timestamp,
++                    status="in_progress",
+                     model=request.model,
+-                    delta={"content": ""},
++                    output=[],
++                    instructions=request.instructions,
++                    previous_response_id=request.previous_response_id,
++                    usage=None,
++                ).model_dump()
++                in_progress_item = {
++                    "id": message_id,
++                    "type": "message",
++                    "status": "in_progress",
++                    "role": "assistant",
++                    "content": [],
++                }
++                yield stream_event({"type": "response.created", "response": in_progress_response})
++                yield stream_event({"type": "response.in_progress", "response": in_progress_response})
++                yield stream_event(
++                    {"type": "response.output_item.added", "output_index": 0, "item": in_progress_item}
++                )
++                yield stream_event(
++                    {
++                        "type": "response.content_part.added",
++                        "item_id": message_id,
++                        "output_index": 0,
++                        "content_index": 0,
++                        "part": {"type": "output_text", "text": "", "annotations": []},
++                    }
+                 )
+-                yield f"data: {initial_chunk.model_dump_json()}\n\n"
+
+                 tool_call_counter = 0
+                 processed_tools = set()  # Track processed tool calls to avoid duplicates
+@@ -144,12 +188,10 @@
+                     content = ""
+                     token_data = {}
+
+-                    # Parse byte string events as JSON
+-                    if isinstance(event_data, bytes):
++                    # Parse serialized Langflow events as JSON.
++                    if isinstance(event_data, (bytes, str)):
+                         try:
+-                            import json
+-
+-                            event_str = event_data.decode("utf-8")
++                            event_str = event_data.decode("utf-8") if isinstance(event_data, bytes) else event_data
+                             parsed_event = json.loads(event_str)
+
+                             if isinstance(parsed_event, dict):
+@@ -171,23 +213,15 @@
+                                         token_data,
+                                     )
+                                 if event_type == "error":
+-                                    # Error message is in 'text' field, not 'error' field
+-                                    # The 'error' field is a boolean flag
+                                     error_message = data.get("text") or data.get("error", "Unknown error")
+-                                    # Ensure error_message is a string
+-                                    if not isinstance(error_message, str):
+-                                        error_message = str(error_message)
+-                                    # Send error as content chunk with finish_reason="error"
+-                                    # This ensures OpenAI SDK can parse and surface the error
+-                                    error_chunk = create_openai_error_chunk(
+-                                        response_id=response_id,
+-                                        created_timestamp=created_timestamp,
+-                                        model=request.model,
+-                                        error_message=error_message,
++                                    yield stream_event(
++                                        {
++                                            "type": "error",
++                                            "code": "flow_stream_error",
++                                            "message": str(error_message),
++                                            "param": None,
++                                        }
+                                     )
+-                                    yield f"data: {error_chunk.model_dump_json()}\n\n"
+-                                    yield "data: [DONE]\n\n"
+-                                    # Exit early after error
+                                     return
+
+                                 if event_type == "add_message":
+@@ -211,12 +245,9 @@
+                                         message_state,
+                                     )
+
+-                                    # Skip processing text content if state is "complete"
+-                                    # All content has already been streamed via token events
++                                    # Token events are authoritative. Fall back to the completed
++                                    # message only for components that do not emit tokens.
+                                     if message_state == "complete":
+-                                        await logger.adebug(
+-                                            "[OpenAIResponses][stream] skipping add_message with state=complete"
+-                                        )
+                                         # Extract usage from completed message properties
+                                         if isinstance(properties, dict) and "usage" in properties:
+                                             usage_obj = properties.get("usage")
+@@ -230,8 +261,14 @@
+                                                 await logger.adebug(
+                                                     "[OpenAIResponses][stream] captured usage: %s", stream_usage_data
+                                                 )
+-                                        # Still process content_blocks for tool calls, but skip text content
+-                                        text = ""
++                                        if (
++                                            not previous_content
++                                            and sender in {"Machine", "AI", "Agent"}
++                                            and sender_name in {"Agent", "AI"}
++                                            and isinstance(text, str)
++                                        ):
++                                            content = text
++                                            previous_content = text
+
+                                     # Look for Agent Steps in content_blocks
+                                     for block in content_blocks:
+@@ -271,10 +308,7 @@
+                                                                 "call_id": call_id,
+                                                             },
+                                                         }
+-                                                        yield (
+-                                                            f"event: response.output_item.added\n"
+-                                                            f"data: {json.dumps(tool_call_event)}\n\n"
+-                                                        )
++                                                        yield stream_event(tool_call_event)
+
+                                                         # Send function call arguments as delta events (like OpenAI)
+                                                         arguments_str = json.dumps(tool_input)
+@@ -284,10 +318,7 @@
+                                                             "item_id": tool_id,
+                                                             "output_index": 0,
+                                                         }
+-                                                        yield (
+-                                                            f"event: response.function_call_arguments.delta\n"
+-                                                            f"data: {json.dumps(arg_delta_event)}\n\n"
+-                                                        )
++                                                        yield stream_event(arg_delta_event)
+
+                                                         # Send function call arguments done event
+                                                         arg_done_event = {
+@@ -296,10 +327,7 @@
+                                                             "item_id": tool_id,
+                                                             "output_index": 0,
+                                                         }
+-                                                        yield (
+-                                                            f"event: response.function_call_arguments.done\n"
+-                                                            f"data: {json.dumps(arg_done_event)}\n\n"
+-                                                        )
++                                                        yield stream_event(arg_done_event)
+                                                         await logger.adebug(
+                                                             "[OpenAIResponses][stream] tool_call.args.done name=%s",
+                                                             tool_name,
+@@ -342,40 +370,12 @@
+                                                                     },
+                                                                 }
+
+-                                                            yield (
+-                                                                f"event: response.output_item.done\n"
+-                                                                f"data: {json.dumps(tool_done_event)}\n\n"
+-                                                            )
++                                                            yield stream_event(tool_done_event)
+                                                             await logger.adebug(
+                                                                 "[OpenAIResponses][stream] tool_call.done name=%s",
+                                                                 tool_name,
+                                                             )
+
+-                                    # Extract text content for streaming (only AI responses)
+-                                    if (
+-                                        sender in ["Machine", "AI", "Agent"]
+-                                        and text != request.input
+-                                        and sender_name in ["Agent", "AI"]
+-                                    ):
+-                                        # Calculate delta: only send newly generated content
+-                                        if text.startswith(previous_content):
+-                                            content = text[len(previous_content) :]
+-                                            previous_content = text
+-                                            await logger.adebug(
+-                                                "[OpenAIResponses][stream] delta computed len=%d total_len=%d",
+-                                                len(content),
+-                                                len(previous_content),
+-                                            )
+-                                        else:
+-                                            # If text doesn't start with previous content, send full text
+-                                            # This handles cases where the content might be reset
+-                                            content = text
+-                                            previous_content = text
+-                                            await logger.adebug(
+-                                                "[OpenAIResponses][stream] content reset; sending full text len=%d",
+-                                                len(content),
+-                                            )
+-
+                         except (json.JSONDecodeError, UnicodeDecodeError):
+                             await logger.adebug("[OpenAIResponses][stream] failed to decode event bytes; skipping")
+                             continue
+@@ -387,44 +387,68 @@
+                             await logger.adebug(
+                                 f"[OpenAIResponses][stream] sent chunk with content={content}",
+                             )
+-                        chunk = OpenAIResponsesStreamChunk(
+-                            id=response_id,
+-                            created=created_timestamp,
+-                            model=request.model,
+-                            delta={"content": content},
++                        yield stream_event(
++                            {
++                                "type": "response.output_text.delta",
++                                "item_id": message_id,
++                                "output_index": 0,
++                                "content_index": 0,
++                                "delta": content,
++                            }
+                         )
+-                        yield f"data: {chunk.model_dump_json()}\n\n"
+                         await logger.adebug(
+                             "[OpenAIResponses][stream] sent chunk with delta_len=%d",
+                             len(content),
+                         )
+
+-                # Send final completion chunk
+-                final_chunk = OpenAIResponsesStreamChunk(
++                completed_content = {
++                    "type": "output_text",
++                    "text": previous_content,
++                    "annotations": [],
++                }
++                completed_item = {
++                    "id": message_id,
++                    "type": "message",
++                    "status": "completed",
++                    "role": "assistant",
++                    "content": [completed_content],
++                }
++                yield stream_event(
++                    {
++                        "type": "response.output_text.done",
++                        "item_id": message_id,
++                        "output_index": 0,
++                        "content_index": 0,
++                        "text": previous_content,
++                    }
++                )
++                yield stream_event(
++                    {
++                        "type": "response.content_part.done",
++                        "item_id": message_id,
++                        "output_index": 0,
++                        "content_index": 0,
++                        "part": completed_content,
++                    }
++                )
++                yield stream_event(
++                    {
++                        "type": "response.output_item.done",
++                        "output_index": 0,
++                        "item": completed_item,
++                    }
++                )
++                completed_response = OpenAIResponsesResponse(
+                     id=response_id,
+-                    created=created_timestamp,
+-                    model=request.model,
+-                    delta={},
++                    created_at=created_timestamp,
+                     status="completed",
+-                    finish_reason="stop",
+-                )
+-                yield f"data: {final_chunk.model_dump_json()}\n\n"
+-
+-                # Send response.completed event with usage (OpenAI format)
+-                completed_event = {
+-                    "type": "response.completed",
+-                    "response": {
+-                        "id": response_id,
+-                        "object": "response",
+-                        "created_at": created_timestamp,
+-                        "status": "completed",
+-                        "model": request.model,
+-                        "usage": stream_usage_data,
+-                    },
+-                }
+-                yield f"event: response.completed\ndata: {json.dumps(completed_event)}\n\n"
+-
+-                yield "data: [DONE]\n\n"
++                    model=request.model,
++                    output=[completed_item],
++                    instructions=request.instructions,
++                    previous_response_id=request.previous_response_id,
++                    usage=stream_usage_data,
++                ).model_dump()
++                yield stream_event({"type": "response.completed", "response": completed_response})
+                 await logger.adebug(
+                     "[OpenAIResponses][stream] completed: response_id=%s total_sent_len=%d usage=%s",
+                     response_id,
+@@ -434,15 +458,14 @@
+
+             except Exception as e:  # noqa: BLE001
+                 logger.error(f"Error in stream generator: {e}")
+-                # Send error as content chunk with finish_reason="error"
+-                error_chunk = create_openai_error_chunk(
+-                    response_id=response_id,
+-                    created_timestamp=created_timestamp,
+-                    model=request.model,
+-                    error_message=str(e),
++                yield stream_event(
++                    {
++                        "type": "error",
++                        "code": "flow_stream_error",
++                        "message": str(e),
++                        "param": None,
++                    }
+                 )
+-                yield f"data: {error_chunk.model_dump_json()}\n\n"
+-                yield "data: [DONE]\n\n"
+             finally:
+                 if not main_task.done():
+                     main_task.cancel()
+@@ -593,6 +616,7 @@
+         created_at=created_timestamp,
+         model=request.model,
+         output=output_items,
++        instructions=request.instructions,
+         previous_response_id=request.previous_response_id,
+         usage=usage_data,
+     )
+@@ -602,7 +626,7 @@
+ async def create_response(
+     request: OpenAIResponsesRequest,
+     background_tasks: BackgroundTasks,
+-    api_key_user: Annotated[UserRead, Depends(api_key_security)],
++    api_key_user: Annotated[UserRead, Depends(openai_api_key_security)],
+     telemetry_service: Annotated[TelemetryService, Depends(get_telemetry_service)],
+     http_request: Request,
+ ) -> OpenAIResponsesResponse | StreamingResponse | OpenAIErrorResponse:
