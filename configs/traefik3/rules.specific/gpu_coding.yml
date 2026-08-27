@@ -48,12 +48,13 @@ http:
         - chain-no-auth-relaxed
       service: lgos-bifrost-svc
 
+    # NOTE: Needed for plotly cdn js
     lgos-openwebui-rtr:
       rule: "Host(`lgos-openwebui.{{env "DOMAINNAME"}}`)"
       entryPoints:
         - websecure
       middlewares:
-        - chain-no-auth
+        - chain-no-auth-relaxed
       service: lgos-openwebui-svc
 
   middlewares:
