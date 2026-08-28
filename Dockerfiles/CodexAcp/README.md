@@ -31,11 +31,13 @@ container runtime must permit unprivileged user namespaces.
 
 ## Compose
 
-`apps/marimo.yml` uses the local `homeserver-codex-acp:test` tag until the
-GHCR package is published. It bind-mounts `$CODEX_AUTH_FILE` when set;
-otherwise it expects `configs/codex-acp/auth.json`. The file must remain
-writable by `PUID:PGID` so Codex can persist refreshed credentials. Its
-workspace is the same `$REPO_PATH/data/marimo` bind mounted by Marimo.
+`apps/marimo.yml` bind-mounts `configs/codex-acp/auth.json`. The file must
+remain writable by `PUID:PGID` so Codex can persist refreshed credentials. Its
+hosted workspace is the same `$REPO_PATH/data/marimo` bind mounted by Marimo.
+Local notebook directories must be mounted at the same absolute host and
+container path because Marimo sends that path as the ACP session working
+directory. Without the matching path, the container cannot start shell or file
+operations for the notebook.
 
 The adapter is patched to advertise ChatGPT before API-key authentication
 because Marimo 0.23.14 selects the first method. The patch targets the pinned

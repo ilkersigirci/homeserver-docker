@@ -16,6 +16,16 @@ http:
         - chain-no-auth-relaxed
       service: marimo-local-svc
 
+    marimo-local-agent-rtr:
+      rule: "Host(`marimo-local.{{env "DOMAINNAME"}}`) && Path(`/message`)"
+      entryPoints:
+        - marimoagent
+      middlewares:
+        - chain-no-auth-relaxed
+      service: marimo-agent-svc@docker
+      tls:
+        options: tls-max@file
+
     homeserver-api-rtr:
       rule: "Host(`api-backend.{{env "DOMAINNAME"}}`)"
       entryPoints:

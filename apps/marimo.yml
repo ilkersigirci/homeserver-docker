@@ -115,6 +115,12 @@ services:
       # Keep the same absolute workspace path Marimo sends in ACP sessions.
       - $REPO_PATH/data/marimo:/workspace
       - type: bind
+        source: $MARIMO_PATH_LGOS_NOTEBOOK
+        target: $MARIMO_PATH_LGOS_NOTEBOOK
+        read_only: false
+        bind:
+          create_host_path: false
+      - type: bind
         source: $REPO_PATH/configs/codex-acp/auth.json
         target: /codex-home/auth.json
         read_only: false
