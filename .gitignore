@@ -15,7 +15,8 @@ appdata/**
 !appdata/*/.gitkeep
 
 # Backups
-# backups/*
+backups/**
+!backups/.gitkeep
 
 # Configs
 configs/**
