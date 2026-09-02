@@ -152,15 +152,31 @@ class ResponsesCompatibilityTests(unittest.IsolatedAsyncioTestCase):
         deltas = [event["delta"] for event in events if event["type"] == "response.output_text.delta"]
         self.assertEqual(deltas, ["Fallback"])
 
-    async def _stream_body(self, flow_events: list[dict]) -> str:
+    async def test_streaming_exception_does_not_expose_raw_details(self):
+        raw_error = RuntimeError("database password=super-secret")
+
+        with patch.object(openai_responses.logger, "aexception", new_callable=AsyncMock) as log_exception:
+            body = await self._stream_body(raw_error)
+
+        events = _parse_sse(body)
+        error = events[-1]
+        self.assertEqual(error["type"], "error")
+        self.assertEqual(error["message"], "Workflow execution failed.")
+        self.assertNotIn(str(raw_error), body)
+        log_exception.assert_awaited_once_with("Error in OpenAI Responses stream generator")
+
+    async def _stream_body(self, flow_events: list[dict] | Exception) -> str:
         async def run_flow_generator(**_kwargs):
             return None
 
         async def consume_and_yield(*_args):
+            if isinstance(flow_events, Exception):
+                raise flow_events
             for event in flow_events:
                 yield json.dumps(event).encode()
 
         flow = SimpleNamespace(
+            user_id="flow-owner-id",
             data={
                 "nodes": [
                     {"data": {"type": "ChatInput"}},

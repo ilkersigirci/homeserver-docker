@@ -18,7 +18,7 @@ OpenAI client or Open WebUI
 
 ## Why a custom image
 
-Stock Langflow 1.11.4 exposes a Responses-shaped endpoint but is not wire
+Stock Langflow 1.12.0 exposes a Responses-shaped endpoint but is not wire
 compatible with OpenAI clients:
 
 - `input` accepts only a string, so canonical message arrays forwarded by
