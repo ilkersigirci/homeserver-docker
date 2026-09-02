@@ -263,6 +263,7 @@
         "zimengxiong/excalidash-backend",
         "zimengxiong/excalidash-frontend"
       ],
+      "groupName": "ExcaliDash",
       "sourceUrl": "https://github.com/ZimengXiong/ExcaliDash"
     },
     {
