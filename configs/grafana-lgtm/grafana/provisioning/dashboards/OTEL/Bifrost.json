@@ -15,7 +15,7 @@
       }
     ]
   },
-  "description": "Bifrost AI Gateway cost and latency dashboard built on low-cardinality Prometheus recording rules and 5-minute range rollups.",
+  "description": "Bifrost gateway RED signals, token usage, and spend from low-cardinality Prometheus recording rules.",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
@@ -28,7 +28,7 @@
       "type": "stat",
       "gridPos": {
         "h": 4,
-        "w": 3,
+        "w": 4,
         "x": 0,
         "y": 0
       },
@@ -78,12 +78,12 @@
     },
     {
       "id": 2,
-      "title": "Total Requests",
+      "title": "Upstream Attempts",
       "type": "stat",
       "gridPos": {
         "h": 4,
-        "w": 3,
-        "x": 3,
+        "w": 4,
+        "x": 4,
         "y": 0
       },
       "datasource": {
@@ -128,7 +128,8 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "12.3.0"
+      "pluginVersion": "12.3.0",
+      "description": "Provider attempts, including retries and fallbacks, in the selected time range."
     },
     {
       "id": 3,
@@ -136,8 +137,8 @@
       "type": "stat",
       "gridPos": {
         "h": 4,
-        "w": 3,
-        "x": 6,
+        "w": 4,
+        "x": 8,
         "y": 0
       },
       "datasource": {
@@ -185,121 +186,13 @@
       "pluginVersion": "12.3.0"
     },
     {
-      "id": 4,
-      "title": "Avg Cost / Request",
-      "type": "stat",
-      "gridPos": {
-        "h": 4,
-        "w": 3,
-        "x": 9,
-        "y": 0
-      },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "instant": true,
-          "range": false,
-          "expr": "sum(sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])) / clamp_min(sum(sum_over_time(bifrost:requests_upstream_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])), 1)"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "currencyUSD",
-          "decimals": 6,
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "12.3.0"
-    },
-    {
-      "id": 5,
-      "title": "Avg Cost / 1M Tokens",
-      "type": "stat",
-      "gridPos": {
-        "h": 4,
-        "w": 3,
-        "x": 12,
-        "y": 0
-      },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "instant": true,
-          "range": false,
-          "expr": "1000000 * sum(sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])) / clamp_min(sum(sum_over_time(bifrost:input_tokens_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])) + sum(sum_over_time(bifrost:output_tokens_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])), 1)"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "currencyUSD",
-          "decimals": 2,
-          "color": {
-            "mode": "thresholds"
-          },
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": 0
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        },
-        "textMode": "auto"
-      },
-      "pluginVersion": "12.3.0"
-    },
-    {
       "id": 6,
-      "title": "Success Rate",
+      "title": "Attempt Success Rate",
       "type": "stat",
       "gridPos": {
         "h": 4,
-        "w": 3,
-        "x": 15,
+        "w": 4,
+        "x": 12,
         "y": 0
       },
       "datasource": {
@@ -352,7 +245,8 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "12.3.0"
+      "pluginVersion": "12.3.0",
+      "description": "Share of upstream provider attempts that completed successfully."
     },
     {
       "id": 7,
@@ -360,8 +254,8 @@
       "type": "stat",
       "gridPos": {
         "h": 4,
-        "w": 3,
-        "x": 18,
+        "w": 4,
+        "x": 16,
         "y": 0
       },
       "datasource": {
@@ -414,16 +308,17 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "12.3.0"
+      "pluginVersion": "12.3.0",
+      "description": "95th percentile latency of upstream provider attempts."
     },
     {
       "id": 8,
-      "title": "Unpriced Requests",
+      "title": "P95 Bifrost Overhead",
       "type": "stat",
       "gridPos": {
         "h": 4,
-        "w": 3,
-        "x": 21,
+        "w": 4,
+        "x": 20,
         "y": 0
       },
       "datasource": {
@@ -435,13 +330,13 @@
           "refId": "A",
           "instant": true,
           "range": false,
-          "expr": "sum((sum by (provider, model, method) (sum_over_time(bifrost:requests_upstream_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))) unless on (provider, model, method) ((sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))) > 0))"
+          "expr": "histogram_quantile(0.95, sum by (le) (increase(bifrost:overhead_latency_microseconds_bucket:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))) / 1000"
         }
       ],
       "fieldConfig": {
         "defaults": {
-          "unit": "short",
-          "decimals": 0,
+          "unit": "ms",
+          "decimals": 2,
           "color": {
             "mode": "thresholds"
           },
@@ -449,7 +344,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "orange",
+                "color": "blue",
                 "value": 0
               }
             ]
@@ -459,7 +354,7 @@
       },
       "options": {
         "colorMode": "value",
-        "graphMode": "none",
+        "graphMode": "area",
         "justifyMode": "auto",
         "reduceOptions": {
           "calcs": ["lastNotNull"],
@@ -468,15 +363,16 @@
         },
         "textMode": "auto"
       },
-      "pluginVersion": "12.3.0"
+      "pluginVersion": "12.3.0",
+      "description": "95th percentile latency added by Bifrost, excluding time waiting on providers."
     },
     {
       "id": 9,
-      "title": "USD/Hour by Provider",
+      "title": "Hourly Spend by Provider / Model",
       "type": "timeseries",
       "gridPos": {
         "h": 8,
-        "w": 8,
+        "w": 16,
         "x": 0,
         "y": 4
       },
@@ -487,8 +383,8 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "topk(10, sum by (provider) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[1h])))",
-          "legendFormat": "{{provider}}",
+          "expr": "topk(12, sum by (provider, model) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[1h])))",
+          "legendFormat": "{{provider}} / {{model}}",
           "interval": "5m"
         }
       ],
@@ -521,60 +417,8 @@
           "sort": "desc"
         }
       },
-      "pluginVersion": "12.3.0"
-    },
-    {
-      "id": 10,
-      "title": "Spend by Provider / Model",
-      "type": "timeseries",
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 4
-      },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "topk(12, sum by (provider, model) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__interval])))",
-          "legendFormat": "{{provider}} / {{model}}",
-          "interval": "5m"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "currencyUSD",
-          "decimals": 4,
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "drawStyle": "line",
-            "fillOpacity": 10,
-            "lineWidth": 2,
-            "showPoints": "never",
-            "spanNulls": true
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "calcs": ["last", "max"],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "12.3.0"
+      "pluginVersion": "12.3.0",
+      "description": "Trailing one-hour spend, split by provider and model."
     },
     {
       "id": 11,
@@ -623,359 +467,14 @@
       "pluginVersion": "12.3.0"
     },
     {
-      "id": 12,
-      "title": "Top Providers",
-      "type": "bargauge",
-      "gridPos": {
-        "h": 10,
-        "w": 6,
-        "x": 0,
-        "y": 12
-      },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "instant": true,
-          "range": false,
-          "expr": "topk(12, sum by (provider) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])))",
-          "legendFormat": "{{provider}}"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "currencyUSD",
-          "decimals": 4,
-          "displayName": "${__field.labels.provider}",
-          "color": {
-            "mode": "continuous-GrYlRd"
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "displayMode": "gradient",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        },
-        "showUnfilled": true
-      },
-      "pluginVersion": "12.3.0"
-    },
-    {
-      "id": 13,
-      "title": "Top Models",
-      "type": "bargauge",
-      "gridPos": {
-        "h": 10,
-        "w": 6,
-        "x": 6,
-        "y": 12
-      },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "instant": true,
-          "range": false,
-          "expr": "topk(15, sum by (model) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])))",
-          "legendFormat": "{{model}}"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "currencyUSD",
-          "decimals": 4,
-          "displayName": "${__field.labels.model}",
-          "color": {
-            "mode": "continuous-GrYlRd"
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "displayMode": "gradient",
-        "orientation": "horizontal",
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        },
-        "showUnfilled": true
-      },
-      "pluginVersion": "12.3.0"
-    },
-    {
-      "id": 14,
-      "title": "Provider / Model / Method Spend Table",
-      "type": "table",
-      "gridPos": {
-        "h": 10,
-        "w": 12,
-        "x": 12,
-        "y": 12
-      },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "format": "table",
-          "instant": true,
-          "range": false,
-          "expr": "label_join(topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
-        },
-        {
-          "refId": "B",
-          "format": "table",
-          "instant": true,
-          "range": false,
-          "expr": "label_join(100 * topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))) / scalar(clamp_min(sum(sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])), 1)), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
-        },
-        {
-          "refId": "C",
-          "format": "table",
-          "instant": true,
-          "range": false,
-          "expr": "label_join((sum by (provider, model, method) (sum_over_time(bifrost:requests_upstream_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))) and on (provider, model, method) topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
-        },
-        {
-          "refId": "D",
-          "format": "table",
-          "instant": true,
-          "range": false,
-          "expr": "label_join((sum by (provider, model, method) (sum_over_time(bifrost:input_tokens_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))) and on (provider, model, method) topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
-        },
-        {
-          "refId": "E",
-          "format": "table",
-          "instant": true,
-          "range": false,
-          "expr": "label_join((sum by (provider, model, method) (sum_over_time(bifrost:output_tokens_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))) and on (provider, model, method) topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
-        },
-        {
-          "refId": "F",
-          "format": "table",
-          "instant": true,
-          "range": false,
-          "expr": "label_join((sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])) / clamp_min(sum by (provider, model, method) (sum_over_time(bifrost:requests_upstream_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])), 1)) and on (provider, model, method) topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
-        },
-        {
-          "refId": "G",
-          "format": "table",
-          "instant": true,
-          "range": false,
-          "expr": "label_join((1000000 * sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])) / clamp_min(sum by (provider, model, method) (sum_over_time(bifrost:input_tokens_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])) + sum by (provider, model, method) (sum_over_time(bifrost:output_tokens_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])), 1)) and on (provider, model, method) topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
-        },
-        {
-          "refId": "H",
-          "format": "table",
-          "instant": true,
-          "range": false,
-          "expr": "label_join((100 * sum by (provider, model, method) (sum_over_time(bifrost:requests_success_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])) / clamp_min(sum by (provider, model, method) (sum_over_time(bifrost:requests_upstream_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])), 1)) and on (provider, model, method) topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
-        },
-        {
-          "refId": "I",
-          "format": "table",
-          "instant": true,
-          "range": false,
-          "expr": "label_join((1000 * increase(bifrost:upstream_latency_seconds_sum:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]) / clamp_min(increase(bifrost:upstream_latency_seconds_count:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]), 1e-9)) and on (provider, model, method) topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
-        }
-      ],
-      "transformations": [
-        {
-          "id": "joinByField",
-          "options": {
-            "byField": "pmm",
-            "mode": "inner"
-          }
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true,
-              "Time 1": true,
-              "Time 2": true,
-              "Time 3": true,
-              "Time 4": true,
-              "Time 5": true,
-              "Time 6": true,
-              "Time 7": true,
-              "Time 8": true,
-              "Time 9": true,
-              "pmm": true
-            },
-            "indexByName": {
-              "provider": 0,
-              "model": 1,
-              "method": 2,
-              "Value #A": 3,
-              "Value #B": 4,
-              "Value #C": 5,
-              "Value #D": 6,
-              "Value #E": 7,
-              "Value #F": 8,
-              "Value #G": 9,
-              "Value #H": 10,
-              "Value #I": 11
-            },
-            "renameByName": {
-              "provider": "Provider",
-              "model": "Model",
-              "method": "Method",
-              "Value #A": "Cost (USD)",
-              "Value #B": "Spend Share %",
-              "Value #C": "Requests",
-              "Value #D": "Input Tokens",
-              "Value #E": "Output Tokens",
-              "Value #F": "Cost / Request",
-              "Value #G": "Cost / 1M Tokens",
-              "Value #H": "Success Rate %",
-              "Value #I": "Avg Latency (ms)"
-            }
-          }
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "cellOptions": {
-              "type": "auto"
-            }
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Cost (USD)"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "currencyUSD"
-              },
-              {
-                "id": "decimals",
-                "value": 4
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Spend Share %"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "percent"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": "Requests|Input Tokens|Output Tokens"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "short"
-              },
-              {
-                "id": "decimals",
-                "value": 0
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": "Cost / Request|Cost / 1M Tokens"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "currencyUSD"
-              },
-              {
-                "id": "decimals",
-                "value": 6
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Success Rate %"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "percent"
-              },
-              {
-                "id": "decimals",
-                "value": 2
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Avg Latency (ms)"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "ms"
-              },
-              {
-                "id": "decimals",
-                "value": 0
-              }
-            ]
-          }
-        ]
-      },
-      "options": {
-        "cellHeight": "sm",
-        "showHeader": true,
-        "sortBy": [
-          {
-            "desc": true,
-            "displayName": "Cost (USD)"
-          }
-        ]
-      },
-      "pluginVersion": "12.3.0"
-    },
-    {
       "id": 15,
-      "title": "Request Outcome Rate",
+      "title": "Upstream Attempt Rate",
       "type": "timeseries",
       "gridPos": {
-        "h": 9,
-        "w": 8,
+        "h": 8,
+        "w": 12,
         "x": 0,
-        "y": 22
+        "y": 12
       },
       "datasource": {
         "type": "prometheus",
@@ -984,14 +483,14 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(rate(bifrost:requests_success_total:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__rate_interval]))",
-          "legendFormat": "Success req/s",
+          "expr": "sum(bifrost:requests_success_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}) / 300",
+          "legendFormat": "Successful attempts/s",
           "interval": "5m"
         },
         {
           "refId": "B",
-          "expr": "sum(rate(bifrost:requests_error_total:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__rate_interval]))",
-          "legendFormat": "Error req/s",
+          "expr": "sum(bifrost:requests_error_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}) / 300",
+          "legendFormat": "Failed attempts/s",
           "interval": "5m"
         }
       ],
@@ -1024,17 +523,18 @@
           "sort": "desc"
         }
       },
-      "pluginVersion": "12.3.0"
+      "pluginVersion": "12.3.0",
+      "description": "Successful and failed provider attempts per second."
     },
     {
       "id": 16,
       "title": "Token Throughput",
       "type": "timeseries",
       "gridPos": {
-        "h": 9,
-        "w": 8,
-        "x": 8,
-        "y": 22
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 12
       },
       "datasource": {
         "type": "prometheus",
@@ -1043,13 +543,13 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(rate(bifrost:input_tokens_total:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__rate_interval]))",
+          "expr": "sum(bifrost:input_tokens_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}) / 300",
           "legendFormat": "Input tokens/s",
           "interval": "5m"
         },
         {
           "refId": "B",
-          "expr": "sum(rate(bifrost:output_tokens_total:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__rate_interval]))",
+          "expr": "sum(bifrost:output_tokens_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}) / 300",
           "legendFormat": "Output tokens/s",
           "interval": "5m"
         }
@@ -1091,9 +591,9 @@
       "type": "timeseries",
       "gridPos": {
         "h": 9,
-        "w": 8,
-        "x": 16,
-        "y": 22
+        "w": 12,
+        "x": 0,
+        "y": 20
       },
       "datasource": {
         "type": "prometheus",
@@ -1136,211 +636,18 @@
           "sort": "desc"
         }
       },
-      "pluginVersion": "12.3.0"
-    },
-    {
-      "id": 18,
-      "title": "Cache Hits",
-      "type": "timeseries",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 31
-      },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "sum(rate(bifrost:cache_hits_total:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__rate_interval]))",
-          "legendFormat": "Cache hits/s",
-          "interval": "5m"
-        },
-        {
-          "refId": "B",
-          "expr": "100 * sum(rate(bifrost:cache_hits_total:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__rate_interval])) / clamp_min(sum(rate(bifrost:requests_upstream_total:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__rate_interval])), 1e-9)",
-          "legendFormat": "Cache hit rate %",
-          "interval": "5m"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "drawStyle": "line",
-            "fillOpacity": 12,
-            "lineWidth": 2,
-            "showPoints": "never",
-            "spanNulls": true
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Cache hits/s"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "short"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Cache hit rate %"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "percent"
-              }
-            ]
-          }
-        ]
-      },
-      "options": {
-        "legend": {
-          "calcs": ["mean", "max", "last"],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "12.3.0"
-    },
-    {
-      "id": 19,
-      "title": "Unpriced Traffic",
-      "type": "table",
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 31
-      },
-      "datasource": {
-        "type": "prometheus",
-        "uid": "prometheus"
-      },
-      "targets": [
-        {
-          "refId": "A",
-          "format": "table",
-          "instant": true,
-          "range": false,
-          "expr": "label_join(topk(30, sum by (provider, model, method) (sum_over_time(bifrost:requests_upstream_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))) unless on (provider, model, method) (sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])) > 0), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
-        },
-        {
-          "refId": "B",
-          "format": "table",
-          "instant": true,
-          "range": false,
-          "expr": "label_join(sum by (provider, model, method) (sum_over_time(bifrost:input_tokens_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])) and on (provider, model, method) (topk(30, sum by (provider, model, method) (sum_over_time(bifrost:requests_upstream_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))) unless on (provider, model, method) (sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])) > 0)), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
-        },
-        {
-          "refId": "C",
-          "format": "table",
-          "instant": true,
-          "range": false,
-          "expr": "label_join(sum by (provider, model, method) (sum_over_time(bifrost:output_tokens_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])) and on (provider, model, method) (topk(30, sum by (provider, model, method) (sum_over_time(bifrost:requests_upstream_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))) unless on (provider, model, method) (sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])) > 0)), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
-        }
-      ],
-      "transformations": [
-        {
-          "id": "joinByField",
-          "options": {
-            "byField": "pmm",
-            "mode": "inner"
-          }
-        },
-        {
-          "id": "organize",
-          "options": {
-            "excludeByName": {
-              "Time": true,
-              "Time 1": true,
-              "Time 2": true,
-              "pmm": true
-            },
-            "indexByName": {
-              "provider": 0,
-              "model": 1,
-              "method": 2,
-              "Value #A": 3,
-              "Value #B": 4,
-              "Value #C": 5
-            },
-            "renameByName": {
-              "provider": "Provider",
-              "model": "Model",
-              "method": "Method",
-              "Value #A": "Requests",
-              "Value #B": "Input Tokens",
-              "Value #C": "Output Tokens"
-            }
-          }
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "custom": {
-            "cellOptions": {
-              "type": "auto"
-            }
-          }
-        },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byRegexp",
-              "options": "Requests|Input Tokens|Output Tokens"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "short"
-              },
-              {
-                "id": "decimals",
-                "value": 0
-              }
-            ]
-          }
-        ]
-      },
-      "options": {
-        "cellHeight": "sm",
-        "showHeader": true,
-        "sortBy": [
-          {
-            "desc": true,
-            "displayName": "Requests"
-          }
-        ]
-      },
-      "pluginVersion": "12.3.0"
+      "pluginVersion": "12.3.0",
+      "description": "95th percentile provider-call latency, grouped by provider and model."
     },
     {
       "id": 20,
       "title": "P95 Bifrost Overhead by Provider / Model",
       "type": "timeseries",
       "gridPos": {
-        "h": 8,
-        "w": 24,
-        "x": 0,
-        "y": 39
+        "h": 9,
+        "w": 12,
+        "x": 12,
+        "y": 20
       },
       "datasource": {
         "type": "prometheus",
@@ -1383,13 +690,282 @@
           "sort": "desc"
         }
       },
-      "pluginVersion": "12.3.0"
+      "pluginVersion": "12.3.0",
+      "description": "95th percentile latency added by Bifrost, grouped by the final provider and model."
+    },
+    {
+      "id": 21,
+      "title": "Cost Details",
+      "type": "row",
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 29
+      },
+      "panels": [
+        {
+          "id": 14,
+          "title": "Provider / Model / Method Spend Table",
+          "type": "table",
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 30
+          },
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "targets": [
+            {
+              "refId": "A",
+              "format": "table",
+              "instant": true,
+              "range": false,
+              "expr": "label_join(topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
+            },
+            {
+              "refId": "B",
+              "format": "table",
+              "instant": true,
+              "range": false,
+              "expr": "label_join(100 * topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))) / scalar(clamp_min(sum(sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])), 1)), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
+            },
+            {
+              "refId": "C",
+              "format": "table",
+              "instant": true,
+              "range": false,
+              "expr": "label_join((sum by (provider, model, method) (sum_over_time(bifrost:requests_upstream_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))) and on (provider, model, method) topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
+            },
+            {
+              "refId": "D",
+              "format": "table",
+              "instant": true,
+              "range": false,
+              "expr": "label_join((sum by (provider, model, method) (sum_over_time(bifrost:input_tokens_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))) and on (provider, model, method) topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
+            },
+            {
+              "refId": "E",
+              "format": "table",
+              "instant": true,
+              "range": false,
+              "expr": "label_join((sum by (provider, model, method) (sum_over_time(bifrost:output_tokens_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))) and on (provider, model, method) topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
+            },
+            {
+              "refId": "F",
+              "format": "table",
+              "instant": true,
+              "range": false,
+              "expr": "label_join((sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])) / clamp_min(sum by (provider, model, method) (sum_over_time(bifrost:requests_upstream_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])), 1)) and on (provider, model, method) topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
+            },
+            {
+              "refId": "G",
+              "format": "table",
+              "instant": true,
+              "range": false,
+              "expr": "label_join((1000000 * sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])) / clamp_min(sum by (provider, model, method) (sum_over_time(bifrost:input_tokens_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])) + sum by (provider, model, method) (sum_over_time(bifrost:output_tokens_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])), 1)) and on (provider, model, method) topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
+            },
+            {
+              "refId": "H",
+              "format": "table",
+              "instant": true,
+              "range": false,
+              "expr": "label_join((100 * sum by (provider, model, method) (sum_over_time(bifrost:requests_success_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])) / clamp_min(sum by (provider, model, method) (sum_over_time(bifrost:requests_upstream_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])), 1)) and on (provider, model, method) topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
+            },
+            {
+              "refId": "I",
+              "format": "table",
+              "instant": true,
+              "range": false,
+              "expr": "label_join((1000 * sum by (provider, model, method) (increase(bifrost:upstream_latency_seconds_sum:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])) / clamp_min(sum by (provider, model, method) (increase(bifrost:upstream_latency_seconds_count:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range])), 1e-9)) and on (provider, model, method) topk(50, sum by (provider, model, method) (sum_over_time(bifrost:cost_usd_delta_5m:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__range]))), \"pmm\", \" | \", \"provider\", \"model\", \"method\")"
+            }
+          ],
+          "transformations": [
+            {
+              "id": "joinByField",
+              "options": {
+                "byField": "pmm",
+                "mode": "inner"
+              }
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {
+                  "Time": true,
+                  "Time 1": true,
+                  "Time 2": true,
+                  "Time 3": true,
+                  "Time 4": true,
+                  "Time 5": true,
+                  "Time 6": true,
+                  "Time 7": true,
+                  "Time 8": true,
+                  "Time 9": true,
+                  "pmm": true
+                },
+                "indexByName": {
+                  "provider": 0,
+                  "model": 1,
+                  "method": 2,
+                  "Value #A": 3,
+                  "Value #B": 4,
+                  "Value #C": 5,
+                  "Value #D": 6,
+                  "Value #E": 7,
+                  "Value #F": 8,
+                  "Value #G": 9,
+                  "Value #H": 10,
+                  "Value #I": 11
+                },
+                "renameByName": {
+                  "provider": "Provider",
+                  "model": "Model",
+                  "method": "Method",
+                  "Value #A": "Cost (USD)",
+                  "Value #B": "Spend Share %",
+                  "Value #C": "Upstream Attempts",
+                  "Value #D": "Input Tokens",
+                  "Value #E": "Output Tokens",
+                  "Value #F": "Cost / Attempt",
+                  "Value #G": "Cost / 1M Tokens",
+                  "Value #H": "Attempt Success Rate %",
+                  "Value #I": "Avg Latency (ms)"
+                }
+              }
+            }
+          ],
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "cellOptions": {
+                  "type": "auto"
+                }
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Cost (USD)"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "currencyUSD"
+                  },
+                  {
+                    "id": "decimals",
+                    "value": 4
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Spend Share %"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "percent"
+                  },
+                  {
+                    "id": "decimals",
+                    "value": 2
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "Upstream Attempts|Input Tokens|Output Tokens"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "short"
+                  },
+                  {
+                    "id": "decimals",
+                    "value": 0
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "Cost / Attempt|Cost / 1M Tokens"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "currencyUSD"
+                  },
+                  {
+                    "id": "decimals",
+                    "value": 6
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Attempt Success Rate %"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "percent"
+                  },
+                  {
+                    "id": "decimals",
+                    "value": 2
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Avg Latency (ms)"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "ms"
+                  },
+                  {
+                    "id": "decimals",
+                    "value": 0
+                  }
+                ]
+              }
+            ]
+          },
+          "options": {
+            "cellHeight": "sm",
+            "showHeader": true,
+            "sortBy": [
+              {
+                "desc": true,
+                "displayName": "Cost (USD)"
+              }
+            ]
+          },
+          "pluginVersion": "12.3.0",
+          "description": "Selected-range cost, traffic, token, success, and average upstream latency by provider, model, and method."
+        }
+      ]
     }
   ],
   "preload": false,
   "refresh": "",
   "schemaVersion": 42,
-  "tags": ["bifrost", "otel", "cost"],
+  "tags": ["bifrost", "otel", "overview"],
   "templating": {
     "list": [
       {
@@ -1409,7 +985,7 @@
         "name": "host",
         "options": [],
         "query": "label_values(bifrost:requests_upstream_total:by_provider_model_method, host_name)",
-        "refresh": 2,
+        "refresh": 1,
         "regex": "",
         "sort": 1,
         "type": "query"
@@ -1431,7 +1007,7 @@
         "name": "provider",
         "options": [],
         "query": "label_values(bifrost:requests_upstream_total:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`}, provider)",
-        "refresh": 2,
+        "refresh": 1,
         "regex": "",
         "sort": 1,
         "type": "query"
@@ -1453,7 +1029,7 @@
         "name": "method",
         "options": [],
         "query": "label_values(bifrost:requests_upstream_total:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`}, method)",
-        "refresh": 2,
+        "refresh": 1,
         "regex": "",
         "sort": 1,
         "type": "query"
@@ -1475,7 +1051,7 @@
         "name": "model",
         "options": [],
         "query": "label_values(bifrost:requests_upstream_total:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,method=~`${method:regex}`}, model)",
-        "refresh": 2,
+        "refresh": 1,
         "regex": "",
         "sort": 1,
         "type": "query"
@@ -1488,8 +1064,8 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Bifrost Cost Tracking",
+  "title": "Bifrost Overview",
   "uid": "bifrost-otel-cost",
-  "version": 3,
+  "version": 7,
   "weekStart": ""
 }
