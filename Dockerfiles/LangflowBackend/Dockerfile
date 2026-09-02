@@ -1,5 +1,5 @@
-ARG IMAGE_VERSION=1.11.4
-FROM langflowai/langflow-backend:${IMAGE_VERSION}@sha256:f90962a3abfa693d8ddd9b479e12aec6c9e4cbfd6e8050729f21ee92c11ce8a4
+ARG IMAGE_VERSION=1.12.0
+FROM langflowai/langflow-backend:${IMAGE_VERSION}@sha256:9a9bfdf77858ae5dbdb47049d67aa8f67a570592d4e4d2c06646f5edbf077678
 
 USER 0
 
