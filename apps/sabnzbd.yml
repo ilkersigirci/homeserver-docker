@@ -12,7 +12,7 @@
 # - host_whitelist=sabnzbd.$DOMAINNAME,sabnzbd: allow proxy and service hostnames.
 services:
   sabnzbd:
-    image: lscr.io/linuxserver/sabnzbd:5.1.0-ls266@sha256:b0f9755d795913bd26ae3f3a12805668ab0681ab847a7624568559c573fc7cae
+    image: lscr.io/linuxserver/sabnzbd:5.1.2-ls270@sha256:13d4404f1242f819e0cc2e294def5858def251a3609eb59404dad303075a564a
     container_name: sabnzbd
     restart: $RESTART_POLICY_MEDIA
     stop_grace_period: 30s
