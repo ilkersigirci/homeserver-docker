@@ -41,7 +41,7 @@ services:
       MAXMIND_LICENSE_KEY: $MAXMIND_LICENSE_KEY
       #  STATIC_API_KEY: your_api_key # Useful for declerative installations
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:1411/healthz >/dev/null || exit 1"]
+      test: ["CMD", "/app/pocket-id", "healthcheck"]
       interval: 2m
       timeout: 5s
       retries: 3
