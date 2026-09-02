@@ -15,7 +15,7 @@
       }
     ]
   },
-  "description": "Bifrost AI Gateway cost dashboard built on low-cardinality Prometheus recording rules and 5-minute range rollups.",
+  "description": "Bifrost AI Gateway cost and latency dashboard built on low-cardinality Prometheus recording rules and 5-minute range rollups.",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
@@ -356,7 +356,7 @@
     },
     {
       "id": 7,
-      "title": "P95 Latency",
+      "title": "P95 Upstream Latency",
       "type": "stat",
       "gridPos": {
         "h": 4,
@@ -1087,7 +1087,7 @@
     },
     {
       "id": 17,
-      "title": "P95 Latency by Provider / Model",
+      "title": "P95 Upstream Latency by Provider / Model",
       "type": "timeseries",
       "gridPos": {
         "h": 9,
@@ -1331,6 +1331,59 @@
         ]
       },
       "pluginVersion": "12.3.0"
+    },
+    {
+      "id": 20,
+      "title": "P95 Bifrost Overhead by Provider / Model",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 39
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(12, histogram_quantile(0.95, sum by (provider, model, le) (rate(bifrost:overhead_latency_microseconds_bucket:by_provider_model_method{host_name!=\"\",host_name=~`${host:regex}`,provider=~`${provider:regex}`,model=~`${model:regex}`,method=~`${method:regex}`}[$__rate_interval])))) / 1000",
+          "legendFormat": "{{provider}} / {{model}}",
+          "interval": "5m"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "decimals": 2,
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "drawStyle": "line",
+            "fillOpacity": 8,
+            "lineWidth": 2,
+            "showPoints": "never",
+            "spanNulls": true
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "calcs": ["mean", "max", "last"],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.3.0"
     }
   ],
   "preload": false,
@@ -1437,6 +1490,6 @@
   "timezone": "browser",
   "title": "Bifrost Cost Tracking",
   "uid": "bifrost-otel-cost",
-  "version": 2,
+  "version": 3,
   "weekStart": ""
 }

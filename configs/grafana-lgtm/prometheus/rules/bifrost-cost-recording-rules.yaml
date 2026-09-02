@@ -204,6 +204,19 @@ groups:
             }
           )
 
+      # Bifrost v2 overhead excludes time spent waiting on upstream providers.
+      # Keep only the histogram buckets used by the dashboard P95 query.
+      - record: bifrost:overhead_latency_microseconds_bucket:by_provider_model_method
+        expr: |
+          sum by (host_name, provider, model, method, le) (
+            bifrost_overhead_latency_microseconds_bucket{
+              host_name!="",
+              provider!="",
+              model!="",
+              method!=""
+            }
+          )
+
       # Optional cache counter rollup. While cache metric is absent, expose zero
       # for active request dimensions so dashboard panels stay stable.
       - record: bifrost:cache_hits_total:by_provider_model_method
