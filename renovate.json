@@ -84,6 +84,13 @@
       }
     },
     {
+      "description": "Ignore non-final images in the Hatchet Dockerfile",
+      "matchManagers": ["dockerfile"],
+      "matchFileNames": ["Dockerfiles/Hatchet/Dockerfile"],
+      "matchDepTypes": ["stage", "syntax"],
+      "enabled": false
+    },
+    {
       "description": "Use JupyterLab as the Jupyter custom image release driver",
       "matchManagers": ["pep621"],
       "matchDatasources": ["pypi"],
