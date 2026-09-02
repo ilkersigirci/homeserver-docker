@@ -38,6 +38,7 @@ services:
       WEBUI_SECRET_KEY: $OPENWEBUI_WEBUI_SECRET_KEY
       WEBUI_URL: https://chat.$DOMAINNAME
       ENABLE_OLLAMA_API: false
+      TASK_MODEL_EXTERNAL: ${OPENAI_TASK_MODEL:-gpt-5.4-mini} # NOTE: It should be configured in the litellm.
       ENABLE_FOLLOW_UP_GENERATION: false
       ENABLE_TAGS_GENERATION: false
       ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS: false
