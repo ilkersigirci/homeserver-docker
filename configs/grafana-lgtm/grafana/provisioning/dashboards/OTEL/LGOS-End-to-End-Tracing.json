@@ -30,7 +30,7 @@
       "targetBlank": false,
       "title": "Bifrost metrics",
       "type": "link",
-      "url": "/d/bifrost-otel-cost/bifrost-cost-tracking"
+      "url": "/d/bifrost-otel-cost"
     },
     {
       "asDropdown": false,
@@ -41,7 +41,7 @@
       "targetBlank": false,
       "title": "Traefik metrics",
       "type": "link",
-      "url": "/d/adbp9s4/traefik-opentelemetry"
+      "url": "/d/adbp9s4"
     },
     {
       "asDropdown": false,
@@ -76,7 +76,7 @@
           "showLineNumbers": false,
           "showMiniMap": false
         },
-        "content": "# LGOS request observability\n\n**Health → trends → trace.** Native HTTP metrics cover chat requests and failures; trace metrics cover graph execution. The request tables list Chainlit and Open WebUI requests with a session ID. Select a **Session ID** to open the UI conversation, the Grafana waterfall, or the matching Langfuse trace. Use **Logs for this span** in the waterfall for correlated logs.",
+        "content": "# LGOS request observability\n\n**Health → trends → trace.** Native HTTP metrics cover Responses requests and failures; trace metrics cover graph execution. The request tables list Chainlit and Open WebUI requests with a session ID. Select a **Session ID** to open the UI conversation, the Grafana waterfall, or the matching Langfuse trace. Use **Logs for this span** in the waterfall for correlated logs.",
         "mode": "markdown"
       },
       "pluginVersion": "13.1.1",
@@ -89,7 +89,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "Chat-completion API requests during the selected time range, including failures.",
+      "description": "Responses API requests during the selected time range, including failures.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -131,13 +131,13 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "round(sum(increase(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",http_route=\"/chat/completions\",http_request_method=\"POST\"}[$__range])) or vector(0))",
+          "expr": "round(sum(increase(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",http_route=\"/responses\",http_request_method=\"POST\"}[$__range])) or vector(0))",
           "instant": true,
           "range": false,
           "refId": "A"
         }
       ],
-      "title": "Chat requests",
+      "title": "Responses requests",
       "type": "stat"
     },
     {
@@ -145,7 +145,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "Chat-completion API requests returning an HTTP 5xx response.",
+      "description": "Responses API requests returning an HTTP 5xx response.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -199,7 +199,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "round(sum(increase(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",http_route=\"/chat/completions\",http_request_method=\"POST\",http_response_status_code=~\"5..\"}[$__range])) or (0 * sum(increase(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",http_route=\"/chat/completions\",http_request_method=\"POST\"}[$__range]))))",
+          "expr": "round(sum(increase(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",http_route=\"/responses\",http_request_method=\"POST\",http_response_status_code=~\"5..\"}[$__range])) or (0 * sum(increase(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",http_route=\"/responses\",http_request_method=\"POST\"}[$__range]))))",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -255,7 +255,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum by (le) (increase(traces_spanmetrics_latency_bucket{service=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",span_name=\"lgos.chat_completion\"}[$__range])))",
+          "expr": "histogram_quantile(0.50, sum by (le) (increase(traces_spanmetrics_latency_bucket{service=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",span_name=\"lgos.graph_run\"}[$__range])))",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -311,7 +311,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le) (increase(traces_spanmetrics_latency_bucket{service=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",span_name=\"lgos.chat_completion\"}[$__range])))",
+          "expr": "histogram_quantile(0.95, sum by (le) (increase(traces_spanmetrics_latency_bucket{service=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",span_name=\"lgos.graph_run\"}[$__range])))",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -325,7 +325,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "Authoritative LGOS chat-completion request rate and HTTP failures.",
+      "description": "Authoritative LGOS Responses request rate and HTTP failures.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -422,7 +422,7 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum(rate(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",http_route=\"/chat/completions\",http_request_method=\"POST\"}[$__rate_interval])) * 60",
+          "expr": "sum(rate(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",http_route=\"/responses\",http_request_method=\"POST\"}[$__rate_interval])) * 60",
           "instant": false,
           "legendFormat": "Attempts",
           "range": true,
@@ -435,14 +435,14 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum(rate(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",http_route=\"/chat/completions\",http_request_method=\"POST\",http_response_status_code=~\"5..\"}[$__rate_interval])) * 60",
+          "expr": "sum(rate(http_server_request_duration_seconds_count{service_name=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",http_route=\"/responses\",http_request_method=\"POST\",http_response_status_code=~\"5..\"}[$__rate_interval])) * 60",
           "instant": false,
           "legendFormat": "Failures",
           "range": true,
           "refId": "B"
         }
       ],
-      "title": "Chat-completion traffic",
+      "title": "Responses traffic",
       "type": "timeseries"
     },
     {
@@ -554,7 +554,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "histogram_quantile(0.50, sum by (le) (rate(traces_spanmetrics_latency_bucket{service=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",span_name=\"lgos.chat_completion\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.50, sum by (le) (rate(traces_spanmetrics_latency_bucket{service=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",span_name=\"lgos.graph_run\"}[$__rate_interval])))",
           "instant": false,
           "legendFormat": "Median",
           "range": true,
@@ -567,7 +567,7 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(traces_spanmetrics_latency_bucket{service=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",span_name=\"lgos.chat_completion\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(traces_spanmetrics_latency_bucket{service=\"lgos-demo-api\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",span_name=\"lgos.graph_run\"}[$__rate_interval])))",
           "instant": false,
           "legendFormat": "P95",
           "range": true,
@@ -615,7 +615,7 @@
                   {
                     "targetBlank": false,
                     "title": "Show nested trace",
-                    "url": "/d/lgos-e2e-otel/lgos-e2e-opentelemetry?orgId=1&var-trace_id=${__data.fields.traceIdHidden}&from=${__from}&to=${__to}"
+                    "url": "/d/lgos-e2e-otel?orgId=1&var-trace_id=${__data.fields.traceIdHidden}&from=${__from}&to=${__to}"
                   },
                   {
                     "targetBlank": true,
@@ -660,13 +660,13 @@
             "uid": "tempo"
           },
           "limit": 10,
-          "query": "{ resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-demo-api\" && name = \"POST /chat/completions\" && span.user_agent.original = \"lgos-chainlit\" && span.session.id != nil } | select(span.session.id) with (most_recent=true)",
+          "query": "{ resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-demo-api\" && name = \"POST /responses\" && span.user_agent.original = \"lgos-chainlit\" && span.session.id != nil } | select(span.session.id) with (most_recent=true)",
           "queryType": "traceql",
           "refId": "A",
           "tableType": "spans"
         }
       ],
-      "description": "The 10 newest client-attributed requests matching the selected dashboard time range. Client attribution is available for traces created after 2026-08-26.",
+      "description": "The 10 newest client-attributed Responses requests with a session ID in the selected time range.",
       "title": "Chainlit requests",
       "transformations": [
         {
@@ -720,13 +720,13 @@
                 "value": [
                   {
                     "targetBlank": true,
-                    "title": "Open Open WebUI chat",
+                    "title": "Open WebUI chat",
                     "url": "https://lgos-openwebui.coding.ilkerflix.com/c/${__value.raw}"
                   },
                   {
                     "targetBlank": false,
                     "title": "Show nested trace",
-                    "url": "/d/lgos-e2e-otel/lgos-e2e-opentelemetry?orgId=1&var-trace_id=${__data.fields.traceIdHidden}&from=${__from}&to=${__to}"
+                    "url": "/d/lgos-e2e-otel?orgId=1&var-trace_id=${__data.fields.traceIdHidden}&from=${__from}&to=${__to}"
                   },
                   {
                     "targetBlank": true,
@@ -771,13 +771,13 @@
             "uid": "tempo"
           },
           "limit": 10,
-          "query": "{ resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-demo-api\" && name = \"POST /chat/completions\" && span.user_agent.original = \"lgos-openwebui\" && span.session.id != nil } | select(span.session.id) with (most_recent=true)",
+          "query": "{ resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-demo-api\" && name = \"POST /responses\" && span.user_agent.original = \"lgos-openwebui\" && span.session.id != nil } | select(span.session.id) with (most_recent=true)",
           "queryType": "traceql",
           "refId": "A",
           "tableType": "spans"
         }
       ],
-      "description": "The 10 newest client-attributed requests matching the selected dashboard time range. Client attribution is available for traces created after 2026-08-26.",
+      "description": "The 10 newest client-attributed Responses requests with a session ID in the selected time range.",
       "title": "Open WebUI requests",
       "transformations": [
         {
