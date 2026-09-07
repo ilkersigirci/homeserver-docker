@@ -76,7 +76,7 @@
           "showLineNumbers": false,
           "showMiniMap": false
         },
-        "content": "# LGOS request observability\n\n**Health → trends → trace.** Native HTTP metrics cover Responses requests and failures; trace metrics cover graph execution. The request tables list Chainlit and Open WebUI requests with a session ID. Select a **Session ID** to open the UI conversation, the Grafana waterfall, or the matching Langfuse trace. Use **Logs for this span** in the waterfall for correlated logs.",
+        "content": "# LGOS request observability\n\n**Health → trends → trace.** Native HTTP metrics cover Responses requests and failures; trace metrics cover graph execution. The request tables list Chainlit and Open WebUI requests with a conversation ID. Select a **Conversation ID** to open the UI conversation, the Grafana waterfall, or the matching Langfuse trace. Use **Logs for this span** in the waterfall for correlated logs.",
         "mode": "markdown"
       },
       "pluginVersion": "13.1.1",
@@ -597,12 +597,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "session.id"
+              "options": "gen_ai.conversation.id"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Session ID"
+                "value": "Conversation ID"
               },
               {
                 "id": "links",
@@ -660,13 +660,13 @@
             "uid": "tempo"
           },
           "limit": 10,
-          "query": "{ resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-demo-api\" && name = \"POST /responses\" && span.user_agent.original = \"lgos-chainlit\" && span.session.id != nil } | select(span.session.id) with (most_recent=true)",
+          "query": "{ resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-demo-api\" && name = \"POST /responses\" && span.user_agent.original = \"lgos-chainlit\" && span.gen_ai.conversation.id != nil } | select(span.gen_ai.conversation.id) with (most_recent=true)",
           "queryType": "traceql",
           "refId": "A",
           "tableType": "spans"
         }
       ],
-      "description": "The 10 newest client-attributed Responses requests with a session ID in the selected time range.",
+      "description": "The 10 newest client-attributed Responses requests with a conversation ID in the selected time range.",
       "title": "Chainlit requests",
       "transformations": [
         {
@@ -708,12 +708,12 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "session.id"
+              "options": "gen_ai.conversation.id"
             },
             "properties": [
               {
                 "id": "displayName",
-                "value": "Session ID"
+                "value": "Conversation ID"
               },
               {
                 "id": "links",
@@ -771,13 +771,13 @@
             "uid": "tempo"
           },
           "limit": 10,
-          "query": "{ resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-demo-api\" && name = \"POST /responses\" && span.user_agent.original = \"lgos-openwebui\" && span.session.id != nil } | select(span.session.id) with (most_recent=true)",
+          "query": "{ resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-demo-api\" && name = \"POST /responses\" && span.user_agent.original = \"lgos-openwebui\" && span.gen_ai.conversation.id != nil } | select(span.gen_ai.conversation.id) with (most_recent=true)",
           "queryType": "traceql",
           "refId": "A",
           "tableType": "spans"
         }
       ],
-      "description": "The 10 newest client-attributed Responses requests with a session ID in the selected time range.",
+      "description": "The 10 newest client-attributed Responses requests with a conversation ID in the selected time range.",
       "title": "Open WebUI requests",
       "transformations": [
         {
