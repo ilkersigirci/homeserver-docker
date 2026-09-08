@@ -77,6 +77,13 @@ maintenance does not republish unchanged image tags.
 PR validation uses read-only repository permissions; only publish jobs get
 `packages: write`.
 
+The shared workflow builds `linux/amd64` and `linux/arm64` on separate native
+Ubuntu runners, with BuildKit caches scoped per image and architecture. Wrappers
+can restrict `platforms` to `linux/amd64` when required. No QEMU is used.
+Publish builds push by digest; only after every architecture succeeds does a
+final job assemble the version tag, preserving SBOM and provenance attestations.
+PR builds do not push images or publish a manifest.
+
 Images publish the version read from `ARG IMAGE_VERSION` by default. If
 `Dockerfiles/<Name>/version_tagging.sh` exists and is executable, the workflow
 uses its stdout as the image tag instead.
