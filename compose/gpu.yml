@@ -64,7 +64,6 @@ include:
   # - ./fragments/immich-machine-learning/nvidia.yml
   #### PROGRAMMING ####
   - ../apps/kreuzberg.yml
-  - ../apps/litellm.yml
   - ../apps/scalar.yml
   #### READING ####
   # - ../apps/hypothesis.yml

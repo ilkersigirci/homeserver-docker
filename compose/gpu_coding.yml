@@ -46,6 +46,7 @@ include:
   - ../apps/hatchet.yml
   - ../apps/langfuse.yml
   - ../apps/langflow.yml
+  - ../apps/litellm.yml
   - ../apps/cloudbeaver.yml
   - ../apps/jupyterlab.yml
   - ../apps/zed-web.yml
