@@ -46,9 +46,7 @@ deployment, set `OIDC_REQUIRE_VERIFIED_EMAIL=false` in `.env` to opt out.
 ## Updating
 
 Use [update-litellm](../../docs/skills/update-litellm/SKILL.md). Renovate tracks
-official version tags; the existing custom-image workflow builds and publishes
-`homeserver-litellm:<IMAGE_VERSION>` for `linux/amd64` and `linux/arm64` using the
-shared workflow's Docker GitHub Builder integration with native runners and
-architecture-specific caches. The version tag is published only after both
-builds succeed. Compose keeps its current pinned image until a new tag is
+official version tags; the shared [custom-image workflow](../../docs/RUNNING.md#custom-images)
+builds and publishes `homeserver-litellm:<IMAGE_VERSION>` for `linux/amd64` and
+`linux/arm64`. Compose keeps its current pinned image until a new tag is
 published and its digest can be resolved.
