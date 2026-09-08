@@ -3,6 +3,7 @@ services:
     image: grafana/otel-lgtm:0.30.2@sha256:069e79be4fcc648b13f22ded28146f0b2d94f7f48681a55aa4995566a0bbdd02
     container_name: grafana-lgtm
     restart: $RESTART_POLICY_MAINTENANCE
+    stop_grace_period: 90s
     profiles:
       - monitoring
     networks:
@@ -22,7 +23,6 @@ services:
     read_only: true
     tmpfs:
       - /tmp
-      - /var/tempo:rw,noexec,nosuid,nodev,size=256m,uid=$PUID,gid=$PGID,mode=0755
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -47,8 +47,12 @@ services:
       - $REPO_PATH/configs/grafana-lgtm/otelcol/default.yaml:/otel-lgtm/otelcol-config.yaml:ro
       ## DATA
       - $REPO_PATH/appdata/grafana-lgtm:/data
+      # Tempo 3 stores its live-store WAL and scheduler state outside /data.
+      - $REPO_PATH/appdata/grafana-lgtm/tempo/runtime:/var/tempo
     environment:
       TZ: $TZ
+      # The image otherwise kills backend processes after only five seconds.
+      LGTM_SHUTDOWN_TIMEOUT_SECONDS: "60"
       ################## GRAFANA CONFIGS ##################
       ##### NORMAL CONFIGS #####
       GF_DEFAULT_INSTANCE_NAME: $DOMAINNAME
