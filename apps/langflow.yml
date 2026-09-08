@@ -204,7 +204,7 @@ services:
       traefik.http.services.langflow-api-svc.loadbalancer.server.port: "7860"
 
   langflow-frontend:
-    image: langflowai/langflow-frontend:1.11.4@sha256:067af6d3a22ae33565a0760b175bcb27d02d0307c607fe5d40097249a4d6bf2b
+    image: langflowai/langflow-frontend:1.12.0@sha256:54f67f1961fe1e0ed2e76eca86df2606f7e01efd2db5a39150df72517c98e023
     container_name: langflow-frontend
     restart: $RESTART_POLICY_PROGRAMMING
     depends_on:
