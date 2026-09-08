@@ -43,8 +43,10 @@ Preserve these rules:
 - `push.paths` includes only the matching image context.
 - `pull_request.paths` includes the image context, shared build workflow, and wrapper.
 - PR validation job uses only `contents: read`.
-- Push publish job uses `contents: read` and `packages: write`.
-- Shared Docker build steps stay in `custom-images-build.yml`.
+- Push publish job uses `contents: read`, `packages: write`, and `id-token: write` for signing.
+- Keep version resolution and the SHA-pinned Docker GitHub Builder call in
+  `custom-images-build.yml`; delegate native runners, caching, and manifest
+  assembly to Docker's workflow.
 
 ### 3) Compose And Renovate
 

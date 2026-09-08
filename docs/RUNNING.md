@@ -75,14 +75,16 @@ Pull requests validate image and workflow changes. Pushes to `main` publish only
 when the matching `Dockerfiles/<Name>/**` context changes, so shared workflow
 maintenance does not republish unchanged image tags.
 PR validation uses read-only repository permissions; only publish jobs get
-`packages: write`.
+`packages: write` and `id-token: write` (for signing).
 
-The shared workflow builds `linux/amd64` and `linux/arm64` on separate native
-Ubuntu runners, with BuildKit caches scoped per image and architecture. Wrappers
+The shared workflow reads the image version and calls the SHA-pinned
+[Docker GitHub Builder](https://github.com/docker/github-builder). Docker manages
+native `linux/amd64` and `linux/arm64` runners, per-image/per-platform caches,
+SBOM/provenance attestations, signing, and final manifest publication. Wrappers
 can restrict `platforms` to `linux/amd64` when required. No QEMU is used.
-Publish builds push by digest; only after every architecture succeeds does a
-final job assemble the version tag, preserving SBOM and provenance attestations.
-PR builds do not push images or publish a manifest.
+Only successful publish builds update the version tag; no `latest` tag is created.
+PR builds do not push images or publish a manifest. GHCR authentication uses the
+automatic GitHub token; no additional stored secrets are required.
 
 Images publish the version read from `ARG IMAGE_VERSION` by default. If
 `Dockerfiles/<Name>/version_tagging.sh` exists and is executable, the workflow
@@ -99,8 +101,8 @@ To add an image:
     it out of the build context with `.dockerignore`.
 5. Reference the published image from Compose as `tag@sha256:digest`.
 
-Keep Docker build steps in `custom-images-build.yml`; per-image workflows should
-only declare triggers and inputs.
+Keep version resolution and Docker workflow inputs in `custom-images-build.yml`;
+per-image workflows only declare triggers, permissions, and inputs.
 Coding agents adding custom images should follow
 `docs/skills/create-custom-image/SKILL.md`.
 
