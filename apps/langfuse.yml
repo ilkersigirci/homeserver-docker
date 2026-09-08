@@ -145,7 +145,7 @@ services:
       start_period: 10s
 
   langfuse-worker:
-    image: langfuse/langfuse-worker:4.11.0@sha256:e11bbafc9e0b68c7dd9ae819ed8b1f21e0cf05fe89b9dda0c72e2c6a233145b3
+    image: langfuse/langfuse-worker:4.27.0@sha256:091a85c3c54bf5fff7cc0073a7f35a52861cc0e30d33dd05569fe3ed66b15d8d
     container_name: langfuse-worker
     restart: $RESTART_POLICY_PROGRAMMING
     depends_on: &langfuse-depends-on
@@ -236,7 +236,7 @@ services:
       start_period: 10s
 
   langfuse-web:
-    image: langfuse/langfuse:4.11.0@sha256:f24c8b1c987a5dc78e3a75ad3e5d9f87ebcadafbd91d8674a739c43fad451905
+    image: langfuse/langfuse:4.27.0@sha256:c9e2cab8469a5d7353e86a3252b02c52ac94ef31288ce2639ee01aabf5e4222b
     container_name: langfuse-web
     restart: $RESTART_POLICY_PROGRAMMING
     depends_on: *langfuse-depends-on
