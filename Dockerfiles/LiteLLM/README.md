@@ -1,23 +1,35 @@
 # LiteLLM
 
-This image is a thin derivative of the community
-[`nathanael-h/litellm-libre`](https://github.com/nathanael-h/litellm-libre)
-image. It adds the OSS authentication dispatcher required to run native
-LiteLLM keys and user-delegated OIDC access tokens in one LiteLLM process.
+This image builds directly from a pinned official `BerriAI/litellm` source tag.
+All OSS and delegated-auth changes live here; no fork image or repository is
+required. It runs native LiteLLM keys and user-delegated OIDC access tokens in
+one LiteLLM process.
 See [ARCHITECTURE.md](ARCHITECTURE.md) for the request flow, provider
 configuration, authorization boundaries, and deployment contract.
 
-The image owns only:
+The build owns:
 
+- `strip_enterprise.py`, which removes enterprise source, packaging and lockfile
+  entries, and the enterprise UI override before installation.
+- `litellm-oss.patch`, which removes the five-user UI SSO cap and the license
+  requirement for SSO debug login.
 - `litellm-auth.patch`, which adds explicit ingress-lane dispatch and shared
   authorization checks to LiteLLM.
 - `oidc_delegated_auth.py`, which validates the configured Pocket ID or
   Keycloak user access-token profile.
 - `verify_auth.py`, which exercises the integration during every image build.
+- `verify_oss.py`, which checks stripped source and the installed runtime.
 
-The build is fail-closed. It pins the Libre base by digest, checks the exact
-upstream source hashes before patching, applies the patch without fuzz, verifies
-that Enterprise modules are absent, and compiles and tests the installed code.
+The build pins base images by digest and source by tag plus commit checksum.
+It checks source hashes, applies patches without fuzz, rebuilds the OSS dashboard,
+and verifies the installed proxy and authentication code. The runtime contains
+no enterprise tree or package. Other upstream premium feature gates remain;
+authentication and user budget/model/rate limits still apply.
+
+The OSS stripping and SSO changes derive from
+[`litellm-OSS`](https://github.com/ilkersigirci/litellm-OSS/tree/2cd6cb24bf6b8ceb56491f23334bdaf8978efa97)
+and retain its MIT notice in `LICENSE.litellm-oss`. Its workflows and agent automation are
+not build dependencies.
 
 ## Configuration
 
@@ -33,14 +45,8 @@ deployment, set `OIDC_REQUIRE_VERIFIED_EMAIL=false` in `.env` to opt out.
 
 ## Updating
 
-When changing `IMAGE_VERSION` or its digest:
-
-1. Confirm the upstream Libre release remains MIT-only.
-2. Refresh `base-sources.sha256` from the pinned image.
-3. Rebase `litellm-auth.patch` when the source hashes or patch application
-    change.
-4. Build the image locally. Do not bypass a failed source, patch, or Enterprise
-    check.
-
-The base image currently publishes only `linux/amd64`, so the matching workflow
-intentionally builds only that platform.
+Use [update-litellm](../../docs/skills/update-litellm/SKILL.md). Renovate tracks
+official version tags; the existing custom-image workflow builds and publishes
+`homeserver-litellm:<IMAGE_VERSION>` for `linux/amd64` and `linux/arm64` using the
+shared workflow's platform defaults. Compose keeps its current
+pinned image until a new tag is published and its digest can be resolved.

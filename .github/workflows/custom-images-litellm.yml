@@ -28,7 +28,6 @@ jobs:
       name: LiteLLM
       context: Dockerfiles/LiteLLM
       repository: homeserver-litellm
-      platforms: linux/amd64
       publish: false
 
   publish:
@@ -41,5 +40,4 @@ jobs:
       name: LiteLLM
       context: Dockerfiles/LiteLLM
       repository: homeserver-litellm
-      platforms: linux/amd64
       publish: true

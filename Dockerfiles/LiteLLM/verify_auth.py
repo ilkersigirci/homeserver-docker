@@ -3,6 +3,7 @@ import os
 import time
 from collections.abc import Callable
 from types import SimpleNamespace
+from unittest.mock import AsyncMock, patch
 
 import jwt
 from cryptography.hazmat.primitives.asymmetric import rsa
@@ -123,6 +124,36 @@ def _configure_hook() -> None:
     )
 
 
+async def _verify_sso_without_license() -> None:
+    from fastapi.responses import RedirectResponse
+    from litellm.proxy import proxy_server
+    from litellm.proxy.management_endpoints import ui_sso
+
+    redirect = RedirectResponse("https://issuer.invalid/authorize")
+    users = SimpleNamespace(count_billable_users=AsyncMock(return_value=100))
+    with (
+        patch.dict(os.environ, {"GENERIC_CLIENT_ID": "build-test"}, clear=True),
+        patch.object(proxy_server, "premium_user", False),
+        patch.object(proxy_server, "prisma_client", object()),
+        patch.object(proxy_server, "user_custom_ui_sso_sign_in_handler", None),
+        patch.object(ui_sso, "UserRepository", return_value=users),
+        patch.object(ui_sso, "show_missing_vars_in_env", return_value=None),
+        patch.object(
+            ui_sso.SSOAuthenticationHandler,
+            "get_redirect_url_for_sso",
+            return_value="https://litellm.invalid/sso/callback",
+        ),
+        patch.object(
+            ui_sso.SSOAuthenticationHandler,
+            "get_sso_login_redirect",
+            new=AsyncMock(return_value=redirect),
+        ),
+    ):
+        assert await ui_sso.google_login(_request()) is redirect
+        assert await ui_sso.debug_sso_login(_request()) is redirect
+        users.count_billable_users.assert_not_awaited()
+
+
 def _token(
     private_key,
     *,
@@ -192,7 +223,7 @@ async def _verify_hook() -> None:
     for invalid_email in ("not-an-email", {"unexpected": "value"}):
         _expect_proxy_error(
             "401",
-            lambda: validate_user_profile(
+            lambda invalid_email=invalid_email: validate_user_profile(
                 {
                     "sub": "oidc-user",
                     "email": invalid_email,
@@ -279,6 +310,7 @@ async def _verify_hook() -> None:
 
 def main() -> None:
     _verify_dispatcher()
+    asyncio.run(_verify_sso_without_license())
     asyncio.run(_verify_hook())
 
 

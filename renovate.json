@@ -26,6 +26,15 @@
   "customManagers": [
     {
       "customType": "regex",
+      "managerFilePatterns": ["/^Dockerfiles/LiteLLM/Dockerfile$/"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\s+ARG IMAGE_VERSION=(?<currentValue>\\S+)"
+      ],
+      "extractVersionTemplate": "^v(?<version>\\d+\\.\\d+\\.\\d+)$",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
       "managerFilePatterns": ["/^Dockerfiles/ProxmoxBackupClient/Dockerfile$/"],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\s+ARG IMAGE_VERSION=(?<currentValue>\\S+)"
@@ -48,6 +57,7 @@
       "matchFileNames": [
         "Dockerfiles/CodexAcp/**",
         "Dockerfiles/Jupyter/**",
+        "Dockerfiles/LiteLLM/**",
         "Dockerfiles/Marimo/**",
         "Dockerfiles/ProxmoxBackupClient/**"
       ],
@@ -121,24 +131,17 @@
       }
     },
     {
-      "description": "Ignore non-final images in the LiteLLM Dockerfile",
-      "matchManagers": ["dockerfile"],
+      "description": "Use upstream LiteLLM tags as the LiteLLM custom image release driver",
+      "matchManagers": ["custom.regex"],
+      "matchDatasources": ["github-tags"],
       "matchFileNames": ["Dockerfiles/LiteLLM/Dockerfile"],
-      "matchDepTypes": ["stage", "syntax"],
-      "enabled": false
-    },
-    {
-      "description": "Track LiteLLM Libre releases only",
-      "matchDatasources": ["docker"],
-      "matchPackageNames": [
-        "ghcr.io/ilkersigirci/homeserver-litellm",
-        "ghcr.io/nathanael-h/litellm-libre"
-      ],
-      "sourceUrl": "https://github.com/nathanael-h/litellm-libre",
-      "changelogUrl": "https://github.com/nathanael-h/litellm-libre/releases",
-      "digest": {
-        "enabled": false
-      }
+      "matchPackageNames": ["BerriAI/litellm"],
+      "enabled": true,
+      "sourceUrl": "https://github.com/BerriAI/litellm",
+      "changelogUrl": "https://github.com/BerriAI/litellm/releases",
+      "prBodyNotes": [
+        "Use docs/skills/update-litellm/SKILL.md to refresh the source commit, rebase local patches, and validate the image."
+      ]
     },
     {
       "description": "Use Marimo as the Marimo custom image release driver",
@@ -201,13 +204,14 @@
       "changelogUrl": "https://github.com/langflow-ai/langflow/releases"
     },
     {
-      "description": "Use LiteLLM Libre GitHub releases for homeserver LiteLLM image changelogs",
+      "description": "Use upstream LiteLLM releases for homeserver LiteLLM image changelogs",
       "matchManagers": ["docker-compose"],
       "matchDatasources": ["docker"],
       "matchFileNames": ["apps/litellm.yml"],
       "matchPackageNames": ["ghcr.io/ilkersigirci/homeserver-litellm"],
-      "sourceUrl": "https://github.com/nathanael-h/litellm-libre",
-      "changelogUrl": "https://github.com/nathanael-h/litellm-libre/releases"
+      "versioning": "semver",
+      "sourceUrl": "https://github.com/BerriAI/litellm",
+      "changelogUrl": "https://github.com/BerriAI/litellm/releases"
     },
     {
       "description": "Use Marimo GitHub releases for homeserver Marimo image changelogs",

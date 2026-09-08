@@ -14,9 +14,9 @@ falls back to another authentication method. Alternate API-key headers, URL
 query keys, and WebSocket API-key subprotocols are rejected.
 
 This one-process topology requires the repository-built
-[`homeserver-litellm`](README.md) image. It is a thin
-derivative of the community `nathanael-h/litellm-libre` image and owns one
-runtime patch plus the delegated-auth module. A stock LiteLLM Libre image can
+[`homeserver-litellm`](README.md) image. It builds official LiteLLM source with
+local enterprise-removal and authentication patches plus the delegated-auth
+module. A stock LiteLLM image can
 load the module, but it cannot dispatch custom and native authentication per
 request in the same process. The delegated lane also requires the boolean
 `custom_auth_run_common_checks: true`; the patched image rejects delegated
