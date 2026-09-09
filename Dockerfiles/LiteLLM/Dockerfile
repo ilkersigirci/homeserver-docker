@@ -1,9 +1,9 @@
 # syntax=docker/dockerfile:1.25@sha256:0adf442eae370b6087e08edc7c50b552d80ddf261576f4ebd6421006b2461f12
 # renovate: datasource=github-tags depName=BerriAI/litellm
-ARG IMAGE_VERSION=1.92.0
-ARG UPSTREAM_COMMIT=b3086ccd74553565c9a39716e72303ae985555f9
+ARG IMAGE_VERSION=1.100.0
+ARG UPSTREAM_COMMIT=e4f25265704e2b2c6cf6e81be2e4c5cffff896f4
 
-FROM rust:1.90.0-slim-trixie@sha256:7fa728f3678acf5980d5db70960cf8491aff9411976789086676bdf0c19db39e AS rust
+FROM rust:1.94.1-slim-trixie@sha256:cf09adf8c3ebaba10779e5c23ff7fe4df4cccdab8a91f199b0c142c53fef3e1a AS rust
 
 FROM ghcr.io/astral-sh/uv:0.11.29-python3.13-trixie-slim@sha256:0b973c14a35cb0dc8fe63a2e8c9919fd797ac566de13090fcf0df4a6b3994b78 AS base
 RUN apt-get update \
@@ -23,7 +23,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends patch \
     && patch --batch --forward --fuzz=0 -p1 < /patches/litellm-auth.patch \
     && python3 /patches/verify_oss.py /app
 
-FROM --platform=$BUILDPLATFORM node:20.18-alpine3.20@sha256:3488b10bf958af7125a176419d2d8a9937d895bf124012aae811651988d2ffe6 AS ui
+FROM --platform=$BUILDPLATFORM node:24.19-alpine3.24@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 AS ui
 ENV NEXT_TELEMETRY_DISABLED=1 npm_config_fund=false npm_config_audit=false
 WORKDIR /ui
 COPY --from=source /app/ui/litellm-dashboard/package*.json ./
@@ -51,23 +51,31 @@ COPY --from=ui /ui/out/ litellm/proxy/_experimental/out/
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-default-groups --no-editable \
       --extra proxy --extra proxy-runtime --extra extra_proxy --extra semantic-router --python python3 \
-    && prisma generate --schema=./schema.prisma \
+    && XDG_CACHE_HOME=/opt/prisma/.cache PRISMA_BINARY_CACHE_DIR=/opt/prisma/binaries \
+      prisma generate --schema=./schema.prisma \
     && chmod +x docker/entrypoint.sh docker/prod_entrypoint.sh
 
 FROM base
 WORKDIR /app
-ENV PATH="/app/.venv/bin:${PATH}"
+ENV PATH="/app/.venv/bin:${PATH}" \
+    PRISMA_BINARY_CACHE_DIR=/opt/prisma/binaries \
+    PRISMA_CLI_PATH=/opt/prisma/binaries/node_modules/.bin/prisma \
+    PRISMA_CLI_QUERY_ENGINE_TYPE=binary \
+    PRISMA_OFFLINE_MODE=true
 COPY --from=builder /app/.venv /app/.venv
 COPY --from=builder /app/docker /app/docker
 COPY --from=builder /app/schema.prisma /app/schema.prisma
 COPY --from=builder /app/litellm/proxy/prisma_migration.py /app/litellm/proxy/prisma_migration.py
-COPY --from=builder /root/.cache/prisma /root/.cache/prisma
-COPY --from=builder /root/.cache/prisma-python /root/.cache/prisma-python
+COPY --from=builder /opt/prisma /opt/prisma
 COPY --from=source /app/LICENSE /app/LICENSE.litellm
 COPY LICENSE.patches /app/LICENSE.patches
 COPY oidc_delegated_auth.py /app/litellm-config/oidc_delegated_auth.py
 COPY verify_oss.py verify_auth.py /tmp/litellm-checks/
-RUN python3 /tmp/litellm-checks/verify_oss.py \
+RUN chmod -R a+rX /opt/prisma \
+    && test -x /opt/prisma/binaries/node_modules/.bin/prisma \
+    && test -f /opt/prisma/binaries/node_modules/prisma/build/index.js \
+    && python3 -c "from prisma.client import BINARY_PATHS; paths = list(BINARY_PATHS.query_engine.values()); assert paths and all(p.startswith('/opt/prisma/') for p in paths), paths" \
+    && python3 /tmp/litellm-checks/verify_oss.py \
     && python3 /tmp/litellm-checks/verify_auth.py \
     && litellm --help > /dev/null \
     && rm -rf /tmp/litellm-checks

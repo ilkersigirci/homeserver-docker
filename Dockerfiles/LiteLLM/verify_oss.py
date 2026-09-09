@@ -53,6 +53,7 @@ def main() -> None:
         for node in ast.walk(login)
     ), "SSO login still counts users for the free-tier gate"
     assert "free SSO user" not in sso.read_text()
+    assert "_raise_if_sso_exceeds_free_user_limit" not in sso.read_text()
     print("OSS source and SSO checks passed")
 
 

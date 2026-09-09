@@ -8,7 +8,12 @@ from unittest.mock import AsyncMock, patch
 import jwt
 from cryptography.hazmat.primitives.asymmetric import rsa
 from fastapi import Request
-from litellm.proxy._types import ProxyException
+from litellm.proxy._types import (
+    LiteLLM_UserTable,
+    LitellmUserRoles,
+    ProxyException,
+    UserAPIKeyAuth,
+)
 from litellm.proxy.auth.user_api_key_auth import (
     _reject_alternate_credential_surfaces,
     _request_used_user_custom_auth,
@@ -152,6 +157,67 @@ async def _verify_sso_without_license() -> None:
         assert await ui_sso.google_login(_request()) is redirect
         assert await ui_sso.debug_sso_login(_request()) is redirect
         users.count_billable_users.assert_not_awaited()
+
+
+async def _verify_shared_authorization() -> None:
+    import importlib
+
+    from litellm.proxy import proxy_server
+
+    auth = importlib.import_module("litellm.proxy.auth.user_api_key_auth")
+    user = LiteLLM_UserTable(
+        user_id="build-test-user",
+        user_role=LitellmUserRoles.INTERNAL_USER,
+        models=["allowed-model"],
+        max_budget=10,
+        metadata={},
+    )
+    # Stop at the shared authorization boundary; prove both ingress lanes
+    # load the database user and propagate an authorization denial.
+    denial = RuntimeError("shared authorization denied")
+    common_checks = AsyncMock(side_effect=denial)
+    with (
+        patch.object(proxy_server, "master_key", "sk-build-test"),
+        patch.object(
+            proxy_server, "general_settings", {"custom_auth_run_common_checks": True}
+        ),
+        patch.object(proxy_server, "llm_router", None),
+        patch.object(auth, "get_user_object", AsyncMock(return_value=user)),
+        patch.object(auth, "get_global_proxy_spend", AsyncMock(return_value=0)),
+        patch.object(auth, "common_checks", common_checks),
+    ):
+        for lane in ("native", "custom"):
+            request = _request(
+                ("X-LiteLLM-Auth-Lane", lane),
+                method="POST",
+                path="/v1/chat/completions",
+            )
+            _should_run_user_custom_auth(request, AsyncMock())
+            for active in (True, False):
+                user.metadata = {"scim_active": active}
+                common_checks.reset_mock()
+                try:
+                    await auth._run_centralized_common_checks(
+                        user_api_key_auth_obj=UserAPIKeyAuth(
+                            user_id=user.user_id,
+                            user_role=LitellmUserRoles.INTERNAL_USER,
+                            end_user_id="",
+                        ),
+                        request=request,
+                        request_data={"model": "allowed-model"},
+                        route="/v1/chat/completions",
+                    )
+                except Exception as exc:
+                    if active:
+                        assert exc is denial
+                        common_checks.assert_awaited_once()
+                        assert common_checks.call_args.kwargs["user_object"] is user
+                        assert common_checks.call_args.kwargs["skip_budget_checks"] is False
+                    else:
+                        assert "deactivated via SCIM" in str(exc)
+                        common_checks.assert_not_awaited()
+                else:
+                    raise AssertionError(f"{lane} authorization denial was bypassed")
 
 
 def _token(
@@ -311,6 +377,7 @@ async def _verify_hook() -> None:
 def main() -> None:
     _verify_dispatcher()
     asyncio.run(_verify_sso_without_license())
+    asyncio.run(_verify_shared_authorization())
     asyncio.run(_verify_hook())
 
 
