@@ -116,7 +116,9 @@ services:
       GENERIC_USER_EMAIL_ATTRIBUTE: email
       GENERIC_USER_ID_ATTRIBUTE: sub
       GENERIC_USERINFO_ENDPOINT: https://pocketid.$BASE_DOMAINNAME/api/oidc/userinfo
-      ## Delegated API access-token validation
+      ##### CUSTOM IMAGE SPECIFIC #####
+      LITELLM_ENABLE_RESPONSES_STREAMING_FIX: "true" # NOTE: Opt in to the public patched image's temporary wildcard streaming fix.
+      ## Delegated API access-token validation ##
       OIDC_ISSUER: https://pocketid.$BASE_DOMAINNAME
       OIDC_JWKS_URL: https://pocketid.$BASE_DOMAINNAME/.well-known/jwks.json
       OIDC_USERINFO_URL: https://pocketid.$BASE_DOMAINNAME/api/oidc/userinfo
