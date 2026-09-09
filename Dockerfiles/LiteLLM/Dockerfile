@@ -15,13 +15,14 @@ ARG IMAGE_VERSION
 ARG UPSTREAM_COMMIT
 WORKDIR /app
 ADD --checksum=${UPSTREAM_COMMIT} https://github.com/BerriAI/litellm.git#v${IMAGE_VERSION} /app
-COPY strip_enterprise.py verify_oss.py base-sources.sha256 sso.patch litellm-auth.patch responses-streaming.patch /patches/
+COPY strip_enterprise.py verify_oss.py base-sources.sha256 sso.patch litellm-auth.patch responses-streaming.patch responses-logging.patch /patches/
 RUN apt-get update && apt-get install -y --no-install-recommends patch \
     && python3 /patches/strip_enterprise.py /app \
     && sha256sum -c /patches/base-sources.sha256 \
     && patch --batch --forward --fuzz=0 -p1 < /patches/sso.patch \
     && patch --batch --forward --fuzz=0 -p1 < /patches/litellm-auth.patch \
     && patch --batch --forward --fuzz=0 -p1 < /patches/responses-streaming.patch \
+    && patch --batch --forward --fuzz=0 -p1 < /patches/responses-logging.patch \
     && python3 /patches/verify_oss.py /app
 
 FROM --platform=$BUILDPLATFORM node:24.19-alpine3.24@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 AS ui
@@ -71,7 +72,7 @@ COPY --from=builder /opt/prisma /opt/prisma
 COPY --from=source /app/LICENSE /app/LICENSE.litellm
 COPY LICENSE.patches /app/LICENSE.patches
 COPY oidc_delegated_auth.py /app/litellm-config/oidc_delegated_auth.py
-COPY verify_oss.py verify_auth.py verify_streaming.py /tmp/litellm-checks/
+COPY verify_oss.py verify_auth.py verify_streaming.py verify_logging.py /tmp/litellm-checks/
 RUN chmod -R a+rX /opt/prisma \
     && test -x /opt/prisma/binaries/node_modules/.bin/prisma \
     && test -f /opt/prisma/binaries/node_modules/prisma/build/index.js \
@@ -79,6 +80,7 @@ RUN chmod -R a+rX /opt/prisma \
     && python3 /tmp/litellm-checks/verify_oss.py \
     && python3 /tmp/litellm-checks/verify_auth.py \
     && LITELLM_LOCAL_MODEL_COST_MAP=true python3 /tmp/litellm-checks/verify_streaming.py \
+    && LITELLM_LOCAL_MODEL_COST_MAP=true python3 /tmp/litellm-checks/verify_logging.py \
     && litellm --help > /dev/null \
     && rm -rf /tmp/litellm-checks
 EXPOSE 4000/tcp

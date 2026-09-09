@@ -16,11 +16,15 @@ The build owns:
   authorization checks to LiteLLM.
 - `responses-streaming.patch`, a temporary upstream bug workaround, not a
   permanent image customization; see [removal criteria](#temporary-streaming-bug-workaround).
+- `responses-logging.patch`, a temporary fix for missing streamed Responses
+  success logs; see [removal criteria](#temporary-logging-bug-workaround).
 - `oidc_delegated_auth.py`, which validates the configured Pocket ID or
   Keycloak user access-token profile.
 - `verify_auth.py`, which exercises the integration during every image build.
 - `verify_streaming.py`, which checks wildcard routing and the upstream `stream`
   request field during every image build without external API calls.
+- `verify_logging.py`, which checks Responses success callbacks and spend-log
+  payloads during every image build without external API calls or a database.
 - `verify_oss.py`, which checks stripped source and the installed runtime.
 
 The build pins base images by digest and source by tag plus commit checksum.
@@ -80,8 +84,8 @@ exact-model deployments. Set it only where the upstream capability is known;
 incorrectly setting `true` can make a non-streaming upstream reject requests.
 External Responses provider subclasses that override `should_fake_stream` need
 to accept the new argument when opting in. Non-streaming requests and unrelated
-API paths are unchanged. This workaround does not fix upstream usage-logging
-or error-metadata limitations.
+API paths are unchanged. Usage logging is handled by the separate patch below;
+upstream error-metadata limitations remain.
 
 At every upstream upgrade, check these references and test the candidate release
 without this streaming patch. Remove it when `verify_streaming.py` passes for
@@ -96,6 +100,25 @@ regression check in the build. Retire flag-specific opt-in/opt-out assertions
 alongside the flag, and adapt internal API calls if upstream changes them,
 without weakening the native-streaming request-path checks.
 The unrelated OSS/auth customizations remain in place.
+
+## Temporary Logging Bug Workaround
+
+`responses-logging.patch` fixes the success-logging failure in
+[upstream issue #34754](https://github.com/BerriAI/litellm/issues/34754).
+The streaming parser can leave the terminal response as a dictionary after a
+validation fallback. The success logger then raises `AttributeError` on `.usage`,
+dropping the spend-log entry even though the client received its response.
+
+The patch normalizes that dictionary into LiteLLM's response object and reuses
+its usage conversion for dictionary and typed usage. It applies automatically
+to streamed completed, incomplete, and failed terminal events. No flag is needed.
+`verify_logging.py` checks sync/async success callbacks, response content, token
+details, spend, and non-streaming behavior. It verifies the payload prepared for
+PostgreSQL insertion; deployment validation must also confirm the stored row.
+
+At each upgrade, test without this patch. Once the pinned release passes
+`verify_logging.py`, remove the patch, its Dockerfile copy/apply steps, and its
+source hash. Keep the regression check in the build.
 
 ## Updating
 
