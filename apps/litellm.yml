@@ -94,6 +94,9 @@ services:
     environment:
       LITELLM_MASTER_KEY: $LITELLM_MASTER_KEY
       LITELLM_SALT_KEY: $LITELLM_SALT_KEY
+      LGOS_A_API_BASE: http://$LGOS_HOST_IP:3004/v1
+      LGOS_B_API_BASE: http://$LGOS_HOST_IP:3005/v1
+      LGOS_API_KEY: $LGOS_API_KEY
       STORE_MODEL_IN_DB: "true"
       STORE_PROMPTS_IN_SPEND_LOGS: "true"
       DATABASE_URL: postgresql://litellm:${LITELLM_DATABASE_PASSWORD}@litellm-db:5432/litellm
