@@ -1,0 +1,98 @@
+Temporary upstream bug workaround, not a permanent OSS/auth customization.
+
+Related upstream reports:
+https://github.com/BerriAI/litellm/issues/21090
+https://github.com/BerriAI/litellm/issues/37800
+https://github.com/BerriAI/litellm/pull/37801
+
+Adapted metadata propagation, not a direct backport: honor explicit wildcard
+supports_native_streaming without requiring base_model or exact graph entries.
+Remove once the pinned upstream release passes verify_streaming.py without this
+patch; a merged PR or closed issue alone is insufficient. Keep the regression
+check. See README.md#temporary-streaming-bug-workaround for cleanup steps.
+
+diff --git a/litellm/llms/base_llm/responses/transformation.py b/litellm/llms/base_llm/responses/transformation.py
+index 1365941..05f1244 100644
+--- a/litellm/llms/base_llm/responses/transformation.py
++++ b/litellm/llms/base_llm/responses/transformation.py
+@@ -237,6 +237,7 @@ class BaseResponsesAPIConfig(ABC):
+         model: str | None,
+         stream: bool | None,
+         custom_llm_provider: str | None = None,
++        supports_native_streaming: bool | None = None,
+     ) -> bool:
+         """Returns True if litellm should fake a stream for the given model and stream value"""
+         return False
+diff --git a/litellm/llms/manus/responses/transformation.py b/litellm/llms/manus/responses/transformation.py
+index f5733a1..5ee208b 100644
+--- a/litellm/llms/manus/responses/transformation.py
++++ b/litellm/llms/manus/responses/transformation.py
+@@ -52,6 +52,7 @@ class ManusResponsesAPIConfig(OpenAIResponsesAPIConfig):
+         model: str | None,
+         stream: bool | None,
+         custom_llm_provider: str | None = None,
++        supports_native_streaming: bool | None = None,
+     ) -> bool:
+         """
+         Manus API doesn't support real-time streaming.
+diff --git a/litellm/llms/openai/responses/transformation.py b/litellm/llms/openai/responses/transformation.py
+index eac844a..f3d11c3 100644
+--- a/litellm/llms/openai/responses/transformation.py
++++ b/litellm/llms/openai/responses/transformation.py
+@@ -523,9 +523,14 @@ class OpenAIResponsesAPIConfig(BaseResponsesAPIConfig):
+         model: str | None,
+         stream: bool | None,
+         custom_llm_provider: str | None = None,
++        supports_native_streaming: bool | None = None,
+     ) -> bool:
+         if stream is not True:
+             return False
++        # Wildcard deployments carry this capability in model_info, while the
++        # resolved model name may be absent from the global model cost map.
++        if isinstance(supports_native_streaming, bool):
++            return not supports_native_streaming
+         if model is not None:
+             try:
+                 if (
+diff --git a/litellm/llms/volcengine/responses/transformation.py b/litellm/llms/volcengine/responses/transformation.py
+index 82c4f7f..1411f8e 100644
+--- a/litellm/llms/volcengine/responses/transformation.py
++++ b/litellm/llms/volcengine/responses/transformation.py
+@@ -407,6 +407,7 @@ class VolcEngineResponsesAPIConfig(OpenAIResponsesAPIConfig):
+         model: str | None,
+         stream: bool | None,
+         custom_llm_provider: str | None = None,
++        supports_native_streaming: bool | None = None,
+     ) -> bool:
+         """
+         Volcengine Responses API supports native streaming; never fall back to fake stream.
+diff --git a/litellm/responses/main.py b/litellm/responses/main.py
+index f012ec8..87bc5a2 100644
+--- a/litellm/responses/main.py
++++ b/litellm/responses/main.py
+@@ -1221,6 +1221,13 @@ def responses(
+         if custom_llm_provider is None:
+             raise ValueError("custom_llm_provider is required but passed as None")
+
++        deployment_model_info: Final = kwargs.get("model_info")
++        native_streaming: Final = (
++            deployment_model_info.get("supports_native_streaming")
++            if isinstance(deployment_model_info, dict)
++            else None
++        )
++
+         response = base_llm_http_handler.response_api_handler(
+             model=model,
+             input=input,
+@@ -1235,7 +1242,10 @@ def responses(
+             _is_async=_is_async,
+             client=kwargs.get("client"),
+             fake_stream=responses_api_provider_config.should_fake_stream(
+-                model=model, stream=stream, custom_llm_provider=custom_llm_provider
++                model=model,
++                stream=stream,
++                custom_llm_provider=custom_llm_provider,
++                supports_native_streaming=native_streaming,
+             ),
+             litellm_metadata=kwargs.get("litellm_metadata", {}),
+             shared_session=kwargs.get("shared_session"),

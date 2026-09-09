@@ -14,9 +14,13 @@ The build owns:
   requirement for SSO debug login.
 - `litellm-auth.patch`, which adds explicit ingress-lane dispatch and shared
   authorization checks to LiteLLM.
+- `responses-streaming.patch`, a temporary upstream bug workaround, not a
+  permanent image customization; see [removal criteria](#temporary-streaming-bug-workaround).
 - `oidc_delegated_auth.py`, which validates the configured Pocket ID or
   Keycloak user access-token profile.
 - `verify_auth.py`, which exercises the integration during every image build.
+- `verify_streaming.py`, which checks wildcard routing and the upstream `stream`
+  request field during every image build without external API calls.
 - `verify_oss.py`, which checks stripped source and the installed runtime.
 
 The build pins base images by digest and source by tag plus commit checksum.
@@ -36,6 +40,44 @@ discarded and cannot participate in LiteLLM account linking.
 Only `true` and `false` are accepted, case-insensitively. Any other value stops
 the process during configuration loading. For this repository's Compose
 deployment, set `OIDC_REQUIRE_VERIFIED_EMAIL=false` in `.env` to opt out.
+
+## Temporary Streaming Bug Workaround
+
+Unlike the enterprise-removal, SSO, and delegated-auth customizations,
+`responses-streaming.patch` exists only to work around a LiteLLM bug and must
+be removed once the pinned upstream release fixes our affected request path.
+Unknown model names reached through wildcard routes can miss LiteLLM's global
+capability lookup, causing it to drop upstream `stream: true` and synthesize
+events only after generation finishes.
+
+Related upstream reports and proposed fix:
+
+- [Issue #21090](https://github.com/BerriAI/litellm/issues/21090): custom-model
+  Responses requests fall back to fake streaming and lose intermediate tool
+  events. Its stale closure is not evidence of a fix.
+- [Issue #37800](https://github.com/BerriAI/litellm/issues/37800): custom Azure
+  deployment names fake-stream because the capability check ignores `base_model`.
+- [PR #37801](https://github.com/BerriAI/litellm/pull/37801): proposes passing
+  deployment metadata into that check and falling back to `base_model`.
+
+The temporary streaming patch follows the metadata propagation approach in
+PR #37801, but is not a direct backport: it honors
+`model_info.supports_native_streaming` directly instead of requiring a
+`base_model`. Set that boolean on wildcard deployments whose upstream supports
+native Responses streaming. Omitted capabilities retain upstream behavior;
+provider-specific Manus and Volcengine streaming rules remain unchanged.
+
+At every upstream upgrade, check these references and test the candidate release
+without this streaming patch. Remove it when `verify_streaming.py` passes for
+wildcard deployments with arbitrary graph names and explicit streaming
+capabilities, without requiring a `base_model` or exact-model registrations.
+A merged PR or closed issue alone is insufficient.
+
+When fixed, delete `responses-streaming.patch`, remove its Dockerfile copy/apply
+steps and source hashes used only by this patch, and update this section and the
+upgrade runbook. Keep the streaming regression check in the build; adapt internal
+API calls if upstream changes them, without weakening the request-path checks.
+The unrelated OSS/auth customizations remain in place.
 
 ## Updating
 
