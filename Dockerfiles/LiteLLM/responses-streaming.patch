@@ -5,6 +5,7 @@ https://github.com/BerriAI/litellm/issues/21090
 https://github.com/BerriAI/litellm/issues/37800
 https://github.com/BerriAI/litellm/pull/37801
 
+Opt in with LITELLM_ENABLE_RESPONSES_STREAMING_FIX=true; disabled by default.
 Adapted metadata propagation, not a direct backport: honor explicit wildcard
 supports_native_streaming without requiring base_model or exact graph entries.
 Remove once the pinned upstream release passes verify_streaming.py without this
@@ -67,10 +68,17 @@ index 82c4f7f..1411f8e 100644
          """
          Volcengine Responses API supports native streaming; never fall back to fake stream.
 diff --git a/litellm/responses/main.py b/litellm/responses/main.py
-index f012ec8..87bc5a2 100644
+index f012ec8..84c0f80 100644
 --- a/litellm/responses/main.py
 +++ b/litellm/responses/main.py
-@@ -1221,6 +1221,13 @@ def responses(
+@@ -1,5 +1,6 @@
+ import asyncio
+ import contextvars
++import os
+ from collections.abc import Coroutine, Generator, Iterable, Mapping
+ from contextlib import contextmanager
+ from functools import partial
+@@ -1221,6 +1222,21 @@ def responses(
          if custom_llm_provider is None:
              raise ValueError("custom_llm_provider is required but passed as None")
 
@@ -80,11 +88,19 @@ index f012ec8..87bc5a2 100644
 +            if isinstance(deployment_model_info, dict)
 +            else None
 +        )
++        # Temporary opt-in fix; keep the upstream provider call unchanged otherwise.
++        streaming_override: Final = (
++            {"supports_native_streaming": native_streaming}
++            if stream is True
++            and os.environ.get("LITELLM_ENABLE_RESPONSES_STREAMING_FIX", "").lower() == "true"
++            and isinstance(native_streaming, bool)
++            else {}
++        )
 +
          response = base_llm_http_handler.response_api_handler(
              model=model,
              input=input,
-@@ -1235,7 +1242,10 @@ def responses(
+@@ -1235,7 +1251,10 @@ def responses(
              _is_async=_is_async,
              client=kwargs.get("client"),
              fake_stream=responses_api_provider_config.should_fake_stream(
@@ -92,7 +108,7 @@ index f012ec8..87bc5a2 100644
 +                model=model,
 +                stream=stream,
 +                custom_llm_provider=custom_llm_provider,
-+                supports_native_streaming=native_streaming,
++                **streaming_override,
              ),
              litellm_metadata=kwargs.get("litellm_metadata", {}),
              shared_session=kwargs.get("shared_session"),

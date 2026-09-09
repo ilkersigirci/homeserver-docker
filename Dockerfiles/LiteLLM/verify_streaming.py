@@ -1,6 +1,7 @@
 """Check wildcard Responses routing against a local HTTP transport at build time."""
 
 import json
+import os
 from unittest.mock import patch
 
 import httpx
@@ -13,7 +14,7 @@ from litellm.llms.volcengine.responses.transformation import (
 )
 
 
-def verify_request(capability: bool | None, stream: bool) -> None:
+def verify_request(capability: bool | None, stream: bool, enabled: bool) -> None:
     requests: list[httpx.Request] = []
 
     def upstream(request: httpx.Request) -> httpx.Response:
@@ -77,16 +78,35 @@ def verify_request(capability: bool | None, stream: bool) -> None:
             body = json.loads(requests[-1].content)
             assert requests[-1].url == "https://graphs.invalid/v1/responses"
             assert body["model"] == model
-            assert bool(body.get("stream")) is (stream and capability is True), body
+            assert bool(body.get("stream")) is (
+                enabled and stream and capability is True
+            ), body
             assert "supports_native_streaming" not in body
             assert "model_info" not in body
     assert len(requests) == 2
 
 
 def main() -> None:
-    for capability in (True, False, None):
-        for stream in (True, False):
-            verify_request(capability, stream)
+    for flag in (None, "false", "true", "TRUE", "1"):
+        with patch.dict(os.environ):
+            os.environ.pop("LITELLM_ENABLE_RESPONSES_STREAMING_FIX", None)
+            if flag is not None:
+                os.environ["LITELLM_ENABLE_RESPONSES_STREAMING_FIX"] = flag
+            for capability in (True, False, None):
+                for stream in (True, False):
+                    verify_request(capability, stream, flag in ("true", "TRUE"))
+
+    upstream_decision = OpenAIResponsesAPIConfig.should_fake_stream
+
+    def legacy_decision(self, model, stream, custom_llm_provider=None):
+        return upstream_decision(self, model, stream, custom_llm_provider)
+
+    # Opting out must also preserve external providers' original call signature.
+    with (
+        patch.dict(os.environ, LITELLM_ENABLE_RESPONSES_STREAMING_FIX="false"),
+        patch.object(OpenAIResponsesAPIConfig, "should_fake_stream", legacy_decision),
+    ):
+        verify_request(True, True, False)
 
     config = OpenAIResponsesAPIConfig()
     assert config.should_fake_stream("gpt-4o", True, "openai") is False

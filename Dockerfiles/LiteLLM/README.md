@@ -67,6 +67,22 @@ PR #37801, but is not a direct backport: it honors
 native Responses streaming. Omitted capabilities retain upstream behavior;
 provider-specific Manus and Volcengine streaming rules remain unchanged.
 
+The workaround is disabled by default. Set the custom image environment variable
+`LITELLM_ENABLE_RESPONSES_STREAMING_FIX=true` to enable it; only `true`
+(case-insensitive) enables the fix. Unset, `false`, and other values retain
+upstream behavior and the original provider-method call signature. The image
+does not set this flag for you.
+
+Enabling the flag is not a global force-stream switch: the selected deployment
+must also set a boolean `model_info.supports_native_streaming`. That boolean
+overrides the model capability lookup for streaming Responses requests, including
+exact-model deployments. Set it only where the upstream capability is known;
+incorrectly setting `true` can make a non-streaming upstream reject requests.
+External Responses provider subclasses that override `should_fake_stream` need
+to accept the new argument when opting in. Non-streaming requests and unrelated
+API paths are unchanged. This workaround does not fix upstream usage-logging
+or error-metadata limitations.
+
 At every upstream upgrade, check these references and test the candidate release
 without this streaming patch. Remove it when `verify_streaming.py` passes for
 wildcard deployments with arbitrary graph names and explicit streaming
@@ -74,9 +90,11 @@ capabilities, without requiring a `base_model` or exact-model registrations.
 A merged PR or closed issue alone is insufficient.
 
 When fixed, delete `responses-streaming.patch`, remove its Dockerfile copy/apply
-steps and source hashes used only by this patch, and update this section and the
-upgrade runbook. Keep the streaming regression check in the build; adapt internal
-API calls if upstream changes them, without weakening the request-path checks.
+steps, its environment flag, and source hashes used only by this patch, and
+update this section and the upgrade runbook. Keep the native wildcard streaming
+regression check in the build. Retire flag-specific opt-in/opt-out assertions
+alongside the flag, and adapt internal API calls if upstream changes them,
+without weakening the native-streaming request-path checks.
 The unrelated OSS/auth customizations remain in place.
 
 ## Updating
