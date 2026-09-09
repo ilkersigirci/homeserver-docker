@@ -1,9 +1,8 @@
 # LiteLLM
 
 This image builds directly from a pinned official `BerriAI/litellm` source tag.
-All OSS and delegated-auth changes live here; no fork image or repository is
-required. It runs native LiteLLM keys and user-delegated OIDC access tokens in
-one LiteLLM process.
+Enterprise-removal, SSO, and delegated-auth changes live here. It runs native
+LiteLLM keys and user-delegated OIDC access tokens in one LiteLLM process.
 See [ARCHITECTURE.md](ARCHITECTURE.md) for the request flow, provider
 configuration, authorization boundaries, and deployment contract.
 
@@ -11,7 +10,7 @@ The build owns:
 
 - `strip_enterprise.py`, which removes enterprise source, packaging and lockfile
   entries, and the enterprise UI override before installation.
-- `litellm-oss.patch`, which removes the five-user UI SSO cap and the license
+- `sso.patch`, which removes the five-user UI SSO cap and the license
   requirement for SSO debug login.
 - `litellm-auth.patch`, which adds explicit ingress-lane dispatch and shared
   authorization checks to LiteLLM.
@@ -25,11 +24,6 @@ It checks source hashes, applies patches without fuzz, rebuilds the OSS dashboar
 and verifies the installed proxy and authentication code. The runtime contains
 no enterprise tree or package. Other upstream premium feature gates remain;
 authentication and user budget/model/rate limits still apply.
-
-The OSS stripping and SSO changes derive from
-[`litellm-OSS`](https://github.com/ilkersigirci/litellm-OSS/tree/2cd6cb24bf6b8ceb56491f23334bdaf8978efa97)
-and retain its MIT notice in `LICENSE.litellm-oss`. Its workflows and agent automation are
-not build dependencies.
 
 ## Configuration
 

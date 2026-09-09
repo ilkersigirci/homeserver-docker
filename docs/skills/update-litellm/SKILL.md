@@ -6,8 +6,7 @@ description: Upgrade the self-contained LiteLLM image and rebase its enterprise-
 # Update LiteLLM
 
 Work in `Dockerfiles/LiteLLM`; read its `README.md` and `ARCHITECTURE.md`.
-Use official `BerriAI/litellm` source. No fork image, vendored checkout, or
-separate release workflow is needed.
+Use official `BerriAI/litellm` source and the shared custom-image workflow.
 
 1. Clone the requested `v<version>` tag into a fresh temporary directory.
     Set `IMAGE_VERSION` and its resolved `UPSTREAM_COMMIT` in the Dockerfile.
@@ -16,7 +15,7 @@ separate release workflow is needed.
 2. Run `strip_enterprise.py <checkout>`. It removes the proprietary trees,
     dependency/workspace entries from both TOML files, and enterprise UI override.
     Preserve unrelated dependency pins. Adapt it if upstream changes layout.
-3. Apply `litellm-oss.patch` then `litellm-auth.patch` with
+3. Apply `sso.patch` then `litellm-auth.patch` with
     `patch --batch --forward --fuzz=0 -p1` inside the checkout. Resolve drift by
     editing upstream code and regenerating the affected diff, keeping the two
     patches separate. Do not turn on `premium_user` globally: retain authorization,

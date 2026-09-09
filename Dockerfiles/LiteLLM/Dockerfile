@@ -15,11 +15,11 @@ ARG IMAGE_VERSION
 ARG UPSTREAM_COMMIT
 WORKDIR /app
 ADD --checksum=${UPSTREAM_COMMIT} https://github.com/BerriAI/litellm.git#v${IMAGE_VERSION} /app
-COPY strip_enterprise.py verify_oss.py base-sources.sha256 litellm-oss.patch litellm-auth.patch /patches/
+COPY strip_enterprise.py verify_oss.py base-sources.sha256 sso.patch litellm-auth.patch /patches/
 RUN apt-get update && apt-get install -y --no-install-recommends patch \
     && python3 /patches/strip_enterprise.py /app \
     && sha256sum -c /patches/base-sources.sha256 \
-    && patch --batch --forward --fuzz=0 -p1 < /patches/litellm-oss.patch \
+    && patch --batch --forward --fuzz=0 -p1 < /patches/sso.patch \
     && patch --batch --forward --fuzz=0 -p1 < /patches/litellm-auth.patch \
     && python3 /patches/verify_oss.py /app
 
@@ -64,7 +64,7 @@ COPY --from=builder /app/litellm/proxy/prisma_migration.py /app/litellm/proxy/pr
 COPY --from=builder /root/.cache/prisma /root/.cache/prisma
 COPY --from=builder /root/.cache/prisma-python /root/.cache/prisma-python
 COPY --from=source /app/LICENSE /app/LICENSE.litellm
-COPY LICENSE.litellm-oss /app/LICENSE.litellm-oss-patches
+COPY LICENSE.patches /app/LICENSE.patches
 COPY oidc_delegated_auth.py /app/litellm-config/oidc_delegated_auth.py
 COPY verify_oss.py verify_auth.py /tmp/litellm-checks/
 RUN python3 /tmp/litellm-checks/verify_oss.py \

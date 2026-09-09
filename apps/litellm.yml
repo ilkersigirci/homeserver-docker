@@ -155,13 +155,13 @@ services:
       traefik.http.services.litellm-svc.loadbalancer.server.port: "4000"
       ####### HOMEPAGE #######
       homepage.group: "Programming"
-      homepage.name: "LiteLLM Libre"
+      homepage.name: "LiteLLM"
       homepage.icon: "litellm.png"
       homepage.href: "https://litellm.$DOMAINNAME/ui"
       homepage.target: "_blank"
-      homepage.description: "Fully libre AI gateway"
+      homepage.description: "AI gateway"
       ####### GLANCE #######
-      glance.name: "LiteLLM Libre"
+      glance.name: "LiteLLM"
       glance.icon: "sh:litellm"
       glance.url: "https://litellm.$DOMAINNAME/ui"
-      glance.description: "Fully libre AI gateway"
+      glance.description: "AI gateway"
