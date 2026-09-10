@@ -17,12 +17,12 @@ from litellm.proxy.auth.auth_checks import get_user_object
 from litellm.secret_managers.main import get_secret_bool
 from pydantic import EmailStr, TypeAdapter, ValidationError
 
-_ISSUER = os.environ.get("OIDC_ISSUER", "").rstrip("/")
+_ISSUER = os.environ.get("OIDC_ISSUER", "")
 _JWKS_URL = os.environ.get("OIDC_JWKS_URL", "")
 _USERINFO_URL = os.environ.get("OIDC_USERINFO_URL", "")
 _AUDIENCE = os.environ.get("OIDC_AUDIENCE", "")
 _REQUIRED_SCOPE = os.environ.get("OIDC_REQUIRED_SCOPE", "")
-_TOKEN_PROFILE = os.environ.get("OIDC_TOKEN_PROFILE", "")
+_TOKEN_PROFILE = os.environ.get("OIDC_TOKEN_PROFILE", "rfc9068")
 _SIGNING_ALGORITHM = os.environ.get("OIDC_SIGNING_ALGORITHM", "")
 _REQUIRE_VERIFIED_EMAIL = get_secret_bool("OIDC_REQUIRE_VERIFIED_EMAIL")
 if _REQUIRE_VERIFIED_EMAIL is None:
@@ -31,9 +31,10 @@ if _REQUIRE_VERIFIED_EMAIL is None:
     _REQUIRE_VERIFIED_EMAIL = True
 _EMAIL_ADAPTER = TypeAdapter(EmailStr)
 
+_RFC9068_PROFILE = "rfc9068"
 _POCKET_ID_PROFILE = "pocket-id"
 _KEYCLOAK_PROFILE = "keycloak"
-_TOKEN_PROFILES = frozenset({_POCKET_ID_PROFILE, _KEYCLOAK_PROFILE})
+_TOKEN_PROFILES = frozenset({_RFC9068_PROFILE, _POCKET_ID_PROFILE, _KEYCLOAK_PROFILE})
 _ALLOWED_SIGNING_ALGORITHMS = frozenset(
     {
         "RS256",
@@ -61,7 +62,7 @@ if not all(
 ):
     raise RuntimeError("OIDC delegated authentication settings are incomplete")
 if _TOKEN_PROFILE not in _TOKEN_PROFILES:
-    raise RuntimeError("OIDC_TOKEN_PROFILE must be pocket-id or keycloak")
+    raise RuntimeError("OIDC_TOKEN_PROFILE must be rfc9068, pocket-id, or keycloak")
 if _SIGNING_ALGORITHM not in _ALLOWED_SIGNING_ALGORITHMS:
     raise RuntimeError("OIDC_SIGNING_ALGORITHM must be an asymmetric JWT algorithm")
 
@@ -114,7 +115,30 @@ def _get_scopes(claims: dict[str, Any]) -> set[str]:
     return set(raw_scope.split()) if isinstance(raw_scope, str) else set()
 
 
-def _validate_profile_claims(claims: dict[str, Any], subject: str) -> None:
+def _validate_profile_claims(
+    claims: dict[str, Any], header: dict[str, Any], subject: str
+) -> None:
+    if _TOKEN_PROFILE == _RFC9068_PROFILE:
+        token_type = header.get("typ")
+        if not isinstance(token_type, str) or token_type.lower() not in (
+            "at+jwt",
+            "application/at+jwt",
+        ):
+            _deny("OIDC access token must use the RFC 9068 JWT type")
+        if any(
+            not isinstance(claims.get(name), str) or not claims[name]
+            for name in ("client_id", "jti")
+        ):
+            _deny("OIDC access token must include client_id and jti")
+        # RFC 9068 recommends sub=client_id for client credentials, but does not
+        # mandate it. The issuer must reserve our scope for user-delegated grants.
+        if subject == claims["client_id"]:
+            _deny(
+                "a user-delegated OIDC access token is required",
+                code=status.HTTP_403_FORBIDDEN,
+            )
+        return
+
     if _TOKEN_PROFILE == _POCKET_ID_PROFILE:
         if claims.get("type") == "id-token":
             _deny("OIDC ID tokens are not accepted")
@@ -153,7 +177,7 @@ async def _get_signing_key(encoded_token: str):
 async def _decode_access_token(encoded_token: str) -> dict[str, Any]:
     signing_key = await _get_signing_key(encoded_token)
     try:
-        claims = jwt.decode(
+        decoded = jwt.decode_complete(
             encoded_token,
             signing_key,
             algorithms=[_SIGNING_ALGORITHM],
@@ -167,13 +191,14 @@ async def _decode_access_token(encoded_token: str) -> dict[str, Any]:
     except jwt.PyJWTError:
         _deny("invalid or expired OIDC access token")
 
+    claims = decoded["payload"]
     subject = claims["sub"]
     if not isinstance(subject, str) or not subject:
         _deny(
             "a user-delegated OIDC access token is required",
             code=status.HTTP_403_FORBIDDEN,
         )
-    _validate_profile_claims(claims, subject)
+    _validate_profile_claims(claims, decoded["header"], subject)
     if _REQUIRED_SCOPE not in _get_scopes(claims):
         _deny(
             f"OIDC access token is missing {_REQUIRED_SCOPE}",
@@ -290,7 +315,10 @@ async def user_api_key_auth(
         user_id=user.user_id,
         user_email=user.user_email,
         user_role=LitellmUserRoles.INTERNAL_USER,
-        allowed_routes=[LiteLLMRoutes.openai_routes.name],
+        allowed_routes=[
+            LiteLLMRoutes.openai_routes.name,
+            LiteLLMRoutes.model_info_routes.name,
+        ],
         models=list(user.models or []),
         user_spend=user.spend,
         user_max_budget=user.max_budget,

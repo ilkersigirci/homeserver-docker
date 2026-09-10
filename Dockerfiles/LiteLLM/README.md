@@ -12,14 +12,14 @@ The build owns:
   entries, and the enterprise UI override before installation.
 - `sso.patch`, which removes the five-user UI SSO cap and the license
   requirement for SSO debug login.
-- `litellm-auth.patch`, which adds explicit ingress-lane dispatch and shared
-  authorization checks to LiteLLM.
+- `litellm-auth.patch`, which adds explicit ingress-lane dispatch, required
+  authorization checks, scoped model metadata, and OpenAI retrieval route coverage.
 - `responses-streaming.patch`, a temporary upstream bug workaround, not a
   permanent image customization; see [removal criteria](#temporary-streaming-bug-workaround).
 - `responses-logging.patch`, a temporary fix for missing streamed Responses
   success logs; see [removal criteria](#temporary-logging-bug-workaround).
-- `oidc_delegated_auth.py`, which validates the configured Pocket ID or
-  Keycloak user access-token profile.
+- `oidc_delegated_auth.py`, which validates RFC 9068 JWT access tokens by default,
+  with explicit Pocket ID and Keycloak compatibility profiles.
 - `verify_auth.py`, which exercises the integration during every image build.
 - `verify_streaming.py`, which checks wildcard routing and the upstream `stream`
   request field during every image build without external API calls.
@@ -35,6 +35,18 @@ authentication and user budget/model/rate limits still apply.
 
 ## Configuration
 
+Delegated authentication requires both
+`general_settings.custom_auth_run_common_checks: true` and
+`litellm_settings.enable_post_custom_auth_checks: true`. Missing either setting
+rejects delegated requests. These enable native model/fallback authorization,
+user budgets, and per-model budgets.
+
+`OIDC_TOKEN_PROFILE` defaults to `rfc9068`. Select `pocket-id` or `keycloak`
+for those providers' token formats. See the
+[token contract](ARCHITECTURE.md#token-profiles), including the required
+issuer-side user-only permission policy. All profiles share JWT verification,
+user provisioning, route authorization, and native LiteLLM limits.
+
 `OIDC_REQUIRE_VERIFIED_EMAIL` controls first-use delegated-user provisioning.
 It defaults to `true`, which rejects a UserInfo email unless
 `email_verified` is the JSON boolean `true`. Set it to `false` to allow the
@@ -42,8 +54,13 @@ OIDC subject through when its email is unverified; the unverified email is
 discarded and cannot participate in LiteLLM account linking.
 
 Only `true` and `false` are accepted, case-insensitively. Any other value stops
-the process during configuration loading. For this repository's Compose
-deployment, set `OIDC_REQUIRE_VERIFIED_EMAIL=false` in `.env` to opt out.
+the process during configuration loading. Configure the variable in the LiteLLM
+service environment; [`apps/litellm.yml`](../../apps/litellm.yml) sets it explicitly.
+
+Delegated users can read native model metadata through `/model/info` and
+`/v1/model/info`, including permitted direct deployment-ID lookups and custom
+`model_info` fields. Model-management writes require native administrator credentials.
+OpenAI model/job retrieval and upstream WebSocket credential handling are retained.
 
 ## Temporary Streaming Bug Workaround
 

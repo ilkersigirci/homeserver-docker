@@ -1,5 +1,27 @@
+diff --git a/litellm/proxy/_types.py b/litellm/proxy/_types.py
+index 5ba5e8f..59f9aec 100644
+--- a/litellm/proxy/_types.py
++++ b/litellm/proxy/_types.py
+@@ -367,6 +367,8 @@ class LiteLLMRoutes(enum.Enum):
+         # fine_tuning
+         "/fine_tuning/jobs",
+         "/v1/fine_tuning/jobs",
++        "/fine_tuning/jobs/{fine_tuning_job_id}",
++        "/v1/fine_tuning/jobs/{fine_tuning_job_id}",
+         "/fine_tuning/jobs/{fine_tuning_job_id}/cancel",
+         "/v1/fine_tuning/jobs/{fine_tuning_job_id}/cancel",
+         # assistants-related routes
+@@ -385,6 +387,8 @@ class LiteLLMRoutes(enum.Enum):
+         # models
+         "/models",
+         "/v1/models",
++        "/models/{model_id}",
++        "/v1/models/{model_id}",
+         # token counter
+         "/utils/token_counter",
+         "/utils/transform_request",
 diff --git a/litellm/proxy/auth/user_api_key_auth.py b/litellm/proxy/auth/user_api_key_auth.py
-index e92d090a..367bf46e 100644
+index e92d090..80cece7 100644
 --- a/litellm/proxy/auth/user_api_key_auth.py
 +++ b/litellm/proxy/auth/user_api_key_auth.py
 @@ -11,7 +11,7 @@ import asyncio
@@ -11,7 +33,7 @@ index e92d090a..367bf46e 100644
  from datetime import datetime, timezone
  from typing import Any, Final, NamedTuple, Protocol, Union, cast
 
-@@ -160,6 +160,98 @@ azure_apim_header: Final = APIKeyHeader(
+@@ -160,6 +160,84 @@ azure_apim_header: Final = APIKeyHeader(
      description="The default name of the subscription key header of Azure",
  )
 
@@ -79,90 +101,32 @@ index e92d090a..367bf46e 100644
 +            code=status.HTTP_500_INTERNAL_SERVER_ERROR,
 +        )
 +
-+
-+def _reject_alternate_credential_surfaces(request: Request, route: str) -> None:
-+    alternate_headers = (
-+        SpecialHeaders.custom_litellm_api_key.value,
-+        SpecialHeaders.azure_authorization.value,
-+        SpecialHeaders.anthropic_authorization.value,
-+        SpecialHeaders.google_ai_studio_authorization.value,
-+        SpecialHeaders.azure_apim_authorization.value,
-+    )
-+    if any(request.headers.get(header) is not None for header in alternate_headers):
-+        raise ProxyException(
-+            message="Authorization is the only accepted credential header",
-+            type=ProxyErrorTypes.auth_error,
-+            param=SpecialHeaders.openai_authorization.value,
-+            code=status.HTTP_400_BAD_REQUEST,
-+        )
-+
 +    if (
-+        RouteChecks.is_generate_content_route(route=route)
-+        and _safe_get_request_query_params(request).get("key") is not None
++        _request_used_user_custom_auth(request=request)
++        and getattr(litellm, "enable_post_custom_auth_checks", False) is not True
 +    ):
 +        raise ProxyException(
-+            message="Authorization is the only accepted credential surface",
-+            type=ProxyErrorTypes.auth_error,
-+            param=SpecialHeaders.openai_authorization.value,
-+            code=status.HTTP_400_BAD_REQUEST,
++            message=(
++                "Delegated authentication requires "
++                "litellm_settings.enable_post_custom_auth_checks: true"
++            ),
++            type=ProxyErrorTypes.internal_server_error,
++            param="enable_post_custom_auth_checks",
++            code=status.HTTP_500_INTERNAL_SERVER_ERROR,
 +        )
 +
 
  def _get_model_from_request_context(
      request_data: dict,
-@@ -513,8 +605,30 @@ async def user_api_key_auth_websocket(websocket: WebSocket):
-     request.body = return_body
-
-     authorization: Final = websocket.headers.get("authorization")
--    # If no Authorization header, try the api-key header
--    if not authorization:
-+    from litellm.proxy.proxy_server import user_custom_auth
-+
-+    if user_custom_auth is not None:
-+        alternate_websocket_credential = (
-+            websocket.headers.get("api-key") is not None
-+            or any(
-+                protocol.strip().startswith("openai-insecure-api-key.")
-+                for protocol in websocket.headers.get("sec-websocket-protocol", "").split(",")
-+            )
-+        )
-+        if alternate_websocket_credential:
-+            await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
-+            raise HTTPException(
-+                status_code=400,
-+                detail="Authorization is the only accepted WebSocket credential surface",
-+            )
-+        if not authorization:
-+            await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
-+            raise HTTPException(
-+                status_code=403,
-+                detail="Authorization header is required",
-+            )
-+        api_key = ""
-+    elif not authorization:
-         api_key = websocket.headers.get("api-key")
-         if not api_key:
-             # Try extracting from WebSocket subprotocol (browser clients)
-@@ -526,12 +640,14 @@ async def user_api_key_auth_websocket(websocket: WebSocket):
-         if not api_key:
-             await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
-             raise HTTPException(status_code=403, detail="No API key provided")
--    else:
--        # Extract the API key from the Bearer token
-+
-+    if authorization:
-         if not authorization.startswith("Bearer "):
-             await websocket.close(code=status.WS_1008_POLICY_VIOLATION)
--            raise HTTPException(status_code=403, detail="Invalid Authorization header format")
--
-+            raise HTTPException(
-+                status_code=403,
-+                detail="Invalid Authorization header format",
-+            )
-         api_key = authorization[len("Bearer ") :].strip()
-
-     # Call user_api_key_auth with the extracted API key
-@@ -1239,22 +1355,31 @@ async def _user_api_key_auth_builder(
+@@ -493,6 +571,7 @@ async def user_api_key_auth_websocket(websocket: WebSocket):
+     # never reaches the fallback.
+     synthetic_scope: Final[dict[str, Any]] = {
+         "type": "http",
++        "method": "GET",
+         "headers": scope_headers,
+         "path": ws_scope.get("path", ""),
+     }
+@@ -1239,6 +1318,14 @@ async def _user_api_key_auth_builder(
                  request=request,
                  route=route,
              )
@@ -174,34 +138,10 @@ index e92d090a..367bf46e 100644
 +            request=request,
 +            general_settings=general_settings,
 +        )
-+        if user_custom_auth is not None:
-+            _reject_alternate_credential_surfaces(request=request, route=route)
          pass_through_endpoints: Final[list[dict] | None] = general_settings.get("pass_through_endpoints", None)
--        ## CHECK IF X-LITELM-API-KEY IS PASSED IN - supercedes Authorization header
+         ## CHECK IF X-LITELM-API-KEY IS PASSED IN - supercedes Authorization header
          api_key, passed_in_key = get_api_key(
--            custom_litellm_key_header=custom_litellm_key_header,
-+            custom_litellm_key_header=(None if user_custom_auth is not None else custom_litellm_key_header),
-             api_key=api_key,
--            azure_api_key_header=azure_api_key_header,
--            anthropic_api_key_header=anthropic_api_key_header,
--            google_ai_studio_api_key_header=google_ai_studio_api_key_header,
--            azure_apim_header=azure_apim_header,
-+            azure_api_key_header=(None if user_custom_auth is not None else azure_api_key_header),
-+            anthropic_api_key_header=(None if user_custom_auth is not None else anthropic_api_key_header),
-+            google_ai_studio_api_key_header=(None if user_custom_auth is not None else google_ai_studio_api_key_header),
-+            azure_apim_header=(None if user_custom_auth is not None else azure_apim_header),
-             pass_through_endpoints=pass_through_endpoints,
-             route=route,
-             request=request,
-         )
-         # if user wants to pass LiteLLM_Master_Key as a custom header, example pass litellm keys as X-LiteLLM-Key: Bearer sk-1234
-         custom_litellm_key_header_name: Final = general_settings.get("litellm_key_header_name")
--        if custom_litellm_key_header_name is not None:
-+        if custom_litellm_key_header_name is not None and user_custom_auth is None:
-             api_key = get_api_key_from_custom_header(
-                 request=request,
-                 custom_litellm_key_header_name=custom_litellm_key_header_name,
-@@ -1287,7 +1412,7 @@ async def _user_api_key_auth_builder(
+@@ -1287,7 +1374,7 @@ async def _user_api_key_auth_builder(
              elif response is not None and isinstance(response, str):
                  api_key = response
                  custom_auth_api_key = True
@@ -210,16 +150,7 @@ index e92d090a..367bf46e 100644
              response = await user_custom_auth(request=request, api_key=api_key)
              validated = UserAPIKeyAuth.model_validate(response)
              if getattr(litellm, "enable_post_custom_auth_checks", False):
-@@ -1601,7 +1726,7 @@ async def _user_api_key_auth_builder(
-
-         #### ELSE ####
-         ## CHECK PASS-THROUGH ENDPOINTS ##
--        if not custom_auth_api_key:
-+        if not custom_auth_api_key and user_custom_auth is None:
-             response = await check_api_key_for_custom_headers_or_pass_through_endpoints(
-                 request=request,
-                 route=route,
-@@ -1961,15 +2086,6 @@ async def _user_api_key_auth_builder(
+@@ -1961,15 +2048,6 @@ async def _user_api_key_auth_builder(
                      # increment through the row fetched here.
                      valid_token.user_model_max_budget = user_obj.model_max_budget
 
@@ -235,7 +166,7 @@ index e92d090a..367bf46e 100644
              # Check 2a. Check if model has zero cost - if so, skip all budget checks
              model = _get_model_from_request_context(
                  request_data=request_data,
-@@ -2376,10 +2492,8 @@ async def _run_centralized_common_checks(
+@@ -2376,10 +2454,8 @@ async def _run_centralized_common_checks(
      model-access, budgets, guardrails, org, and vector-store checks.
 
      Invariants:
@@ -243,12 +174,12 @@ index e92d090a..367bf46e 100644
 -      skips the gate — matches the existing custom-auth RPS guarantee.
 -      Custom-auth deployments don't use OAuth2 / DB-fallback paths, so
 -      the skip does not re-open any bypass.
-+    - Delegated custom auth requires ``custom_auth_run_common_checks: true``.
-+      A missing or non-boolean setting is a server configuration error.
++    - Delegated custom auth requires common and post-custom checks enabled.
++      Missing or non-boolean settings are server configuration errors.
      - ``PROXY_ADMIN`` tokens still run through ``common_checks`` so
        team-blocked / team-budget / end-user-budget / tag-budget /
        vector-store / tool-allowlist enforcement applies to admin keys
-@@ -2394,7 +2508,6 @@ async def _run_centralized_common_checks(
+@@ -2394,7 +2470,6 @@ async def _run_centralized_common_checks(
          prisma_client,
          proxy_logging_obj,
          user_api_key_cache,
@@ -256,7 +187,7 @@ index e92d090a..367bf46e 100644
      )
 
      # Public routes (e.g. /health/liveness) are exempt from
-@@ -2429,8 +2542,10 @@ async def _run_centralized_common_checks(
+@@ -2429,8 +2504,10 @@ async def _run_centralized_common_checks(
      ):
          return
 
@@ -269,7 +200,7 @@ index e92d090a..367bf46e 100644
 
      parent_otel_span: Final = user_api_key_auth_obj.parent_otel_span
      # In the integrated auth flow ``_user_api_key_auth_builder`` has already
-@@ -2587,6 +2702,16 @@ async def _run_centralized_common_checks(
+@@ -2587,6 +2664,16 @@ async def _run_centralized_common_checks(
      )
      global_proxy_spend: float | None = None if isinstance(global_spend_result, BaseException) else global_spend_result
 
@@ -286,13 +217,47 @@ index e92d090a..367bf46e 100644
      if user_api_key_auth_obj.org_id is None and team_object is not None and team_object.organization_id is not None:
          user_api_key_auth_obj.org_id = team_object.organization_id
 
+diff --git a/litellm/proxy/proxy_server.py b/litellm/proxy/proxy_server.py
+index 887716a..732c81a 100644
+--- a/litellm/proxy/proxy_server.py
++++ b/litellm/proxy/proxy_server.py
+@@ -14513,8 +14513,23 @@ async def model_info_v1(
+                 status_code=400,
+                 detail={"error": f"Model id = {litellm_model_id} not found on litellm proxy"},
+             )
+-        _deployment_info_dict = _get_proxy_model_info(model=deployment_info.model_dump(exclude_none=True))
+-        single_model_list: list[dict] = [_deployment_info_dict]
++        # Direct-ID reads must enforce the same model and team scope as listings.
++        single_model_list = _filter_v1_model_info_deployments(
++            all_models=[deployment_info.model_dump(exclude_none=True)],
++            allowed_model_names=_get_v1_model_info_allowed_model_names(
++                user_api_key_dict=user_api_key_dict,
++                llm_router=llm_router,
++            ),
++        )
++        allowed_team_ids = await _get_caller_byok_team_scope(
++            user_api_key_dict=user_api_key_dict,
++            prisma_client=prisma_client,
++        )
++        single_model_list = [
++            _get_proxy_model_info(model=model)
++            for model in single_model_list
++            if not _byok_row_outside_caller_teams(model.get("model_info") or {}, allowed_team_ids)
++        ]
+         if prisma_client is not None:
+             single_model_list = await _populate_team_access_on_models(
+                 user_api_key_dict=user_api_key_dict,
 diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/response_api_endpoints/endpoints.py
-index 5e56e822..b8b6727d 100644
+index 5e56e82..a746066 100644
 --- a/litellm/proxy/response_api_endpoints/endpoints.py
 +++ b/litellm/proxy/response_api_endpoints/endpoints.py
-@@ -1222,13 +1222,13 @@ async def _enforce_responses_ws_first_frame_model_auth(
+@@ -1220,15 +1220,18 @@ async def _enforce_responses_ws_first_frame_model_auth(
+     user_api_key_dict: UserAPIKeyAuth,
+     llm_router: Any | None,
  ) -> None:
++    from litellm.proxy.auth.auth_checks import _is_model_cost_zero
      from litellm.proxy.auth.user_api_key_auth import (
++        _check_user_model_budget,
          _enforce_key_and_fallback_model_access,
 +        _require_custom_auth_common_checks,
          _run_centralized_common_checks,
@@ -302,10 +267,11 @@ index 5e56e822..b8b6727d 100644
          llm_model_list,
          master_key,
 -        user_custom_auth,
++        model_max_budget_limiter,
      )
 
      request_data: Final = {"model": model}
-@@ -1239,8 +1239,10 @@ async def _enforce_responses_ws_first_frame_model_auth(
+@@ -1239,8 +1242,10 @@ async def _enforce_responses_ws_first_frame_model_auth(
          or general_settings.get("enable_oauth2_proxy_auth", False)
      ):
          return
@@ -318,3 +284,17 @@ index 5e56e822..b8b6727d 100644
      await _enforce_key_and_fallback_model_access(
          valid_token=user_api_key_dict,
          request_data=request_data,
+@@ -1249,6 +1254,13 @@ async def _enforce_responses_ws_first_frame_model_auth(
+         llm_model_list=llm_model_list,
+         llm_router=llm_router,
+     )
++    # The handshake loaded the user's budgets before this model was known.
++    if llm_router is None or not _is_model_cost_zero(model=model, llm_router=llm_router):
++        await _check_user_model_budget(
++            valid_token=user_api_key_dict,
++            model_max_budget_limiter=model_max_budget_limiter,
++            models=[model],
++        )
+     await _run_centralized_common_checks(
+         user_api_key_auth_obj=user_api_key_dict,
+         request=request,

@@ -8,19 +8,22 @@ LiteLLM runs as one OSS process with two authentication endpoints:
 | `https://litellm-sso.$DOMAINNAME` | User-delegated OIDC access token | Open WebUI and SSO-aware applications |
 
 Both hostnames forward to the same container and port. Each Traefik middleware
-overwrites the fixed `X-LiteLLM-Auth-Lane` header. Both endpoints use
-`Authorization: Bearer ...`; the backend never guesses a credential type or
-falls back to another authentication method. Alternate API-key headers, URL
-query keys, and WebSocket API-key subprotocols are rejected.
+overwrites the fixed `X-LiteLLM-Auth-Lane` header. OpenAI HTTP clients use
+`Authorization: Bearer ...`. LiteLLM's upstream credential extraction is retained,
+including WebSocket Bearer headers, `api-key`, and `openai-insecure-api-key.*`
+subprotocols. The trusted lane selects the verifier regardless of credential
+transport; the backend never guesses a credential type or falls back to another
+authentication method.
 
 This one-process topology requires the repository-built
 [`homeserver-litellm`](README.md) image. It builds official LiteLLM source with
 local enterprise-removal and authentication patches plus the delegated-auth
 module. A stock LiteLLM image can
 load the module, but it cannot dispatch custom and native authentication per
-request in the same process. The delegated lane also requires the boolean
-`custom_auth_run_common_checks: true`; the patched image rejects delegated
-requests before OIDC validation if that invariant is missing.
+request in the same process. The delegated lane requires both boolean settings:
+`general_settings.custom_auth_run_common_checks: true` and
+`litellm_settings.enable_post_custom_auth_checks: true`. The patched image rejects
+delegated requests before OIDC validation if either setting is missing.
 
 ## Protocol Roles
 
@@ -31,32 +34,66 @@ internal user.
 
 ## Token Profiles
 
-The image supports both token profiles, but each deployment configures exactly
-one issuer and one profile:
+The default contract is [RFC 9068 JWT access tokens](https://www.rfc-editor.org/rfc/rfc9068.html).
+Each deployment configures exactly one issuer and one profile. Pocket ID and
+Keycloak retain explicit compatibility profiles because their token formats
+differ from RFC 9068; no provider is guessed from an incoming token.
 
 | `OIDC_TOKEN_PROFILE` | Permission claim | User token requirement |
 | --- | --- | --- |
+| `rfc9068` (default) | Space-delimited `scope` string | Signed header `typ` is `at+jwt` or `application/at+jwt`; non-empty `client_id` and `jti`; `sub` differs from `client_id` |
 | `pocket-id` | String array in `scp` | `sub` must not start with `client-` |
 | `keycloak` | Space-delimited `scope` string | `typ` is `Bearer`; `preferred_username` must not start with `service-account-` |
 
 The profile selects one exact token contract. LiteLLM does not inspect token
 shape to guess a provider and does not fall back to the other profile.
-These shapes follow [Pocket ID v2.11.0's access-token tests](https://github.com/pocket-id/pocket-id/blob/v2.11.0/backend/internal/oidc/preview_test.go#L41-L50),
+The compatibility shapes follow [Pocket ID v2.11.0's access-token tests](https://github.com/pocket-id/pocket-id/blob/v2.11.0/backend/internal/oidc/preview_test.go#L41-L50),
 [Pocket ID's client-subject assignment](https://github.com/pocket-id/pocket-id/blob/v2.11.0/backend/internal/oidc/token_handler.go#L96-L102),
 [Keycloak's access-token initialization](https://github.com/keycloak/keycloak/blob/main/services/src/main/java/org/keycloak/protocol/oidc/TokenManager.java#L975-L986),
 and [Keycloak's service-account prefix](https://github.com/keycloak/keycloak/blob/main/common/src/main/java/org/keycloak/common/constants/ServiceAccountConstants.java#L23-L28).
 
-Both profiles require:
+All profiles require:
 
 - An asymmetric JWT access token.
-- Explicit issuer, JWKS, UserInfo, audience, required scope, token profile, and
-  signing algorithm settings.
+- Explicit issuer, JWKS, UserInfo, audience, required scope, and signing algorithm
+  settings. The issuer must match exactly, including any trailing slash.
 - A UserInfo endpoint whose `sub` matches the verified access token.
 
 The implementation intentionally does not use discovery, token introspection,
 opaque tokens, or provider SDKs. `OIDC_TOKEN_PROFILE` selects only the JWT claim
 contract. Each deployment must also provide matching endpoints, clients,
 audience, and scope configuration for its selected provider.
+
+### Standard JWT Deployment
+
+For a provider issuing RFC 9068 access tokens:
+
+```yaml
+OIDC_ISSUER: https://id.example.com
+OIDC_JWKS_URL: https://id.example.com/jwks
+OIDC_USERINFO_URL: https://id.example.com/userinfo
+OIDC_AUDIENCE: https://api.example.com
+OIDC_REQUIRED_SCOPE: llm:invoke
+OIDC_TOKEN_PROFILE: rfc9068
+OIDC_SIGNING_ALGORITHM: RS256
+```
+
+Use the endpoints published by your provider and its registered API audience.
+Reserve the gateway scope for **user-delegated grants only**. Do not grant it
+to service accounts or client-credentials flows. Use an API audience distinct
+from OIDC login client IDs. Request `openid` and the identity scopes needed for
+first-use UserInfo provisioning; the API access token must also work at that endpoint.
+
+RFC 9068 recommends `sub=client_id` for client-credentials tokens, which the
+standard profile rejects, but it does not mandate that representation. There
+is no universal human-versus-machine claim: the issuer's user-only permission
+policy is required. First-use UserInfo is for provisioning, not a substitute
+for that policy, and existing users are resolved locally. The compatibility
+profiles keep their additional provider-specific machine-token checks.
+
+The standard profile is not a fallback for arbitrary JWTs. Providers with
+opaque tokens, unsupported claim formats, or API tokens that cannot call
+UserInfo are outside this implementation's contract.
 
 ## Request Flow
 
@@ -160,9 +197,9 @@ Configure these values consistently within each environment:
 - Open WebUI discovery URL, provider name, scopes, and OIDC client credentials.
 - The provider-specific audience configuration.
 
-Pocket ID clients send the RFC 8707 `resource` parameter. Keycloak clients do
-not send that Pocket ID parameter; their linked client scope and audience mapper
-place the LiteLLM audience in the access token.
+Pocket ID clients send the standard RFC 8707 `resource` parameter. These
+Keycloak deployments instead use linked client scopes and an audience mapper
+to place the LiteLLM audience in the access token.
 
 ## Delegated Client Contract
 
@@ -191,19 +228,40 @@ token because it collapses attribution and enforcement to one identity.
 
 1. Verifies the configured asymmetric JWT signature.
 2. Validates `iss`, `aud`, `sub`, `iat`, `exp`, and the required scope.
-3. Enforces the configured Pocket ID or Keycloak token profile.
-4. Rejects ID tokens and machine identities.
+3. Enforces the configured standard or compatibility token profile.
+4. Rejects ID tokens and the profile's machine-token representation; the issuer
+    must grant the gateway scope only for user-delegated access.
 5. Uses UserInfo on first use to verify and provision the identity.
 6. Resolves the immutable OIDC `sub` to a LiteLLM internal user.
-7. Restricts delegated identities to LiteLLM's `openai_routes` group.
+7. Grants LiteLLM's `openai_routes` and read-only `model_info_routes` groups.
 
 The `openai_routes` group includes OpenAI-compatible chat, responses, embeddings,
 audio, images, files, batches, assistants, realtime, rerank, search, OCR, and
-vector store routes. Management routes remain unavailable to delegated identities.
+vector store routes. Model-info reads use LiteLLM's native catalog and filtering.
+Administrative writes and arbitrary pass-through routes remain unavailable to
+delegated identities.
 
 `GET /health/liveliness` remains public for the container health check.
 `custom_auth_run_common_checks: true` loads the matched database user and
-enforces model, spend, TPM, and RPM controls.
+enforces model and spend controls. `enable_post_custom_auth_checks: true` also
+enforces request-supplied fallback permissions and per-model budgets. Native
+request hooks enforce the user's TPM and RPM limits.
+Responses WebSockets also check the user's per-model budget when the model
+is supplied in the first message after the handshake.
+
+### Model Metadata
+
+Model definitions are managed through LiteLLM's native API or Admin UI.
+Applications may attach custom `model_info` fields; the gateway stores and
+returns them without interpreting application-specific schemas.
+
+Clients read `/model/info` (also available as `/v1/model/info`) using their own
+credential. Listings and `?litellm_model_id=...` lookups apply the same model and
+team filters. A known deployment outside that scope returns `{"data": []}`;
+custom `model_info` fields are preserved and upstream credentials are removed.
+Clients use the returned `model_name` for inference. Native Chat Completions and Responses
+routes handle inference. No application-specific pass-through endpoints are
+configured.
 
 ## User Provisioning
 
@@ -217,7 +275,7 @@ email, the default requires `email_verified` to be the JSON boolean `true`.
 Set the variable to `false` to provision by OIDC subject without blocking on an
 unverified email. The verifier discards that email, so only a verified email can
 participate in LiteLLM's
-[email fallback lookup](https://github.com/BerriAI/litellm/blob/v1.92.0/litellm/proxy/auth/auth_checks.py#L1415-L1451).
+[email fallback lookup](https://github.com/BerriAI/litellm/blob/v1.100.0/litellm/proxy/auth/auth_checks.py#L2096-L2132).
 Invalid values fail configuration loading.
 
 Pocket ID defaults `EMAILS_VERIFIED` and `EMAIL_VERIFICATION_ENABLED` to

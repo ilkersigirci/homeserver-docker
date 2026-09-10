@@ -20,6 +20,8 @@ Use official `BerriAI/litellm` source and the shared custom-image workflow.
     editing upstream code and regenerating the affected diff, keeping the
     patches separate. Remove temporary patches only when the unpatched release
     passes their regression checks; follow the image README's removal criteria.
+    Require both common and post-custom authentication checks for the delegated
+    lane. Preserve scoped model-info reads and upstream WebSocket credentials.
     Do not turn on `premium_user` globally: retain authorization,
     model access, budgets, rate limits, SCIM deactivation, and admin-only UI access.
 4. Refresh `base-sources.sha256` for every patched file from pristine upstream
@@ -31,7 +33,7 @@ Use official `BerriAI/litellm` source and the shared custom-image workflow.
     ```
 
     This rebuilds the OSS dashboard and checks the installed proxy, absence of
-    enterprise modules, unlimited UI SSO, both delegated token profiles, and
+    enterprise modules, unlimited UI SSO, standard and compatibility token profiles, and
     native Responses streaming for wildcard routes and spend-log payloads.
     Fix failed checks; do not skip them or accept patch fuzz. Verify startup with
     an isolated configuration if entrypoint or migration behavior changed.

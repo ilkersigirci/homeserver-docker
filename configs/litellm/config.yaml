@@ -1,33 +1,13 @@
-model_list:
-  - model_name: lgos-a/*
-    litellm_params:
-      model: openai/*
-      api_base: os.environ/LGOS_A_API_BASE
-      api_key: os.environ/LGOS_API_KEY
-    model_info:
-      supports_native_streaming: true
-  - model_name: lgos-b/*
-    litellm_params:
-      model: openai/*
-      api_base: os.environ/LGOS_B_API_BASE
-      api_key: os.environ/LGOS_API_KEY
-    model_info:
-      supports_native_streaming: true
+# Model definitions are managed through LiteLLM's native API or Admin UI.
+model_list: []
 
 general_settings:
   custom_auth: oidc_delegated_auth.user_api_key_auth
   custom_auth_run_common_checks: true
   ui_access_mode: admin_only
-  pass_through_endpoints:
-    - path: /v1/lgos-a
-      target: os.environ/LGOS_A_API_BASE
-      include_subpath: true
-    - path: /v1/lgos-b
-      target: os.environ/LGOS_B_API_BASE
-      include_subpath: true
 
 litellm_settings:
-  check_provider_endpoint: true
+  enable_post_custom_auth_checks: true
   # First-use provisioning creates a visible but fail-closed user record.
   # Assign a positive budget and allowed models in the normal LiteLLM UI.
   default_internal_user_params:
