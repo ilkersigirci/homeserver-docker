@@ -42,6 +42,14 @@ http:
         - chain-no-auth-relaxed
       service: homeserver-api-ui-svc
 
+    lgos-aigateway-rtr:
+      rule: "Host(`lgos-aigateway.{{env "DOMAINNAME"}}`)"
+      entryPoints:
+        - websecure
+      middlewares:
+        - chain-no-auth-relaxed
+      service: lgos-aigateway-svc
+
     lgos-chainlit-rtr:
       rule: "Host(`lgos-chainlit.{{env "DOMAINNAME"}}`)"
       entryPoints:
@@ -49,14 +57,6 @@ http:
       middlewares:
         - chain-no-auth-relaxed
       service: lgos-chainlit-svc
-
-    lgos-bifrost-rtr:
-      rule: "Host(`lgos-bifrost.{{env "DOMAINNAME"}}`)"
-      entryPoints:
-        - websecure
-      middlewares:
-        - chain-no-auth-relaxed
-      service: lgos-bifrost-svc
 
     # NOTE: Needed for plotly cdn js
     lgos-openwebui-rtr:
@@ -112,15 +112,15 @@ http:
         servers:
           - url: "http://{{env "LOCAL_STATIC_IP"}}:5002"
 
+    lgos-aigateway-svc:
+      loadBalancer:
+        servers:
+          - url: "http://{{env "LOCAL_STATIC_IP"}}:3000"
+
     lgos-chainlit-svc:
       loadBalancer:
         servers:
           - url: "http://{{env "LOCAL_STATIC_IP"}}:3002"
-
-    lgos-bifrost-svc:
-      loadBalancer:
-        servers:
-          - url: "http://{{env "LOCAL_STATIC_IP"}}:3000"
 
     lgos-openwebui-svc:
       loadBalancer:
