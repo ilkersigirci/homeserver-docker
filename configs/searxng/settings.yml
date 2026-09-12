@@ -10,6 +10,29 @@ valkey:
   url: valkey://searxng-valkey:6379/0
 # Custom
 search:
+  default_lang: all
   formats:
     - html
     - json
+engines:
+  - name: brave
+    disabled: false
+    weight: 2
+  - name: gmx
+    disabled: true
+  - name: seznam
+    disabled: false
+    weight: 2
+  - name: bing
+    disabled: false
+    weight: 0.5
+  - name: duckduckgo
+    disabled: true
+  - name: google
+    disabled: true
+  - name: karmasearch
+    disabled: true
+  - name: karmasearch videos
+    disabled: true
+  - name: startpage
+    disabled: true
