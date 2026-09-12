@@ -1,0 +1,111 @@
+# Degoog owns its configuration and extensions in appdata/degoog; back it up.
+# DEGOOG_SETTINGS_PASSWORDS is stored in the repository's ignored .env file.
+# Web: Brave/Bing/Google CSE; media: Brave/Bing; autocomplete: Brave.
+networks:
+  degoog_backend:
+    internal: true
+
+services:
+  degoog-valkey:
+    image: docker.io/valkey/valkey:9@sha256:8436e10bc65c94886a91d4415b6a6dfa9cb5a306fb3b996e5bb67cd2b4854193
+    container_name: degoog-valkey
+    restart: $RESTART_POLICY_PROGRAMMING
+    profiles:
+      - programming
+      - degoog
+    networks:
+      - degoog_backend
+    user: $PUID:$PGID
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "1G"
+    # Valkey is disposable shared cache; application state lives in appdata/degoog.
+    command: ["valkey-server", "--save", "", "--appendonly", "no"]
+    ulimits:
+      nofile:
+        soft: 16384
+        hard: 16384
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1m
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  degoog:
+    image: ghcr.io/degoog-org/degoog:0.25.0@sha256:a90a6e66765b7c05ec25c7bccaef55da3fc4e52ac0108abaebef81a3f6c1b4ba
+    container_name: degoog
+    restart: $RESTART_POLICY_PROGRAMMING
+    profiles:
+      - root
+      - programming
+      - degoog
+    depends_on:
+      degoog-valkey:
+        condition: service_healthy
+    networks:
+      - t3_proxy
+      - degoog_backend
+    expose:
+      - 4444
+    # Upstream starts as root to chown /app/data, then drops to PUID:PGID.
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    pids_limit: 256
+    cpus: "1.5"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      - $REPO_PATH/appdata/degoog:/app/data
+    environment:
+      PUID: $PUID
+      PGID: $PGID
+      TZ: $TZ
+      DEGOOG_BASE_URL: https://degoog.$DOMAINNAME
+      DEGOOG_SETTINGS_PASSWORDS: $DEGOOG_SETTINGS_PASSWORDS
+      DEGOOG_PUBLIC_INSTANCE: "false"
+      DEGOOG_CACHE_TTL_MS: "300000"
+      DEGOOG_CACHE_MAX_ENTRIES: "1000"
+      DEGOOG_VALKEY_URL: redis://degoog-valkey:6379
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "--max-time", "3", "http://127.0.0.1:4444/readyz"]
+      interval: 1m
+      timeout: 5s
+      retries: 3
+      start_period: 2m
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "t3_proxy"
+      traefik.http.routers.degoog-rtr.entrypoints: "websecure"
+      traefik.http.routers.degoog-rtr.rule: "Host(`degoog.$DOMAINNAME`)"
+      traefik.http.routers.degoog-rtr.middlewares: "chain-tinyauth@file"
+      traefik.http.routers.degoog-rtr.service: "degoog-svc"
+      traefik.http.services.degoog-svc.loadbalancer.server.port: "4444"
+      homepage.group: "Programming"
+      homepage.name: "degoog"
+      homepage.icon: "mdi-magnify"
+      homepage.href: "https://degoog.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Private multi-engine search"
+      glance.name: "degoog"
+      glance.icon: "mdi:magnify"
+      glance.url: "https://degoog.$DOMAINNAME"
+      glance.description: "Private multi-engine search"

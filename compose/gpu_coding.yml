@@ -53,5 +53,6 @@ include:
   - ../apps/marimo.yml
   - ../apps/open-webui.yml
   - ../apps/searxng.yml
+  - ../apps/degoog.yml
   # - ../apps/pgweb.yml
   # - ../apps/pgadmin.yml # TODO
