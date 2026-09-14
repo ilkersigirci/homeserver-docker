@@ -24,6 +24,7 @@ configs/**
 !configs/**/
 !configs/**/.gitkeep
 !configs/litellm/config.yaml
+!configs/grafana-lgtm/grafana/provisioning/dashboards/OTEL/LiteLLM.json
 
 ## Keep credentials out of git
 configs/headscale/oidc_client_secret

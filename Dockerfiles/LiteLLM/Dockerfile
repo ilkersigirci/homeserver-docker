@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.25@sha256:0adf442eae370b6087e08edc7c50b552d80ddf261576f4ebd6421006b2461f12
 # renovate: datasource=github-tags depName=BerriAI/litellm
-ARG IMAGE_VERSION=1.100.0
-ARG UPSTREAM_COMMIT=e4f25265704e2b2c6cf6e81be2e4c5cffff896f4
+ARG IMAGE_VERSION=1.100.1
+ARG UPSTREAM_COMMIT=1dba17b10ded12ad0021edb453ba2c54e4637928
 
 FROM rust:1.94.1-slim-trixie@sha256:cf09adf8c3ebaba10779e5c23ff7fe4df4cccdab8a91f199b0c142c53fef3e1a AS rust
 
@@ -15,7 +15,7 @@ ARG IMAGE_VERSION
 ARG UPSTREAM_COMMIT
 WORKDIR /app
 ADD --checksum=${UPSTREAM_COMMIT} https://github.com/BerriAI/litellm.git#v${IMAGE_VERSION} /app
-COPY strip_enterprise.py verify_oss.py base-sources.sha256 sso.patch litellm-auth.patch responses-streaming.patch responses-logging.patch /patches/
+COPY strip_enterprise.py verify_oss.py base-sources.sha256 sso.patch litellm-auth.patch responses-streaming.patch responses-logging.patch otel-propagation.patch /patches/
 RUN apt-get update && apt-get install -y --no-install-recommends patch \
     && python3 /patches/strip_enterprise.py /app \
     && sha256sum -c /patches/base-sources.sha256 \
@@ -23,6 +23,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends patch \
     && patch --batch --forward --fuzz=0 -p1 < /patches/litellm-auth.patch \
     && patch --batch --forward --fuzz=0 -p1 < /patches/responses-streaming.patch \
     && patch --batch --forward --fuzz=0 -p1 < /patches/responses-logging.patch \
+    && patch --batch --forward --fuzz=0 -p1 < /patches/otel-propagation.patch \
     && python3 /patches/verify_oss.py /app
 
 FROM --platform=$BUILDPLATFORM node:24.19-alpine3.24@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 AS ui
@@ -72,7 +73,7 @@ COPY --from=builder /opt/prisma /opt/prisma
 COPY --from=source /app/LICENSE /app/LICENSE.litellm
 COPY LICENSE.patches /app/LICENSE.patches
 COPY oidc_delegated_auth.py /app/litellm-config/oidc_delegated_auth.py
-COPY verify_oss.py verify_auth.py verify_streaming.py verify_logging.py /tmp/litellm-checks/
+COPY verify_oss.py verify_auth.py verify_streaming.py verify_logging.py verify_tracing.py /tmp/litellm-checks/
 RUN chmod -R a+rX /opt/prisma \
     && test -x /opt/prisma/binaries/node_modules/.bin/prisma \
     && test -f /opt/prisma/binaries/node_modules/prisma/build/index.js \
@@ -81,6 +82,7 @@ RUN chmod -R a+rX /opt/prisma \
     && python3 /tmp/litellm-checks/verify_auth.py \
     && LITELLM_LOCAL_MODEL_COST_MAP=true python3 /tmp/litellm-checks/verify_streaming.py \
     && LITELLM_LOCAL_MODEL_COST_MAP=true python3 /tmp/litellm-checks/verify_logging.py \
+    && LITELLM_LOCAL_MODEL_COST_MAP=true python3 /tmp/litellm-checks/verify_tracing.py \
     && litellm --help > /dev/null \
     && rm -rf /tmp/litellm-checks
 EXPOSE 4000/tcp

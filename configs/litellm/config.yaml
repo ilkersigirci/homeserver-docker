@@ -8,7 +8,18 @@ general_settings:
 
 litellm_settings:
   enable_post_custom_auth_checks: true
+  # Preserve W3C context through LiteLLM's model-call span to the provider.
+  forward_traceparent_to_llm_provider: true
   # First-use provisioning creates a visible but fail-closed user record.
   # Assign a positive budget and allowed models in the normal LiteLLM UI.
   default_internal_user_params:
     max_budget: 0
+
+# Keep metric cardinality bounded to stable GenAI dimensions. Model names stay
+# available on model-call spans even when excluded from metric labels.
+callback_settings:
+  otel:
+    attributes:
+      include_list:
+        - gen_ai.operation.name
+        - gen_ai.provider.name

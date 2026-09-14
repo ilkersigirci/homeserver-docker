@@ -275,7 +275,7 @@ email, the default requires `email_verified` to be the JSON boolean `true`.
 Set the variable to `false` to provision by OIDC subject without blocking on an
 unverified email. The verifier discards that email, so only a verified email can
 participate in LiteLLM's
-[email fallback lookup](https://github.com/BerriAI/litellm/blob/v1.100.0/litellm/proxy/auth/auth_checks.py#L2096-L2132).
+[email fallback lookup](https://github.com/BerriAI/litellm/blob/v1.100.1/litellm/proxy/auth/auth_checks.py#L2096-L2132).
 Invalid values fail configuration loading.
 
 Pocket ID defaults `EMAILS_VERIFIED` and `EMAIL_VERIFICATION_ENABLED` to

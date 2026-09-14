@@ -39,6 +39,17 @@
       "keepTime": true,
       "tags": [],
       "targetBlank": false,
+      "title": "LiteLLM metrics",
+      "type": "link",
+      "url": "/d/litellm-otel-overview"
+    },
+    {
+      "asDropdown": false,
+      "icon": "dashboard",
+      "includeVars": false,
+      "keepTime": true,
+      "tags": [],
+      "targetBlank": false,
       "title": "Traefik metrics",
       "type": "link",
       "url": "/d/adbp9s4"
@@ -660,7 +671,7 @@
             "uid": "tempo"
           },
           "limit": 10,
-          "query": "{ resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-demo-api\" && name = \"POST /responses\" && span.user_agent.original = \"lgos-chainlit\" && span.gen_ai.conversation.id != nil } | select(span.gen_ai.conversation.id) with (most_recent=true)",
+          "query": "{ resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-chainlit\" } >> { resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-demo-api\" && name = \"POST /responses\" && span.gen_ai.conversation.id != nil } | select(span.gen_ai.conversation.id) with (most_recent=true)",
           "queryType": "traceql",
           "refId": "A",
           "tableType": "spans"
@@ -771,7 +782,7 @@
             "uid": "tempo"
           },
           "limit": 10,
-          "query": "{ resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-demo-api\" && name = \"POST /responses\" && span.user_agent.original = \"lgos-openwebui\" && span.gen_ai.conversation.id != nil } | select(span.gen_ai.conversation.id) with (most_recent=true)",
+          "query": "{ resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-openwebui\" } >> { resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-demo-api\" && name = \"POST /responses\" && span.gen_ai.conversation.id != nil } | select(span.gen_ai.conversation.id) with (most_recent=true)",
           "queryType": "traceql",
           "refId": "A",
           "tableType": "spans"

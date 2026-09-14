@@ -18,6 +18,9 @@ The build owns:
   permanent image customization; see [removal criteria](#temporary-streaming-bug-workaround).
 - `responses-logging.patch`, a temporary fix for missing streamed Responses
   success logs; see [removal criteria](#temporary-logging-bug-workaround).
+- `otel-propagation.patch`, a temporary fix that makes provider requests children
+  of LiteLLM's model-call spans; see
+  [removal criteria](#temporary-trace-propagation-workaround).
 - `oidc_delegated_auth.py`, which validates RFC 9068 JWT access tokens by default,
   with explicit Pocket ID and Keycloak compatibility profiles.
 - `verify_auth.py`, which exercises the integration during every image build.
@@ -25,6 +28,8 @@ The build owns:
   request field during every image build without external API calls.
 - `verify_logging.py`, which checks Responses success callbacks and spend-log
   payloads during every image build without external API calls or a database.
+- `verify_tracing.py`, which checks provider `traceparent` injection during every
+  image build without an external collector or model provider.
 - `verify_oss.py`, which checks stripped source and the installed runtime.
 
 The build pins base images by digest and source by tag plus commit checksum.
@@ -136,6 +141,26 @@ PostgreSQL insertion; deployment validation must also confirm the stored row.
 At each upgrade, test without this patch. Once the pinned release passes
 `verify_logging.py`, remove the patch, its Dockerfile copy/apply steps, and its
 source hash. Keep the regression check in the build.
+
+## Temporary Trace Propagation Workaround
+
+Upstream's `forward_traceparent_to_llm_provider` setting copies the inbound
+`traceparent` header unchanged. That keeps the provider in the caller's trace,
+but makes the LiteLLM request span and provider server span siblings instead of
+recording the provider beneath LiteLLM's model-call client span.
+This behavior is tracked in
+[upstream issue #39067](https://github.com/BerriAI/litellm/issues/39067).
+
+`otel-propagation.patch` replaces that stale header at the provider handoff with
+the W3C context of LiteLLM's model-call span. The existing setting remains the
+opt-in gate; deployments that leave it disabled retain upstream behavior.
+`verify_tracing.py` checks both enabled and disabled paths against an in-memory
+tracer provider.
+
+At each upgrade, test without this patch. Remove it when the enabled upstream
+path injects the model-call span into provider headers and `verify_tracing.py`
+passes unchanged. Delete the patch, its Dockerfile copy/apply step, and the
+source hash while retaining the regression check.
 
 ## Updating
 
