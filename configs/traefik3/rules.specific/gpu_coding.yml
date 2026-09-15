@@ -5,7 +5,7 @@ http:
       entryPoints:
         - websecure
       middlewares:
-        - chain-no-auth
+        - chain-no-auth-relaxed
       service: t3code-svc
 
     marimo-local-rtr:
