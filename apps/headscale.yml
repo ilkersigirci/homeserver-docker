@@ -174,7 +174,7 @@ services:
 
   # NOTE: When changing ACL in admin ui, restart the headscale container to make it take effect.
   headscale-admin:
-    image: goodieshq/headscale-admin:v0.27.0@sha256:e579fce717aa9b52d8a4a17e7624ef8e2f0352b90da333615ffd1eccd9e34bf5
+    image: goodieshq/headscale-admin:0.28.0@sha256:02f6d5c658b1ea276c74d58bfc23d6d4763b68ff0e1d9b7f2ba72f1b1e233126
     container_name: headscale-admin
     restart: $RESTART_POLICY_CORE
     depends_on:
