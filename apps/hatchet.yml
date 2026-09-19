@@ -45,7 +45,7 @@ services:
       start_period: 30s
 
   hatchet:
-    image: ghcr.io/ilkersigirci/homeserver-hatchet:v0.107.0@sha256:de5b377aadbf07866d53fe703f81050471feb1caed1c4fdb339a03757b16dc61
+    image: ghcr.io/ilkersigirci/homeserver-hatchet:v0.107.2@sha256:ef7277862f20d10a0595c6b5c31206fc5d739cdabdd41d74379fab7ca71857aa
     container_name: hatchet
     restart: $RESTART_POLICY_PROGRAMMING
     depends_on:
