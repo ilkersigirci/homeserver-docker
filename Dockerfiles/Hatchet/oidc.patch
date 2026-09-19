@@ -1,0 +1,1189 @@
+diff --git a/api-contracts/openapi/openapi.yaml b/api-contracts/openapi/openapi.yaml
+index 8cfe9bbdd..79034ee88 100644
+--- a/api-contracts/openapi/openapi.yaml
++++ b/api-contracts/openapi/openapi.yaml
+@@ -103,6 +103,10 @@ paths:
+     $ref: "./paths/user/user.yaml#/oauth-start-github"
+   /api/v1/users/github/callback:
+     $ref: "./paths/user/user.yaml#/oauth-callback-github"
++  /api/v1/users/oidc/start:
++    $ref: "./paths/user/user.yaml#/oauth-start-oidc"
++  /api/v1/users/oidc/callback:
++    $ref: "./paths/user/user.yaml#/oauth-callback-oidc"
+   /api/v1/tenants/{tenant}/slack/start:
+     $ref: "./paths/user/user.yaml#/oauth-start-slack"
+   /api/v1/users/slack/callback:
+diff --git a/api-contracts/openapi/paths/user/user.yaml b/api-contracts/openapi/paths/user/user.yaml
+index a4fe0beac..7bce297f4 100644
+--- a/api-contracts/openapi/paths/user/user.yaml
++++ b/api-contracts/openapi/paths/user/user.yaml
+@@ -232,6 +232,36 @@ oauth-callback-github:
+     summary: Complete OAuth flow
+     tags:
+       - User
++oauth-start-oidc:
++  get:
++    description: Starts the OIDC OAuth flow
++    operationId: user:update:oidc-oauth-start
++    responses:
++      "302":
++        description: Successfully started the OAuth flow
++        headers:
++          location:
++            schema:
++              type: string
++    security: []
++    summary: Start OIDC OAuth flow
++    tags:
++      - User
++oauth-callback-oidc:
++  get:
++    description: Completes the OIDC OAuth flow
++    operationId: user:update:oidc-oauth-callback
++    responses:
++      "302":
++        description: Successfully completed the OAuth flow
++        headers:
++          location:
++            schema:
++              type: string
++    security: []
++    summary: Complete OIDC OAuth flow
++    tags:
++      - User
+ oauth-start-slack:
+   get:
+     x-resources: ["tenant"]
+diff --git a/api/v1/server/authz/rbac.yaml b/api/v1/server/authz/rbac.yaml
+index ec0c95001..b72e1ccd8 100644
+--- a/api/v1/server/authz/rbac.yaml
++++ b/api/v1/server/authz/rbac.yaml
+@@ -133,6 +133,8 @@ roles:
+       - TenantResourcePolicyGet
+       - UserUpdateSlackOauthStart
+       - UserUpdateGoogleOauthStart
++      - UserUpdateOidcOauthStart
++      - UserUpdateOidcOauthCallback
+       - V1CelDebug
+       - V1WorkflowRunGetTimings
+       - InfoGetVersion
+diff --git a/api/v1/server/handlers/metadata/get.go b/api/v1/server/handlers/metadata/get.go
+index 236df1949..b16b04f41 100644
+--- a/api/v1/server/handlers/metadata/get.go
++++ b/api/v1/server/handlers/metadata/get.go
+@@ -22,6 +22,10 @@ func (u *MetadataService) MetadataGet(ctx echo.Context, request gen.MetadataGetR
+ 		authTypes = append(authTypes, "github")
+ 	}
+
++	if u.config.Auth.ConfigFile.OIDC.Enabled {
++		authTypes = append(authTypes, "oidc")
++	}
++
+ 	pylonAppID := u.config.Pylon.AppID
+
+ 	var posthogConfig *gen.APIMetaPosthog
+diff --git a/api/v1/server/handlers/users/oidc_oauth_callback.go b/api/v1/server/handlers/users/oidc_oauth_callback.go
+new file mode 100644
+index 000000000..5b55e1a2b
+--- /dev/null
++++ b/api/v1/server/handlers/users/oidc_oauth_callback.go
+@@ -0,0 +1,216 @@
++package users
++
++import (
++	"context"
++	"errors"
++	"fmt"
++
++	"github.com/coreos/go-oidc/v3/oidc"
++	"github.com/jackc/pgx/v5"
++	"github.com/labstack/echo/v4"
++	"golang.org/x/oauth2"
++
++	"github.com/hatchet-dev/hatchet/api/v1/server/authn"
++	"github.com/hatchet-dev/hatchet/api/v1/server/middleware/redirect"
++	"github.com/hatchet-dev/hatchet/api/v1/server/oas/gen"
++	"github.com/hatchet-dev/hatchet/pkg/analytics"
++	"github.com/hatchet-dev/hatchet/pkg/config/server"
++	v1 "github.com/hatchet-dev/hatchet/pkg/repository"
++	"github.com/hatchet-dev/hatchet/pkg/repository/sqlcv1"
++)
++
++// Note: we want all errors to redirect, otherwise the user will be greeted with raw JSON in the middle of the login flow.
++func (u *UserService) UserUpdateOidcOauthCallback(ctx echo.Context, _ gen.UserUpdateOidcOauthCallbackRequestObject) (gen.UserUpdateOidcOauthCallbackResponseObject, error) {
++	if u.config.Auth.OIDCOAuthConfig == nil || u.config.Auth.OIDCProvider == nil {
++		return nil, redirect.GetRedirectWithError(ctx, u.config.Logger, nil, "OIDC authentication is not configured.")
++	}
++
++	isValid, _, err := authn.NewSessionHelpers(u.config.SessionStore).ValidateOAuthState(ctx, "oidc")
++
++	if err != nil || !isValid {
++		return nil, redirect.GetRedirectWithError(ctx, u.config.Logger, err, "Could not log in. Please try again and make sure cookies are enabled.")
++	}
++
++	token, err := u.config.Auth.OIDCOAuthConfig.Exchange(ctx.Request().Context(), ctx.Request().URL.Query().Get("code"))
++
++	if err != nil {
++		return nil, redirect.GetRedirectWithError(ctx, u.config.Logger, err, "Forbidden")
++	}
++
++	if !token.Valid() {
++		return nil, redirect.GetRedirectWithError(ctx, u.config.Logger, fmt.Errorf("invalid token"), "Forbidden")
++	}
++
++	user, err := u.upsertOIDCUserFromToken(ctx.Request().Context(), u.config, token)
++
++	if err != nil {
++		if errors.Is(err, ErrNotInRestrictedDomain) {
++			return nil, redirect.GetRedirectWithError(ctx, u.config.Logger, err, "Email is not in the restricted domain group.")
++		}
++
++		return nil, redirect.GetRedirectWithError(ctx, u.config.Logger, err, "Internal error.")
++	}
++
++	err = authn.NewSessionHelpers(u.config.SessionStore).SaveAuthenticated(ctx, user)
++
++	if err != nil {
++		return nil, redirect.GetRedirectWithError(ctx, u.config.Logger, err, "Internal error.")
++	}
++
++	analyticsCtx := context.WithValue(ctx.Request().Context(), analytics.UserIDKey, user.ID)
++	analyticsCtx = context.WithValue(analyticsCtx, analytics.SourceKey, analytics.SourceUI)
++	u.config.Analytics.Enqueue(
++		analyticsCtx,
++		analytics.User, analytics.Login,
++		user.ID.String(),
++		map[string]interface{}{"provider": "oidc"},
++	)
++
++	return gen.UserUpdateOidcOauthCallback302Response{
++		Headers: gen.UserUpdateOidcOauthCallback302ResponseHeaders{
++			Location: u.config.Runtime.ServerURL,
++		},
++	}, nil
++}
++
++func (u *UserService) upsertOIDCUserFromToken(ctx context.Context, config *server.ServerConfig, tok *oauth2.Token) (*sqlcv1.User, error) {
++	claims, err := getOIDCClaimsFromToken(ctx, config, tok)
++	if err != nil {
++		return nil, err
++	}
++
++	if err := u.checkUserRestrictionsForEmail(config, claims.Email); err != nil {
++		return nil, err
++	}
++
++	// Consistent with the Google/GitHub handlers, an unverified email is not
++	// rejected here — the user is created and the application's verify-email gate
++	// handles it. SetEmailVerified (SERVER_AUTH_SET_EMAIL_VERIFIED) auto-verifies,
++	// the same instance-wide setting other providers honor. This also covers
++	// providers that don't emit email_verified at all (e.g. Microsoft Entra ID).
++	emailVerified := claims.EmailVerified || config.Auth.ConfigFile.SetEmailVerified
++
++	expiresAt := tok.Expiry
++
++	accessTokenEncrypted, err := config.Encryption.Encrypt([]byte(tok.AccessToken), "oidc_access_token")
++	if err != nil {
++		return nil, fmt.Errorf("failed to encrypt access token: %s", err.Error())
++	}
++
++	refreshToken := tok.RefreshToken
++	if refreshToken == "" {
++		refreshToken = "none"
++	}
++
++	refreshTokenEncrypted, err := config.Encryption.Encrypt([]byte(refreshToken), "oidc_refresh_token")
++	if err != nil {
++		return nil, fmt.Errorf("failed to encrypt refresh token: %s", err.Error())
++	}
++
++	oauthOpts := &v1.OAuthOpts{
++		Provider:       "oidc",
++		ProviderUserId: claims.Sub,
++		AccessToken:    accessTokenEncrypted,
++		RefreshToken:   refreshTokenEncrypted,
++		ExpiresAt:      &expiresAt,
++	}
++
++	user, err := u.config.V1.User().GetUserByEmail(ctx, claims.Email)
++
++	switch err {
++	case nil:
++		user, err = u.config.V1.User().UpdateUser(ctx, user.ID, &v1.UpdateUserOpts{
++			EmailVerified: v1.BoolPtr(emailVerified),
++			Name:          v1.StringPtr(claims.Name),
++			OAuth:         oauthOpts,
++		})
++
++		if err != nil {
++			return nil, fmt.Errorf("failed to update user: %s", err.Error())
++		}
++	case pgx.ErrNoRows:
++		if !config.Runtime.AllowSignup {
++			return nil, fmt.Errorf("user signup is disabled")
++		}
++
++		user, err = u.config.V1.User().CreateUser(ctx, &v1.CreateUserOpts{
++			Email:         claims.Email,
++			EmailVerified: v1.BoolPtr(emailVerified),
++			Name:          v1.StringPtr(claims.Name),
++			OAuth:         oauthOpts,
++		})
++
++		if err != nil {
++			return nil, fmt.Errorf("failed to create user: %s", err.Error())
++		}
++	default:
++		return nil, fmt.Errorf("failed to get user: %s", err.Error())
++	}
++
++	return user, nil
++}
++
++type oidcClaims struct {
++	Email         string `json:"email"`
++	EmailVerified bool   `json:"email_verified"`
++	Name          string `json:"name"`
++	Sub           string `json:"sub"`
++}
++
++func getOIDCClaimsFromToken(ctx context.Context, config *server.ServerConfig, tok *oauth2.Token) (*oidcClaims, error) {
++	verifier := config.Auth.OIDCProvider.Verifier(&oidc.Config{
++		ClientID: config.Auth.OIDCOAuthConfig.ClientID,
++	})
++
++	rawIDToken, ok := tok.Extra("id_token").(string)
++	if !ok {
++		return nil, fmt.Errorf("no id_token in token response")
++	}
++
++	idToken, err := verifier.Verify(ctx, rawIDToken)
++	if err != nil {
++		return nil, fmt.Errorf("failed to verify ID token: %s", err.Error())
++	}
++
++	claims := &oidcClaims{}
++	if err := idToken.Claims(claims); err != nil {
++		return nil, fmt.Errorf("failed to parse ID token claims: %s", err.Error())
++	}
++
++	// Fall back to UserInfo endpoint when the ID token is missing optional claims.
++	// The OIDC spec does not require providers to include email/name in the ID token.
++	if claims.Email == "" || claims.Name == "" || !claims.EmailVerified {
++		userInfo, uiErr := config.Auth.OIDCProvider.UserInfo(ctx, oauth2.StaticTokenSource(tok))
++		if uiErr == nil {
++			uiClaims := &oidcClaims{}
++			if err := userInfo.Claims(uiClaims); err == nil {
++				// Per OIDC spec, the UserInfo sub must match the ID token sub.
++				if uiClaims.Sub != "" && claims.Sub != "" && uiClaims.Sub != claims.Sub {
++					return nil, fmt.Errorf("OIDC UserInfo sub claim (%s) does not match ID token sub claim (%s)", uiClaims.Sub, claims.Sub)
++				}
++				if claims.Email == "" {
++					claims.Email = uiClaims.Email
++				}
++				if claims.Name == "" {
++					claims.Name = uiClaims.Name
++				}
++				if !claims.EmailVerified && uiClaims.EmailVerified {
++					claims.EmailVerified = true
++				}
++				if claims.Sub == "" {
++					claims.Sub = uiClaims.Sub
++				}
++			}
++		}
++	}
++
++	if claims.Email == "" {
++		return nil, fmt.Errorf("OIDC provider did not return an email claim")
++	}
++
++	if claims.Sub == "" {
++		return nil, fmt.Errorf("OIDC provider did not return a sub claim")
++	}
++
++	return claims, nil
++}
+diff --git a/api/v1/server/handlers/users/oidc_oauth_callback_integration_test.go b/api/v1/server/handlers/users/oidc_oauth_callback_integration_test.go
+new file mode 100644
+index 000000000..93b5ff2e3
+--- /dev/null
++++ b/api/v1/server/handlers/users/oidc_oauth_callback_integration_test.go
+@@ -0,0 +1,150 @@
++//go:build integration
++
++package users
++
++import (
++	"context"
++	"os"
++	"strings"
++	"testing"
++
++	"github.com/rs/zerolog"
++
++	"github.com/hatchet-dev/hatchet/internal/testutils"
++	"github.com/hatchet-dev/hatchet/pkg/config/database"
++	"github.com/hatchet-dev/hatchet/pkg/config/server"
++	"github.com/hatchet-dev/hatchet/pkg/encryption"
++	"github.com/hatchet-dev/hatchet/pkg/random"
++)
++
++// newOIDCTestConfig builds a ServerConfig wired to the in-process mock issuer +
++// the real database layer. SetEmailVerified defaults to false (the production
++// default), so unverified emails are created but left unverified.
++func newOIDCTestConfig(t *testing.T, dbConf *database.Layer) (*server.ServerConfig, *mockOIDC) {
++	t.Helper()
++
++	masterKey, privJWT, pubJWT, _, err := encryption.GenerateLocalKeys()
++	if err != nil {
++		t.Fatalf("generate local keys: %v", err)
++	}
++	enc, err := encryption.NewLocalEncryption(masterKey, privJWT, pubJWT)
++	if err != nil {
++		t.Fatalf("new local encryption: %v", err)
++	}
++
++	m := newMockOIDC(t)
++	logger := zerolog.Nop()
++	cfg := &server.ServerConfig{
++		Layer:      dbConf,
++		Encryption: enc,
++		Logger:     &logger,
++		Runtime:    server.ConfigFileRuntime{AllowSignup: true, ServerURL: "http://localhost:8080"},
++		Auth: server.AuthConfig{
++			OIDCProvider:    m.provider,
++			OIDCOAuthConfig: m.oauthCfg,
++		},
++	}
++	return cfg, m
++}
++
++func uniqueEmail(t *testing.T, prefix string) string {
++	t.Helper()
++	suffix, err := random.Generate(8)
++	if err != nil {
++		t.Fatalf("random suffix: %v", err)
++	}
++	// CreateUser stores emails lowercased, so use a lowercase address.
++	return strings.ToLower(prefix + "-" + suffix + "@example.com")
++}
++
++// TestUpsertOIDCUserFromToken exercises the full OIDC upsert against a real
++// database: verify the ID token, then create (and on a second login, update) the
++// Hatchet user + OAuth link. This is the path where OAuthOpts.Provider="oidc"
++// must pass repository validation — a regression here is exactly the bug that
++// shipped in the original PR (provider "oidc" rejected by the oneof validator).
++func TestUpsertOIDCUserFromToken(t *testing.T) {
++	// Keep this DB-only test self-contained on the PostgreSQL queue backend.
++	_ = os.Setenv("SERVER_MSGQUEUE_KIND", "postgres")
++
++	testutils.RunTestWithDatabase(t, func(dbConf *database.Layer) error {
++		cfg, m := newOIDCTestConfig(t, dbConf)
++		us := NewUserService(cfg)
++		ctx := context.Background()
++
++		email := uniqueEmail(t, "oidc")
++
++		// First login: user does not exist yet -> CreateUser with provider="oidc".
++		tok := m.token(t, idTokenClaims{
++			Subject: "kc-sub-abc", Email: email, EmailVerified: true, Name: "Alice Example",
++		})
++		user, err := us.upsertOIDCUserFromToken(ctx, cfg, tok)
++		if err != nil {
++			t.Fatalf("create via OIDC failed: %v", err)
++		}
++		if user.Email != email {
++			t.Fatalf("created user email = %q, want %q", user.Email, email)
++		}
++		if !user.EmailVerified {
++			t.Fatal("created user should be email-verified")
++		}
++
++		// Second login for the same email: should update the existing user, not
++		// create a duplicate.
++		tok2 := m.token(t, idTokenClaims{
++			Subject: "kc-sub-abc", Email: email, EmailVerified: true, Name: "Alice Renamed",
++		})
++		user2, err := us.upsertOIDCUserFromToken(ctx, cfg, tok2)
++		if err != nil {
++			t.Fatalf("update via OIDC failed: %v", err)
++		}
++		if user2.ID != user.ID {
++			t.Fatalf("second login created a new user (%s) instead of updating (%s)", user2.ID, user.ID)
++		}
++
++		return nil
++	})
++}
++
++// TestUpsertOIDCUserFromToken_UnverifiedEmail covers a provider that does not
++// assert a verified email (e.g. Microsoft Entra ID). The login is never rejected
++// (matching Google/GitHub); SetEmailVerified controls whether the stored user is
++// verified or left for the application's verify-email gate.
++func TestUpsertOIDCUserFromToken_UnverifiedEmail(t *testing.T) {
++	_ = os.Setenv("SERVER_MSGQUEUE_KIND", "postgres")
++
++	testutils.RunTestWithDatabase(t, func(dbConf *database.Layer) error {
++		cfg, m := newOIDCTestConfig(t, dbConf)
++		us := NewUserService(cfg)
++		ctx := context.Background()
++
++		// SetEmailVerified=false (default): the user is created but left
++		// unverified (the verify-email gate then applies) — not rejected.
++		gatedEmail := uniqueEmail(t, "entra-gated")
++		gatedTok := m.token(t, idTokenClaims{
++			Subject: "entra-sub-1", Email: gatedEmail, EmailVerified: false, Name: "Bob Example",
++		})
++		gated, err := us.upsertOIDCUserFromToken(ctx, cfg, gatedTok)
++		if err != nil {
++			t.Fatalf("unverified email should be created, not rejected: %v", err)
++		}
++		if gated.EmailVerified {
++			t.Fatal("with SetEmailVerified=false an unverified email should stay unverified")
++		}
++
++		// SetEmailVerified=true: the same flow auto-verifies the user.
++		cfg.Auth.ConfigFile.SetEmailVerified = true
++		autoEmail := uniqueEmail(t, "entra-auto")
++		autoTok := m.token(t, idTokenClaims{
++			Subject: "entra-sub-2", Email: autoEmail, EmailVerified: false, Name: "Carol Example",
++		})
++		auto, err := us.upsertOIDCUserFromToken(ctx, cfg, autoTok)
++		if err != nil {
++			t.Fatalf("upsert with SetEmailVerified=true failed: %v", err)
++		}
++		if !auto.EmailVerified {
++			t.Fatal("with SetEmailVerified=true the user should be stored as verified")
++		}
++
++		return nil
++	})
++}
+diff --git a/api/v1/server/handlers/users/oidc_oauth_callback_test.go b/api/v1/server/handlers/users/oidc_oauth_callback_test.go
+new file mode 100644
+index 000000000..aad412239
+--- /dev/null
++++ b/api/v1/server/handlers/users/oidc_oauth_callback_test.go
+@@ -0,0 +1,181 @@
++package users
++
++import (
++	"context"
++	"crypto/rand"
++	"crypto/rsa"
++	"encoding/json"
++	"net/http"
++	"net/http/httptest"
++	"testing"
++	"time"
++
++	"github.com/coreos/go-oidc/v3/oidc"
++	"github.com/go-jose/go-jose/v4"
++	"golang.org/x/oauth2"
++
++	"github.com/hatchet-dev/hatchet/pkg/config/server"
++)
++
++const testOIDCClientID = "hatchet-test"
++
++// mockOIDC is an in-process OIDC issuer for tests: it serves the discovery
++// document + JWKS and mints signed ID tokens, so the OIDC verification and user
++// upsert paths can be exercised without a real IdP (Keycloak/Dex). This keeps
++// the test deterministic and container-free, matching the project's preference
++// for in-process integration tests.
++type mockOIDC struct {
++	server   *httptest.Server
++	signer   jose.Signer
++	provider *oidc.Provider
++	oauthCfg *oauth2.Config
++}
++
++func newMockOIDC(t *testing.T) *mockOIDC {
++	t.Helper()
++
++	priv, err := rsa.GenerateKey(rand.Reader, 2048)
++	if err != nil {
++		t.Fatalf("generate rsa key: %v", err)
++	}
++
++	const keyID = "test-key-1"
++	signer, err := jose.NewSigner(
++		jose.SigningKey{Algorithm: jose.RS256, Key: jose.JSONWebKey{Key: priv, KeyID: keyID}},
++		(&jose.SignerOptions{}).WithType("JWT"),
++	)
++	if err != nil {
++		t.Fatalf("new signer: %v", err)
++	}
++
++	jwks := jose.JSONWebKeySet{Keys: []jose.JSONWebKey{{
++		Key: priv.Public(), KeyID: keyID, Algorithm: "RS256", Use: "sig",
++	}}}
++
++	mux := http.NewServeMux()
++	srv := httptest.NewServer(mux)
++	t.Cleanup(srv.Close)
++
++	mux.HandleFunc("/.well-known/openid-configuration", func(w http.ResponseWriter, _ *http.Request) {
++		w.Header().Set("Content-Type", "application/json")
++		_ = json.NewEncoder(w).Encode(map[string]any{
++			"issuer":                                srv.URL,
++			"authorization_endpoint":                srv.URL + "/auth",
++			"token_endpoint":                        srv.URL + "/token",
++			"jwks_uri":                              srv.URL + "/keys",
++			"userinfo_endpoint":                     srv.URL + "/userinfo",
++			"id_token_signing_alg_values_supported": []string{"RS256"},
++			"response_types_supported":              []string{"code"},
++			"subject_types_supported":               []string{"public"},
++		})
++	})
++	mux.HandleFunc("/keys", func(w http.ResponseWriter, _ *http.Request) {
++		w.Header().Set("Content-Type", "application/json")
++		_ = json.NewEncoder(w).Encode(jwks)
++	})
++
++	provider, err := oidc.NewProvider(context.Background(), srv.URL)
++	if err != nil {
++		t.Fatalf("oidc discovery: %v", err)
++	}
++
++	return &mockOIDC{
++		server:   srv,
++		signer:   signer,
++		provider: provider,
++		oauthCfg: &oauth2.Config{ClientID: testOIDCClientID},
++	}
++}
++
++// idTokenClaims are the claims the mock signs into an ID token. Zero values for
++// iss/aud/exp/iat are filled with sensible defaults in token().
++type idTokenClaims struct {
++	Issuer        string `json:"iss"`
++	Subject       string `json:"sub"`
++	Audience      string `json:"aud"`
++	Expiry        int64  `json:"exp"`
++	IssuedAt      int64  `json:"iat"`
++	Email         string `json:"email,omitempty"`
++	EmailVerified bool   `json:"email_verified"`
++	Name          string `json:"name,omitempty"`
++}
++
++// token mints an *oauth2.Token whose "id_token" extra is a signed JWT carrying
++// the given claims (audience defaults to the test client id).
++func (m *mockOIDC) token(t *testing.T, c idTokenClaims) *oauth2.Token {
++	t.Helper()
++
++	if c.Issuer == "" {
++		c.Issuer = m.server.URL
++	}
++	if c.Audience == "" {
++		c.Audience = testOIDCClientID
++	}
++	if c.Expiry == 0 {
++		c.Expiry = time.Now().Add(time.Hour).Unix()
++	}
++	if c.IssuedAt == 0 {
++		c.IssuedAt = time.Now().Unix()
++	}
++
++	payload, err := json.Marshal(c)
++	if err != nil {
++		t.Fatalf("marshal claims: %v", err)
++	}
++	jws, err := m.signer.Sign(payload)
++	if err != nil {
++		t.Fatalf("sign id token: %v", err)
++	}
++	raw, err := jws.CompactSerialize()
++	if err != nil {
++		t.Fatalf("serialize id token: %v", err)
++	}
++
++	return (&oauth2.Token{AccessToken: "test-access-token", TokenType: "Bearer"}).
++		WithExtra(map[string]any{"id_token": raw})
++}
++
++// TestGetOIDCClaimsFromToken covers the security-critical verification path:
++// the ID token is checked against the issuer's JWKS and audience before any
++// claims are trusted.
++func TestGetOIDCClaimsFromToken(t *testing.T) {
++	m := newMockOIDC(t)
++	cfg := &server.ServerConfig{
++		Auth: server.AuthConfig{
++			OIDCProvider:    m.provider,
++			OIDCOAuthConfig: m.oauthCfg,
++		},
++	}
++	ctx := context.Background()
++
++	t.Run("valid token returns verified claims", func(t *testing.T) {
++		tok := m.token(t, idTokenClaims{
++			Subject: "kc-sub-123", Email: "alice@example.com", EmailVerified: true, Name: "Alice",
++		})
++
++		claims, err := getOIDCClaimsFromToken(ctx, cfg, tok)
++		if err != nil {
++			t.Fatalf("unexpected error: %v", err)
++		}
++		if claims.Email != "alice@example.com" || claims.Sub != "kc-sub-123" ||
++			!claims.EmailVerified || claims.Name != "Alice" {
++			t.Fatalf("unexpected claims: %+v", claims)
++		}
++	})
++
++	t.Run("token for a different audience is rejected", func(t *testing.T) {
++		tok := m.token(t, idTokenClaims{
++			Subject: "x", Audience: "some-other-client", Email: "a@b.c", EmailVerified: true,
++		})
++		if _, err := getOIDCClaimsFromToken(ctx, cfg, tok); err == nil {
++			t.Fatal("expected verification error for wrong audience, got nil")
++		}
++	})
++
++	t.Run("response without an id_token is rejected", func(t *testing.T) {
++		tok := &oauth2.Token{AccessToken: "no-id-token"}
++		if _, err := getOIDCClaimsFromToken(ctx, cfg, tok); err == nil {
++			t.Fatal("expected error for missing id_token, got nil")
++		}
++	})
++}
+diff --git a/api/v1/server/handlers/users/oidc_oauth_start.go b/api/v1/server/handlers/users/oidc_oauth_start.go
+new file mode 100644
+index 000000000..74032ebea
+--- /dev/null
++++ b/api/v1/server/handlers/users/oidc_oauth_start.go
+@@ -0,0 +1,30 @@
++package users
++
++import (
++	"github.com/labstack/echo/v4"
++
++	"github.com/hatchet-dev/hatchet/api/v1/server/authn"
++	"github.com/hatchet-dev/hatchet/api/v1/server/middleware/redirect"
++	"github.com/hatchet-dev/hatchet/api/v1/server/oas/gen"
++)
++
++// Note: we want all errors to redirect, otherwise the user will be greeted with raw JSON in the middle of the login flow.
++func (u *UserService) UserUpdateOidcOauthStart(ctx echo.Context, _ gen.UserUpdateOidcOauthStartRequestObject) (gen.UserUpdateOidcOauthStartResponseObject, error) {
++	if u.config.Auth.OIDCOAuthConfig == nil {
++		return nil, redirect.GetRedirectWithError(ctx, u.config.Logger, nil, "OIDC authentication is not configured.")
++	}
++
++	state, err := authn.NewSessionHelpers(u.config.SessionStore).SaveOAuthState(ctx, "oidc")
++
++	if err != nil {
++		return nil, redirect.GetRedirectWithError(ctx, u.config.Logger, err, "Could not get cookie. Please make sure cookies are enabled.")
++	}
++
++	url := u.config.Auth.OIDCOAuthConfig.AuthCodeURL(state)
++
++	return gen.UserUpdateOidcOauthStart302Response{
++		Headers: gen.UserUpdateOidcOauthStart302ResponseHeaders{
++			Location: url,
++		},
++	}, nil
++}
+diff --git a/api/v1/server/oas/gen/openapi.gen.go b/api/v1/server/oas/gen/openapi.gen.go
+index 5b027c95e..b2a6411a6 100644
+--- a/api/v1/server/oas/gen/openapi.gen.go
++++ b/api/v1/server/oas/gen/openapi.gen.go
+@@ -4014,6 +4014,12 @@ type ServerInterface interface {
+ 	// List tenant memberships
+ 	// (GET /api/v1/users/memberships)
+ 	TenantMembershipsList(ctx echo.Context) error
++	// Complete OIDC OAuth flow
++	// (GET /api/v1/users/oidc/callback)
++	UserUpdateOidcOauthCallback(ctx echo.Context) error
++	// Start OIDC OAuth flow
++	// (GET /api/v1/users/oidc/start)
++	UserUpdateOidcOauthStart(ctx echo.Context) error
+ 	// Change user password
+ 	// (POST /api/v1/users/password)
+ 	UserUpdatePassword(ctx echo.Context) error
+@@ -7916,6 +7922,24 @@ func (w *ServerInterfaceWrapper) TenantMembershipsList(ctx echo.Context) error {
+ 	return err
+ }
+
++// UserUpdateOidcOauthCallback converts echo context to params.
++func (w *ServerInterfaceWrapper) UserUpdateOidcOauthCallback(ctx echo.Context) error {
++	var err error
++
++	// Invoke the callback with all the unmarshaled arguments
++	err = w.Handler.UserUpdateOidcOauthCallback(ctx)
++	return err
++}
++
++// UserUpdateOidcOauthStart converts echo context to params.
++func (w *ServerInterfaceWrapper) UserUpdateOidcOauthStart(ctx echo.Context) error {
++	var err error
++
++	// Invoke the callback with all the unmarshaled arguments
++	err = w.Handler.UserUpdateOidcOauthStart(ctx)
++	return err
++}
++
+ // UserUpdatePassword converts echo context to params.
+ func (w *ServerInterfaceWrapper) UserUpdatePassword(ctx echo.Context) error {
+ 	var err error
+@@ -8347,6 +8371,8 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL
+ 	router.POST(baseURL+"/api/v1/users/login", wrapper.UserUpdateLogin)
+ 	router.POST(baseURL+"/api/v1/users/logout", wrapper.UserUpdateLogout)
+ 	router.GET(baseURL+"/api/v1/users/memberships", wrapper.TenantMembershipsList)
++	router.GET(baseURL+"/api/v1/users/oidc/callback", wrapper.UserUpdateOidcOauthCallback)
++	router.GET(baseURL+"/api/v1/users/oidc/start", wrapper.UserUpdateOidcOauthStart)
+ 	router.POST(baseURL+"/api/v1/users/password", wrapper.UserUpdatePassword)
+ 	router.POST(baseURL+"/api/v1/users/register", wrapper.UserCreate)
+ 	router.GET(baseURL+"/api/v1/users/slack/callback", wrapper.UserUpdateSlackOauthCallback)
+@@ -13483,6 +13509,48 @@ func (response TenantMembershipsList403JSONResponse) VisitTenantMembershipsListR
+ 	return json.NewEncoder(w).Encode(response)
+ }
+
++type UserUpdateOidcOauthCallbackRequestObject struct {
++}
++
++type UserUpdateOidcOauthCallbackResponseObject interface {
++	VisitUserUpdateOidcOauthCallbackResponse(w http.ResponseWriter) error
++}
++
++type UserUpdateOidcOauthCallback302ResponseHeaders struct {
++	Location string
++}
++
++type UserUpdateOidcOauthCallback302Response struct {
++	Headers UserUpdateOidcOauthCallback302ResponseHeaders
++}
++
++func (response UserUpdateOidcOauthCallback302Response) VisitUserUpdateOidcOauthCallbackResponse(w http.ResponseWriter) error {
++	w.Header().Set("location", fmt.Sprint(response.Headers.Location))
++	w.WriteHeader(302)
++	return nil
++}
++
++type UserUpdateOidcOauthStartRequestObject struct {
++}
++
++type UserUpdateOidcOauthStartResponseObject interface {
++	VisitUserUpdateOidcOauthStartResponse(w http.ResponseWriter) error
++}
++
++type UserUpdateOidcOauthStart302ResponseHeaders struct {
++	Location string
++}
++
++type UserUpdateOidcOauthStart302Response struct {
++	Headers UserUpdateOidcOauthStart302ResponseHeaders
++}
++
++func (response UserUpdateOidcOauthStart302Response) VisitUserUpdateOidcOauthStartResponse(w http.ResponseWriter) error {
++	w.Header().Set("location", fmt.Sprint(response.Headers.Location))
++	w.WriteHeader(302)
++	return nil
++}
++
+ type UserUpdatePasswordRequestObject struct {
+ 	Body *UserUpdatePasswordJSONRequestBody
+ }
+@@ -14313,6 +14381,10 @@ type StrictServerInterface interface {
+
+ 	TenantMembershipsList(ctx echo.Context, request TenantMembershipsListRequestObject) (TenantMembershipsListResponseObject, error)
+
++	UserUpdateOidcOauthCallback(ctx echo.Context, request UserUpdateOidcOauthCallbackRequestObject) (UserUpdateOidcOauthCallbackResponseObject, error)
++
++	UserUpdateOidcOauthStart(ctx echo.Context, request UserUpdateOidcOauthStartRequestObject) (UserUpdateOidcOauthStartResponseObject, error)
++
+ 	UserUpdatePassword(ctx echo.Context, request UserUpdatePasswordRequestObject) (UserUpdatePasswordResponseObject, error)
+
+ 	UserCreate(ctx echo.Context, request UserCreateRequestObject) (UserCreateResponseObject, error)
+@@ -17432,6 +17504,46 @@ func (sh *strictHandler) TenantMembershipsList(ctx echo.Context) error {
+ 	return nil
+ }
+
++// UserUpdateOidcOauthCallback operation
++func (sh *strictHandler) UserUpdateOidcOauthCallback(ctx echo.Context) error {
++	var request UserUpdateOidcOauthCallbackRequestObject
++
++	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
++		return sh.ssi.UserUpdateOidcOauthCallback(ctx, request.(UserUpdateOidcOauthCallbackRequestObject))
++	}
++
++	response, err := handler(ctx, request)
++
++	if err != nil {
++		return err
++	} else if validResponse, ok := response.(UserUpdateOidcOauthCallbackResponseObject); ok {
++		return validResponse.VisitUserUpdateOidcOauthCallbackResponse(ctx.Response())
++	} else if response != nil {
++		return fmt.Errorf("Unexpected response type: %T", response)
++	}
++	return nil
++}
++
++// UserUpdateOidcOauthStart operation
++func (sh *strictHandler) UserUpdateOidcOauthStart(ctx echo.Context) error {
++	var request UserUpdateOidcOauthStartRequestObject
++
++	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
++		return sh.ssi.UserUpdateOidcOauthStart(ctx, request.(UserUpdateOidcOauthStartRequestObject))
++	}
++
++	response, err := handler(ctx, request)
++
++	if err != nil {
++		return err
++	} else if validResponse, ok := response.(UserUpdateOidcOauthStartResponseObject); ok {
++		return validResponse.VisitUserUpdateOidcOauthStartResponse(ctx.Response())
++	} else if response != nil {
++		return fmt.Errorf("Unexpected response type: %T", response)
++	}
++	return nil
++}
++
+ // UserUpdatePassword operation
+ func (sh *strictHandler) UserUpdatePassword(ctx echo.Context) error {
+ 	var request UserUpdatePasswordRequestObject
+@@ -18135,20 +18247,21 @@ var swaggerSpec = []string{
+ 	"YsTrn1npa8i/N6Mv0WdL9CUG3wB9iZW39FVJXwLbK9CXH85wYCerq3BGAA4A5GfjUYX6ccUH2pL7GzuC",
+ 	"2fj1hLS7+7sfzmbIAzhor+0vfG3vdn4/O9vVuqM4ZDTAjcX9gGK6BD3wBH3s8cnYpsgmOJgJFxLSqVKH",
+ 	"OWGbTQhNFWE/nIUJreHmMKFu7MyG2hMmY6C0XHY4xjFBPZsh6gVajFFM5jhqcMPTOrnd8sQJ+THrJpMC",
+-	"bZX8zZM2v+7pKGqvfKtc+XQM1htyI0jIcxhXOHiktXxYB6DaVwncWzXm9lSoizkMZulE+6RLTThkXoqo",
+-	"Vti3KlUzlaqa1QXl55lx7YMpRjMmieOqS7loQSoVrtR/a1t8r8DYJ45XyGufP1um38w9SlH5ZrRO4sPJ",
+-	"41aev0Zs5D1+/aqRpBt9DntCMZEAWl222AplO+W2JeIzSjgeBNPwHaKf5KBrirgoZqNTLHprkGb5c0+P",
+-	"To5OTBl6NW+pv6ddv6QNwzE3vFr8Rc2LrSL9zwjEiCZxkENW4d7DhG4SBIybUvx97akhe2EkEgCWN+kZ",
+-	"jedh+NiTznLH3+QPDslI2MEnW5ed6cTv7nlG5EB2Z7V0oh37qjkm7lDwtcfcyxsyislCdDK1eqjJFl+c",
+-	"mONY4tnFaKGaSt//Go6RahxxTVu8t3yzGR9PAb1w8ZSoYZipyn/FsJJWZZLYSberZc89Yk9uoyltUVMe",
+-	"TXmT//G9xkNctDI6f3MHUieeE46wVX7VhpC7w/GqbuzfKlfcWidLjtOloDSlQtv9pLlVsr6OeCUhuyeB",
+-	"2Qta3lZOldy5YTsrJAYShbLdxWo58pqeIqXlNEsF73WYrXCaFAOQnNIyNqvo3+BetJdRPE1SGqYAtkGE",
+-	"L5zHRxKrRjErxvB06zQsd05ooHL9DMFsKwawtbz10rylR8qtw1guap87dzXTA/eCwTavC+aR4RrPLzNE",
+-	"57hs18qhk0QoqoetPLAqiOsxZ42a6FS8lG1SvkppynhP6cuG9aRsUKx0H/jZUDBIlPvZQDX31Wu5mwGb",
+-	"xWES8SpMGQhqo6yg8E4f0LJTm6pky0JizcqI6lGpLY64h9rEStUYGwkulT7J6uqS5eBsltBopTxGeym5",
+-	"7gzscgQGU27dJgmjDuR1OVf5kCJCU57CBEwRncyRZ6vVlwn+PVekJBmsmBzpxVIiafA2yoXUZkBqMyBt",
+-	"IQNSI9EsZQNxeNXKneROYln60hyQCeZHkMtblnLKQWo9VbCVd3ulAmakuKoKWHQDHCMYozh1A+waHQO5",
+-	"J5mQB0nsd153Ot+/fP//AgAA///x/2+1kpsDAA==",
++	"bZX8zZM2v+7pKGqvfKtc+XQM1htyQ+xNGpvGBpcXboacG+xNDs86VlqeExLdTWDN0XcQVrDGaIsgIc9h",
++	"XOFclNaRYh2Aal912N+qMbenvl/MYTBLJ9onPX7CIfNSRLWKRqvON1Pnq48ZQfl5ZlxbKYrRjGkBcZVB",
++	"SLQglcp+6ju4Lb5XYOwTxyvktU/vLdNv5g6vqHwzNx7iw8njVp5eR2zkPdYtayTpRp9in1BMJIBWd0G2",
++	"QtlOuQyK2KASjgfBNHyH6Cc56JoiLorZ6BSL3hqkWe7m06OToxNTdmjNU+/vadcvacNwzI3+Fl9l82Kr",
++	"SP8zAjGiSRzkkFW4czOhmwQB46YUf197asheGInkk+VNekbjeRg+9qSj5vE3+YNDIhx28MnWZUdO8bt7",
++	"jhs5kN1RMp1ox36SjkljFHztMffyRrRiohqdTK3ekbLFFyfmOJZ4djGYqaYy7qSGY6QaR1xTZu8t32zG",
++	"v1hAL9yLJWoYZqpyrzGspBXBJHbS7WrZc4/Yk9sHS1vUlEdT3uR/fK+JThCtjIEH3HnZieeEE3aVT78h",
++	"3PNwPPob+1bLFbeW8ZLTfikgUqnQdh99bpWsr2FfScjuCYj2gpa3lc8nd27YzgqJgUShbHdxgo68pqfn",
++	"aTnNUj1+HWYrnCbF4DenlKBphI5T+psG96K9jCBrkk4zBbANYH3hHFKSWDWKWTF+rFunYblzQgOV62cI",
++	"pFwxeLLlrZfmLT1Kcx3GclH73LmrmR64Fwy2eV0wjwzXXBIyO3mOy3atHDpJhKJ62MoDq4K4HnPWqIlO",
++	"hXPZJuUr5KaM95S+bFhPygaFcveBnw3FqkSpqVyx/tWqVa1S601VqDIBNovDJOIVwDIQ1EZZQeGdPqBl",
++	"pzZNzpaFxJpVOdWjUluYcw+1iZUqgTYSXCp1l9XVJcv/2iyZ1ko5tPZSct0Z2OUIDKbcuk0SRh3I63Ku",
++	"8iFFhKY8hQmYIjqZI89WJzIT/HuuSEkyWDEx14ul49LgbZSHq82+1Wbf2kL2rUaiWcoG4vCqlTvJncSy",
++	"9KU5IBPMjyCXtyzllIPUeqpgK+/2SgXMSHFVFbDoBjhGMEZx6gbYNToGck8yIQ+S2O+87nS+f/n+/wUA",
++	"AP//ncFJYw6eAwA=",
+ }
+
+ // GetSwagger returns the content of the embedded swagger specification file
+diff --git a/frontend/app/src/pages/auth/components/auth-page.tsx b/frontend/app/src/pages/auth/components/auth-page.tsx
+index 39be31bf1..a5e1fc078 100644
+--- a/frontend/app/src/pages/auth/components/auth-page.tsx
++++ b/frontend/app/src/pages/auth/components/auth-page.tsx
+@@ -29,12 +29,14 @@ export function AuthPage({
+   const googleEnabled = schemes.includes('google');
+   const githubEnabled = schemes.includes('github');
+   const ssoEnabled = schemes.includes('sso');
++  const oidcEnabled = schemes.includes('oidc');
+
+   const providers = [
+     googleEnabled && 'google',
+     githubEnabled && 'github',
+     ssoEnabled && 'sso',
+-  ].filter(Boolean) as Array<'google' | 'github' | 'sso'>;
++    oidcEnabled && 'oidc',
++  ].filter(Boolean) as Array<'google' | 'github' | 'sso' | 'oidc'>;
+
+   const sections = [
+     providers.length > 0 && (
+diff --git a/frontend/app/src/pages/auth/components/social-auth.tsx b/frontend/app/src/pages/auth/components/social-auth.tsx
+index 4cd4f1f6e..5e90dc046 100644
+--- a/frontend/app/src/pages/auth/components/social-auth.tsx
++++ b/frontend/app/src/pages/auth/components/social-auth.tsx
+@@ -1,10 +1,12 @@
+ import { Button } from '@/components/v1/ui/button';
+ import { Icons } from '@/components/v1/ui/icons';
+ import useControlPlane from '@/hooks/use-control-plane.ts';
+-import { ArrowLeft, LockOpen } from 'lucide-react';
++import { ArrowLeft, LockOpen, LockKeyhole } from 'lucide-react';
+ import React, { useState } from 'react';
+
+-export type SocialAuthProvider = 'google' | 'github' | 'sso';
++// 'sso' is the cloud/control-plane SSO flow (email-first); 'oidc' is the
++// self-hosted OIDC provider (PR hatchet-dev#4176) — a direct redirect.
++export type SocialAuthProvider = 'google' | 'github' | 'sso' | 'oidc';
+
+ const PROVIDER_CONFIG: Record<
+   SocialAuthProvider,
+@@ -25,6 +27,11 @@ const PROVIDER_CONFIG: Record<
+     label: 'SSO',
+     icon: <LockOpen className="size-4" />,
+   },
++  oidc: {
++    href: 'users/oidc/start',
++    label: 'OIDC',
++    icon: <LockKeyhole className="size-4" />,
++  },
+ };
+
+ export function OrContinueWith() {
+diff --git a/frontend/docs/content/docs/self-hosting/configuration-options.mdx b/frontend/docs/content/docs/self-hosting/configuration-options.mdx
+index 7788a2cad..bf3f80161 100644
+--- a/frontend/docs/content/docs/self-hosting/configuration-options.mdx
++++ b/frontend/docs/content/docs/self-hosting/configuration-options.mdx
+@@ -295,6 +295,13 @@ Variables marked with ⚠️ are conditionally required when specific features a
+ | `SERVER_AUTH_GITHUB_CLIENT_ID` ⚠️      | GitHub auth client ID (required if GitHub auth enabled)     |                                  |
+ | `SERVER_AUTH_GITHUB_CLIENT_SECRET` ⚠️  | GitHub auth client secret (required if GitHub auth enabled) |                                  |
+ | `SERVER_AUTH_GITHUB_SCOPES`            | GitHub auth scopes                                          | `["read:user", "user:email"]`    |
++| `SERVER_AUTH_OIDC_ENABLED`             | Whether generic OIDC auth is enabled                        | `false`                          |
++| `SERVER_AUTH_OIDC_CLIENT_ID` ⚠️        | OIDC client ID (required if OIDC auth enabled)              |                                  |
++| `SERVER_AUTH_OIDC_CLIENT_SECRET` ⚠️    | OIDC client secret (required if OIDC auth enabled)          |                                  |
++| `SERVER_AUTH_OIDC_ISSUER_URL` ⚠️       | OIDC issuer URL used for discovery (required if OIDC auth enabled) |                            |
++| `SERVER_AUTH_OIDC_SCOPES`              | OIDC auth scopes                                            | `["openid", "profile", "email"]` |
++
++The OIDC provider works with any OIDC-compliant identity provider (Keycloak, Authentik, Dex, Okta, Azure AD, etc.). The issuer URL is the base URL from which the provider's `/.well-known/openid-configuration` is discovered — e.g. `https://auth.example.com/realms/my-realm` for Keycloak. The redirect URI to register with the provider is `${SERVER_URL}/api/v1/users/oidc/callback`.
+
+ ## Task Queue Configuration
+
+diff --git a/go.mod b/go.mod
+index 350521a60..81de034f5 100644
+--- a/go.mod
++++ b/go.mod
+@@ -14,6 +14,7 @@ require (
+ 	github.com/charmbracelet/log v1.0.0
+ 	github.com/cockroachdb/errors v1.14.0
+ 	github.com/containerd/errdefs v1.0.0
++	github.com/coreos/go-oidc/v3 v3.18.0
+ 	github.com/creasty/defaults v1.8.0
+ 	github.com/docker/docker v28.5.2+incompatible
+ 	github.com/docker/go-connections v0.8.1
+@@ -24,6 +25,7 @@ require (
+ 	github.com/fatih/color v1.19.0
+ 	github.com/getkin/kin-openapi v0.149.0
+ 	github.com/go-co-op/gocron/v2 v2.22.0
++	github.com/go-jose/go-jose/v4 v4.1.4
+ 	github.com/google/go-github/v57 v57.0.0
+ 	github.com/google/jsonschema-go v0.4.3
+ 	github.com/gorilla/securecookie v1.1.2
+diff --git a/go.sum b/go.sum
+index 4623bf061..d3798a576 100644
+--- a/go.sum
++++ b/go.sum
+@@ -130,6 +130,8 @@ github.com/containerd/log v0.1.0 h1:TCJt7ioM2cr/tfR8GPbGf9/VRAX8D2B4PjzCpfX540I=
+ github.com/containerd/log v0.1.0/go.mod h1:VRRf09a7mHDIRezVKTRCrOq78v577GXq3bSa3EhrzVo=
+ github.com/containerd/platforms v0.2.1 h1:zvwtM3rz2YHPQsF2CHYM8+KtB5dvhISiXh5ZpSBQv6A=
+ github.com/containerd/platforms v0.2.1/go.mod h1:XHCb+2/hzowdiut9rkudds9bE5yJ7npe7dG/wG+uFPw=
++github.com/coreos/go-oidc/v3 v3.18.0 h1:V9orjXynvu5wiC9SemFTWnG4F45v403aIcjWo0d41+A=
++github.com/coreos/go-oidc/v3 v3.18.0/go.mod h1:DYCf24+ncYi+XkIH97GY1+dqoRlbaSI26KVTCI9SrY4=
+ github.com/cpuguy83/dockercfg v0.3.2 h1:DlJTyZGBDlXqUZ2Dk2Q3xHs/FtnooJJVaad2S9GKorA=
+ github.com/cpuguy83/dockercfg v0.3.2/go.mod h1:sugsbF4//dDlL/i+S+rtpIWp+5h0BHJHfjj5/jFyUJc=
+ github.com/cpuguy83/go-md2man/v2 v2.0.6/go.mod h1:oOW0eioCTA6cOiMLiUPZOpcVxMig6NIQQ7OS05n1F4g=
+@@ -194,6 +196,8 @@ github.com/go-co-op/gocron/v2 v2.22.0 h1:uEuH2F7k7VoESb1BYSaffuuV+T0kkpzsC0aXk7/
+ github.com/go-co-op/gocron/v2 v2.22.0/go.mod h1:hiH/U9RMhTi1BBZJmef9s3KC9QwhpBF6PFrvUKaXY9M=
+ github.com/go-errors/errors v1.4.2 h1:J6MZopCL4uSllY1OfXM374weqZFFItUbrImctkmUxIA=
+ github.com/go-errors/errors v1.4.2/go.mod h1:sIVyrIiJhuEF+Pj9Ebtd6P/rEYROXFi3BopGUQ5a5Og=
++github.com/go-jose/go-jose/v4 v4.1.4 h1:moDMcTHmvE6Groj34emNPLs/qtYXRVcd6S7NHbHz3kA=
++github.com/go-jose/go-jose/v4 v4.1.4/go.mod h1:x4oUasVrzR7071A4TnHLGSPpNOm2a21K9Kf04k1rs08=
+ github.com/go-logfmt/logfmt v0.6.1 h1:4hvbpePJKnIzH1B+8OR/JPbTx37NktoI9LE2QZBBkvE=
+ github.com/go-logfmt/logfmt v0.6.1/go.mod h1:EV2pOAQoZaT1ZXZbqDl5hrymndi4SY9ED9/z6CO0XAk=
+ github.com/go-logr/logr v1.2.2/go.mod h1:jdQByPbusPIv2/zmleS9BjJVeZ6kBagPoEUsqbVz/1A=
+diff --git a/pkg/auth/oauth/configs.go b/pkg/auth/oauth/configs.go
+index a0d181238..98701c53c 100644
+--- a/pkg/auth/oauth/configs.go
++++ b/pkg/auth/oauth/configs.go
+@@ -1,6 +1,8 @@
+ package oauth
+
+ import (
++	"strings"
++
+ 	"golang.org/x/oauth2"
+ )
+
+@@ -11,6 +13,16 @@ type Config struct {
+ 	BaseURL      string
+ }
+
++type OIDCConfig struct {
++	ClientID     string
++	ClientSecret string
++	Scopes       []string
++	BaseURL      string
++	IssuerURL    string
++	AuthURL      string
++	TokenURL     string
++}
++
+ const (
+ 	GoogleAuthURL  string = "https://accounts.google.com/o/oauth2/v2/auth"
+ 	GoogleTokenURL string = "https://oauth2.googleapis.com/token" // #nosec G101
+@@ -58,3 +70,16 @@ func NewSlackClient(cfg *Config) *oauth2.Config {
+ 		Scopes:      cfg.Scopes,
+ 	}
+ }
++
++func NewOIDCClient(cfg *OIDCConfig) *oauth2.Config {
++	return &oauth2.Config{
++		ClientID:     cfg.ClientID,
++		ClientSecret: cfg.ClientSecret,
++		Endpoint: oauth2.Endpoint{
++			AuthURL:  cfg.AuthURL,
++			TokenURL: cfg.TokenURL,
++		},
++		RedirectURL: strings.TrimRight(cfg.BaseURL, "/") + "/api/v1/users/oidc/callback",
++		Scopes:      cfg.Scopes,
++	}
++}
+diff --git a/pkg/config/loader/loader.go b/pkg/config/loader/loader.go
+index 3de06c639..68457ad40 100644
+--- a/pkg/config/loader/loader.go
++++ b/pkg/config/loader/loader.go
+@@ -22,6 +22,8 @@ import (
+ 	"github.com/rs/zerolog"
+ 	"golang.org/x/oauth2"
+
++	"github.com/coreos/go-oidc/v3/oidc"
++
+ 	"github.com/hatchet-dev/hatchet/internal/integrations/alerting"
+ 	"github.com/hatchet-dev/hatchet/internal/services/ingestor"
+ 	"github.com/hatchet-dev/hatchet/pkg/analytics"
+@@ -768,6 +770,59 @@ func createControllerLayer(dc *database.Layer, cf *server.ServerConfigFile, vers
+ 		})
+ 	}
+
++	if cf.Auth.OIDC.Enabled {
++		// Parse ScopesString before building OIDCOAuthConfig so the env var is used.
++		if cf.Auth.OIDC.ScopesString != "" {
++			cf.Auth.OIDC.Scopes = getStrArr(cf.Auth.OIDC.ScopesString)
++		}
++
++		if cf.Auth.OIDC.ClientID == "" {
++			return nil, nil, fmt.Errorf("oidc client id is required")
++		}
++
++		if cf.Auth.OIDC.ClientSecret == "" {
++			return nil, nil, fmt.Errorf("oidc client secret is required")
++		}
++
++		if cf.Auth.OIDC.IssuerURL == "" {
++			return nil, nil, fmt.Errorf("oidc issuer url is required")
++		}
++
++		// Ensure "openid" scope is always present, since we rely on the ID token.
++		hasOpenID := false
++		for _, s := range cf.Auth.OIDC.Scopes {
++			if s == "openid" {
++				hasOpenID = true
++				break
++			}
++		}
++
++		if !hasOpenID {
++			cf.Auth.OIDC.Scopes = append([]string{"openid"}, cf.Auth.OIDC.Scopes...)
++		}
++
++		discoveryCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
++		defer cancel()
++
++		oidcProvider, err := oidc.NewProvider(discoveryCtx, cf.Auth.OIDC.IssuerURL)
++		if err != nil {
++			return nil, nil, fmt.Errorf("could not create OIDC provider from issuer URL %s: %w", cf.Auth.OIDC.IssuerURL, err)
++		}
++
++		endpoint := oidcProvider.Endpoint()
++
++		auth.OIDCProvider = oidcProvider
++		auth.OIDCOAuthConfig = oauth.NewOIDCClient(&oauth.OIDCConfig{
++			ClientID:     cf.Auth.OIDC.ClientID,
++			ClientSecret: cf.Auth.OIDC.ClientSecret,
++			BaseURL:      cf.Runtime.ServerURL,
++			Scopes:       cf.Auth.OIDC.Scopes,
++			IssuerURL:    cf.Auth.OIDC.IssuerURL,
++			AuthURL:      endpoint.AuthURL,
++			TokenURL:     endpoint.TokenURL,
++		})
++	}
++
+ 	encryptionSvc, err := LoadEncryptionSvc(cf)
+
+ 	if err != nil {
+diff --git a/pkg/config/server/server.go b/pkg/config/server/server.go
+index e0a2f84bf..5e2013477 100644
+--- a/pkg/config/server/server.go
++++ b/pkg/config/server/server.go
+@@ -4,6 +4,7 @@ import (
+ 	"crypto/tls"
+ 	"time"
+
++	"github.com/coreos/go-oidc/v3/oidc"
+ 	"github.com/labstack/echo/v4"
+ 	"github.com/rs/zerolog"
+ 	"github.com/spf13/viper"
+@@ -488,6 +489,8 @@ type ConfigFileAuth struct {
+
+ 	Github ConfigFileAuthGithub `mapstructure:"github" json:"github,omitempty"`
+
++	OIDC ConfigFileAuthOIDC `mapstructure:"oidc" json:"oidc,omitempty"`
++
+ 	ControlPlaneExchangeTokenConfig ConfigFileAuthControlPlaneExchangeToken `mapstructure:"controlPlaneExchangeToken" json:"controlPlaneExchangeToken,omitempty"`
+ }
+
+@@ -541,6 +544,18 @@ type ConfigFileAuthGithub struct {
+ 	Scopes       []string `mapstructure:"scopes" json:"scopes,omitempty" default:"[\"read:user\", \"user:email\"]"`
+ }
+
++type ConfigFileAuthOIDC struct {
++	Enabled bool `mapstructure:"enabled" json:"enabled,omitempty" default:"false"`
++
++	ClientID     string   `mapstructure:"clientID" json:"clientID,omitempty"`
++	ClientSecret string   `mapstructure:"clientSecret" json:"clientSecret,omitempty"`
++	IssuerURL    string   `mapstructure:"issuerURL" json:"issuerURL,omitempty"`
++	Scopes       []string `mapstructure:"scopes" json:"scopes,omitempty" default:"[\"openid\", \"profile\", \"email\"]"`
++	// ScopesString is used to bind the SERVER_AUTH_OIDC_SCOPES env var, since
++	// direct env-to-[]string binding is unreliable without a decode hook.
++	ScopesString string `mapstructure:"scopesString" json:"scopesString,omitempty"`
++}
++
+ type ConfigFileAuthCookie struct {
+ 	Name     string `mapstructure:"name" json:"name,omitempty" default:"hatchet"`
+ 	Domain   string `mapstructure:"domain" json:"domain,omitempty"`
+@@ -695,6 +710,12 @@ type AuthConfig struct {
+
+ 	GithubOAuthConfig *oauth2.Config
+
++	OIDCOAuthConfig *oauth2.Config
++
++	// OIDCProvider is the cached OIDC provider, created at startup via discovery.
++	// Reuse this instead of calling oidc.NewProvider on every request.
++	OIDCProvider *oidc.Provider
++
+ 	JWTManager token.JWTManager
+
+ 	ExchangeTokenClient exchangetoken.ExchangeTokenClient
+@@ -952,6 +973,12 @@ func BindAllEnv(v *viper.Viper) {
+ 	_ = v.BindEnv("auth.github.clientID", "SERVER_AUTH_GITHUB_CLIENT_ID")
+ 	_ = v.BindEnv("auth.github.clientSecret", "SERVER_AUTH_GITHUB_CLIENT_SECRET")
+ 	_ = v.BindEnv("auth.github.scopes", "SERVER_AUTH_GITHUB_SCOPES")
++	_ = v.BindEnv("auth.oidc.enabled", "SERVER_AUTH_OIDC_ENABLED")
++	_ = v.BindEnv("auth.oidc.clientID", "SERVER_AUTH_OIDC_CLIENT_ID")
++	_ = v.BindEnv("auth.oidc.clientSecret", "SERVER_AUTH_OIDC_CLIENT_SECRET")
++	_ = v.BindEnv("auth.oidc.issuerURL", "SERVER_AUTH_OIDC_ISSUER_URL")
++	_ = v.BindEnv("auth.oidc.scopes", "SERVER_AUTH_OIDC_SCOPES")
++	_ = v.BindEnv("auth.oidc.scopesString", "SERVER_AUTH_OIDC_SCOPES")
+
+ 	// task queue options
+ 	// legacy options
+diff --git a/pkg/repository/user.go b/pkg/repository/user.go
+index ea09e6928..332239463 100644
+--- a/pkg/repository/user.go
++++ b/pkg/repository/user.go
+@@ -24,7 +24,7 @@ type CreateUserOpts struct {
+ }
+
+ type OAuthOpts struct {
+-	Provider       string     `validate:"required,oneof=google github sso"`
++	Provider       string     `validate:"required,oneof=google github sso oidc"`
+ 	ProviderUserId string     `validate:"required,min=1"`
+ 	AccessToken    []byte     `validate:"required,min=1"`
+ 	RefreshToken   []byte     // optional

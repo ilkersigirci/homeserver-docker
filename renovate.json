@@ -26,6 +26,15 @@
   "customManagers": [
     {
       "customType": "regex",
+      "managerFilePatterns": ["/^Dockerfiles/Hatchet/Dockerfile$/"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\s+ARG IMAGE_VERSION=(?<currentValue>\\S+)"
+      ],
+      "extractVersionTemplate": "^v(?<version>\\d+\\.\\d+\\.\\d+)$",
+      "versioningTemplate": "semver"
+    },
+    {
+      "customType": "regex",
       "managerFilePatterns": ["/^Dockerfiles/LiteLLM/Dockerfile$/"],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\s+ARG IMAGE_VERSION=(?<currentValue>\\S+)"
@@ -56,6 +65,7 @@
       "description": "Disable non-release-driver updates for package-derived custom images",
       "matchFileNames": [
         "Dockerfiles/CodexAcp/**",
+        "Dockerfiles/Hatchet/**",
         "Dockerfiles/Jupyter/**",
         "Dockerfiles/LiteLLM/**",
         "Dockerfiles/Marimo/**",
@@ -94,11 +104,17 @@
       }
     },
     {
-      "description": "Ignore non-final images in the Hatchet Dockerfile",
-      "matchManagers": ["dockerfile"],
+      "description": "Use upstream Hatchet tags as the Hatchet custom image release driver",
+      "matchManagers": ["custom.regex"],
+      "matchDatasources": ["github-tags"],
       "matchFileNames": ["Dockerfiles/Hatchet/Dockerfile"],
-      "matchDepTypes": ["stage", "syntax"],
-      "enabled": false
+      "matchPackageNames": ["hatchet-dev/hatchet"],
+      "enabled": true,
+      "sourceUrl": "https://github.com/hatchet-dev/hatchet",
+      "changelogUrl": "https://github.com/hatchet-dev/hatchet/releases",
+      "prBodyNotes": [
+        "Use Dockerfiles/Hatchet/README.md to refresh the source commit, rebase oidc.patch, and validate the image."
+      ]
     },
     {
       "description": "Use JupyterLab as the Jupyter custom image release driver",
@@ -184,6 +200,15 @@
       "matchPackageNames": ["ghcr.io/ilkersigirci/homeserver-codex-acp"],
       "sourceUrl": "https://github.com/agentclientprotocol/codex-acp",
       "changelogUrl": "https://github.com/agentclientprotocol/codex-acp/releases"
+    },
+    {
+      "description": "Use upstream Hatchet releases for homeserver Hatchet image changelogs",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchFileNames": ["apps/hatchet.yml"],
+      "matchPackageNames": ["ghcr.io/ilkersigirci/homeserver-hatchet"],
+      "sourceUrl": "https://github.com/hatchet-dev/hatchet",
+      "changelogUrl": "https://github.com/hatchet-dev/hatchet/releases"
     },
     {
       "description": "Use JupyterLab GitHub releases for homeserver Jupyter image changelogs",
@@ -300,13 +325,6 @@
       "matchFileNames": ["apps/gatus-container-health.yml"],
       "matchPackageNames": ["python"],
       "enabled": false
-    },
-    {
-      "description": "Use GitHub releases for Hatchet Docker image changelogs",
-      "matchManagers": ["docker-compose"],
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["ghcr.io/hatchet-dev/hatchet/hatchet-lite"],
-      "sourceUrl": "https://github.com/hatchet-dev/hatchet"
     },
     {
       "description": "Use GitHub releases for Headscale Docker image changelogs",
