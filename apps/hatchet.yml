@@ -1,4 +1,3 @@
-# Default user / pass is admin@example.com / Admin123!!
 networks:
   hatchet_backend:
 
@@ -84,8 +83,9 @@ services:
       # Refer to https://docs.hatchet.run/self-hosting/configuration-options
       # for a list of all supported environment variables
       DATABASE_URL: "postgresql://postgres:postgres@hatchet-db:5432/postgres?sslmode=disable"
-      SERVER_AUTH_COOKIE_DOMAIN: $DOMAINNAME
-      SERVER_AUTH_COOKIE_INSECURE: "t"
+      SERVER_AUTH_BASIC_AUTH_ENABLED: "f"
+      SERVER_AUTH_COOKIE_DOMAIN: hatchet.$DOMAINNAME
+      SERVER_AUTH_COOKIE_INSECURE: "f"
       SERVER_AUTH_OIDC_ENABLED: "t"
       SERVER_AUTH_OIDC_CLIENT_ID: $HATCHET_CLIENT_ID
       SERVER_AUTH_OIDC_CLIENT_SECRET: $HATCHET_CLIENT_SECRET
@@ -96,7 +96,6 @@ services:
       SERVER_GRPC_BROADCAST_ADDRESS: hatchet-rpc.$DOMAINNAME:443
       SERVER_GRPC_PORT: "7077"
       SERVER_URL: https://hatchet.$DOMAINNAME
-      SERVER_AUTH_SET_EMAIL_VERIFIED: "t"
       SERVER_DEFAULT_ENGINE_VERSION: "V1"
       SERVER_INTERNAL_CLIENT_INTERNAL_GRPC_BROADCAST_ADDRESS: localhost:7077
       SERVER_LIMITS_DEFAULT_TENANT_RETENTION_PERIOD: 720h # 30 days

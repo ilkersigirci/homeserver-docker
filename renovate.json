@@ -104,16 +104,16 @@
       }
     },
     {
-      "description": "Use upstream Hatchet tags as the Hatchet custom image release driver",
+      "description": "Use upstream Hatchet releases as the Hatchet custom image release driver",
       "matchManagers": ["custom.regex"],
-      "matchDatasources": ["github-tags"],
+      "matchDatasources": ["github-releases"],
       "matchFileNames": ["Dockerfiles/Hatchet/Dockerfile"],
       "matchPackageNames": ["hatchet-dev/hatchet"],
       "enabled": true,
       "sourceUrl": "https://github.com/hatchet-dev/hatchet",
       "changelogUrl": "https://github.com/hatchet-dev/hatchet/releases",
       "prBodyNotes": [
-        "Use Dockerfiles/Hatchet/README.md to refresh the source commit, rebase oidc.patch, and validate the image."
+        "Use Dockerfiles/Hatchet/README.md to refresh the source commit, rebase oidc.patch and oidc-hardening.patch, and validate the image."
       ]
     },
     {
@@ -207,6 +207,7 @@
       "matchDatasources": ["docker"],
       "matchFileNames": ["apps/hatchet.yml"],
       "matchPackageNames": ["ghcr.io/ilkersigirci/homeserver-hatchet"],
+      "versioning": "semver",
       "sourceUrl": "https://github.com/hatchet-dev/hatchet",
       "changelogUrl": "https://github.com/hatchet-dev/hatchet/releases"
     },

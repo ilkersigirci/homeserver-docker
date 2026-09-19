@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.26@sha256:ecfaec9ed6d810b56388c508f4121597bfbba70d41a6dfeee4d8cad5f295fc32
-# renovate: datasource=github-tags depName=hatchet-dev/hatchet
-ARG IMAGE_VERSION=v0.107.0
-ARG UPSTREAM_COMMIT=22e6fc995227011818c676e04a97ff535fb73887
+# renovate: datasource=github-releases depName=hatchet-dev/hatchet
+ARG IMAGE_VERSION=v0.107.2
+ARG UPSTREAM_COMMIT=e53ce04dc75462ebc4169e21f26a5ae2ae8fc508
 
 FROM golang:1.26-alpine@sha256:0178a641fbb4858c5f1b48e34bdaabe0350a330a1b1149aabd498d0699ff5fb2 AS server-build
 
@@ -13,20 +13,25 @@ ENV CGO_ENABLED=0
 # Pin the official release source by tag and commit so builds are reproducible.
 ADD --checksum=${UPSTREAM_COMMIT} https://github.com/hatchet-dev/hatchet.git#${IMAGE_VERSION} .
 
-COPY base-sources.sha256 oidc.patch /patches/
+COPY base-sources.sha256 oidc.patch oidc-hardening.patch /patches/
 RUN apk add --no-cache git patch python3 \
     && sha256sum -c /patches/base-sources.sha256 \
     && patch --batch --forward --fuzz=0 -p1 < /patches/oidc.patch \
+    && patch --batch --forward --fuzz=0 -p1 < /patches/oidc-hardening.patch \
     && (cd frontend/snippets && python3 -X utf8 generate.py)
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg/mod \
-    go test ./api/v1/server/handlers/users -run 'OIDC' -count=1 \
+    go test \
+      ./api/v1/server/handlers/users \
+      ./api/v1/server/authn \
+      -run 'OIDC|OAuth|Session' -count=1 \
     && go build -ldflags="-w -s -X 'main.Version=${IMAGE_VERSION}'" \
-      -o /out/ \
-      ./cmd/hatchet-lite \
-      ./cmd/hatchet-admin \
-      ./cmd/hatchet-migrate
+      -o /out/hatchet-lite ./cmd/hatchet-lite \
+    && go build -ldflags="-w -s -X 'main.Version=${IMAGE_VERSION}'" \
+      -o /out/hatchet-migrate ./cmd/hatchet-migrate \
+    && go build -ldflags="-w -s -X 'github.com/hatchet-dev/hatchet/cmd/hatchet-admin/cli.Version=${IMAGE_VERSION}'" \
+      -o /out/hatchet-admin ./cmd/hatchet-admin
 
 FROM node:24-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 AS frontend-build
 

@@ -2,8 +2,7 @@ diff --git a/api-contracts/openapi/openapi.yaml b/api-contracts/openapi/openapi.
 index 8cfe9bbdd..79034ee88 100644
 --- a/api-contracts/openapi/openapi.yaml
 +++ b/api-contracts/openapi/openapi.yaml
-@@ -103,6 +103,10 @@ paths:
-     $ref: "./paths/user/user.yaml#/oauth-start-github"
+@@ -104,4 +104,8 @@ paths:
    /api/v1/users/github/callback:
      $ref: "./paths/user/user.yaml#/oauth-callback-github"
 +  /api/v1/users/oidc/start:
@@ -12,13 +11,11 @@ index 8cfe9bbdd..79034ee88 100644
 +    $ref: "./paths/user/user.yaml#/oauth-callback-oidc"
    /api/v1/tenants/{tenant}/slack/start:
      $ref: "./paths/user/user.yaml#/oauth-start-slack"
-   /api/v1/users/slack/callback:
 diff --git a/api-contracts/openapi/paths/user/user.yaml b/api-contracts/openapi/paths/user/user.yaml
 index a4fe0beac..7bce297f4 100644
 --- a/api-contracts/openapi/paths/user/user.yaml
 +++ b/api-contracts/openapi/paths/user/user.yaml
-@@ -232,6 +232,36 @@ oauth-callback-github:
-     summary: Complete OAuth flow
+@@ -233,4 +233,34 @@ oauth-callback-github:
      tags:
        - User
 +oauth-start-oidc:
@@ -53,26 +50,22 @@ index a4fe0beac..7bce297f4 100644
 +      - User
  oauth-start-slack:
    get:
-     x-resources: ["tenant"]
 diff --git a/api/v1/server/authz/rbac.yaml b/api/v1/server/authz/rbac.yaml
 index ec0c95001..b72e1ccd8 100644
 --- a/api/v1/server/authz/rbac.yaml
 +++ b/api/v1/server/authz/rbac.yaml
-@@ -133,6 +133,8 @@ roles:
-       - TenantResourcePolicyGet
+@@ -134,4 +134,6 @@ roles:
        - UserUpdateSlackOauthStart
        - UserUpdateGoogleOauthStart
 +      - UserUpdateOidcOauthStart
 +      - UserUpdateOidcOauthCallback
        - V1CelDebug
        - V1WorkflowRunGetTimings
-       - InfoGetVersion
 diff --git a/api/v1/server/handlers/metadata/get.go b/api/v1/server/handlers/metadata/get.go
 index 236df1949..b16b04f41 100644
 --- a/api/v1/server/handlers/metadata/get.go
 +++ b/api/v1/server/handlers/metadata/get.go
-@@ -22,6 +22,10 @@ func (u *MetadataService) MetadataGet(ctx echo.Context, request gen.MetadataGetR
- 		authTypes = append(authTypes, "github")
+@@ -23,4 +23,8 @@ func (u *MetadataService) MetadataGet(ctx echo.Context, request gen.MetadataGetR
  	}
 
 +	if u.config.Auth.ConfigFile.OIDC.Enabled {
@@ -81,7 +74,6 @@ index 236df1949..b16b04f41 100644
 +
  	pylonAppID := u.config.Pylon.AppID
 
- 	var posthogConfig *gen.APIMetaPosthog
 diff --git a/api/v1/server/handlers/users/oidc_oauth_callback.go b/api/v1/server/handlers/users/oidc_oauth_callback.go
 new file mode 100644
 index 000000000..5b55e1a2b
@@ -687,8 +679,7 @@ diff --git a/api/v1/server/oas/gen/openapi.gen.go b/api/v1/server/oas/gen/openap
 index 5b027c95e..b2a6411a6 100644
 --- a/api/v1/server/oas/gen/openapi.gen.go
 +++ b/api/v1/server/oas/gen/openapi.gen.go
-@@ -4014,6 +4014,12 @@ type ServerInterface interface {
- 	// List tenant memberships
+@@ -4015,4 +4015,10 @@ type ServerInterface interface {
  	// (GET /api/v1/users/memberships)
  	TenantMembershipsList(ctx echo.Context) error
 +	// Complete OIDC OAuth flow
@@ -699,9 +690,7 @@ index 5b027c95e..b2a6411a6 100644
 +	UserUpdateOidcOauthStart(ctx echo.Context) error
  	// Change user password
  	// (POST /api/v1/users/password)
- 	UserUpdatePassword(ctx echo.Context) error
-@@ -7916,6 +7922,24 @@ func (w *ServerInterfaceWrapper) TenantMembershipsList(ctx echo.Context) error {
- 	return err
+@@ -7917,4 +7923,22 @@ func (w *ServerInterfaceWrapper) TenantMembershipsList(ctx echo.Context) error {
  }
 
 +// UserUpdateOidcOauthCallback converts echo context to params.
@@ -724,18 +713,14 @@ index 5b027c95e..b2a6411a6 100644
 +
  // UserUpdatePassword converts echo context to params.
  func (w *ServerInterfaceWrapper) UserUpdatePassword(ctx echo.Context) error {
- 	var err error
-@@ -8347,6 +8371,8 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL
- 	router.POST(baseURL+"/api/v1/users/login", wrapper.UserUpdateLogin)
+@@ -8348,4 +8372,6 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL
  	router.POST(baseURL+"/api/v1/users/logout", wrapper.UserUpdateLogout)
  	router.GET(baseURL+"/api/v1/users/memberships", wrapper.TenantMembershipsList)
 +	router.GET(baseURL+"/api/v1/users/oidc/callback", wrapper.UserUpdateOidcOauthCallback)
 +	router.GET(baseURL+"/api/v1/users/oidc/start", wrapper.UserUpdateOidcOauthStart)
  	router.POST(baseURL+"/api/v1/users/password", wrapper.UserUpdatePassword)
  	router.POST(baseURL+"/api/v1/users/register", wrapper.UserCreate)
- 	router.GET(baseURL+"/api/v1/users/slack/callback", wrapper.UserUpdateSlackOauthCallback)
-@@ -13483,6 +13509,48 @@ func (response TenantMembershipsList403JSONResponse) VisitTenantMembershipsListR
- 	return json.NewEncoder(w).Encode(response)
+@@ -13484,4 +13510,46 @@ func (response TenantMembershipsList403JSONResponse) VisitTenantMembershipsListR
  }
 
 +type UserUpdateOidcOauthCallbackRequestObject struct {
@@ -782,9 +767,7 @@ index 5b027c95e..b2a6411a6 100644
 +
  type UserUpdatePasswordRequestObject struct {
  	Body *UserUpdatePasswordJSONRequestBody
- }
-@@ -14313,6 +14381,10 @@ type StrictServerInterface interface {
-
+@@ -14314,4 +14382,8 @@ type StrictServerInterface interface {
  	TenantMembershipsList(ctx echo.Context, request TenantMembershipsListRequestObject) (TenantMembershipsListResponseObject, error)
 
 +	UserUpdateOidcOauthCallback(ctx echo.Context, request UserUpdateOidcOauthCallbackRequestObject) (UserUpdateOidcOauthCallbackResponseObject, error)
@@ -793,9 +776,7 @@ index 5b027c95e..b2a6411a6 100644
 +
  	UserUpdatePassword(ctx echo.Context, request UserUpdatePasswordRequestObject) (UserUpdatePasswordResponseObject, error)
 
- 	UserCreate(ctx echo.Context, request UserCreateRequestObject) (UserCreateResponseObject, error)
-@@ -17432,6 +17504,46 @@ func (sh *strictHandler) TenantMembershipsList(ctx echo.Context) error {
- 	return nil
+@@ -17433,4 +17505,44 @@ func (sh *strictHandler) TenantMembershipsList(ctx echo.Context) error {
  }
 
 +// UserUpdateOidcOauthCallback operation
@@ -840,9 +821,7 @@ index 5b027c95e..b2a6411a6 100644
 +
  // UserUpdatePassword operation
  func (sh *strictHandler) UserUpdatePassword(ctx echo.Context) error {
- 	var request UserUpdatePasswordRequestObject
-@@ -18135,20 +18247,21 @@ var swaggerSpec = []string{
- 	"YsTrn1npa8i/N6Mv0WdL9CUG3wB9iZW39FVJXwLbK9CXH85wYCerq3BGAA4A5GfjUYX6ccUH2pL7GzuC",
+@@ -18136,18 +18248,19 @@ var swaggerSpec = []string{
  	"2fj1hLS7+7sfzmbIAzhor+0vfG3vdn4/O9vVuqM4ZDTAjcX9gGK6BD3wBH3s8cnYpsgmOJgJFxLSqVKH",
  	"OWGbTQhNFWE/nIUJreHmMKFu7MyG2hMmY6C0XHY4xjFBPZsh6gVajFFM5jhqcMPTOrnd8sQJ+THrJpMC",
 -	"bZX8zZM2v+7pKGqvfKtc+XQM1htyI0jIcxhXOHiktXxYB6DaVwncWzXm9lSoizkMZulE+6RLTThkXoqo",
@@ -876,19 +855,17 @@ index 5b027c95e..b2a6411a6 100644
 +	"AP//ncFJYw6eAwA=",
  }
 
- // GetSwagger returns the content of the embedded swagger specification file
 diff --git a/frontend/app/src/pages/auth/components/auth-page.tsx b/frontend/app/src/pages/auth/components/auth-page.tsx
 index 39be31bf1..a5e1fc078 100644
 --- a/frontend/app/src/pages/auth/components/auth-page.tsx
 +++ b/frontend/app/src/pages/auth/components/auth-page.tsx
-@@ -29,12 +29,14 @@ export function AuthPage({
-   const googleEnabled = schemes.includes('google');
+@@ -30,4 +30,5 @@ export function AuthPage({
    const githubEnabled = schemes.includes('github');
    const ssoEnabled = schemes.includes('sso');
 +  const oidcEnabled = schemes.includes('oidc');
 
    const providers = [
-     googleEnabled && 'google',
+@@ -35,5 +36,6 @@ export function AuthPage({
      githubEnabled && 'github',
      ssoEnabled && 'sso',
 -  ].filter(Boolean) as Array<'google' | 'github' | 'sso'>;
@@ -896,13 +873,11 @@ index 39be31bf1..a5e1fc078 100644
 +  ].filter(Boolean) as Array<'google' | 'github' | 'sso' | 'oidc'>;
 
    const sections = [
-     providers.length > 0 && (
 diff --git a/frontend/app/src/pages/auth/components/social-auth.tsx b/frontend/app/src/pages/auth/components/social-auth.tsx
 index 4cd4f1f6e..5e90dc046 100644
 --- a/frontend/app/src/pages/auth/components/social-auth.tsx
 +++ b/frontend/app/src/pages/auth/components/social-auth.tsx
-@@ -1,10 +1,12 @@
- import { Button } from '@/components/v1/ui/button';
+@@ -2,8 +2,10 @@ import { Button } from '@/components/v1/ui/button';
  import { Icons } from '@/components/v1/ui/icons';
  import useControlPlane from '@/hooks/use-control-plane.ts';
 -import { ArrowLeft, LockOpen } from 'lucide-react';
@@ -915,9 +890,7 @@ index 4cd4f1f6e..5e90dc046 100644
 +export type SocialAuthProvider = 'google' | 'github' | 'sso' | 'oidc';
 
  const PROVIDER_CONFIG: Record<
-   SocialAuthProvider,
-@@ -25,6 +27,11 @@ const PROVIDER_CONFIG: Record<
-     label: 'SSO',
+@@ -26,4 +28,9 @@ const PROVIDER_CONFIG: Record<
      icon: <LockOpen className="size-4" />,
    },
 +  oidc: {
@@ -927,13 +900,11 @@ index 4cd4f1f6e..5e90dc046 100644
 +  },
  };
 
- export function OrContinueWith() {
 diff --git a/frontend/docs/content/docs/self-hosting/configuration-options.mdx b/frontend/docs/content/docs/self-hosting/configuration-options.mdx
 index 7788a2cad..bf3f80161 100644
 --- a/frontend/docs/content/docs/self-hosting/configuration-options.mdx
 +++ b/frontend/docs/content/docs/self-hosting/configuration-options.mdx
-@@ -295,6 +295,13 @@ Variables marked with ⚠️ are conditionally required when specific features a
- | `SERVER_AUTH_GITHUB_CLIENT_ID` ⚠️      | GitHub auth client ID (required if GitHub auth enabled)     |                                  |
+@@ -296,4 +296,11 @@ Variables marked with ⚠️ are conditionally required when specific features a
  | `SERVER_AUTH_GITHUB_CLIENT_SECRET` ⚠️  | GitHub auth client secret (required if GitHub auth enabled) |                                  |
  | `SERVER_AUTH_GITHUB_SCOPES`            | GitHub auth scopes                                          | `["read:user", "user:email"]`    |
 +| `SERVER_AUTH_OIDC_ENABLED`             | Whether generic OIDC auth is enabled                        | `false`                          |
@@ -945,64 +916,52 @@ index 7788a2cad..bf3f80161 100644
 +The OIDC provider works with any OIDC-compliant identity provider (Keycloak, Authentik, Dex, Okta, Azure AD, etc.). The issuer URL is the base URL from which the provider's `/.well-known/openid-configuration` is discovered — e.g. `https://auth.example.com/realms/my-realm` for Keycloak. The redirect URI to register with the provider is `${SERVER_URL}/api/v1/users/oidc/callback`.
 
  ## Task Queue Configuration
-
 diff --git a/go.mod b/go.mod
-index 350521a60..81de034f5 100644
+index 26c971fe2..36b03aa6a 100644
 --- a/go.mod
 +++ b/go.mod
-@@ -14,6 +14,7 @@ require (
- 	github.com/charmbracelet/log v1.0.0
+@@ -15,4 +15,5 @@ require (
  	github.com/cockroachdb/errors v1.14.0
  	github.com/containerd/errdefs v1.0.0
 +	github.com/coreos/go-oidc/v3 v3.18.0
  	github.com/creasty/defaults v1.8.0
  	github.com/docker/docker v28.5.2+incompatible
- 	github.com/docker/go-connections v0.8.1
-@@ -24,6 +25,7 @@ require (
- 	github.com/fatih/color v1.19.0
+@@ -25,4 +26,5 @@ require (
  	github.com/getkin/kin-openapi v0.149.0
  	github.com/go-co-op/gocron/v2 v2.22.0
 +	github.com/go-jose/go-jose/v4 v4.1.4
  	github.com/google/go-github/v57 v57.0.0
  	github.com/google/jsonschema-go v0.4.3
- 	github.com/gorilla/securecookie v1.1.2
 diff --git a/go.sum b/go.sum
 index 4623bf061..d3798a576 100644
 --- a/go.sum
 +++ b/go.sum
-@@ -130,6 +130,8 @@ github.com/containerd/log v0.1.0 h1:TCJt7ioM2cr/tfR8GPbGf9/VRAX8D2B4PjzCpfX540I=
- github.com/containerd/log v0.1.0/go.mod h1:VRRf09a7mHDIRezVKTRCrOq78v577GXq3bSa3EhrzVo=
+@@ -131,4 +131,6 @@ github.com/containerd/log v0.1.0/go.mod h1:VRRf09a7mHDIRezVKTRCrOq78v577GXq3bSa3
  github.com/containerd/platforms v0.2.1 h1:zvwtM3rz2YHPQsF2CHYM8+KtB5dvhISiXh5ZpSBQv6A=
  github.com/containerd/platforms v0.2.1/go.mod h1:XHCb+2/hzowdiut9rkudds9bE5yJ7npe7dG/wG+uFPw=
 +github.com/coreos/go-oidc/v3 v3.18.0 h1:V9orjXynvu5wiC9SemFTWnG4F45v403aIcjWo0d41+A=
 +github.com/coreos/go-oidc/v3 v3.18.0/go.mod h1:DYCf24+ncYi+XkIH97GY1+dqoRlbaSI26KVTCI9SrY4=
  github.com/cpuguy83/dockercfg v0.3.2 h1:DlJTyZGBDlXqUZ2Dk2Q3xHs/FtnooJJVaad2S9GKorA=
  github.com/cpuguy83/dockercfg v0.3.2/go.mod h1:sugsbF4//dDlL/i+S+rtpIWp+5h0BHJHfjj5/jFyUJc=
- github.com/cpuguy83/go-md2man/v2 v2.0.6/go.mod h1:oOW0eioCTA6cOiMLiUPZOpcVxMig6NIQQ7OS05n1F4g=
-@@ -194,6 +196,8 @@ github.com/go-co-op/gocron/v2 v2.22.0 h1:uEuH2F7k7VoESb1BYSaffuuV+T0kkpzsC0aXk7/
- github.com/go-co-op/gocron/v2 v2.22.0/go.mod h1:hiH/U9RMhTi1BBZJmef9s3KC9QwhpBF6PFrvUKaXY9M=
+@@ -195,4 +197,6 @@ github.com/go-co-op/gocron/v2 v2.22.0/go.mod h1:hiH/U9RMhTi1BBZJmef9s3KC9QwhpBF6
  github.com/go-errors/errors v1.4.2 h1:J6MZopCL4uSllY1OfXM374weqZFFItUbrImctkmUxIA=
  github.com/go-errors/errors v1.4.2/go.mod h1:sIVyrIiJhuEF+Pj9Ebtd6P/rEYROXFi3BopGUQ5a5Og=
 +github.com/go-jose/go-jose/v4 v4.1.4 h1:moDMcTHmvE6Groj34emNPLs/qtYXRVcd6S7NHbHz3kA=
 +github.com/go-jose/go-jose/v4 v4.1.4/go.mod h1:x4oUasVrzR7071A4TnHLGSPpNOm2a21K9Kf04k1rs08=
  github.com/go-logfmt/logfmt v0.6.1 h1:4hvbpePJKnIzH1B+8OR/JPbTx37NktoI9LE2QZBBkvE=
  github.com/go-logfmt/logfmt v0.6.1/go.mod h1:EV2pOAQoZaT1ZXZbqDl5hrymndi4SY9ED9/z6CO0XAk=
- github.com/go-logr/logr v1.2.2/go.mod h1:jdQByPbusPIv2/zmleS9BjJVeZ6kBagPoEUsqbVz/1A=
 diff --git a/pkg/auth/oauth/configs.go b/pkg/auth/oauth/configs.go
 index a0d181238..98701c53c 100644
 --- a/pkg/auth/oauth/configs.go
 +++ b/pkg/auth/oauth/configs.go
-@@ -1,6 +1,8 @@
- package oauth
+@@ -2,4 +2,6 @@ package oauth
 
  import (
 +	"strings"
 +
  	"golang.org/x/oauth2"
  )
-
-@@ -11,6 +13,16 @@ type Config struct {
- 	BaseURL      string
+@@ -12,4 +14,14 @@ type Config struct {
  }
 
 +type OIDCConfig struct {
@@ -1017,9 +976,7 @@ index a0d181238..98701c53c 100644
 +
  const (
  	GoogleAuthURL  string = "https://accounts.google.com/o/oauth2/v2/auth"
- 	GoogleTokenURL string = "https://oauth2.googleapis.com/token" // #nosec G101
-@@ -58,3 +70,16 @@ func NewSlackClient(cfg *Config) *oauth2.Config {
- 		Scopes:      cfg.Scopes,
+@@ -59,2 +71,15 @@ func NewSlackClient(cfg *Config) *oauth2.Config {
  	}
  }
 +
@@ -1039,17 +996,14 @@ diff --git a/pkg/config/loader/loader.go b/pkg/config/loader/loader.go
 index 3de06c639..68457ad40 100644
 --- a/pkg/config/loader/loader.go
 +++ b/pkg/config/loader/loader.go
-@@ -22,6 +22,8 @@ import (
- 	"github.com/rs/zerolog"
+@@ -23,4 +23,6 @@ import (
  	"golang.org/x/oauth2"
 
 +	"github.com/coreos/go-oidc/v3/oidc"
 +
  	"github.com/hatchet-dev/hatchet/internal/integrations/alerting"
  	"github.com/hatchet-dev/hatchet/internal/services/ingestor"
- 	"github.com/hatchet-dev/hatchet/pkg/analytics"
-@@ -768,6 +770,59 @@ func createControllerLayer(dc *database.Layer, cf *server.ServerConfigFile, vers
- 		})
+@@ -769,4 +771,57 @@ func createControllerLayer(dc *database.Layer, cf *server.ServerConfigFile, vers
  	}
 
 +	if cf.Auth.OIDC.Enabled {
@@ -1107,30 +1061,24 @@ index 3de06c639..68457ad40 100644
 +
  	encryptionSvc, err := LoadEncryptionSvc(cf)
 
- 	if err != nil {
 diff --git a/pkg/config/server/server.go b/pkg/config/server/server.go
 index e0a2f84bf..5e2013477 100644
 --- a/pkg/config/server/server.go
 +++ b/pkg/config/server/server.go
-@@ -4,6 +4,7 @@ import (
- 	"crypto/tls"
+@@ -5,4 +5,5 @@ import (
  	"time"
 
 +	"github.com/coreos/go-oidc/v3/oidc"
  	"github.com/labstack/echo/v4"
  	"github.com/rs/zerolog"
- 	"github.com/spf13/viper"
-@@ -488,6 +489,8 @@ type ConfigFileAuth struct {
-
+@@ -489,4 +490,6 @@ type ConfigFileAuth struct {
  	Github ConfigFileAuthGithub `mapstructure:"github" json:"github,omitempty"`
 
 +	OIDC ConfigFileAuthOIDC `mapstructure:"oidc" json:"oidc,omitempty"`
 +
  	ControlPlaneExchangeTokenConfig ConfigFileAuthControlPlaneExchangeToken `mapstructure:"controlPlaneExchangeToken" json:"controlPlaneExchangeToken,omitempty"`
  }
-
-@@ -541,6 +544,18 @@ type ConfigFileAuthGithub struct {
- 	Scopes       []string `mapstructure:"scopes" json:"scopes,omitempty" default:"[\"read:user\", \"user:email\"]"`
+@@ -542,4 +545,16 @@ type ConfigFileAuthGithub struct {
  }
 
 +type ConfigFileAuthOIDC struct {
@@ -1147,9 +1095,7 @@ index e0a2f84bf..5e2013477 100644
 +
  type ConfigFileAuthCookie struct {
  	Name     string `mapstructure:"name" json:"name,omitempty" default:"hatchet"`
- 	Domain   string `mapstructure:"domain" json:"domain,omitempty"`
-@@ -695,6 +710,12 @@ type AuthConfig struct {
-
+@@ -696,4 +711,10 @@ type AuthConfig struct {
  	GithubOAuthConfig *oauth2.Config
 
 +	OIDCOAuthConfig *oauth2.Config
@@ -1160,9 +1106,7 @@ index e0a2f84bf..5e2013477 100644
 +
  	JWTManager token.JWTManager
 
- 	ExchangeTokenClient exchangetoken.ExchangeTokenClient
-@@ -952,6 +973,12 @@ func BindAllEnv(v *viper.Viper) {
- 	_ = v.BindEnv("auth.github.clientID", "SERVER_AUTH_GITHUB_CLIENT_ID")
+@@ -953,4 +974,10 @@ func BindAllEnv(v *viper.Viper) {
  	_ = v.BindEnv("auth.github.clientSecret", "SERVER_AUTH_GITHUB_CLIENT_SECRET")
  	_ = v.BindEnv("auth.github.scopes", "SERVER_AUTH_GITHUB_SCOPES")
 +	_ = v.BindEnv("auth.oidc.enabled", "SERVER_AUTH_OIDC_ENABLED")
@@ -1173,17 +1117,14 @@ index e0a2f84bf..5e2013477 100644
 +	_ = v.BindEnv("auth.oidc.scopesString", "SERVER_AUTH_OIDC_SCOPES")
 
  	// task queue options
- 	// legacy options
 diff --git a/pkg/repository/user.go b/pkg/repository/user.go
 index ea09e6928..332239463 100644
 --- a/pkg/repository/user.go
 +++ b/pkg/repository/user.go
-@@ -24,7 +24,7 @@ type CreateUserOpts struct {
- }
+@@ -25,5 +25,5 @@ type CreateUserOpts struct {
 
  type OAuthOpts struct {
 -	Provider       string     `validate:"required,oneof=google github sso"`
 +	Provider       string     `validate:"required,oneof=google github sso oidc"`
  	ProviderUserId string     `validate:"required,min=1"`
  	AccessToken    []byte     `validate:"required,min=1"`
- 	RefreshToken   []byte     // optional
