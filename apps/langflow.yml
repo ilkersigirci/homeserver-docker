@@ -90,7 +90,7 @@ services:
   # NOTE: Install/update LFX packages on the host, then restart Langflow:
   # uv pip install --target data/langflow-backend/packages --no-deps "lfx-openai-compatible==0.1.0" "langchain-openai==1.4.1"
   langflow-backend:
-    image: ghcr.io/ilkersigirci/homeserver-langflow-backend:1.11.4@sha256:0855770cccc8bca28152c968b4d2910aefbbf9150db503ed5f38f2f4fcd0a1fa
+    image: ghcr.io/ilkersigirci/homeserver-langflow-backend:1.12.0@sha256:62d500fc14c143445db8a6eaa8cbd128a5b5d724333c04f95b796da11467856c
     # container_name: langflow-backend # NOTE: Omit container_name so Compose can run multiple backend replicas.
     restart: $RESTART_POLICY_PROGRAMMING
     deploy:
@@ -129,18 +129,21 @@ services:
         soft: 8192
         hard: 16384
     environment:
-      AWS_ACCESS_KEY_ID: $VERSITYGW_ROOT_ACCESS_KEY
-      AWS_DEFAULT_REGION: $S3_REGION
-      AWS_ENDPOINT_URL_S3: $S3_URL
-      AWS_SECRET_ACCESS_KEY: $VERSITYGW_ROOT_SECRET_KEY
+      #### RUNTIME ####
       DO_NOT_TRACK: "true"
-      LANGFLOW_ACCESS_SECURE: "true"
-      LANGFLOW_ALEMBIC_LOG_TO_STDOUT: "true"
-      LANGFLOW_AUTO_LOGIN: "false"
       LANGFLOW_BACKEND_ONLY: "true"
       LANGFLOW_CONFIG_DIR: /app/data/langflow
+      LANGFLOW_LOG_ENV: container_json
+      LANGFLOW_OPEN_BROWSER: "false"
+      LANGFLOW_WORKERS: "2" # NOTE: Processes per replica; 2 replicas × 2 workers = 4 workers sharing the Valkey job queue.
+      TZ: $TZ
+      #### DATABASE ####
+      LANGFLOW_ALEMBIC_LOG_TO_STDOUT: "true"
       LANGFLOW_DATABASE_CONNECTION_RETRY: "true"
       LANGFLOW_DATABASE_URL: postgresql://langflow:${LANGFLOW_DATABASE_PASSWORD}@langflow-db:5432/langflow
+      #### AUTHENTICATION ####
+      LANGFLOW_ACCESS_SECURE: "true"
+      LANGFLOW_AUTO_LOGIN: "false"
       LANGFLOW_ENABLE_SIGNUP: "false"
       LANGFLOW_ENABLE_SUPERUSER_CLI: "false"
       # Traefik obtains the PocketID access token; Langflow independently validates it.
@@ -150,27 +153,42 @@ services:
       LANGFLOW_EXTERNAL_AUTH_JWKS_URL: https://pocketid.$BASE_DOMAINNAME/.well-known/jwks.json
       LANGFLOW_EXTERNAL_AUTH_PROVIDER: pocketid
       LANGFLOW_EXTERNAL_AUTH_TOKEN_HEADER: Authorization
-      LANGFLOW_JOB_QUEUE_TYPE: redis
-      LANGFLOW_LOG_ENV: container_json
-      LANGFLOW_OPEN_BROWSER: "false"
-      LANGFLOW_OBJECT_STORAGE_BUCKET_NAME: langflow
-      LANGFLOW_OBJECT_STORAGE_PREFIX: files
-      LANGFLOW_REDIS_QUEUE_URL: redis://langflow-redis:6379/1
       LANGFLOW_REFRESH_SECURE: "true"
       LANGFLOW_SECRET_KEY: $LANGFLOW_SECRET_KEY
-      LANGFLOW_SSRF_ALLOWED_HOSTS: $AIGATEWAY_HOST
       LANGFLOW_SUPERUSER: bootstrap-admin
       LANGFLOW_SUPERUSER_PASSWORD: $LANGFLOW_SUPERUSER_PASSWORD
-      LANGFLOW_STORAGE_TYPE: s3
       LANGFLOW_WEBHOOK_AUTH_ENABLE: "true"
-      # Processes per replica; 2 replicas × 2 workers = 4 workers sharing the Valkey job queue.
-      LANGFLOW_WORKERS: "2"
+      #### NETWORK SECURITY ####
+      LANGFLOW_SSRF_ALLOWED_HOSTS: $AIGATEWAY_HOST
+      #### JOB QUEUE ####
+      LANGFLOW_JOB_QUEUE_TYPE: redis
+      LANGFLOW_REDIS_QUEUE_URL: redis://langflow-redis:6379/1
+      #### OBJECT STORAGE ####
+      AWS_ACCESS_KEY_ID: $VERSITYGW_ROOT_ACCESS_KEY
+      AWS_DEFAULT_REGION: $S3_REGION
+      AWS_ENDPOINT_URL_S3: $S3_URL
+      AWS_SECRET_ACCESS_KEY: $VERSITYGW_ROOT_SECRET_KEY
+      LANGFLOW_OBJECT_STORAGE_BUCKET_NAME: langflow
+      LANGFLOW_OBJECT_STORAGE_PREFIX: files
+      LANGFLOW_STORAGE_TYPE: s3
+      #### LANGFUSE ####
       LANGFUSE_BASE_URL: $LANGFUSE_BASE_URL
       LANGFUSE_PUBLIC_KEY: $LANGFUSE_PUBLIC_KEY_LANGFLOW
       LANGFUSE_SECRET_KEY: $LANGFUSE_SECRET_KEY_LANGFLOW
+      #### OPENTELEMETRY ####
+      LANGFLOW_OTEL_DB_SPANS: "true"
+      LANGFLOW_OTEL_LOG_LEVEL: INFO
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector-agent:4317
+      OTEL_EXPORTER_OTLP_INSECURE: "true"
+      OTEL_EXPORTER_OTLP_LOGS_ENDPOINT: http://otel-collector-agent:4317 # NOTE: Log export is intentional; message bodies remain withheld by Langflow.
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_PROPAGATORS: tracecontext,baggage
+      OTEL_SEMCONV_STABILITY_OPT_IN: http
+      OTEL_SERVICE_NAME: langflow
+      OTEL_TRACES_SAMPLER: parentbased_always_on
+      #### PYTHON ####
       PYTHONPATH: /app/packages
       PYTHONDONTWRITEBYTECODE: "1"
-      TZ: $TZ
     healthcheck:
       test:
         [
@@ -204,7 +222,7 @@ services:
       traefik.http.services.langflow-api-svc.loadbalancer.server.port: "7860"
 
   langflow-frontend:
-    image: langflowai/langflow-frontend:1.11.4@sha256:067af6d3a22ae33565a0760b175bcb27d02d0307c607fe5d40097249a4d6bf2b
+    image: langflowai/langflow-frontend:1.12.0@sha256:54f67f1961fe1e0ed2e76eca86df2606f7e01efd2db5a39150df72517c98e023
     container_name: langflow-frontend
     restart: $RESTART_POLICY_PROGRAMMING
     depends_on:
