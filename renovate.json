@@ -113,7 +113,7 @@
       "sourceUrl": "https://github.com/hatchet-dev/hatchet",
       "changelogUrl": "https://github.com/hatchet-dev/hatchet/releases",
       "prBodyNotes": [
-        "Use Dockerfiles/Hatchet/README.md to refresh the source commit, rebase oidc.patch and oidc-hardening.patch, and validate the image."
+        "Use Dockerfiles/Hatchet/README.md to refresh the source commit, rebase oidc.patch, and validate the image."
       ]
     },
     {

@@ -13,11 +13,10 @@ ENV CGO_ENABLED=0
 # Pin the official release source by tag and commit so builds are reproducible.
 ADD --checksum=${UPSTREAM_COMMIT} https://github.com/hatchet-dev/hatchet.git#${IMAGE_VERSION} .
 
-COPY base-sources.sha256 oidc.patch oidc-hardening.patch /patches/
+COPY base-sources.sha256 oidc.patch /patches/
 RUN apk add --no-cache git patch python3 \
     && sha256sum -c /patches/base-sources.sha256 \
     && patch --batch --forward --fuzz=0 -p1 < /patches/oidc.patch \
-    && patch --batch --forward --fuzz=0 -p1 < /patches/oidc-hardening.patch \
     && (cd frontend/snippets && python3 -X utf8 generate.py)
 
 RUN --mount=type=cache,target=/root/.cache/go-build \

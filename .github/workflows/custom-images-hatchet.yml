@@ -19,6 +19,64 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  auth-tests:
+    name: OIDC integration tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:18.6@sha256:ae6c78831cbc35fa3a4aaf4d763ddacf6183d6004774cc2dc28b3920410d1d1a
+        env:
+          POSTGRES_USER: hatchet
+          POSTGRES_PASSWORD: hatchet
+          POSTGRES_DB: hatchet
+        ports:
+          - 5431:5432
+        options: >-
+          --health-cmd "pg_isready -U hatchet -d hatchet"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Read upstream pin
+        id: upstream
+        shell: bash
+        run: |
+          commit="$(sed -n 's/^ARG UPSTREAM_COMMIT=//p' Dockerfiles/Hatchet/Dockerfile)"
+          [[ "$commit" =~ ^[0-9a-f]{40}$ ]]
+          printf 'commit=%s\n' "$commit" >> "$GITHUB_OUTPUT"
+      - name: Checkout pinned Hatchet
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: hatchet-dev/hatchet
+          ref: ${{ steps.upstream.outputs.commit }}
+          path: upstream
+          persist-credentials: false
+      - name: Apply OIDC patch
+        working-directory: upstream
+        run: |
+          sha256sum -c ../Dockerfiles/Hatchet/base-sources.sha256
+          patch --batch --forward --fuzz=0 -p1 < ../Dockerfiles/Hatchet/oidc.patch
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7
+        with:
+          go-version-file: upstream/go.mod
+          cache-dependency-path: upstream/go.sum
+      - name: Test authentication against PostgreSQL and mock OIDC provider
+        working-directory: upstream
+        env:
+          DATABASE_URL: postgresql://hatchet:hatchet@127.0.0.1:5431/hatchet?sslmode=disable
+          SERVER_MSGQUEUE_KIND: postgres
+        run: |
+          go run ./cmd/hatchet-migrate
+          bash hack/dev/generate-x509-certs.sh ./hack/dev/certs
+          bash hack/dev/generate-local-encryption-keys.sh ./hack/dev/encryption-keys
+          go test -p 1 -tags integration ./api/v1/server/handlers/users ./api/v1/server/authn -run 'OIDC|OAuth|Session' -count=1
+
   validate:
     if: github.event_name == 'pull_request'
     permissions:
@@ -33,6 +91,7 @@ jobs:
 
   publish:
     if: github.event_name == 'push'
+    needs: auth-tests
     permissions:
       contents: read
       packages: write

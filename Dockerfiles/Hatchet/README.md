@@ -1,74 +1,60 @@
 # Hatchet
 
-This image builds a pinned official Hatchet release with generic OIDC login.
-The patch boundary is deliberate:
+Builds the pinned official Hatchet release with generic OIDC login, based on
+[hatchet-dev/hatchet#4176](https://github.com/hatchet-dev/hatchet/pull/4176).
+`oidc.patch` adds the provider configuration, login button, handlers, and tests.
 
-- `oidc.patch` is the rebased implementation from
-  [hatchet-dev/hatchet#4176](https://github.com/hatchet-dev/hatchet/pull/4176).
-- `oidc-hardening.patch` is this repository's security and identity layer on
-  top of that PR.
+We prioritize Hatchet compatibility and a small patch over custom identity and
+session hardening. Accounts are matched by email, not `(issuer, subject)`;
+tokens are encrypted in native `UserOAuth`, and login does not rotate the
+session ID. This avoids custom tables, migrations, queries, and shared-session
+changes.
 
-The hardening patch adds PKCE S256, an OIDC nonce, one-time flow state, login
-rate limiting, strict UserInfo subject validation, and session ID rotation. It
-resolves returning users by the stable `(issuer, subject)` identity before
-email. First-time provisioning requires a verified email, and an existing email
-is treated as a conflict rather than an implicit account link. OIDC access and
-refresh tokens are not retained because Hatchet does not consume them after
-login.
+Protocol handling uses `go-oidc` and `golang.org/x/oauth2` for discovery, ID-token
+verification, and PKCE S256. The handlers check the nonce and UserInfo subject,
+keep email and verification claims paired, and expire login attempts after five
+minutes. Flow data lives in Hatchet's existing session; starting another login
+replaces the pending attempt. The OIDC routes use Hatchet's rate limiter.
 
-The included database migration makes `(provider, providerUserId)` unique while
-preserving Hatchet's existing one-OAuth-identity-per-user constraint. OIDC's
-provider user ID is a versioned digest of issuer and subject, so two issuers may
-use the same subject safely.
+## Configuration
 
-`IMAGE_VERSION` selects the official release and published image tag.
-`UPSTREAM_COMMIT` pins that tag to its peeled commit. During the build,
-`base-sources.sha256` verifies every existing upstream file changed by either
-patch, both patches apply with zero fuzz, generated frontend snippets are
-refreshed, and focused auth tests run before the binaries are built. The image
-contains matching `hatchet-lite`, `hatchet-admin`, `hatchet-migrate`, and
+Set `SERVER_AUTH_OIDC_ENABLED`, `SERVER_AUTH_OIDC_CLIENT_ID`,
+`SERVER_AUTH_OIDC_CLIENT_SECRET`, and `SERVER_AUTH_OIDC_ISSUER_URL`.
+Scopes default to `openid profile email`. Register this redirect URI:
+
+```text
+${SERVER_URL}/api/v1/users/oidc/callback
+```
+
+The provider must return an email in the ID token or a subject-matched UserInfo
+response. New users without verified email remain subject to Hatchet's
+email-verification gate. Matching an existing account requires
+`email_verified: true` or an explicit `SERVER_AUTH_SET_EMAIL_VERIFIED` trust
+setting. Configure an issuer trusted to assert account email addresses.
+
+The repository deployment is OIDC-only, with a secure cookie scoped to the
+Hatchet hostname.
+
+## Updating and Validation
+
+`IMAGE_VERSION` selects the official release and published tag;
+`UPSTREAM_COMMIT` pins its peeled commit. The build verifies
+`base-sources.sha256`, applies the patch with zero fuzz, refreshes frontend
+snippets, runs focused tests, and builds matching server, admin, migration, and
 frontend artifacts.
 
-## OIDC Email Provisioning
+For an update:
 
-First-time OIDC provisioning requires a non-empty `email` and
-`email_verified: true` from the verified ID token or a subject-matched UserInfo
-response. The email and its verification status always come from the same
-verified claim set. If that email already belongs to a Hatchet account, login
-is rejected; accounts are never linked by email.
+1. Update the release tag and peeled commit in `Dockerfile`.
+2. Rebase `oidc.patch` onto that release. Regenerate the OpenAPI server with
+    `hack/oas/generate-server.sh` if the contract changes.
+3. Refresh `base-sources.sha256` for existing upstream files touched by the patch.
+4. Build the image and run the PostgreSQL authentication tests.
 
-Returning login uses only the verified issuer and subject, so it does not
-depend on mutable email claims. There is no issuer-specific trust bypass, and
-the instance-wide `SERVER_AUTH_SET_EMAIL_VERIFIED` setting does not override
-the first-time provisioning policy.
+The image workflow runs the tagged integration tests, including PKCE code
+exchange, nonce validation, flow expiry, replay rejection, and native account
+provisioning. Publishing requires those tests to pass.
 
-The repository deployment is OIDC-only. Its session cookie is secure and scoped
-to the Hatchet hostname rather than the parent domain.
-
-## Updating
-
-Renovate tracks GitHub releases rather than every Git tag. For an update:
-
-1. Resolve the new official release tag to its peeled commit and update
-    `IMAGE_VERSION` and `UPSTREAM_COMMIT` in `Dockerfile`.
-2. Check out that release in a clean upstream clone and apply `oidc.patch`, then
-    `oidc-hardening.patch`, with three-way merge support.
-3. Resolve conflicts in the upstream patch first, regenerate it as the diff
-    from the clean release, then rebase and regenerate the hardening patch as the
-    diff from the upstream-patched tree.
-4. If the API contract changed, run `hack/oas/generate-server.sh`. If repository
-    queries changed, run the upstream `generate-sqlc` task. Run `go mod tidy`
-    after dependency changes.
-5. Refresh `base-sources.sha256` from the unpatched release for the union of
-    existing files touched by both patches.
-6. Build the image, run the tagged PostgreSQL integration tests, and exercise a
-    complete runtime redirect and callback against a mock or real OIDC issuer.
-
-The Compose image reference stays on its published `tag@digest` until the
-custom-image workflow publishes the rebuilt tag and a later Renovate run
-resolves its new digest.
-
-Remove `oidc.patch` when an official Hatchet release contains equivalent generic
-OIDC support. Remove `oidc-hardening.patch` only when upstream also provides the
-same issuer/subject identity semantics, database constraints, and protocol
-protections.
+Keep the Compose reference on its published `tag@digest` until the rebuilt image
+is published and Renovate resolves the new digest. Remove the patch when an
+official release provides equivalent OIDC support.
