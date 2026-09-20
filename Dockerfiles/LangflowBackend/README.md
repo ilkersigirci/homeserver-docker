@@ -1,40 +1,38 @@
-# Langflow through the OpenAI API
+# Langflow through OpenAI-compatible gateways
 
-Bifrost is the only public OpenAI-compatible API. Langflow keeps its existing
-`POST /api/v1/responses` route behind Bifrost; it does not expose parallel
-`/v1` routes or reimplement Chat Completions and model discovery.
+Langflow keeps its native `POST /api/v1/responses` route. The custom backend
+makes that route compatible with standard OpenAI Responses clients, whether
+they call Langflow directly or through a gateway such as LiteLLM. No gateway is
+required by the image.
 
 ```text
 OpenAI client or Open WebUI
         |
         | /v1/responses
         v
-      Bifrost
+Optional OpenAI-compatible gateway
         |
         | /api/v1/responses
         v
       Langflow
 ```
 
+Langflow does not expose parallel `/v1` routes or implement Chat Completions
+and model discovery.
+
 ## Why a custom image
 
-Stock Langflow 1.12.0 exposes a Responses-shaped endpoint but is not wire
-compatible with OpenAI clients:
+Stock Langflow 1.12.0 exposes a Responses-shaped endpoint but is not fully wire
+compatible with standard OpenAI clients:
 
-- `input` accepts only a string, so canonical message arrays forwarded by
-  Bifrost fail with HTTP 422;
+- `input` accepts only a string, so canonical message arrays fail with HTTP 422;
 - authentication accepts `x-api-key`, not the standard Bearer header;
 - streaming emits legacy `response.chunk` data, duplicates the first text
   delta, and terminates with `[DONE]` instead of canonical typed events.
 
-A Bifrost path override changes only the URL, while passthrough forwards these
-incompatibilities unchanged. The thin custom image therefore patches Langflow's
-existing endpoint instead of adding another API facade.
-
-The custom backend image applies
+The custom backend applies
 [`openai-responses.patch`](../../Dockerfiles/LangflowBackend/patches/openai-responses.patch)
-to Langflow's existing endpoint. The patch is limited to two upstream modules
-and adds only what the gateway needs:
+to Langflow's existing endpoint. The gateway-neutral patch adds:
 
 - canonical string or text-message-array `input`, plus `instructions`;
 - OpenAI-standard `Authorization: Bearer` authentication in addition to
@@ -47,87 +45,66 @@ and adds only what the gateway needs:
 The flow must contain Chat Input and Chat Output components. Input is text-only,
 and caller-provided tools are not supported by Langflow's endpoint.
 
-## Bifrost provider
+## Endpoint contract
 
-Create an OpenAI-based custom provider named `Langflow`. Keep the Langflow API
-key in Bifrost's environment and configure both Responses request types to use
-Langflow's actual path:
+Use one of these base URLs:
 
-```json
-{
-  "providers": {
-    "Langflow": {
-      "keys": [
-        {
-          "name": "langflow-key",
-          "value": "env.LANGFLOW_API_KEY",
-          "models": ["FirstFlow"],
-          "weight": 1.0
-        }
-      ],
-      "network_config": {
-        "base_url": "https://langflow.example.com"
-      },
-      "custom_provider_config": {
-        "base_provider_type": "openai",
-        "allowed_requests": {
-          "responses": true,
-          "responses_stream": true
-        },
-        "request_path_overrides": {
-          "responses": "/api/v1/responses",
-          "responses_stream": "/api/v1/responses"
-        }
-      }
-    }
-  }
-}
+- Inside this Compose project: `http://langflow-backend:7860/api/v1`
+- Through Traefik: `https://langflow.example.com/api/v1`
+
+Send `POST /responses` with a Langflow API key as either
+`Authorization: Bearer <key>` or `x-api-key: <key>`. The `model` value is the
+Langflow flow name or ID. Gateways must use an explicit model mapping because
+Langflow does not expose an OpenAI-compatible `/models` endpoint.
+
+## LiteLLM
+
+### Expose a Langflow flow through LiteLLM
+
+Create an OpenAI-compatible deployment in LiteLLM's Admin UI. The equivalent
+static configuration is:
+
+```yaml
+model_list:
+  - model_name: langflow-first-flow
+    litellm_params:
+      model: openai/FirstFlow
+      api_base: http://langflow-backend:7860/api/v1
+      api_key: os.environ/LANGFLOW_API_KEY
 ```
 
-The path overrides are normal custom provider configuration; no passthrough
-route, compatibility conversion, or per-request passthrough header is needed.
+Store a Langflow API key in the deployment or inject `LANGFLOW_API_KEY` into
+LiteLLM. Do not enable `use_chat_completions_api`: Langflow has a native
+Responses endpoint and does not expose Chat Completions.
 
-Use an explicit provider/model prefix so routing does not depend on model
-catalog discovery:
+Clients can then use LiteLLM's normal Responses endpoint and its own API key:
 
 ```bash
-curl -fsS "https://aigateway.example.com/v1/responses" \
+curl -fsS "https://litellm.example.com/v1/responses" \
   --no-buffer \
-  -H "Authorization: Bearer $BIFROST_API_KEY" \
+  -H "Authorization: Bearer $LITELLM_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "Langflow/FirstFlow",
+    "model": "langflow-first-flow",
     "input": "Who are you?",
     "stream": true
   }'
 ```
 
-## OpenAI client and Open WebUI
+### Use LiteLLM from a Langflow flow
 
-Point the standard OpenAI client at Bifrost, not Langflow:
+Configure an OpenAI-compatible model provider in Langflow with:
 
-```python
-import os
+- base URL: `http://litellm:4000/v1`
+- API key: a LiteLLM virtual or master key
+- model: a model alias configured in LiteLLM
 
-from openai import OpenAI
+The internal `litellm` hostname is explicitly included in Langflow's SSRF
+allowlist. Both services share the `t3_proxy` Docker network, so this path does
+not depend on public DNS or Traefik.
 
-client = OpenAI(
-    api_key=os.environ["BIFROST_API_KEY"],
-    base_url="https://aigateway.example.com/v1",
-)
+## OpenAI clients and Open WebUI
 
-for event in client.responses.create(
-    model="Langflow/FirstFlow",
-    input="Who are you?",
-    stream=True,
-):
-    if event.type == "response.output_text.delta":
-        print(event.delta, end="", flush=True)
-```
-
-For Open WebUI 0.11 or newer, add an OpenAI connection with the same Bifrost
-`/v1` URL and Bifrost API key, set **API type** to **Responses**, and add
-`Langflow/FirstFlow` as an explicit model ID. Bifrost cannot discover flows
-through Langflow's Responses-only endpoint, so configure model IDs instead of
-calling upstream model discovery. Disable tool calling and image input for this
-text-only model.
+Point clients at either LiteLLM's `/v1` URL or Langflow's direct `/api/v1` URL.
+Use the Responses API and configure an explicit model ID. Disable tool calling
+and image input for Langflow-backed models because this endpoint is text-only.

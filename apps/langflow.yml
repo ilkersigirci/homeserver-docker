@@ -159,7 +159,8 @@ services:
       LANGFLOW_SUPERUSER_PASSWORD: $LANGFLOW_SUPERUSER_PASSWORD
       LANGFLOW_WEBHOOK_AUTH_ENABLE: "true"
       #### NETWORK SECURITY ####
-      LANGFLOW_SSRF_ALLOWED_HOSTS: $AIGATEWAY_HOST
+      # Allow the configured gateway plus internal LiteLLM for provider calls.
+      LANGFLOW_SSRF_ALLOWED_HOSTS: $AIGATEWAY_HOST,litellm
       #### JOB QUEUE ####
       LANGFLOW_JOB_QUEUE_TYPE: redis
       LANGFLOW_REDIS_QUEUE_URL: redis://langflow-redis:6379/1
@@ -207,7 +208,7 @@ services:
     labels:
       traefik.enable: "true"
       traefik.docker.network: "t3_proxy"
-      ## Bifrost bypasses OIDC only for Responses requests carrying a Langflow API key.
+      ## Gateway-neutral Responses route: bypass browser OIDC, then let Langflow validate the API key.
       traefik.http.routers.langflow-responses-rtr.entrypoints: "websecure"
       traefik.http.routers.langflow-responses-rtr.rule: "Host(`langflow.$DOMAINNAME`) && Path(`/api/v1/responses`) && (HeaderRegexp(`Authorization`, `(?i)^Bearer .+`) || HeaderRegexp(`x-api-key`, `.+`))"
       traefik.http.routers.langflow-responses-rtr.middlewares: "chain-no-auth@file"
