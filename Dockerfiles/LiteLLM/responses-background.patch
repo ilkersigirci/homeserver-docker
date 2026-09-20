@@ -1,0 +1,106 @@
+Temporary workaround for native background Responses failing in OSS builds after
+the upstream provider returns a queued or in-progress response.
+
+https://github.com/BerriAI/litellm/issues/32782
+https://github.com/BerriAI/litellm/pull/32784
+https://github.com/BerriAI/litellm/issues/17204
+
+The image intentionally excludes litellm_enterprise, so remove its background
+managed-object persistence side effect while preserving native create, retrieve,
+and cancel forwarding. Preserve the client-visible response ID across retrieval
+and cancellation instead of re-encrypting it on every response. Remove this
+patch when the pinned upstream release passes verify_background.py without it;
+retain the regression check.
+
+diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/response_api_endpoints/endpoints.py
+--- a/litellm/proxy/response_api_endpoints/endpoints.py
++++ b/litellm/proxy/response_api_endpoints/endpoints.py
+@@ -356,50 +356,6 @@ async def responses_api(
+             version=version,
+         )
+
+-        # Store in managed objects table if background mode is enabled
+-        if data.get("background") and isinstance(response, ResponsesAPIResponse):
+-            if response.status in ["queued", "in_progress"]:
+-                from litellm_enterprise.proxy.hooks.managed_files import (
+-                    _PROXY_LiteLLMManagedFiles,
+-                )
+-
+-                managed_files_obj: Final = cast(
+-                    _PROXY_LiteLLMManagedFiles | None,
+-                    proxy_logging_obj.get_proxy_hook("managed_files"),
+-                )
+-
+-                if managed_files_obj and llm_router:
+-                    try:
+-                        # Get the actual deployment model_id from hidden params
+-                        hidden_params: Final = getattr(response, "_hidden_params", {}) or {}
+-                        model_id: Final = hidden_params.get("model_id", None)
+-
+-                        if not model_id:
+-                            verbose_proxy_logger.warning(
+-                                "No model_id found in response hidden params for response %s, skipping managed object storage",
+-                                response.id,
+-                            )
+-                            raise Exception("No model_id found in response hidden params")
+-                        # Store in managed objects table
+-                        await managed_files_obj.store_unified_object_id(
+-                            unified_object_id=response.id,
+-                            file_object=response,
+-                            litellm_parent_otel_span=None,
+-                            model_object_id=response.id,
+-                            file_purpose="response",
+-                            user_api_key_dict=user_api_key_dict,
+-                        )
+-
+-                        verbose_proxy_logger.info(
+-                            "Stored background response %s in managed objects table with unified_id=%s",
+-                            response.id,
+-                            response.id,
+-                        )
+-                    except Exception as e:
+-                        verbose_proxy_logger.error(
+-                            "Failed to store background response in managed objects table: %s", e
+-                        )
+-
+         return response
+     except ModifyResponseException as e:
+         # Guardrail passthrough: return violation message in Responses API format (200)
+@@ -734,7 +690,7 @@ async def get_response(
+     data["response_id"] = response_id
+     processor: Final = ProxyBaseLLMRequestProcessing(data=data)
+     try:
+-        return await processor.base_process_llm_request(
++        response = await processor.base_process_llm_request(
+             request=request,
+             fastapi_response=fastapi_response,
+             user_api_key_dict=user_api_key_dict,
+@@ -752,6 +708,9 @@ async def get_response(
+             user_api_base=user_api_base,
+             version=version,
+         )
++        if isinstance(response, ResponsesAPIResponse):
++            response.id = response_id
++        return response
+     except Exception as e:
+         raise await processor._handle_llm_api_exception(
+             e=e,
+@@ -1105,7 +1064,7 @@ async def cancel_response(
+     data["response_id"] = response_id
+     processor: Final = ProxyBaseLLMRequestProcessing(data=data)
+     try:
+-        return await processor.base_process_llm_request(
++        response = await processor.base_process_llm_request(
+             request=request,
+             fastapi_response=fastapi_response,
+             user_api_key_dict=user_api_key_dict,
+@@ -1123,6 +1082,9 @@ async def cancel_response(
+             user_api_base=user_api_base,
+             version=version,
+         )
++        if isinstance(response, ResponsesAPIResponse):
++            response.id = response_id
++        return response
+     except Exception as e:
+         raise await processor._handle_llm_api_exception(
+             e=e,

@@ -14,6 +14,8 @@ The build owns:
   requirement for SSO debug login.
 - `litellm-auth.patch`, which adds explicit ingress-lane dispatch, required
   authorization checks, scoped model metadata, and OpenAI retrieval route coverage.
+- `responses-background.patch`, a temporary fix for native background Responses
+  failing in the OSS image; see [removal criteria](#temporary-background-responses-workaround).
 - `responses-streaming.patch`, a temporary upstream bug workaround, not a
   permanent image customization; see [removal criteria](#temporary-streaming-bug-workaround).
 - `responses-logging.patch`, a temporary fix for missing streamed Responses
@@ -24,6 +26,8 @@ The build owns:
 - `oidc_delegated_auth.py`, which validates RFC 9068 JWT access tokens by default,
   with explicit Pocket ID and Keycloak compatibility profiles.
 - `verify_auth.py`, which exercises the integration during every image build.
+- `verify_background.py`, which checks queued background Responses and stable
+  polling IDs during every image build without an external provider.
 - `verify_streaming.py`, which checks wildcard routing and the upstream `stream`
   request field during every image build without external API calls.
 - `verify_logging.py`, which checks Responses success callbacks and spend-log
@@ -122,6 +126,33 @@ regression check in the build. Retire flag-specific opt-in/opt-out assertions
 alongside the flag, and adapt internal API calls if upstream changes them,
 without weakening the native-streaming request-path checks.
 The unrelated OSS/auth customizations remain in place.
+
+## Temporary Background Responses Workaround
+
+`responses-background.patch` fixes
+[upstream issue #32782](https://github.com/BerriAI/litellm/issues/32782).
+LiteLLM forwards a native `background: true` request successfully, then imports
+an Enterprise-only managed-files hook when the provider returns `queued` or
+`in_progress`. Because this image deliberately excludes `litellm_enterprise`,
+the client receives a 500 after the provider has already accepted the job.
+
+The patch removes only that Enterprise managed-object persistence side effect.
+Native background creation, retrieval, and cancellation remain provider-owned
+and use LiteLLM's normal Responses routes. The unmerged
+[upstream PR #32784](https://github.com/BerriAI/litellm/pull/32784) proposed a
+guarded import for mixed OSS/Enterprise source distributions; removal is the
+smaller equivalent for this OSS-only image.
+
+It also fixes [upstream issue #17204](https://github.com/BerriAI/litellm/issues/17204)
+by preserving the client-visible response ID across retrieval and cancellation;
+LiteLLM still decrypts and owner-checks that ID before forwarding it. The patch
+does not partially backport the unmerged retrieval-streaming work in
+[upstream PR #26750](https://github.com/BerriAI/litellm/pull/26750) for
+[issue #26762](https://github.com/BerriAI/litellm/issues/26762).
+
+At each upgrade, test without this patch. Remove it when the pinned release
+passes `verify_background.py` without importing `litellm_enterprise` or changing
+polling IDs. Keep the regression check in the build.
 
 ## Temporary Logging Bug Workaround
 

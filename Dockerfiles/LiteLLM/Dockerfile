@@ -15,12 +15,13 @@ ARG IMAGE_VERSION
 ARG UPSTREAM_COMMIT
 WORKDIR /app
 ADD --checksum=${UPSTREAM_COMMIT} https://github.com/BerriAI/litellm.git#v${IMAGE_VERSION} /app
-COPY strip_enterprise.py verify_oss.py base-sources.sha256 sso.patch litellm-auth.patch responses-streaming.patch responses-logging.patch otel-propagation.patch /patches/
+COPY strip_enterprise.py verify_oss.py base-sources.sha256 sso.patch litellm-auth.patch responses-background.patch responses-streaming.patch responses-logging.patch otel-propagation.patch /patches/
 RUN apt-get update && apt-get install -y --no-install-recommends patch \
     && python3 /patches/strip_enterprise.py /app \
     && sha256sum -c /patches/base-sources.sha256 \
     && patch --batch --forward --fuzz=0 -p1 < /patches/sso.patch \
     && patch --batch --forward --fuzz=0 -p1 < /patches/litellm-auth.patch \
+    && patch --batch --forward --fuzz=0 -p1 < /patches/responses-background.patch \
     && patch --batch --forward --fuzz=0 -p1 < /patches/responses-streaming.patch \
     && patch --batch --forward --fuzz=0 -p1 < /patches/responses-logging.patch \
     && patch --batch --forward --fuzz=0 -p1 < /patches/otel-propagation.patch \
@@ -73,13 +74,14 @@ COPY --from=builder /opt/prisma /opt/prisma
 COPY --from=source /app/LICENSE /app/LICENSE.litellm
 COPY LICENSE.patches /app/LICENSE.patches
 COPY oidc_delegated_auth.py /app/litellm-config/oidc_delegated_auth.py
-COPY verify_oss.py verify_auth.py verify_streaming.py verify_logging.py verify_tracing.py /tmp/litellm-checks/
+COPY verify_oss.py verify_auth.py verify_background.py verify_streaming.py verify_logging.py verify_tracing.py /tmp/litellm-checks/
 RUN chmod -R a+rX /opt/prisma \
     && test -x /opt/prisma/binaries/node_modules/.bin/prisma \
     && test -f /opt/prisma/binaries/node_modules/prisma/build/index.js \
     && python3 -c "from prisma.client import BINARY_PATHS; paths = list(BINARY_PATHS.query_engine.values()); assert paths and all(p.startswith('/opt/prisma/') for p in paths), paths" \
     && python3 /tmp/litellm-checks/verify_oss.py \
     && python3 /tmp/litellm-checks/verify_auth.py \
+    && LITELLM_LOCAL_MODEL_COST_MAP=true python3 /tmp/litellm-checks/verify_background.py \
     && LITELLM_LOCAL_MODEL_COST_MAP=true python3 /tmp/litellm-checks/verify_streaming.py \
     && LITELLM_LOCAL_MODEL_COST_MAP=true python3 /tmp/litellm-checks/verify_logging.py \
     && LITELLM_LOCAL_MODEL_COST_MAP=true python3 /tmp/litellm-checks/verify_tracing.py \
