@@ -76,8 +76,8 @@ http:
             Url: 'https://pocketid.{{env "BASE_DOMAINNAME"}}'
             ClientId: '{{env "LANGFLOW_CLIENT_ID"}}'
             ClientSecret: '{{env "LANGFLOW_CLIENT_SECRET"}}'
-            TokenValidation: AccessToken
-            UsePkce: false
+            TokenValidation: IdToken
+            UsePkce: true
           Scopes:
             - openid
             - profile
@@ -89,7 +89,7 @@ http:
             SameSite: lax
           Headers:
             - Name: Authorization
-              Value: "{{`Bearer {{ .accessToken }}`}}"
+              Value: "{{`Bearer {{ .idToken }}`}}"
 
   services:
     t3code-svc:

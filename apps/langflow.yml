@@ -86,9 +86,8 @@ services:
 
   # NOTE: LANGFLOW_SECRET_KEY: Generate with: python3 -c 'from secrets import token_urlsafe; print(token_urlsafe(32))'
   # NOTE: Create a bucket named "langflow" in the S3 provider beforehand.
-  # NOTE: The backend image includes LFX core only; provider bundles and Torch are not installed.
-  # NOTE: Install/update LFX packages on the host, then restart Langflow:
-  # uv pip install --target data/langflow-backend/packages --no-deps "lfx-openai-compatible==0.1.0" "langchain-openai==1.4.1"
+  # NOTE: The custom image includes the OpenAI and OpenAI Compatible bundles.
+  # The optional package mount is for additional bundles (not these pinned dependencies).
   langflow-backend:
     image: ghcr.io/ilkersigirci/homeserver-langflow-backend:1.12.0@sha256:62d500fc14c143445db8a6eaa8cbd128a5b5d724333c04f95b796da11467856c
     # container_name: langflow-backend # NOTE: Omit container_name so Compose can run multiple backend replicas.
@@ -146,7 +145,7 @@ services:
       LANGFLOW_AUTO_LOGIN: "false"
       LANGFLOW_ENABLE_SIGNUP: "false"
       LANGFLOW_ENABLE_SUPERUSER_CLI: "false"
-      # Traefik obtains the PocketID access token; Langflow independently validates it.
+      # Traefik forwards the PocketID ID token; Langflow independently validates it.
       LANGFLOW_EXTERNAL_AUTH_AUDIENCE: $LANGFLOW_CLIENT_ID
       LANGFLOW_EXTERNAL_AUTH_ENABLED: "true"
       LANGFLOW_EXTERNAL_AUTH_ISSUER: https://pocketid.$BASE_DOMAINNAME
@@ -159,8 +158,9 @@ services:
       LANGFLOW_SUPERUSER_PASSWORD: $LANGFLOW_SUPERUSER_PASSWORD
       LANGFLOW_WEBHOOK_AUTH_ENABLE: "true"
       #### NETWORK SECURITY ####
-      # Allow the configured gateway plus internal LiteLLM for provider calls.
-      LANGFLOW_SSRF_ALLOWED_HOSTS: $AIGATEWAY_HOST,litellm
+      # Langflow blocks private addresses by default; list every private
+      # OpenAI-compatible endpoint by comma that users may configure as a model provider.
+      LANGFLOW_SSRF_ALLOWED_HOSTS: litellm.coding.$BASE_DOMAINNAME
       #### JOB QUEUE ####
       LANGFLOW_JOB_QUEUE_TYPE: redis
       LANGFLOW_REDIS_QUEUE_URL: redis://langflow-redis:6379/1
@@ -207,7 +207,6 @@ services:
       start_interval: 5s
     labels:
       traefik.enable: "true"
-      traefik.docker.network: "t3_proxy"
       ## Gateway-neutral Responses route: bypass browser OIDC, then let Langflow validate the API key.
       traefik.http.routers.langflow-responses-rtr.entrypoints: "websecure"
       traefik.http.routers.langflow-responses-rtr.rule: "Host(`langflow.$DOMAINNAME`) && Path(`/api/v1/responses`) && (HeaderRegexp(`Authorization`, `(?i)^Bearer .+`) || HeaderRegexp(`x-api-key`, `.+`))"
