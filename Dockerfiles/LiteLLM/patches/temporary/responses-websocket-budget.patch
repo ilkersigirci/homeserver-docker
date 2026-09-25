@@ -1,3 +1,11 @@
+Upstream bug: Responses WebSocket first-frame authorization skips the
+Internal User's per-model budget that HTTP requests enforce.
+
+Check the user's per-model budget once the first frame names the model;
+zero-cost models stay exempt, as on HTTP.
+
+Removal check: WebSocket budget check in tests/verify_user_auth.py
+
 diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/response_api_endpoints/endpoints.py
 --- a/litellm/proxy/response_api_endpoints/endpoints.py
 +++ b/litellm/proxy/response_api_endpoints/endpoints.py

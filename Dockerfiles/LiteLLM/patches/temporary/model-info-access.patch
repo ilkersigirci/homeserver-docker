@@ -1,3 +1,10 @@
+Upstream bug: direct /model/info?litellm_model_id=... lookups bypass
+the model and team filters used by the endpoint's listing form.
+
+Apply the listing's model and team scope to direct-ID reads.
+
+Removal check: model-info scope check in tests/verify_user_auth.py
+
 diff --git a/litellm/proxy/proxy_server.py b/litellm/proxy/proxy_server.py
 --- a/litellm/proxy/proxy_server.py
 +++ b/litellm/proxy/proxy_server.py

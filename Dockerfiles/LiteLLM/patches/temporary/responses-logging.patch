@@ -1,11 +1,12 @@
-Temporary workaround for Responses streaming success logs lost after the parser's
-model_construct fallback leaves a dictionary response or usage.
+Upstream bug: Responses streaming success logs are lost when the
+parser's model_construct fallback leaves a dictionary response or usage.
 
 https://github.com/BerriAI/litellm/issues/34754
 
-Reuse the existing response object and usage conversion in the shared sync/async
-logger. Remove when the pinned upstream release passes verify_logging.py without
-this patch; retain the regression check.
+Reuse the existing response object and usage conversion in the shared
+sync/async logger.
+
+Removal check: tests/verify_logging.py
 
 diff --git a/litellm/litellm_core_utils/litellm_logging.py b/litellm/litellm_core_utils/litellm_logging.py
 --- a/litellm/litellm_core_utils/litellm_logging.py

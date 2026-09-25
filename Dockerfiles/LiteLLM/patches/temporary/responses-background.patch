@@ -1,16 +1,16 @@
-Temporary workaround for native background Responses failing in OSS builds after
-the upstream provider returns a queued or in-progress response.
+Upstream bug: native background Responses fail in OSS builds after the
+provider returns a queued or in-progress response.
 
 https://github.com/BerriAI/litellm/issues/32782
 https://github.com/BerriAI/litellm/pull/32784
 https://github.com/BerriAI/litellm/issues/17204
 
-The image intentionally excludes litellm_enterprise, so remove its background
-managed-object persistence side effect while preserving native create, retrieve,
-and cancel forwarding. Preserve the client-visible response ID across retrieval
-and cancellation instead of re-encrypting it on every response. Remove this
-patch when the pinned upstream release passes verify_background.py without it;
-retain the regression check.
+The image excludes litellm_enterprise, so remove its background managed-object
+persistence side effect while preserving native create, retrieve, and cancel
+forwarding. Preserve the client-visible response ID across retrieval and
+cancellation instead of re-encrypting it on every response.
+
+Removal check: tests/verify_background.py
 
 diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/response_api_endpoints/endpoints.py
 --- a/litellm/proxy/response_api_endpoints/endpoints.py

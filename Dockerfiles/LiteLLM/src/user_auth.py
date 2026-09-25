@@ -7,8 +7,8 @@ limits natively.
 
 Every other credential returns ``None`` and continues through LiteLLM's native
 master-key, virtual-key, and public-route authentication
-(``custom-auth-fallback.patch``). An Internal User's virtual key without a
-team is bounded by that user's models and budget natively.
+(``patches/permanent/custom-auth-fallback.patch``). An Internal User's virtual
+key without a team is bounded by that user's models and budget natively.
 """
 
 from __future__ import annotations

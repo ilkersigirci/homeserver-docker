@@ -15,18 +15,18 @@ ARG IMAGE_VERSION
 ARG UPSTREAM_COMMIT
 WORKDIR /app
 ADD --checksum=${UPSTREAM_COMMIT} https://github.com/BerriAI/litellm.git#v${IMAGE_VERSION} /app
-COPY strip_enterprise.py verify_oss.py base-sources.sha256 sso.patch custom-auth-fallback.patch model-info-access.patch responses-websocket-budget.patch responses-background.patch responses-streaming.patch responses-logging.patch otel-propagation.patch /patches/
+COPY scripts/strip_enterprise.py tests/verify_oss.py base-sources.sha256 patches/ /patches/
 RUN apt-get update && apt-get install -y --no-install-recommends patch \
     && python3 /patches/strip_enterprise.py /app \
     && sha256sum -c /patches/base-sources.sha256 \
-    && patch --batch --forward --fuzz=0 -p1 < /patches/sso.patch \
-    && patch --batch --forward --fuzz=0 -p1 < /patches/custom-auth-fallback.patch \
-    && patch --batch --forward --fuzz=0 -p1 < /patches/model-info-access.patch \
-    && patch --batch --forward --fuzz=0 -p1 < /patches/responses-websocket-budget.patch \
-    && patch --batch --forward --fuzz=0 -p1 < /patches/responses-background.patch \
-    && patch --batch --forward --fuzz=0 -p1 < /patches/responses-streaming.patch \
-    && patch --batch --forward --fuzz=0 -p1 < /patches/responses-logging.patch \
-    && patch --batch --forward --fuzz=0 -p1 < /patches/otel-propagation.patch \
+    && patch --batch --forward --fuzz=0 -p1 < /patches/permanent/sso.patch \
+    && patch --batch --forward --fuzz=0 -p1 < /patches/permanent/custom-auth-fallback.patch \
+    && patch --batch --forward --fuzz=0 -p1 < /patches/temporary/model-info-access.patch \
+    && patch --batch --forward --fuzz=0 -p1 < /patches/temporary/responses-websocket-budget.patch \
+    && patch --batch --forward --fuzz=0 -p1 < /patches/temporary/responses-background.patch \
+    && patch --batch --forward --fuzz=0 -p1 < /patches/temporary/responses-streaming.patch \
+    && patch --batch --forward --fuzz=0 -p1 < /patches/temporary/responses-logging.patch \
+    && patch --batch --forward --fuzz=0 -p1 < /patches/temporary/otel-propagation.patch \
     && python3 /patches/verify_oss.py /app
 
 FROM --platform=$BUILDPLATFORM node:24.19-alpine3.24@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 AS ui
@@ -75,8 +75,8 @@ COPY --from=builder /app/litellm/proxy/prisma_migration.py /app/litellm/proxy/pr
 COPY --from=builder /opt/prisma /opt/prisma
 COPY --from=source /app/LICENSE /app/LICENSE.litellm
 COPY LICENSE.patches /app/LICENSE.patches
-COPY user_auth.py /app/litellm-config/user_auth.py
-COPY verify_oss.py verify_user_auth.py verify_background.py verify_streaming.py verify_logging.py verify_tracing.py /tmp/litellm-checks/
+COPY src/user_auth.py /app/litellm-config/user_auth.py
+COPY tests/ /tmp/litellm-checks/
 RUN chmod -R a+rX /opt/prisma \
     && test -x /opt/prisma/binaries/node_modules/.bin/prisma \
     && test -f /opt/prisma/binaries/node_modules/prisma/build/index.js \

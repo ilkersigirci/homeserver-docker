@@ -1,9 +1,12 @@
-Temporary workaround for downstream provider spans bypassing LiteLLM's
-model-call span when forward_traceparent_to_llm_provider is enabled.
+Upstream bug: with forward_traceparent_to_llm_provider enabled,
+provider spans bypass LiteLLM's model-call span.
 
-Inject the model-call span context at the provider handoff. Remove when the
-pinned upstream release passes verify_tracing.py without this patch; retain the
-regression check.
+https://github.com/BerriAI/litellm/issues/39067
+
+Replace the inbound traceparent at the provider handoff with the model-call
+span context.
+
+Removal check: tests/verify_tracing.py
 
 diff --git a/litellm/integrations/otel/logger.py b/litellm/integrations/otel/logger.py
 --- a/litellm/integrations/otel/logger.py

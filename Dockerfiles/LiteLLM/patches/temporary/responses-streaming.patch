@@ -1,16 +1,16 @@
-Temporary upstream bug workaround, not a permanent OSS/auth customization.
+Upstream bug: wildcard deployments lose native streaming capability
+metadata.
 
-Related upstream reports:
 https://github.com/BerriAI/litellm/issues/21090
 https://github.com/BerriAI/litellm/issues/37800
 https://github.com/BerriAI/litellm/pull/37801
 
-Opt in with LITELLM_ENABLE_RESPONSES_STREAMING_FIX=true; disabled by default.
-Adapted metadata propagation, not a direct backport: honor explicit wildcard
-supports_native_streaming without requiring base_model or exact graph entries.
-Remove once the pinned upstream release passes verify_streaming.py without this
-patch; a merged PR or closed issue alone is insufficient. Keep the regression
-check. See README.md#temporary-upstream-workarounds for cleanup steps.
+Adapted metadata propagation, not a direct backport: honor an explicit
+wildcard model_info.supports_native_streaming: true without requiring
+base_model or exact graph entries. Enabled only with
+LITELLM_ENABLE_RESPONSES_STREAMING_FIX=true.
+
+Removal check: tests/verify_streaming.py
 
 diff --git a/litellm/llms/base_llm/responses/transformation.py b/litellm/llms/base_llm/responses/transformation.py
 --- a/litellm/llms/base_llm/responses/transformation.py

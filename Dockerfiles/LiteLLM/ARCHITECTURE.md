@@ -1,13 +1,8 @@
 # LiteLLM Authentication and User Policy
 
-One LiteLLM OSS process serves the Admin UI, native keys, and OIDC access
-tokens against one PostgreSQL-backed policy and model catalog.
-
-```text
-Open WebUI / OAuth client -- Bearer <user access token>  --> LiteLLM --> provider
-Langflow / CLI / SDK      -- Bearer sk-<user's own key>  --> LiteLLM --> provider
-Administrator             -- master key / UI SSO         --> LiteLLM
-```
+How this image authenticates OIDC access tokens, Admin UI SSO logins, and
+virtual keys against one PostgreSQL-backed policy and model catalog. Image
+contents, upstream workarounds, and upgrades are in [README.md](README.md).
 
 ## Identity model
 
@@ -19,13 +14,13 @@ Administrator             -- master key / UI SSO         --> LiteLLM
 | Administrator | Master key or Admin UI SSO session | `proxy_admin` |
 
 The Internal User is the policy scope for humans: allowed models,
-`max_budget`, `budget_duration`, TPM/RPM, and spend. LiteLLM enforces it
-natively for OIDC tokens and personal virtual keys without a team, so spend
-from Open WebUI, Langflow, and scripts aggregates on one record.
+`max_budget`, `budget_duration`, TPM/RPM, and spend. A person's OIDC token and
+[personal keys](#personal-virtual-keys) share it, so spend from Open WebUI,
+Langflow, and scripts aggregates on one record.
 
 ## OAuth 2.0 resource server
 
-[`user_auth.py`](user_auth.py) validates [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068.html)
+[`user_auth.py`](src/user_auth.py) validates [RFC 9068](https://www.rfc-editor.org/rfc/rfc9068.html)
 JWT access tokens locally with PyJWT: JWKS signature with the pinned
 algorithm, exact issuer and audience, `exp`/`iat`, the `typ: at+jwt` header
 (rejects ID tokens), and the required permission in the standard
@@ -42,10 +37,12 @@ LITELLM_OIDC_REQUIRED_SCOPE: llm:invoke
 LITELLM_OIDC_SIGNING_ALGORITHM: RS256
 ```
 
+Startup fails if any setting is missing or the algorithm is symmetric.
+
 The hook exists only because LiteLLM's native `enable_jwt_auth` is
 Enterprise-gated. It returns `None` for credentials it does not handle and
-[`custom-auth-fallback.patch`](custom-auth-fallback.patch) lets LiteLLM
-continue with native master-key, virtual-key, and public-route
+[`custom-auth-fallback.patch`](patches/permanent/custom-auth-fallback.patch)
+lets LiteLLM continue with native master-key, virtual-key, and public-route
 authentication; upstream documents that mixed mode
 (`custom_auth_settings.mode: auto`) as Enterprise-only. See the
 [custom-auth contract](https://docs.litellm.ai/docs/proxy/custom_auth).
@@ -58,41 +55,54 @@ user's UI role.
 model, budget, and rate-limit enforcement to LiteLLM. The hook rejects every
 request with 500 unless both are set, because without
 `custom_auth_run_common_checks` LiteLLM skips its common checks for every
-credential.
+credential. Two [temporary patches](README.md#temporary-upstream-workarounds)
+close upstream gaps in that enforcement.
 
-Validation is local: a revoked token stays valid until `exp`, the JWKS cache
-lasts five minutes, and an unreachable JWKS endpoint fails closed with 503.
+Traefik adds no authentication in front of LiteLLM. Validation is local: a
+revoked token stays valid until `exp`, the JWKS cache lasts five minutes, and
+an unreachable JWKS endpoint fails closed with 503.
+
+The JWKS client follows LiteLLM's native TLS settings. To trust a private CA
+(for example, a self-hosted Keycloak), mount a PEM bundle containing the public
+roots plus that CA and set `SSL_CERT_FILE` to its path. As a last resort, set
+`LITELLM_SSL_VERIFY=false` in the host's `.env`; Compose passes it as
+LiteLLM's native `SSL_VERIFY`, which disables certificate checks for all
+LiteLLM outbound requests, including LLM providers. JWT signature and claim
+checks still apply.
+
+## Admin UI SSO
+
+The Admin UI uses LiteLLM's native generic OIDC SSO with PKCE against the same
+provider ([`apps/litellm.yml`](../../apps/litellm.yml)).
+`GENERIC_USER_ID_ATTRIBUTE: sub` resolves an SSO login and an OIDC request to
+the same Internal User. The `groups` claim maps `admin` to `proxy_admin`, and
+`ui_access_mode: admin_only` limits the UI to administrators.
+[`sso.patch`](patches/permanent/sso.patch) removes the OSS five-user SSO cap
+and the SSO debug-login license gate.
 
 ## Personal virtual keys
 
-Tools that run without the user's token, such as Langflow flows that run
-server-side, use a virtual key owned by the user's Internal User. An
-administrator mints it in the Admin UI or with `/key/generate` and
-`user_id: <sub>`, or sets `ui_access_mode: all` so users mint their own.
-LiteLLM caps every key without a team by its owner's models
-(`can_user_call_model`) and `max_budget`, and records its spend on the owner.
-An empty user model list imposes no model restriction on personal keys;
-restrictions on the key still apply. Native key listings follow the key's
-model policy.
+Tools that run without the user's token, such as Langflow, use a virtual key
+owned by the user's Internal User. An administrator mints it in the Admin UI
+or with `/key/generate` and `user_id: <sub>`, or sets `ui_access_mode: all` so
+users mint their own. LiteLLM caps every key without a team by its owner's
+models (`can_user_call_model`) and `max_budget`, and records its spend on the
+owner; restrictions on the key itself still apply. Native key listings follow
+the key's model policy.
 
 ## Provisioning and model access
 
 The first OIDC request or Admin UI SSO login creates the `sub`-keyed Internal
 User from `default_internal_user_params` (`max_budget: 0`, empty model list).
-`GENERIC_USER_ID_ATTRIBUTE: sub` keeps both paths on one record. Users created
-by an OIDC request have no email; look up their `sub` in the provider.
-An empty `models` list allows all models. Assign models (or a model access
-group) in the Admin UI to limit which models the user can see and invoke.
-New users can list models immediately; their zero budget blocks paid model
-calls until an administrator assigns a budget. Zero-cost models are exempt
-from monetary budget checks.
+Users created by an OIDC request have no email; look up their `sub` in the
+provider. An empty `models` list allows all models. Assign models (or a model
+access group) in the Admin UI to limit which models the user can see and
+invoke. New users can list models immediately; their zero budget blocks paid
+model calls until an administrator assigns a budget. Zero-cost models are
+exempt from monetary budget checks.
 `fail_closed_budget_enforcement` rejects requests whose current spend cannot
 be verified. Monetary budgets need nonzero model pricing; TPM/RPM are
 independent.
-
-`ui_access_mode: admin_only` limits the UI to administrators. Open WebUI users
-need no key; see [Personal virtual keys](#personal-virtual-keys) for Langflow,
-CLI, and SDK use.
 
 ## Client contracts
 
@@ -100,8 +110,9 @@ CLI, and SDK use.
   ([Provider notes](#provider-notes)), send
   `Authorization: Bearer <access token>`, and refresh it themselves. Grant the
   permission as user-delegated access only, never to client-credentials
-  clients.
-- A person's own virtual key is bounded by that user's models and budget.
+  clients. Open WebUI adds `llm:invoke` to `OAUTH_SCOPES`, sends the resource
+  in `OAUTH_AUTHORIZE_PARAMS`, and forwards the token with
+  `auth_type: system_oauth` ([`apps/open-webui.yml`](../../apps/open-webui.yml)).
 - A backend with no user context uses its own key. It may name an end user
   with LiteLLM's `x-litellm-end-user-id` header; LiteLLM records that end user
   natively and can budget it through `/customer/new`, but per-user model
@@ -110,8 +121,8 @@ CLI, and SDK use.
 ## Provider notes
 
 - PocketID issues RFC 9068 tokens for its APIs: define the API resource, add
-  the `llm:invoke` permission, and grant it per client as user-delegated
-  access ([PocketID APIs](https://pocket-id.org/docs/guides/apis)). Clients
+  the `llm:invoke` permission, and grant it per client
+  ([PocketID APIs](https://pocket-id.org/docs/guides/apis)). Clients
   request it with `resource=https://llm.$BASE_DOMAINNAME`.
 - Keycloak 26.2+: on every client that calls LiteLLM, enable *Use "at+jwt" as
   access token header type* (Advanced → Fine grain OpenID Connect
@@ -123,23 +134,15 @@ CLI, and SDK use.
   JWKS: `<issuer>/protocol/openid-connect/certs`.
 - Pairwise subjects differ per client; configure a shared identity so one
   human maps to one Internal User across applications.
-- Switching providers changes every `sub`: users get new Internal Users from
-  the defaults; reapply any model restrictions and budgets.
+- To switch providers, update `LITELLM_OIDC_*`, the Admin UI `GENERIC_*`
+  settings, and each client's login, such as
+  [Langflow's](../LangflowBackend/README.md#browser-login). The switch changes
+  every `sub`: users get new Internal Users from the defaults; reapply any
+  model restrictions and budgets.
 
-## Verification contract
+## Verification
 
-[`verify_user_auth.py`](verify_user_auth.py) runs during the image build:
-
-- credentials other than JWTs, including master and virtual keys, bypass the
-  hook and use LiteLLM's native authentication;
-- valid tokens resolve to the upserted Internal User; wrong signature,
-  issuer, audience, expiry, subject, token type, or scope fail closed;
-- empty user model lists allow all models; populated lists restrict discovery
-  and invocation; user lookup failures return 503;
-- resolved users cannot call key, user, or model management routes;
-- `/model/info` listings and direct-ID lookups apply the caller's model and
-  team scope ([`model-info-access.patch`](model-info-access.patch));
-- OIDC tokens and native keys run through the installed authentication chain,
-  which enforces denied models, per-model and total user budgets (also for a
-  Responses WebSocket first frame), and scoped model retrieval; with either
-  enforcement setting off, every credential is rejected.
+[`verify_user_auth.py`](tests/verify_user_auth.py) checks the behavior described
+here: token validation, native credential fallback, route limits, model
+access, budgets, and the enforcement-settings guard. Change it together with
+this document.
