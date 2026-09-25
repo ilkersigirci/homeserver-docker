@@ -17,7 +17,7 @@ for the identity model.
 - `responses-websocket-budget.patch` applies the Internal User's per-model
   budgets when a Responses WebSocket names its model in the first frame.
 - `user_auth.py` resolves RFC 9068 access tokens (validated with PyJWT) to a
-  LiteLLM Internal User, created fail-closed on first use.
+  LiteLLM Internal User, created from the configured defaults on first use.
 - `responses-background.patch`, `responses-streaming.patch`, and
   `responses-logging.patch` are narrow upstream Responses API workarounds.
 - `otel-propagation.patch` propagates the model-call span to providers.
@@ -33,10 +33,10 @@ required scope, then resolves `sub` to an Internal User. Configure
 `LITELLM_OIDC_REQUIRED_SCOPE`, and `LITELLM_OIDC_SIGNING_ALGORITHM`; startup
 fails if any is missing or the algorithm is symmetric.
 
-A missing user is created from LiteLLM's native `default_internal_user_params`,
-which [`config.yaml`](../../configs/litellm/config.yaml) sets to a fail-closed
-`max_budget: 0` with no models. Requests are rejected until an administrator
-assigns models and a budget. `custom_auth_run_common_checks` and
+A missing user is created from LiteLLM's native `default_internal_user_params`
+in [`config.yaml`](../../configs/litellm/config.yaml): all models and a zero
+budget ([model access](ARCHITECTURE.md#provisioning-and-model-access)).
+`custom_auth_run_common_checks` and
 `enable_post_custom_auth_checks` hand model, budget, RPM, and TPM enforcement
 to LiteLLM's native checks. The hook rejects every request with 500 unless
 both are set: without the first, LiteLLM skips its common checks for native
@@ -46,7 +46,7 @@ read-only model-info routes only.
 Every other credential returns `None` from the hook, so master keys, virtual
 keys, and public routes use LiteLLM's native authentication. Tools without the
 user's token, such as Langflow, use a virtual key owned by the user's Internal
-User, which LiteLLM caps by that user's models and budget
+User; LiteLLM caps keys without a team by their owner's models and budget
 ([ARCHITECTURE.md](ARCHITECTURE.md#personal-virtual-keys)).
 
 ## TLS certificates

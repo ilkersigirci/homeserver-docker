@@ -9,8 +9,8 @@ general_settings:
 
 litellm_settings:
   enable_post_custom_auth_checks: true
-  # A first OIDC request or UI SSO login creates a visible but fail-closed
-  # user record. Assign allowed models and a budget in the LiteLLM UI.
+  # A first OIDC request or UI SSO login creates a user with a zero budget.
+  # Empty user models allow all models; set a list in the UI to restrict access.
   default_internal_user_params:
     max_budget: 0
   # Preserve W3C context through LiteLLM's model-call span to the provider.

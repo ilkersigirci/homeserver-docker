@@ -147,9 +147,12 @@ async def _verify_tokens() -> None:
         ):
             await _expect_denied(auth(request=_request(), api_key=invalid), code)
 
-        for user in (_user(models=[]), _user(models=None), None):
-            with patch.dict(auth.__globals__, {"get_user_object": AsyncMock(return_value=user)}):
-                await _expect_denied(auth(request=_request(), api_key=token()), "403")
+        with patch.dict(auth.__globals__, {"get_user_object": AsyncMock(return_value=_user(models=[]))}):
+            authorized = await auth(request=_request(), api_key=token())
+            assert authorized.models == []
+            assert authorized.user_id == _SUBJECT
+        with patch.dict(auth.__globals__, {"get_user_object": AsyncMock(return_value=None)}):
+            await _expect_denied(auth(request=_request(), api_key=token()), "503")
         with patch.dict(auth.__globals__, {"get_user_object": AsyncMock(side_effect=ValueError("db"))}):
             await _expect_denied(auth(request=_request(), api_key=token()), "503")
 
@@ -217,11 +220,7 @@ async def _verify_model_info_scope() -> None:
     router = litellm.Router(model_list=models)
     auth = _auth()
     token, jwks_client = _token_fixture()
-    with patch.dict(
-        auth.__globals__,
-        {"_JWKS_CLIENT": jwks_client, "get_user_object": AsyncMock(return_value=_user(models=["allowed"]))},
-    ):
-        authorized = await auth(request=_request(), api_key=token())
+    user = _user(models=["allowed"])
 
     async def model_info(model_id: str | None = None):
         return await proxy_server.model_info_v1(
@@ -233,21 +232,31 @@ async def _verify_model_info_scope() -> None:
         )
 
     with (
+        patch.dict(
+            auth.__globals__,
+            {"_JWKS_CLIENT": jwks_client, "get_user_object": AsyncMock(return_value=user)},
+        ),
         patch.object(proxy_server, "llm_router", router),
         patch.object(proxy_server, "llm_model_list", models),
         patch.object(proxy_server, "user_model", None),
         patch.object(proxy_server, "prisma_client", None),
         patch.object(proxy_server, "_get_caller_byok_team_scope", AsyncMock(return_value=set())),
     ):
-        listing = (await model_info())["data"]
-        assert [row["model_info"]["id"] for row in listing] == ["allowed-id"]
-        assert listing[0]["model_info"]["project_metadata"] == {"description": "visible"}
-        assert "api_key" not in listing[0]["litellm_params"]
+        for user_models, expected_ids in (
+            (["allowed"], {"allowed-id"}),
+            ([], {"allowed-id", "denied-id"}),
+        ):
+            user.models = user_models
+            authorized = await auth(request=_request(), api_key=token())
+            listing = (await model_info())["data"]
+            assert {row["model_info"]["id"] for row in listing} == expected_ids
+            assert all("api_key" not in row["litellm_params"] for row in listing)
 
-        allowed = (await model_info("allowed-id"))["data"]
-        assert allowed[0]["model_info"]["project_metadata"] == {"description": "visible"}
-        assert (await model_info("denied-id"))["data"] == []
-        assert (await model_info("other-team-id"))["data"] == []
+            allowed = (await model_info("allowed-id"))["data"]
+            assert allowed[0]["model_info"]["project_metadata"] == {"description": "visible"}
+            denied = (await model_info("denied-id"))["data"]
+            assert {row["model_info"]["id"] for row in denied} == expected_ids & {"denied-id"}
+            assert (await model_info("other-team-id"))["data"] == []
 
 
 async def _verify_enforcement() -> None:
@@ -288,6 +297,7 @@ async def _verify_enforcement() -> None:
         # Stop after authorization without calling a model provider.
         return {"user_id": key.user_id, "user_role": key.user_role}
 
+    app.add_api_route("/v1/models", proxy_server.model_list, methods=["GET"])
     app.add_api_route("/v1/models/{model_id}", proxy_server.model_info, methods=["GET"])
 
     async def user_spend(**_kwargs):
@@ -357,12 +367,20 @@ async def _verify_enforcement() -> None:
             assert response.json()["user_role"] == "proxy_admin", response.text
             response = await call(headers={"Authorization": f"Bearer {token(header_typ='JWT')}"})
             assert response.status_code == 401, response.text
-            response = await call(model="denied")
-            assert response.status_code == 403, response.text
-            response = await client.get("/v1/models/allowed", headers=oidc)
-            assert response.status_code == 200, response.text
-            response = await client.get("/v1/models/denied", headers=oidc)
-            assert response.status_code == 404, response.text
+            # The unrestricted case runs last so the budget checks below cover it.
+            for user_models, visible_models in (
+                (["allowed"], {"allowed"}),
+                ([], {"allowed", "denied"}),
+            ):
+                user.models = user_models
+                response = await client.get("/v1/models", headers=oidc)
+                assert response.status_code == 200, response.text
+                assert {row["id"] for row in response.json()["data"]} == visible_models, response.text
+                for model in ("allowed", "denied"):
+                    response = await call(model=model)
+                    assert response.status_code == (200 if model in visible_models else 403), response.text
+                    response = await client.get(f"/v1/models/{model}", headers=oidc)
+                    assert response.status_code == (200 if model in visible_models else 404), response.text
 
             assert await first_frame_allowed()
             user.model_max_budget = {"allowed": {"max_budget": 0, "budget_duration": "1d"}}

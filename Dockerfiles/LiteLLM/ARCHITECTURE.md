@@ -20,7 +20,7 @@ Administrator             -- master key / UI SSO         --> LiteLLM
 
 The Internal User is the policy scope for humans: allowed models,
 `max_budget`, `budget_duration`, TPM/RPM, and spend. LiteLLM enforces it
-natively for OIDC tokens and for every virtual key the user owns, so spend
+natively for OIDC tokens and personal virtual keys without a team, so spend
 from Open WebUI, Langflow, and scripts aggregates on one record.
 
 ## OAuth 2.0 resource server
@@ -71,18 +71,21 @@ administrator mints it in the Admin UI or with `/key/generate` and
 `user_id: <sub>`, or sets `ui_access_mode: all` so users mint their own.
 LiteLLM caps every key without a team by its owner's models
 (`can_user_call_model`) and `max_budget`, and records its spend on the owner.
-Assign the user's models before issuing a key: for native keys an empty model
-list means all models.
+An empty user model list imposes no model restriction on personal keys;
+restrictions on the key still apply. Native key listings follow the key's
+model policy.
 
-## Provisioning and fail-closed defaults
+## Provisioning and model access
 
 The first OIDC request or Admin UI SSO login creates the `sub`-keyed Internal
-User from `default_internal_user_params` (`max_budget: 0`, no models).
+User from `default_internal_user_params` (`max_budget: 0`, empty model list).
 `GENERIC_USER_ID_ATTRIBUTE: sub` keeps both paths on one record. Users created
-by an OIDC request have no email; look up their `sub` in the provider. The hook
-rejects users whose `models` list is empty because LiteLLM treats `[]` as
-unrestricted and skips budget checks for zero-cost models. An administrator
-then assigns models (or a model access group) and a budget in the Admin UI.
+by an OIDC request have no email; look up their `sub` in the provider.
+An empty `models` list allows all models. Assign models (or a model access
+group) in the Admin UI to limit which models the user can see and invoke.
+New users can list models immediately; their zero budget blocks paid model
+calls until an administrator assigns a budget. Zero-cost models are exempt
+from monetary budget checks.
 `fail_closed_budget_enforcement` rejects requests whose current spend cannot
 be verified. Monetary budgets need nonzero model pricing; TPM/RPM are
 independent.
@@ -120,8 +123,8 @@ CLI, and SDK use.
   JWKS: `<issuer>/protocol/openid-connect/certs`.
 - Pairwise subjects differ per client; configure a shared identity so one
   human maps to one Internal User across applications.
-- Switching providers changes every `sub`: users get new fail-closed Internal
-  Users and need models and budgets reassigned.
+- Switching providers changes every `sub`: users get new Internal Users from
+  the defaults; reapply any model restrictions and budgets.
 
 ## Verification contract
 
@@ -131,7 +134,8 @@ CLI, and SDK use.
   hook and use LiteLLM's native authentication;
 - valid tokens resolve to the upserted Internal User; wrong signature,
   issuer, audience, expiry, subject, token type, or scope fail closed;
-- users without a model policy are rejected; user lookup failures return 503;
+- empty user model lists allow all models; populated lists restrict discovery
+  and invocation; user lookup failures return 503;
 - resolved users cannot call key, user, or model management routes;
 - `/model/info` listings and direct-ID lookups apply the caller's model and
   team scope ([`model-info-access.patch`](model-info-access.patch));

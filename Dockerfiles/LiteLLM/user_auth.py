@@ -7,8 +7,8 @@ limits natively.
 
 Every other credential returns ``None`` and continues through LiteLLM's native
 master-key, virtual-key, and public-route authentication
-(``custom-auth-fallback.patch``). A virtual key owned by an Internal User is
-bounded by that user's models and budget natively.
+(``custom-auth-fallback.patch``). An Internal User's virtual key without a
+team is bounded by that user's models and budget natively.
 """
 
 from __future__ import annotations
@@ -118,12 +118,9 @@ async def _internal_user(subject: str):
             user_id_upsert=True,
         )
     except ValueError:
+        user = None
+    if user is None:
         _deny("user lookup failed", status.HTTP_503_SERVICE_UNAVAILABLE)
-    if user is None or not user.models:
-        # LiteLLM treats an empty model list as unrestricted and skips budget
-        # checks for zero-cost models, so users stay blocked until an
-        # administrator assigns an explicit model policy.
-        _deny("user has no model policy", status.HTTP_403_FORBIDDEN)
     return user
 
 
@@ -142,6 +139,7 @@ def _user_auth(user) -> UserAPIKeyAuth:
             "/v1/models/*",
             "/models/*",
         ],
+        # Preserve LiteLLM's native policy: an empty list allows all models.
         models=list(user.models),
         user_spend=user.spend,
         user_max_budget=user.max_budget,
