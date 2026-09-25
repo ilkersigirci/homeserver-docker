@@ -44,7 +44,7 @@ Deployment is host-driven:
 - `scripts/`
   - Operational entrypoints (`docker-manage.sh`) and maintenance helpers.
 - `scripts/database/`
-  - Database backup and major-upgrade automation.
+  - Database backup automation.
 - `Dockerfiles/`
   - Custom images when upstream images are not enough.
 - `appdata/`, `data/`, `logs/`, `backups/`
@@ -79,7 +79,6 @@ Deployment is host-driven:
 - Prefer hardened container defaults (`read_only`, `no-new-privileges`, dropped capabilities) unless a service documents an exception.
 - Telemetry-capable services should send OTLP to local `otel-collector-agent`.
 - Public exposure should go through managed ingress controls, not ad hoc port exposure.
-- PostgreSQL major upgrades should follow [`docs/postgres_upgrade.md`](./postgres_upgrade.md) and `scripts/database/postgres-upgrade-major.sh`.
 
 ## Cross-Cutting Concerns
 
@@ -104,5 +103,5 @@ Deployment is host-driven:
   - edit `apps/traefik.yml` and `configs/traefik3/`.
 - Change deploy/operations workflow:
   - edit `scripts/docker-manage.sh` and related scripts.
-- Change DB upgrade behavior:
-  - edit `scripts/database/` and keep runbook docs aligned.
+- Change DB backup behavior:
+  - edit `scripts/database/` and keep its README aligned.

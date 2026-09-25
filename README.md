@@ -49,7 +49,6 @@ Human/operator docs:
 2. [Architecture](docs/ARCHITECTURE.md)
 3. [Edge Networking and Cloudflare](docs/EDGE_NETWORKING.md)
 4. [Observability and OpenTelemetry](docs/OBSERVABILITY.md)
-5. [PostgreSQL Upgrade Runbook](docs/postgres_upgrade.md)
-6. [Database Script Reference](scripts/database/README.md)
+5. [Database Script Reference](scripts/database/README.md)
 
 For coding agents, start at [AGENTS.md](AGENTS.md).

@@ -10,8 +10,7 @@ Read in this order:
 3. [Edge Networking and Cloudflare](docs/EDGE_NETWORKING.md) - public ingress policy and Cloudflare rules.
 4. [Egress Control](docs/EGRESS_CONTROL.md) - Docker outbound policy, proxy allowlists, and exceptions.
 5. [Observability and OpenTelemetry](docs/OBSERVABILITY.md) - OTEL topology and service onboarding.
-6. [PostgreSQL Upgrade Runbook](docs/postgres_upgrade.md) - deterministic major-upgrade procedure.
-7. [Database Script Reference](scripts/database/README.md) - script-level examples and defaults.
+6. [Database Script Reference](scripts/database/README.md) - script-level examples and defaults.
 
 Task routing:
 
@@ -20,7 +19,6 @@ Task routing:
 - Public ingress / Cloudflare changes: [docs/EDGE_NETWORKING.md](docs/EDGE_NETWORKING.md)
 - Docker egress policy changes: [docs/EGRESS_CONTROL.md](docs/EGRESS_CONTROL.md)
 - Telemetry/OTEL changes: [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md)
-- PostgreSQL major upgrades: [docs/postgres_upgrade.md](docs/postgres_upgrade.md)
 - Custom image additions: [docs/skills/create-custom-image/SKILL.md](docs/skills/create-custom-image/SKILL.md)
 - Renovate package-rule placement: [docs/RUNNING.md#renovate-package-rule-placement](docs/RUNNING.md#renovate-package-rule-placement)
 
