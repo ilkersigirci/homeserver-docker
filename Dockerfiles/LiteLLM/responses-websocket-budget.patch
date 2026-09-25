@@ -1,0 +1,35 @@
+diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/response_api_endpoints/endpoints.py
+--- a/litellm/proxy/response_api_endpoints/endpoints.py
++++ b/litellm/proxy/response_api_endpoints/endpoints.py
+@@ -1375,7 +1375,9 @@
+     user_api_key_dict: UserAPIKeyAuth,
+     llm_router: "Router | None",
+ ) -> None:
++    from litellm.proxy.auth.auth_checks import _is_model_cost_zero
+     from litellm.proxy.auth.user_api_key_auth import (
++        _check_user_model_budget,
+         _enforce_key_and_fallback_model_access,
+         _run_centralized_common_checks,
+     )
+@@ -1383,6 +1385,7 @@
+         general_settings,
+         llm_model_list,
+         master_key,
++        model_max_budget_limiter,
+         user_custom_auth,
+     )
+
+@@ -1404,6 +1407,13 @@
+         llm_model_list=llm_model_list,
+         llm_router=llm_router,
+     )
++    # The handshake loaded the user's per-model budgets before the model was known.
++    if llm_router is None or not _is_model_cost_zero(model=model, llm_router=llm_router):
++        await _check_user_model_budget(
++            valid_token=user_api_key_dict,
++            model_max_budget_limiter=model_max_budget_limiter,
++            models=[model],
++        )
+     await _run_centralized_common_checks(
+         user_api_key_auth_obj=user_api_key_dict,
+         request=request,

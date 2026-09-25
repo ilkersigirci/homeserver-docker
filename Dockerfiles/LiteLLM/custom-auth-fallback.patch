@@ -1,0 +1,31 @@
+diff --git a/litellm/proxy/auth/user_api_key_auth.py b/litellm/proxy/auth/user_api_key_auth.py
+--- a/litellm/proxy/auth/user_api_key_auth.py
++++ b/litellm/proxy/auth/user_api_key_auth.py
+@@ -1345,16 +1345,17 @@
+                 custom_auth_api_key = True
+         elif user_custom_auth is not None:
+             response = await user_custom_auth(request=request, api_key=api_key)
+-            validated = UserAPIKeyAuth.model_validate(response)
+-            if getattr(litellm, "enable_post_custom_auth_checks", False):
+-                validated = await _run_post_custom_auth_checks(
+-                    valid_token=validated,
+-                    request=request,
+-                    request_data=request_data,
+-                    route=route,
+-                    parent_otel_span=parent_otel_span,
+-                )
+-            return validated
++            if response is not None:
++                validated = UserAPIKeyAuth.model_validate(response)
++                if getattr(litellm, "enable_post_custom_auth_checks", False):
++                    validated = await _run_post_custom_auth_checks(
++                        valid_token=validated,
++                        request=request,
++                        request_data=request_data,
++                        route=route,
++                        parent_otel_span=parent_otel_span,
++                    )
++                return validated
+
+         ### LITELLM-DEFINED AUTH FUNCTION ###
+         #### IF JWT ####

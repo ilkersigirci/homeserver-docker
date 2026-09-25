@@ -1,0 +1,29 @@
+diff --git a/litellm/proxy/proxy_server.py b/litellm/proxy/proxy_server.py
+--- a/litellm/proxy/proxy_server.py
++++ b/litellm/proxy/proxy_server.py
+@@ -15161,8 +15161,23 @@
+                 status_code=400,
+                 detail={"error": f"Model id = {litellm_model_id} not found on litellm proxy"},
+             )
+-        _deployment_info_dict = _get_proxy_model_info(model=deployment_info.model_dump(exclude_none=True))
+-        single_model_list: list[dict] = [_deployment_info_dict]
++        # Direct-ID reads must enforce the same model and team scope as listings.
++        single_model_list = _filter_v1_model_info_deployments(
++            all_models=[deployment_info.model_dump(exclude_none=True)],
++            allowed_model_names=_get_v1_model_info_allowed_model_names(
++                user_api_key_dict=user_api_key_dict,
++                llm_router=llm_router,
++            ),
++        )
++        allowed_team_ids = await _get_caller_byok_team_scope(
++            user_api_key_dict=user_api_key_dict,
++            prisma_client=prisma_client,
++        )
++        single_model_list = [
++            _get_proxy_model_info(model=model)
++            for model in single_model_list
++            if not _byok_row_outside_caller_teams(model.get("model_info") or {}, allowed_team_ids)
++        ]
+         if prisma_client is not None:
+             single_model_list = await _populate_team_access_on_models(
+                 user_api_key_dict=user_api_key_dict,

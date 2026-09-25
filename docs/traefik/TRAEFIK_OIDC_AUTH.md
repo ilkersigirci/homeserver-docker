@@ -1,57 +1,54 @@
 # Traefik OIDC Authentication
 
-`traefik-oidc-auth` runs the OIDC authorization-code flow at Traefik and passes
-the resulting access token to the upstream application.
+`traefik-oidc-auth` handles Langflow's browser login only. LiteLLM validates
+OIDC access tokens itself and needs no Traefik authentication contract; see
+[`Dockerfiles/LiteLLM/ARCHITECTURE.md`](../../Dockerfiles/LiteLLM/ARCHITECTURE.md).
 
-## When To Use It
+## Configuration location
 
-Use this plugin when an application can validate an OIDC provider's access token
-but needs Traefik to handle the browser login, callback, session, and token
-refresh.
+The plugin version is registered in [`apps/traefik.yml`](../../apps/traefik.yml).
+The Langflow middleware is defined in
+[`configs/traefik3/rules.specific/gpu_coding.yml`](../../configs/traefik3/rules.specific/gpu_coding.yml).
 
-TinyAuth's normal ForwardAuth flow returns an allow/deny result and identity
-headers, not the original PocketID access token required by this flow. TinyAuth
-can instead act as an OIDC server, but then the application validates a
-TinyAuth-issued token rather than the PocketID token. For Langflow, the plugin
-keeps PocketID as the issuer end to end.
+## Langflow browser login
 
-## Request Flow
+`langflow-oidc` runs the authorization-code flow with PKCE, keeps the
+encrypted session cookie, refreshes tokens, and sets
+`Authorization: Bearer <ID token>` on upstream requests. Langflow's native
+external auth validates the issuer, the audience (`LANGFLOW_CLIENT_ID`), and
+the signature, then provisions the local user from the token claims. The
+backend must stay reachable only through Traefik.
 
-1. A browser requests a protected router.
-2. The middleware redirects it to the OIDC provider.
-3. The provider returns to `https://<service-host>/oidc/callback`.
-4. The middleware exchanges the code for tokens and creates an encrypted session
-    cookie.
-5. Traefik adds `Authorization: Bearer <access-token>` to upstream requests.
-6. The upstream application validates the token and resolves the user.
+`langflow-responses-rtr` is the exception: `/api/v1/responses` requests that
+carry an API key skip browser OIDC so OpenAI clients and LiteLLM can run
+saved flows.
 
-Unauthenticated browser requests are redirected. API-style requests receive
-`401` unless another authentication path is configured.
-
-## How It Is Configured
-
-The plugin and its version are registered in `apps/traefik.yml`.
-The middleware is defined in the Traefik rules for the host that runs the
-application. Its Go templates read the selected container variables with
-`{{env "VARIABLE"}}`. Application routers enable it with:
-
-```yaml
-traefik.http.routers.app-rtr.middlewares: "chain-no-auth@file,app-oidc@file"
-```
-
-The middleware handles `/oidc/callback` and `/logout` before forwarding normal
-requests to the application.
-
-## Langflow Example
-
-Langflow uses `langflow-oidc@file`, configured in
-`configs/traefik3/rules.specific/gpu_coding.yml`. Traefik reads the PocketID
-client ID, client secret, and session secret from its container environment,
-then forwards the PocketID access token to Langflow. Langflow validates the JWT
-and creates a local user on first login.
-
-The registered PocketID callback is:
+Register this callback in PocketID:
 
 ```text
 https://langflow.<DOMAINNAME>/oidc/callback
 ```
+
+The Langflow client needs login scopes only. Model calls inside flows use each
+user's own LiteLLM virtual key; see
+[`Dockerfiles/LangflowBackend/README.md`](../../Dockerfiles/LangflowBackend/README.md#use-litellm-from-a-langflow-flow).
+
+## LiteLLM API bearer tokens
+
+Open WebUI requests `llm:invoke` for the `https://llm.<BASE_DOMAINNAME>`
+resource at login and sends the resulting user access token to
+`https://litellm.<DOMAINNAME>/v1` with `auth_type: system_oauth`. LiteLLM
+checks the RFC 9068 `typ: at+jwt` header, signature, exact issuer and
+audience, expiry, and scope, then resolves `sub` to an Internal User.
+Requests fail until that user has explicit models and a budget. ID tokens are
+for OIDC clients and are rejected by the LiteLLM API. See
+[PocketID's API guide](https://pocket-id.org/docs/guides/apis).
+
+Tools without a user token, such as Langflow, use a LiteLLM virtual key owned
+by the user's Internal User instead.
+
+## Provider changes
+
+For another provider, such as Keycloak, update LiteLLM's `LITELLM_OIDC_*`
+settings and Langflow's browser login. See LiteLLM's
+[provider notes](../../Dockerfiles/LiteLLM/ARCHITECTURE.md#provider-notes).

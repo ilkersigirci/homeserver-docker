@@ -65,17 +65,7 @@ services:
       - litellm_backend
     expose:
       - 4000
-    command:
-      - --port
-      - "4000"
-      - --telemetry
-      - "False"
-      - --use_v2_migration_resolver
-      - --config
-      - /app/litellm-config/config.yaml
-    # Upstream runs its migration entrypoint as root and writes Prisma engine
-    # files inside the image before starting the proxy.
-    user: root
+    user: root # NOTE: Upstream writes Prisma engine files inside the image before startup.
     read_only: false
     tmpfs:
       - /tmp:rw,noexec,nosuid,nodev,size=256m,mode=1777
@@ -91,18 +81,27 @@ services:
       nofile:
         soft: 4096
         hard: 8192
+    command:
+      - --port
+      - "4000"
+      - --telemetry
+      - "False"
+      - --use_v2_migration_resolver
+      - --config
+      - /app/litellm-config/config.yaml
     volumes:
       - $REPO_PATH/configs/litellm/config.yaml:/app/litellm-config/config.yaml:ro
     environment:
       LITELLM_MASTER_KEY: $LITELLM_MASTER_KEY
       LITELLM_SALT_KEY: $LITELLM_SALT_KEY
+      SSL_VERIFY: ${LITELLM_SSL_VERIFY:-true}
       STORE_MODEL_IN_DB: "true"
       STORE_PROMPTS_IN_SPEND_LOGS: "true"
       DATABASE_URL: postgresql://litellm:${LITELLM_DATABASE_PASSWORD}@litellm-db:5432/litellm
       ENFORCE_PRISMA_MIGRATION_CHECK: "true"
-      FORWARDED_ALLOW_IPS: 192.168.90.254 # NOTE: Traefik's IP
+      FORWARDED_ALLOW_IPS: 192.168.90.254 # NOTE: Traefik on t3_proxy
       PROXY_BASE_URL: https://litellm.$DOMAINNAME
-      ## OpenTelemetry v2 via the host-local collector agent
+      #### OpenTelemetry v2 #####
       OTEL_EXPORTER_OTLP_PROTOCOL: grpc
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector-agent:4317
       OTEL_EXPORTER_OTLP_INSECURE: "true"
@@ -114,11 +113,9 @@ services:
       OTEL_RESOURCE_ATTRIBUTES: service.instance.id=litellm-$MY_HOSTNAME
       LITELLM_OTEL_V2: "true"
       LITELLM_OTEL_INTEGRATION_ENABLE_METRICS: "true"
-      # Keep prompts and responses out of telemetry. Legacy exception events
-      # remain disabled until their OTLP encoding is safe for body-less events.
-      LITELLM_OTEL_LEGACY_COMPAT: "false"
+      LITELLM_OTEL_LEGACY_COMPAT: "false" # NOTE: Keep prompts and responses out of telemetry.
       OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT: no_content
-      ## Admin UI OIDC login
+      #### Admin UI OIDC login ####
       AUTO_REDIRECT_UI_LOGIN_TO_SSO: "true"
       GENERIC_AUTHORIZATION_ENDPOINT: https://pocketid.$BASE_DOMAINNAME/authorize
       GENERIC_CLIENT_ID: $LITELLM_CLIENT_ID
@@ -134,43 +131,22 @@ services:
       GENERIC_USER_EMAIL_ATTRIBUTE: email
       GENERIC_USER_ID_ATTRIBUTE: sub
       GENERIC_USERINFO_ENDPOINT: https://pocketid.$BASE_DOMAINNAME/api/oidc/userinfo
-      ##### CUSTOM IMAGE SPECIFIC #####
-      LITELLM_ENABLE_RESPONSES_STREAMING_FIX: "true" # NOTE: Opt in to the public patched image's temporary wildcard streaming fix.
-      ## Delegated API access-token validation ##
-      OIDC_ISSUER: https://pocketid.$BASE_DOMAINNAME
-      OIDC_JWKS_URL: https://pocketid.$BASE_DOMAINNAME/.well-known/jwks.json
-      OIDC_USERINFO_URL: https://pocketid.$BASE_DOMAINNAME/api/oidc/userinfo
-      OIDC_AUDIENCE: https://llm.$BASE_DOMAINNAME
-      OIDC_REQUIRED_SCOPE: llm:invoke
-      OIDC_TOKEN_PROFILE: pocket-id
-      OIDC_SIGNING_ALGORITHM: RS256
-      OIDC_REQUIRE_VERIFIED_EMAIL: "true"
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "python3",
-          "-c",
-          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:4000/health/liveliness', timeout=3)",
-        ]
-      interval: 2m
-      timeout: 5s
-      retries: 3
-      start_period: 2m
+      ###### CUSTOM #######
+      ## OIDC access tokens (OAuth 2.0 resource server; see Dockerfiles/LiteLLM/ARCHITECTURE.md)
+      LITELLM_OIDC_ISSUER: https://pocketid.$BASE_DOMAINNAME
+      LITELLM_OIDC_JWKS_URL: https://pocketid.$BASE_DOMAINNAME/.well-known/jwks.json
+      LITELLM_OIDC_AUDIENCE: https://llm.$BASE_DOMAINNAME
+      LITELLM_OIDC_REQUIRED_SCOPE: llm:invoke
+      LITELLM_OIDC_SIGNING_ALGORITHM: RS256
+      LITELLM_ENABLE_RESPONSES_STREAMING_FIX: "true" # NOTE: Temporary wildcard Responses streaming fix (responses-streaming.patch)
     labels:
       traefik.enable: "true"
+      traefik.docker.network: "t3_proxy"
       ## HTTP Routers
       traefik.http.routers.litellm-rtr.entrypoints: "websecure"
       traefik.http.routers.litellm-rtr.rule: "Host(`litellm.$DOMAINNAME`)"
-      traefik.http.routers.litellm-rtr.middlewares: "litellm-native-auth-lane,chain-no-auth-relaxed@file"
+      traefik.http.routers.litellm-rtr.middlewares: "chain-no-auth-relaxed@file"
       traefik.http.routers.litellm-rtr.service: "litellm-svc"
-      traefik.http.routers.litellm-sso-rtr.entrypoints: "websecure"
-      traefik.http.routers.litellm-sso-rtr.rule: "Host(`litellm-sso.$DOMAINNAME`)"
-      traefik.http.routers.litellm-sso-rtr.middlewares: "litellm-sso-auth-lane,chain-no-auth-relaxed@file"
-      traefik.http.routers.litellm-sso-rtr.service: "litellm-svc"
-      ## Middlewares
-      traefik.http.middlewares.litellm-native-auth-lane.headers.customrequestheaders.X-LiteLLM-Auth-Lane: "native"
-      traefik.http.middlewares.litellm-sso-auth-lane.headers.customrequestheaders.X-LiteLLM-Auth-Lane: "custom"
       ## HTTP Services
       traefik.http.services.litellm-svc.loadbalancer.server.port: "4000"
       ####### HOMEPAGE #######
@@ -185,3 +161,15 @@ services:
       glance.icon: "sh:litellm"
       glance.url: "https://litellm.$DOMAINNAME/ui"
       glance.description: "AI gateway"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python3",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:4000/health/liveliness', timeout=3)",
+        ]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 2m

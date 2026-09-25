@@ -6,7 +6,6 @@ pinned upstream release passes verify_tracing.py without this patch; retain the
 regression check.
 
 diff --git a/litellm/integrations/otel/logger.py b/litellm/integrations/otel/logger.py
-index d2a32ef..2f1b2bf 100644
 --- a/litellm/integrations/otel/logger.py
 +++ b/litellm/integrations/otel/logger.py
 @@ -1,7 +1,7 @@
@@ -17,27 +16,29 @@ index d2a32ef..2f1b2bf 100644
 +from collections.abc import Callable, Iterator, Mapping, MutableMapping, Sequence
  from contextlib import contextmanager
  from datetime import datetime
- from typing import TYPE_CHECKING, Any, Final, cast
-@@ -18,6 +18,7 @@ from opentelemetry.trace import (
-     set_span_in_context,
+ from types import MappingProxyType
+@@ -21,6 +21,7 @@
      use_span,
  )
+ from opentelemetry.trace import TracerProvider as ApiTracerProvider
 +from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
 
  import litellm
  from litellm._logging import verbose_logger
-@@ -83,6 +84,7 @@ if TYPE_CHECKING:
+@@ -89,6 +90,7 @@
      )
 
  LITELLM_TRACER_NAME: Final = "litellm"
 +_TRACE_CONTEXT_PROPAGATOR: Final = TraceContextTextMapPropagator()
+ _published_v2_provider: ApiTracerProvider | None = None
 
 
- def _span_error_from_exception(
-@@ -133,6 +135,25 @@ def _request_trace_links(context: Context | None) -> tuple[Link, ...] | None:
+@@ -138,6 +140,25 @@
+     """A link back to the request trace, for a span detached into its own trace."""
+     anchor: Final = get_current_span(context).get_span_context()
      return (Link(anchor),) if anchor.is_valid else None
-
-
++
++
 +def _inject_provider_trace_context(span: Span, kwargs: Mapping[str, Any]) -> None:
 +    """Make the provider request a child of LiteLLM's LLM-call span."""
 +    if not litellm.forward_traceparent_to_llm_provider:
@@ -55,12 +56,10 @@ index d2a32ef..2f1b2bf 100644
 +        context=set_span_in_context(span),
 +    )
 +    headers.update(carrier)
-+
-+
- class _LLMCallSpan:
-     """The state carried from the ``pre_call`` boundary to span close.
 
-@@ -308,6 +329,7 @@ class OpenTelemetryV2(CustomLogger):
+
+ class _LLMCallSpan:
+@@ -322,6 +343,7 @@
                  tracer=route.tracer,
                  links=_request_trace_links(parent_context) if route.detached else None,
              )

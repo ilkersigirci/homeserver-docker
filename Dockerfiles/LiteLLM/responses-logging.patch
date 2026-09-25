@@ -10,7 +10,7 @@ this patch; retain the regression check.
 diff --git a/litellm/litellm_core_utils/litellm_logging.py b/litellm/litellm_core_utils/litellm_logging.py
 --- a/litellm/litellm_core_utils/litellm_logging.py
 +++ b/litellm/litellm_core_utils/litellm_logging.py
-@@ -3721,14 +3721,18 @@
+@@ -3846,14 +3846,18 @@
              result,
              (ResponseCompletedEvent, ResponseIncompleteEvent, ResponseFailedEvent),
          ):
@@ -32,7 +32,7 @@ diff --git a/litellm/litellm_core_utils/litellm_logging.py b/litellm/litellm_cor
                      "usage",
                      (
                          transformed_usage.model_dump()
-@@ -3736,7 +3740,7 @@
+@@ -3861,7 +3865,7 @@
                          else dict(transformed_usage)
                      ),
                  )

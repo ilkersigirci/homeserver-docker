@@ -156,7 +156,7 @@
       "sourceUrl": "https://github.com/BerriAI/litellm",
       "changelogUrl": "https://github.com/BerriAI/litellm/releases",
       "prBodyNotes": [
-        "Use docs/skills/update-litellm/SKILL.md to refresh the source commit, rebase local patches, and validate the image."
+        "Use Dockerfiles/LiteLLM/README.md#updating to refresh the source commit, rebase local patches, and validate the image."
       ]
     },
     {

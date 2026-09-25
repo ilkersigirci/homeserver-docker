@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.25@sha256:0adf442eae370b6087e08edc7c50b552d80ddf261576f4ebd6421006b2461f12
 # renovate: datasource=github-tags depName=BerriAI/litellm
-ARG IMAGE_VERSION=1.100.1
-ARG UPSTREAM_COMMIT=1dba17b10ded12ad0021edb453ba2c54e4637928
+ARG IMAGE_VERSION=1.102.1
+ARG UPSTREAM_COMMIT=d09bbae1c6df463e425558f60d460437193635da
 
 FROM rust:1.94.1-slim-trixie@sha256:cf09adf8c3ebaba10779e5c23ff7fe4df4cccdab8a91f199b0c142c53fef3e1a AS rust
 
@@ -15,12 +15,14 @@ ARG IMAGE_VERSION
 ARG UPSTREAM_COMMIT
 WORKDIR /app
 ADD --checksum=${UPSTREAM_COMMIT} https://github.com/BerriAI/litellm.git#v${IMAGE_VERSION} /app
-COPY strip_enterprise.py verify_oss.py base-sources.sha256 sso.patch litellm-auth.patch responses-background.patch responses-streaming.patch responses-logging.patch otel-propagation.patch /patches/
+COPY strip_enterprise.py verify_oss.py base-sources.sha256 sso.patch custom-auth-fallback.patch model-info-access.patch responses-websocket-budget.patch responses-background.patch responses-streaming.patch responses-logging.patch otel-propagation.patch /patches/
 RUN apt-get update && apt-get install -y --no-install-recommends patch \
     && python3 /patches/strip_enterprise.py /app \
     && sha256sum -c /patches/base-sources.sha256 \
     && patch --batch --forward --fuzz=0 -p1 < /patches/sso.patch \
-    && patch --batch --forward --fuzz=0 -p1 < /patches/litellm-auth.patch \
+    && patch --batch --forward --fuzz=0 -p1 < /patches/custom-auth-fallback.patch \
+    && patch --batch --forward --fuzz=0 -p1 < /patches/model-info-access.patch \
+    && patch --batch --forward --fuzz=0 -p1 < /patches/responses-websocket-budget.patch \
     && patch --batch --forward --fuzz=0 -p1 < /patches/responses-background.patch \
     && patch --batch --forward --fuzz=0 -p1 < /patches/responses-streaming.patch \
     && patch --batch --forward --fuzz=0 -p1 < /patches/responses-logging.patch \
@@ -73,14 +75,14 @@ COPY --from=builder /app/litellm/proxy/prisma_migration.py /app/litellm/proxy/pr
 COPY --from=builder /opt/prisma /opt/prisma
 COPY --from=source /app/LICENSE /app/LICENSE.litellm
 COPY LICENSE.patches /app/LICENSE.patches
-COPY oidc_delegated_auth.py /app/litellm-config/oidc_delegated_auth.py
-COPY verify_oss.py verify_auth.py verify_background.py verify_streaming.py verify_logging.py verify_tracing.py /tmp/litellm-checks/
+COPY user_auth.py /app/litellm-config/user_auth.py
+COPY verify_oss.py verify_user_auth.py verify_background.py verify_streaming.py verify_logging.py verify_tracing.py /tmp/litellm-checks/
 RUN chmod -R a+rX /opt/prisma \
     && test -x /opt/prisma/binaries/node_modules/.bin/prisma \
     && test -f /opt/prisma/binaries/node_modules/prisma/build/index.js \
     && python3 -c "from prisma.client import BINARY_PATHS; paths = list(BINARY_PATHS.query_engine.values()); assert paths and all(p.startswith('/opt/prisma/') for p in paths), paths" \
     && python3 /tmp/litellm-checks/verify_oss.py \
-    && python3 /tmp/litellm-checks/verify_auth.py \
+    && LITELLM_LOCAL_MODEL_COST_MAP=true python3 /tmp/litellm-checks/verify_user_auth.py \
     && LITELLM_LOCAL_MODEL_COST_MAP=true python3 /tmp/litellm-checks/verify_background.py \
     && LITELLM_LOCAL_MODEL_COST_MAP=true python3 /tmp/litellm-checks/verify_streaming.py \
     && LITELLM_LOCAL_MODEL_COST_MAP=true python3 /tmp/litellm-checks/verify_logging.py \

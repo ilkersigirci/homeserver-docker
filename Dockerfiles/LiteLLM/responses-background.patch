@@ -15,10 +15,11 @@ retain the regression check.
 diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/response_api_endpoints/endpoints.py
 --- a/litellm/proxy/response_api_endpoints/endpoints.py
 +++ b/litellm/proxy/response_api_endpoints/endpoints.py
-@@ -356,50 +356,6 @@ async def responses_api(
+@@ -364,50 +364,6 @@
+             user_api_base=user_api_base,
              version=version,
          )
-
+-
 -        # Store in managed objects table if background mode is enabled
 -        if data.get("background") and isinstance(response, ResponsesAPIResponse):
 -            if response.status in ["queued", "in_progress"]:
@@ -62,11 +63,10 @@ diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/r
 -                        verbose_proxy_logger.error(
 -                            "Failed to store background response in managed objects table: %s", e
 -                        )
--
+
          return response
      except ModifyResponseException as e:
-         # Guardrail passthrough: return violation message in Responses API format (200)
-@@ -734,7 +690,7 @@ async def get_response(
+@@ -743,7 +699,7 @@
      data["response_id"] = response_id
      processor: Final = ProxyBaseLLMRequestProcessing(data=data)
      try:
@@ -75,7 +75,7 @@ diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/r
              request=request,
              fastapi_response=fastapi_response,
              user_api_key_dict=user_api_key_dict,
-@@ -752,6 +708,9 @@ async def get_response(
+@@ -761,6 +717,9 @@
              user_api_base=user_api_base,
              version=version,
          )
@@ -85,7 +85,7 @@ diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/r
      except Exception as e:
          raise await processor._handle_llm_api_exception(
              e=e,
-@@ -1105,7 +1064,7 @@ async def cancel_response(
+@@ -1260,7 +1219,7 @@
      data["response_id"] = response_id
      processor: Final = ProxyBaseLLMRequestProcessing(data=data)
      try:
@@ -94,7 +94,7 @@ diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/r
              request=request,
              fastapi_response=fastapi_response,
              user_api_key_dict=user_api_key_dict,
-@@ -1123,6 +1082,9 @@ async def cancel_response(
+@@ -1278,6 +1237,9 @@
              user_api_base=user_api_base,
              version=version,
          )

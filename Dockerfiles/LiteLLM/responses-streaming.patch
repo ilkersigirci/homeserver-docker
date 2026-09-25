@@ -10,13 +10,12 @@ Adapted metadata propagation, not a direct backport: honor explicit wildcard
 supports_native_streaming without requiring base_model or exact graph entries.
 Remove once the pinned upstream release passes verify_streaming.py without this
 patch; a merged PR or closed issue alone is insufficient. Keep the regression
-check. See README.md#temporary-streaming-bug-workaround for cleanup steps.
+check. See README.md#temporary-upstream-workarounds for cleanup steps.
 
 diff --git a/litellm/llms/base_llm/responses/transformation.py b/litellm/llms/base_llm/responses/transformation.py
-index 1365941..05f1244 100644
 --- a/litellm/llms/base_llm/responses/transformation.py
 +++ b/litellm/llms/base_llm/responses/transformation.py
-@@ -237,6 +237,7 @@ class BaseResponsesAPIConfig(ABC):
+@@ -240,6 +240,7 @@
          model: str | None,
          stream: bool | None,
          custom_llm_provider: str | None = None,
@@ -25,10 +24,9 @@ index 1365941..05f1244 100644
          """Returns True if litellm should fake a stream for the given model and stream value"""
          return False
 diff --git a/litellm/llms/manus/responses/transformation.py b/litellm/llms/manus/responses/transformation.py
-index f5733a1..5ee208b 100644
 --- a/litellm/llms/manus/responses/transformation.py
 +++ b/litellm/llms/manus/responses/transformation.py
-@@ -52,6 +52,7 @@ class ManusResponsesAPIConfig(OpenAIResponsesAPIConfig):
+@@ -52,6 +52,7 @@
          model: str | None,
          stream: bool | None,
          custom_llm_provider: str | None = None,
@@ -37,10 +35,9 @@ index f5733a1..5ee208b 100644
          """
          Manus API doesn't support real-time streaming.
 diff --git a/litellm/llms/openai/responses/transformation.py b/litellm/llms/openai/responses/transformation.py
-index eac844a..f3d11c3 100644
 --- a/litellm/llms/openai/responses/transformation.py
 +++ b/litellm/llms/openai/responses/transformation.py
-@@ -523,9 +523,14 @@ class OpenAIResponsesAPIConfig(BaseResponsesAPIConfig):
+@@ -712,9 +712,14 @@
          model: str | None,
          stream: bool | None,
          custom_llm_provider: str | None = None,
@@ -56,10 +53,9 @@ index eac844a..f3d11c3 100644
              try:
                  if (
 diff --git a/litellm/llms/volcengine/responses/transformation.py b/litellm/llms/volcengine/responses/transformation.py
-index 82c4f7f..1411f8e 100644
 --- a/litellm/llms/volcengine/responses/transformation.py
 +++ b/litellm/llms/volcengine/responses/transformation.py
-@@ -407,6 +407,7 @@ class VolcEngineResponsesAPIConfig(OpenAIResponsesAPIConfig):
+@@ -407,6 +407,7 @@
          model: str | None,
          stream: bool | None,
          custom_llm_provider: str | None = None,
@@ -68,17 +64,16 @@ index 82c4f7f..1411f8e 100644
          """
          Volcengine Responses API supports native streaming; never fall back to fake stream.
 diff --git a/litellm/responses/main.py b/litellm/responses/main.py
-index f012ec8..84c0f80 100644
 --- a/litellm/responses/main.py
 +++ b/litellm/responses/main.py
 @@ -1,5 +1,6 @@
  import asyncio
  import contextvars
 +import os
- from collections.abc import Coroutine, Generator, Iterable, Mapping
+ from collections.abc import Coroutine, Generator, Iterable, Mapping, Sequence
  from contextlib import contextmanager
- from functools import partial
-@@ -1221,6 +1222,21 @@ def responses(
+ from dataclasses import dataclass
+@@ -1350,6 +1351,21 @@
          if custom_llm_provider is None:
              raise ValueError("custom_llm_provider is required but passed as None")
 
@@ -100,7 +95,7 @@ index f012ec8..84c0f80 100644
          response = base_llm_http_handler.response_api_handler(
              model=model,
              input=input,
-@@ -1235,7 +1251,10 @@ def responses(
+@@ -1364,7 +1380,10 @@
              _is_async=_is_async,
              client=kwargs.get("client"),
              fake_stream=responses_api_provider_config.should_fake_stream(
