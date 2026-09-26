@@ -2,7 +2,7 @@ services:
   # NOTE: Full config example: https://github.com/gtsteffaniak/filebrowser/blob/main/frontend/public/config.generated.yaml
   filebrowser:
     container_name: filebrowser
-    image: ghcr.io/gtsteffaniak/filebrowser:1.4.0-stable@sha256:2cd949cd06c058576773c5b8400c854478a64c4f364b1e2bea275819847f099b
+    image: ghcr.io/gtsteffaniak/filebrowser:1.5.6-stable@sha256:7c5d7ac8ffda31294d278063cf9d2e04303b39e6dce1f4c691342240ca7703b8
     profiles:
       - media
       - filebrowser
