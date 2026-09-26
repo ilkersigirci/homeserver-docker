@@ -19,7 +19,6 @@
   "schedule": ["* 10-16 * * 1-5"],
   "prHourlyLimit": 1,
   "prConcurrentLimit": 10,
-  "commitHourlyLimit": 2,
   "docker-compose": {
     "managerFilePatterns": ["/^(?:apps|compose\\/fragments)\\/.*\\.ya?ml$/"]
   },
@@ -364,10 +363,11 @@
       "matchDatasources": ["docker"],
       "matchFileNames": ["apps/langflow.yml"],
       "matchPackageNames": [
-        "langflowai/langflow-backend",
+        "ghcr.io/ilkersigirci/homeserver-langflow-backend",
         "langflowai/langflow-frontend"
       ],
       "groupName": "Langflow",
+      "groupSlug": "langflow",
       "sourceUrl": "https://github.com/langflow-ai/langflow"
     },
     {

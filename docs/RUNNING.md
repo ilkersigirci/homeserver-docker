@@ -161,6 +161,11 @@ changed through the supported Packages REST API.
 3. Resolve the public image digest and switch the service to
     `ghcr.io/ilkersigirci/homeserver-<name>:<tag>@sha256:<digest>`.
 
+## Renovate PR Updates
+
+The workflow uses a personal access token with platform commits disabled and a
+dedicated Git author. Keep that author stable so Renovate recognizes its commits.
+
 ## Renovate Local Checks
 
 ```bash

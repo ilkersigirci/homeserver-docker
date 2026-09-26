@@ -65,9 +65,11 @@ jobs:
           RENOVATE_AUTODISCOVER: true
           RENOVATE_AUTODISCOVER_FILTER: ${{ github.repository }}
           RENOVATE_DRY_RUN: ${{ inputs.dryRun || false }}
+          RENOVATE_GIT_AUTHOR: Renovate Bot <renovate@homeserver.invalid>
           RENOVATE_INTERNAL_CHECKS_FILTER: strict
           RENOVATE_PLATFORM: github
-          RENOVATE_PLATFORM_COMMIT: true
+          # PAT authentication uses Git commits with the dedicated author above.
+          RENOVATE_PLATFORM_COMMIT: disabled
         with:
           token: ${{ secrets.RENOVATE_TOKEN }}
           renovate-version: ${{ inputs.version || 'latest' }}
