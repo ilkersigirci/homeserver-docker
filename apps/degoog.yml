@@ -1,6 +1,3 @@
-# Degoog owns its configuration and extensions in appdata/degoog; back it up.
-# DEGOOG_SETTINGS_PASSWORDS is stored in the repository's ignored .env file.
-# Web: Brave/Bing/Google CSE; media: Brave/Bing; autocomplete: Brave.
 networks:
   degoog_backend:
     internal: true
@@ -25,7 +22,6 @@ services:
     pids_limit: 256
     cpus: "1.0"
     mem_limit: "1G"
-    # Valkey is disposable shared cache; application state lives in appdata/degoog.
     command: ["valkey-server", "--save", "", "--appendonly", "no"]
     ulimits:
       nofile:
@@ -43,7 +39,7 @@ services:
     container_name: degoog
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
-      - root
+      - root # Upstream starts as root to chown /app/data, then drops to PUID:PGID.
       - programming
       - degoog
     depends_on:
@@ -54,7 +50,6 @@ services:
       - degoog_backend
     expose:
       - 4444
-    # Upstream starts as root to chown /app/data, then drops to PUID:PGID.
     read_only: true
     tmpfs:
       - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
