@@ -1,6 +1,6 @@
 services:
   marimo:
-    image: ghcr.io/ilkersigirci/homeserver-marimo:0.23.14@sha256:adfd3cd44af1834e36638ac980870fa87860814df1833cd5739cbdd67b7a2ad2
+    image: ghcr.io/ilkersigirci/homeserver-marimo:0.24.0@sha256:f3e85f1cec5f339cd9cc87b69914950079b529e6c4137f6c87a39a84b07fde47
     container_name: marimo
     restart: $RESTART_POLICY_PROGRAMMING
     init: true
@@ -80,7 +80,7 @@ services:
       glance.description: "Sandboxed notebooks with isolated uv environments"
 
   codex-acp:
-    image: ghcr.io/ilkersigirci/homeserver-codex-acp:1.1.4-ws0.2.0@sha256:4542676b0f10f337eefc9eae132fd61bd96da144367be688b12b5244f2b1144b
+    image: ghcr.io/ilkersigirci/homeserver-codex-acp:1.1.9-ws0.2.0@sha256:c767ea624e7b85a7e792495d4723dcc88c8bfcb6c7d3f46d59f676ab212eb217
     container_name: codex-acp
     restart: $RESTART_POLICY_PROGRAMMING
     init: true
