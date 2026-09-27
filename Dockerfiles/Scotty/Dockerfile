@@ -1,5 +1,5 @@
 # Multi-stage build for minimal final image
-FROM golang:1.26-alpine@sha256:0178a641fbb4858c5f1b48e34bdaabe0350a330a1b1149aabd498d0699ff5fb2 AS builder
+FROM golang:1.26-alpine@sha256:8ac98ca534ac3f51e1f420a1dd2c15e74c75cfa0f23f3ad27eb5d7236c349a0c AS builder
 
 # Install git (required for go install)
 RUN apk add --no-cache git ca-certificates
