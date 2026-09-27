@@ -1,4 +1,3 @@
-# NOTE: Gotify 3 does not support disabling local authentication; the existing password is recovery-only.
 services:
   gotify:
     image: ghcr.io/gotify/server:3.1.1@sha256:44fc5bbd1c0618878e33073d38c2c13126b48f245c3fe12236b1da48eb203b86
@@ -30,20 +29,23 @@ services:
       - $REPO_PATH/data/gotify:/app/data
     environment:
       TZ: $TZ
-      GOTIFY_DEFAULTUSER_NAME: $GOTIFY_DEFAULT_USER_NAME
-      GOTIFY_DEFAULTUSER_PASS: $GOTIFY_DEFAULT_USER_PASS
+      GOTIFY_LOCALAUTH_ENABLED: false
       GOTIFY_REGISTRATION: false
       GOTIFY_SERVER_SECURECOOKIE: true
       ## OIDC
       GOTIFY_OIDC_ENABLED: true
+      GOTIFY_OIDC_AUTO_REDIRECT: true
       GOTIFY_OIDC_ISSUER: https://pocketid.$BASE_DOMAINNAME
       GOTIFY_OIDC_CLIENTID: $GOTIFY_CLIENT_ID
       GOTIFY_OIDC_CLIENTSECRET: $GOTIFY_CLIENT_SECRET
       GOTIFY_OIDC_REDIRECTURL: https://gotify.$DOMAINNAME/auth/oidc/callback
-      GOTIFY_OIDC_AUTOREGISTER: false
+      GOTIFY_OIDC_AUTOREGISTER: true
       GOTIFY_OIDC_USERNAMECLAIM: preferred_username
       GOTIFY_OIDC_LINK_BY_USERNAME: true
-      GOTIFY_OIDC_SCOPES: openid,profile,email
+      GOTIFY_OIDC_SCOPES: openid,profile,email,groups
+      GOTIFY_OIDC_IDP_NAME: PocketID
+      GOTIFY_OIDC_GROUPS_CLAIM: groups
+      GOTIFY_OIDC_GROUPS_ADMIN: admin
     healthcheck:
       test: ["CMD", "curl", "-fsS", "--max-time", "3", "-o", "/dev/null", "http://127.0.0.1:80/health"]
       interval: 2m
