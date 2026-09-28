@@ -425,6 +425,17 @@
         "ghcr.io/rybbit-io/rybbit-client"
       ],
       "groupName": "Rybbit"
+    },
+    {
+      "description": "Group Scanopy server and daemon Docker image updates",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchFileNames": ["apps/scanopy.yml"],
+      "matchPackageNames": [
+        "ghcr.io/scanopy/scanopy/server",
+        "ghcr.io/scanopy/scanopy/daemon"
+      ],
+      "groupName": "Scanopy"
     }
   ],
   "major": {
