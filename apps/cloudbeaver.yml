@@ -1,6 +1,6 @@
 services:
   cloudbeaver:
-    image: dbeaver/cloudbeaver:26.1.5@sha256:bb4968967796856e3b89e3ece33654d69aaed52113b6bf9d2d2d0056956a4722
+    image: dbeaver/cloudbeaver:26.2.1@sha256:34b078483dac9502ed6a718a68c54368d55dd0abbc7b392d6e78b90f6a9ec3f6
     container_name: cloudbeaver
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
