@@ -2,7 +2,7 @@ services:
   # NOTE: To fix json parse error: Bitwarden extension → Settings → Autofill → Blocked domains → add: filestash.example.com
   filestash-wopi-server:
     # NOTE: After 24.04.10.2.1, support for custom command with css with root user is removed
-    image: collabora/code:26.04.3.2.1@sha256:379b8f1fc955dd6d01ba24adf61d1b177048ddaae179ae8c1e6a6342daccb282
+    image: collabora/code:26.04.4.2.1@sha256:4e983196eb9878f339cc506c38c21f1cc3473bca3d6de883c5de08f9c0cc3a6c
     container_name: filestash-wopi-server
     restart: $RESTART_POLICY_MEDIA
     profiles:
