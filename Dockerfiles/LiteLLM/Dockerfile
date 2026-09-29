@@ -26,6 +26,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends patch \
     && patch --batch --forward --fuzz=0 -p1 < /patches/temporary/responses-background.patch \
     && patch --batch --forward --fuzz=0 -p1 < /patches/temporary/responses-streaming.patch \
     && patch --batch --forward --fuzz=0 -p1 < /patches/temporary/responses-logging.patch \
+    && patch --batch --forward --fuzz=0 -p1 < /patches/temporary/responses-disconnect-logging.patch \
     && patch --batch --forward --fuzz=0 -p1 < /patches/temporary/otel-propagation.patch \
     && python3 /patches/verify_oss.py /app
 
@@ -35,7 +36,9 @@ WORKDIR /ui
 COPY --from=source /app/ui/litellm-dashboard/package*.json ./
 RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline
 COPY --from=source /app/ui/litellm-dashboard/ ./
-RUN npm run build
+COPY tests/verify_responses_disconnect_ui.integration.test.tsx tests/
+RUN npm run test:integration -- tests/verify_responses_disconnect_ui.integration.test.tsx \
+    && npm run build
 
 FROM base AS builder
 WORKDIR /app
@@ -86,6 +89,7 @@ RUN chmod -R a+rX /opt/prisma \
     && LITELLM_LOCAL_MODEL_COST_MAP=true python3 /tmp/litellm-checks/verify_background.py \
     && LITELLM_LOCAL_MODEL_COST_MAP=true python3 /tmp/litellm-checks/verify_streaming.py \
     && LITELLM_LOCAL_MODEL_COST_MAP=true python3 /tmp/litellm-checks/verify_logging.py \
+    && LITELLM_LOCAL_MODEL_COST_MAP=true python3 /tmp/litellm-checks/verify_responses_disconnect.py \
     && LITELLM_LOCAL_MODEL_COST_MAP=true python3 /tmp/litellm-checks/verify_tracing.py \
     && litellm --help > /dev/null \
     && rm -rf /tmp/litellm-checks

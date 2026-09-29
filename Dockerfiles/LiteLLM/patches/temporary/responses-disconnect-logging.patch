@@ -1,0 +1,189 @@
+Upstream bug: cancelled native Responses streams never reach spend logging.
+The Chat partial-spend recovery requires collected chunks that Responses
+iterators do not expose, and cancellation bypasses ordinary failure hooks.
+
+Related upstream tracking (these do not cover this native Responses path):
+https://github.com/BerriAI/litellm/issues/14457
+https://github.com/BerriAI/litellm/pull/33736
+https://github.com/BerriAI/litellm/pull/35349
+
+Record the cancellation as a 499 failure through native failure callbacks and
+the proxy failure hook, which persists the row and releases the request slot.
+Delivered output text becomes a logging-only cancelled Response snapshot in
+the standard failure payload, so redaction and prompt-storage settings apply;
+final usage stays unknown. The Logs drawer shows that captured output instead
+of replacing every failed response with the error object.
+
+Removal checks: tests/verify_responses_disconnect.py and
+tests/verify_responses_disconnect_ui.integration.test.tsx against unpatched upstream,
+then cancel a native Responses stream and verify one 499 row with partial output
+in the Logs UI, preserved after refresh.
+
+diff --git a/litellm/proxy/common_request_processing.py b/litellm/proxy/common_request_processing.py
+--- a/litellm/proxy/common_request_processing.py
++++ b/litellm/proxy/common_request_processing.py
+@@ -6,6 +6,8 @@
+ from collections.abc import AsyncGenerator, Awaitable, Callable, Mapping, Sequence
+ from datetime import datetime
+ from functools import lru_cache
++from itertools import groupby
++from operator import attrgetter
+ from types import MappingProxyType
+ from typing import TYPE_CHECKING, Any, Final, Literal, NamedTuple, Protocol, TypeAlias, TypeVar, overload
+
+@@ -74,10 +76,12 @@
+ from litellm.proxy.guardrails.auto_router_compression import arm_pre_call as _arm_auto_router_compression
+ from litellm.proxy.route_llm_request import route_request
+ from litellm.proxy.utils import ProxyLogging, _check_and_merge_model_level_guardrails
++from litellm.responses.streaming_iterator import BaseResponsesAPIStreamingIterator
+ from litellm.router import Router
+ from litellm.router_utils.add_retry_fallback_headers import get_hidden_params_dict
+ from litellm.router_utils.common_utils import resolve_model_group_alias
+ from litellm.types.guardrails import GuardrailEventHooks
++from litellm.types.llms.openai import OutputTextDeltaEvent
+ from litellm.types.router import RouterRateLimitError
+
+ _LateResponseT = TypeVar("_LateResponseT", bound=Response)
+@@ -411,6 +415,62 @@
+     return True
+
+
++async def _log_cancelled_responses_stream(
++    request_data: dict,
++    response: object,
++    output_text_deltas: Sequence[OutputTextDeltaEvent],
++    user_api_key_dict: UserAPIKeyAuth,
++    proxy_logging_obj: ProxyLogging,
++) -> bool:
++    """
++    Responses streams have no Chat chunks for partial billing, so record the
++    disconnect as a 499 failure. The proxy failure hook persists it, releases the
++    request slot, and pops the logging object, so this runs at most once; returns
++    True when it ran. Final usage is unknown without a terminal event, so the
++    logged snapshot carries only the delivered text.
++    """
++    logging_obj: Final = request_data.get("litellm_logging_obj")
++    if (
++        litellm.disable_streaming_logging is True
++        or not isinstance(response, BaseResponsesAPIStreamingIterator)
++        or not isinstance(logging_obj, LiteLLMLoggingObj)
++        or response.completed_response is not None
++    ):
++        return False
++    if output_text_deltas:
++        logging_obj.model_call_details["partial_response"] = {
++            "object": "response",
++            "status": "cancelled",
++            "output": [
++                {
++                    "id": item_id,
++                    "type": "message",
++                    "role": "assistant",
++                    "status": "incomplete",
++                    "content": [
++                        {"type": "output_text", "text": "".join(delta.delta for delta in part), "annotations": []}
++                        for _, part in groupby(item_deltas, key=attrgetter("content_index"))
++                    ],
++                }
++                for item_id, item_deltas in groupby(output_text_deltas, key=attrgetter("item_id"))
++            ],
++            "usage": None,
++        }
++    exception: Final = litellm.APIError(
++        status_code=LITELLM_HTTP_STATUS_CLIENT_DISCONNECTED,
++        message=_CLIENT_DISCONNECTED_ERROR_INFORMATION["error_message"],
++        llm_provider=response.custom_llm_provider or "",
++        model=response.model or "",
++    )
++    await logging_obj.dispatch_failure_handlers(exception, traceback_exception="", prefer_async_handlers=True)
++    await proxy_logging_obj.post_call_failure_hook(
++        request_data=request_data,
++        original_exception=exception,
++        user_api_key_dict=user_api_key_dict,
++    )
++    return True
++
++
+ async def _cancel_pending_gather_tasks(tasks: list["asyncio.Task[Any]"]) -> None:
+     pending_tasks: Final = [task for task in tasks if not task.done()]
+     for task in pending_tasks:
+@@ -3581,6 +3641,7 @@
+         client_disconnected: bool = False,
+         user_api_key_dict: UserAPIKeyAuth | None = None,
+         proxy_logging_obj: ProxyLogging | None = None,
++        output_text_deltas: Sequence[OutputTextDeltaEvent] = (),
+     ) -> None:
+         with anyio.CancelScope(shield=True):
+             should_record_client_disconnect: Final = client_disconnected or (not stream_completed)
+@@ -3611,7 +3672,10 @@
+                     and proxy_logging_obj is not None
+                     and user_api_key_dict is not None
+                 ):
+-                    await proxy_logging_obj._arelease_max_parallel_requests_on_disconnect(user_api_key_dict)
++                    if not await _log_cancelled_responses_stream(
++                        request_data, response, output_text_deltas, user_api_key_dict, proxy_logging_obj
++                    ):
++                        await proxy_logging_obj._arelease_max_parallel_requests_on_disconnect(user_api_key_dict)
+
+             if hasattr(response, "aclose"):
+                 try:
+diff --git a/litellm/proxy/proxy_server.py b/litellm/proxy/proxy_server.py
+--- a/litellm/proxy/proxy_server.py
++++ b/litellm/proxy/proxy_server.py
+@@ -739,6 +739,7 @@
+     ChatCompletionSystemMessage,
+     ChatCompletionToolParam,
+     HttpxBinaryResponseContent,
++    OutputTextDeltaEvent,
+ )
+ from litellm.types.proxy.control_plane_endpoints import WorkerRegistryEntry
+ from litellm.types.proxy.management_endpoints.model_management_endpoints import (
+@@ -9025,6 +9026,7 @@
+     verbose_proxy_logger.debug("inside generator")
+     stream_completed = False
+     client_disconnected = False
++    output_text_deltas: list[OutputTextDeltaEvent] = []  # logged if the client disconnects
+     try:
+         error_message: str | None = None
+         requested_model_from_client: Final = _get_client_requested_model_for_streaming(request_data=request_data)
+@@ -9136,6 +9138,8 @@
+                 continue
+
+             raw_passthrough = False
++            if isinstance(chunk, OutputTextDeltaEvent):
++                output_text_deltas.append(chunk)
+             if isinstance(chunk, BaseModel):
+                 chunk = _serialize_streaming_chunk(chunk)
+             elif isinstance(chunk, bytes):
+@@ -9248,6 +9252,7 @@
+             client_disconnected=client_disconnected,
+             user_api_key_dict=user_api_key_dict,
+             proxy_logging_obj=proxy_logging_obj,
++            output_text_deltas=output_text_deltas,
+         )
+
+
+diff --git a/litellm/litellm_core_utils/litellm_logging.py b/litellm/litellm_core_utils/litellm_logging.py
+--- a/litellm/litellm_core_utils/litellm_logging.py
++++ b/litellm/litellm_core_utils/litellm_logging.py
+@@ -3331,7 +3331,7 @@
+
+         self.model_call_details["standard_logging_object"] = get_standard_logging_object_payload(
+             kwargs=self.model_call_details,
+-            init_response_obj={},
++            init_response_obj=self.model_call_details.pop("partial_response", {}),
+             start_time=start_time,
+             end_time=end_time,
+             logging_obj=self,
+diff --git a/ui/litellm-dashboard/src/components/view_logs/LogDetailsDrawer/LogDetailContent.tsx b/ui/litellm-dashboard/src/components/view_logs/LogDetailsDrawer/LogDetailContent.tsx
+--- a/ui/litellm-dashboard/src/components/view_logs/LogDetailsDrawer/LogDetailContent.tsx
++++ b/ui/litellm-dashboard/src/components/view_logs/LogDetailsDrawer/LogDetailContent.tsx
+@@ -97,7 +97,7 @@
+   const hasVectorStoreData = checkHasVectorStoreData(metadata);
+
+   const getFormattedResponse = () => {
+-    if (hasError && errorInfo) {
++    if (hasError && errorInfo && !hasResponse) {
+       return {
+         error: {
+           message: errorInfo.error_message || "An error occurred",

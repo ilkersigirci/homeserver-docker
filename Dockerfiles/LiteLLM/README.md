@@ -30,6 +30,8 @@ the patch changes, and its removal check.
   wildcard native streaming
 - [`responses-logging.patch`](patches/temporary/responses-logging.patch):
   streamed Responses success logging
+- [`responses-disconnect-logging.patch`](patches/temporary/responses-disconnect-logging.patch):
+  cancelled Responses stream failure logging
 - [`otel-propagation.patch`](patches/temporary/otel-propagation.patch):
   provider trace context
 
