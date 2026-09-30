@@ -138,10 +138,8 @@ services:
       LITELLM_OIDC_AUDIENCE: https://llm.$BASE_DOMAINNAME
       LITELLM_OIDC_REQUIRED_SCOPE: llm:invoke
       LITELLM_OIDC_SIGNING_ALGORITHM: RS256
-      LITELLM_ENABLE_RESPONSES_STREAMING_FIX: "true"
     labels:
       traefik.enable: "true"
-      traefik.docker.network: "t3_proxy"
       ## HTTP Routers
       traefik.http.routers.litellm-rtr.entrypoints: "websecure"
       traefik.http.routers.litellm-rtr.rule: "Host(`litellm.$DOMAINNAME`)"

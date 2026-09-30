@@ -223,13 +223,14 @@ async def _verify_model_info_scope() -> None:
     user = _user(models=["allowed"])
 
     async def model_info(model_id: str | None = None):
-        return await proxy_server.model_info_v1(
+        response = await proxy_server.model_info_v1(
             user_api_key_dict=authorized,
             litellm_model_id=model_id,
             include_team_models=False,
             teamId=None,
             healthy_only=False,
         )
+        return json.loads(response.body)
 
     with (
         patch.dict(

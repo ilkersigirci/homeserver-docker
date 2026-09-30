@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.25@sha256:0adf442eae370b6087e08edc7c50b552d80ddf261576f4ebd6421006b2461f12
 # renovate: datasource=github-tags depName=BerriAI/litellm
-ARG IMAGE_VERSION=1.102.1
-ARG UPSTREAM_COMMIT=d09bbae1c6df463e425558f60d460437193635da
+ARG IMAGE_VERSION=1.103.1
+ARG UPSTREAM_COMMIT=580bde9a2d148714889ec1c04a9872819e78a778
 
 FROM rust:1.94.1-slim-trixie@sha256:cf09adf8c3ebaba10779e5c23ff7fe4df4cccdab8a91f199b0c142c53fef3e1a AS rust
 
@@ -19,15 +19,9 @@ COPY scripts/strip_enterprise.py tests/verify_oss.py base-sources.sha256 patches
 RUN apt-get update && apt-get install -y --no-install-recommends patch \
     && python3 /patches/strip_enterprise.py /app \
     && sha256sum -c /patches/base-sources.sha256 \
-    && patch --batch --forward --fuzz=0 -p1 < /patches/permanent/sso.patch \
-    && patch --batch --forward --fuzz=0 -p1 < /patches/permanent/custom-auth-fallback.patch \
-    && patch --batch --forward --fuzz=0 -p1 < /patches/temporary/model-info-access.patch \
-    && patch --batch --forward --fuzz=0 -p1 < /patches/temporary/responses-websocket-budget.patch \
-    && patch --batch --forward --fuzz=0 -p1 < /patches/temporary/responses-background.patch \
-    && patch --batch --forward --fuzz=0 -p1 < /patches/temporary/responses-streaming.patch \
-    && patch --batch --forward --fuzz=0 -p1 < /patches/temporary/responses-logging.patch \
-    && patch --batch --forward --fuzz=0 -p1 < /patches/temporary/responses-disconnect-logging.patch \
-    && patch --batch --forward --fuzz=0 -p1 < /patches/temporary/otel-propagation.patch \
+    && for p in /patches/permanent/*.patch /patches/temporary/*.patch; do \
+        patch --batch --forward --fuzz=0 -p1 < "$p" || exit 1; \
+    done \
     && python3 /patches/verify_oss.py /app
 
 FROM --platform=$BUILDPLATFORM node:24.19-alpine3.24@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 AS ui
@@ -36,8 +30,8 @@ WORKDIR /ui
 COPY --from=source /app/ui/litellm-dashboard/package*.json ./
 RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline
 COPY --from=source /app/ui/litellm-dashboard/ ./
-COPY tests/verify_responses_disconnect_ui.integration.test.tsx tests/
-RUN npm run test:integration -- tests/verify_responses_disconnect_ui.integration.test.tsx \
+COPY tests/verify_*.integration.test.tsx tests/
+RUN npm run test:integration -- tests/verify_ \
     && npm run build
 
 FROM base AS builder
@@ -49,17 +43,15 @@ COPY --from=rust /usr/local/rustup /usr/local/rustup
 ENV CARGO_HOME=/usr/local/cargo RUSTUP_HOME=/usr/local/rustup \
     UV_PROJECT_ENVIRONMENT=/app/.venv UV_LINK_MODE=copy \
     PATH="/app/.venv/bin:/usr/local/cargo/bin:${PATH}"
+ARG UV_SYNC="uv sync --frozen --no-default-groups --no-editable \
+    --extra proxy --extra proxy-runtime --extra extra_proxy --extra semantic-router --python python3"
 COPY --from=source /app/pyproject.toml /app/uv.lock ./
 COPY --from=source /app/litellm-proxy-extras/pyproject.toml litellm-proxy-extras/
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-install-workspace --no-default-groups --no-editable \
-      --extra proxy --extra proxy-runtime --extra extra_proxy --extra semantic-router --python python3
+RUN --mount=type=cache,target=/root/.cache/uv ${UV_SYNC} --no-install-workspace
 COPY --from=source /app/ ./
 RUN rm -rf /app/litellm/proxy/_experimental/out
 COPY --from=ui /ui/out/ litellm/proxy/_experimental/out/
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-default-groups --no-editable \
-      --extra proxy --extra proxy-runtime --extra extra_proxy --extra semantic-router --python python3 \
+RUN --mount=type=cache,target=/root/.cache/uv ${UV_SYNC} \
     && XDG_CACHE_HOME=/opt/prisma/.cache PRISMA_BINARY_CACHE_DIR=/opt/prisma/binaries \
       prisma generate --schema=./schema.prisma \
     && chmod +x docker/entrypoint.sh docker/prod_entrypoint.sh
@@ -84,13 +76,9 @@ RUN chmod -R a+rX /opt/prisma \
     && test -x /opt/prisma/binaries/node_modules/.bin/prisma \
     && test -f /opt/prisma/binaries/node_modules/prisma/build/index.js \
     && python3 -c "from prisma.client import BINARY_PATHS; paths = list(BINARY_PATHS.query_engine.values()); assert paths and all(p.startswith('/opt/prisma/') for p in paths), paths" \
-    && python3 /tmp/litellm-checks/verify_oss.py \
-    && LITELLM_LOCAL_MODEL_COST_MAP=true python3 /tmp/litellm-checks/verify_user_auth.py \
-    && LITELLM_LOCAL_MODEL_COST_MAP=true python3 /tmp/litellm-checks/verify_background.py \
-    && LITELLM_LOCAL_MODEL_COST_MAP=true python3 /tmp/litellm-checks/verify_streaming.py \
-    && LITELLM_LOCAL_MODEL_COST_MAP=true python3 /tmp/litellm-checks/verify_logging.py \
-    && LITELLM_LOCAL_MODEL_COST_MAP=true python3 /tmp/litellm-checks/verify_responses_disconnect.py \
-    && LITELLM_LOCAL_MODEL_COST_MAP=true python3 /tmp/litellm-checks/verify_tracing.py \
+    && for check in /tmp/litellm-checks/verify_*.py; do \
+        LITELLM_LOCAL_MODEL_COST_MAP=true python3 "$check" || exit 1; \
+    done \
     && litellm --help > /dev/null \
     && rm -rf /tmp/litellm-checks
 EXPOSE 4000/tcp

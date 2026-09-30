@@ -25,10 +25,10 @@ diff --git a/litellm/integrations/otel/logger.py b/litellm/integrations/otel/log
  )
  from opentelemetry.trace import TracerProvider as ApiTracerProvider
 +from opentelemetry.trace.propagation.tracecontext import TraceContextTextMapPropagator
+ from typing_extensions import TypedDict, Unpack
 
  import litellm
- from litellm._logging import verbose_logger
-@@ -89,6 +90,7 @@
+@@ -90,6 +91,7 @@
      )
 
  LITELLM_TRACER_NAME: Final = "litellm"
@@ -36,33 +36,24 @@ diff --git a/litellm/integrations/otel/logger.py b/litellm/integrations/otel/log
  _published_v2_provider: ApiTracerProvider | None = None
 
 
-@@ -138,6 +140,25 @@
-     """A link back to the request trace, for a span detached into its own trace."""
-     anchor: Final = get_current_span(context).get_span_context()
+@@ -141,6 +143,16 @@
      return (Link(anchor),) if anchor.is_valid else None
-+
-+
-+def _inject_provider_trace_context(span: Span, kwargs: Mapping[str, Any]) -> None:
+
+
++def _inject_provider_trace_context(span: Span, kwargs: Mapping[str, object]) -> None:
 +    """Make the provider request a child of LiteLLM's LLM-call span."""
 +    if not litellm.forward_traceparent_to_llm_provider:
 +        return
 +    additional_args: Final = kwargs.get("additional_args")
-+    if not isinstance(additional_args, Mapping):
-+        return
-+    headers: Final = additional_args.get("headers")
-+    if not isinstance(headers, MutableMapping):
-+        return
++    headers: Final = additional_args.get("headers") if isinstance(additional_args, Mapping) else None
++    if isinstance(headers, MutableMapping):
++        _TRACE_CONTEXT_PROPAGATOR.inject(headers, context=set_span_in_context(span))
 +
-+    carrier: dict[str, str] = {}
-+    _TRACE_CONTEXT_PROPAGATOR.inject(
-+        carrier,
-+        context=set_span_in_context(span),
-+    )
-+    headers.update(carrier)
++
+ class _CustomLoggerOptions(TypedDict, total=False, extra_items=object):
+     pass
 
-
- class _LLMCallSpan:
-@@ -322,6 +343,7 @@
+@@ -327,6 +339,7 @@
                  tracer=route.tracer,
                  links=_request_trace_links(parent_context) if route.detached else None,
              )

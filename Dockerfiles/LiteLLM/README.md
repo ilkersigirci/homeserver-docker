@@ -36,8 +36,10 @@ the patch changes, and its removal check.
   provider trace context
 
 At each LiteLLM upgrade, test the pinned release without each workaround. Remove
-a patch, its Dockerfile step, its source hashes, and its entry above only when
-its removal check passes against unpatched upstream code; keep the check.
+a patch, its source hashes, and its entry above only when its removal check
+passes against unpatched upstream code; keep the check. The Dockerfile applies
+every patch under `patches/` and runs every `tests/verify_*` check, so neither
+needs a Dockerfile step.
 
 ## Updating
 
@@ -49,11 +51,12 @@ its removal check passes against unpatched upstream code; keep the check.
     source. Run `scripts/strip_enterprise.py <checkout>` to remove proprietary source,
     package/workspace entries, and the enterprise UI override, preserving
     unrelated dependency pins. Adapt the script if upstream's layout changed.
-3. Apply `patches/` in Dockerfile order with `patch --batch --forward --fuzz=0 -p1`
-    inside the checkout. Resolve drift by editing upstream code and regenerating
-    separate diffs; follow the [removal criteria](#temporary-upstream-workarounds)
-    above. Keep authorization, model access, budgets, rate limits, and admin-only
-    UI access intact; never enable `premium_user` globally.
+3. Apply `patches/permanent/` and then `patches/temporary/`, each in name order,
+    with `patch --batch --forward --fuzz=0 -p1` inside the checkout. Resolve drift
+    by editing upstream code and regenerating separate diffs; follow the
+    [removal criteria](#temporary-upstream-workarounds) above. Keep
+    authorization, model access, budgets, rate limits, and admin-only UI access
+    intact; never enable `premium_user` globally.
 4. Run `tests/verify_oss.py <patched-checkout>`, then build from the repository root:
 
     ```sh

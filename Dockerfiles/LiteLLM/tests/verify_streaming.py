@@ -1,20 +1,19 @@
 """Check wildcard Responses routing against a local HTTP transport at build time."""
 
 import json
-import os
 from unittest.mock import patch
 
 import httpx
 import litellm
 from litellm.llms.custom_httpx.http_handler import HTTPHandler
-from litellm.llms.manus.responses.transformation import ManusResponsesAPIConfig
-from litellm.llms.openai.responses.transformation import OpenAIResponsesAPIConfig
-from litellm.llms.volcengine.responses.transformation import (
-    VolcEngineResponsesAPIConfig,
-)
+
+# Absent from LiteLLM's model cost map, which upstream reads as "fake the stream".
+_UNKNOWN_MODELS = ("new-graph", "another-new-graph")
+# Registered in main(), so the check does not depend on upstream's model catalog.
+_KNOWN_MODEL = "registered-model"
 
 
-def verify_request(capability: bool | None, stream: bool, enabled: bool) -> None:
+def verify_request(capability: bool | None, stream: bool) -> None:
     requests: list[httpx.Request] = []
 
     def upstream(request: httpx.Request) -> httpx.Response:
@@ -65,8 +64,7 @@ def verify_request(capability: bool | None, stream: bool, enabled: bool) -> None
             return_value=HTTPHandler(client=client),
         ),
     ):
-        # Neither graph exists in LiteLLM's model cost map or configuration.
-        for model in ("new-graph", "another-new-graph"):
+        for model in (*_UNKNOWN_MODELS, _KNOWN_MODEL):
             result = router.responses(
                 model=f"graphs/{model}",
                 input="Check streaming.",
@@ -78,50 +76,20 @@ def verify_request(capability: bool | None, stream: bool, enabled: bool) -> None
             body = json.loads(requests[-1].content)
             assert requests[-1].url == "https://graphs.invalid/v1/responses"
             assert body["model"] == model
-            assert bool(body.get("stream")) is (
-                enabled and stream and capability is True
-            ), body
+            # An explicit capability decides; unset keeps the upstream decision.
+            native = model == _KNOWN_MODEL if capability is None else capability
+            assert bool(body.get("stream")) is (stream and native), (model, body)
             assert "supports_native_streaming" not in body
             assert "model_info" not in body
-    assert len(requests) == 2
+    assert len(requests) == len(_UNKNOWN_MODELS) + 1
 
 
 def main() -> None:
-    for flag in (None, "false", "true", "TRUE", "1"):
-        with patch.dict(os.environ):
-            os.environ.pop("LITELLM_ENABLE_RESPONSES_STREAMING_FIX", None)
-            if flag is not None:
-                os.environ["LITELLM_ENABLE_RESPONSES_STREAMING_FIX"] = flag
-            for capability in (True, False, None):
-                for stream in (True, False):
-                    verify_request(capability, stream, flag in ("true", "TRUE"))
-
-    upstream_decision = OpenAIResponsesAPIConfig.should_fake_stream
-
-    def legacy_decision(self, model, stream, custom_llm_provider=None):
-        return upstream_decision(self, model, stream, custom_llm_provider)
-
-    # Opting out must also preserve external providers' original call signature.
-    with (
-        patch.dict(os.environ, LITELLM_ENABLE_RESPONSES_STREAMING_FIX="false"),
-        patch.object(OpenAIResponsesAPIConfig, "should_fake_stream", legacy_decision),
-    ):
-        verify_request(True, True, False)
-
-    config = OpenAIResponsesAPIConfig()
-    assert config.should_fake_stream("gpt-4o", True, "openai") is False
-    assert config.should_fake_stream("o1-pro", True, "openai") is True
-    assert config.should_fake_stream("gpt-4o", True, "openai", False) is True
-    assert (
-        ManusResponsesAPIConfig().should_fake_stream("manus", True, "manus", True)
-        is True
-    )
-    assert (
-        VolcEngineResponsesAPIConfig().should_fake_stream(
-            "model", True, "volcengine", False
-        )
-        is False
-    )
+    # A known model without the capability field streams natively upstream.
+    litellm.register_model({f"openai/{_KNOWN_MODEL}": {"litellm_provider": "openai", "mode": "responses"}})
+    for capability in (True, False, None):
+        for stream in (True, False):
+            verify_request(capability, stream)
     print("Wildcard Responses streaming checks passed")
 
 

@@ -11,7 +11,7 @@ Removal check: tests/verify_logging.py
 diff --git a/litellm/litellm_core_utils/litellm_logging.py b/litellm/litellm_core_utils/litellm_logging.py
 --- a/litellm/litellm_core_utils/litellm_logging.py
 +++ b/litellm/litellm_core_utils/litellm_logging.py
-@@ -3846,14 +3846,18 @@
+@@ -3916,14 +3916,18 @@
              result,
              (ResponseCompletedEvent, ResponseIncompleteEvent, ResponseFailedEvent),
          ):
@@ -33,7 +33,7 @@ diff --git a/litellm/litellm_core_utils/litellm_logging.py b/litellm/litellm_cor
                      "usage",
                      (
                          transformed_usage.model_dump()
-@@ -3861,7 +3865,7 @@
+@@ -3931,7 +3935,7 @@
                          else dict(transformed_usage)
                      ),
                  )
