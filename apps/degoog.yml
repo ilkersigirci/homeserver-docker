@@ -88,7 +88,6 @@ services:
       start_period: 2m
     labels:
       traefik.enable: "true"
-      traefik.docker.network: "t3_proxy"
       traefik.http.routers.degoog-rtr.entrypoints: "websecure"
       traefik.http.routers.degoog-rtr.rule: "Host(`degoog.$DOMAINNAME`)"
       traefik.http.routers.degoog-rtr.middlewares: "chain-tinyauth@file"

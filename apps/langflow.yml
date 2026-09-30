@@ -273,7 +273,6 @@ services:
       start_period: 30s
     labels:
       traefik.enable: "true"
-      traefik.docker.network: "t3_proxy"
       ## Frontend catch-all router.
       traefik.http.routers.langflow-rtr.entrypoints: "websecure"
       traefik.http.routers.langflow-rtr.rule: "Host(`langflow.$DOMAINNAME`)"
