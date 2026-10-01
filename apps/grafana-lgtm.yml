@@ -92,7 +92,7 @@ services:
       GF_AUTH_GENERIC_OAUTH_ALLOW_ASSIGN_GRAFANA_ADMIN: true
       GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH: "contains(groups[*], 'admin') && 'GrafanaAdmin' || 'Viewer'"
       ################ OTHER CONFIGS ##################
-      LOKI_ARGS: --limits.retention-period=90d --pattern-ingester.enabled=true
+      LOKI_EXTRA_ARGS: --store.retention=90d --pattern-ingester.enabled=true
       # TEMPO_EXTRA_ARGS:
       # Store each OTLP series start time as a zero sample, so increase() and rate()
       # count the first value of a new counter series.
@@ -103,17 +103,19 @@ services:
       CROWDSEC_VICTORIAMETRICS_URL: $CROWDSEC_VICTORIAMETRICS_URL
     healthcheck:
       test:
-        [
-          "CMD",
-          "curl",
-          "-fsS",
-          "--max-time",
-          "3",
-          "http://127.0.0.1:3000/api/health",
-        ]
+        - CMD-SHELL
+        - >-
+          test -f /tmp/ready &&
+          curl -fsS --fail-early --max-time 3
+          http://127.0.0.1:3000/api/health
+          http://127.0.0.1:3100/ready
+          http://127.0.0.1:3200/ready
+          http://127.0.0.1:4040/ready
+          http://127.0.0.1:9090/-/ready
+          http://127.0.0.1:13133/ready
+          > /dev/null
       interval: 2m
-      timeout: 5s
-      retries: 3
+      timeout: 20s
       start_period: 2m
     labels:
       traefik.enable: "true"

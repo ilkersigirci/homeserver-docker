@@ -28,7 +28,7 @@ processors:
     limit_mib: 512
     spike_limit_mib: 128
   batch:
-  deltatocumulative/chhoto_url:
+  delta_to_cumulative/chhoto_url:
     max_stale: 2160h
     max_streams: 50000
   filter/chhoto_url_redirect:
@@ -98,7 +98,7 @@ service:
       #exporters: [otlphttp/metrics,debug/metrics]
     metrics/chhoto_url:
       receivers: [count/chhoto_url]
-      processors: [memory_limiter, deltatocumulative/chhoto_url, interval/chhoto_url, batch]
+      processors: [memory_limiter, delta_to_cumulative/chhoto_url, interval/chhoto_url, batch]
       exporters: [otlphttp/metrics]
     logs:
       receivers: [otlp]
