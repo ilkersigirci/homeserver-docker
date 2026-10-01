@@ -18,7 +18,7 @@
   "description": "Distributed request traces entering Chainlit or Open WebUI and continuing through the services that were reached.",
   "editable": true,
   "fiscalYearStartMonth": 0,
-  "graphTooltip": 0,
+  "graphTooltip": 1,
   "id": null,
   "links": [
     {
@@ -87,7 +87,7 @@
           "showLineNumbers": false,
           "showMiniMap": false
         },
-        "content": "# LGOS request observability\n\nHTTP metrics cover Responses requests and failures. Graph metrics and tables cover foreground and background execution. Select a **Conversation ID** to open the UI conversation, trace waterfall, or Langfuse trace. Use **Logs for this span** in the waterfall for correlated logs.",
+        "content": "# LGOS request observability\n\nGraph run, failure, and duration panels read LGOS's GenAI workflow metric for foreground and background runs; a cancelled run is not a failure. Select a **Conversation ID** to open the UI conversation, trace waterfall, or Langfuse trace. Use **Logs for this span** in the waterfall for correlated logs.",
         "mode": "markdown"
       },
       "pluginVersion": "13.1.1",
@@ -100,7 +100,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "Responses API requests during the selected time range, including failures.",
+      "description": "Foreground and background graph runs in the selected time range, including failed and cancelled runs.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -142,13 +142,13 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "round(sum(increase(http_server_request_duration_seconds_count{service_name=~\"lgos-demo-api|lgos-api-coding-agent\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",http_route=\"/v1/responses\",http_request_method=\"POST\"}[$__range])) or vector(0))",
+          "expr": "round(sum(increase(gen_ai_invoke_workflow_duration_seconds_count{service_namespace=\"lgos\",deployment_environment_name=\"$environment\"}[$__range])) or vector(0))",
           "instant": true,
           "range": false,
           "refId": "A"
         }
       ],
-      "title": "Responses requests",
+      "title": "Graph runs",
       "type": "stat"
     },
     {
@@ -156,7 +156,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "Responses API requests returning an HTTP 5xx response.",
+      "description": "Graph runs that raised an exception. A cancelled run, such as a Stop click or a closed stream, is not a failure.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -210,13 +210,13 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "round(sum(increase(http_server_request_duration_seconds_count{service_name=~\"lgos-demo-api|lgos-api-coding-agent\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",http_route=\"/v1/responses\",http_request_method=\"POST\",http_response_status_code=~\"5..\"}[$__range])) or (0 * sum(increase(http_server_request_duration_seconds_count{service_name=~\"lgos-demo-api|lgos-api-coding-agent\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",http_route=\"/v1/responses\",http_request_method=\"POST\"}[$__range]))))",
+          "expr": "round(sum(increase(gen_ai_invoke_workflow_duration_seconds_count{service_namespace=\"lgos\",deployment_environment_name=\"$environment\",error_type!=\"\"}[$__range])) or vector(0))",
           "instant": true,
           "range": false,
           "refId": "A"
         }
       ],
-      "title": "HTTP failures",
+      "title": "Failed graph runs",
       "type": "stat"
     },
     {
@@ -224,7 +224,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "Median duration of the LGOS foreground or background graph-execution span during the selected time range.",
+      "description": "Median graph run duration in the selected time range. The GenAI conventions' buckets start at one second, so sub-second values are approximate.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -266,7 +266,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum by (le) (increase(traces_spanmetrics_latency_bucket{service=~\"lgos-demo-api|lgos-background-worker|lgos-api-coding-agent\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",span_name=\"lgos.graph_run\"}[$__range])))",
+          "expr": "histogram_quantile(0.50, sum by (le) (increase(gen_ai_invoke_workflow_duration_seconds_bucket{service_namespace=\"lgos\",deployment_environment_name=\"$environment\"}[$__range])))",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -280,7 +280,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "95th-percentile duration of the LGOS foreground or background graph-execution span during the selected time range.",
+      "description": "95th-percentile graph run duration in the selected time range. The GenAI conventions' buckets start at one second, so sub-second values are approximate.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -322,7 +322,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le) (increase(traces_spanmetrics_latency_bucket{service=~\"lgos-demo-api|lgos-background-worker|lgos-api-coding-agent\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",span_name=\"lgos.graph_run\"}[$__range])))",
+          "expr": "histogram_quantile(0.95, sum by (le) (increase(gen_ai_invoke_workflow_duration_seconds_bucket{service_namespace=\"lgos\",deployment_environment_name=\"$environment\"}[$__range])))",
           "instant": true,
           "range": false,
           "refId": "A"
@@ -336,7 +336,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "Authoritative LGOS Responses request rate and HTTP failures.",
+      "description": "Graph runs, failed runs, and LGOS HTTP 5xx responses per minute. HTTP 5xx covers server errors before a run starts; a cancelled run is not a failure.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -346,7 +346,7 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "Attempts / minute",
+            "axisLabel": "Per minute",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
@@ -383,13 +383,36 @@
           {
             "matcher": {
               "id": "byName",
-              "options": "Failures"
+              "options": "Failed runs"
             },
             "properties": [
               {
                 "id": "color",
                 "value": {
                   "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.drawStyle",
+                "value": "bars"
+              },
+              {
+                "id": "custom.fillOpacity",
+                "value": 35
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "HTTP 5xx"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
                   "mode": "fixed"
                 }
               },
@@ -433,9 +456,9 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum(rate(http_server_request_duration_seconds_count{service_name=~\"lgos-demo-api|lgos-api-coding-agent\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",http_route=\"/v1/responses\",http_request_method=\"POST\"}[$__rate_interval])) * 60",
+          "expr": "sum(rate(gen_ai_invoke_workflow_duration_seconds_count{service_namespace=\"lgos\",deployment_environment_name=\"$environment\"}[$__rate_interval])) * 60",
           "instant": false,
-          "legendFormat": "Attempts",
+          "legendFormat": "Runs",
           "range": true,
           "refId": "A"
         },
@@ -446,14 +469,27 @@
           },
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum(rate(http_server_request_duration_seconds_count{service_name=~\"lgos-demo-api|lgos-api-coding-agent\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",http_route=\"/v1/responses\",http_request_method=\"POST\",http_response_status_code=~\"5..\"}[$__rate_interval])) * 60",
+          "expr": "sum(rate(gen_ai_invoke_workflow_duration_seconds_count{service_namespace=\"lgos\",deployment_environment_name=\"$environment\",error_type!=\"\"}[$__rate_interval])) * 60",
           "instant": false,
-          "legendFormat": "Failures",
+          "legendFormat": "Failed runs",
           "range": true,
           "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum(rate(http_server_request_duration_seconds_count{service_name=~\"$graph_service\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",http_route=\"/v1/responses\",http_request_method=\"POST\",http_response_status_code=~\"5..\"}[$__rate_interval])) * 60",
+          "instant": false,
+          "legendFormat": "HTTP 5xx",
+          "range": true,
+          "refId": "C"
         }
       ],
-      "title": "Responses traffic",
+      "title": "Graph run rate",
       "type": "timeseries"
     },
     {
@@ -461,7 +497,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "Median and tail latency of LGOS graph execution. Exemplars link metric points back to traces.",
+      "description": "95th-percentile duration of each graph. Graphs run different workloads, so one combined percentile would hide a regression in any of them. The GenAI conventions' buckets start at one second, so sub-second values are approximate. Exemplars link to traces.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -504,38 +540,7 @@
           "min": 0,
           "unit": "s"
         },
-        "overrides": [
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "P95"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "orange",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Median"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              }
-            ]
-          }
-        ]
+        "overrides": []
       },
       "gridPos": {
         "h": 9,
@@ -565,27 +570,14 @@
           },
           "editorMode": "code",
           "exemplar": true,
-          "expr": "histogram_quantile(0.50, sum by (le) (rate(traces_spanmetrics_latency_bucket{service=~\"lgos-demo-api|lgos-background-worker|lgos-api-coding-agent\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",span_name=\"lgos.graph_run\"}[$__rate_interval])))",
+          "expr": "histogram_quantile(0.95, sum by (le, gen_ai_workflow_name) (rate(gen_ai_invoke_workflow_duration_seconds_bucket{service_namespace=\"lgos\",deployment_environment_name=\"$environment\"}[$__rate_interval])))",
           "instant": false,
-          "legendFormat": "Median",
+          "legendFormat": "{{gen_ai_workflow_name}}",
           "range": true,
           "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "editorMode": "code",
-          "exemplar": true,
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(traces_spanmetrics_latency_bucket{service=~\"lgos-demo-api|lgos-background-worker|lgos-api-coding-agent\",service_namespace=\"lgos\",deployment_environment_name=\"$environment\",span_name=\"lgos.graph_run\"}[$__rate_interval])))",
-          "instant": false,
-          "legendFormat": "P95",
-          "range": true,
-          "refId": "B"
         }
       ],
-      "title": "Graph execution latency",
+      "title": "P95 graph duration by graph",
       "type": "timeseries"
     },
     {
@@ -636,6 +628,18 @@
                 ]
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "gen_ai.workflow.name"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Graph"
+              }
+            ]
           }
         ]
       },
@@ -671,13 +675,13 @@
             "uid": "tempo"
           },
           "limit": 10,
-          "query": "{ resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-chainlit\" } >> { resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name =~ \"lgos-demo-api|lgos-background-worker|lgos-api-coding-agent\" && name = \"lgos.graph_run\" && span.gen_ai.conversation.id != nil } | select(span.gen_ai.conversation.id) with (most_recent=true)",
+          "query": "{ resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-chainlit\" } >> { resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && span.gen_ai.operation.name = \"invoke_workflow\" && span.gen_ai.conversation.id != nil } | select(span.gen_ai.conversation.id, span.gen_ai.workflow.name) with (most_recent=true)",
           "queryType": "traceql",
           "refId": "A",
           "tableType": "spans"
         }
       ],
-      "description": "The 10 newest client-attributed foreground or background graph runs with a conversation ID. Duration measures graph execution, excluding Hatchet queue time; runs appear after the graph span finishes.",
+      "description": "The 10 newest client-attributed foreground or background graph runs with a conversation ID. Duration measures graph execution, excluding Hatchet queue time; runs appear after the workflow span finishes.",
       "title": "Chainlit requests",
       "transformations": [
         {
@@ -747,6 +751,18 @@
                 ]
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "gen_ai.workflow.name"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Graph"
+              }
+            ]
           }
         ]
       },
@@ -782,13 +798,13 @@
             "uid": "tempo"
           },
           "limit": 10,
-          "query": "{ resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-openwebui\" } >> { resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name =~ \"lgos-demo-api|lgos-background-worker|lgos-api-coding-agent\" && name = \"lgos.graph_run\" && span.gen_ai.conversation.id != nil } | select(span.gen_ai.conversation.id) with (most_recent=true)",
+          "query": "{ resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && resource.service.name = \"lgos-openwebui\" } >> { resource.service.namespace = \"lgos\" && resource.deployment.environment.name = \"$environment\" && span.gen_ai.operation.name = \"invoke_workflow\" && span.gen_ai.conversation.id != nil } | select(span.gen_ai.conversation.id, span.gen_ai.workflow.name) with (most_recent=true)",
           "queryType": "traceql",
           "refId": "A",
           "tableType": "spans"
         }
       ],
-      "description": "The 10 newest client-attributed foreground or background graph runs with a conversation ID. Duration measures graph execution, excluding Hatchet queue time; runs appear after the graph span finishes.",
+      "description": "The 10 newest client-attributed foreground or background graph runs with a conversation ID. Duration measures graph execution, excluding Hatchet queue time; runs appear after the workflow span finishes.",
       "title": "Open WebUI requests",
       "transformations": [
         {
@@ -870,7 +886,7 @@
           "type": "prometheus",
           "uid": "prometheus"
         },
-        "definition": "label_values(http_server_request_duration_seconds_count{service_name=~\"lgos-demo-api|lgos-api-coding-agent\",service_namespace=\"lgos\"},deployment_environment_name)",
+        "definition": "label_values(gen_ai_invoke_workflow_duration_seconds_count{service_namespace=\"lgos\"},deployment_environment_name)",
         "description": "Deployment environment included in the LGOS telemetry.",
         "hide": 0,
         "includeAll": false,
@@ -878,10 +894,36 @@
         "name": "environment",
         "options": [],
         "query": {
-          "query": "label_values(http_server_request_duration_seconds_count{service_name=~\"lgos-demo-api|lgos-api-coding-agent\",service_namespace=\"lgos\"},deployment_environment_name)",
+          "query": "label_values(gen_ai_invoke_workflow_duration_seconds_count{service_namespace=\"lgos\"},deployment_environment_name)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 1,
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "definition": "label_values(gen_ai_invoke_workflow_duration_seconds_count{service_namespace=\"lgos\",deployment_environment_name=\"$environment\"},service_name)",
+        "description": "Services that emit LGOS workflow measurements. The HTTP 5xx series counts only these services, which excludes the gateway.",
+        "hide": 2,
+        "includeAll": true,
+        "label": "Graph service",
+        "multi": true,
+        "name": "graph_service",
+        "options": [],
+        "query": {
+          "query": "label_values(gen_ai_invoke_workflow_duration_seconds_count{service_namespace=\"lgos\",deployment_environment_name=\"$environment\"},service_name)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
         "skipUrlSync": false,
         "sort": 1,
         "type": "query"

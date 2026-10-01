@@ -94,7 +94,9 @@ services:
       ################ OTHER CONFIGS ##################
       LOKI_ARGS: --limits.retention-period=90d --pattern-ingester.enabled=true
       # TEMPO_EXTRA_ARGS:
-      PROMETHEUS_EXTRA_ARGS: --storage.tsdb.retention.time=90d
+      # Store each OTLP series start time as a zero sample, so increase() and rate()
+      # count the first value of a new counter series.
+      PROMETHEUS_EXTRA_ARGS: --storage.tsdb.retention.time=90d --enable-feature=created-timestamp-zero-ingestion
       # PYROSCOPE_EXTRA_ARGS:
       # OTELCOL_EXTRA_ARGS:
       ################ CUSTOM ENV VARS ################
