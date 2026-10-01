@@ -1,6 +1,6 @@
 services:
   grafana-lgtm:
-    image: grafana/otel-lgtm:0.30.2@sha256:069e79be4fcc648b13f22ded28146f0b2d94f7f48681a55aa4995566a0bbdd02
+    image: grafana/otel-lgtm:0.34.0@sha256:b966ea107831d526d9eb8fe4d2d86c9e5731392fad9dce8296bcf2072031f07c
     container_name: grafana-lgtm
     restart: $RESTART_POLICY_MAINTENANCE
     stop_grace_period: 90s
