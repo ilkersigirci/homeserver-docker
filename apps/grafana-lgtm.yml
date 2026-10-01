@@ -60,12 +60,13 @@ services:
       GF_PATHS_DATA: /data/grafana
       GF_PATHS_PROVISIONING: /otel-lgtm/grafana/conf/provisioning
       GF_LOG_LEVEL: "info"
+      GF_FEATURE_TOGGLES_ENABLE: "provisioning" # Enable new provisioning/Git Sync features.
       GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /otel-lgtm/grafana/conf/provisioning/dashboards/OTEL/Traefik-Opentelemetry.json
       # GF_PANELS_DISABLE_SANITIZE_HTML: "true" # Allow raw HTML/JS in text panels (XSS risk).
       # GF_PLUGINS_ENABLE_ALPHA: "true" # Enable alpha plugins (experimental quality).
       # GF_SECURITY_ALLOW_EMBEDDING: "true" # Allow Grafana in iframes.
       # GF_PLUGINS_PREINSTALL: "yesoreyeram-infinity-datasource" # Preinstall Infinity datasource plugin.
-      GF_FEATURE_TOGGLES_ENABLE: "provisioning" # Enable new provisioning/Git Sync features.
+      GF_PLUGINS_PREINSTALL_AUTO_UPDATE: false # Failed updates to read-only bundled plugins unload their data sources.
       ##### AUTH CONFIGS #####
       ## Normal Auth ##
       # GF_SECURITY_ADMIN_USER: admin
