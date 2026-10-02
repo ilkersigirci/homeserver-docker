@@ -37,7 +37,7 @@ OpenAI clients:
 The image also installs pinned `lfx-openai`, `lfx-openai-compatible`, and
 `langchain-openai`, so these providers work without the host package mount.
 The mount remains available for additional bundles. The **Responses Input**
-component is loaded from `/app/custom_components` through
+and **OpenaiFilesAPI** components are loaded from `/app/custom_components` through
 `LANGFLOW_COMPONENTS_PATH`.
 
 ## Browser login
@@ -111,7 +111,7 @@ Connect this output to components that forward the IDs to a compatible model
 endpoint or call the Files API's `/v1/files/{file_id}/content` endpoint and
 use its response. The receiving endpoint must recognize the same file IDs.
 Retrieval, authentication, and content handling are configured by the flow
-author. The Responses backend performs no file I/O or content extraction.
+author. The Responses endpoint performs no file I/O or content extraction.
 
 Custom Python components can access the same original input through
 `self.ctx.get("responses_input", [])`. This context belongs to the current
@@ -121,6 +121,41 @@ endpoints, Responses Input returns `{"input": [], "file_ids": []}`.
 Only non-empty `file_id` references are accepted. Inline `file_data` and
 `file_url` inputs are rejected with HTTP 400. Keep Chat Input and Chat Output
 in the flow; Responses Input is an additional component.
+
+### Use external files and Playground attachments in one flow
+
+Add **Responses → OpenaiFilesAPI** between Chat Input and the model:
+
+```mermaid
+flowchart LR
+    ChatInput[Chat Input] -->|Chat Input| Files[OpenaiFilesAPI]
+    Responses[Responses Input] -->|Responses Input| Files
+    Files -->|Message| Model[OpenAI or another model]
+    Model --> ChatOutput[Chat Output]
+```
+
+1. Connect Chat Input's **Chat Message** to OpenaiFilesAPI's **Chat Input**.
+2. Connect Responses Input's **Input** JSON output to **Responses Input**.
+3. Connect OpenaiFilesAPI's **Message** to the model's **Input**, replacing
+    the direct Chat Input connection. Keep the model connected to Chat Output.
+4. Set **Files API Base URL**, including `/v1`, and the optional **Files API
+    Key** bearer token. Use a Langflow secret global variable for the key.
+
+When `file_ids` contains external references, the component calls
+`GET {base_url}/files/{file_id}/content` once per distinct ID, in input order.
+The endpoint must return JSON; its entire body is added to the question as
+text, labeled with its file ID. The component copies the incoming Message
+and preserves its native attachments and metadata. It performs no document
+extraction. HTTP failures and non-JSON responses stop the flow.
+
+With no external IDs, including Playground runs and text-only requests, it
+returns the original Chat Input Message without making HTTP requests or
+requiring Files API settings. Playground attachments use Langflow's native
+file handling and retain its file-type and model limitations.
+
+Requests use Langflow's API Request component and its network policy. For a
+Files API on a private address, configure `LANGFLOW_SSRF_ALLOWED_HOSTS` for
+that host as with other API Request components. Redirects are disabled.
 
 ## LiteLLM
 
