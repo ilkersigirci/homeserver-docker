@@ -40,6 +40,21 @@ The mount remains available for additional bundles. The **Responses Input**
 and **OpenaiFilesAPI** components are loaded from `/app/custom_components` through
 `LANGFLOW_COMPONENTS_PATH`.
 
+### Temporary S3 attachment backport
+
+[`s3-chat-attachments.patch`](patches/s3-chat-attachments.patch) backports the
+production changes from [langflow-ai/langflow#15249](https://github.com/langflow-ai/langflow/pull/15249)
+(merge commit `d9f36c06f448790b2cad5666407333e5c1d13e1e`, included in source
+release 1.12.3). It fixes Playground attachments being silently omitted when
+`LANGFLOW_STORAGE_TYPE=s3`, using native storage helpers for images and documents.
+
+**Remove this backport when upgrading the pinned `langflowai/langflow-backend`
+image to a published tag that includes #15249.** Confirm the fix is present in
+the image's installed LFX code; a GitHub source release alone is insufficient.
+Delete the patch and its Dockerfile copy, application, and cleanup entries,
+then remove this section. Patch application is strict so an upstream code
+change or an already-applied fix stops the build for review.
+
 ## Browser login
 
 Traefik's `traefik-oidc-auth` plugin, registered in
