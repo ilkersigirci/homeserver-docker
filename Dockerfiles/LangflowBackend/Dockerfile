@@ -18,6 +18,9 @@ RUN set -eux; \
 
 USER user
 
+ENV LANGFLOW_COMPONENTS_PATH=/app/custom_components
+COPY --chown=1000:0 components /app/custom_components
+
 COPY --chown=1000:0 tests /tmp/langflow-backend-tests
 
 RUN set -eux; \

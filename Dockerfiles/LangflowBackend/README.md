@@ -22,8 +22,10 @@ Optional OpenAI-compatible gateway
 Langflow 1.12.0's Responses-shaped endpoint wire compatible with standard
 OpenAI clients:
 
-- canonical string or text-message-array `input`, plus `instructions`; stock
+- canonical string or message-array `input`, plus `instructions`; stock
   Langflow accepts only a string and rejects message arrays with HTTP 422;
+- `input_file.file_id` references exposed to flow components through the run
+  context; flow authors choose whether to forward IDs or retrieve content;
 - OpenAI-standard `Authorization: Bearer` authentication in addition to
   Langflow's `x-api-key`;
 - canonical typed Responses SSE events with monotonic sequence numbers,
@@ -34,7 +36,9 @@ OpenAI clients:
 
 The image also installs pinned `lfx-openai`, `lfx-openai-compatible`, and
 `langchain-openai`, so these providers work without the host package mount.
-The mount remains available for additional bundles.
+The mount remains available for additional bundles. The **Responses Input**
+component is loaded from `/app/custom_components` through
+`LANGFLOW_COMPONENTS_PATH`.
 
 ## Browser login
 
@@ -71,9 +75,52 @@ Send `POST /responses` with a Langflow API key as either
 Langflow flow name or ID; the flow must contain Chat Input and Chat Output
 components. Langflow exposes no `/v1` routes, Chat Completions, or
 OpenAI-compatible `/models` endpoint, so clients and gateways need the
-Responses API and an explicit model mapping. Input is text-only and
-caller-provided tools are not supported, so disable tool calling and image
-input for Langflow-backed models in clients such as Open WebUI.
+Responses API and an explicit model mapping. Input supports text and file-ID
+references. Caller-provided tools and `input_image` are not supported, so
+disable tool calling and native image input for Langflow-backed models in
+clients such as Open WebUI.
+
+## File references
+
+Upload through an external OpenAI-compatible Files API, then include the
+returned ID in the Responses request:
+
+```json
+{
+  "model": "FirstFlow",
+  "input": [
+    {
+      "role": "user",
+      "content": [
+        {"type": "input_text", "text": "Summarize this document."},
+        {"type": "input_file", "file_id": "file-abc123"}
+      ]
+    }
+  ]
+}
+```
+
+Chat Input receives the text. Add **Responses → Responses Input** to a flow
+to read a JSON object with these fields:
+
+- `input`: the original validated input string or message array, preserving
+  file references and their message associations.
+- `file_ids`: IDs from all input messages in order, including repeated IDs.
+
+Connect this output to components that forward the IDs to a compatible model
+endpoint or call the Files API's `/v1/files/{file_id}/content` endpoint and
+use its response. The receiving endpoint must recognize the same file IDs.
+Retrieval, authentication, and content handling are configured by the flow
+author. The Responses backend performs no file I/O or content extraction.
+
+Custom Python components can access the same original input through
+`self.ctx.get("responses_input", [])`. This context belongs to the current
+run; resend IDs on requests that need them. In the Playground or other run
+endpoints, Responses Input returns `{"input": [], "file_ids": []}`.
+
+Only non-empty `file_id` references are accepted. Inline `file_data` and
+`file_url` inputs are rejected with HTTP 400. Keep Chat Input and Chat Output
+in the flow; Responses Input is an additional component.
 
 ## LiteLLM
 
