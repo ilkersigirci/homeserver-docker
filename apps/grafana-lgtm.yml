@@ -28,9 +28,10 @@ services:
     cap_drop:
       - ALL
     cap_add: []
-    pids_limit: 256
-    cpus: "2.0"
-    mem_limit: 2G
+    # Shared thread budget for six backends, Grafana plugins, and healthchecks.
+    pids_limit: 512
+    cpus: "4.0"
+    mem_limit: 4G
     ulimits:
       nofile:
         soft: 4096
@@ -51,6 +52,7 @@ services:
       - $REPO_PATH/appdata/grafana-lgtm/tempo/runtime:/var/tempo
     environment:
       TZ: $TZ
+      ENABLE_LOGS_ALL: "true"
       # The image otherwise kills backend processes after only five seconds.
       LGTM_SHUTDOWN_TIMEOUT_SECONDS: "60"
       ################## GRAFANA CONFIGS ##################
@@ -107,7 +109,7 @@ services:
         - CMD-SHELL
         - >-
           test -f /tmp/ready &&
-          curl -fsS --fail-early --max-time 3
+          exec curl -fsS --fail-early --max-time 3
           http://127.0.0.1:3000/api/health
           http://127.0.0.1:3100/ready
           http://127.0.0.1:3200/ready
@@ -115,8 +117,9 @@ services:
           http://127.0.0.1:9090/-/ready
           http://127.0.0.1:13133/ready
           > /dev/null
-      interval: 2m
+      interval: 30s
       timeout: 20s
+      retries: 3
       start_period: 2m
     labels:
       traefik.enable: "true"
