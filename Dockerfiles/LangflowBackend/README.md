@@ -22,10 +22,11 @@ Optional OpenAI-compatible gateway
 Langflow 1.12.0's Responses-shaped endpoint wire compatible with standard
 OpenAI clients:
 
-- canonical string or message-array `input`, plus `instructions`; stock
-  Langflow accepts only a string and rejects message arrays with HTTP 422;
-- `input_file.file_id` references exposed to flow components through the run
-  context; flow authors choose whether to forward IDs or retrieve content;
+- canonical string or message-array `input`, mapped onto Langflow's
+  [session chat history](#conversation-history); stock Langflow accepts only a
+  string and rejects message arrays with HTTP 422;
+- `input_file.file_id` references and caller `instructions` exposed to flow
+  components through the run context; flow authors choose how to use them;
 - OpenAI-standard `Authorization: Bearer` authentication in addition to
   Langflow's `x-api-key`;
 - canonical typed Responses SSE events with monotonic sequence numbers,
@@ -95,6 +96,48 @@ references. Caller-provided tools and `input_image` are not supported, so
 disable tool calling and native image input for Langflow-backed models in
 clients such as Open WebUI.
 
+## Conversation history
+
+Langflow [groups chat history by session](https://docs.langflow.org/memory#session-id-and-chat-memory).
+A request with `previous_response_id` continues that response's session; any
+other request starts a new one.
+
+A message-array `input` must end with a user message. Its text becomes the
+Chat Input message, so components receive only the current question. Earlier
+user and assistant messages are stored in the run's session before the flow
+starts, as ordinary Langflow chat history. Messages without text are not
+stored; their file IDs remain available through
+[Responses Input](#file-references). With end-user session scoping
+(`LANGFLOW_SERVING_END_USER_HEADER`) enabled, earlier messages in `input` are
+rejected with HTTP 400.
+
+Use the stock **Agent** component's built-in chat memory, which Langflow
+[recommends for most flows](https://docs.langflow.org/memory#chat-memory-options).
+Connect Chat Input to the Agent's **Input**, through OpenaiFilesAPI when the
+flow [uses file references](#use-external-files-and-playground-attachments-in-one-flow),
+put the flow's system instructions in **Agent Instructions**, and set
+**Number of Chat History Messages** (advanced). The Agent reads the session's earlier
+messages, up to that limit, and skips the message it is answering. Playground
+runs and API requests therefore get the same history behavior. The Agent
+lists only tool-capable models; the **OpenAI Compatible** provider marks
+LiteLLM models as tool-capable.
+
+**Message History** reads the same history but also returns the current
+message, which Chat Input stores before other components run.
+
+### Caller instructions
+
+Langflow chat history has no system role, so `instructions` and system or
+developer messages are not stored. Responses Input's **Instructions** output
+joins them in input order; LiteLLM sends leading chat system messages, such
+as Open WebUI system prompts, as `instructions`. Flows ignore them unless
+the author connects this output; leave it unconnected to keep API runs
+identical to Playground runs, where it is empty. To apply them, add a
+`{caller_instructions}` variable to a **Prompt Template** that holds the
+flow's instructions, connect **Instructions** to it, and connect the prompt
+to **Agent Instructions**. Custom Python components can read
+`self.ctx.get("responses_instructions", "")`.
+
 ## File references
 
 Upload through an external OpenAI-compatible Files API, then include the
@@ -115,8 +158,9 @@ returned ID in the Responses request:
 }
 ```
 
-Chat Input receives the text. Add **Responses → Responses Input** to a flow
-to read a JSON object with these fields:
+Chat Input receives the last user message's text. Add **Responses →
+Responses Input** to a flow; its **Input** output is a JSON object with
+these fields:
 
 - `input`: the original validated input string or message array, preserving
   file references and their message associations.
@@ -131,7 +175,7 @@ author. The Responses endpoint performs no file I/O or content extraction.
 Custom Python components can access the same original input through
 `self.ctx.get("responses_input", [])`. This context belongs to the current
 run; resend IDs on requests that need them. In the Playground or other run
-endpoints, Responses Input returns `{"input": [], "file_ids": []}`.
+endpoints, **Input** returns `{"input": [], "file_ids": []}`.
 
 Only non-empty `file_id` references are accepted. Inline `file_data` and
 `file_url` inputs are rejected with HTTP 400. Keep Chat Input and Chat Output
@@ -171,6 +215,27 @@ file handling and retain its file-type and model limitations.
 Requests use Langflow's API Request component and its network policy. For a
 Files API on a private address, configure `LANGFLOW_SSRF_ALLOWED_HOSTS` for
 that host as with other API Request components. Redirects are disabled.
+
+## Playground and API parity
+
+To make a flow behave the same in the Playground and from Open WebUI through
+LiteLLM:
+
+- Use the Agent's built-in chat memory as described in
+  [Conversation history](#conversation-history). Both paths then give it the
+  same current message, earlier turns, and history limit.
+- Leave Responses Input's **Instructions** unconnected. Open WebUI system
+  prompts and memories arrive as `instructions` and then do not affect the run.
+- In Open WebUI's settings for the Langflow-backed model, turn off the **File
+  Context**, **Web Search**, and **Code Interpreter** capabilities, in addition
+  to tool calling and image input. These add Open WebUI prompts or retrieved
+  content to the request. With the default `RAG_SYSTEM_CONTEXT=false`, file
+  and search content goes into the user message, which becomes Chat Input
+  text the Playground never sends.
+
+Files remain the one intended difference: Playground attachments use
+Langflow's native file handling, while API requests use
+[file IDs](#file-references).
 
 ## LiteLLM
 

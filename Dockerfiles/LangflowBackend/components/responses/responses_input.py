@@ -3,16 +3,20 @@ from copy import deepcopy
 from lfx.custom.custom_component.component import Component
 from lfx.io import Output
 from lfx.schema.data import Data
+from lfx.schema.message import Message
 
 
 class ResponsesInput(Component):
     display_name = "Responses Input"
-    description = "Read the Responses API input and file IDs for this run."
+    description = "Read the Responses API input, file IDs, and caller instructions for this run."
     icon = "Paperclip"
     name = "ResponsesInput"
 
     inputs = []
-    outputs = [Output(display_name="Input", name="input_data", method="read_input")]
+    outputs = [
+        Output(display_name="Input", name="input_data", method="read_input", group_outputs=True),
+        Output(display_name="Instructions", name="instructions", method="read_instructions", group_outputs=True),
+    ]
 
     def read_input(self) -> Data:
         input_value = deepcopy(self.ctx.get("responses_input", []))
@@ -27,3 +31,6 @@ class ResponsesInput(Component):
                         if isinstance(part, dict) and part.get("type") == "input_file"
                     )
         return Data(data={"input": input_value, "file_ids": file_ids})
+
+    def read_instructions(self) -> Message:
+        return Message(text=self.ctx.get("responses_instructions", ""))

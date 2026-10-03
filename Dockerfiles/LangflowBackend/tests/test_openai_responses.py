@@ -38,25 +38,58 @@ def _parse_sse(body: str) -> list[dict]:
 
 
 class ResponsesCompatibilityTests(unittest.IsolatedAsyncioTestCase):
-    def test_normalizes_canonical_message_input(self):
+    def test_splits_canonical_message_input(self):
         request = OpenAIResponsesRequest(
             model="FirstFlow",
             instructions="Be concise.",
             input=[
+                {"role": "developer", "content": "Answer in English."},
                 {"role": "user", "content": [{"type": "input_text", "text": "Hello"}]},
-                {"role": "assistant", "content": "Hi"},
+                {"role": "assistant", "content": [{"type": "output_text", "text": "Hi"}]},
                 {"role": "user", "content": "Who are you?"},
             ],
         )
 
         self.assertEqual(
-            request.to_input_text(),
-            "SYSTEM: Be concise.\n\nUSER: Hello\n\nASSISTANT: Hi\n\nUSER: Who are you?",
+            request.to_conversation(),
+            ("Be concise.\n\nAnswer in English.", [("user", "Hello"), ("assistant", "Hi")], "Who are you?"),
         )
         self.assertEqual(
-            OpenAIResponsesRequest(model="FirstFlow", input="Hello").to_input_text(),
-            "Hello",
+            OpenAIResponsesRequest(model="FirstFlow", input="Hello").to_conversation(),
+            ("", [], "Hello"),
         )
+        for input_value in ([], [{"role": "user", "content": "Hi"}, {"role": "assistant", "content": "Hello"}]):
+            with self.subTest(input=input_value), self.assertRaises(ValueError):
+                OpenAIResponsesRequest(model="FirstFlow", input=input_value).to_conversation()
+
+    async def test_stores_earlier_turns_in_the_run_session(self):
+        flow = SimpleNamespace(id="flow-id")
+        user = SimpleNamespace(id="user-id")
+        history = [("user", "Hello"), ("user", ""), ("assistant", "Hi")]
+
+        with patch.object(openai_responses, "aadd_messages", AsyncMock()) as store:
+            await openai_responses._store_history(
+                history, flow=flow, api_key_user=user, session_id="session-id", http_request=None
+            )
+
+        messages = store.call_args.args[0]
+        self.assertEqual(
+            [(message.sender, message.sender_name, message.text, message.session_id) for message in messages],
+            [("User", "User", "Hello", "session-id"), ("Machine", "AI", "Hi", "session-id")],
+        )
+        self.assertLess(messages[0].timestamp, messages[1].timestamp)
+        self.assertEqual(store.call_args.kwargs, {"flow_id": "flow-id", "user_id": "user-id"})
+
+        # End-user scoping would move the run to another session and owner.
+        with (
+            patch.object(openai_responses, "resolve_serving_scope", return_value=SimpleNamespace()),
+            patch.object(openai_responses, "aadd_messages", AsyncMock()) as store,
+            self.assertRaises(ValueError),
+        ):
+            await openai_responses._store_history(
+                history, flow=flow, api_key_user=user, session_id="session-id", http_request=_request()
+            )
+        store.assert_not_awaited()
 
     async def test_accepts_openai_bearer_auth(self):
         user = SimpleNamespace(id="user-id")

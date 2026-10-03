@@ -24,17 +24,20 @@ class FileInputTests(unittest.IsolatedAsyncioTestCase):
         code = (COMPONENTS_PATH / "responses/responses_input.py").read_text()
         cls.component_class = eval_custom_component_code(code)
 
-    def read_context(self, context):
+    def component(self, context):
         component = self.component_class()
         component.set_vertex(SimpleNamespace(graph=SimpleNamespace(context=context)))
-        return component.read_input().data
+        return component
+
+    def read_context(self, context):
+        return self.component(context).read_input().data
 
     def test_file_only_input_keeps_ids_out_of_chat_text(self):
         request = OpenAIResponsesRequest(
             model="FirstFlow",
             input=[{"role": "user", "content": [{"type": "input_file", "file_id": "file-only"}]}],
         )
-        self.assertEqual(request.to_input_text(), "")
+        self.assertEqual(request.to_conversation()[2], "")
         self.assertEqual(self.read_context({"responses_input": request.input})["file_ids"], ["file-only"])
 
     def test_rejects_malformed_and_unsupported_file_inputs(self):
@@ -54,7 +57,7 @@ class FileInputTests(unittest.IsolatedAsyncioTestCase):
             with self.subTest(part=part), self.assertRaises(ValueError):
                 OpenAIResponsesRequest(
                     model="FirstFlow", input=[{"role": "user", "content": [part]}]
-                ).to_input_text()
+                ).to_conversation()
 
     async def test_invalid_file_inputs_return_http_400_before_execution(self):
         app = FastAPI()
@@ -112,6 +115,7 @@ class FileInputTests(unittest.IsolatedAsyncioTestCase):
             },
         ]
         flow = SimpleNamespace(
+            id="flow-id",
             user_id="flow-owner",
             data={"nodes": [{"data": {"type": "ChatInput"}}, {"data": {"type": "ChatOutput"}}]},
         )
@@ -125,6 +129,7 @@ class FileInputTests(unittest.IsolatedAsyncioTestCase):
                         observed["chat_text"] = kwargs["input_request"].input_value
                         observed["variables"] = kwargs["context"]["request_variables"]
                         observed["data"] = self.read_context(kwargs["context"])
+                        observed["instructions"] = self.component(kwargs["context"]).read_instructions().text
                         completed.set()
                         return SimpleNamespace(outputs=[])
 
@@ -132,11 +137,14 @@ class FileInputTests(unittest.IsolatedAsyncioTestCase):
                         await asyncio.wait_for(completed.wait(), timeout=5)
                         yield json.dumps({"event": "token", "data": {"chunk": "Done"}}).encode()
 
-                    request = OpenAIResponsesRequest(model="FirstFlow", input=input_value)
+                    request = OpenAIResponsesRequest(
+                        model="FirstFlow", instructions="Be concise.", input=input_value
+                    )
                     with (
                         patch.object(openai_responses, "simple_run_flow", execute),
                         patch.object(openai_responses, "run_flow_generator", execute),
                         patch.object(openai_responses, "consume_and_yield", consume),
+                        patch.object(openai_responses, "aadd_messages", AsyncMock()) as store,
                     ):
                         response = await openai_responses.run_flow_for_openai_responses(
                             flow=flow,
@@ -151,14 +159,16 @@ class FileInputTests(unittest.IsolatedAsyncioTestCase):
 
                     self.assertEqual(observed["data"]["input"], input_value)
                     self.assertEqual(observed["variables"], {"EXAMPLE": "value"})
+                    self.assertEqual(observed["instructions"], "Be concise.")
                     if isinstance(input_value, list):
+                        self.assertEqual(observed["chat_text"], "Compare these")
                         self.assertEqual(
-                            observed["chat_text"],
-                            "USER: First document\n\nASSISTANT: Ready\n\nUSER: Compare these",
+                            [message.text for message in store.call_args.args[0]], ["First document", "Ready"]
                         )
                         self.assertEqual(observed["data"]["file_ids"], ["file-first", "file-second", "file-first"])
                     else:
                         self.assertEqual(observed["chat_text"], "Next question")
+                        store.assert_not_awaited()
                         self.assertEqual(observed["data"]["file_ids"], [])
 
     def test_component_output_does_not_mutate_request_context(self):
@@ -169,12 +179,13 @@ class FileInputTests(unittest.IsolatedAsyncioTestCase):
 
     def test_component_outside_responses_has_no_file_references(self):
         self.assertEqual(self.read_context({}), {"input": [], "file_ids": []})
+        self.assertEqual(self.component({}).read_instructions().text, "")
 
     async def test_component_is_discoverable(self):
         menu = await abuild_custom_component_list_from_path(str(COMPONENTS_PATH))
         component = menu["responses"]["ResponsesInput"]
         self.assertEqual(component["display_name"], "Responses Input")
-        self.assertEqual(component["outputs"][0]["types"], ["JSON"])
+        self.assertEqual([output["types"] for output in component["outputs"]], [["JSON"], ["Message"]])
 
 
 if __name__ == "__main__":

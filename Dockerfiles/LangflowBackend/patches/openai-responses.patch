@@ -10,34 +10,36 @@
      stream: bool = Field(default=False, description="Whether to stream the response")
      background: bool = Field(default=False, description="Whether to process in background")
      tools: list[Any] | None = Field(default=None, description="Tools are not supported yet")
-@@ -18,6 +19,65 @@
+@@ -18,6 +19,67 @@
          default=None, description="Additional response data to include, e.g., ['tool_call.results']"
      )
 
-+    def to_input_text(self) -> str:
-+        """Extract chat text; file references are passed separately in the run context."""
-+        if isinstance(self.input, str):
-+            messages = [("user", self.input)]
-+        else:
-+            messages = []
-+            for item in self.input:
-+                if not isinstance(item, dict) or "role" not in item:
-+                    msg = "Only message items are supported in Responses input arrays"
-+                    raise ValueError(msg)
-+                role = str(item["role"]).lower()
-+                if role not in {"developer", "system", "user", "assistant"}:
-+                    msg = f"Unsupported message role: {role}"
-+                    raise ValueError(msg)
-+                messages.append((role, _input_content_text(item.get("content"))))
++    def to_conversation(self) -> tuple[str, list[tuple[str, str]], str]:
++        """Split input into caller instructions, earlier turns, and the current user message.
 +
-+        if self.instructions:
-+            messages.insert(0, ("system", self.instructions))
-+        if not messages:
-+            msg = "At least one input message is required"
++        File references are passed separately in the run context.
++        """
++        items = [{"role": "user", "content": self.input}] if isinstance(self.input, str) else self.input
++        instructions = [self.instructions or ""]
++        turns = []
++        for item in items:
++            if not isinstance(item, dict) or "role" not in item:
++                msg = "Only message items are supported in Responses input arrays"
++                raise ValueError(msg)
++            role = str(item["role"]).lower()
++            if role not in {"developer", "system", "user", "assistant"}:
++                msg = f"Unsupported message role: {role}"
++                raise ValueError(msg)
++            text = _input_content_text(item.get("content"))
++            if role in {"developer", "system"}:
++                instructions.append(text)
++            else:
++                turns.append((role, text))
++
++        if not turns or turns[-1][0] != "user":
++            msg = "Input must end with a user message"
 +            raise ValueError(msg)
-+        if len(messages) == 1 and messages[0][0] == "user":
-+            return messages[0][1]
-+        return "\n\n".join(f"{role.upper()}: {content}" for role, content in messages)
++        return "\n\n".join(filter(None, instructions)), turns[:-1], turns[-1][1]
 +
 +
 +def _input_content_text(content: Any) -> str:
@@ -78,11 +80,12 @@
      """OpenAI-compatible responses response."""
 --- a/src/backend/base/langflow/api/v1/openai_responses.py
 +++ b/src/backend/base/langflow/api/v1/openai_responses.py
-@@ -3,13 +3,15 @@
+@@ -3,13 +3,18 @@
  import time
  import uuid
  from collections.abc import AsyncGenerator
 +from copy import deepcopy
++from datetime import UTC, datetime, timedelta
  from typing import Annotated, Any
 
  from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Request, status
@@ -92,11 +95,18 @@
  from lfx.log.logger import logger
  from lfx.observability import execution_protocol
 -from lfx.schema.openai_responses_schemas import create_openai_error, create_openai_error_chunk
++from lfx.schema.message import Message
 +from lfx.schema.openai_responses_schemas import create_openai_error
++from lfx.utils.constants import MESSAGE_SENDER_AI, MESSAGE_SENDER_NAME_AI, MESSAGE_SENDER_NAME_USER, MESSAGE_SENDER_USER
  from lfx.utils.flow_validation import CustomComponentValidationError
  from lfx.workflow.end_user_identity import (
      EndUserIdentityRequiredError,
-@@ -27,7 +29,6 @@
+@@ -23,11 +28,11 @@
+ from langflow.api.v1.schemas import SimplifiedAPIRequest
+ from langflow.events.event_manager import create_stream_tokens_event_manager
+ from langflow.helpers.flow import get_flow_by_id_or_endpoint_name
++from langflow.memory import aadd_messages
+ from langflow.schema import (
      OpenAIErrorResponse,
      OpenAIResponsesRequest,
      OpenAIResponsesResponse,
@@ -104,7 +114,7 @@
  )
  from langflow.schema.content_types import ToolContent
  from langflow.services.auth.utils import api_key_security
-@@ -66,6 +67,17 @@
+@@ -66,6 +71,54 @@
      return any(node.get("data", {}).get("type") in ["ChatOutput", "Chat Output"] for node in flow_data["nodes"])
 
 
@@ -119,26 +129,72 @@
 +    return await api_key_security(query_key, header_key)
 +
 +
++async def _store_history(
++    history: list[tuple[str, str]],
++    *,
++    flow: FlowRead,
++    api_key_user: UserRead,
++    session_id: str,
++    http_request: Request | None,
++) -> None:
++    """Store earlier turns in the run's session so native chat memory reads them as history."""
++    start = datetime.now(UTC)
++    messages = [
++        Message(
++            text=text,
++            sender=MESSAGE_SENDER_USER if role == "user" else MESSAGE_SENDER_AI,
++            sender_name=MESSAGE_SENDER_NAME_USER if role == "user" else MESSAGE_SENDER_NAME_AI,
++            session_id=session_id,
++            # Chat memory orders by timestamp alone.
++            timestamp=start + timedelta(microseconds=index),
++        )
++        for index, (role, text) in enumerate(history)
++        # File-only turns have no text; their IDs stay in the run context.
++        if text
++    ]
++    if not messages:
++        return
++    if http_request is not None and (
++        resolve_serving_scope(
++            http_request=http_request, requested_session_id=session_id, default_session_id=str(flow.id)
++        )
++        is not None
++    ):
++        # End-user scoping changes the session and message owner inside the run.
++        msg = "Conversation history in input is not supported with end-user session scoping"
++        raise ValueError(msg)
++    await aadd_messages(messages, flow_id=flow.id, user_id=api_key_user.id)
++
++
  async def run_flow_for_openai_responses(
      flow: FlowRead,
      request: OpenAIResponsesRequest,
-@@ -99,12 +111,14 @@
+@@ -96,15 +149,23 @@
+         context["request_variables"] = variables
+         await logger.adebug(f"Added request variables to context: {list(variables.keys())}")
+
++    instructions, history, message = request.to_conversation()
++
      # Convert OpenAI request to SimplifiedAPIRequest
      # Note: We're moving away from tweaks to a context-based approach
      simplified_request = SimplifiedAPIRequest(
 -        input_value=request.input,
-+        input_value=request.to_input_text(),
++        input_value=message,
          input_type="chat",  # Use chat input type for better compatibility
          output_type="chat",  # Use chat output type for better compatibility
          tweaks={},  # Empty tweaks, using context instead
          session_id=session_id,
      )
-+    # Components decide how to use file IDs; preserve their message associations.
++    # Components decide how to use file IDs and caller instructions.
 +    context["responses_input"] = deepcopy(request.input)
++    context["responses_instructions"] = instructions
++    await _store_history(
++        history, flow=flow, api_key_user=api_key_user, session_id=session_id, http_request=http_request
++    )
 
      # Context will be passed separately to simple_run_flow
 
-@@ -139,20 +153,53 @@
+@@ -139,20 +200,53 @@
                  )
 
              try:
@@ -197,7 +253,7 @@
 
                  tool_call_counter = 0
                  processed_tools = set()  # Track processed tool calls to avoid duplicates
-@@ -167,12 +214,10 @@
+@@ -167,12 +261,10 @@
                      content = ""
                      token_data = {}
 
@@ -213,7 +269,7 @@
                              parsed_event = json.loads(event_str)
 
                              if isinstance(parsed_event, dict):
-@@ -194,23 +239,15 @@
+@@ -194,23 +286,15 @@
                                          token_data,
                                      )
                                  if event_type == "error":
@@ -244,7 +300,7 @@
                                      return
 
                                  if event_type == "add_message":
-@@ -234,12 +271,9 @@
+@@ -234,12 +318,9 @@
                                          message_state,
                                      )
 
@@ -259,7 +315,7 @@
                                          # Extract usage from completed message properties
                                          if isinstance(properties, dict) and "usage" in properties:
                                              usage_obj = properties.get("usage")
-@@ -253,8 +287,14 @@
+@@ -253,8 +334,14 @@
                                                  await logger.adebug(
                                                      "[OpenAIResponses][stream] captured usage: %s", stream_usage_data
                                                  )
@@ -276,7 +332,7 @@
 
                                      # Look for Agent Steps in content_blocks
                                      for block in content_blocks:
-@@ -294,10 +334,7 @@
+@@ -294,10 +381,7 @@
                                                                  "call_id": call_id,
                                                              },
                                                          }
@@ -288,7 +344,7 @@
 
                                                          # Send function call arguments as delta events (like OpenAI)
                                                          arguments_str = json.dumps(tool_input)
-@@ -307,10 +344,7 @@
+@@ -307,10 +391,7 @@
                                                              "item_id": tool_id,
                                                              "output_index": 0,
                                                          }
@@ -300,7 +356,7 @@
 
                                                          # Send function call arguments done event
                                                          arg_done_event = {
-@@ -319,10 +353,7 @@
+@@ -319,10 +400,7 @@
                                                              "item_id": tool_id,
                                                              "output_index": 0,
                                                          }
@@ -312,7 +368,7 @@
                                                          await logger.adebug(
                                                              "[OpenAIResponses][stream] tool_call.args.done name=%s",
                                                              tool_name,
-@@ -365,40 +396,12 @@
+@@ -365,40 +443,12 @@
                                                                      },
                                                                  }
 
@@ -354,7 +410,7 @@
                          except (json.JSONDecodeError, UnicodeDecodeError):
                              await logger.adebug("[OpenAIResponses][stream] failed to decode event bytes; skipping")
                              continue
-@@ -410,44 +413,68 @@
+@@ -410,44 +460,68 @@
                              await logger.adebug(
                                  f"[OpenAIResponses][stream] sent chunk with content={content}",
                              )
@@ -453,7 +509,7 @@
                  await logger.adebug(
                      "[OpenAIResponses][stream] completed: response_id=%s total_sent_len=%d usage=%s",
                      response_id,
-@@ -458,15 +485,14 @@
+@@ -458,15 +532,14 @@
              except Exception as e:  # noqa: BLE001
                  await logger.aexception("Error in OpenAI Responses stream generator")
                  client_error = error_for_client(e, expose_details=expose_error_details)
@@ -476,7 +532,7 @@
              finally:
                  if not main_task.done():
                      main_task.cancel()
-@@ -620,6 +646,7 @@
+@@ -620,6 +693,7 @@
          created_at=created_timestamp,
          model=request.model,
          output=output_items,
@@ -484,7 +540,7 @@
          previous_response_id=request.previous_response_id,
          usage=usage_data,
      )
-@@ -629,10 +656,10 @@
+@@ -629,10 +703,10 @@
  async def create_response(
      request: OpenAIResponsesRequest,
      background_tasks: BackgroundTasks,
@@ -497,7 +553,7 @@
      """Create a response using OpenAI Responses API format.
 
      This endpoint accepts a flow_id in the model parameter and processes
-@@ -743,7 +770,7 @@
+@@ -743,7 +817,7 @@
              type_="invalid_request_error",
              code="invalid_flow_request",
          )
