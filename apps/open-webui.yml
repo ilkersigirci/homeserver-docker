@@ -38,7 +38,7 @@ services:
       WEBUI_SECRET_KEY: $OPENWEBUI_WEBUI_SECRET_KEY
       WEBUI_URL: https://chat.$DOMAINNAME
       ENABLE_OLLAMA_API: false
-      TASK_MODEL_EXTERNAL: ${OPENAI_TASK_MODEL:-gpt-5.4-mini} # NOTE: It should be configured in the litellm.
+      TASK_MODEL_EXTERNAL: ${OPENAI_TASK_MODEL:-openai/gpt-5.4-mini}
       ENABLE_FOLLOW_UP_GENERATION: false
       ENABLE_TAGS_GENERATION: false
       ENABLE_PIP_INSTALL_FRONTMATTER_REQUIREMENTS: false
@@ -53,8 +53,7 @@ services:
       OAUTH_CLIENT_SECRET: $OPENWEBUI_CLIENT_SECRET
       OPENID_PROVIDER_URL: https://pocketid.$BASE_DOMAINNAME/.well-known/openid-configuration
       OAUTH_PROVIDER_NAME: Pocketid
-      # LiteLLM validates this user access token for its own API audience.
-      OAUTH_SCOPES: openid email profile groups offline_access llm:invoke
+      OAUTH_SCOPES: openid email profile groups offline_access llm:invoke # NOTE: LiteLLM validates this user access token for its own API audience.
       OAUTH_AUTHORIZE_PARAMS: '{"resource":"https://llm.$BASE_DOMAINNAME"}'
       OPENID_REDIRECT_URI: https://chat.$DOMAINNAME/oauth/oidc/callback
       OAUTH_GROUP_CLAIM: groups
