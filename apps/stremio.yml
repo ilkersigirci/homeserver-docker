@@ -89,7 +89,7 @@ services:
       glance.description: Online Streaming Platform
 
   stremio-server:
-    image: stremio/server:v4.21.2@sha256:a50ec2fae52cb9f6490faa0a12015ce129273fd3c1fc706efe911c18cee36a75
+    image: stremio/server:v4.22.0@sha256:30829e739e6336811830f87c3d725eb5f14169f94f54725c907f42275a3bda27
     container_name: stremio-server
     restart: $RESTART_POLICY_MEDIA
     profiles:
