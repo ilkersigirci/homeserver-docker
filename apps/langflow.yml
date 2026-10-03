@@ -89,7 +89,7 @@ services:
   # NOTE: The custom image includes the OpenAI and OpenAI Compatible bundles.
   # The optional package mount is for additional bundles (not these pinned dependencies).
   langflow-backend:
-    image: ghcr.io/ilkersigirci/homeserver-langflow-backend:1.12.0@sha256:0e67d7ddaa9df96ac8e32e4f05a540514b2d875ffb907f39ed7511495d161196
+    image: ghcr.io/ilkersigirci/homeserver-langflow-backend:1.12.0@sha256:a3eababcbeaee9cfd239b1b53f8dcfa0bd40b131b78d3b6d201980be1e92f7fa
     # container_name: langflow-backend # NOTE: Omit container_name so Compose can run multiple backend replicas.
     restart: $RESTART_POLICY_PROGRAMMING
     deploy:
