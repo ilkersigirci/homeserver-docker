@@ -1,6 +1,6 @@
 services:
   jupyterlab:
-    image: ghcr.io/ilkersigirci/homeserver-jupyter:4.6.3@sha256:65cba32c406b5725fc29c87f4405c7140a23eca41f40d13f3e835766c7ea8840
+    image: ghcr.io/ilkersigirci/homeserver-jupyter:4.6.4@sha256:ccb542c01c17f024f0484726c94c37441d3bdf0e2d9d3e9ec8ba012f9d021e35
     container_name: jupyterlab
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
