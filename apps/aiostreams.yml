@@ -1,6 +1,6 @@
 services:
   aiostreams:
-    image: ghcr.io/viren070/aiostreams:v2.33.2@sha256:b169ccfb2b6f351f1bc5a8a460e4e102db77a11fb4fc58222e411d96b3adb85b
+    image: ghcr.io/viren070/aiostreams:v2.35.8@sha256:9065546d8e74511b249a94287b2fd15cad212c22fcb9cbe274ab57b4f4aa9d8b
     container_name: aiostreams
     restart: $RESTART_POLICY_MEDIA
     # NOTE: Not needed after v2.30.0
