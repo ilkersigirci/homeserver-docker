@@ -196,8 +196,13 @@ its owner's budget. The trade-off: each user holds a key.
 
 ### Expose a Langflow flow through LiteLLM
 
-Create an OpenAI-compatible deployment in LiteLLM's Admin UI. The equivalent
-static configuration is:
+In LiteLLM's Admin UI, create an **OpenAI** deployment with a custom model
+name. Preserve existing fields and add:
+
+- **Model Info**: `{"mode": "responses"}`.
+- **LiteLLM Params**: `{"additional_drop_params": ["tools", "tool_choice", "parallel_tool_calls"]}`.
+
+The equivalent static configuration is:
 
 ```yaml
 model_list:
@@ -206,7 +211,15 @@ model_list:
       model: openai/FirstFlow
       api_base: https://langflow.example.com/api/v1
       api_key: os.environ/LANGFLOW_API_KEY
+      additional_drop_params: [tools, tool_choice, parallel_tool_calls]
+    model_info:
+      mode: responses
 ```
+
+Drop caller-provided tools because Langflow currently rejects the `tools`
+field; tools configured inside the flow still work. Future Open WebUI
+`ask_user` HITL support requires Langflow to accept tool definitions and
+results, plus a pause/resume bridge, before removing these drops.
 
 Leave `use_chat_completions_api` off ([endpoint contract](#endpoint-contract)).
 The flow runs as the Langflow API key's owner, so its nested LiteLLM calls use
