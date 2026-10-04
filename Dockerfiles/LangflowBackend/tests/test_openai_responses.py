@@ -1,10 +1,12 @@
 import json
 import unittest
+import uuid
+from contextlib import asynccontextmanager
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
 import httpx
-from fastapi import Request
+from fastapi import FastAPI, Request
 from openai import OpenAI
 
 from langflow.api.v1 import openai_responses
@@ -66,30 +68,123 @@ class ResponsesCompatibilityTests(unittest.IsolatedAsyncioTestCase):
         flow = SimpleNamespace(id="flow-id")
         user = SimpleNamespace(id="user-id")
         history = [("user", "Hello"), ("user", ""), ("assistant", "Hi")]
+        calls = []
+        db = SimpleNamespace(exec=AsyncMock(side_effect=lambda _statement: calls.append("delete")))
+        store = AsyncMock(side_effect=lambda *_args, **_kwargs: calls.append("add"))
 
-        with patch.object(openai_responses, "aadd_messages", AsyncMock()) as store:
+        @asynccontextmanager
+        async def session_scope():
+            yield db
+
+        async def store_history(*, replace, http_request=None):
             await openai_responses._store_history(
-                history, flow=flow, api_key_user=user, session_id="session-id", http_request=None
+                history,
+                flow=flow,
+                api_key_user=user,
+                session_id="session-id",
+                http_request=http_request,
+                replace=replace,
             )
 
-        messages = store.call_args.args[0]
-        self.assertEqual(
-            [(message.sender, message.sender_name, message.text, message.session_id) for message in messages],
-            [("User", "User", "Hello", "session-id"), ("Machine", "AI", "Hi", "session-id")],
-        )
-        self.assertLess(messages[0].timestamp, messages[1].timestamp)
-        self.assertEqual(store.call_args.kwargs, {"flow_id": "flow-id", "user_id": "user-id"})
-
-        # End-user scoping would move the run to another session and owner.
         with (
-            patch.object(openai_responses, "resolve_serving_scope", return_value=SimpleNamespace()),
-            patch.object(openai_responses, "aadd_messages", AsyncMock()) as store,
-            self.assertRaises(ValueError),
+            patch.object(openai_responses, "session_scope", session_scope),
+            patch.object(openai_responses, "aadd_messages", store),
         ):
-            await openai_responses._store_history(
-                history, flow=flow, api_key_user=user, session_id="session-id", http_request=_request()
-            )
-        store.assert_not_awaited()
+            for replace in (False, True):
+                with self.subTest(replace=replace):
+                    calls.clear()
+                    await store_history(replace=replace)
+
+                    messages = store.call_args.args[0]
+                    self.assertEqual(
+                        [(item.sender, item.sender_name, item.text, item.session_id) for item in messages],
+                        [("User", "User", "Hello", "session-id"), ("Machine", "AI", "Hi", "session-id")],
+                    )
+                    self.assertLess(messages[0].timestamp, messages[1].timestamp)
+                    self.assertEqual(store.call_args.kwargs, {"flow_id": "flow-id", "user_id": "user-id"})
+                    self.assertEqual(calls, ["delete", "add"] if replace else ["add"])
+            # Replacing removes only this session's messages for this flow and caller.
+            statement = db.exec.call_args.args[0]
+            self.assertEqual(sorted(statement.compile().params.values()), ["flow-id", "session-id", "user-id"])
+
+            # End-user scoping would move the run to another session and owner.
+            calls.clear()
+            with (
+                patch.object(openai_responses, "resolve_serving_scope", return_value=SimpleNamespace()),
+                self.assertRaises(ValueError),
+            ):
+                await store_history(replace=True, http_request=_request())
+            self.assertEqual(calls, [])
+
+    async def test_session_header_selects_the_session(self):
+        flow = SimpleNamespace(
+            id="flow-id",
+            user_id="user-id",
+            data={"nodes": [{"data": {"type": "ChatInput"}}, {"data": {"type": "ChatOutput"}}]},
+        )
+        header = ("X-Langflow-Session-Id", "chat-1")
+        for headers, fields, session_id, mirrored in (
+            ([header], {}, "chat-1", True),
+            ([header], {"previous_response_id": "response-1"}, "response-1", False),
+            ([("X-Langflow-Session-Id", "")], {}, None, False),
+            ([], {}, None, False),
+        ):
+            run = AsyncMock(return_value=SimpleNamespace(outputs=[]))
+            with (
+                self.subTest(headers=headers, fields=fields),
+                patch.object(openai_responses, "_store_history", AsyncMock()) as store,
+                patch.object(openai_responses, "simple_run_flow", run),
+            ):
+                response = await openai_responses.run_flow_for_openai_responses(
+                    flow=flow,
+                    request=OpenAIResponsesRequest(model="FirstFlow", input="Hello", **fields),
+                    api_key_user=SimpleNamespace(id="user-id"),
+                    http_request=_request(*headers),
+                )
+
+                run_session_id = run.call_args.kwargs["input_request"].session_id
+                if session_id is None:
+                    self.assertEqual(str(uuid.UUID(run_session_id)), run_session_id)
+                else:
+                    self.assertEqual(run_session_id, session_id)
+                self.assertEqual(store.call_args.kwargs["session_id"], run_session_id)
+                self.assertIs(store.call_args.kwargs["replace"], mirrored)
+                # Gateways log each response by ID, so every turn of a mirrored chat needs its own.
+                if mirrored:
+                    self.assertNotEqual(response.id, run_session_id)
+                    self.assertEqual(str(uuid.UUID(response.id)), response.id)
+                else:
+                    self.assertEqual(response.id, run_session_id)
+
+    async def test_ignores_global_variable_headers(self):
+        # Gateways forward caller headers, which must not override the flow owner's variables.
+        app = FastAPI()
+        app.include_router(openai_responses.router, prefix="/api/v1")
+        user = SimpleNamespace(id="user-id")
+        flow = SimpleNamespace(
+            id="flow-id",
+            user_id=user.id,
+            data={"nodes": [{"data": {"type": "ChatInput"}}, {"data": {"type": "ChatOutput"}}]},
+        )
+        telemetry = SimpleNamespace(log_package_run=AsyncMock())
+        app.dependency_overrides[openai_responses.openai_api_key_security] = lambda: user
+        app.dependency_overrides[openai_responses.get_telemetry_service] = lambda: telemetry
+        run = AsyncMock(return_value=SimpleNamespace(outputs=[]))
+        with (
+            patch.object(openai_responses, "get_flow_by_id_or_endpoint_name", AsyncMock(return_value=flow)),
+            patch.object(openai_responses, "ensure_flow_permission", AsyncMock()),
+            patch.object(openai_responses, "resolve_serving_scope", return_value=None),
+            patch.object(openai_responses, "simple_run_flow", run),
+        ):
+            async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://langflow") as client:
+                response = await client.post(
+                    "/api/v1/responses",
+                    json={"model": flow.id, "input": "Hello"},
+                    headers={"X-LANGFLOW-GLOBAL-VAR-API_URL": "https://attacker.example"},
+                )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("request_variables", run.call_args.kwargs["context"])
 
     async def test_accepts_openai_bearer_auth(self):
         user = SimpleNamespace(id="user-id")

@@ -127,7 +127,6 @@ class FileInputTests(unittest.IsolatedAsyncioTestCase):
 
                     async def execute(**kwargs):
                         observed["chat_text"] = kwargs["input_request"].input_value
-                        observed["variables"] = kwargs["context"]["request_variables"]
                         observed["data"] = self.read_context(kwargs["context"])
                         observed["instructions"] = self.component(kwargs["context"]).read_instructions().text
                         completed.set()
@@ -144,31 +143,27 @@ class FileInputTests(unittest.IsolatedAsyncioTestCase):
                         patch.object(openai_responses, "simple_run_flow", execute),
                         patch.object(openai_responses, "run_flow_generator", execute),
                         patch.object(openai_responses, "consume_and_yield", consume),
-                        patch.object(openai_responses, "aadd_messages", AsyncMock()) as store,
+                        patch.object(openai_responses, "_store_history", AsyncMock()) as store,
                     ):
                         response = await openai_responses.run_flow_for_openai_responses(
                             flow=flow,
                             request=request,
                             api_key_user=SimpleNamespace(id="flow-owner"),
                             stream=stream,
-                            variables={"EXAMPLE": "value"},
                         )
                         if stream:
                             async for _chunk in response.body_iterator:
                                 pass
 
                     self.assertEqual(observed["data"]["input"], input_value)
-                    self.assertEqual(observed["variables"], {"EXAMPLE": "value"})
                     self.assertEqual(observed["instructions"], "Be concise.")
                     if isinstance(input_value, list):
                         self.assertEqual(observed["chat_text"], "Compare these")
-                        self.assertEqual(
-                            [message.text for message in store.call_args.args[0]], ["First document", "Ready"]
-                        )
+                        self.assertEqual(store.call_args.args[0], [("user", "First document"), ("assistant", "Ready")])
                         self.assertEqual(observed["data"]["file_ids"], ["file-first", "file-second", "file-first"])
                     else:
                         self.assertEqual(observed["chat_text"], "Next question")
-                        store.assert_not_awaited()
+                        self.assertEqual(store.call_args.args[0], [])
                         self.assertEqual(observed["data"]["file_ids"], [])
 
     def test_component_output_does_not_mutate_request_context(self):

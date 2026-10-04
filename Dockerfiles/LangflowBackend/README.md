@@ -94,13 +94,20 @@ OpenAI-compatible `/models` endpoint, so clients and gateways need the
 Responses API and an explicit model mapping. Input supports text and file-ID
 references. Caller-provided tools and `input_image` are not supported, so
 disable tool calling and native image input for Langflow-backed models in
-clients such as Open WebUI.
+clients such as Open WebUI. Gateways may forward caller headers, so the
+endpoint ignores `X-LANGFLOW-GLOBAL-VAR-*` overrides; use Langflow's `/run`
+API for per-request variables.
 
 ## Conversation history
 
 Langflow [groups chat history by session](https://docs.langflow.org/memory#session-id-and-chat-memory).
-A request with `previous_response_id` continues that response's session; any
-other request starts a new one.
+A request with `previous_response_id` continues that response's session.
+Otherwise the input is the whole conversation. With an `X-Langflow-Session-Id`
+header, its value is the session, and the session's stored messages for this
+flow and caller are replaced by the request's earlier turns. The session therefore
+mirrors the client's conversation, including edited and regenerated messages,
+and each of its responses gets a unique ID; concurrent requests in one
+conversation and flow can interleave. Any other request starts a new session.
 
 A message-array `input` must end with a user message. Its text becomes the
 Chat Input message, so components receive only the current question. Earlier
@@ -216,6 +223,21 @@ Requests use Langflow's API Request component and its network policy. For a
 Files API on a private address, configure `LANGFLOW_SSRF_ALLOWED_HOSTS` for
 that host as with other API Request components. Redirects are disabled.
 
+## Open WebUI
+
+Each Open WebUI chat keeps one Langflow session through native configuration:
+
+- Open WebUI's LiteLLM connection in [`apps/open-webui.yml`](../../apps/open-webui.yml)
+  sends the chat ID as `X-Langflow-Session-Id: {{CHAT_ID}}`.
+- LiteLLM's `model_group_settings` in
+  [`configs/litellm/config.yaml`](../../configs/litellm/config.yaml) forwards
+  caller `x-` headers to `langflow-*` models only, so
+  [name Langflow deployments](#expose-a-langflow-flow-through-litellm)
+  `langflow-<flow>`.
+
+Keep Open WebUI's task model (`TASK_MODEL_EXTERNAL`) on a regular model;
+otherwise title generation would also run the flow and replace its session.
+
 ## Playground and API parity
 
 To make a flow behave the same in the Playground and from Open WebUI through
@@ -262,7 +284,8 @@ its owner's budget. The trade-off: each user holds a key.
 ### Expose a Langflow flow through LiteLLM
 
 In LiteLLM's Admin UI, create an **OpenAI** deployment with a custom model
-name. Preserve existing fields and add:
+name starting with `langflow-`, which [Open WebUI sessions](#open-webui)
+require. Preserve existing fields and add:
 
 - **Model Info**: `{"mode": "responses"}`.
 - **LiteLLM Params**: `{"additional_drop_params": ["tools", "tool_choice", "parallel_tool_calls"]}`.

@@ -80,7 +80,7 @@
      """OpenAI-compatible responses response."""
 --- a/src/backend/base/langflow/api/v1/openai_responses.py
 +++ b/src/backend/base/langflow/api/v1/openai_responses.py
-@@ -3,13 +3,18 @@
+@@ -3,38 +3,45 @@
  import time
  import uuid
  from collections.abc import AsyncGenerator
@@ -101,7 +101,15 @@
  from lfx.utils.flow_validation import CustomComponentValidationError
  from lfx.workflow.end_user_identity import (
      EndUserIdentityRequiredError,
-@@ -23,11 +28,11 @@
+     end_user_required_detail,
+     resolve_serving_scope,
+ )
++from sqlalchemy import delete
++from sqlmodel import col
+
+-from langflow.api.utils import extract_global_variables_from_headers
+ from langflow.api.utils.execution_errors import error_for_client
+ from langflow.api.v1.endpoints import _caller_owns_flow, consume_and_yield, run_flow_generator, simple_run_flow
  from langflow.api.v1.schemas import SimplifiedAPIRequest
  from langflow.events.event_manager import create_stream_tokens_event_manager
  from langflow.helpers.flow import get_flow_by_id_or_endpoint_name
@@ -114,7 +122,16 @@
  )
  from langflow.schema.content_types import ToolContent
  from langflow.services.auth.utils import api_key_security
-@@ -66,6 +71,54 @@
+ from langflow.services.authorization import FlowAction, ensure_flow_permission
+ from langflow.services.database.models.flow.model import FlowRead
++from langflow.services.database.models.message.model import MessageTable
+ from langflow.services.database.models.user.model import UserRead
+-from langflow.services.deps import get_telemetry_service
++from langflow.services.deps import get_telemetry_service, session_scope
+ from langflow.services.telemetry.schema import RunPayload
+ from langflow.services.telemetry.service import TelemetryService
+
+@@ -66,13 +73,74 @@
      return any(node.get("data", {}).get("type") in ["ChatOutput", "Chat Output"] for node in flow_data["nodes"])
 
 
@@ -136,8 +153,12 @@
 +    api_key_user: UserRead,
 +    session_id: str,
 +    http_request: Request | None,
++    replace: bool,
 +) -> None:
-+    """Store earlier turns in the run's session so native chat memory reads them as history."""
++    """Store earlier turns in the run's session so native chat memory reads them as history.
++
++    ``replace`` first clears the session so it mirrors a caller that sends its whole conversation.
++    """
 +    start = datetime.now(UTC)
 +    messages = [
 +        Message(
@@ -152,29 +173,62 @@
 +        # File-only turns have no text; their IDs stay in the run context.
 +        if text
 +    ]
-+    if not messages:
-+        return
 +    if http_request is not None and (
 +        resolve_serving_scope(
 +            http_request=http_request, requested_session_id=session_id, default_session_id=str(flow.id)
 +        )
 +        is not None
 +    ):
-+        # End-user scoping changes the session and message owner inside the run.
-+        msg = "Conversation history in input is not supported with end-user session scoping"
-+        raise ValueError(msg)
-+    await aadd_messages(messages, flow_id=flow.id, user_id=api_key_user.id)
++        if messages:
++            # End-user scoping changes the session and message owner inside the run.
++            msg = "Conversation history in input is not supported with end-user session scoping"
++            raise ValueError(msg)
++        return
++    if replace:
++        async with session_scope() as db:
++            await db.exec(
++                delete(MessageTable).where(
++                    col(MessageTable.session_id) == session_id,
++                    col(MessageTable.flow_id) == flow.id,
++                    col(MessageTable.user_id) == api_key_user.id,
++                )
++            )
++    if messages:
++        await aadd_messages(messages, flow_id=flow.id, user_id=api_key_user.id)
 +
 +
  async def run_flow_for_openai_responses(
      flow: FlowRead,
      request: OpenAIResponsesRequest,
-@@ -96,15 +149,23 @@
-         context["request_variables"] = variables
-         await logger.adebug(f"Added request variables to context: {list(variables.keys())}")
+     api_key_user: UserRead,
+     *,
+     stream: bool = False,
+-    variables: dict[str, str] | None = None,
+     http_request: Request | None = None,
+ ) -> OpenAIResponsesResponse | StreamingResponse:
+     """Run a flow for OpenAI Responses API compatibility."""
+@@ -86,32 +154,43 @@
+         msg = "Flow must have a ChatOutput component to be compatible with OpenAI Responses API"
+         raise ValueError(msg)
 
-+    instructions, history, message = request.to_conversation()
+-    # Use previous_response_id as session_id for conversation continuity
+-    # If no previous_response_id, create a new session_id
+-    session_id = request.previous_response_id or str(uuid.uuid4())
+-
+-    # Store header variables in context for global variable override
+-    context = {}
+-    if variables:
+-        context["request_variables"] = variables
+-        await logger.adebug(f"Added request variables to context: {list(variables.keys())}")
++    # previous_response_id continues a stored session. Otherwise the input is the whole
++    # conversation, and X-Langflow-Session-Id keeps one session per caller conversation.
++    requested_session_id = http_request.headers.get("X-Langflow-Session-Id") if http_request is not None else None
++    session_id = request.previous_response_id or requested_session_id or str(uuid.uuid4())
++    # A header-named session mirrors a caller that resends its whole conversation.
++    mirrored = request.previous_response_id is None and bool(requested_session_id)
 +
++    instructions, history, message = request.to_conversation()
+
      # Convert OpenAI request to SimplifiedAPIRequest
      # Note: We're moving away from tweaks to a context-based approach
      simplified_request = SimplifiedAPIRequest(
@@ -185,16 +239,31 @@
          tweaks={},  # Empty tweaks, using context instead
          session_id=session_id,
      )
-+    # Components decide how to use file IDs and caller instructions.
-+    context["responses_input"] = deepcopy(request.input)
-+    context["responses_instructions"] = instructions
++    # Components decide how to use file IDs and caller instructions. Gateways may forward
++    # caller headers here, so X-LANGFLOW-GLOBAL-VAR-* overrides stay on the native run API.
++    context = {"responses_input": deepcopy(request.input), "responses_instructions": instructions}
 +    await _store_history(
-+        history, flow=flow, api_key_user=api_key_user, session_id=session_id, http_request=http_request
++        history,
++        flow=flow,
++        api_key_user=api_key_user,
++        session_id=session_id,
++        http_request=http_request,
++        replace=mirrored,
 +    )
 
      # Context will be passed separately to simple_run_flow
 
-@@ -139,20 +200,53 @@
+     await logger.adebug(f"SimplifiedAPIRequest created with context keys: {list(context.keys())}")
+
+-    # Use session_id as response_id for OpenAI compatibility
+-    response_id = session_id
++    # previous_response_id continues the session a response ID names. A mirrored session is
++    # named by the header instead, so each of its responses gets a unique ID.
++    response_id = str(uuid.uuid4()) if mirrored else session_id
+     created_timestamp = int(time.time())
+
+     if stream:
+@@ -139,20 +218,53 @@
                  )
 
              try:
@@ -253,7 +322,7 @@
 
                  tool_call_counter = 0
                  processed_tools = set()  # Track processed tool calls to avoid duplicates
-@@ -167,12 +261,10 @@
+@@ -167,12 +279,10 @@
                      content = ""
                      token_data = {}
 
@@ -269,7 +338,7 @@
                              parsed_event = json.loads(event_str)
 
                              if isinstance(parsed_event, dict):
-@@ -194,23 +286,15 @@
+@@ -194,23 +304,15 @@
                                          token_data,
                                      )
                                  if event_type == "error":
@@ -300,7 +369,7 @@
                                      return
 
                                  if event_type == "add_message":
-@@ -234,12 +318,9 @@
+@@ -234,12 +336,9 @@
                                          message_state,
                                      )
 
@@ -315,7 +384,7 @@
                                          # Extract usage from completed message properties
                                          if isinstance(properties, dict) and "usage" in properties:
                                              usage_obj = properties.get("usage")
-@@ -253,8 +334,14 @@
+@@ -253,8 +352,14 @@
                                                  await logger.adebug(
                                                      "[OpenAIResponses][stream] captured usage: %s", stream_usage_data
                                                  )
@@ -332,7 +401,7 @@
 
                                      # Look for Agent Steps in content_blocks
                                      for block in content_blocks:
-@@ -294,10 +381,7 @@
+@@ -294,10 +399,7 @@
                                                                  "call_id": call_id,
                                                              },
                                                          }
@@ -344,7 +413,7 @@
 
                                                          # Send function call arguments as delta events (like OpenAI)
                                                          arguments_str = json.dumps(tool_input)
-@@ -307,10 +391,7 @@
+@@ -307,10 +409,7 @@
                                                              "item_id": tool_id,
                                                              "output_index": 0,
                                                          }
@@ -356,7 +425,7 @@
 
                                                          # Send function call arguments done event
                                                          arg_done_event = {
-@@ -319,10 +400,7 @@
+@@ -319,10 +418,7 @@
                                                              "item_id": tool_id,
                                                              "output_index": 0,
                                                          }
@@ -368,7 +437,7 @@
                                                          await logger.adebug(
                                                              "[OpenAIResponses][stream] tool_call.args.done name=%s",
                                                              tool_name,
-@@ -365,40 +443,12 @@
+@@ -365,40 +461,12 @@
                                                                      },
                                                                  }
 
@@ -410,7 +479,7 @@
                          except (json.JSONDecodeError, UnicodeDecodeError):
                              await logger.adebug("[OpenAIResponses][stream] failed to decode event bytes; skipping")
                              continue
-@@ -410,44 +460,68 @@
+@@ -410,44 +478,68 @@
                              await logger.adebug(
                                  f"[OpenAIResponses][stream] sent chunk with content={content}",
                              )
@@ -509,7 +578,7 @@
                  await logger.adebug(
                      "[OpenAIResponses][stream] completed: response_id=%s total_sent_len=%d usage=%s",
                      response_id,
-@@ -458,15 +532,14 @@
+@@ -458,15 +550,14 @@
              except Exception as e:  # noqa: BLE001
                  await logger.aexception("Error in OpenAI Responses stream generator")
                  client_error = error_for_client(e, expose_details=expose_error_details)
@@ -532,7 +601,7 @@
              finally:
                  if not main_task.done():
                      main_task.cancel()
-@@ -620,6 +693,7 @@
+@@ -620,6 +711,7 @@
          created_at=created_timestamp,
          model=request.model,
          output=output_items,
@@ -540,7 +609,7 @@
          previous_response_id=request.previous_response_id,
          usage=usage_data,
      )
-@@ -629,10 +703,10 @@
+@@ -629,10 +721,10 @@
  async def create_response(
      request: OpenAIResponsesRequest,
      background_tasks: BackgroundTasks,
@@ -553,7 +622,27 @@
      """Create a response using OpenAI Responses API format.
 
      This endpoint accepts a flow_id in the model parameter and processes
-@@ -743,7 +817,7 @@
+@@ -653,11 +745,7 @@
+     """
+     start_time = time.perf_counter()
+
+-    # Extract global variables from X-LANGFLOW-GLOBAL-VAR-* headers
+-    variables = extract_global_variables_from_headers(http_request.headers)
+-
+     await logger.adebug(f"All headers received: {list(http_request.headers.keys())}")
+-    await logger.adebug(f"Extracted global variables from headers: {list(variables.keys())}")
+
+     # Validate tools parameter - error out if tools are provided
+     if request.tools is not None:
+@@ -721,7 +809,6 @@
+             request=request,
+             api_key_user=api_key_user,
+             stream=request.stream,
+-            variables=variables,
+             http_request=http_request,
+         )
+
+@@ -743,7 +830,7 @@
              type_="invalid_request_error",
              code="invalid_flow_request",
          )
