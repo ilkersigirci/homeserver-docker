@@ -16,7 +16,7 @@ Compose-based homelab repository for running services across multiple machines (
 
 Prerequisites:
 - Docker
-- Docker Compose 5.3.0 or later for `pre_start` init containers
+- Docker Compose 5.4.0 or later for automatic pulling of `pre_start` images
 - A configured `.env`
 - `MY_HOSTNAME` set to a host with a matching file in `compose/`
 

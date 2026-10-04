@@ -5,7 +5,7 @@ This is the operator quick reference for humans and coding agents.
 ## Prerequisites
 
 - Docker installed
-- Docker Compose 5.3.0 or later
+- Docker Compose 5.4.0 or later for automatic pulling of `pre_start` images
 - Repo `.env` exists at `$HOME/docker/.env`
 - `MY_HOSTNAME` is set and matches a file in `compose/` (examples: `gpu`, `remoteserver`, `remoteserver2`, `rpi3`)
 
@@ -30,6 +30,17 @@ bash scripts/docker-manage.sh prune
 # Restart
 bash scripts/docker-manage.sh restart
 ```
+
+## Missing `pre_start` Images After Pruning
+
+If startup fails with `No such image` for a `pre_start` hook, check
+`docker compose version` on the affected host. Compose 5.3.x does not pull hook
+images automatically; `docker system prune -a` can remove these images when no
+container references them. Upgrade to Compose 5.4.0 or later, which includes the
+[hook image pull fix](https://github.com/docker/compose/releases/tag/v5.4.0).
+For immediate recovery on an older version, run `docker pull` with the exact
+image reference from the error, including its digest, then retry
+`bash scripts/docker-manage.sh up`.
 
 ## Direct Docker Compose Commands
 
