@@ -81,7 +81,8 @@ services:
       ENABLE_OPENAI_API: true
       OPENAI_API_BASE_URL: https://litellm.coding.$BASE_DOMAINNAME/v1
       OPENAI_API_KEY: ""
-      OPENAI_API_CONFIGS: '{"0":{"auth_type":"system_oauth"}}'
+      # X-Langflow-Session-Id keeps one Langflow session per chat; LiteLLM forwards it to langflow/* models only.
+      OPENAI_API_CONFIGS: '{"0":{"auth_type":"system_oauth","headers":{"X-Langflow-Session-Id":"{{CHAT_ID}}"}}}'
       ENABLE_BASE_MODELS_CACHE: false
       ############# IMAGE GENERATION #############
       # NOTE: Doesn't support system_oauth like chat mode

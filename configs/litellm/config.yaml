@@ -15,6 +15,10 @@ litellm_settings:
     max_budget: 0
   # Preserve W3C context through LiteLLM's model-call span to the provider.
   forward_traceparent_to_llm_provider: true
+  # Langflow flows use the caller's X-Langflow-Session-Id as their chat session.
+  # Name their deployments langflow/<flow>; only those receive caller x- headers.
+  model_group_settings:
+    forward_client_headers_to_llm_api: ["langflow/*"]
 
 # Keep metric cardinality bounded to stable GenAI dimensions. Model names stay
 # available on model-call spans even when excluded from metric labels.

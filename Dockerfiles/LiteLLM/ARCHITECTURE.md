@@ -117,7 +117,7 @@ independent.
   with LiteLLM's `x-litellm-end-user-id` header; LiteLLM records that end user
   natively and can budget it through `/customer/new`, but per-user model
   policy does not apply.
-- Caller `x-` headers reach `langflow-*` deployments only, carrying Open
+- Caller `x-` headers reach `langflow/*` deployments only, carrying Open
   WebUI's [Langflow session header](../LangflowBackend/README.md#open-webui).
   Langflow's Responses endpoint ignores its variable-override headers.
 

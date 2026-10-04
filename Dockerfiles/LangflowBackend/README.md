@@ -231,9 +231,9 @@ Each Open WebUI chat keeps one Langflow session through native configuration:
   sends the chat ID as `X-Langflow-Session-Id: {{CHAT_ID}}`.
 - LiteLLM's `model_group_settings` in
   [`configs/litellm/config.yaml`](../../configs/litellm/config.yaml) forwards
-  caller `x-` headers to `langflow-*` models only, so
+  caller `x-` headers to `langflow/*` models only, so
   [name Langflow deployments](#expose-a-langflow-flow-through-litellm)
-  `langflow-<flow>`.
+  `langflow/<flow>`.
 
 Keep Open WebUI's task model (`TASK_MODEL_EXTERNAL`) on a regular model;
 otherwise title generation would also run the flow and replace its session.
@@ -284,7 +284,7 @@ its owner's budget. The trade-off: each user holds a key.
 ### Expose a Langflow flow through LiteLLM
 
 In LiteLLM's Admin UI, create an **OpenAI** deployment with a custom model
-name starting with `langflow-`, which [Open WebUI sessions](#open-webui)
+name starting with `langflow/`, which [Open WebUI sessions](#open-webui)
 require. Preserve existing fields and add:
 
 - **Model Info**: `{"mode": "responses"}`.
@@ -294,7 +294,7 @@ The equivalent static configuration is:
 
 ```yaml
 model_list:
-  - model_name: langflow-first-flow
+  - model_name: langflow/FirstFlow
     litellm_params:
       model: openai/FirstFlow
       api_base: https://langflow.example.com/api/v1
@@ -323,7 +323,7 @@ curl -fsS "https://litellm.example.com/v1/responses" \
   -H "Authorization: Bearer $LITELLM_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "langflow-first-flow",
+    "model": "langflow/FirstFlow",
     "input": "Who are you?",
     "stream": true
   }'
