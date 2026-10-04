@@ -37,6 +37,7 @@ x-socket-proxy-service: &socket_proxy_service
 ## 0 to revoke access. 1 to grant access.
 x-socket-proxy-env-common: &socket_proxy_env_common
   LOG_LEVEL: info # debug,info,notice,warning,err,crit,alert,emerg
+  ALLOW_LOGS: 1 # Container logs require this in addition to CONTAINERS (Arcane, Dozzle, Loggifly).
   ALLOW_START: 0
   ALLOW_STOP: 0
   ALLOW_RESTARTS: 0
