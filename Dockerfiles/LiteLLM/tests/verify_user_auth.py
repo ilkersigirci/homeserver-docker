@@ -384,14 +384,15 @@ async def _verify_enforcement() -> None:
                     assert response.status_code == (200 if model in visible_models else 404), response.text
 
             assert await first_frame_allowed()
+            # Budget refusals use LiteLLM's default budget_exceeded_status_code.
             user.model_max_budget = {"allowed": {"max_budget": 0, "budget_duration": "1d"}}
             response = await call()
-            assert response.status_code == 429, response.text
+            assert response.status_code == 422, response.text
             assert not await first_frame_allowed(), "Responses WebSocket bypassed the user's model budget"
             user.model_max_budget = {}
             user.max_budget = 0
             response = await call()
-            assert response.status_code == 429, response.text
+            assert response.status_code == 422, response.text
             user.max_budget = 10
 
             # The hook refuses every credential unless both enforcement settings are on.

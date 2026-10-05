@@ -15,7 +15,7 @@ Removal check: tests/verify_streaming.py
 diff --git a/litellm/responses/main.py b/litellm/responses/main.py
 --- a/litellm/responses/main.py
 +++ b/litellm/responses/main.py
-@@ -1387,6 +1387,12 @@
+@@ -1418,6 +1418,12 @@
          if custom_llm_provider is None:
              raise ValueError("custom_llm_provider is required but passed as None")
 
@@ -28,7 +28,7 @@ diff --git a/litellm/responses/main.py b/litellm/responses/main.py
          response = base_llm_http_handler.response_api_handler(
              model=model,
              input=input,
-@@ -1400,8 +1406,12 @@
+@@ -1431,8 +1437,12 @@
              timeout=timeout or request_timeout,
              _is_async=_is_async,
              client=kwargs.get("client"),

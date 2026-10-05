@@ -1,7 +1,7 @@
 diff --git a/litellm/proxy/auth/user_api_key_auth.py b/litellm/proxy/auth/user_api_key_auth.py
 --- a/litellm/proxy/auth/user_api_key_auth.py
 +++ b/litellm/proxy/auth/user_api_key_auth.py
-@@ -1555,16 +1555,17 @@
+@@ -1561,16 +1561,17 @@
                  custom_auth_api_key = True
          elif user_custom_auth is not None:
              response = await user_custom_auth(request=request, api_key=api_key)

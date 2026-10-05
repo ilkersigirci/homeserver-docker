@@ -31,8 +31,8 @@ diff --git a/litellm/proxy/common_request_processing.py b/litellm/proxy/common_r
  from types import MappingProxyType
  from typing import (
      TYPE_CHECKING,
-@@ -95,10 +97,12 @@
- from litellm.proxy.guardrails.auto_router_compression import arm_pre_call as _arm_auto_router_compression
+@@ -111,10 +113,12 @@
+ from litellm.proxy.native_compaction import with_proxy_compaction_executor
  from litellm.proxy.route_llm_request import route_request
  from litellm.proxy.utils import ProxyLogging, _check_and_merge_model_level_guardrails
 +from litellm.responses.streaming_iterator import BaseResponsesAPIStreamingIterator
@@ -44,7 +44,7 @@ diff --git a/litellm/proxy/common_request_processing.py b/litellm/proxy/common_r
  from litellm.types.router import RouterRateLimitError
  from litellm.types.router_weights import validate_router_weights
 
-@@ -439,6 +443,62 @@
+@@ -459,6 +463,62 @@
      return True
 
 
@@ -104,10 +104,10 @@ diff --git a/litellm/proxy/common_request_processing.py b/litellm/proxy/common_r
 +    return True
 +
 +
- async def _cancel_pending_gather_tasks(tasks: list["asyncio.Task[Any]"]) -> None:
+ async def _cancel_pending_gather_tasks(tasks: Sequence["asyncio.Task[object]"]) -> None:
      pending_tasks: Final = [task for task in tasks if not task.done()]
      for task in pending_tasks:
-@@ -3709,6 +3769,7 @@
+@@ -3801,6 +3861,7 @@
          client_disconnected: bool = False,
          user_api_key_dict: UserAPIKeyAuth | None = None,
          proxy_logging_obj: ProxyLogging | None = None,
@@ -115,7 +115,7 @@ diff --git a/litellm/proxy/common_request_processing.py b/litellm/proxy/common_r
      ) -> None:
          with anyio.CancelScope(shield=True):
              should_record_client_disconnect: Final = client_disconnected or (not stream_completed)
-@@ -3739,7 +3800,10 @@
+@@ -3831,7 +3892,10 @@
                      and proxy_logging_obj is not None
                      and user_api_key_dict is not None
                  ):
@@ -130,7 +130,7 @@ diff --git a/litellm/proxy/common_request_processing.py b/litellm/proxy/common_r
 diff --git a/litellm/proxy/proxy_server.py b/litellm/proxy/proxy_server.py
 --- a/litellm/proxy/proxy_server.py
 +++ b/litellm/proxy/proxy_server.py
-@@ -777,6 +777,7 @@
+@@ -849,6 +849,7 @@
      ChatCompletionSystemMessage,
      ChatCompletionToolParam,
      HttpxBinaryResponseContent,
@@ -138,7 +138,7 @@ diff --git a/litellm/proxy/proxy_server.py b/litellm/proxy/proxy_server.py
  )
  from litellm.types.proxy.control_plane_endpoints import WorkerRegistryEntry
  from litellm.types.proxy.management_endpoints.model_management_endpoints import (
-@@ -9297,6 +9298,7 @@
+@@ -9579,6 +9580,7 @@
      stream_completed = False
      client_disconnected = False
      error_state: Final = ResponsesStreamErrorState() if responses_stream_errors else None
@@ -146,7 +146,7 @@ diff --git a/litellm/proxy/proxy_server.py b/litellm/proxy/proxy_server.py
      try:
          error_message: str | None = None
          requested_model_from_client: Final = _get_client_requested_model_for_streaming(request_data=request_data)
-@@ -9410,6 +9412,8 @@
+@@ -9692,6 +9694,8 @@
              if error_state is not None:
                  error_state.observe_chunk(cast(object, chunk))  # cast-ok: the helper validates legacy untyped chunks
              raw_passthrough = False
@@ -155,7 +155,7 @@ diff --git a/litellm/proxy/proxy_server.py b/litellm/proxy/proxy_server.py
              if isinstance(chunk, BaseModel):
                  chunk = _serialize_streaming_chunk(chunk)
              elif isinstance(chunk, bytes):
-@@ -9534,6 +9538,7 @@
+@@ -9816,6 +9820,7 @@
              client_disconnected=client_disconnected,
              user_api_key_dict=user_api_key_dict,
              proxy_logging_obj=proxy_logging_obj,
@@ -166,7 +166,7 @@ diff --git a/litellm/proxy/proxy_server.py b/litellm/proxy/proxy_server.py
 diff --git a/litellm/litellm_core_utils/litellm_logging.py b/litellm/litellm_core_utils/litellm_logging.py
 --- a/litellm/litellm_core_utils/litellm_logging.py
 +++ b/litellm/litellm_core_utils/litellm_logging.py
-@@ -3399,7 +3399,7 @@
+@@ -3624,7 +3624,7 @@
 
          self.model_call_details["standard_logging_object"] = get_standard_logging_object_payload(
              kwargs=self.model_call_details,

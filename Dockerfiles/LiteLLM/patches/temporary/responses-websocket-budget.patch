@@ -9,7 +9,7 @@ Removal check: WebSocket budget check in tests/verify_user_auth.py
 diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/response_api_endpoints/endpoints.py
 --- a/litellm/proxy/response_api_endpoints/endpoints.py
 +++ b/litellm/proxy/response_api_endpoints/endpoints.py
-@@ -1377,7 +1377,9 @@
+@@ -1400,7 +1400,9 @@
      user_api_key_dict: UserAPIKeyAuth,
      llm_router: "Router | None",
  ) -> None:
@@ -19,7 +19,7 @@ diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/r
          _enforce_key_and_fallback_model_access,
          _run_centralized_common_checks,
      )
-@@ -1385,6 +1387,7 @@
+@@ -1408,6 +1410,7 @@
          general_settings,
          llm_model_list,
          master_key,
@@ -27,7 +27,7 @@ diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/r
          user_custom_auth,
      )
 
-@@ -1406,6 +1409,13 @@
+@@ -1429,6 +1432,13 @@
          llm_model_list=llm_model_list,
          llm_router=llm_router,
      )

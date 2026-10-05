@@ -54,7 +54,7 @@ diff --git a/litellm/proxy/management_endpoints/ui_sso.py b/litellm/proxy/manage
      ui_access_mode: Final = general_settings.get("ui_access_mode", None)
      relay_state: Final = post_data.get("RelayState")
      cp_return_to: Final[str | None] = (
-@@ -4624,22 +4592,10 @@
+@@ -4625,22 +4593,10 @@
      PROXY_BASE_URL should be the your deployed proxy endpoint, e.g. PROXY_BASE_URL="https://litellm-production-7002.up.railway.app/"
      Example:
      """

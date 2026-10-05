@@ -8,7 +8,7 @@ Removal check: model-info scope check in tests/verify_user_auth.py
 diff --git a/litellm/proxy/proxy_server.py b/litellm/proxy/proxy_server.py
 --- a/litellm/proxy/proxy_server.py
 +++ b/litellm/proxy/proxy_server.py
-@@ -15456,8 +15456,23 @@
+@@ -15910,8 +15910,23 @@
                  status_code=400,
                  detail={"error": f"Model id = {litellm_model_id} not found on litellm proxy"},
              )
