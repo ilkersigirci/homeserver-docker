@@ -5,17 +5,10 @@ FROM node:${NODE_VERSION}@sha256:6f7b03f7c2c8e2e784dcf9295400527b9b1270fd37b7e9a
 
 WORKDIR /opt/codex-acp
 
-RUN apt-get update \
-    && apt-get install --yes --no-install-recommends patch \
-    && rm -rf /var/lib/apt/lists/*
-
-COPY package.json package-lock.json codex-acp-chatgpt-first.patch ./
+COPY package.json package-lock.json ./
 
 RUN --mount=type=cache,target=/root/.npm,sharing=locked \
-    npm ci --omit=dev --ignore-scripts --no-audit --no-fund \
-    && patch --batch --forward --strip=1 \
-      --directory=node_modules/@agentclientprotocol/codex-acp \
-      < codex-acp-chatgpt-first.patch
+    npm ci --omit=dev --ignore-scripts --no-audit --no-fund
 
 FROM node:${NODE_VERSION}@sha256:6f7b03f7c2c8e2e784dcf9295400527b9b1270fd37b7e9a7285cf83b6951452d
 

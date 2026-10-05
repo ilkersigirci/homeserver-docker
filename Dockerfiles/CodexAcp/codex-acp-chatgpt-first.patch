@@ -1,7 +1,0 @@
---- a/dist/index.js
-+++ b/dist/index.js
-@@ -26378,3 +26378,3 @@
-   if (!env["NO_BROWSER"]) {
--    authMethods.push(ChatGptAuthMethod);
-+    authMethods.unshift(ChatGptAuthMethod);
-   }

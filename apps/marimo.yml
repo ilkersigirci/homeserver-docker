@@ -129,6 +129,7 @@ services:
     environment:
       CODEX_HOME: /codex-home
       HOME: /tmp/codex-user
+      INITIAL_AGENT_MODE: workspace-write # NOTE: Ask before leaving the workspace sandbox instead of Codex auto-review.
       TZ: $TZ
     healthcheck:
       test: ["CMD", "/usr/local/bin/codex-acp-healthcheck"]

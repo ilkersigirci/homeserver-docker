@@ -39,11 +39,6 @@ container path because Marimo sends that path as the ACP session working
 directory. Without the matching path, the container cannot start shell or file
 operations for the notebook.
 
-The adapter is patched to advertise ChatGPT before API-key authentication
-because Marimo 0.23.14 selects the first method. The patch targets the pinned
-adapter bundle and intentionally fails the image build when it no longer
-applies.
-
 ## References
 
 - [Codex ACP](https://github.com/agentclientprotocol/codex-acp)
