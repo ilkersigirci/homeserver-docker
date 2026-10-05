@@ -92,6 +92,7 @@ services:
       FORGEJO__server__DOMAIN: git.$DOMAINNAME
       FORGEJO__server__SSH_DOMAIN: git.$DOMAINNAME
       FORGEJO__server__LANDING_PAGE: login
+      FORGEJO__security__REVERSE_PROXY_TRUSTED_PROXIES: 127.0.0.0/8,::1/128,192.168.90.254/32 # NOTE: Traefik on t3_proxy
       FORGEJO__database__DB_TYPE: postgres
       FORGEJO__database__HOST: forgejo-db:5432
       FORGEJO__database__NAME: postgres
