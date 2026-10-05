@@ -3,16 +3,18 @@ networks:
 
 services:
   karakeep-chrome:
-    image: gcr.io/zenika-hub/alpine-chrome:124@sha256:1a0046448e0bb6c275c88f86e01faf0de62b02ec8572901256ada0a8c08be23f
+    image: ghcr.io/karakeep-app/karakeep-chrome:151.0.7922.47-r1@sha256:5b19bbb160e9ff60681a3abd97e1c4ec9f64212301410de658c3900ab7ef31e7
     container_name: karakeep-chrome
     restart: $RESTART_POLICY_OTHERS
+    init: true
+    # NOTE: The image entrypoint sets --no-sandbox and the remote debugging flags.
+    # https://docs.karakeep.app/administration/chrome-image-migration
     command:
-      - --no-sandbox
       - --disable-gpu
       - --disable-dev-shm-usage
-      - --remote-debugging-address=0.0.0.0
-      - --remote-debugging-port=9222
       - --hide-scrollbars
+      - --disable-blink-features=AutomationControlled
+      - --window-size=1440,900
     profiles:
       - reading
       - karakeep
@@ -20,6 +22,7 @@ services:
       - karakeep_backend
     expose:
       - 9222
+    read_only: true
     tmpfs:
       - /tmp
     security_opt:
@@ -28,14 +31,24 @@ services:
       - ALL
     cap_add: []
     pids_limit: 256
-    cpus: '1.0'
+    cpus: "1.0"
     mem_limit: 1G
     ulimits:
       nofile:
         soft: 4096
         hard: 8192
+    environment:
+      HOME: /tmp # NOTE: The image user's home is /nonexistent; fontconfig needs a writable cache.
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:9222/json/version"]
+      test:
+        - CMD
+        - /usr/bin/bash
+        - -c
+        - >-
+          exec 3<>/dev/tcp/127.0.0.1/9222 &&
+          printf 'GET /json/version HTTP/1.1\r\nHost: 127.0.0.1\r\nConnection: close\r\n\r\n' >&3 &&
+          IFS= read -r status <&3 &&
+          [[ "$$status" == *' 200 '* ]]
       interval: 5m
       timeout: 5s
       retries: 3
@@ -69,7 +82,7 @@ services:
       - ALL
     cap_add: []
     pids_limit: 256
-    cpus: '1.0'
+    cpus: "1.0"
     mem_limit: 1G
     ulimits:
       nofile:
@@ -181,7 +194,8 @@ services:
       OTEL_SAMPLE_RATE: 1.0
       PROMETHEUS_AUTH_TOKEN: Random
     healthcheck:
-      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3000/api/health"]
+      test:
+        ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3000/api/health"]
       interval: 2m
       timeout: 5s
       retries: 3
