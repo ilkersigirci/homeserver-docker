@@ -49,7 +49,7 @@ services:
       start_period: 30s
 
   litellm:
-    image: ghcr.io/ilkersigirci/homeserver-litellm:1.103.1@sha256:ce51bdf37aaade0604a9a2f229586538b991528851099b9cb7ff9418e5b74f65
+    image: ghcr.io/ilkersigirci/homeserver-litellm:1.104.0@sha256:2f5faa7035941ae1343eb4625e903e5662ec8426bdd596cb64d4b3fbd21b7a6c
     container_name: litellm
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
@@ -86,7 +86,6 @@ services:
       - "4000"
       - --telemetry
       - "False"
-      - --use_v2_migration_resolver
       - --config
       - /app/litellm-config/config.yaml
     volumes:
