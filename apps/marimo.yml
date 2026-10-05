@@ -80,7 +80,7 @@ services:
       glance.description: "Sandboxed notebooks with isolated uv environments"
 
   codex-acp:
-    image: ghcr.io/ilkersigirci/homeserver-codex-acp:1.1.9-ws0.2.0@sha256:c767ea624e7b85a7e792495d4723dcc88c8bfcb6c7d3f46d59f676ab212eb217
+    image: ghcr.io/ilkersigirci/homeserver-codex-acp:2.1.1-ws0.2.0@sha256:e9e272439ea338d1d26b8c9a38ea8ba89023b295da8763ffa2f9e7cf337aa50b
     container_name: codex-acp
     restart: $RESTART_POLICY_PROGRAMMING
     init: true
