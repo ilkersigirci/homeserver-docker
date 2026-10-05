@@ -141,19 +141,15 @@ services:
       - target: 80
         published: 80
         protocol: tcp
-        mode: host
       - target: 443
         published: 443
         protocol: tcp
-        mode: host
       # - target: 853
       #   published: 853
       #   protocol: tcp
-      #   mode: host
       # - target: 8080  # need to enable --api.insecure=true
       #   published: 8085
       #   protocol: tcp
-      #   mode: host
     user: $PUID:$PGID
     read_only: true
     tmpfs:
