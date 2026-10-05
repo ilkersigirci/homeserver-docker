@@ -1,5 +1,6 @@
 services:
-  # NOTE: The upstream entrypoint owns /app/prisma, runs migrations, then drops to nodejs.
+  # Keep the image's nodejs UID 1001: startup rewrites image-owned /app/dist/generated.
+  # Overriding user with $PUID:$PGID requires changing those files and database ownership.
   excalidash-db:
     image: zimengxiong/excalidash-backend:0.6.5@sha256:29937c62fbed5f4d417398c21c7ab261965231427bd5ae3c64f8d365fe2c02a3
     container_name: excalidash-db
@@ -12,20 +13,15 @@ services:
       - t3_proxy
     expose:
       - 8000
-    read_only: false # NOTE: It doesn't work otherwise
+    read_only: false # Upstream recreates /app/dist/generated and writes user caches.
     tmpfs:
       - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
-      - /app/uploads:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=700
+      - /app/uploads:rw,noexec,nosuid,nodev,size=64m,uid=1001,gid=1001,mode=700
     security_opt:
       - no-new-privileges:true
     cap_drop:
       - ALL
-    cap_add:
-      - CHOWN
-      - DAC_OVERRIDE
-      - FOWNER
-      - SETGID
-      - SETUID
+    cap_add: []
     pids_limit: 256
     cpus: "1.0"
     mem_limit: "1G"
@@ -91,9 +87,6 @@ services:
       - t3_proxy
     user: $PUID:$PGID
     read_only: true
-    entrypoint:
-      - /bin/sh
-      - /configs/excalidash/frontend-entrypoint.sh
     tmpfs:
       - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
       - /run:rw,noexec,nosuid,nodev,size=16m,uid=$PUID,gid=$PGID,mode=755
@@ -110,8 +103,6 @@ services:
       nofile:
         soft: 4096
         hard: 8192
-    volumes:
-      - $REPO_PATH/configs/excalidash/frontend-entrypoint.sh:/configs/excalidash/frontend-entrypoint.sh:ro
     environment:
       PUID: $PUID
       PGID: $PGID
