@@ -35,7 +35,7 @@ services:
       start_period: 10s
 
   degoog:
-    image: ghcr.io/degoog-org/degoog:0.26.0@sha256:69e28fe2dc8008981b0ea8b9270f6b5b482d107b8a3dfa71d8acdac37f4b77c0
+    image: ghcr.io/degoog-org/degoog:1.0.0@sha256:e1ce8ee724a4514d269b74088424e579322bdfcf718256c1c5dd2cbb5aaf510c
     container_name: degoog
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
