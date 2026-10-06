@@ -1,6 +1,6 @@
 services:
   marimo:
-    image: ghcr.io/ilkersigirci/homeserver-marimo:0.25.0@sha256:7a77758e13d5c9abdab80a5ddc1ec35fc2b18ae3043ac62cce6930b166d71392
+    image: ghcr.io/ilkersigirci/homeserver-marimo:0.25.1@sha256:2919271cba9850b0a72c8d8b938c50c0fb3a8786c555453911b0548cc39f29de
     container_name: marimo
     restart: $RESTART_POLICY_PROGRAMMING
     init: true
