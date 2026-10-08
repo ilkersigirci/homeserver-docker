@@ -60,6 +60,5 @@ include:
   #### MONITORING ####
   - ../apps/rybbit.yml
   - ../apps/victoriametrics.yml
-
   #### READING ####
-  - ../apps/silverbullet.yml
+  # - ../apps/silverbullet.yml
