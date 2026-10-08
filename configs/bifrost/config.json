@@ -1,5 +1,12 @@
 {
   "$schema": "https://www.getbifrost.ai/schema",
+  "governance": {
+    "auth_config": {
+      "is_enabled": true,
+      "admin_username": "env.ADMIN_USERNAME",
+      "admin_password": "env.ADMIN_PASSWORD"
+    }
+  },
   "client": {
     "enable_logging": true,
     "disable_content_logging": false,
