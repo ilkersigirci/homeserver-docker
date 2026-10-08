@@ -16,30 +16,14 @@ http:
 
     middlewares-silverbullet-headers:
       headers:
-        accessControlAllowMethods:
-          - GET
-          - OPTIONS
-          - PUT
-          - POST
-          - DELETE
-        accessControlMaxAge: 100
-        hostsProxyHeaders:
-          - "X-Forwarded-Host"
-        sslRedirect: true
-        sslForceHost: true
-        sslProxyHeaders:
-          X-Forwarded-Proto: https
+        # Preserve SilverBullet's native CSP and referrer policy.
         stsSeconds: 63072000 # 2 years HSTS
         stsIncludeSubdomains: true
         stsPreload: true
         forceSTSHeader: true
         contentTypeNosniff: true
-        browserXssFilter: true
-        referrerPolicy: "strict-origin-when-cross-origin"
-        permissionsPolicy: "camera=(), microphone=(), geolocation=(), payment=(), usb=(), vr=()"
+        frameDeny: true
+        permissionsPolicy: "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
         customResponseHeaders:
           X-Robots-Tag: "none,noarchive,nosnippet,notranslate,noimageindex"
           server: ""
-          Content-Security-Policy: "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval' blob:; script-src-elem * 'unsafe-inline' 'unsafe-eval'; style-src * 'unsafe-inline'; style-src-elem * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; font-src * data:; connect-src * data: blob:; media-src * blob:; object-src *; child-src * blob:; frame-src *; worker-src * blob:; frame-ancestors 'self'; form-action *; base-uri *; manifest-src *;"
-        customRequestHeaders:
-          X-Forwarded-Proto: https

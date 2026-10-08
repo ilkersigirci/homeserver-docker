@@ -1,5 +1,7 @@
 # NOTE: env variables: https://silverbullet.md/Install/Configuration
-# TODO: Simplify middleware architecture
+# NOTE: On a fresh install, disable the DIR_NOTES bind until Dashboard setup completes.
+# Automatic setup requires /data to have no non-hidden entries. Then configure a
+# space at /data/spaces/notes and re-enable the bind.
 services:
   silverbullet:
     image: ghcr.io/silverbulletmd/silverbullet:2.12.0@sha256:1b97ce0f7b5085c76e0e9363c88ed97673db62a3b0f78c7bb12868827fff8b37
@@ -26,9 +28,10 @@ services:
         soft: 4096
         hard: 8192
     volumes:
+      - $REPO_PATH/data/silverbullet:/data
       - type: bind
         source: $DIR_NOTES
-        target: /space
+        target: /data/spaces/notes
         bind:
           create_host_path: false
     environment:
@@ -36,17 +39,11 @@ services:
       PGID: $PGID
       SB_HOSTNAME: 0.0.0.0
       SB_PORT: 3000
-      SB_FOLDER: /space
-      SB_INDEX_PAGE: index
-      # SB_READ_ONLY: true
-      # SB_USER: admin:admin
-      # SB_LOG_PUSH: 1
-      # SB_DISABLE_SERVICE_WORKER: 1
     healthcheck:
       test:
         [
           "CMD-SHELL",
-          "wget -q --tries=1 --timeout=3 --spider http://127.0.0.1:3000/ || exit 1",
+          "wget -q --tries=1 --timeout=3 --spider http://127.0.0.1:3000/.instance || exit 1",
         ]
       interval: 5m
       timeout: 5s
@@ -58,10 +55,10 @@ services:
       traefik.http.routers.silverbullet-rtr.entrypoints: "websecure"
       traefik.http.routers.silverbullet-rtr.rule: "Host(`notes.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.silverbullet-rtr.middlewares: "chain-silverbullet-tinyauth@file"
-      ## Fullscreen PWA manifest router
+      traefik.http.routers.silverbullet-rtr.middlewares: "chain-silverbullet-no-auth@file"
+      ## Fullscreen PWA manifests at the root or under a space prefix
       traefik.http.routers.silverbullet-manifest-rtr.entrypoints: "websecure"
-      traefik.http.routers.silverbullet-manifest-rtr.rule: "Host(`notes.$DOMAINNAME`) && Path(`/.client/manifest.json`)"
+      traefik.http.routers.silverbullet-manifest-rtr.rule: "Host(`notes.$DOMAINNAME`) && PathRegexp(`^/([^/]+/)*[.]client/manifest[.]json$`)"
       traefik.http.routers.silverbullet-manifest-rtr.priority: "100"
       traefik.http.routers.silverbullet-manifest-rtr.middlewares: "chain-silverbullet-tinyauth@file,chain-silverbullet-manifest@file"
       traefik.http.routers.silverbullet-manifest-rtr.service: "silverbullet-svc"
