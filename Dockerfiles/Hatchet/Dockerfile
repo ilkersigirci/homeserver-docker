@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.26@sha256:ecfaec9ed6d810b56388c508f4121597bfbba70d41a6dfeee4d8cad5f295fc32
 # renovate: datasource=github-releases depName=hatchet-dev/hatchet
-ARG IMAGE_VERSION=v0.107.2
+ARG IMAGE_VERSION=0.110.5
 ARG UPSTREAM_COMMIT=e53ce04dc75462ebc4169e21f26a5ae2ae8fc508
 
 FROM golang:1.27.1-alpine@sha256:4cb7ac979db5fcc41cae44b2227ba5ab8a51e8807f40d9ba4dee20a0ad960b5b AS server-build
