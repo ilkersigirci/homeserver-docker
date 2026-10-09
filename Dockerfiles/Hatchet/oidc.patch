@@ -12,10 +12,10 @@ index 8cfe9bb..79034ee 100644
    /api/v1/tenants/{tenant}/slack/start:
      $ref: "./paths/user/user.yaml#/oauth-start-slack"
 diff --git a/api-contracts/openapi/paths/user/user.yaml b/api-contracts/openapi/paths/user/user.yaml
-index a4fe0be..80704f2 100644
+index 5877c60..53565bb 100644
 --- a/api-contracts/openapi/paths/user/user.yaml
 +++ b/api-contracts/openapi/paths/user/user.yaml
-@@ -233,4 +233,36 @@ oauth-callback-github:
+@@ -241,4 +241,36 @@ oauth-callback-github:
      tags:
        - User
 +oauth-start-oidc:
@@ -78,7 +78,7 @@ index 236df19..b16b04f 100644
 
 diff --git a/api/v1/server/handlers/users/oidc_oauth_callback.go b/api/v1/server/handlers/users/oidc_oauth_callback.go
 new file mode 100644
-index 0000000..530c25b
+index 0000000..20490b1
 --- /dev/null
 +++ b/api/v1/server/handlers/users/oidc_oauth_callback.go
 @@ -0,0 +1,224 @@
@@ -215,7 +215,7 @@ index 0000000..530c25b
 +		if !emailVerified {
 +			return nil, fmt.Errorf("OIDC account matching requires a verified email")
 +		}
-+		user, err = u.config.V1.User().UpdateUser(ctx, user.ID, &v1.UpdateUserOpts{
++		user, err = u.config.V1.User().UpdateUserFromOAuth(ctx, user.ID, &v1.UpdateUserOpts{
 +			EmailVerified: v1.BoolPtr(emailVerified),
 +			Name:          v1.StringPtr(claims.Name),
 +			OAuth:         oauthOpts,
@@ -308,10 +308,10 @@ index 0000000..530c25b
 +}
 diff --git a/api/v1/server/handlers/users/oidc_oauth_callback_integration_test.go b/api/v1/server/handlers/users/oidc_oauth_callback_integration_test.go
 new file mode 100644
-index 0000000..07fc9e8
+index 0000000..f9602da
 --- /dev/null
 +++ b/api/v1/server/handlers/users/oidc_oauth_callback_integration_test.go
-@@ -0,0 +1,246 @@
+@@ -0,0 +1,345 @@
 +//go:build integration
 +
 +package users
@@ -327,7 +327,10 @@ index 0000000..07fc9e8
 +	"strings"
 +	"sync/atomic"
 +	"testing"
++	"time"
 +
++	"github.com/google/uuid"
++	"github.com/jackc/pgx/v5"
 +	"github.com/labstack/echo/v4"
 +	"github.com/rs/zerolog"
 +	"github.com/stretchr/testify/require"
@@ -341,6 +344,7 @@ index 0000000..07fc9e8
 +	"github.com/hatchet-dev/hatchet/pkg/config/server"
 +	"github.com/hatchet-dev/hatchet/pkg/encryption"
 +	"github.com/hatchet-dev/hatchet/pkg/random"
++	v1 "github.com/hatchet-dev/hatchet/pkg/repository"
 +)
 +
 +// newOIDCTestConfig builds a ServerConfig wired to the in-process mock issuer +
@@ -376,7 +380,7 @@ index 0000000..07fc9e8
 +func TestOIDCLoginFlow(t *testing.T) {
 +	t.Setenv("SERVER_MSGQUEUE_KIND", "postgres")
 +	testutils.RunTestWithDatabase(t, func(db *database.Layer) error {
-+		for _, scenario := range []string{"success", "expired", "wrong nonce"} {
++		for _, scenario := range []string{"success", "first verification", "expired", "wrong nonce"} {
 +			t.Run(scenario, func(t *testing.T) {
 +				cfg, m := newOIDCTestConfig(t, db)
 +				var err error
@@ -401,6 +405,21 @@ index 0000000..07fc9e8
 +				require.Equal(t, "S256", q.Get("code_challenge_method"))
 +				require.NotEmpty(t, q.Get("nonce"))
 +				claims := idTokenClaims{Subject: "flow-user", Email: uniqueEmail(t, "flow"), EmailVerified: true, Nonce: q.Get("nonce")}
++				var existingUserID, staleSessionID uuid.UUID
++				if scenario == "first verification" {
++					hash, err := v1.HashPassword("password-for-tests")
++					require.NoError(t, err)
++					user, err := db.V1.User().CreateUser(context.Background(), &v1.CreateUserOpts{
++						Email: claims.Email, EmailVerified: v1.BoolPtr(false), Password: hash,
++					})
++					require.NoError(t, err)
++					existingUserID, staleSessionID = user.ID, uuid.New()
++					_, err = db.V1.UserSession().Create(context.Background(), &v1.CreateSessionOpts{
++						ID: staleSessionID, UserId: &existingUserID,
++						ExpiresAt: time.Now().Add(time.Hour), Data: []byte("{}"),
++					})
++					require.NoError(t, err)
++				}
 +				if scenario == "wrong nonce" {
 +					claims.Nonce = "wrong"
 +				}
@@ -431,16 +450,37 @@ index 0000000..07fc9e8
 +					require.NoError(t, err)
 +					require.NoError(t, helper.SaveKV(startCtx, oidcFlowSessionKey, string(expired)))
 +				}
-+				callback := func() error {
++				callback := func() (*httptest.ResponseRecorder, error) {
 +					req := httptest.NewRequest(http.MethodGet, "/?code=test-code&state="+q.Get("state"), nil)
 +					req.AddCookie(startRec.Result().Cookies()[0])
-+					_, err := u.UserUpdateOidcOauthCallback(e.NewContext(req, httptest.NewRecorder()), gen.UserUpdateOidcOauthCallbackRequestObject{})
-+					return err
++					rec := httptest.NewRecorder()
++					_, err := u.UserUpdateOidcOauthCallback(e.NewContext(req, rec), gen.UserUpdateOidcOauthCallbackRequestObject{})
++					return rec, err
 +				}
-+				if scenario == "success" {
-+					require.NoError(t, callback())
++				rec, err := callback()
++				if scenario == "success" || scenario == "first verification" {
++					require.NoError(t, err)
++					cookies := rec.Result().Cookies()
++					require.NotEmpty(t, cookies)
++					req := httptest.NewRequest(http.MethodGet, "/", nil)
++					req.AddCookie(cookies[len(cookies)-1])
++					session, err := cfg.SessionStore.Get(req, cfg.SessionStore.GetName())
++					require.NoError(t, err)
++					require.False(t, session.IsNew)
++					require.Equal(t, true, session.Values["authenticated"])
++					require.Equal(t, "true", session.Values["email_verified"])
++					user, err := db.V1.User().GetUserByEmail(context.Background(), claims.Email)
++					require.NoError(t, err)
++					require.Equal(t, user.ID.String(), session.Values["user_id"])
++					if scenario == "first verification" {
++						require.Equal(t, existingUserID, user.ID)
++						_, err = db.V1.User().GetUserPassword(context.Background(), user.ID)
++						require.ErrorIs(t, err, pgx.ErrNoRows)
++						_, err = db.V1.UserSession().GetById(context.Background(), staleSessionID)
++						require.ErrorIs(t, err, pgx.ErrNoRows)
++					}
 +				} else {
-+					require.Error(t, callback())
++					require.Error(t, err)
 +				}
 +				if scenario == "expired" {
 +					require.Zero(t, exchanges.Load())
@@ -448,7 +488,8 @@ index 0000000..07fc9e8
 +					require.EqualValues(t, 1, exchanges.Load())
 +				}
 +				before := exchanges.Load()
-+				require.Error(t, callback(), "replayed state must be rejected")
++				_, err = callback()
++				require.Error(t, err, "replayed state must be rejected")
 +				require.Equal(t, before, exchanges.Load())
 +			})
 +		}
@@ -555,6 +596,64 @@ index 0000000..07fc9e8
 +			t.Fatal("with SetEmailVerified=true the user should be stored as verified")
 +		}
 +
++		return nil
++	})
++}
++
++func TestUpsertOIDCUserFromToken_VerificationResetsCredentials(t *testing.T) {
++	t.Setenv("SERVER_MSGQUEUE_KIND", "postgres")
++
++	testutils.RunTestWithDatabase(t, func(db *database.Layer) error {
++		for _, scenario := range []struct {
++			name             string
++			alreadyVerified  bool
++			setEmailVerified bool
++		}{
++			{name: "provider verifies email"},
++			{name: "configured trust verifies email", setEmailVerified: true},
++			{name: "already verified account", alreadyVerified: true},
++		} {
++			t.Run(scenario.name, func(t *testing.T) {
++				ctx := context.Background()
++				cfg, m := newOIDCTestConfig(t, db)
++				cfg.Auth.ConfigFile.SetEmailVerified = scenario.setEmailVerified
++				hash, err := v1.HashPassword("password-for-tests")
++				require.NoError(t, err)
++				user, err := db.V1.User().CreateUser(ctx, &v1.CreateUserOpts{
++					Email:         uniqueEmail(t, "oidc-verification"),
++					EmailVerified: v1.BoolPtr(scenario.alreadyVerified),
++					Password:      hash,
++				})
++				require.NoError(t, err)
++				sessionID := uuid.New()
++				_, err = db.V1.UserSession().Create(ctx, &v1.CreateSessionOpts{
++					ID:        sessionID,
++					ExpiresAt: time.Now().Add(time.Hour),
++					UserId:    &user.ID,
++					Data:      []byte("{}"),
++				})
++				require.NoError(t, err)
++
++				tok := m.token(t, idTokenClaims{
++					Subject: "verification-user", Email: user.Email,
++					EmailVerified: !scenario.setEmailVerified,
++				})
++				updated, err := NewUserService(cfg).upsertOIDCUserFromToken(ctx, cfg, tok, testOIDCNonce)
++				require.NoError(t, err)
++				require.Equal(t, user.ID, updated.ID)
++				require.True(t, updated.EmailVerified)
++
++				_, passwordErr := db.V1.User().GetUserPassword(ctx, user.ID)
++				_, sessionErr := db.V1.UserSession().GetById(ctx, sessionID)
++				if scenario.alreadyVerified {
++					require.NoError(t, passwordErr)
++					require.NoError(t, sessionErr)
++				} else {
++					require.ErrorIs(t, passwordErr, pgx.ErrNoRows)
++					require.ErrorIs(t, sessionErr, pgx.ErrNoRows)
++				}
++			})
++		}
 +		return nil
 +	})
 +}
@@ -841,10 +940,10 @@ index 0000000..30d0fa5
 +	}, nil
 +}
 diff --git a/api/v1/server/oas/gen/openapi.gen.go b/api/v1/server/oas/gen/openapi.gen.go
-index 5b027c9..1f1fb5d 100644
+index d462622..dd3fc79 100644
 --- a/api/v1/server/oas/gen/openapi.gen.go
 +++ b/api/v1/server/oas/gen/openapi.gen.go
-@@ -4015,4 +4015,10 @@ type ServerInterface interface {
+@@ -4018,4 +4018,10 @@ type ServerInterface interface {
  	// (GET /api/v1/users/memberships)
  	TenantMembershipsList(ctx echo.Context) error
 +	// Complete OIDC OAuth flow
@@ -855,7 +954,7 @@ index 5b027c9..1f1fb5d 100644
 +	UserUpdateOidcOauthStart(ctx echo.Context) error
  	// Change user password
  	// (POST /api/v1/users/password)
-@@ -7917,4 +7923,22 @@ func (w *ServerInterfaceWrapper) TenantMembershipsList(ctx echo.Context) error {
+@@ -7920,4 +7926,22 @@ func (w *ServerInterfaceWrapper) TenantMembershipsList(ctx echo.Context) error {
  }
 
 +// UserUpdateOidcOauthCallback converts echo context to params.
@@ -878,14 +977,14 @@ index 5b027c9..1f1fb5d 100644
 +
  // UserUpdatePassword converts echo context to params.
  func (w *ServerInterfaceWrapper) UserUpdatePassword(ctx echo.Context) error {
-@@ -8348,4 +8372,6 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL
+@@ -8351,4 +8375,6 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL
  	router.POST(baseURL+"/api/v1/users/logout", wrapper.UserUpdateLogout)
  	router.GET(baseURL+"/api/v1/users/memberships", wrapper.TenantMembershipsList)
 +	router.GET(baseURL+"/api/v1/users/oidc/callback", wrapper.UserUpdateOidcOauthCallback)
 +	router.GET(baseURL+"/api/v1/users/oidc/start", wrapper.UserUpdateOidcOauthStart)
  	router.POST(baseURL+"/api/v1/users/password", wrapper.UserUpdatePassword)
  	router.POST(baseURL+"/api/v1/users/register", wrapper.UserCreate)
-@@ -13484,4 +13510,46 @@ func (response TenantMembershipsList403JSONResponse) VisitTenantMembershipsListR
+@@ -13487,4 +13513,46 @@ func (response TenantMembershipsList403JSONResponse) VisitTenantMembershipsListR
  }
 
 +type UserUpdateOidcOauthCallbackRequestObject struct {
@@ -932,7 +1031,7 @@ index 5b027c9..1f1fb5d 100644
 +
  type UserUpdatePasswordRequestObject struct {
  	Body *UserUpdatePasswordJSONRequestBody
-@@ -14314,4 +14382,8 @@ type StrictServerInterface interface {
+@@ -14317,4 +14385,8 @@ type StrictServerInterface interface {
  	TenantMembershipsList(ctx echo.Context, request TenantMembershipsListRequestObject) (TenantMembershipsListResponseObject, error)
 
 +	UserUpdateOidcOauthCallback(ctx echo.Context, request UserUpdateOidcOauthCallbackRequestObject) (UserUpdateOidcOauthCallbackResponseObject, error)
@@ -941,7 +1040,7 @@ index 5b027c9..1f1fb5d 100644
 +
  	UserUpdatePassword(ctx echo.Context, request UserUpdatePasswordRequestObject) (UserUpdatePasswordResponseObject, error)
 
-@@ -17433,4 +17505,44 @@ func (sh *strictHandler) TenantMembershipsList(ctx echo.Context) error {
+@@ -17436,4 +17508,44 @@ func (sh *strictHandler) TenantMembershipsList(ctx echo.Context) error {
  }
 
 +// UserUpdateOidcOauthCallback operation
@@ -986,38 +1085,38 @@ index 5b027c9..1f1fb5d 100644
 +
  // UserUpdatePassword operation
  func (sh *strictHandler) UserUpdatePassword(ctx echo.Context) error {
-@@ -18136,18 +18248,19 @@ var swaggerSpec = []string{
- 	"2fj1hLS7+7sfzmbIAzhor+0vfG3vdn4/O9vVuqM4ZDTAjcX9gGK6BD3wBH3s8cnYpsgmOJgJFxLSqVKH",
- 	"OWGbTQhNFWE/nIUJreHmMKFu7MyG2hMmY6C0XHY4xjFBPZsh6gVajFFM5jhqcMPTOrnd8sQJ+THrJpMC",
--	"bZX8zZM2v+7pKGqvfKtc+XQM1htyI0jIcxhXOHiktXxYB6DaVwncWzXm9lSoizkMZulE+6RLTThkXoqo",
--	"Vti3KlUzlaqa1QXl55lx7YMpRjMmieOqS7loQSoVrtR/a1t8r8DYJ45XyGufP1um38w9SlH5ZrRO4sPJ",
--	"41aev0Zs5D1+/aqRpBt9DntCMZEAWl222AplO+W2JeIzSjgeBNPwHaKf5KBrirgoZqNTLHprkGb5c0+P",
--	"To5OTBl6NW+pv6ddv6QNwzE3vFr8Rc2LrSL9zwjEiCZxkENW4d7DhG4SBIybUvx97akhe2EkEgCWN+kZ",
--	"jedh+NiTznLH3+QPDslI2MEnW5ed6cTv7nlG5EB2Z7V0oh37qjkm7lDwtcfcyxsyislCdDK1eqjJFl+c",
--	"mONY4tnFaKGaSt//Go6RahxxTVu8t3yzGR9PAb1w8ZSoYZipyn/FsJJWZZLYSberZc89Yk9uoyltUVMe",
--	"TXmT//G9xkNctDI6f3MHUieeE46wVX7VhpC7w/GqbuzfKlfcWidLjtOloDSlQtv9pLlVsr6OeCUhuyeB",
--	"2Qta3lZOldy5YTsrJAYShbLdxWo58pqeIqXlNEsF73WYrXCaFAOQnNIyNqvo3+BetJdRPE1SGqYAtkGE",
--	"L5zHRxKrRjErxvB06zQsd05ooHL9DMFsKwawtbz10rylR8qtw1guap87dzXTA/eCwTavC+aR4RrPLzNE",
--	"57hs18qhk0QoqoetPLAqiOsxZ42a6FS8lG1SvkppynhP6cuG9aRsUKx0H/jZUDBIlPvZQDX31Wu5mwGb",
--	"xWES8SpMGQhqo6yg8E4f0LJTm6pky0JizcqI6lGpLY64h9rEStUYGwkulT7J6uqS5eBsltBopTxGeym5",
--	"7gzscgQGU27dJgmjDuR1OVf5kCJCU57CBEwRncyRZ6vVlwn+PVekJBmsmBzpxVIiafA2yoXUZkBqMyBt",
--	"IQNSI9EsZQNxeNXKneROYln60hyQCeZHkMtblnLKQWo9VbCVd3ulAmakuKoKWHQDHCMYozh1A+waHQO5",
--	"J5mQB0nsd153Ot+/fP//AgAA///x/2+1kpsDAA==",
-+	"bZX8zZM2v+7pKGqvfKtc+XQM1htyQ+xNGpvGBpcXboacG+xNDs86VlreelzPUexuIGuO3IOwkW0YqREk",
-+	"5DmMKxyT0hpUrANQ7asUhVs15vZU/4s5DGbpRPt0B5hwyLwUUa2S0l4Fml0Fqo8oQfl5ZlxbCsRoxjSI",
-+	"uMqYJFqQyotC6ne4Lb5XYOwTxyvktc/2LdNv5v6vqHwztyXiw8njVp5tR2zkPdZLayTpRp9xn1BMJIBW",
-+	"V0O2QtlOuRuKuKISjgfBNHyH6Cc56JoiLorZ6BSL3hqkWd7n06OToxNTZmnNy+/vadcvacNwzB8MLH7O",
-+	"5sVWkf5nBGJEkzjIIatwX2dCNwkCxk0p/r721JC9MBKJK8ub9IzG8zB87Eknz+Nv8geHJDrs4JOty06g",
-+	"4nf3/DhyILuTZTrRjn0sHRPOKPjaY+7lDXDFJDc6mVo9K2WLL07McSzx7GJsU01lzEoNx0g1jrim295b",
-+	"vtmMb7KAXrgmS9QwzFTlbWNYSauJSeyk29Wy5x6xJ7ctlraoKY+mvMn/+F4T2SBaGYMWuOOzE88JB+6q",
-+	"eABDqOjhRAM09suWK26t6iWH/1IwpVKh7f793JpeX/++kpDdkxftBS1vKxdQ7tywnRUSA4lC2e5iDB15",
-+	"TU/t03KapfL8OsxWOE2KgXNO6UTT6B6n1DkN7kV7GX3WJBVnCmAb/PrC+acksWoUs2LsWbdOw3LnhAYq",
-+	"188QhLli4GXLWy/NW3qE5zqM5aL2uXNXMz1wLxhs87pgHhmueShkZvMcl+1aOXSSCEX1sJUHVgVxPeas",
-+	"UROdiu6yTcpX100Z7yl92bCelA2K7O4DPxsKXYkyVblC/6tVulqlTpyqbmUCbBaHScSrh2UgqI2ygsI7",
-+	"fUDLTm2KnS0LiTUreqpHpbao5x5qEytVEW0kuFTaL6urS5Y7tlkirpXyb+2l5LozsMsRGEy5dZskjDqQ",
-+	"1+Vc5UOKCE15ChMwRXQyR56txmQm+PdckZJksGJSrxdL5aXB2yiHV5u5q83ctYXMXY1Es5QNxOFVK3eS",
-+	"O4ll6UtzQCaYH0Eub1nKKQep9VTBVt7tlQqYkeKqKmDRDXCMYIzi1A2wa3QM5J5kQh4ksd953el8//L9",
-+	"/wsAAP//Sw1pJ0qeAwA=",
+@@ -18142,18 +18254,19 @@ var swaggerSpec = []string{
+ 	"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",
++	"8v3/CwAA///Jv5y3F6oDAA==",
  }
 
 diff --git a/frontend/app/src/pages/auth/components/auth-page.tsx b/frontend/app/src/pages/auth/components/auth-page.tsx
@@ -1039,7 +1138,7 @@ index 39be31b..a5e1fc0 100644
 
    const sections = [
 diff --git a/frontend/app/src/pages/auth/components/social-auth.tsx b/frontend/app/src/pages/auth/components/social-auth.tsx
-index 4cd4f1f..5e90dc0 100644
+index 11e10fc..4b7b6a3 100644
 --- a/frontend/app/src/pages/auth/components/social-auth.tsx
 +++ b/frontend/app/src/pages/auth/components/social-auth.tsx
 @@ -2,8 +2,10 @@ import { Button } from '@/components/v1/ui/button';
@@ -1066,10 +1165,10 @@ index 4cd4f1f..5e90dc0 100644
  };
 
 diff --git a/frontend/docs/content/docs/self-hosting/configuration-options.mdx b/frontend/docs/content/docs/self-hosting/configuration-options.mdx
-index 7788a2c..cfdce26 100644
+index ed438a0..82358ce 100644
 --- a/frontend/docs/content/docs/self-hosting/configuration-options.mdx
 +++ b/frontend/docs/content/docs/self-hosting/configuration-options.mdx
-@@ -296,4 +296,13 @@ Variables marked with ⚠️ are conditionally required when specific features a
+@@ -305,4 +305,13 @@ Variables marked with ⚠️ are conditionally required when specific features a
  | `SERVER_AUTH_GITHUB_CLIENT_SECRET` ⚠️  | GitHub auth client secret (required if GitHub auth enabled) |                                  |
  | `SERVER_AUTH_GITHUB_SCOPES`            | GitHub auth scopes                                          | `["read:user", "user:email"]`    |
 +| `SERVER_AUTH_OIDC_ENABLED`             | Whether generic OIDC auth is enabled                        | `false`                          |
@@ -1084,33 +1183,33 @@ index 7788a2c..cfdce26 100644
 
  ## Task Queue Configuration
 diff --git a/go.mod b/go.mod
-index 26c971f..36b03aa 100644
+index 59db985..7662455 100644
 --- a/go.mod
 +++ b/go.mod
-@@ -15,4 +15,5 @@ require (
+@@ -16,4 +16,5 @@ require (
  	github.com/cockroachdb/errors v1.14.0
  	github.com/containerd/errdefs v1.0.0
 +	github.com/coreos/go-oidc/v3 v3.18.0
- 	github.com/creasty/defaults v1.8.0
+ 	github.com/creasty/defaults v1.11.0
  	github.com/docker/docker v28.5.2+incompatible
-@@ -25,4 +26,5 @@ require (
+@@ -26,4 +27,5 @@ require (
  	github.com/getkin/kin-openapi v0.149.0
  	github.com/go-co-op/gocron/v2 v2.22.0
 +	github.com/go-jose/go-jose/v4 v4.1.4
  	github.com/google/go-github/v57 v57.0.0
  	github.com/google/jsonschema-go v0.4.3
 diff --git a/go.sum b/go.sum
-index 4623bf0..d3798a5 100644
+index cfd09ac..d529923 100644
 --- a/go.sum
 +++ b/go.sum
-@@ -131,4 +131,6 @@ github.com/containerd/log v0.1.0/go.mod h1:VRRf09a7mHDIRezVKTRCrOq78v577GXq3bSa3
+@@ -133,4 +133,6 @@ github.com/containerd/log v0.1.0/go.mod h1:VRRf09a7mHDIRezVKTRCrOq78v577GXq3bSa3
  github.com/containerd/platforms v0.2.1 h1:zvwtM3rz2YHPQsF2CHYM8+KtB5dvhISiXh5ZpSBQv6A=
  github.com/containerd/platforms v0.2.1/go.mod h1:XHCb+2/hzowdiut9rkudds9bE5yJ7npe7dG/wG+uFPw=
 +github.com/coreos/go-oidc/v3 v3.18.0 h1:V9orjXynvu5wiC9SemFTWnG4F45v403aIcjWo0d41+A=
 +github.com/coreos/go-oidc/v3 v3.18.0/go.mod h1:DYCf24+ncYi+XkIH97GY1+dqoRlbaSI26KVTCI9SrY4=
  github.com/cpuguy83/dockercfg v0.3.2 h1:DlJTyZGBDlXqUZ2Dk2Q3xHs/FtnooJJVaad2S9GKorA=
  github.com/cpuguy83/dockercfg v0.3.2/go.mod h1:sugsbF4//dDlL/i+S+rtpIWp+5h0BHJHfjj5/jFyUJc=
-@@ -195,4 +197,6 @@ github.com/go-co-op/gocron/v2 v2.22.0/go.mod h1:hiH/U9RMhTi1BBZJmef9s3KC9QwhpBF6
+@@ -197,4 +199,6 @@ github.com/go-co-op/gocron/v2 v2.22.0/go.mod h1:hiH/U9RMhTi1BBZJmef9s3KC9QwhpBF6
  github.com/go-errors/errors v1.4.2 h1:J6MZopCL4uSllY1OfXM374weqZFFItUbrImctkmUxIA=
  github.com/go-errors/errors v1.4.2/go.mod h1:sIVyrIiJhuEF+Pj9Ebtd6P/rEYROXFi3BopGUQ5a5Og=
 +github.com/go-jose/go-jose/v4 v4.1.4 h1:moDMcTHmvE6Groj34emNPLs/qtYXRVcd6S7NHbHz3kA=
@@ -1229,23 +1328,23 @@ index 3de06c6..68457ad 100644
  	encryptionSvc, err := LoadEncryptionSvc(cf)
 
 diff --git a/pkg/config/server/server.go b/pkg/config/server/server.go
-index e0a2f84..5e20134 100644
+index 97345d9..2d14a13 100644
 --- a/pkg/config/server/server.go
 +++ b/pkg/config/server/server.go
-@@ -5,4 +5,5 @@ import (
- 	"time"
+@@ -6,4 +6,5 @@ import (
 
+ 	"connectrpc.com/connect"
 +	"github.com/coreos/go-oidc/v3/oidc"
  	"github.com/labstack/echo/v4"
  	"github.com/rs/zerolog"
-@@ -489,4 +490,6 @@ type ConfigFileAuth struct {
+@@ -503,4 +504,6 @@ type ConfigFileAuth struct {
  	Github ConfigFileAuthGithub `mapstructure:"github" json:"github,omitempty"`
 
 +	OIDC ConfigFileAuthOIDC `mapstructure:"oidc" json:"oidc,omitempty"`
 +
  	ControlPlaneExchangeTokenConfig ConfigFileAuthControlPlaneExchangeToken `mapstructure:"controlPlaneExchangeToken" json:"controlPlaneExchangeToken,omitempty"`
  }
-@@ -542,4 +545,16 @@ type ConfigFileAuthGithub struct {
+@@ -556,4 +559,16 @@ type ConfigFileAuthGithub struct {
  }
 
 +type ConfigFileAuthOIDC struct {
@@ -1262,7 +1361,7 @@ index e0a2f84..5e20134 100644
 +
  type ConfigFileAuthCookie struct {
  	Name     string `mapstructure:"name" json:"name,omitempty" default:"hatchet"`
-@@ -696,4 +711,10 @@ type AuthConfig struct {
+@@ -710,4 +725,10 @@ type AuthConfig struct {
  	GithubOAuthConfig *oauth2.Config
 
 +	OIDCOAuthConfig *oauth2.Config
@@ -1273,7 +1372,7 @@ index e0a2f84..5e20134 100644
 +
  	JWTManager token.JWTManager
 
-@@ -953,4 +974,10 @@ func BindAllEnv(v *viper.Viper) {
+@@ -977,4 +998,10 @@ func BindAllEnv(v *viper.Viper) {
  	_ = v.BindEnv("auth.github.clientSecret", "SERVER_AUTH_GITHUB_CLIENT_SECRET")
  	_ = v.BindEnv("auth.github.scopes", "SERVER_AUTH_GITHUB_SCOPES")
 +	_ = v.BindEnv("auth.oidc.enabled", "SERVER_AUTH_OIDC_ENABLED")
@@ -1285,7 +1384,7 @@ index e0a2f84..5e20134 100644
 
  	// task queue options
 diff --git a/pkg/repository/user.go b/pkg/repository/user.go
-index ea09e69..3322394 100644
+index d530ab9..b4d0043 100644
 --- a/pkg/repository/user.go
 +++ b/pkg/repository/user.go
 @@ -25,5 +25,5 @@ type CreateUserOpts struct {

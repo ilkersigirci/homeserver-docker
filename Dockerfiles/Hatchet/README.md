@@ -7,8 +7,9 @@ Builds the pinned official Hatchet release with generic OIDC login, based on
 We prioritize Hatchet compatibility and a small patch over custom identity and
 session hardening. Accounts are matched by email, not `(issuer, subject)`;
 tokens are encrypted in native `UserOAuth`, and login does not rotate the
-session ID. This avoids custom tables, migrations, queries, and shared-session
-changes.
+session ID. When OIDC first verifies an existing account's email, Hatchet clears
+that account's password and existing sessions. This avoids custom tables,
+migrations, queries, and shared-session changes.
 
 Protocol handling uses `go-oidc` and `golang.org/x/oauth2` for discovery, ID-token
 verification, and PKCE S256. The handlers check the nonce and UserInfo subject,
@@ -52,8 +53,9 @@ For an update:
 4. Build the image and run the PostgreSQL authentication tests.
 
 The image workflow runs the tagged integration tests, including PKCE code
-exchange, nonce validation, flow expiry, replay rejection, and native account
-provisioning. Publishing requires those tests to pass.
+exchange, nonce validation, flow expiry, replay rejection, native account
+provisioning, and credential cleanup on first email verification. Publishing
+requires those tests to pass.
 
 Keep the Compose reference on its published `tag@digest` until the rebuilt image
 is published and Renovate resolves the new digest. Remove the patch when an
