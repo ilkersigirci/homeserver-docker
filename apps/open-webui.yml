@@ -77,7 +77,7 @@ services:
       # OPENAI_API_KEY: $AIGATEWAY_API_KEY
       ## OPENAI_API_BASE_URLS: https://api.openai.com/v1;$OPENROUTER_API_BASE_URL
       ## OPENAI_API_KEYS: $OPENAI_API_KEY;$OPENROUTER_API_KEY
-      ############# OPENAI API - USER-ATTRIBUTED LITELLM #############
+      ############# OPENAI API - SYSTEM AUTH #############
       ENABLE_OPENAI_API: true
       OPENAI_API_BASE_URL: https://litellm.coding.$BASE_DOMAINNAME/v1
       OPENAI_API_KEY: ""
@@ -90,8 +90,19 @@ services:
       IMAGE_GENERATION_ENGINE: openai
       IMAGES_OPENAI_API_BASE_URL: $AIGATEWAY_BASE_URL
       IMAGES_OPENAI_API_KEY: $AIGATEWAY_API_KEY
-      IMAGE_GENERATION_MODEL: ${OPENAI_IMAGE_GENERATION_MODEL:-openai/gpt-image-2.5}
-      IMAGE_SIZE: 1024x1024
+      IMAGES_OPENAI_PARAMS: '{"additional_drop_params":["extra_headers"]}' # NOTE: LiteLLM duplicates forwarded headers into the generation body. Remove this when https://github.com/BerriAI/litellm/issues/40628 fixed
+      IMAGE_GENERATION_MODEL: ${OPENAI_IMAGE_GENERATION_MODEL:-openai/gpt-image-2.5-flare}
+      IMAGE_SIZE: ${OPENWEBUI_IMAGE_SIZE:-1024x1024}
+      IMAGE_URL_RESPONSE_MODELS_REGEX_PATTERN: '^(openai/)?gpt-image' # NOTE: Prevents Open WebUI from sending unsupported response_format for your openai/gpt-image-* models
+      ############# IMAGE EDIT #############
+      # NOTE: Doesn't support system_oauth like chat mode
+      ENABLE_IMAGE_EDIT: true
+      IMAGE_EDIT_ENGINE: openai
+      IMAGES_EDIT_OPENAI_API_BASE_URL: $AIGATEWAY_BASE_URL
+      IMAGES_EDIT_OPENAI_API_KEY: $AIGATEWAY_API_KEY
+      IMAGE_EDIT_MODEL: ${OPENWEBUI_IMAGE_EDIT_MODEL:-openai/gpt-image-2.5-flare}
+      IMAGE_EDIT_SIZE: ${OPENWEBUI_IMAGE_SIZE:-1024x1024}
+      IMAGE_AUTO_SIZE_MODELS_REGEX_PATTERN: '^(openai/)?gpt-image' # NOTE: Prevents Open WebUI from sending unsupported response_format for your openai/gpt-image-* models
       ############# AUDIO #############
       # NOTE: Doesn't support system_oauth like chat mode
       AUDIO_STT_ENGINE: openai
