@@ -5,6 +5,10 @@ Internal User named by its verified ``sub`` (LiteLLM's own JWT auth is
 Enterprise-only). LiteLLM then enforces that user's models, budget, and rate
 limits natively.
 
+On MCP routes the token resolves to the principal LiteLLM admits for its own
+MCP logins, so the user reaches the MCP servers granted to them and to every
+team they belong to, natively.
+
 Every other credential returns ``None`` and continues through LiteLLM's native
 master-key, virtual-key, and public-route authentication
 (``patches/permanent/custom-auth-fallback.patch``). An Internal User's virtual
@@ -31,6 +35,7 @@ from litellm.proxy._types import (
     UserAPIKeyAuth,
 )
 from litellm.proxy.auth.auth_checks import get_user_object
+from litellm.proxy.auth.route_checks import RouteChecks
 
 _ASYMMETRIC_ALGORITHMS = frozenset(
     {"RS256", "RS384", "RS512", "PS256", "PS384", "PS512", "ES256", "ES384", "ES512", "EdDSA"}
@@ -172,8 +177,24 @@ def _require_native_checks() -> None:
         )
 
 
+async def _mcp_user_auth(authorized: UserAPIKeyAuth) -> UserAPIKeyAuth:
+    """Admit the user to MCP as LiteLLM admits its own MCP logins.
+
+    Only that principal unions the MCP grants of the user and of each team they
+    belong to; LiteLLM strips its marker from validated input, so custom auth
+    cannot build it. The hook's identity, routes, and limits stay on top, so
+    the user never gains an admin's view of every server.
+    """
+    from litellm.proxy._experimental.mcp_server.auth.user_api_key_auth_mcp import MCPRequestHandler
+
+    admitted = await MCPRequestHandler.reload_admitted_user(authorized.user_id)
+    return admitted.model_copy(update=authorized.model_dump(exclude_unset=True))
+
+
 async def user_api_key_auth(request: Request, api_key: str | None) -> UserAPIKeyAuth | None:
     """Resolve an OIDC access token; defer anything else to LiteLLM."""
+    from litellm.proxy.auth.auth_utils import get_request_route
+
     _require_native_checks()
     if not isinstance(api_key, str) or not api_key:
         return None
@@ -181,4 +202,9 @@ async def user_api_key_auth(request: Request, api_key: str | None) -> UserAPIKey
         jwt.get_unverified_header(api_key)
     except jwt.PyJWTError:
         return None  # Not a JWT: LiteLLM's native authentication decides.
-    return _user_auth(await _internal_user(await _oidc_subject(api_key)))
+    authorized = _user_auth(await _internal_user(await _oidc_subject(api_key)))
+    if RouteChecks.check_route_access(
+        route=get_request_route(request), allowed_routes=LiteLLMRoutes.mcp_inference_routes.value
+    ):
+        return await _mcp_user_auth(authorized)
+    return authorized

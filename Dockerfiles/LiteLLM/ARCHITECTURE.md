@@ -50,9 +50,14 @@ authentication; upstream documents that mixed mode
 Resolved users receive `allowed_routes: openai_routes + model_info_routes +
 mcp_inference_routes` plus model retrieval (`/v1/models/*`, `/models/*`): they
 can invoke models, read model metadata, and list and call MCP tools, but cannot
-manage keys, users, models, or MCP servers, whatever the user's UI role. MCP
-servers follow LiteLLM's native policy for a user without a key or team: those
-marked `allow_all_keys`.
+manage keys, users, models, or MCP servers, whatever the user's UI role. On
+MCP routes the hook starts from the principal LiteLLM admits for its own MCP
+logins (`MCPRequestHandler.reload_admitted_user`) and keeps its own identity,
+routes, and limits on top. Users therefore reach `allow_all_keys` servers plus
+the servers the Admin UI grants to them and to every team they belong to; an
+admin's token gets the same, not every server. That principal is internal to
+LiteLLM, so [`verify_user_auth.py`](tests/verify_user_auth.py) checks the grants
+against LiteLLM's own resolver on every build.
 `custom_auth_run_common_checks` and `enable_post_custom_auth_checks` delegate
 model, budget, and rate-limit enforcement to LiteLLM. The hook rejects every
 request with 500 unless both are set, because without

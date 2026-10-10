@@ -201,6 +201,52 @@ async def _verify_routes() -> None:
             raise AssertionError(f"user token was allowed to call {path}")
 
 
+async def _verify_mcp_grants() -> None:
+    """MCP routes reach open servers and the user's and their teams' grants, nothing else."""
+    import litellm.proxy.auth.auth_checks as auth_checks
+    from litellm.proxy import proxy_server
+    from litellm.proxy._experimental.mcp_server.mcp_server_manager import global_mcp_server_manager
+    from litellm.proxy._types import LiteLLM_ObjectPermissionTable, LiteLLM_TeamTable, Member
+    from litellm.types.mcp_server.mcp_server_manager import MCPServer
+
+    servers = {
+        name: MCPServer(server_id=name, name=name, transport="http", allow_all_keys=name == "open")
+        for name in ("open", "user_grant", "team_grant", "closed")
+    }
+    # An admin's token must not gain the admin view of every server.
+    user = LiteLLM_UserTable(
+        **vars(_user(user_role="proxy_admin")),
+        teams=["reports"],
+        object_permission=LiteLLM_ObjectPermissionTable(
+            object_permission_id="user-grants", mcp_servers=["user_grant"]
+        ),
+    )
+    team = LiteLLM_TeamTable(
+        team_id="reports",
+        members_with_roles=[Member(user_id=_SUBJECT, role="user")],
+        object_permission=LiteLLM_ObjectPermissionTable(
+            object_permission_id="team-grants", mcp_servers=["team_grant"]
+        ),
+    )
+    auth = _auth()
+    token, jwks_client = _token_fixture()
+    with (
+        patch.dict(
+            auth.__globals__, {"_JWKS_CLIENT": jwks_client, "get_user_object": AsyncMock(return_value=user)}
+        ),
+        patch.object(auth_checks, "get_user_object", AsyncMock(return_value=user)),
+        patch.object(auth_checks, "get_team_object", AsyncMock(return_value=team)),
+        patch.object(proxy_server, "prisma_client", object()),
+        patch.dict(global_mcp_server_manager.config_mcp_servers, servers, clear=True),
+    ):
+        authorized = await auth(request=_request(path="/mcp"), api_key=token())
+        allowed = await global_mcp_server_manager.get_allowed_mcp_servers(authorized)
+
+    _assert_user_auth(authorized)
+    assert RouteChecks.should_call_route(route="/mcp", valid_token=authorized, request=_request(path="/mcp"))
+    assert set(allowed) == {"open", "user_grant", "team_grant"}, allowed
+
+
 async def _verify_model_info_scope() -> None:
     """Expose custom metadata without leaking denied or cross-team models."""
 
@@ -425,6 +471,7 @@ def main() -> None:
     _verify_jwks_tls()
     asyncio.run(_verify_tokens())
     asyncio.run(_verify_routes())
+    asyncio.run(_verify_mcp_grants())
     asyncio.run(_verify_model_info_scope())
     asyncio.run(_verify_enforcement())
     print("Internal User authorization checks passed")
