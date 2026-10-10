@@ -185,9 +185,14 @@ async def _verify_routes() -> None:
         "/models/allowed-model",
         "/model/info",
         "/v1/model/info",
+        "/mcp",
+        "/mcp/",
+        "/mcp/tools/list",
+        "/mcp/tools/call",
+        "/v1/mcp/tools",
     ):
         assert RouteChecks.should_call_route(route=path, valid_token=authorized, request=_request(path=path))
-    for path in ("/key/generate", "/user/new", "/model/new", "/spend/logs"):
+    for path in ("/key/generate", "/user/new", "/model/new", "/spend/logs", "/v1/mcp/server", "/v1/mcp/sessions"):
         try:
             RouteChecks.should_call_route(route=path, valid_token=authorized, request=_request(path=path))
         except HTTPException as exc:

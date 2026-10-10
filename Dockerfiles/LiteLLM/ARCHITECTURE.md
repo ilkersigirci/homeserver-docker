@@ -47,10 +47,12 @@ authentication; upstream documents that mixed mode
 (`custom_auth_settings.mode: auto`) as Enterprise-only. See the
 [custom-auth contract](https://docs.litellm.ai/docs/proxy/custom_auth).
 
-Resolved users receive `allowed_routes: openai_routes + model_info_routes`
-plus model retrieval (`/v1/models/*`, `/models/*`): they can invoke models and
-read model metadata but cannot manage keys, users, or models, whatever the
-user's UI role.
+Resolved users receive `allowed_routes: openai_routes + model_info_routes +
+mcp_inference_routes` plus model retrieval (`/v1/models/*`, `/models/*`): they
+can invoke models, read model metadata, and list and call MCP tools, but cannot
+manage keys, users, models, or MCP servers, whatever the user's UI role. MCP
+servers follow LiteLLM's native policy for a user without a key or team: those
+marked `allow_all_keys`.
 `custom_auth_run_common_checks` and `enable_post_custom_auth_checks` delegate
 model, budget, and rate-limit enforcement to LiteLLM. The hook rejects every
 request with 500 unless both are set, because without

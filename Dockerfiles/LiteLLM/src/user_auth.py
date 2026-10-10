@@ -135,6 +135,8 @@ def _user_auth(user) -> UserAPIKeyAuth:
         allowed_routes=[
             LiteLLMRoutes.openai_routes.name,
             LiteLLMRoutes.model_info_routes.name,
+            # MCP tool discovery and calls; MCP server management stays admin-only.
+            LiteLLMRoutes.mcp_inference_routes.name,
             # OpenAI model retrieval; LiteLLM scopes it to the user's models.
             "/v1/models/*",
             "/models/*",
