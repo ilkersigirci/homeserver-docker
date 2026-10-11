@@ -1,0 +1,203 @@
+Unlock LiteLLM features whose MIT-licensed implementations sit behind
+premium_user license gates (code outside enterprise/; the image has no
+license). Each feature already runs without enterprise code.
+
+- Premium key/team/org metadata (tags, guardrails, policies, logging, prompts,
+  allowed_passthrough_routes, secret_manager_settings,
+  disable_global_guardrails): _premium_user_check refuses nothing, at save
+  time and at request time. The same check also gates the SCIM v2 router and
+  the GCS Pub/Sub and Azure Storage loggers. team_member_key_duration is
+  accepted but has no MIT implementation, so it has no effect.
+- Per-model budgets (model_max_budget) on keys and teams; users already
+  accept them.
+- Key regeneration, including the scheduled rotation that calls it.
+- Team admins through /team/member_add and /team/member_update.
+- Audit log writes. Storing them stays opt-in through
+  litellm_settings.store_audit_logs; the /audit read API is enterprise code.
+- The Admin UI's region outage alert TTL setting (/alerting/settings) is no
+  longer marked premium; the alerts already run without a license.
+
+Checks: tests/verify_premium_features.py
+
+diff --git a/litellm/proxy/proxy_server.py b/litellm/proxy/proxy_server.py
+--- a/litellm/proxy/proxy_server.py
++++ b/litellm/proxy/proxy_server.py
+@@ -16483,7 +16483,7 @@
+                     field_default,
+                 ),
+                 field_default_value=field_default,
+-                premium_field=(True if field_name == "region_outage_alert_ttl" else False),
++                premium_field=False,  # Region outage alerts run without a license here.
+             )
+             return_val.append(_response_obj)
+     return return_val
+diff --git a/litellm/proxy/utils.py b/litellm/proxy/utils.py
+--- a/litellm/proxy/utils.py
++++ b/litellm/proxy/utils.py
+@@ -8195,22 +8195,8 @@
+
+ def _premium_user_check(feature: str | None = None):
+     """
+-    Raises an HTTPException if the user is not a premium user
++    No license gate: the guarded features run on MIT code in this image.
+     """
+-    from litellm.proxy.proxy_server import premium_user
+-
+-    if feature:
+-        detail_msg = f"This feature is only available for LiteLLM Enterprise users: {feature}. {CommonProxyErrors.not_premium_user.value}"
+-    else:
+-        detail_msg = (
+-            f"This feature is only available for LiteLLM Enterprise users. {CommonProxyErrors.not_premium_user.value}"
+-        )
+-
+-    if not premium_user:
+-        raise HTTPException(
+-            status_code=403,
+-            detail={"error": detail_msg},
+-        )
+
+
+ def is_known_model(model: str | None, llm_router: Router | None) -> bool:
+diff --git a/litellm/proxy/management_endpoints/common_utils.py b/litellm/proxy/management_endpoints/common_utils.py
+--- a/litellm/proxy/management_endpoints/common_utils.py
++++ b/litellm/proxy/management_endpoints/common_utils.py
+@@ -77,13 +77,6 @@
+     """Reject a team `model_max_budget` the limiter could not enforce (no duration, bad cap, tpm/rpm limits)."""
+     if not model_max_budget:
+         return
+-    if premium_user is not True:
+-        raise HTTPException(
+-            status_code=403,
+-            detail={
+-                "error": f"Setting model_max_budget on a team is an enterprise feature. {CommonProxyErrors.not_premium_user.value}"
+-            },
+-        )
+     for model_name, budget_config in model_max_budget.items():
+         if not model_name.strip():
+             raise HTTPException(
+diff --git a/litellm/proxy/management_endpoints/key_management_endpoints.py b/litellm/proxy/management_endpoints/key_management_endpoints.py
+--- a/litellm/proxy/management_endpoints/key_management_endpoints.py
++++ b/litellm/proxy/management_endpoints/key_management_endpoints.py
+@@ -5797,7 +5797,6 @@
+             hash_token,
+             llm_router,
+             master_key,
+-            premium_user,
+             prisma_client,
+             proxy_logging_obj,
+             user_api_key_cache,
+@@ -5832,25 +5831,6 @@
+                 allow_safe_presets=True,
+             )
+
+-        # Premium-gate bypass for master-key rotation must verify the
+-        # caller actually holds the master key, not just that the request
+-        # body has a ``new_master_key`` field. A presence-only check let
+-        # any non-premium caller skip the enterprise gate by sending any
+-        # value in that field.
+-        regenerate_target_key: Final = data.key if data and data.key else key
+-        is_master_key_regeneration: Final = (
+-            data is not None
+-            and data.new_master_key is not None
+-            and _is_master_key(api_key=regenerate_target_key, _master_key=master_key)
+-        )
+-
+-        if (
+-            premium_user is not True and not is_master_key_regeneration
+-        ):  # allow master key regeneration for non-premium users
+-            raise ValueError(
+-                f"Regenerating Virtual Keys is an Enterprise feature, {CommonProxyErrors.not_premium_user.value}"
+-            )
+-
+         # Check if key exists, raise exception if key is not in the DB
+         key = data.key if data and data.key else key
+         if not key:
+@@ -7832,12 +7812,6 @@
+         if len(model_max_budget) == 0:
+             return
+         if model_max_budget is not None:
+-            from litellm.proxy.proxy_server import CommonProxyErrors, premium_user
+-
+-            if premium_user is not True:
+-                raise ValueError(
+-                    f"You must have an enterprise license to set model_max_budget. {CommonProxyErrors.not_premium_user.value}"
+-                )
+             for _model, _budget_info in model_max_budget.items():
+                 assert isinstance(_model, str)
+
+diff --git a/litellm/proxy/management_endpoints/team_endpoints.py b/litellm/proxy/management_endpoints/team_endpoints.py
+--- a/litellm/proxy/management_endpoints/team_endpoints.py
++++ b/litellm/proxy/management_endpoints/team_endpoints.py
+@@ -2726,22 +2726,6 @@
+     return data_json
+
+
+-def _check_team_member_admin_add(
+-    member: Member | list[Member],
+-    premium_user: bool,
+-):
+-    if isinstance(member, Member) and member.role == "admin":
+-        if premium_user is not True:
+-            raise ValueError(f"Assigning team admins is a premium feature. {CommonProxyErrors.not_premium_user.value}")
+-    elif isinstance(member, list):
+-        for m in member:
+-            if m.role == "admin":
+-                if premium_user is not True:
+-                    raise ValueError(
+-                        f"Assigning team admins is a premium feature. Got={m}. {CommonProxyErrors.not_premium_user.value}. "
+-                    )
+-
+-
+ def team_call_validation_checks(
+     prisma_client: PrismaClient | None,
+     data: TeamMemberAddRequest,
+@@ -2756,14 +2740,6 @@
+     if data.member is None:
+         raise HTTPException(status_code=400, detail={"error": "No member/members passed in"})
+
+-    try:
+-        _check_team_member_admin_add(
+-            member=data.member,
+-            premium_user=premium_user,
+-        )
+-    except Exception as e:
+-        raise HTTPException(status_code=400, detail={"error": str(e)})
+-
+
+ def team_member_add_duplication_check(
+     data: TeamMemberAddRequest,
+@@ -3817,7 +3793,6 @@
+     """
+     from litellm.proxy.proxy_server import (
+         litellm_proxy_admin_name,
+-        premium_user,
+         prisma_client,
+         user_api_key_cache,
+     )
+@@ -3828,12 +3803,6 @@
+     if data.team_id is None:
+         raise HTTPException(status_code=400, detail={"error": "No team id passed in"})
+
+-    if data.role == "admin" and not premium_user:
+-        # exactly the same text your proxy throws for add:
+-        raise HTTPException(
+-            status_code=400,
+-            detail="Assigning team admins is a premium feature. You must be a LiteLLM Enterprise user to use this feature. If you have a license please set `LITELLM_LICENSE` in your env. Get a 7 day trial key here: https://www.litellm.ai/#trial. Pricing: https://www.litellm.ai/#pricing",
+-        )
+     if data.user_id is None and data.user_email is None:
+         raise HTTPException(
+             status_code=400,
+diff --git a/litellm/proxy/management_helpers/audit_logs.py b/litellm/proxy/management_helpers/audit_logs.py
+--- a/litellm/proxy/management_helpers/audit_logs.py
++++ b/litellm/proxy/management_helpers/audit_logs.py
+@@ -211,10 +211,7 @@
+     if not is_audit_logging_enabled():
+         return
+
+-    from litellm.proxy.proxy_server import premium_user, prisma_client
+-
+-    if premium_user is not True:
+-        return
++    from litellm.proxy.proxy_server import prisma_client
+
+     verbose_proxy_logger.debug("creating audit log for %s", request_data)

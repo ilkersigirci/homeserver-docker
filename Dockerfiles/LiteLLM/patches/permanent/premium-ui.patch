@@ -1,0 +1,157 @@
+Enable the Admin UI controls for the features premium-features.patch unlocks.
+The dashboard locks them from the `premium_user` claim in its session token,
+which stays false; these components ignore it instead of flipping the claim,
+so screens whose backends are stripped or harmful stay locked (audit log
+viewer, UI access control, allowed IPs, email branding, organizations).
+
+- Per-model budgets for users, keys, and teams (ModelMaxBudgetEditor).
+- Key create and edit: policies, prompts, allowed pass-through routes,
+  logging callbacks; key regeneration on the key page and chat "Rotate".
+- Team create and edit: secret manager settings, disable global guardrails
+  (still proxy admin only on the server), allowed pass-through routes,
+  logging callbacks.
+- Pass-through endpoint auth toggle, which the proxy already honors.
+- Region outage alerts switch.
+
+Checks: tests/verify_premium_ui.integration.test.tsx
+
+diff --git a/ui/litellm-dashboard/src/components/PassThroughSettings/PassThroughSettings.tsx b/ui/litellm-dashboard/src/components/PassThroughSettings/PassThroughSettings.tsx
+--- a/ui/litellm-dashboard/src/components/PassThroughSettings/PassThroughSettings.tsx
++++ b/ui/litellm-dashboard/src/components/PassThroughSettings/PassThroughSettings.tsx
+@@ -37,7 +37,9 @@
+   is_from_config?: boolean;
+ }
+
+-const PassThroughSettings: React.FC<PassThroughSettingsProps> = ({ accessToken, userRole, userID, premiumUser }) => {
++const PassThroughSettings: React.FC<PassThroughSettingsProps> = ({ accessToken, userRole, userID }) => {
++  // This image's proxy serves these features without a license (premium-features.patch).
++  const premiumUser = true;
+   const [generalSettings, setGeneralSettings] = useState<passThroughItem[]>([]);
+   const [isLoading, setIsLoading] = useState(true);
+   const [selectedEndpointId, setSelectedEndpointId] = useState<string | null>(null);
+diff --git a/ui/litellm-dashboard/src/components/Teams.tsx b/ui/litellm-dashboard/src/components/Teams.tsx
+--- a/ui/litellm-dashboard/src/components/Teams.tsx
++++ b/ui/litellm-dashboard/src/components/Teams.tsx
+@@ -208,7 +208,9 @@
+ };
+
+ // @deprecated
+-const Teams: React.FC<TeamProps> = ({ accessToken, userID, userRole, premiumUser = false }) => {
++const Teams: React.FC<TeamProps> = ({ accessToken, userID, userRole }) => {
++  // This image's proxy serves these features without a license (premium-features.patch).
++  const premiumUser = true;
+   const { data: organizationsData } = useOrganizations();
+   const organizations = organizationsData ?? null;
+   const { data: teamMetadataSchemaFields = [], isLoading: isTeamMetadataSchemaLoading } = useTeamMetadataSchema();
+diff --git a/ui/litellm-dashboard/src/components/chat/KeysPanel.tsx b/ui/litellm-dashboard/src/components/chat/KeysPanel.tsx
+--- a/ui/litellm-dashboard/src/components/chat/KeysPanel.tsx
++++ b/ui/litellm-dashboard/src/components/chat/KeysPanel.tsx
+@@ -58,7 +58,9 @@
+   grace_period: string;
+ }
+
+-const KeysPanel: React.FC<Props> = ({ accessToken, userId, premiumUser }) => {
++const KeysPanel: React.FC<Props> = ({ accessToken, userId }) => {
++  // This image's proxy serves these features without a license (premium-features.patch).
++  const premiumUser = true;
+   const queryClient = useQueryClient();
+   const [rotateTarget, setRotateTarget] = useState<KeyResponse | null>(null);
+   const [regeneratedKey, setRegeneratedKey] = useState<string | null>(null);
+diff --git a/ui/litellm-dashboard/src/components/key_team_helpers/ModelMaxBudgetEditor.tsx b/ui/litellm-dashboard/src/components/key_team_helpers/ModelMaxBudgetEditor.tsx
+--- a/ui/litellm-dashboard/src/components/key_team_helpers/ModelMaxBudgetEditor.tsx
++++ b/ui/litellm-dashboard/src/components/key_team_helpers/ModelMaxBudgetEditor.tsx
+@@ -87,9 +87,10 @@
+   value,
+   onChange,
+   availableModels,
+-  premiumUser,
+   usage,
+ }: ModelMaxBudgetEditorProps) {
++  // This image's proxy serves these features without a license (premium-features.patch).
++  const premiumUser = true;
+   const [entries, setEntries] = useState<ModelBudgetEntry[]>(() => modelMaxBudgetToEntries(value));
+
+   const emitChange = (updated: ModelBudgetEntry[]) => {
+diff --git a/ui/litellm-dashboard/src/components/organisms/create_key_button.tsx b/ui/litellm-dashboard/src/components/organisms/create_key_button.tsx
+--- a/ui/litellm-dashboard/src/components/organisms/create_key_button.tsx
++++ b/ui/litellm-dashboard/src/components/organisms/create_key_button.tsx
+@@ -217,7 +217,9 @@
+  * ─────────────────────────────────────────────────────────────────────────
+  */
+ const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOpenCreate, prefillData }) => {
+-  const { accessToken, userId: userID, userRole, premiumUser } = useAuthorized();
++  const { accessToken, userId: userID, userRole } = useAuthorized();
++  // This image's proxy serves these features without a license (premium-features.patch).
++  const premiumUser = true;
+   const canEditGuardrails = premiumUser || (userRole != null && rolesWithWriteAccess.includes(userRole));
+   const canViewPolicies = useCan("viewPolicies");
+   const canViewPrompts = useCan("viewPrompts");
+diff --git a/ui/litellm-dashboard/src/components/settings.tsx b/ui/litellm-dashboard/src/components/settings.tsx
+--- a/ui/litellm-dashboard/src/components/settings.tsx
++++ b/ui/litellm-dashboard/src/components/settings.tsx
+@@ -618,29 +618,13 @@
+                   {Object.entries(alerts_to_UI_NAME).map(([key, value], index) => (
+                     <TableRow key={index}>
+                       <TableCell>
+-                        {key == "region_outage_alerts" ? (
+-                          premiumUser ? (
+-                            <Switch
+-                              id="switch"
+-                              name="switch"
+-                              checked={isAlertOn(key)}
+-                              onCheckedChange={() => handleSwitchChange(key)}
+-                            />
+-                          ) : (
+-                            <Button className="flex items-center justify-center">
+-                              <a href="https://forms.gle/W3U4PZpJGFHWtHyA9" target="_blank">
+-                                ✨ Enterprise Feature
+-                              </a>
+-                            </Button>
+-                          )
+-                        ) : (
+-                          <Switch
+-                            id="switch"
+-                            name="switch"
+-                            checked={isAlertOn(key)}
+-                            onCheckedChange={() => handleSwitchChange(key)}
+-                          />
+-                        )}
++                        {/* Region outage alerts run without a license in this image. */}
++                        <Switch
++                          id="switch"
++                          name="switch"
++                          checked={isAlertOn(key)}
++                          onCheckedChange={() => handleSwitchChange(key)}
++                        />
+                       </TableCell>
+                       <TableCell className="whitespace-normal break-words">
+                         <p>{value}</p>
+diff --git a/ui/litellm-dashboard/src/components/team/TeamInfo.tsx b/ui/litellm-dashboard/src/components/team/TeamInfo.tsx
+--- a/ui/litellm-dashboard/src/components/team/TeamInfo.tsx
++++ b/ui/litellm-dashboard/src/components/team/TeamInfo.tsx
+@@ -551,9 +551,10 @@
+   is_proxy_admin,
+   userModels,
+   editTeam,
+-  premiumUser = false,
+   onUpdate,
+ }) => {
++  // This image's proxy serves these features without a license (premium-features.patch).
++  const premiumUser = true;
+   const teamUpdateSchema = useMemo(
+     () =>
+       teamUpdateFieldsSchema.superRefine((values, ctx) => {
+diff --git a/ui/litellm-dashboard/src/components/templates/key_info_view.tsx b/ui/litellm-dashboard/src/components/templates/key_info_view.tsx
+--- a/ui/litellm-dashboard/src/components/templates/key_info_view.tsx
++++ b/ui/litellm-dashboard/src/components/templates/key_info_view.tsx
+@@ -94,7 +94,9 @@
+   onDelete,
+   backButtonText = "Back to Keys",
+ }: KeyInfoViewProps) {
+-  const { accessToken, userId: userID, userRole, premiumUser } = useAuthorized();
++  const { accessToken, userId: userID, userRole } = useAuthorized();
++  // This image's proxy serves these features without a license (premium-features.patch).
++  const premiumUser = true;
+   const activityDateRange = useActivityDateRange();
+   const queryClient = useQueryClient();
+   const canEditGuardrails = premiumUser || (userRole != null && rolesWithWriteAccess.includes(userRole));

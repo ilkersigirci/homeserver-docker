@@ -8,12 +8,37 @@ Enterprise source tree.
 - [`scripts/`](scripts/) holds build tooling: `strip_enterprise.py` removes
   Enterprise source and package entries before installation.
 - [`patches/permanent/`](patches/permanent/) unlocks LiteLLM's native JWT
-  auth and SSO, and [`src/`](src/) ships the `access_token.py` claim validator
-  that [authentication](ARCHITECTURE.md) configures.
+  auth, SSO, and [other license-gated features](#unlocked-features), and
+  [`src/`](src/) ships the `access_token.py` claim validator that
+  [authentication](ARCHITECTURE.md) configures.
 - [`patches/temporary/`](patches/temporary/) holds
   [temporary upstream workarounds](#temporary-upstream-workarounds).
-- [`tests/`](tests/) holds the `verify_*.py` checks for every retained
-  customization.
+- [`tests/`](tests/) holds the `verify_*.py` and Admin UI
+  `verify_*.integration.test.tsx` checks for every retained customization.
+
+## Unlocked features
+
+The image has no license, so `premium_user` is always false. Permanent patches
+remove license gates only where the feature runs on MIT code outside
+`enterprise/`, one feature at a time; forcing `premium_user` true would also
+switch on unreviewed behavior and enterprise-backed code that is not here.
+
+- [`premium-features.patch`](patches/permanent/premium-features.patch) unlocks
+  per-model budgets on keys and teams, key regeneration and scheduled
+  rotation, team admins, premium key/team metadata (tags, guardrails,
+  policies, logging, prompts, pass-through routes, secret manager settings),
+  SCIM v2, the GCS Pub/Sub and Azure Storage loggers, audit log writes
+  (`litellm_settings.store_audit_logs`), and region outage alert settings.
+- [`premium-ui.patch`](patches/permanent/premium-ui.patch) enables the matching
+  Admin UI controls in the components that render them. The session token's
+  `premium_user` claim stays false, so these stay locked: UI access control
+  (saving it clears the SSO settings; use `ui_access_mode` in the config),
+  allowed IPs (filter at the edge), email branding, organizations, and the
+  audit log viewer.
+- Enterprise code is absent, so no patch can provide the `/audit` read API
+  (query `LiteLLM_AuditLog` instead), `team_member_key_duration`, per-key
+  disabled callbacks, `DISABLE_ADMIN_ENDPOINTS`, managed files and vector
+  stores, the email v2 system, or the legacy moderation callbacks.
 
 ## Temporary upstream workarounds
 

@@ -125,7 +125,8 @@ or with `/key/generate` and `user_id: <sub>`, or sets `ui_access_mode: all` so
 users mint their own. LiteLLM caps every key without a team by its owner's
 models (`can_user_call_model`) and `max_budget`, and records its spend on the
 owner; restrictions on the key itself still apply. Native key listings follow
-the key's model policy.
+the key's model policy. Owners and administrators can regenerate a leaked key
+in place, keeping its settings.
 
 ## Provisioning and model access
 
@@ -134,7 +135,8 @@ The first OIDC request (`user_id_upsert`) or Admin UI SSO login creates the
 (`max_budget: 0`, empty model list). Users created by an OIDC request have no
 email; look up their `sub` in the provider. An empty `models` list allows all
 models. Assign models (or a model access group) in the Admin UI to limit which
-models the user can see and invoke. New users can list models immediately;
+models the user can see and invoke, and per-model budgets to cap spend on
+individual models. New users can list models immediately;
 their zero budget blocks paid model calls until an administrator assigns a
 budget. Zero-cost models are exempt from monetary budget checks.
 `fail_closed_budget_enforcement` rejects requests whose current spend cannot

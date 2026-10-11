@@ -26,6 +26,9 @@ litellm_settings:
   # Empty user models allow all models; set a list in the UI to restrict access.
   default_internal_user_params:
     max_budget: 0
+  # Record who changed keys, users, teams, and models in LiteLLM_AuditLog. The
+  # /audit read API is enterprise-only, so query the table directly.
+  store_audit_logs: true
   # Preserve W3C context through LiteLLM's model-call span to the provider.
   forward_traceparent_to_llm_provider: true
   # Langflow flows use the caller's X-Langflow-Session-Id as their chat session.
