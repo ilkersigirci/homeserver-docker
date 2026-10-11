@@ -2,13 +2,26 @@
 model_list: []
 
 general_settings:
-  custom_auth: user_auth.user_api_key_auth
-  custom_auth_run_common_checks: true
+  # OIDC access tokens act as the Internal User named by `sub`; master and
+  # virtual keys keep native auth (Dockerfiles/LiteLLM/ARCHITECTURE.md).
+  enable_jwt_auth: true
+  litellm_jwtauth:
+    user_id_jwt_field: sub
+    user_id_upsert: true
+    end_user_id_jwt_field: sub
+    custom_validate: access_token.validate_claims
+    enforce_rbac: true
+    # Disable LiteLLM's built-in `litellm_proxy_admin` token scope; administer
+    # through the Admin UI or the master key.
+    admin_allowed_routes: []
+  # Tokens reach inference, model metadata, and MCP tools, whatever the user's role.
+  role_permissions:
+    - role: internal_user
+      routes: [openai_routes, model_info_routes, mcp_inference_routes, "/v1/models/*", "/models/*"]
   fail_closed_budget_enforcement: true
   ui_access_mode: admin_only
 
 litellm_settings:
-  enable_post_custom_auth_checks: true
   # A first OIDC request or UI SSO login creates a user with a zero budget.
   # Empty user models allow all models; set a list in the UI to restrict access.
   default_internal_user_params:

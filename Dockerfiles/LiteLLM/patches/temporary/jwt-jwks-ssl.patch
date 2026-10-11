@@ -1,0 +1,33 @@
+Upstream bug: JWT auth makes its JWKS, OIDC discovery, and UserInfo requests
+with a bare httpx client (httpx_handler.HTTPHandler) that ignores LiteLLM's
+TLS settings. LiteLLM's other identity-provider calls (Admin
+UI SSO, OAuth2 introspection) use get_async_httpx_client and honor SSL_VERIFY
+and SSL_CERT_FILE, so a provider with a private CA cannot be used for JWT auth
+with SSL_VERIFY=false.
+
+Build that client with get_ssl_configuration(), as the shared clients do.
+JWT auth is its only user.
+
+Removal check: JWKS TLS check in tests/verify_jwt_auth.py
+
+diff --git a/litellm/llms/custom_httpx/httpx_handler.py b/litellm/llms/custom_httpx/httpx_handler.py
+--- a/litellm/llms/custom_httpx/httpx_handler.py
++++ b/litellm/llms/custom_httpx/httpx_handler.py
+@@ -25,6 +25,8 @@
+
+ class HTTPHandler:
+     def __init__(self, concurrent_limit=1000):
++        from litellm.llms.custom_httpx.http_handler import get_ssl_configuration
++
+         headers: Final = get_default_headers()
+         # Create a client with a connection pool
+         self.client = httpx.AsyncClient(
+@@ -33,6 +35,8 @@
+                 max_keepalive_connections=concurrent_limit,
+             ),
+             headers=headers,
++            # Follow LiteLLM's SSL_VERIFY / SSL_CERT_FILE like its other outbound clients.
++            verify=get_ssl_configuration(),
+         )
+
+     async def close(self):

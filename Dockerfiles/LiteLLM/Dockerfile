@@ -70,7 +70,7 @@ COPY --from=builder /app/litellm/proxy/prisma_migration.py /app/litellm/proxy/pr
 COPY --from=builder /opt/prisma /opt/prisma
 COPY --from=source /app/LICENSE /app/LICENSE.litellm
 COPY LICENSE.patches /app/LICENSE.patches
-COPY src/user_auth.py /app/litellm-config/user_auth.py
+COPY src/access_token.py /app/litellm-config/access_token.py
 COPY tests/ /tmp/litellm-checks/
 RUN chmod -R a+rX /opt/prisma \
     && test -x /opt/prisma/binaries/node_modules/.bin/prisma \

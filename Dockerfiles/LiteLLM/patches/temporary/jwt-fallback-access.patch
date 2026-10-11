@@ -1,0 +1,31 @@
+Upstream bug: JWT auth never authorizes client-supplied fallbacks
+(`fallbacks`, `context_window_fallbacks`, ...). common_checks covers only the
+primary model; the virtual-key, custom-auth, and Responses WebSocket
+first-frame paths call _enforce_key_and_fallback_model_access, but the HTTP
+JWT path does not, so a JWT user restricted to one model can name a denied
+model as a fallback and be served by it.
+
+Run the same check on the JWT path after the token is built.
+
+Removal check: fallback check in tests/verify_jwt_auth.py
+diff --git a/litellm/proxy/auth/user_api_key_auth.py b/litellm/proxy/auth/user_api_key_auth.py
+--- a/litellm/proxy/auth/user_api_key_auth.py
++++ b/litellm/proxy/auth/user_api_key_auth.py
+@@ -1792,6 +1792,17 @@
+                             valid_token = auto_registered
+                             api_key = valid_token.token or ""
+
++                    # Same as the virtual-key path: common_checks covers only the primary
++                    # model, so authorize client-supplied fallbacks here too.
++                    await _enforce_key_and_fallback_model_access(
++                        valid_token=valid_token,
++                        request_data=request_data,
++                        route=route,
++                        request=request,
++                        llm_model_list=llm_model_list,
++                        llm_router=llm_router,
++                    )
++
+                     # Check if model has zero cost - if so, skip all budget checks
+                     model = _get_model_from_request_context(
+                         request_data=request_data,

@@ -1,0 +1,109 @@
+Unlock LiteLLM's MIT-licensed JWT auth (litellm/proxy/auth/handle_jwt.py,
+outside enterprise/) so an OIDC access token acts as its Internal User.
+
+- Remove the premium_user gate in front of `general_settings.enable_jwt_auth`.
+- Require the RFC 9068 section 4 `typ: at+jwt` header so ID tokens and other
+  JWTs are never accepted as access tokens. Upstream JWT auth serves any IdP
+  JWT, including Keycloak's default `typ: JWT`, so this is this image's token
+  profile rather than an upstream bug.
+- Carry a teamless JWT user's models onto the token, as upstream already does
+  for UI session tokens. Invocation enforces them through common_checks, but
+  /v1/models, /model/info, and the key-level checks (client fallbacks,
+  Responses WebSocket first frame, access-group routing) read the token's
+  models, so a restricted user would otherwise see and reach every model.
+- Skip the single-team fallback. Upstream attaches a user's only team to a
+  teamless token, which replaces the user's models and personal budget with
+  the team's; adding a user to a team for MCP grants must not change that.
+- On MCP routes, admit the user as LiteLLM admits its own MCP logins
+  (MCPRequestHandler.reload_admitted_user), so they reach the servers granted
+  to them and to each of their teams, or an admin's view.
+
+Checks: tests/verify_jwt_auth.py
+
+diff --git a/litellm/proxy/auth/user_api_key_auth.py b/litellm/proxy/auth/user_api_key_auth.py
+--- a/litellm/proxy/auth/user_api_key_auth.py
++++ b/litellm/proxy/auth/user_api_key_auth.py
+@@ -1631,15 +1631,6 @@
+             is_jwt = jwt_handler.is_jwt(token=api_key)
+             verbose_proxy_logger.debug("is_jwt: %s", is_jwt)
+             if is_jwt:
+-                from litellm.proxy.proxy_server import premium_user
+-
+-                if premium_user is not True:
+-                    raise ProxyException(
+-                        message=f"JWT Auth is an enterprise only feature. {CommonProxyErrors.not_premium_user.value}",
+-                        type=ProxyErrorTypes.auth_error,
+-                        param="premium_user",
+-                        code=status.HTTP_403_FORBIDDEN,
+-                    )
+                 # Try JWT-to-Virtual-Key mapping first to avoid
+                 # unnecessary DB queries in auth_builder
+                 do_standard_jwt_auth = True
+@@ -1730,6 +1721,23 @@
+                             detail=f"User={user_id} has been deactivated via SCIM. Keys owned by this user cannot be used.",
+                         )
+
++                    if RouteChecks.check_route_access(
++                        route=route, allowed_routes=LiteLLMRoutes.mcp_inference_routes.value
++                    ):
++                        # Admit the user to MCP as LiteLLM admits its own MCP logins: the servers
++                        # granted to them and to each of their teams, or an admin's view.
++                        from litellm.proxy._experimental.mcp_server.auth.user_api_key_auth_mcp import (
++                            MCPRequestHandler,
++                        )
++
++                        token = JWTAuthManager.user_api_key_auth_from_result(result, parent_otel_span)
++                        admitted = await MCPRequestHandler.reload_admitted_user(user_id)
++                        # Copy the token's fields as objects; model_dump would turn nested models into dicts.
++                        identity = {name: getattr(token, name) for name in token.model_fields_set}
++                        return admitted.model_copy(
++                            update={name: value for name, value in identity.items() if value is not None}
++                        )
++
+                     if is_proxy_admin:
+                         # Proxy admins authenticate via auth_builder (full
+                         # access), not via a mapped virtual key. If
+diff --git a/litellm/proxy/auth/handle_jwt.py b/litellm/proxy/auth/handle_jwt.py
+--- a/litellm/proxy/auth/handle_jwt.py
++++ b/litellm/proxy/auth/handle_jwt.py
+@@ -1275,6 +1275,9 @@
+
+     async def auth_jwt(self, token: str) -> dict:
+         header: Final = jwt.get_unverified_header(token)
++        # RFC 9068 section 4: accept only typed JWT access tokens, never ID or other tokens.
++        if str(header.get("typ", "")).lower() not in ("at+jwt", "application/at+jwt"):
++            raise Exception("Validation fails: the typ header must be at+jwt")
+
+         verbose_proxy_logger.debug("header: %s", header)
+
+@@ -2750,20 +2753,7 @@
+                 team_allowed_routes=handler.litellm_jwtauth.team_allowed_routes,
+             ):
+                 JWTAuthManager._raise_team_passthrough_route_denial(route=route)
+-        elif team_id is None:
+-            (
+-                team_id,
+-                team_object,
+-                team_membership_object,
+-            ) = await JWTAuthManager._resolve_single_team_fallback(
+-                user_object=user_object,
+-                user_id=user_id,
+-                prisma_client=prisma_client,
+-                user_api_key_cache=user_api_key_cache,
+-                parent_otel_span=parent_otel_span,
+-                proxy_logging_obj=proxy_logging_obj,
+-                team_id_upsert=team_id_upsert,
+-            )
++        # A token without a team acts as its Internal User, however many teams the user belongs to.
+         elif provisional_header_team is not None and team_id == provisional_header_team.team_id:
+             JWTAuthManager._validate_header_team_in_db_membership(
+                 team_id=team_id,
+@@ -2846,6 +2836,8 @@
+             user_tpm_limit=user.tpm_limit if user is not None and not admin else None,
+             user_rpm_limit=user.rpm_limit if user is not None and not admin else None,
+             user_model_max_budget=user.model_max_budget if user is not None and not admin else None,
++            # Without a team, the user's models govern access; list the same models.
++            models=list(user.models) if user is not None and not admin and result["team_object"] is None else [],
+             **team_grants(
+                 team_object=result["team_object"],
+                 team_membership=result.get("team_membership"),

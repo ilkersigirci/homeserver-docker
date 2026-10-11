@@ -7,9 +7,9 @@ Enterprise source tree.
 
 - [`scripts/`](scripts/) holds build tooling: `strip_enterprise.py` removes
   Enterprise source and package entries before installation.
-- [`src/`](src/) holds code shipped in the image: `user_auth.py`, with the
-  [`patches/permanent/`](patches/permanent/) patches, implements
-  [authentication](ARCHITECTURE.md).
+- [`patches/permanent/`](patches/permanent/) unlocks LiteLLM's native JWT
+  auth and SSO, and [`src/`](src/) ships the `access_token.py` claim validator
+  that [authentication](ARCHITECTURE.md) configures.
 - [`patches/temporary/`](patches/temporary/) holds
   [temporary upstream workarounds](#temporary-upstream-workarounds).
 - [`tests/`](tests/) holds the `verify_*.py` checks for every retained
@@ -20,6 +20,10 @@ Enterprise source tree.
 Each patch's header records the upstream problem, any upstream reports, what
 the patch changes, and its removal check.
 
+- [`jwt-fallback-access.patch`](patches/temporary/jwt-fallback-access.patch):
+  client-supplied fallbacks on JWT requests
+- [`jwt-jwks-ssl.patch`](patches/temporary/jwt-jwks-ssl.patch):
+  JWKS fetch TLS settings
 - [`model-info-access.patch`](patches/temporary/model-info-access.patch):
   direct-ID `/model/info` scope
 - [`responses-websocket-budget.patch`](patches/temporary/responses-websocket-budget.patch):

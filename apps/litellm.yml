@@ -130,13 +130,11 @@ services:
       GENERIC_USER_EMAIL_ATTRIBUTE: email
       GENERIC_USER_ID_ATTRIBUTE: sub
       GENERIC_USERINFO_ENDPOINT: https://pocketid.$BASE_DOMAINNAME/api/oidc/userinfo
-      ###### CUSTOM #######
-      ## OIDC access tokens (OAuth 2.0 resource server; see Dockerfiles/LiteLLM/ARCHITECTURE.md)
-      LITELLM_OIDC_ISSUER: https://pocketid.$BASE_DOMAINNAME
-      LITELLM_OIDC_JWKS_URL: https://pocketid.$BASE_DOMAINNAME/.well-known/jwks.json
-      LITELLM_OIDC_AUDIENCE: https://llm.$BASE_DOMAINNAME
-      LITELLM_OIDC_REQUIRED_SCOPE: llm:invoke
-      LITELLM_OIDC_SIGNING_ALGORITHM: RS256
+      ##### CUSTOM IMAGE #####
+      # OAuth 2.0 resource server (litellm native JWT auth)
+      JWT_PUBLIC_KEY_URL: https://pocketid.$BASE_DOMAINNAME/.well-known/openid-configuration
+      JWT_ISSUER: https://pocketid.$BASE_DOMAINNAME
+      JWT_AUDIENCE: https://llm.$BASE_DOMAINNAME
     labels:
       traefik.enable: "true"
       ## HTTP Routers
