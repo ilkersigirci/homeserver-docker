@@ -1,0 +1,44 @@
+---
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Build Open WebUI Image
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - Dockerfiles/OpenWebUI/**
+  pull_request:
+    paths:
+      - Dockerfiles/OpenWebUI/**
+      - .github/workflows/custom-images-build.yml
+      - .github/workflows/custom-images-open-webui.yml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    if: github.event_name == 'pull_request'
+    permissions:
+      contents: read
+    uses: ./.github/workflows/custom-images-build.yml
+    with:
+      name: OpenWebUI
+      context: Dockerfiles/OpenWebUI
+      repository: homeserver-open-webui
+      publish: false
+
+  publish:
+    if: github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    uses: ./.github/workflows/custom-images-build.yml
+    with:
+      name: OpenWebUI
+      context: Dockerfiles/OpenWebUI
+      repository: homeserver-open-webui
+      publish: true

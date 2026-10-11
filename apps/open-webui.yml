@@ -72,46 +72,36 @@ services:
       SEARXNG_QUERY_URL: http://searxng:8080/search?q=<query>
       SEARXNG_LANGUAGE: all
       ############# OPENAI API #############
-      # ENABLE_OPENAI_API: true
-      # OPENAI_API_BASE_URL: $AIGATEWAY_BASE_URL
-      # OPENAI_API_KEY: $AIGATEWAY_API_KEY
-      ## OPENAI_API_BASE_URLS: https://api.openai.com/v1;$OPENROUTER_API_BASE_URL
-      ## OPENAI_API_KEYS: $OPENAI_API_KEY;$OPENROUTER_API_KEY
-      ############# OPENAI API - SYSTEM AUTH #############
       ENABLE_OPENAI_API: true
       OPENAI_API_BASE_URL: https://litellm.coding.$BASE_DOMAINNAME/v1
-      OPENAI_API_KEY: ""
-      # X-Langflow-Session-Id keeps one Langflow session per chat; LiteLLM forwards it to langflow/* models only.
-      OPENAI_API_CONFIGS: '{"0":{"auth_type":"system_oauth","headers":{"X-Langflow-Session-Id":"{{CHAT_ID}}"}}}'
+      OPENAI_API_KEY: "" # NOTE: Fill it when not using system_oauth
+      OPENAI_API_CONFIGS: '{"0":{"auth_type":"system_oauth","headers":{"X-Langflow-Session-Id":"{{CHAT_ID}}"}}}' # NOTE: X-Langflow-Session-Id keeps one Langflow session per chat; LiteLLM forwards it to langflow/* models only.
       ENABLE_BASE_MODELS_CACHE: false
       ############# IMAGE GENERATION #############
-      # NOTE: Doesn't support system_oauth like chat mode
       ENABLE_IMAGE_GENERATION: true
       IMAGE_GENERATION_ENGINE: openai
-      IMAGES_OPENAI_API_BASE_URL: $AIGATEWAY_BASE_URL
-      IMAGES_OPENAI_API_KEY: $AIGATEWAY_API_KEY
+      IMAGES_OPENAI_API_BASE_URL: https://litellm.coding.$BASE_DOMAINNAME/v1
+      # IMAGES_OPENAI_API_KEY:  "" # NOTE: Fill it when not using system_oauth
       IMAGES_OPENAI_PARAMS: '{"additional_drop_params":["extra_headers"]}' # NOTE: LiteLLM duplicates forwarded headers into the generation body. Remove this when https://github.com/BerriAI/litellm/issues/40628 fixed
       IMAGE_GENERATION_MODEL: ${OPENAI_IMAGE_GENERATION_MODEL:-openai/gpt-image-2.5-flare}
       IMAGE_SIZE: ${OPENWEBUI_IMAGE_SIZE:-1024x1024}
       IMAGE_URL_RESPONSE_MODELS_REGEX_PATTERN: '^(openai/)?gpt-image' # NOTE: Prevents Open WebUI from sending unsupported response_format for your openai/gpt-image-* models
       ############# IMAGE EDIT #############
-      # NOTE: Doesn't support system_oauth like chat mode
       ENABLE_IMAGE_EDIT: true
       IMAGE_EDIT_ENGINE: openai
-      IMAGES_EDIT_OPENAI_API_BASE_URL: $AIGATEWAY_BASE_URL
-      IMAGES_EDIT_OPENAI_API_KEY: $AIGATEWAY_API_KEY
+      IMAGES_EDIT_OPENAI_API_BASE_URL: https://litellm.coding.$BASE_DOMAINNAME/v1
+      # IMAGES_EDIT_OPENAI_API_KEY: "" # NOTE: Fill it when not using system_oauth
       IMAGE_EDIT_MODEL: ${OPENWEBUI_IMAGE_EDIT_MODEL:-openai/gpt-image-2.5-flare}
       IMAGE_EDIT_SIZE: ${OPENWEBUI_IMAGE_SIZE:-1024x1024}
       IMAGE_AUTO_SIZE_MODELS_REGEX_PATTERN: '^(openai/)?gpt-image' # NOTE: Prevents Open WebUI from sending unsupported response_format for your openai/gpt-image-* models
       ############# AUDIO #############
-      # NOTE: Doesn't support system_oauth like chat mode
       AUDIO_STT_ENGINE: openai
-      AUDIO_STT_OPENAI_API_BASE_URL: $AIGATEWAY_BASE_URL
-      AUDIO_STT_OPENAI_API_KEY: $AIGATEWAY_API_KEY
+      AUDIO_STT_OPENAI_API_BASE_URL: https://litellm.coding.$BASE_DOMAINNAME/v1
+      # AUDIO_STT_OPENAI_API_KEY:  "" # NOTE: Fill it when not using system_oauth
       AUDIO_STT_MODEL: ${AUDIO_STT_MODEL:-openai/gpt-4o-mini-transcribe}
       AUDIO_TTS_ENGINE: openai
-      AUDIO_TTS_OPENAI_API_BASE_URL: $AIGATEWAY_BASE_URL
-      AUDIO_TTS_OPENAI_API_KEY: $AIGATEWAY_API_KEY
+      AUDIO_TTS_OPENAI_API_BASE_URL: https://litellm.coding.$BASE_DOMAINNAME/v1
+      # AUDIO_TTS_OPENAI_API_KEY:  "" # NOTE: Fill it when not using system_oauth
       AUDIO_TTS_MODEL: ${AUDIO_TTS_MODEL:-openai/gpt-4o-mini-tts}
       AUDIO_TTS_VOICE: ${AUDIO_TTS_VOICE:-alloy}
       ############# CODE #############

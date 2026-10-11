@@ -1,0 +1,52 @@
+Upstream gap: Open WebUI calls a manifold Pipe's pipes() without the user, so
+the Pipe can only list its models with one shared credential.
+
+Pass pipes() the user's OAuth token when it declares __oauth_token__, as pipe()
+receives it.
+
+Removal check: an Open WebUI release that gives pipes() the user's OAuth token.
+
+--- a/open_webui/functions.py
++++ b/open_webui/functions.py
+@@ -68,7 +68,16 @@
+     return function_module
+
+
+-async def get_function_models(request):
++async def get_pipes_params(request, user, pipes) -> dict:
++    """Give a manifold's pipes() the user's OAuth token, as pipe() receives it."""
++    if user is None or '__oauth_token__' not in inspect.signature(pipes).parameters:
++        return {}
++    from open_webui.utils.middleware import get_system_oauth_token
++
++    return {'__oauth_token__': await get_system_oauth_token(request, user)}
++
++
++async def get_function_models(request, user=None):
+     if not ENABLE_PLUGINS:
+         return []
+
+@@ -90,10 +99,11 @@
+                 # Handle pipes being a list, sync function, or async function
+                 try:
+                     if callable(function_module.pipes):
++                        params = await get_pipes_params(request, user, function_module.pipes)
+                         if asyncio.iscoroutinefunction(function_module.pipes):
+-                            sub_pipes = await function_module.pipes()
++                            sub_pipes = await function_module.pipes(**params)
+                         else:
+-                            sub_pipes = function_module.pipes()
++                            sub_pipes = function_module.pipes(**params)
+                     else:
+                         sub_pipes = function_module.pipes
+                 except Exception as e:
+--- a/open_webui/utils/models.py
++++ b/open_webui/utils/models.py
+@@ -59,7 +59,7 @@
+     config = await Config.get_many('openai.enable', 'ollama.enable')
+     openai_task = fetch_openai_models(request, user) if config.get('openai.enable') else asyncio.sleep(0, result=[])
+     ollama_task = fetch_ollama_models(request, user) if config.get('ollama.enable') else asyncio.sleep(0, result=[])
+-    function_task = get_function_models(request)
++    function_task = get_function_models(request, user)
+
+     openai_models, ollama_models, function_models = await asyncio.gather(openai_task, ollama_task, function_task)
