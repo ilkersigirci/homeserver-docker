@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.25@sha256:0adf442eae370b6087e08edc7c50b552d80ddf261576f4ebd6421006b2461f12
 # renovate: datasource=github-tags depName=BerriAI/litellm
-ARG IMAGE_VERSION=1.104.0
-ARG UPSTREAM_COMMIT=79645770fedc7ec2627e6468d31062f20f82aecc
+ARG IMAGE_VERSION=1.105.0
+ARG UPSTREAM_COMMIT=80b9556dd312d18c535ae06884faa97d1fdb8f46
 
 FROM rust:1.94.1-slim-trixie@sha256:cf09adf8c3ebaba10779e5c23ff7fe4df4cccdab8a91f199b0c142c53fef3e1a AS rust
 

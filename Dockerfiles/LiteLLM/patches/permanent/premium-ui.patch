@@ -46,7 +46,7 @@ diff --git a/ui/litellm-dashboard/src/components/Teams.tsx b/ui/litellm-dashboar
 diff --git a/ui/litellm-dashboard/src/components/chat/KeysPanel.tsx b/ui/litellm-dashboard/src/components/chat/KeysPanel.tsx
 --- a/ui/litellm-dashboard/src/components/chat/KeysPanel.tsx
 +++ b/ui/litellm-dashboard/src/components/chat/KeysPanel.tsx
-@@ -58,7 +58,9 @@
+@@ -67,7 +67,9 @@
    grace_period: string;
  }
 
@@ -89,7 +89,7 @@ diff --git a/ui/litellm-dashboard/src/components/organisms/create_key_button.tsx
 diff --git a/ui/litellm-dashboard/src/components/settings.tsx b/ui/litellm-dashboard/src/components/settings.tsx
 --- a/ui/litellm-dashboard/src/components/settings.tsx
 +++ b/ui/litellm-dashboard/src/components/settings.tsx
-@@ -618,29 +618,13 @@
+@@ -627,29 +627,13 @@
                    {Object.entries(alerts_to_UI_NAME).map(([key, value], index) => (
                      <TableRow key={index}>
                        <TableCell>
@@ -129,7 +129,7 @@ diff --git a/ui/litellm-dashboard/src/components/settings.tsx b/ui/litellm-dashb
 diff --git a/ui/litellm-dashboard/src/components/team/TeamInfo.tsx b/ui/litellm-dashboard/src/components/team/TeamInfo.tsx
 --- a/ui/litellm-dashboard/src/components/team/TeamInfo.tsx
 +++ b/ui/litellm-dashboard/src/components/team/TeamInfo.tsx
-@@ -551,9 +551,10 @@
+@@ -575,9 +575,10 @@
    is_proxy_admin,
    userModels,
    editTeam,

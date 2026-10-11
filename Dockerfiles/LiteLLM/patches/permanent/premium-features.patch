@@ -22,7 +22,7 @@ Checks: tests/verify_premium_features.py
 diff --git a/litellm/proxy/proxy_server.py b/litellm/proxy/proxy_server.py
 --- a/litellm/proxy/proxy_server.py
 +++ b/litellm/proxy/proxy_server.py
-@@ -16483,7 +16483,7 @@
+@@ -16748,7 +16748,7 @@
                      field_default,
                  ),
                  field_default_value=field_default,
@@ -34,7 +34,7 @@ diff --git a/litellm/proxy/proxy_server.py b/litellm/proxy/proxy_server.py
 diff --git a/litellm/proxy/utils.py b/litellm/proxy/utils.py
 --- a/litellm/proxy/utils.py
 +++ b/litellm/proxy/utils.py
-@@ -8195,22 +8195,8 @@
+@@ -8219,22 +8219,8 @@
 
  def _premium_user_check(feature: str | None = None):
      """
@@ -61,7 +61,7 @@ diff --git a/litellm/proxy/utils.py b/litellm/proxy/utils.py
 diff --git a/litellm/proxy/management_endpoints/common_utils.py b/litellm/proxy/management_endpoints/common_utils.py
 --- a/litellm/proxy/management_endpoints/common_utils.py
 +++ b/litellm/proxy/management_endpoints/common_utils.py
-@@ -77,13 +77,6 @@
+@@ -81,13 +81,6 @@
      """Reject a team `model_max_budget` the limiter could not enforce (no duration, bad cap, tpm/rpm limits)."""
      if not model_max_budget:
          return
@@ -78,7 +78,7 @@ diff --git a/litellm/proxy/management_endpoints/common_utils.py b/litellm/proxy/
 diff --git a/litellm/proxy/management_endpoints/key_management_endpoints.py b/litellm/proxy/management_endpoints/key_management_endpoints.py
 --- a/litellm/proxy/management_endpoints/key_management_endpoints.py
 +++ b/litellm/proxy/management_endpoints/key_management_endpoints.py
-@@ -5797,7 +5797,6 @@
+@@ -5789,7 +5789,6 @@
              hash_token,
              llm_router,
              master_key,
@@ -86,7 +86,7 @@ diff --git a/litellm/proxy/management_endpoints/key_management_endpoints.py b/li
              prisma_client,
              proxy_logging_obj,
              user_api_key_cache,
-@@ -5832,25 +5831,6 @@
+@@ -5824,25 +5823,6 @@
                  allow_safe_presets=True,
              )
 
@@ -112,7 +112,7 @@ diff --git a/litellm/proxy/management_endpoints/key_management_endpoints.py b/li
          # Check if key exists, raise exception if key is not in the DB
          key = data.key if data and data.key else key
          if not key:
-@@ -7832,12 +7812,6 @@
+@@ -7819,12 +7799,6 @@
          if len(model_max_budget) == 0:
              return
          if model_max_budget is not None:
@@ -128,7 +128,7 @@ diff --git a/litellm/proxy/management_endpoints/key_management_endpoints.py b/li
 diff --git a/litellm/proxy/management_endpoints/team_endpoints.py b/litellm/proxy/management_endpoints/team_endpoints.py
 --- a/litellm/proxy/management_endpoints/team_endpoints.py
 +++ b/litellm/proxy/management_endpoints/team_endpoints.py
-@@ -2726,22 +2726,6 @@
+@@ -2687,22 +2687,6 @@
      return data_json
 
 
@@ -151,7 +151,7 @@ diff --git a/litellm/proxy/management_endpoints/team_endpoints.py b/litellm/prox
  def team_call_validation_checks(
      prisma_client: PrismaClient | None,
      data: TeamMemberAddRequest,
-@@ -2756,14 +2740,6 @@
+@@ -2717,14 +2701,6 @@
      if data.member is None:
          raise HTTPException(status_code=400, detail={"error": "No member/members passed in"})
 
@@ -166,7 +166,7 @@ diff --git a/litellm/proxy/management_endpoints/team_endpoints.py b/litellm/prox
 
  def team_member_add_duplication_check(
      data: TeamMemberAddRequest,
-@@ -3817,7 +3793,6 @@
+@@ -3772,7 +3748,6 @@
      """
      from litellm.proxy.proxy_server import (
          litellm_proxy_admin_name,
@@ -174,7 +174,7 @@ diff --git a/litellm/proxy/management_endpoints/team_endpoints.py b/litellm/prox
          prisma_client,
          user_api_key_cache,
      )
-@@ -3828,12 +3803,6 @@
+@@ -3783,12 +3758,6 @@
      if data.team_id is None:
          raise HTTPException(status_code=400, detail={"error": "No team id passed in"})
 

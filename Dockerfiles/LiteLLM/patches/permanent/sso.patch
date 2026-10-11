@@ -45,7 +45,7 @@ diff --git a/litellm/proxy/management_endpoints/ui_sso.py b/litellm/proxy/manage
      ####### Detect DB + MASTER KEY in .env #######
      missing_env_vars: Final = show_missing_vars_in_env()
      if missing_env_vars is not None:
-@@ -2170,8 +2140,6 @@
+@@ -2199,8 +2169,6 @@
 
      result: Final = await SAMLAuthHandler.handle_acs(request=request, cache=user_api_key_cache, post_data=post_data)
 
@@ -54,10 +54,10 @@ diff --git a/litellm/proxy/management_endpoints/ui_sso.py b/litellm/proxy/manage
      ui_access_mode: Final = general_settings.get("ui_access_mode", None)
      relay_state: Final = post_data.get("RelayState")
      cp_return_to: Final[str | None] = (
-@@ -4625,22 +4593,10 @@
-     PROXY_BASE_URL should be the your deployed proxy endpoint, e.g. PROXY_BASE_URL="https://litellm-production-7002.up.railway.app/"
-     Example:
+@@ -4692,22 +4660,10 @@
      """
+     _raise_if_sso_debug_disabled()
+
 -    from litellm.proxy.proxy_server import premium_user
 -
      microsoft_client_id: Final = os.getenv("MICROSOFT_CLIENT_ID", None)

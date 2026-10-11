@@ -11,7 +11,15 @@ Removal check: fallback check in tests/verify_jwt_auth.py
 diff --git a/litellm/proxy/auth/user_api_key_auth.py b/litellm/proxy/auth/user_api_key_auth.py
 --- a/litellm/proxy/auth/user_api_key_auth.py
 +++ b/litellm/proxy/auth/user_api_key_auth.py
-@@ -1792,6 +1792,17 @@
+@@ -1486,6 +1486,7 @@
+         general_settings,
+         jwt_handler,
+         litellm_proxy_admin_name,
++        llm_model_list,
+         llm_router,
+         master_key,
+         model_max_budget_limiter,
+@@ -1810,6 +1811,17 @@
                              valid_token = auto_registered
                              api_key = valid_token.token or ""
 

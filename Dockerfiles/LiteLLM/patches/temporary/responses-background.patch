@@ -15,7 +15,7 @@ Removal check: tests/verify_background.py
 diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/response_api_endpoints/endpoints.py
 --- a/litellm/proxy/response_api_endpoints/endpoints.py
 +++ b/litellm/proxy/response_api_endpoints/endpoints.py
-@@ -386,50 +386,6 @@
+@@ -385,50 +385,6 @@
              version=version,
          )
 
@@ -66,7 +66,7 @@ diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/r
          return response
      except ModifyResponseException as e:
          # Guardrail passthrough: return violation message in Responses API format (200)
-@@ -767,7 +723,7 @@
+@@ -763,7 +719,7 @@
      data["response_id"] = response_id
      processor: Final = ProxyBaseLLMRequestProcessing(data=data)
      try:
@@ -75,7 +75,7 @@ diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/r
              request=request,
              fastapi_response=fastapi_response,
              user_api_key_dict=user_api_key_dict,
-@@ -785,6 +741,9 @@
+@@ -781,6 +737,9 @@
              user_api_base=user_api_base,
              version=version,
          )
@@ -85,7 +85,7 @@ diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/r
      except Exception as e:
          raise await processor._handle_llm_api_exception(
              e=e,
-@@ -1290,7 +1249,7 @@
+@@ -1286,7 +1245,7 @@
      data["response_id"] = response_id
      processor: Final = ProxyBaseLLMRequestProcessing(data=data)
      try:
@@ -94,7 +94,7 @@ diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/r
              request=request,
              fastapi_response=fastapi_response,
              user_api_key_dict=user_api_key_dict,
-@@ -1308,6 +1267,9 @@
+@@ -1304,6 +1263,9 @@
              user_api_base=user_api_base,
              version=version,
          )

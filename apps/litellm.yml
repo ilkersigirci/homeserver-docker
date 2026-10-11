@@ -97,7 +97,6 @@ services:
       STORE_MODEL_IN_DB: "true"
       STORE_PROMPTS_IN_SPEND_LOGS: "true"
       DATABASE_URL: postgresql://litellm:${LITELLM_DATABASE_PASSWORD}@litellm-db:5432/litellm
-      ENFORCE_PRISMA_MIGRATION_CHECK: "true"
       FORWARDED_ALLOW_IPS: 192.168.90.254 # NOTE: Traefik on t3_proxy
       PROXY_BASE_URL: https://litellm.$DOMAINNAME
       #### OpenTelemetry v2 #####

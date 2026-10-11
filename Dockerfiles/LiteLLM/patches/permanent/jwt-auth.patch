@@ -16,14 +16,15 @@ outside enterprise/) so an OIDC access token acts as its Internal User.
   the team's; adding a user to a team for MCP grants must not change that.
 - On MCP routes, admit the user as LiteLLM admits its own MCP logins
   (MCPRequestHandler.reload_admitted_user), so they reach the servers granted
-  to them and to each of their teams, or an admin's view.
+  to them and to each of their teams, or an admin's view. Managed agent
+  identities keep upstream's delegated MCP authorization.
 
 Checks: tests/verify_jwt_auth.py
 
 diff --git a/litellm/proxy/auth/user_api_key_auth.py b/litellm/proxy/auth/user_api_key_auth.py
 --- a/litellm/proxy/auth/user_api_key_auth.py
 +++ b/litellm/proxy/auth/user_api_key_auth.py
-@@ -1631,15 +1631,6 @@
+@@ -1638,15 +1638,6 @@
              is_jwt = jwt_handler.is_jwt(token=api_key)
              verbose_proxy_logger.debug("is_jwt: %s", is_jwt)
              if is_jwt:
@@ -39,15 +40,16 @@ diff --git a/litellm/proxy/auth/user_api_key_auth.py b/litellm/proxy/auth/user_a
                  # Try JWT-to-Virtual-Key mapping first to avoid
                  # unnecessary DB queries in auth_builder
                  do_standard_jwt_auth = True
-@@ -1730,6 +1721,23 @@
+@@ -1747,6 +1738,24 @@
                              detail=f"User={user_id} has been deactivated via SCIM. Keys owned by this user cannot be used.",
                          )
 
-+                    if RouteChecks.check_route_access(
++                    if result.get("managed_agent_context") is None and RouteChecks.check_route_access(
 +                        route=route, allowed_routes=LiteLLMRoutes.mcp_inference_routes.value
 +                    ):
 +                        # Admit the user to MCP as LiteLLM admits its own MCP logins: the servers
-+                        # granted to them and to each of their teams, or an admin's view.
++                        # granted to them and to each of their teams, or an admin's view. Managed
++                        # agent identities keep LiteLLM's own delegated MCP authorization.
 +                        from litellm.proxy._experimental.mcp_server.auth.user_api_key_auth_mcp import (
 +                            MCPRequestHandler,
 +                        )
@@ -66,7 +68,7 @@ diff --git a/litellm/proxy/auth/user_api_key_auth.py b/litellm/proxy/auth/user_a
 diff --git a/litellm/proxy/auth/handle_jwt.py b/litellm/proxy/auth/handle_jwt.py
 --- a/litellm/proxy/auth/handle_jwt.py
 +++ b/litellm/proxy/auth/handle_jwt.py
-@@ -1275,6 +1275,9 @@
+@@ -1294,6 +1294,9 @@
 
      async def auth_jwt(self, token: str) -> dict:
          header: Final = jwt.get_unverified_header(token)
@@ -76,11 +78,11 @@ diff --git a/litellm/proxy/auth/handle_jwt.py b/litellm/proxy/auth/handle_jwt.py
 
          verbose_proxy_logger.debug("header: %s", header)
 
-@@ -2750,20 +2753,7 @@
+@@ -2852,20 +2855,7 @@
                  team_allowed_routes=handler.litellm_jwtauth.team_allowed_routes,
              ):
                  JWTAuthManager._raise_team_passthrough_route_denial(route=route)
--        elif team_id is None:
+-        elif selected_team_id is None:
 -            (
 -                team_id,
 -                team_object,
@@ -95,10 +97,10 @@ diff --git a/litellm/proxy/auth/handle_jwt.py b/litellm/proxy/auth/handle_jwt.py
 -                team_id_upsert=team_id_upsert,
 -            )
 +        # A token without a team acts as its Internal User, however many teams the user belongs to.
-         elif provisional_header_team is not None and team_id == provisional_header_team.team_id:
+         elif provisional_header_team is not None and selected_team_id == provisional_header_team.team_id:
              JWTAuthManager._validate_header_team_in_db_membership(
-                 team_id=team_id,
-@@ -2846,6 +2836,8 @@
+                 team_id=selected_team_id,
+@@ -2958,6 +2948,8 @@
              user_tpm_limit=user.tpm_limit if user is not None and not admin else None,
              user_rpm_limit=user.rpm_limit if user is not None and not admin else None,
              user_model_max_budget=user.model_max_budget if user is not None and not admin else None,
