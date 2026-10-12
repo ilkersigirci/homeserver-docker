@@ -1,0 +1,37 @@
+Upstream bug: on every OpenAI realtime input transcription, the proxy sends
+its own response.create, even with no transcript guardrail and when the client
+set turn_detection.create_response=false to request responses itself. A client
+that does (Open WebUI voice calls) collides with the proxy-started response,
+gets conversation_already_has_active_response, and ends the call; when the
+first response finishes in time, the model answers twice instead.
+
+Fixed upstream after v1.105.0:
+https://github.com/BerriAI/litellm/pull/43791
+
+Backport that fix: inject response.create only when a
+realtime_input_transcription guardrail disabled VAD auto-response, so the
+proxy owns the turn.
+
+Removal check: tests/verify_realtime_turns.py
+
+diff --git a/litellm/litellm_core_utils/realtime_streaming.py b/litellm/litellm_core_utils/realtime_streaming.py
+--- a/litellm/litellm_core_utils/realtime_streaming.py
++++ b/litellm/litellm_core_utils/realtime_streaming.py
+@@ -1017,7 +1017,7 @@ class RealTimeStreaming:
+                     cast(str, transcript),
+                     item_id=cast(str | None, event.get("item_id")),
+                 )
+-                if not blocked and not self._is_transcription_session:
++                if not blocked and not self._is_transcription_session and self._has_audio_transcription_guardrails():
+                     await self._send_to_backend(json.dumps({"type": "response.create"}))
+                 continue
+             ## LOGGING
+@@ -1068,7 +1068,7 @@ class RealTimeStreaming:
+                 transcript,
+                 item_id=event_obj.get("item_id"),
+             )
+-            if not blocked:
++            if not blocked and self._has_audio_transcription_guardrails():
+                 await self._send_to_backend(json.dumps({"type": "response.create"}))
+             return True
+         return False

@@ -132,12 +132,12 @@ Permissions-Policy: camera=(), microphone=()
 ```
 
 The shared relaxed middleware still blocks camera and microphone. Home Assistant
-uses a dedicated middleware instead.
+uses the shared camera and microphone middleware instead.
 
 In `configs/traefik3/rules/middlewares-secure-headers.yml`:
 
 ```yaml
-middlewares-secure-headers-home-assistant:
+middlewares-secure-headers-media-devices:
   headers:
     <<: *headers-relaxed
     permissionsPolicy: "camera=(self), microphone=(self), geolocation=(), payment=(), usb=()"
@@ -146,18 +146,18 @@ middlewares-secure-headers-home-assistant:
 In `configs/traefik3/rules/chain-no-auth.yml`:
 
 ```yaml
-chain-no-auth-home-assistant:
+chain-no-auth-media-devices:
   chain:
     middlewares:
       - middlewares-rate-limit-public-app
-      - middlewares-secure-headers-home-assistant
+      - middlewares-secure-headers-media-devices
 ```
 
 If CrowdSec is enabled, keep the same CrowdSec middlewares used by the other
 chains before the rate limit middleware.
 
 In `configs/traefik3/rules.specific/rpi0.yml`, route Home Assistant through the
-Home Assistant-specific chain:
+camera and microphone chain:
 
 ```yaml
 home-assistant-rtr:
@@ -165,7 +165,7 @@ home-assistant-rtr:
   entryPoints:
     - websecure
   middlewares:
-    - chain-no-auth-home-assistant
+    - chain-no-auth-media-devices
   service: home-assistant-svc
 ```
 

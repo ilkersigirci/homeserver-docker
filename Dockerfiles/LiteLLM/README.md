@@ -63,6 +63,8 @@ the patch changes, and its removal check.
   cancelled Responses stream failure logging
 - [`otel-propagation.patch`](patches/temporary/otel-propagation.patch):
   provider trace context
+- [`realtime-turns.patch`](patches/temporary/realtime-turns.patch):
+  client-owned realtime voice responses
 
 At each LiteLLM upgrade, test the pinned release without each workaround. Remove
 a patch, its source hashes, and its entry above only when its removal check

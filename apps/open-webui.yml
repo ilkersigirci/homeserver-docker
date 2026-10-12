@@ -130,6 +130,11 @@ services:
       USER_PERMISSIONS_CHAT_CONTROLS: true
       USER_PERMISSIONS_SETTINGS_INTERFACE: true
       USER_PERMISSIONS_CHAT_CALL: true
+      ############# SECURITY HEADERS #############
+      # NOTE: Temporary data: exception. Open WebUI 0.12.0 inlines its realtime-call AudioWorklet as a data: URL because the file is under Vite's 4 KiB assetsInlineLimit. Remove data: once Firefox stops logging the Report-Only violation below during a voice call.
+      CONTENT_SECURITY_POLICY: "default-src 'self'; script-src 'self' 'unsafe-inline' data:; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self'; media-src 'self'; object-src 'none'; child-src 'self'; frame-src 'self' https://*.$BASE_DOMAINNAME; worker-src 'self'; frame-ancestors 'self' https://*.$BASE_DOMAINNAME; form-action 'self'; base-uri 'self'; manifest-src 'self';"
+      # NOTE: Enforced script-src without data:. Browsers only log violations to the console because no report collector exists; Chromium does not report worklet loads.
+      CONTENT_SECURITY_POLICY_REPORT_ONLY: "script-src 'self' 'unsafe-inline'"
       ############# OTEL #############
       ENABLE_OTEL: false
       ENABLE_OTEL_TRACES: true
@@ -155,7 +160,7 @@ services:
       traefik.http.routers.open-webui-rtr.entrypoints: "websecure"
       traefik.http.routers.open-webui-rtr.rule: "Host(`chat.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.open-webui-rtr.middlewares: "chain-no-auth@file"
+      traefik.http.routers.open-webui-rtr.middlewares: "chain-no-auth-media-devices@file"
       ## HTTP Services
       traefik.http.routers.open-webui-rtr.service: "open-webui-svc"
       traefik.http.services.open-webui-svc.loadbalancer.server.port: "8080"

@@ -86,7 +86,8 @@ http:
         customRequestHeaders:
           X-Forwarded-Proto: https
 
-    middlewares-secure-headers-home-assistant:
+    # Relaxed headers with camera and microphone access; no CSP, so an app can send its own.
+    middlewares-secure-headers-media-devices:
       headers:
         <<: *headers-relaxed
         permissionsPolicy: "camera=(self), microphone=(self), geolocation=(), payment=(), usb=()"
