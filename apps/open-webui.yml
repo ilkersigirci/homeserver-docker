@@ -56,11 +56,13 @@ services:
       OAUTH_SCOPES: openid email profile groups offline_access llm:invoke # NOTE: LiteLLM validates this user access token for its own API audience.
       OAUTH_AUTHORIZE_PARAMS: '{"resource":"https://llm.$BASE_DOMAINNAME"}'
       OPENID_REDIRECT_URI: https://chat.$DOMAINNAME/oauth/oidc/callback
-      OAUTH_GROUP_CLAIM: groups
-      ENABLE_OAUTH_ROLE_MANAGEMENT: false
+      OAUTH_GROUPS_CLAIM: groups
+      ENABLE_OAUTH_ROLE_MANAGEMENT: true
       ENABLE_OAUTH_GROUP_MANAGEMENT: true
       ENABLE_OAUTH_GROUP_CREATION: true
       ENABLE_OAUTH_BACKCHANNEL_LOGOUT: true
+      OAUTH_ADMIN_ROLES: admin
+      OAUTH_ALLOWED_ROLES: "*"
       ############# WEB SEARCH #############
       BYPASS_WEB_SEARCH_EMBEDDING_AND_RETRIEVAL: true
       ENABLE_WEB_SEARCH: true
