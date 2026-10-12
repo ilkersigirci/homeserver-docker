@@ -2,7 +2,8 @@
 
 Thin wrapper over the pinned official Open WebUI slim image. Its patches let an
 Open WebUI that signs users in with OIDC send each user's own OAuth token where
-upstream allows only a shared key.
+upstream allows only a shared key, and can keep chat uploads raw for an
+external Files API.
 
 ## Image contents
 
@@ -14,11 +15,17 @@ patch changes, and its removal check.
   `__oauth_token__`, as `pipe()` does, so a Pipe can list each user's models
   with that user's credential.
 - [`speech-images-system-oauth.patch`](patches/speech-images-system-oauth.patch):
-  speech-to-text, text-to-speech, image generation, and image editing
-  authenticate like the OpenAI connection with the same base URL. When that
-  connection's `auth_type` is `system_oauth`, they send the user's OAuth token
-  instead of their configured key; otherwise they keep the key. Only the auth
-  type is shared; the connection's custom headers still apply to chat only.
+  speech-to-text, text-to-speech (the `openai` and `openai-realtime` engines),
+  realtime voice calls, image generation, and image editing authenticate like
+  the OpenAI connection with the same base URL. When that connection's
+  `auth_type` is `system_oauth`, they send the user's OAuth token instead of
+  their configured key; otherwise they keep the key. Only the auth type is
+  shared; the connection's custom headers still apply to chat only.
+- [`file-upload-processing.patch`](patches/file-upload-processing.patch), a
+  temporary upstream workaround: `ENABLE_FILE_UPLOAD_PROCESSING=false` stores
+  chat uploads without extraction or embedding, for deployments whose Pipes
+  send files to an external Files API. Unset, uploads are processed as
+  upstream does.
 
 A user without an OAuth session gets no token, never a fallback to a shared
 key. [`tests/`](tests/) checks every patch against the patched modules on

@@ -104,6 +104,13 @@ services:
       # AUDIO_TTS_OPENAI_API_KEY:  "" # NOTE: Fill it when not using system_oauth
       AUDIO_TTS_MODEL: ${AUDIO_TTS_MODEL:-openai/gpt-4o-mini-tts}
       AUDIO_TTS_VOICE: ${AUDIO_TTS_VOICE:-alloy}
+      ############# AUDIO REALTIME #############
+      AUDIO_REALTIME_ENABLED: true
+      AUDIO_REALTIME_OPENAI_API_BASE_URL: https://litellm.coding.$BASE_DOMAINNAME/v1
+      # AUDIO_REALTIME_OPENAI_API_KEY: "" # NOTE: Fill it when not using system_oauth
+      AUDIO_REALTIME_MODEL: ${AUDIO_REALTIME_MODEL:-openai/gpt-realtime-2.1-mini}
+      AUDIO_REALTIME_VOICE: ${AUDIO_REALTIME_VOICE:-marin}
+      AUDIO_REALTIME_TRANSCRIPTION_MODEL: ${AUDIO_REALTIME_TRANSCRIPTION_MODEL:-gpt-4o-mini-transcribe} # NOTE: LiteLLM forwards realtime session events unchanged, so this is OpenAI's own model ID.
       ############# CODE #############
       ## EXECUTION ##
       ENABLE_CODE_EXECUTION: true

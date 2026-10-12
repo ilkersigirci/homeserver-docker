@@ -1,0 +1,26 @@
+Temporary upstream workaround: Open WebUI extracts and embeds chat uploads
+before a Pipe or Filter runs, and has no setting that keeps them raw for an
+external Files API.
+
+https://github.com/open-webui/open-webui/issues/12228 (closed after Filters
+gained raw-file access; uploads are still processed)
+https://github.com/open-webui/open-webui/pull/27627 (closed unmerged)
+
+ENABLE_FILE_UPLOAD_PROCESSING=false makes POST /api/v1/files store uploads
+without processing, as if each request sent process=false. Leaving it unset,
+or any other value, keeps upstream behavior. Open WebUI's internal uploads,
+such as generated images, keep their own processing choice.
+
+Removal check: an Open WebUI release that can keep chat uploads raw without
+this patch.
+--- a/open_webui/routers/files.py
++++ b/open_webui/routers/files.py
+@@ -292,7 +292,7 @@
+         request,
+         file=file,
+         metadata=metadata,
+-        process=process,
++        process=process and os.environ.get('ENABLE_FILE_UPLOAD_PROCESSING', 'true').lower() == 'true',
+         process_in_background=process_in_background,
+         user=user,
+         background_tasks=background_tasks,

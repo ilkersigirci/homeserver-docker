@@ -1,19 +1,32 @@
 """Speech and images authenticate like the OpenAI connection with the same base URL."""
 
 import asyncio
+import contextlib
+import json
 import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
+import aiohttp
+from fastapi import HTTPException
 from open_webui.routers import audio, images
+from open_webui.routers.audio import realtime
 
 GATEWAY = "https://gateway.example/v1"
-USER = SimpleNamespace(id="user-id")
+# An admin, so the realtime call needs no separate call permission.
+USER = SimpleNamespace(id="user-id", role="admin")
 TOKEN = {"access_token": "user-token"}
 PNG = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
-FLOWS = ("speech-to-text", "text-to-speech", "image generation", "image edit")
+FLOWS = (
+    "speech-to-text",
+    "text-to-speech",
+    "realtime text-to-speech",
+    "realtime voice call",
+    "image generation",
+    "image edit",
+)
 
 
 class FakeResponse:
@@ -51,8 +64,33 @@ class FakeSession:
         self.authorization.append(kwargs["headers"]["Authorization"])
         return FakeCall()
 
+    async def ws_connect(self, url: str, **kwargs) -> None:
+        """Record the Realtime credential, then refuse the connection."""
+        self.authorization.append(kwargs["headers"]["Authorization"])
+        raise aiohttp.ClientError
 
-async def send(flow: str, user: object, workdir: Path) -> None:
+
+class FakeWebSocket:
+    """A browser's realtime call socket that authenticates and then waits."""
+
+    def __init__(self) -> None:
+        self.app = SimpleNamespace(state=SimpleNamespace(redis=None, MODELS={"chat-model": {"id": "chat-model"}}))
+        self.cookies: dict[str, str] = {}
+
+    async def accept(self) -> None:
+        return None
+
+    async def receive_text(self) -> str:
+        return json.dumps({"type": "auth", "token": "session-token", "model_id": "chat-model"})
+
+    async def send_json(self, message: object) -> None:
+        return None
+
+    async def close(self) -> None:
+        return None
+
+
+async def send(flow: str, user: object, feature_url: str, workdir: Path) -> None:
     request = SimpleNamespace()
     if flow == "speech-to-text":
         recording = workdir / "recording.wav"
@@ -60,6 +98,19 @@ async def send(flow: str, user: object, workdir: Path) -> None:
         await audio._transcribe_openai(request, str(recording), recording.name, [None], str(workdir), "id", user)
     elif flow == "text-to-speech":
         await audio._tts_openai(request, {"input": "Hello"}, workdir / "speech.mp3", workdir / "speech.json", user)
+    elif flow == "realtime text-to-speech":
+        payload = {
+            "input": "Hello",
+            "model": "gpt-realtime",
+            "voice": "marin",
+            "instructions": "Read it.",
+            "api_base_url": feature_url,
+        }
+        with contextlib.suppress(HTTPException):
+            await audio._tts_openai_realtime(request, payload, workdir / "speech.wav", workdir / "speech.json", user)
+    elif flow == "realtime voice call":
+        with patch.object(realtime, "get_verified_user_by_token", AsyncMock(return_value=user)):
+            await realtime.realtime_call(FakeWebSocket())
     elif flow == "image generation":
         await images.image_generations(request, images.CreateImageForm(prompt="A cat"), user=user)
     else:
@@ -67,8 +118,8 @@ async def send(flow: str, user: object, workdir: Path) -> None:
         await images.image_edits(request, form, user=user)
 
 
-async def authorization(flow: str, auth_type: str, feature_url: str, user: object, token: object) -> str:
-    """The Authorization header one request sends, with the chat connection at GATEWAY."""
+async def authorization(flow: str, auth_type: str, feature_url: str, user: object, token: object) -> str | None:
+    """The Authorization header one request sends, or None when none is sent."""
     settings = {
         "audio.stt.openai.api_base_url": feature_url,
         "audio.stt.openai.api_key": "static-key",
@@ -78,6 +129,13 @@ async def authorization(flow: str, auth_type: str, feature_url: str, user: objec
         "audio.tts.openai.api_key": "static-key",
         "audio.tts.model": "speech",
         "audio.tts.voice": "alloy",
+        "audio.realtime.enabled": True,
+        "audio.realtime.openai.api_base_url": feature_url,
+        "audio.realtime.openai.api_key": "static-key",
+        "audio.realtime.model": "gpt-realtime",
+        "audio.realtime.voice": "marin",
+        "audio.realtime.transcription_model": "transcribe",
+        "user.permissions": {},
     }
     image_config = SimpleNamespace(
         IMAGE_GENERATION_ENGINE="openai",
@@ -100,20 +158,26 @@ async def authorization(flow: str, auth_type: str, feature_url: str, user: objec
     async def setting(key: str, default: object = None) -> object:
         return settings.get(key, default)
 
+    async def many(*keys: str) -> dict[str, object]:
+        return {key: settings.get(key) for key in keys}
+
     with (
         tempfile.TemporaryDirectory() as workdir,
         patch("open_webui.routers.openai.get_openai_runtime_config", AsyncMock(return_value=connections)),
         patch("open_webui.utils.middleware.get_system_oauth_token", AsyncMock(return_value=token)),
         patch.object(audio.Config, "get", setting),
+        patch.object(audio.Config, "get_many", many),
         patch.object(audio, "get_session", AsyncMock(return_value=session)),
+        patch.object(realtime, "get_session", AsyncMock(return_value=session)),
+        patch.object(realtime.Models, "get_model_by_id", AsyncMock(return_value=None)),
         patch.object(images, "get_session", AsyncMock(return_value=session)),
         patch.object(images, "get_image_config", AsyncMock(return_value=image_config)),
         patch.object(images, "get_image_model", AsyncMock(return_value="gpt-image-1")),
         patch.object(images, "upload_image", AsyncMock(return_value=(None, {"url": "/image"}))),
     ):
-        await send(flow, user, Path(workdir))
-    (header,) = session.authorization
-    return header
+        await send(flow, user, feature_url, Path(workdir))
+    assert len(session.authorization) <= 1, session.authorization
+    return session.authorization[0] if session.authorization else None
 
 
 class SpeechImagesSystemOAuthTest(unittest.IsolatedAsyncioTestCase):
@@ -123,8 +187,9 @@ class SpeechImagesSystemOAuthTest(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(
                     await authorization(flow, "system_oauth", f"{GATEWAY}/", USER, TOKEN), "Bearer user-token"
                 )
-                self.assertEqual(await authorization(flow, "system_oauth", GATEWAY, USER, None), "Bearer ")
-                self.assertEqual(await authorization(flow, "system_oauth", GATEWAY, None, TOKEN), "Bearer ")
+                # Without a token, a request carries none, or is never sent.
+                self.assertIn(await authorization(flow, "system_oauth", GATEWAY, USER, None), ("Bearer ", None))
+                self.assertIn(await authorization(flow, "system_oauth", GATEWAY, None, TOKEN), ("Bearer ", None))
 
     async def test_other_connections_keep_the_configured_key(self) -> None:
         for flow in FLOWS:

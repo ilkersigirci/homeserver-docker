@@ -1,19 +1,20 @@
 Upstream gap: Open WebUI's OpenAI speech and image settings take only a static
-key, so speech-to-text, text-to-speech, image generation, and image editing
-cannot send the signed-in user's OAuth token (requested in open-webui#21281;
-open-webui#21282 was closed unmerged).
+key, so speech-to-text, text-to-speech, realtime voice calls, image generation,
+and image editing cannot send the signed-in user's OAuth token (requested in
+open-webui#21281; open-webui#21282 was closed unmerged).
 
 Authenticate each of them like the OpenAI connection with the same base URL:
 when that connection's auth_type is system_oauth, send the user's OAuth token
-instead of the configured key. Other connection settings, such as custom
-headers, still apply to chat only.
+instead of the configured key. Text-to-speech covers both the openai and the
+openai-realtime engines. Other connection settings, such as custom headers,
+still apply to chat only.
 
 Removal check: an Open WebUI release with an auth type for OpenAI speech and
 image requests.
 
 --- a/open_webui/routers/openai.py
 +++ b/open_webui/routers/openai.py
-@@ -343,6 +343,21 @@
+@@ -260,6 +260,21 @@
      return url, key, api_config
 
 
@@ -32,12 +33,12 @@ image requests.
 +    return api_key
 +
 +
- async def clear_openai_model_cache(request: Request):
+ async def clear_models_cache(request: Request):
      await get_all_models.cache.clear()
      redis = getattr(request.app.state, 'redis', None)
---- a/open_webui/routers/audio.py
-+++ b/open_webui/routers/audio.py
-@@ -400,8 +400,10 @@
+--- a/open_webui/routers/audio/__init__.py
++++ b/open_webui/routers/audio/__init__.py
+@@ -434,8 +434,10 @@
      if not payload.get('voice'):
          payload['voice'] = await Config.get('audio.tts.voice')
      payload = {**payload, **(await Config.get('audio.tts.openai.params') or {})}
@@ -49,7 +50,20 @@ image requests.
 
      headers = {
          'Content-Type': 'application/json',
-@@ -701,8 +703,12 @@
+@@ -477,7 +479,11 @@
+
+ async def _tts_openai_realtime(request, payload, file_path, file_body_path, user):
+     """Generate speech via the OpenAI Realtime API."""
+-    api_key = await Config.get('audio.tts.openai.api_key')
++    from open_webui.routers.openai import get_connection_api_key
++
++    api_key = await get_connection_api_key(
++        request, user, payload['api_base_url'], await Config.get('audio.tts.openai.api_key')
++    )
+     if not isinstance(api_key, str) or not api_key.strip():
+         raise HTTPException(400, 'Configure an OpenAI Realtime API key.')
+     url = urlsplit(payload['api_base_url'])
+@@ -893,8 +899,12 @@
      r = None
      try:
          session = await get_session()
@@ -63,9 +77,27 @@ image requests.
          request_format = (await Config.get('audio.stt.openai.api_request_format') or 'multipart').lower()
 
          headers = {'Authorization': f'Bearer {api_key}'}
+--- a/open_webui/routers/audio/realtime.py
++++ b/open_webui/routers/audio/realtime.py
+@@ -382,7 +382,14 @@
+         override = ModelVoice.model_validate((model_info.meta.model_dump().get('voice') if model_info else None) or {})
+         voice_model = config.get('audio.realtime.model')
+         voice = override.voice or config.get('audio.realtime.voice')
+-        key = config.get('audio.realtime.openai.api_key')
++        from open_webui.routers.openai import get_connection_api_key
++
++        key = await get_connection_api_key(
++            ws,
++            user,
++            config.get('audio.realtime.openai.api_base_url') or '',
++            config.get('audio.realtime.openai.api_key'),
++        )
+         url = urlsplit(config.get('audio.realtime.openai.api_base_url') or '')
+         if (
+             url.scheme not in {'http', 'https'}
 --- a/open_webui/routers/images.py
 +++ b/open_webui/routers/images.py
-@@ -619,8 +619,13 @@
+@@ -625,8 +625,13 @@
 
      try:
          if image_config.IMAGE_GENERATION_ENGINE == 'openai':
@@ -80,7 +112,7 @@ image requests.
                  'Content-Type': 'application/json',
              }
 
-@@ -976,8 +981,13 @@
+@@ -982,8 +987,13 @@
 
      try:
          if image_config.IMAGE_EDIT_ENGINE == 'openai':

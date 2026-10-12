@@ -5,10 +5,9 @@ Pass pipes() the user's OAuth token when it declares __oauth_token__, as pipe()
 receives it.
 
 Removal check: an Open WebUI release that gives pipes() the user's OAuth token.
-
 --- a/open_webui/functions.py
 +++ b/open_webui/functions.py
-@@ -68,7 +68,16 @@
+@@ -69,7 +69,16 @@
      return function_module
 
 
@@ -23,10 +22,10 @@ Removal check: an Open WebUI release that gives pipes() the user's OAuth token.
 +
 +
 +async def get_function_models(request, user=None):
-     if not ENABLE_PLUGINS:
+     if not ENABLE_FUNCTIONS:
          return []
 
-@@ -90,10 +99,11 @@
+@@ -91,10 +100,11 @@
                  # Handle pipes being a list, sync function, or async function
                  try:
                      if callable(function_module.pipes):
@@ -42,7 +41,7 @@ Removal check: an Open WebUI release that gives pipes() the user's OAuth token.
                  except Exception as e:
 --- a/open_webui/utils/models.py
 +++ b/open_webui/utils/models.py
-@@ -59,7 +59,7 @@
+@@ -80,7 +80,7 @@
      config = await Config.get_many('openai.enable', 'ollama.enable')
      openai_task = fetch_openai_models(request, user) if config.get('openai.enable') else asyncio.sleep(0, result=[])
      ollama_task = fetch_ollama_models(request, user) if config.get('ollama.enable') else asyncio.sleep(0, result=[])
