@@ -9,6 +9,10 @@ metastore:
   raft:
     dir: /data/pyroscope/metastore/raft
     snapshots_dir: /data/pyroscope/metastore/raft
+    # Single node: wait for disk writes instead of abandoning them after 10s.
+    # Pyroscope 2.3.1 can otherwise get stuck with non-monotonic Raft log entries.
+    # Revisit once LGTM bundles the fix: https://github.com/grafana/pyroscope/pull/5307
+    log_store_timeout: 0s
 
 # Keep the legacy profile reader alongside the v2 storage components.
 architecture_storage: v1-v2-dual
