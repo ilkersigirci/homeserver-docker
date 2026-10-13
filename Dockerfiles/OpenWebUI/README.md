@@ -2,8 +2,8 @@
 
 Thin wrapper over the pinned official Open WebUI slim image. Its patches let an
 Open WebUI that signs users in with OIDC send each user's own OAuth token where
-upstream allows only a shared key, and can keep chat uploads raw for an
-external Files API.
+upstream allows only a shared key, let a Pipe describe the models it lists, and
+can keep chat uploads raw for an external Files API.
 
 ## Image contents
 
@@ -14,6 +14,11 @@ patch changes, and its removal check.
   Pipe's `pipes()` receives the user's OAuth token when it declares
   `__oauth_token__`, as `pipe()` does, so a Pipe can list each user's models
   with that user's credential.
+- [`pipes-model-info.patch`](patches/pipes-model-info.patch): each `pipes()`
+  entry may carry an `info` dict, which becomes the listed model's info, as a
+  stored model record would provide it: description, capabilities, default
+  tools, Filters, and Chat Variables form. A stored record still replaces it.
+  Upstream declined this ([open-webui#23047](https://github.com/open-webui/open-webui/issues/23047)).
 - [`speech-images-system-oauth.patch`](patches/speech-images-system-oauth.patch):
   speech-to-text, text-to-speech (the `openai` and `openai-realtime` engines),
   realtime voice calls, image generation, and image editing authenticate like

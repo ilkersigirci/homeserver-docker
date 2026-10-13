@@ -1,0 +1,20 @@
+Upstream gap: Open WebUI keeps only id and name from a manifold Pipe's
+pipes() entries and reads a model's description, capabilities, default tools,
+Filters, and Chat Variables form only from a stored model record, so a Pipe
+cannot describe the models it lists (open-webui#23047, declined upstream).
+
+Keep the info dict of each pipes() entry as the listed model's info, the shape
+a stored model record provides. A stored record for the same model still
+replaces it.
+
+Removal check: an Open WebUI release that keeps model info from pipes().
+--- a/open_webui/functions.py
++++ b/open_webui/functions.py
+@@ -121,6 +121,7 @@
+                             'owned_by': 'openai',
+                             'pipe': pipe_flag,
+                             'has_user_valves': has_user_valves,
++                            **({'info': p['info']} if 'info' in p else {}),
+                         }
+                     )
+             else:
