@@ -87,7 +87,7 @@
           "showLineNumbers": false,
           "showMiniMap": false
         },
-        "content": "# LGOS request observability\n\nGraph run, failure, and duration panels read LGOS's GenAI workflow metric for foreground and background runs; a cancelled run is not a failure. Select a **Conversation ID** to open the UI conversation, trace waterfall, or Langfuse trace. Use **Logs for this span** in the waterfall for correlated logs.",
+        "content": "# LGOS request observability\n\nGraph run, failure, and duration panels read LGOS's GenAI workflow metric for foreground and background runs; a run that ends before its output fails, cancellations included, and its `error.type` names the cause. Select a **Conversation ID** to open the UI conversation, trace waterfall, or Langfuse trace. Use **Logs for this span** in the waterfall for correlated logs.",
         "mode": "markdown"
       },
       "pluginVersion": "13.1.1",
@@ -156,7 +156,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "Graph runs that raised an exception. A cancelled run, such as a Stop click or a closed stream, is not a failure.",
+      "description": "Graph runs that ended before their output: an exception, or a cancellation such as a Stop click, a closed stream, or a cancelled background Response. error.type tells them apart.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -336,7 +336,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "Graph runs, failed runs, and LGOS HTTP 5xx responses per minute. HTTP 5xx covers server errors before a run starts; a cancelled run is not a failure.",
+      "description": "Graph runs, failed runs, and LGOS HTTP 5xx responses per minute. Failed runs include cancellations; HTTP 5xx covers server errors before a run starts.",
       "fieldConfig": {
         "defaults": {
           "color": {
