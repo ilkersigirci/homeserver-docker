@@ -81,6 +81,10 @@ metrics_generator:
 
 overrides:
   defaults:
+    read:
+      # Tempo trims leading zeros from search results by default, which breaks
+      # links that look up the exact ID, such as Langfuse's.
+      left_pad_trace_ids: true
     metrics_generator:
       # Match the OpenTelemetry Prometheus exemplar label convention.
       trace_id_label_name: trace_id
