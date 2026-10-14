@@ -20,6 +20,7 @@ general_settings:
       routes: [openai_routes, model_info_routes, mcp_inference_routes, "/v1/models/*", "/models/*"]
   fail_closed_budget_enforcement: true
   ui_access_mode: admin_only
+  disable_env_credential_login: true
 
 litellm_settings:
   # A first OIDC request or UI SSO login creates a user with a zero budget.
