@@ -227,6 +227,8 @@ services:
       REDIS_TLS_KEY: ${REDIS_TLS_KEY:-/certs/redis.key}
       EMAIL_FROM_ADDRESS: ${EMAIL_FROM_ADDRESS:-}
       SMTP_CONNECTION_URL: ${SMTP_CONNECTION_URL:-}
+      ## LLM Connection: the web Playground and the worker's LLM-as-a-Judge calls both reach this private host.
+      LANGFUSE_LLM_CONNECTION_WHITELISTED_HOST: $AIGATEWAY_HOST # NOTE: It shouldn't have https prefix
     healthcheck:
       test:
         ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3030/api/health"]
@@ -285,8 +287,6 @@ services:
       # AUTH_CUSTOM_AUTHORIZATION_URL: dummy
       # AUTH_CUSTOM_TOKEN_URL: dummy
       # AUTH_CUSTOM_USERINFO_URL: dummy
-      ## LLM Connection
-      LANGFUSE_LLM_CONNECTION_WHITELISTED_HOST: $AIGATEWAY_HOST # NOTE: It shouldn't have https prefix
     healthcheck:
       test:
         [
