@@ -111,10 +111,6 @@ receivers:
         enabled: false
 
 processors:
-  batch:
-    send_batch_size: 8192
-    timeout: 5s
-
   memory_limiter:
     check_interval: 1s
     limit_mib: ${env:OTEL_COLLECTOR_MEMORY_LIMIT_MIB}
@@ -165,6 +161,13 @@ exporters:
       storage: file_storage
       num_consumers: 4
       queue_size: 20000
+      # Batch after persistence so queue failures reach the receiver for retry.
+      # Bound serialized bytes: a record count does not bound large log bodies.
+      batch:
+        sizer: bytes
+        min_size: 262144
+        max_size: 1048576
+        flush_timeout: 5s
     retry_on_failure:
       enabled: true
       initial_interval: 1s
@@ -193,12 +196,12 @@ service:
     # Pipeline for Logs (going to Loki)
     logs:
       receivers: [otlp]
-      processors: [memory_limiter, resourcedetection, resource/common, batch]
+      processors: [memory_limiter, resourcedetection, resource/common]
       exporters: [otlp]
     # Pipeline for application and edge metrics (Traefik/FastAPI/etc.).
     metrics:
       receivers: [otlp]
-      processors: [memory_limiter, resourcedetection, resource/common, batch]
+      processors: [memory_limiter, resourcedetection, resource/common]
       exporters: [otlp]
     # Pipeline for machine level metrics (cpu/memory/disk/network/filesystem).
     metrics/host:
@@ -209,7 +212,6 @@ service:
           resourcedetection,
           resource/common,
           resource/hostmetrics,
-          batch,
         ]
       exporters: [otlp]
     # Pipeline for Docker container resource counters, including CPU throttling
@@ -222,11 +224,10 @@ service:
           resourcedetection,
           resource/common,
           resource/dockerstats,
-          batch,
         ]
       exporters: [otlp]
     # Pipeline for Traefik Traces (going to Tempo)
     traces:
       receivers: [otlp]
-      processors: [memory_limiter, resourcedetection, resource/common, batch]
+      processors: [memory_limiter, resourcedetection, resource/common]
       exporters: [otlp]

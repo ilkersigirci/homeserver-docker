@@ -21,6 +21,20 @@ extensions:
   health_check:
     endpoint: 0.0.0.0:13133
     path: "/ready"
+  file_storage:
+    directory: /data/otelcol
+    create_directory: true
+    timeout: 10s
+    fsync: true
+    # Cap each exporter database at 128 MiB; compaction needs extra disk space.
+    max_size: 134217728
+    compaction:
+      directory: /data/otelcol/compaction
+      on_rebound: true
+      cleanup_on_start: true
+      rebound_needed_threshold_mib: 100
+      rebound_trigger_threshold_mib: 10
+      check_interval: 5s
 
 processors:
   memory_limiter:
@@ -48,22 +62,82 @@ processors:
           - set(attributes["request_host"], attributes["RequestHost"])
 
 exporters:
+  # Persist before batching so queue failures reach upstream OTLP senders.
+  # Queue budgets count serialized bytes, not process RAM or database file sizes.
   otlphttp/metrics:
     endpoint: http://127.0.0.1:9090/api/v1/otlp
     tls:
       insecure: true
+    sending_queue:
+      storage: file_storage
+      sizer: bytes
+      queue_size: 33554432
+      # Preserve export order when retrying older metric samples.
+      num_consumers: 1
+      batch:
+        sizer: bytes
+        min_size: 262144
+        max_size: 1048576
+        flush_timeout: 1s
+    retry_on_failure:
+      initial_interval: 1s
+      max_interval: 30s
+      max_elapsed_time: 1h
   otlphttp/traces:
     endpoint: http://127.0.0.1:4418
     tls:
       insecure: true
+    sending_queue:
+      storage: file_storage
+      sizer: bytes
+      queue_size: 33554432
+      num_consumers: 2
+      batch:
+        sizer: bytes
+        min_size: 262144
+        max_size: 1048576
+        flush_timeout: 1s
+    retry_on_failure:
+      initial_interval: 1s
+      max_interval: 30s
+      max_elapsed_time: 1h
   otlphttp/logs:
     endpoint: http://127.0.0.1:3100/otlp
     tls:
       insecure: true
+    # Split large log requests below Loki's gRPC limit.
+    sending_queue:
+      storage: file_storage
+      sizer: bytes
+      queue_size: 33554432
+      num_consumers: 2
+      batch:
+        sizer: bytes
+        min_size: 262144
+        max_size: 1048576
+        flush_timeout: 1s
+    retry_on_failure:
+      initial_interval: 1s
+      max_interval: 30s
+      max_elapsed_time: 1h
   otlp/profiles:
     endpoint: http://127.0.0.1:4040
     tls:
       insecure: true
+    sending_queue:
+      storage: file_storage
+      sizer: bytes
+      queue_size: 33554432
+      num_consumers: 2
+      batch:
+        sizer: bytes
+        min_size: 262144
+        max_size: 1048576
+        flush_timeout: 1s
+    retry_on_failure:
+      initial_interval: 1s
+      max_interval: 30s
+      max_elapsed_time: 1h
   debug/metrics:
     verbosity: detailed
   debug/traces:
@@ -84,25 +158,25 @@ connectors:
             default_value: unknown
 
 service:
-  extensions: [health_check]
+  extensions: [health_check, file_storage]
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [memory_limiter, batch]
+      processors: [memory_limiter]
       exporters: [otlphttp/traces]
       #exporters: [otlphttp/traces,debug/traces]
     metrics:
       receivers: [otlp, prometheus/collector]
-      processors: [memory_limiter, batch]
+      processors: [memory_limiter]
       exporters: [otlphttp/metrics]
       #exporters: [otlphttp/metrics,debug/metrics]
     metrics/chhoto_url:
       receivers: [count/chhoto_url]
-      processors: [memory_limiter, delta_to_cumulative/chhoto_url, interval/chhoto_url, batch]
+      processors: [memory_limiter, delta_to_cumulative/chhoto_url, interval/chhoto_url]
       exporters: [otlphttp/metrics]
     logs:
       receivers: [otlp]
-      processors: [memory_limiter, batch]
+      processors: [memory_limiter]
       exporters: [otlphttp/logs]
       #exporters: [otlphttp/logs,debug/logs]
     logs/chhoto_url:
@@ -111,4 +185,5 @@ service:
       exporters: [count/chhoto_url]
     profiles:
       receivers: [otlp]
+      processors: [memory_limiter]
       exporters: [otlp/profiles]

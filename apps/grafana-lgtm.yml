@@ -47,6 +47,8 @@ services:
       - $REPO_PATH/configs/grafana-lgtm/pyroscope/default.yaml:/otel-lgtm/pyroscope-config.yaml:ro
       - $REPO_PATH/configs/grafana-lgtm/otelcol/default.yaml:/otel-lgtm/otelcol-config.yaml:ro
       ## DATA
+      # Preserve /data/otelcol across recreates: it holds pending exporter queues.
+      # Tune queue capacity and retries together in the collector config for longer outages.
       - $REPO_PATH/appdata/grafana-lgtm:/data
       # Tempo 3 stores its live-store WAL and scheduler state outside /data.
       - $REPO_PATH/appdata/grafana-lgtm/tempo/runtime:/var/tempo
