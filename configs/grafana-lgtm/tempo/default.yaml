@@ -1,4 +1,7 @@
 # From: https://github.com/grafana/docker-otel-lgtm/blob/main/docker/tempo-config.yaml
+usage_report:
+  reporting_enabled: false
+
 server:
   http_listen_port: 3200
   grpc_listen_port: 9096

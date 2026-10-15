@@ -1,4 +1,7 @@
 # From: https://github.com/grafana/docker-otel-lgtm/blob/main/docker/pyroscope-config.yaml
+analytics:
+  reporting_enabled: false
+
 server:
   grpc_listen_port: 9097 # to avoid conflict with tempo
 

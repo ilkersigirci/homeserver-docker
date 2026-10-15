@@ -64,6 +64,7 @@ services:
       GF_PATHS_DATA: /data/grafana
       GF_PATHS_PROVISIONING: /otel-lgtm/grafana/conf/provisioning
       GF_LOG_LEVEL: "info"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
       GF_FEATURE_TOGGLES_ENABLE: "provisioning" # Enable new provisioning/Git Sync features.
       GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /otel-lgtm/grafana/conf/provisioning/dashboards/OTEL/Traefik-Opentelemetry.json
       # GF_PANELS_DISABLE_SANITIZE_HTML: "true" # Allow raw HTML/JS in text panels (XSS risk).
