@@ -38,7 +38,7 @@ image requests.
      redis = getattr(request.app.state, 'redis', None)
 --- a/open_webui/routers/audio/__init__.py
 +++ b/open_webui/routers/audio/__init__.py
-@@ -434,8 +434,10 @@
+@@ -440,8 +440,10 @@
      if not payload.get('voice'):
          payload['voice'] = await Config.get('audio.tts.voice')
      payload = {**payload, **(await Config.get('audio.tts.openai.params') or {})}
@@ -50,7 +50,7 @@ image requests.
 
      headers = {
          'Content-Type': 'application/json',
-@@ -477,7 +479,11 @@
+@@ -483,7 +485,11 @@
 
  async def _tts_openai_realtime(request, payload, file_path, file_body_path, user):
      """Generate speech via the OpenAI Realtime API."""
@@ -63,7 +63,7 @@ image requests.
      if not isinstance(api_key, str) or not api_key.strip():
          raise HTTPException(400, 'Configure an OpenAI Realtime API key.')
      url = urlsplit(payload['api_base_url'])
-@@ -893,8 +899,12 @@
+@@ -899,8 +905,12 @@
      r = None
      try:
          session = await get_session()
@@ -79,22 +79,22 @@ image requests.
          headers = {'Authorization': f'Bearer {api_key}'}
 --- a/open_webui/routers/audio/realtime.py
 +++ b/open_webui/routers/audio/realtime.py
-@@ -382,7 +382,14 @@
-         override = ModelVoice.model_validate((model_info.meta.model_dump().get('voice') if model_info else None) or {})
-         voice_model = config.get('audio.realtime.model')
-         voice = override.voice or config.get('audio.realtime.voice')
--        key = config.get('audio.realtime.openai.api_key')
-+        from open_webui.routers.openai import get_connection_api_key
+@@ -423,6 +423,15 @@
+             raise ValueError('Configure the Realtime model, voice, and transcription model')
+         async with asyncio.timeout(30):
+             async with asyncio.timeout(15):
++                if config.get('audio.realtime.provider', 'openai') == 'openai':
++                    from open_webui.routers.openai import get_connection_api_key
 +
-+        key = await get_connection_api_key(
-+            ws,
-+            user,
-+            config.get('audio.realtime.openai.api_base_url') or '',
-+            config.get('audio.realtime.openai.api_key'),
-+        )
-         url = urlsplit(config.get('audio.realtime.openai.api_base_url') or '')
-         if (
-             url.scheme not in {'http', 'https'}
++                    config['audio.realtime.openai.api_key'] = await get_connection_api_key(
++                        ws,
++                        user,
++                        config.get('audio.realtime.openai.api_base_url') or '',
++                        config.get('audio.realtime.openai.api_key'),
++                    )
+                 ws_url, headers = await _get_realtime_connection(config)
+                 session = await get_session()
+                 try:
 --- a/open_webui/routers/images.py
 +++ b/open_webui/routers/images.py
 @@ -625,8 +625,13 @@

@@ -58,15 +58,15 @@ class FakeCall:
 
 class FakeSession:
     def __init__(self) -> None:
-        self.authorization: list[str] = []
+        self.headers: list[dict[str, str]] = []
 
     def post(self, **kwargs) -> FakeCall:
-        self.authorization.append(kwargs["headers"]["Authorization"])
+        self.headers.append(kwargs["headers"])
         return FakeCall()
 
     async def ws_connect(self, url: str, **kwargs) -> None:
         """Record the Realtime credential, then refuse the connection."""
-        self.authorization.append(kwargs["headers"]["Authorization"])
+        self.headers.append(kwargs["headers"])
         raise aiohttp.ClientError
 
 
@@ -118,8 +118,17 @@ async def send(flow: str, user: object, feature_url: str, workdir: Path) -> None
         await images.image_edits(request, form, user=user)
 
 
-async def authorization(flow: str, auth_type: str, feature_url: str, user: object, token: object) -> str | None:
-    """The Authorization header one request sends, or None when none is sent."""
+async def request_headers(
+    flow: str,
+    auth_type: str,
+    feature_url: str,
+    user: object,
+    token: object,
+    *,
+    realtime_provider: str = "openai",
+    realtime_auth_type: str = "api_key",
+) -> dict[str, str]:
+    """The headers one request sends, or an empty dict when none is sent."""
     settings = {
         "audio.stt.openai.api_base_url": feature_url,
         "audio.stt.openai.api_key": "static-key",
@@ -130,6 +139,8 @@ async def authorization(flow: str, auth_type: str, feature_url: str, user: objec
         "audio.tts.model": "speech",
         "audio.tts.voice": "alloy",
         "audio.realtime.enabled": True,
+        "audio.realtime.provider": realtime_provider,
+        "audio.realtime.auth_type": realtime_auth_type,
         "audio.realtime.openai.api_base_url": feature_url,
         "audio.realtime.openai.api_key": "static-key",
         "audio.realtime.model": "gpt-realtime",
@@ -176,11 +187,33 @@ async def authorization(flow: str, auth_type: str, feature_url: str, user: objec
         patch.object(images, "upload_image", AsyncMock(return_value=(None, {"url": "/image"}))),
     ):
         await send(flow, user, feature_url, Path(workdir))
-    assert len(session.authorization) <= 1, session.authorization
-    return session.authorization[0] if session.authorization else None
+    assert len(session.headers) <= 1, session.headers
+    return session.headers[0] if session.headers else {}
+
+
+async def authorization(flow: str, auth_type: str, feature_url: str, user: object, token: object) -> str | None:
+    """The Authorization header one request sends, or None when none is sent."""
+    return (await request_headers(flow, auth_type, feature_url, user, token)).get("Authorization")
 
 
 class SpeechImagesSystemOAuthTest(unittest.IsolatedAsyncioTestCase):
+    async def test_azure_realtime_keeps_its_provider_credentials(self) -> None:
+        for auth_type, expected in (
+            ("api_key", {"api-key": "static-key"}),
+            ("microsoft_entra_id", {"Authorization": "Bearer entra-token"}),
+        ):
+            with (
+                self.subTest(auth_type=auth_type),
+                patch.object(realtime, "get_microsoft_entra_id_access_token", return_value="entra-token"),
+            ):
+                self.assertEqual(
+                    await request_headers(
+                        "realtime voice call", "system_oauth", GATEWAY, USER, TOKEN,
+                        realtime_provider="azure", realtime_auth_type=auth_type,
+                    ),
+                    expected,
+                )
+
     async def test_a_system_oauth_connection_sends_the_user_token_and_never_the_key(self) -> None:
         for flow in FLOWS:
             with self.subTest(flow=flow):
