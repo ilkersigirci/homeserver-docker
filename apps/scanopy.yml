@@ -4,7 +4,7 @@ networks:
 
 services:
   scanopy-daemon:
-    image: ghcr.io/scanopy/scanopy/daemon:v0.17.22@sha256:6c7636c40db8b1e000680178f160ca3cee116e0c6b7535b291fe0c1e47147b85
+    image: ghcr.io/scanopy/scanopy/daemon:v0.18.2@sha256:06cc7f6f4b41bef89fd58b4f002eb0539d7df204adc5a3ab97898cbb1fcaf261
     container_name: scanopy-daemon
     restart: $RESTART_POLICY_MAINTENANCE
     init: true
@@ -82,7 +82,7 @@ services:
       start_period: 30s
 
   scanopy:
-    image: ghcr.io/scanopy/scanopy/server:v0.17.22@sha256:f6407504c838b6a25dd57f70b07c3c9d544c125636897f3d6ad28ec8ad4f5595
+    image: ghcr.io/scanopy/scanopy/server:v0.18.2@sha256:a1437d84225edb2df6a96c1221fb3f4793e41be41ef134cf00e72be5032eee57
     container_name: scanopy
     restart: $RESTART_POLICY_MAINTENANCE
     init: true
