@@ -5,7 +5,8 @@ http:
       entryPoints:
         - websecure
       middlewares:
-        - chain-no-auth-relaxed
+        - t3code-rate-limit
+        - middlewares-secure-headers-relaxed
       service: t3code-svc
 
     marimo-local-rtr:
@@ -68,6 +69,12 @@ http:
       service: lgos-openwebui-svc
 
   middlewares:
+    # T3 loads ~160 assets at startup; the shared 100-request burst causes 429s.
+    t3code-rate-limit:
+      rateLimit:
+        average: 200
+        burst: 500
+
     langflow-oidc:
       plugin:
         traefik-oidc-auth:
