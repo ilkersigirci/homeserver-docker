@@ -1,9 +1,9 @@
 # syntax=docker/dockerfile:1.25@sha256:0adf442eae370b6087e08edc7c50b552d80ddf261576f4ebd6421006b2461f12
 # renovate: datasource=github-tags depName=BerriAI/litellm
-ARG IMAGE_VERSION=1.105.0
-ARG UPSTREAM_COMMIT=80b9556dd312d18c535ae06884faa97d1fdb8f46
+ARG IMAGE_VERSION=1.106.0
+ARG UPSTREAM_COMMIT=955bdaafa8b72b2b6ff728048f272fbc06049f63
 
-FROM rust:1.94.1-slim-trixie@sha256:cf09adf8c3ebaba10779e5c23ff7fe4df4cccdab8a91f199b0c142c53fef3e1a AS rust
+FROM rust:1.98.0-slim-trixie@sha256:17d1ba895198f9934c6314ec5346a0d5115372f3243390c3d731e242f35c2f27 AS rust
 
 FROM ghcr.io/astral-sh/uv:0.11.29-python3.13-trixie-slim@sha256:0b973c14a35cb0dc8fe63a2e8c9919fd797ac566de13090fcf0df4a6b3994b78 AS base
 RUN apt-get update \
@@ -51,7 +51,8 @@ RUN --mount=type=cache,target=/root/.cache/uv ${UV_SYNC} --no-install-workspace
 COPY --from=source /app/ ./
 RUN rm -rf /app/litellm/proxy/_experimental/out
 COPY --from=ui /ui/out/ litellm/proxy/_experimental/out/
-RUN --mount=type=cache,target=/root/.cache/uv ${UV_SYNC} \
+# Upstream's uv cache keys omit patched Python sources and the rebuilt dashboard.
+RUN --mount=type=cache,target=/root/.cache/uv ${UV_SYNC} --reinstall-package litellm \
     && XDG_CACHE_HOME=/opt/prisma/.cache PRISMA_BINARY_CACHE_DIR=/opt/prisma/binaries \
       prisma generate --schema=./schema.prisma \
     && chmod +x docker/entrypoint.sh docker/prod_entrypoint.sh

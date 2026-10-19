@@ -13,7 +13,7 @@ Removal check: JWKS TLS check in tests/verify_jwt_auth.py
 diff --git a/litellm/llms/custom_httpx/httpx_handler.py b/litellm/llms/custom_httpx/httpx_handler.py
 --- a/litellm/llms/custom_httpx/httpx_handler.py
 +++ b/litellm/llms/custom_httpx/httpx_handler.py
-@@ -25,6 +25,8 @@
+@@ -25,6 +25,8 @@ def get_default_headers() -> dict:
 
  class HTTPHandler:
      def __init__(self, concurrent_limit=1000):
@@ -22,7 +22,7 @@ diff --git a/litellm/llms/custom_httpx/httpx_handler.py b/litellm/llms/custom_ht
          headers: Final = get_default_headers()
          # Create a client with a connection pool
          self.client = httpx.AsyncClient(
-@@ -33,6 +35,8 @@
+@@ -33,6 +35,8 @@ class HTTPHandler:
                  max_keepalive_connections=concurrent_limit,
              ),
              headers=headers,

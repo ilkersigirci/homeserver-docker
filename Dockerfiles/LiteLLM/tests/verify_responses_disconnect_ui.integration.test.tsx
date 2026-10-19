@@ -1,8 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import { LogDetailContent } from "@/components/view_logs/LogDetailsDrawer/LogDetailContent";
-import type { LogEntry } from "@/components/view_logs/columns";
+import { LogDetailContent } from "@/components/logs/detail/LogDetailContent";
+import type { LogEntry } from "@/components/logs/types";
 
 describe("cancelled Responses logs", () => {
   it.each([true, false])(

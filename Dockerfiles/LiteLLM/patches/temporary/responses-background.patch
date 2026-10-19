@@ -15,7 +15,7 @@ Removal check: tests/verify_background.py
 diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/response_api_endpoints/endpoints.py
 --- a/litellm/proxy/response_api_endpoints/endpoints.py
 +++ b/litellm/proxy/response_api_endpoints/endpoints.py
-@@ -385,50 +385,6 @@
+@@ -389,50 +389,6 @@ async def responses_api(
              version=version,
          )
 
@@ -23,11 +23,11 @@ diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/r
 -        if data.get("background") and isinstance(response, ResponsesAPIResponse):
 -            if response.status in ["queued", "in_progress"]:
 -                from litellm_enterprise.proxy.hooks.managed_files import (
--                    _PROXY_LiteLLMManagedFiles,
+-                    PROXY_LiteLLMManagedFiles,
 -                )
 -
 -                managed_files_obj: Final = cast(
--                    _PROXY_LiteLLMManagedFiles | None,
+-                    PROXY_LiteLLMManagedFiles | None,
 -                    proxy_logging_obj.get_proxy_hook("managed_files"),
 -                )
 -
@@ -66,7 +66,7 @@ diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/r
          return response
      except ModifyResponseException as e:
          # Guardrail passthrough: return violation message in Responses API format (200)
-@@ -763,7 +719,7 @@
+@@ -767,7 +723,7 @@ async def get_response(
      data["response_id"] = response_id
      processor: Final = ProxyBaseLLMRequestProcessing(data=data)
      try:
@@ -75,7 +75,7 @@ diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/r
              request=request,
              fastapi_response=fastapi_response,
              user_api_key_dict=user_api_key_dict,
-@@ -781,6 +737,9 @@
+@@ -785,6 +741,9 @@ async def get_response(
              user_api_base=user_api_base,
              version=version,
          )
@@ -83,9 +83,9 @@ diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/r
 +            response.id = response_id
 +        return response
      except Exception as e:
-         raise await processor._handle_llm_api_exception(
+         raise await processor.handle_llm_api_exception(
              e=e,
-@@ -1286,7 +1245,7 @@
+@@ -1290,7 +1249,7 @@ async def cancel_response(
      data["response_id"] = response_id
      processor: Final = ProxyBaseLLMRequestProcessing(data=data)
      try:
@@ -94,7 +94,7 @@ diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/r
              request=request,
              fastapi_response=fastapi_response,
              user_api_key_dict=user_api_key_dict,
-@@ -1304,6 +1263,9 @@
+@@ -1308,6 +1267,9 @@ async def cancel_response(
              user_api_base=user_api_base,
              version=version,
          )
@@ -102,5 +102,5 @@ diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/r
 +            response.id = response_id
 +        return response
      except Exception as e:
-         raise await processor._handle_llm_api_exception(
+         raise await processor.handle_llm_api_exception(
              e=e,

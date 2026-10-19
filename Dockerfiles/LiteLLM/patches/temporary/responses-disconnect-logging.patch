@@ -22,7 +22,7 @@ in the Logs UI, preserved after refresh.
 diff --git a/litellm/proxy/common_request_processing.py b/litellm/proxy/common_request_processing.py
 --- a/litellm/proxy/common_request_processing.py
 +++ b/litellm/proxy/common_request_processing.py
-@@ -6,6 +6,8 @@
+@@ -6,6 +6,8 @@ import math
  from collections.abc import AsyncGenerator, Awaitable, Callable, Coroutine, Mapping, Sequence
  from datetime import datetime
  from functools import lru_cache
@@ -31,10 +31,10 @@ diff --git a/litellm/proxy/common_request_processing.py b/litellm/proxy/common_r
  from types import MappingProxyType
  from typing import (
      TYPE_CHECKING,
-@@ -116,10 +118,12 @@
- from litellm.proxy.native_compaction import with_proxy_compaction_executor
- from litellm.proxy.route_llm_request import route_request
- from litellm.proxy.utils import ProxyLogging, _check_and_merge_model_level_guardrails
+@@ -124,10 +126,12 @@ from litellm.proxy.utils import (  # noqa: F401  # legacy module exports
+     _check_and_merge_model_level_guardrails,  # pyright: ignore[reportPrivateUsage,reportUnusedImport]  # backwards-compatible package export
+     check_and_merge_model_level_guardrails,
+ )
 +from litellm.responses.streaming_iterator import BaseResponsesAPIStreamingIterator
  from litellm.router import Router
  from litellm.router_utils.add_retry_fallback_headers import get_hidden_params_dict
@@ -44,7 +44,7 @@ diff --git a/litellm/proxy/common_request_processing.py b/litellm/proxy/common_r
  from litellm.types.router import RouterRateLimitError
  from litellm.types.router_weights import validate_router_weights
 
-@@ -466,6 +470,62 @@
+@@ -489,6 +493,62 @@ async def _bill_partial_streamed_spend_on_disconnect(request_data: dict, respons
      return True
 
 
@@ -107,7 +107,7 @@ diff --git a/litellm/proxy/common_request_processing.py b/litellm/proxy/common_r
  async def _cancel_pending_gather_tasks(tasks: Sequence["asyncio.Task[object]"]) -> None:
      pending_tasks: Final = [task for task in tasks if not task.done()]
      for task in pending_tasks:
-@@ -3814,6 +3874,7 @@
+@@ -3845,6 +3905,7 @@ class ProxyBaseLLMRequestProcessing:
          client_disconnected: bool = False,
          user_api_key_dict: UserAPIKeyAuth | None = None,
          proxy_logging_obj: ProxyLogging | None = None,
@@ -115,22 +115,22 @@ diff --git a/litellm/proxy/common_request_processing.py b/litellm/proxy/common_r
      ) -> None:
          with anyio.CancelScope(shield=True):
              should_record_client_disconnect: Final = client_disconnected or (not stream_completed)
-@@ -3844,7 +3905,10 @@
+@@ -3875,7 +3936,10 @@ class ProxyBaseLLMRequestProcessing:
                      and proxy_logging_obj is not None
                      and user_api_key_dict is not None
                  ):
--                    await proxy_logging_obj._arelease_max_parallel_requests_on_disconnect(user_api_key_dict)
+-                    await proxy_logging_obj.arelease_max_parallel_requests_on_disconnect(user_api_key_dict)
 +                    if not await _log_cancelled_responses_stream(
 +                        request_data, response, output_text_deltas, user_api_key_dict, proxy_logging_obj
 +                    ):
-+                        await proxy_logging_obj._arelease_max_parallel_requests_on_disconnect(user_api_key_dict)
++                        await proxy_logging_obj.arelease_max_parallel_requests_on_disconnect(user_api_key_dict)
 
              if hasattr(response, "aclose"):
                  try:
 diff --git a/litellm/proxy/proxy_server.py b/litellm/proxy/proxy_server.py
 --- a/litellm/proxy/proxy_server.py
 +++ b/litellm/proxy/proxy_server.py
-@@ -871,6 +871,7 @@
+@@ -929,6 +929,7 @@ from litellm.types.llms.openai import (
      ChatCompletionSystemMessage,
      ChatCompletionToolParam,
      HttpxBinaryResponseContent,
@@ -138,15 +138,15 @@ diff --git a/litellm/proxy/proxy_server.py b/litellm/proxy/proxy_server.py
  )
  from litellm.types.proxy.control_plane_endpoints import WorkerRegistryEntry
  from litellm.types.proxy.management_endpoints.model_management_endpoints import (
-@@ -9839,6 +9840,7 @@
+@@ -10105,6 +10106,7 @@ async def async_data_generator(
      stream_completed = False
      client_disconnected = False
      error_state: Final = ResponsesStreamErrorState() if responses_stream_errors else None
 +    output_text_deltas: list[OutputTextDeltaEvent] = []  # logged if the client disconnects
-     try:
-         error_message: str | None = None
-         requested_model_from_client: Final = _get_client_requested_model_for_streaming(request_data=request_data)
-@@ -9952,6 +9954,8 @@
+     needs_iterator_wrap: Final = proxy_logging_obj.needs_iterator_wrap()
+     stream_iterator: Final[AsyncIterator[object]] = (
+         proxy_logging_obj.async_post_call_streaming_iterator_hook(
+@@ -10219,6 +10221,8 @@ async def async_data_generator(
              if error_state is not None:
                  error_state.observe_chunk(cast(object, chunk))  # cast-ok: the helper validates legacy untyped chunks
              raw_passthrough = False
@@ -155,7 +155,7 @@ diff --git a/litellm/proxy/proxy_server.py b/litellm/proxy/proxy_server.py
              if isinstance(chunk, BaseModel):
                  chunk = _serialize_streaming_chunk(chunk)
              elif isinstance(chunk, bytes):
-@@ -10076,6 +10080,7 @@
+@@ -10346,6 +10350,7 @@ async def async_data_generator(
              client_disconnected=client_disconnected,
              user_api_key_dict=user_api_key_dict,
              proxy_logging_obj=proxy_logging_obj,
@@ -166,7 +166,7 @@ diff --git a/litellm/proxy/proxy_server.py b/litellm/proxy/proxy_server.py
 diff --git a/litellm/litellm_core_utils/litellm_logging.py b/litellm/litellm_core_utils/litellm_logging.py
 --- a/litellm/litellm_core_utils/litellm_logging.py
 +++ b/litellm/litellm_core_utils/litellm_logging.py
-@@ -3627,7 +3627,7 @@
+@@ -3690,7 +3690,7 @@ class Logging(LiteLLMLoggingBaseClass):
 
          self.model_call_details["standard_logging_object"] = get_standard_logging_object_payload(
              kwargs=self.model_call_details,
@@ -175,10 +175,10 @@ diff --git a/litellm/litellm_core_utils/litellm_logging.py b/litellm/litellm_cor
              start_time=start_time,
              end_time=end_time,
              logging_obj=self,
-diff --git a/ui/litellm-dashboard/src/components/view_logs/LogDetailsDrawer/LogDetailContent.tsx b/ui/litellm-dashboard/src/components/view_logs/LogDetailsDrawer/LogDetailContent.tsx
---- a/ui/litellm-dashboard/src/components/view_logs/LogDetailsDrawer/LogDetailContent.tsx
-+++ b/ui/litellm-dashboard/src/components/view_logs/LogDetailsDrawer/LogDetailContent.tsx
-@@ -104,7 +104,7 @@
+diff --git a/ui/litellm-dashboard/src/components/logs/detail/LogDetailContent.tsx b/ui/litellm-dashboard/src/components/logs/detail/LogDetailContent.tsx
+--- a/ui/litellm-dashboard/src/components/logs/detail/LogDetailContent.tsx
++++ b/ui/litellm-dashboard/src/components/logs/detail/LogDetailContent.tsx
+@@ -104,7 +104,7 @@ export function LogDetailContent({
    const hasVectorStoreData = checkHasVectorStoreData(metadata);
 
    const getFormattedResponse = () => {

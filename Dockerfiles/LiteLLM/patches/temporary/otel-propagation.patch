@@ -11,16 +11,16 @@ Removal check: tests/verify_tracing.py
 diff --git a/litellm/integrations/otel/logger.py b/litellm/integrations/otel/logger.py
 --- a/litellm/integrations/otel/logger.py
 +++ b/litellm/integrations/otel/logger.py
-@@ -1,7 +1,7 @@
- """``CustomLogger`` adapter on the OpenTelemetry span engine."""
+@@ -2,7 +2,7 @@
 
+ import sys
  from collections import OrderedDict
 -from collections.abc import Callable, Iterator, Mapping, Sequence
 +from collections.abc import Callable, Iterator, Mapping, MutableMapping, Sequence
- from contextlib import contextmanager
+ from contextlib import contextmanager, nullcontext
  from dataclasses import replace
  from datetime import datetime
-@@ -22,6 +22,7 @@
+@@ -23,6 +23,7 @@ from opentelemetry.trace import (
      use_span,
  )
  from opentelemetry.trace import TracerProvider as ApiTracerProvider
@@ -28,7 +28,7 @@ diff --git a/litellm/integrations/otel/logger.py b/litellm/integrations/otel/log
  from typing_extensions import TypedDict, Unpack
 
  import litellm
-@@ -91,6 +92,7 @@
+@@ -96,6 +97,7 @@ if TYPE_CHECKING:
      )
 
  LITELLM_TRACER_NAME: Final = "litellm"
@@ -36,7 +36,7 @@ diff --git a/litellm/integrations/otel/logger.py b/litellm/integrations/otel/log
  _published_v2_provider: ApiTracerProvider | None = None
 
 
-@@ -142,6 +144,16 @@
+@@ -147,6 +149,16 @@ def _request_trace_links(context: Context | None) -> tuple[Link, ...] | None:
      return (Link(anchor),) if anchor.is_valid else None
 
 
@@ -53,7 +53,7 @@ diff --git a/litellm/integrations/otel/logger.py b/litellm/integrations/otel/log
  class _CustomLoggerOptions(TypedDict, total=False, extra_items=object):
      pass
 
-@@ -328,6 +340,7 @@
+@@ -339,6 +351,7 @@ class OpenTelemetryV2(CustomLogger):
                  tracer=route.tracer,
                  links=_request_trace_links(parent_context) if route.detached else None,
              )

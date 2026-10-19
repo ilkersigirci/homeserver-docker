@@ -18,7 +18,7 @@ Checks: tests/verify_premium_ui.integration.test.tsx
 diff --git a/ui/litellm-dashboard/src/components/PassThroughSettings/PassThroughSettings.tsx b/ui/litellm-dashboard/src/components/PassThroughSettings/PassThroughSettings.tsx
 --- a/ui/litellm-dashboard/src/components/PassThroughSettings/PassThroughSettings.tsx
 +++ b/ui/litellm-dashboard/src/components/PassThroughSettings/PassThroughSettings.tsx
-@@ -37,7 +37,9 @@
+@@ -37,7 +37,9 @@ export interface passThroughItem {
    is_from_config?: boolean;
  }
 
@@ -32,7 +32,7 @@ diff --git a/ui/litellm-dashboard/src/components/PassThroughSettings/PassThrough
 diff --git a/ui/litellm-dashboard/src/components/Teams.tsx b/ui/litellm-dashboard/src/components/Teams.tsx
 --- a/ui/litellm-dashboard/src/components/Teams.tsx
 +++ b/ui/litellm-dashboard/src/components/Teams.tsx
-@@ -208,7 +208,9 @@
+@@ -210,7 +210,9 @@ const getAdminOrganizations = (
  };
 
  // @deprecated
@@ -46,7 +46,7 @@ diff --git a/ui/litellm-dashboard/src/components/Teams.tsx b/ui/litellm-dashboar
 diff --git a/ui/litellm-dashboard/src/components/chat/KeysPanel.tsx b/ui/litellm-dashboard/src/components/chat/KeysPanel.tsx
 --- a/ui/litellm-dashboard/src/components/chat/KeysPanel.tsx
 +++ b/ui/litellm-dashboard/src/components/chat/KeysPanel.tsx
-@@ -67,7 +67,9 @@
+@@ -67,7 +67,9 @@ interface FormState {
    grace_period: string;
  }
 
@@ -60,7 +60,7 @@ diff --git a/ui/litellm-dashboard/src/components/chat/KeysPanel.tsx b/ui/litellm
 diff --git a/ui/litellm-dashboard/src/components/key_team_helpers/ModelMaxBudgetEditor.tsx b/ui/litellm-dashboard/src/components/key_team_helpers/ModelMaxBudgetEditor.tsx
 --- a/ui/litellm-dashboard/src/components/key_team_helpers/ModelMaxBudgetEditor.tsx
 +++ b/ui/litellm-dashboard/src/components/key_team_helpers/ModelMaxBudgetEditor.tsx
-@@ -87,9 +87,10 @@
+@@ -87,9 +87,10 @@ export function ModelMaxBudgetEditor({
    value,
    onChange,
    availableModels,
@@ -75,7 +75,7 @@ diff --git a/ui/litellm-dashboard/src/components/key_team_helpers/ModelMaxBudget
 diff --git a/ui/litellm-dashboard/src/components/organisms/create_key_button.tsx b/ui/litellm-dashboard/src/components/organisms/create_key_button.tsx
 --- a/ui/litellm-dashboard/src/components/organisms/create_key_button.tsx
 +++ b/ui/litellm-dashboard/src/components/organisms/create_key_button.tsx
-@@ -217,7 +217,9 @@
+@@ -217,7 +217,9 @@ export const fetchUserModels = async (
   * ─────────────────────────────────────────────────────────────────────────
   */
  const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOpenCreate, prefillData }) => {
@@ -89,7 +89,7 @@ diff --git a/ui/litellm-dashboard/src/components/organisms/create_key_button.tsx
 diff --git a/ui/litellm-dashboard/src/components/settings.tsx b/ui/litellm-dashboard/src/components/settings.tsx
 --- a/ui/litellm-dashboard/src/components/settings.tsx
 +++ b/ui/litellm-dashboard/src/components/settings.tsx
-@@ -627,29 +627,13 @@
+@@ -627,29 +627,13 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID,
                    {Object.entries(alerts_to_UI_NAME).map(([key, value], index) => (
                      <TableRow key={index}>
                        <TableCell>
@@ -129,7 +129,7 @@ diff --git a/ui/litellm-dashboard/src/components/settings.tsx b/ui/litellm-dashb
 diff --git a/ui/litellm-dashboard/src/components/team/TeamInfo.tsx b/ui/litellm-dashboard/src/components/team/TeamInfo.tsx
 --- a/ui/litellm-dashboard/src/components/team/TeamInfo.tsx
 +++ b/ui/litellm-dashboard/src/components/team/TeamInfo.tsx
-@@ -575,9 +575,10 @@
+@@ -582,9 +582,10 @@ const TeamInfoView: React.FC<TeamInfoProps> = ({
    is_proxy_admin,
    userModels,
    editTeam,
@@ -144,7 +144,7 @@ diff --git a/ui/litellm-dashboard/src/components/team/TeamInfo.tsx b/ui/litellm-
 diff --git a/ui/litellm-dashboard/src/components/templates/key_info_view.tsx b/ui/litellm-dashboard/src/components/templates/key_info_view.tsx
 --- a/ui/litellm-dashboard/src/components/templates/key_info_view.tsx
 +++ b/ui/litellm-dashboard/src/components/templates/key_info_view.tsx
-@@ -94,7 +94,9 @@
+@@ -95,7 +95,9 @@ export default function KeyInfoView({
    onDelete,
    backButtonText = "Back to Keys",
  }: KeyInfoViewProps) {
@@ -152,6 +152,6 @@ diff --git a/ui/litellm-dashboard/src/components/templates/key_info_view.tsx b/u
 +  const { accessToken, userId: userID, userRole } = useAuthorized();
 +  // This image's proxy serves these features without a license (premium-features.patch).
 +  const premiumUser = true;
+   const accessGroupNames = useModelAccessGroupNames();
    const activityDateRange = useActivityDateRange();
    const queryClient = useQueryClient();
-   const canEditGuardrails = premiumUser || (userRole != null && rolesWithWriteAccess.includes(userRole));

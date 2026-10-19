@@ -1,7 +1,7 @@
 diff --git a/litellm/proxy/management_endpoints/ui_sso.py b/litellm/proxy/management_endpoints/ui_sso.py
 --- a/litellm/proxy/management_endpoints/ui_sso.py
 +++ b/litellm/proxy/management_endpoints/ui_sso.py
-@@ -974,27 +974,6 @@
+@@ -983,27 +983,6 @@ def _merge_sso_token_claims(
      )
 
 
@@ -29,9 +29,9 @@ diff --git a/litellm/proxy/management_endpoints/ui_sso.py b/litellm/proxy/manage
  @router.get("/sso/key/generate", tags=["experimental"], include_in_schema=False)
  async def google_login(
      request: Request,
-@@ -1029,15 +1008,6 @@
-         if is_disabled:
-             return admin_ui_disabled()
+@@ -1037,15 +1016,6 @@ async def google_login(
+     if admin_ui_is_disabled and not is_cli_sso_login:
+         return admin_ui_disabled()
 
 -    ####### Check if user is a Enterprise / Premium User #######
 -    if (
@@ -45,7 +45,7 @@ diff --git a/litellm/proxy/management_endpoints/ui_sso.py b/litellm/proxy/manage
      ####### Detect DB + MASTER KEY in .env #######
      missing_env_vars: Final = show_missing_vars_in_env()
      if missing_env_vars is not None:
-@@ -2199,8 +2169,6 @@
+@@ -2209,8 +2179,6 @@ async def saml_callback(request: Request):
 
      result: Final = await SAMLAuthHandler.handle_acs(request=request, cache=user_api_key_cache, post_data=post_data)
 
@@ -54,7 +54,7 @@ diff --git a/litellm/proxy/management_endpoints/ui_sso.py b/litellm/proxy/manage
      ui_access_mode: Final = general_settings.get("ui_access_mode", None)
      relay_state: Final = post_data.get("RelayState")
      cp_return_to: Final[str | None] = (
-@@ -4692,22 +4660,10 @@
+@@ -4720,22 +4688,10 @@ async def debug_sso_login(request: Request):
      """
      _raise_if_sso_debug_disabled()
 

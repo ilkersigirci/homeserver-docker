@@ -24,7 +24,7 @@ Checks: tests/verify_jwt_auth.py
 diff --git a/litellm/proxy/auth/user_api_key_auth.py b/litellm/proxy/auth/user_api_key_auth.py
 --- a/litellm/proxy/auth/user_api_key_auth.py
 +++ b/litellm/proxy/auth/user_api_key_auth.py
-@@ -1638,15 +1638,6 @@
+@@ -1707,15 +1707,6 @@ async def user_api_key_auth_builder(
              is_jwt = jwt_handler.is_jwt(token=api_key)
              verbose_proxy_logger.debug("is_jwt: %s", is_jwt)
              if is_jwt:
@@ -40,7 +40,7 @@ diff --git a/litellm/proxy/auth/user_api_key_auth.py b/litellm/proxy/auth/user_a
                  # Try JWT-to-Virtual-Key mapping first to avoid
                  # unnecessary DB queries in auth_builder
                  do_standard_jwt_auth = True
-@@ -1747,6 +1738,24 @@
+@@ -1816,6 +1807,24 @@ async def user_api_key_auth_builder(
                              detail=f"User={user_id} has been deactivated via SCIM. Keys owned by this user cannot be used.",
                          )
 
@@ -68,7 +68,7 @@ diff --git a/litellm/proxy/auth/user_api_key_auth.py b/litellm/proxy/auth/user_a
 diff --git a/litellm/proxy/auth/handle_jwt.py b/litellm/proxy/auth/handle_jwt.py
 --- a/litellm/proxy/auth/handle_jwt.py
 +++ b/litellm/proxy/auth/handle_jwt.py
-@@ -1294,6 +1294,9 @@
+@@ -1300,6 +1300,9 @@ class JWTHandler:
 
      async def auth_jwt(self, token: str) -> dict:
          header: Final = jwt.get_unverified_header(token)
@@ -78,10 +78,10 @@ diff --git a/litellm/proxy/auth/handle_jwt.py b/litellm/proxy/auth/handle_jwt.py
 
          verbose_proxy_logger.debug("header: %s", header)
 
-@@ -2852,20 +2855,7 @@
+@@ -2868,20 +2871,7 @@ class JWTAuthManager:
                  team_allowed_routes=handler.litellm_jwtauth.team_allowed_routes,
              ):
-                 JWTAuthManager._raise_team_passthrough_route_denial(route=route)
+                 JWTAuthManager._raise_team_passthrough_route_denial(route=route, team_object=team_object)
 -        elif selected_team_id is None:
 -            (
 -                team_id,
@@ -100,7 +100,7 @@ diff --git a/litellm/proxy/auth/handle_jwt.py b/litellm/proxy/auth/handle_jwt.py
          elif provisional_header_team is not None and selected_team_id == provisional_header_team.team_id:
              JWTAuthManager._validate_header_team_in_db_membership(
                  team_id=selected_team_id,
-@@ -2958,6 +2948,8 @@
+@@ -2974,6 +2964,8 @@ class JWTAuthManager:
              user_tpm_limit=user.tpm_limit if user is not None and not admin else None,
              user_rpm_limit=user.rpm_limit if user is not None and not admin else None,
              user_model_max_budget=user.model_max_budget if user is not None and not admin else None,

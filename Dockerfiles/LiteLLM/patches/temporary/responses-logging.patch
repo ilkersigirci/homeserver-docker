@@ -11,7 +11,7 @@ Removal check: tests/verify_logging.py
 diff --git a/litellm/litellm_core_utils/litellm_logging.py b/litellm/litellm_core_utils/litellm_logging.py
 --- a/litellm/litellm_core_utils/litellm_logging.py
 +++ b/litellm/litellm_core_utils/litellm_logging.py
-@@ -4111,15 +4111,20 @@
+@@ -4176,15 +4176,20 @@ class Logging(LiteLLMLoggingBaseClass):
              result,
              (ResponseCompletedEvent, ResponseIncompleteEvent, ResponseFailedEvent),
          ):
@@ -25,7 +25,7 @@ diff --git a/litellm/litellm_core_utils/litellm_logging.py b/litellm/litellm_cor
 +            if isinstance(response.usage, (ResponseAPIUsage, dict)):
 +                # Only typed usage carries the parsed provider-reported cost.
 +                set_response_cost_in_hidden_params(response, getattr(response.usage, "cost", None))
-                 transformed_usage: Final = ResponseAPILoggingUtils._transform_response_api_usage_to_chat_usage(
+                 transformed_usage: Final = ResponseAPILoggingUtils.transform_response_api_usage_to_chat_usage(
 -                    result.response.usage
 +                    response.usage
                  )
@@ -36,7 +36,7 @@ diff --git a/litellm/litellm_core_utils/litellm_logging.py b/litellm/litellm_cor
                      "usage",
                      (
                          transformed_usage.model_dump()
-@@ -4127,7 +4132,7 @@
+@@ -4192,7 +4197,7 @@ class Logging(LiteLLMLoggingBaseClass):
                          else dict(transformed_usage)
                      ),
                  )

@@ -60,7 +60,7 @@ def verify_request(capability: bool | None, stream: bool) -> None:
     with (
         httpx.Client(transport=httpx.MockTransport(upstream)) as client,
         patch(
-            "litellm.llms.custom_httpx.llm_http_handler._get_httpx_client",
+            "litellm.llms.custom_httpx.llm_http_handler.get_httpx_client",
             return_value=HTTPHandler(client=client),
         ),
     ):

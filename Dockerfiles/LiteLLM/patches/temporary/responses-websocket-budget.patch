@@ -9,17 +9,17 @@ Removal check: WebSocket budget check in tests/verify_jwt_auth.py
 diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/response_api_endpoints/endpoints.py
 --- a/litellm/proxy/response_api_endpoints/endpoints.py
 +++ b/litellm/proxy/response_api_endpoints/endpoints.py
-@@ -1396,7 +1396,9 @@
+@@ -1413,7 +1413,9 @@ async def _enforce_responses_ws_first_frame_model_auth(
      user_api_key_dict: UserAPIKeyAuth,
      llm_router: "Router | None",
  ) -> None:
-+    from litellm.proxy.auth.auth_checks import _is_model_cost_zero
++    from litellm.proxy.auth.auth_checks import is_model_cost_zero
      from litellm.proxy.auth.user_api_key_auth import (
 +        _check_user_model_budget,
-         _enforce_key_and_fallback_model_access,
-         _run_centralized_common_checks,
+         enforce_key_and_fallback_model_access,
+         run_centralized_common_checks,
      )
-@@ -1404,6 +1406,7 @@
+@@ -1421,6 +1423,7 @@ async def _enforce_responses_ws_first_frame_model_auth(
          general_settings,
          llm_model_list,
          master_key,
@@ -27,17 +27,17 @@ diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/r
          user_custom_auth,
      )
 
-@@ -1425,6 +1428,13 @@
+@@ -1442,6 +1445,13 @@ async def _enforce_responses_ws_first_frame_model_auth(
          llm_model_list=llm_model_list,
          llm_router=llm_router,
      )
 +    # The handshake loaded the user's per-model budgets before the model was known.
-+    if llm_router is None or not _is_model_cost_zero(model=model, llm_router=llm_router):
++    if llm_router is None or not is_model_cost_zero(model=model, llm_router=llm_router):
 +        await _check_user_model_budget(
 +            valid_token=user_api_key_dict,
 +            model_max_budget_limiter=model_max_budget_limiter,
 +            models=[model],
 +        )
-     await _run_centralized_common_checks(
+     await run_centralized_common_checks(
          user_api_key_auth_obj=user_api_key_dict,
          request=request,

@@ -4,10 +4,12 @@ license). Each feature already runs without enterprise code.
 
 - Premium key/team/org metadata (tags, guardrails, policies, logging, prompts,
   allowed_passthrough_routes, secret_manager_settings,
-  disable_global_guardrails): _premium_user_check refuses nothing, at save
+  disable_global_guardrails): premium_user_check refuses nothing, at save
   time and at request time. The same check also gates the SCIM v2 router and
   the GCS Pub/Sub and Azure Storage loggers. team_member_key_duration is
   accepted but has no MIT implementation, so it has no effect.
+  Its legacy _premium_user_check alias follows it; require_enterprise_license
+  still gates unreviewed features such as hosted admin MCP.
 - Per-model budgets (model_max_budget) on keys and teams; users already
   accept them.
 - Key regeneration, including the scheduled rotation that calls it.
@@ -22,7 +24,7 @@ Checks: tests/verify_premium_features.py
 diff --git a/litellm/proxy/proxy_server.py b/litellm/proxy/proxy_server.py
 --- a/litellm/proxy/proxy_server.py
 +++ b/litellm/proxy/proxy_server.py
-@@ -16748,7 +16748,7 @@
+@@ -17077,7 +17077,7 @@ async def alerting_settings(
                      field_default,
                  ),
                  field_default_value=field_default,
@@ -34,34 +36,20 @@ diff --git a/litellm/proxy/proxy_server.py b/litellm/proxy/proxy_server.py
 diff --git a/litellm/proxy/utils.py b/litellm/proxy/utils.py
 --- a/litellm/proxy/utils.py
 +++ b/litellm/proxy/utils.py
-@@ -8219,22 +8219,8 @@
-
- def _premium_user_check(feature: str | None = None):
-     """
--    Raises an HTTPException if the user is not a premium user
-+    No license gate: the guarded features run on MIT code in this image.
-     """
--    from litellm.proxy.proxy_server import premium_user
--
--    if feature:
--        detail_msg = f"This feature is only available for LiteLLM Enterprise users: {feature}. {CommonProxyErrors.not_premium_user.value}"
--    else:
--        detail_msg = (
--            f"This feature is only available for LiteLLM Enterprise users. {CommonProxyErrors.not_premium_user.value}"
--        )
--
--    if not premium_user:
--        raise HTTPException(
--            status_code=403,
--            detail={"error": detail_msg},
--        )
+@@ -8486,7 +8486,8 @@ def require_enterprise_license(feature: str | None = None) -> None:
+         )
 
 
- def is_known_model(model: str | None, llm_router: Router | None) -> bool:
+-premium_user_check: Final = require_enterprise_license
++def premium_user_check(feature: str | None = None) -> None:
++    """No license gate: the guarded features run on MIT code in this image."""
+
+ _premium_user_check: Final = premium_user_check
+
 diff --git a/litellm/proxy/management_endpoints/common_utils.py b/litellm/proxy/management_endpoints/common_utils.py
 --- a/litellm/proxy/management_endpoints/common_utils.py
 +++ b/litellm/proxy/management_endpoints/common_utils.py
-@@ -81,13 +81,6 @@
+@@ -84,13 +84,6 @@ def validate_team_model_max_budget(
      """Reject a team `model_max_budget` the limiter could not enforce (no duration, bad cap, tpm/rpm limits)."""
      if not model_max_budget:
          return
@@ -78,7 +66,7 @@ diff --git a/litellm/proxy/management_endpoints/common_utils.py b/litellm/proxy/
 diff --git a/litellm/proxy/management_endpoints/key_management_endpoints.py b/litellm/proxy/management_endpoints/key_management_endpoints.py
 --- a/litellm/proxy/management_endpoints/key_management_endpoints.py
 +++ b/litellm/proxy/management_endpoints/key_management_endpoints.py
-@@ -5789,7 +5789,6 @@
+@@ -5850,7 +5850,6 @@ async def regenerate_key_fn(
              hash_token,
              llm_router,
              master_key,
@@ -86,7 +74,7 @@ diff --git a/litellm/proxy/management_endpoints/key_management_endpoints.py b/li
              prisma_client,
              proxy_logging_obj,
              user_api_key_cache,
-@@ -5824,25 +5823,6 @@
+@@ -5882,25 +5881,6 @@ async def regenerate_key_fn(
                  allow_safe_presets=True,
              )
 
@@ -99,7 +87,7 @@ diff --git a/litellm/proxy/management_endpoints/key_management_endpoints.py b/li
 -        is_master_key_regeneration: Final = (
 -            data is not None
 -            and data.new_master_key is not None
--            and _is_master_key(api_key=regenerate_target_key, _master_key=master_key)
+-            and is_master_key(api_key=regenerate_target_key, _master_key=master_key)
 -        )
 -
 -        if (
@@ -112,7 +100,7 @@ diff --git a/litellm/proxy/management_endpoints/key_management_endpoints.py b/li
          # Check if key exists, raise exception if key is not in the DB
          key = data.key if data and data.key else key
          if not key:
-@@ -7819,12 +7799,6 @@
+@@ -7886,12 +7866,6 @@ def validate_model_max_budget(model_max_budget: dict | None) -> None:
          if len(model_max_budget) == 0:
              return
          if model_max_budget is not None:
@@ -128,7 +116,7 @@ diff --git a/litellm/proxy/management_endpoints/key_management_endpoints.py b/li
 diff --git a/litellm/proxy/management_endpoints/team_endpoints.py b/litellm/proxy/management_endpoints/team_endpoints.py
 --- a/litellm/proxy/management_endpoints/team_endpoints.py
 +++ b/litellm/proxy/management_endpoints/team_endpoints.py
-@@ -2687,22 +2687,6 @@
+@@ -2715,22 +2715,6 @@ async def handle_update_object_permission(data_json: dict, existing_team_row: _O
      return data_json
 
 
@@ -151,7 +139,7 @@ diff --git a/litellm/proxy/management_endpoints/team_endpoints.py b/litellm/prox
  def team_call_validation_checks(
      prisma_client: PrismaClient | None,
      data: TeamMemberAddRequest,
-@@ -2717,14 +2701,6 @@
+@@ -2745,14 +2729,6 @@ def team_call_validation_checks(
      if data.member is None:
          raise HTTPException(status_code=400, detail={"error": "No member/members passed in"})
 
@@ -166,7 +154,7 @@ diff --git a/litellm/proxy/management_endpoints/team_endpoints.py b/litellm/prox
 
  def team_member_add_duplication_check(
      data: TeamMemberAddRequest,
-@@ -3772,7 +3748,6 @@
+@@ -3803,7 +3779,6 @@ async def team_member_update(
      """
      from litellm.proxy.proxy_server import (
          litellm_proxy_admin_name,
@@ -174,7 +162,7 @@ diff --git a/litellm/proxy/management_endpoints/team_endpoints.py b/litellm/prox
          prisma_client,
          user_api_key_cache,
      )
-@@ -3783,12 +3758,6 @@
+@@ -3814,12 +3789,6 @@ async def team_member_update(
      if data.team_id is None:
          raise HTTPException(status_code=400, detail={"error": "No team id passed in"})
 
@@ -190,7 +178,8 @@ diff --git a/litellm/proxy/management_endpoints/team_endpoints.py b/litellm/prox
 diff --git a/litellm/proxy/management_helpers/audit_logs.py b/litellm/proxy/management_helpers/audit_logs.py
 --- a/litellm/proxy/management_helpers/audit_logs.py
 +++ b/litellm/proxy/management_helpers/audit_logs.py
-@@ -211,10 +211,7 @@
+@@ -210,12 +210,9 @@ async def create_audit_log_for_update(request_data: LiteLLM_AuditLogs):
+     """
      if not is_audit_logging_enabled():
          return
 
@@ -201,3 +190,5 @@ diff --git a/litellm/proxy/management_helpers/audit_logs.py b/litellm/proxy/mana
 +    from litellm.proxy.proxy_server import prisma_client
 
      verbose_proxy_logger.debug("creating audit log for %s", request_data)
+
+     if isinstance(request_data.updated_values, dict):

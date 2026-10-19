@@ -9,6 +9,7 @@ from types import SimpleNamespace
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import litellm
+from fastapi import HTTPException
 from litellm.proxy._types import (
     LiteLLM_AuditLogs,
     LitellmUserRoles,
@@ -27,10 +28,20 @@ def _message(error: Exception) -> str:
 
 def _verify_premium_metadata() -> None:
     """Key/team metadata fields, request-time guardrails and policies, SCIM, and loggers share this check."""
-    from litellm.proxy.utils import _premium_user_check
+    from litellm.proxy.admin_mcp import _require_enterprise_license
+    from litellm.proxy.utils import _premium_user_check, premium_user_check
 
-    _premium_user_check()
-    _premium_user_check("tags")
+    for check in (premium_user_check, _premium_user_check):
+        check()
+        check("tags")
+
+    # The new shared license helper must still gate unreviewed features.
+    try:
+        _require_enterprise_license()
+    except HTTPException as error:
+        assert error.status_code == 403
+    else:
+        raise AssertionError("Hosted admin MCP was unexpectedly unlocked")
 
 
 def _verify_model_budgets() -> None:

@@ -8,7 +8,7 @@ Removal check: model-info scope check in tests/verify_jwt_auth.py
 diff --git a/litellm/proxy/proxy_server.py b/litellm/proxy/proxy_server.py
 --- a/litellm/proxy/proxy_server.py
 +++ b/litellm/proxy/proxy_server.py
-@@ -16175,8 +16175,23 @@
+@@ -16501,8 +16501,23 @@ async def model_info_v1(
                  status_code=400,
                  detail={"error": f"Model id = {litellm_model_id} not found on litellm proxy"},
              )
