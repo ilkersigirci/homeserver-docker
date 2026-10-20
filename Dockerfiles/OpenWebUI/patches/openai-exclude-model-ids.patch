@@ -1,0 +1,43 @@
+Upstream gap: an OpenAI connection lists every model its provider returns,
+unless its model_ids allowlist replaces that list with fixed IDs, which also
+hides every model the provider adds later. Hiding a model otherwise takes a
+stored model record, so a deployment cannot leave out one family of a
+provider's models, such as the ones a Pipe already serves, while still listing
+the rest as the provider changes them.
+
+Add exclude_model_ids to a connection's config in OPENAI_API_CONFIGS: glob
+patterns such as "acme/*" or "*embedding*", matched case-sensitively against
+the provider's model IDs before prefix_id applies. Each time Open WebUI lists
+models, it leaves the matching ones out of that connection's list, so they
+cannot be selected or chatted with through it. Other connections are
+unaffected.
+
+Removal check: an Open WebUI release that can exclude a connection's models
+by pattern.
+--- a/open_webui/routers/openai.py
++++ b/open_webui/routers/openai.py
+@@ -656,6 +656,24 @@
+                 # Catch non-list responses
+                 model_list = []
+
++            exclude_model_ids = api_config.get('exclude_model_ids', [])
++            if exclude_model_ids:
++                from fnmatch import fnmatchcase
++
++                # Patterns match the provider's own model IDs, before prefix_id applies.
++                model_list = [
++                    model
++                    for model in model_list
++                    if not any(
++                        fnmatchcase(str(model.get('id', model.get('name', ''))), pattern)
++                        for pattern in exclude_model_ids
++                    )
++                ]
++                if isinstance(response, list):
++                    response[:] = model_list
++                else:
++                    response['data'] = model_list
++
+             for model in model_list:
+                 # Remove name key if its value is None #16689
+                 if 'name' in model and model['name'] is None:
