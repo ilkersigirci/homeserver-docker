@@ -299,7 +299,9 @@ services:
       interval: 2m
       timeout: 5s
       retries: 3
-      start_period: 10s
+      # Keep probing during migrations and Next.js initialization before switching to the regular interval.
+      start_period: 1m
+      start_interval: 5s
     labels:
       traefik.enable: "true"
       ## HTTP Routers
