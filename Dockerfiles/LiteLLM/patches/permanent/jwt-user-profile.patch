@@ -1,0 +1,78 @@
+Give users who reach LiteLLM only through an OIDC access token the email and
+alias that the Admin UI SSO login gives them.
+
+Upstream JWT auth creates the `sub`-keyed user without either. Its
+`user_email_jwt_field` adds the email but also looks up an unknown `sub` by
+email, which this image rules out, and nothing sets the alias.
+
+After the user is resolved by `sub`, apply the SSO login's update
+(`_build_sso_user_update_data`) to the token's standard OIDC claims, the way
+`sync_user_role_and_teams` applies roles. Missing claims and unchanged values
+write nothing.
+
+Checks: tests/verify_jwt_auth.py
+
+diff --git a/litellm/proxy/auth/handle_jwt.py b/litellm/proxy/auth/handle_jwt.py
+--- a/litellm/proxy/auth/handle_jwt.py
++++ b/litellm/proxy/auth/handle_jwt.py
+@@ -2148,6 +2148,47 @@ class JWTAuthManager:
+                 )
+         return
+
++    @staticmethod
++    async def sync_user_profile(
++        jwt_valid_token: dict,
++        user_object: LiteLLM_UserTable | None,
++        prisma_client: PrismaClient | None,
++        user_api_key_cache: UserApiKeyCache,
++    ) -> None:
++        """Apply the Admin UI SSO login's email and alias update to the token's OIDC claims.
++
++        The user stays selected by ``sub``. Missing claims and unchanged values write nothing.
++        """
++        if user_object is None or prisma_client is None:
++            return
++        from litellm.proxy.management_endpoints.ui_sso import _build_sso_user_update_data
++
++        sso_update: Final = _build_sso_user_update_data(
++            result={
++                "id": jwt_valid_token.get("sub"),
++                "display_name": jwt_valid_token.get("name"),
++                "first_name": jwt_valid_token.get("given_name"),
++                "last_name": jwt_valid_token.get("family_name"),
++            },
++            user_email=jwt_valid_token.get("email"),
++            user_id=user_object.user_id,
++            existing_user_alias=user_object.user_alias,
++        )
++        update: Final = {
++            name: value for name, value in sso_update.items() if value and value != getattr(user_object, name)
++        }
++        if not update:
++            return
++        await UserRepository(prisma_client).table.update(where={"user_id": user_object.user_id}, data=update)
++        for name, value in update.items():
++            setattr(user_object, name, value)
++        await user_api_key_cache.async_set_cache(
++            key=user_object.user_id,
++            value=user_object,
++            model_type=LiteLLM_UserTable,
++            ttl=get_management_object_ttl(user_api_key_cache),
++        )
++
+     @staticmethod
+     async def _attach_team_from_header_for_admin(
+         admin_result: JWTAuthBuilderResult,
+@@ -2840,6 +2881,12 @@ class JWTAuthManager:
+                 prisma_client=prisma_client,
+                 user_api_key_cache=user_api_key_cache,
+             )
++            await JWTAuthManager.sync_user_profile(
++                jwt_valid_token=jwt_valid_token,
++                user_object=user_object,
++                prisma_client=prisma_client,
++                user_api_key_cache=user_api_key_cache,
++            )
+
+         # If JWT did not resolve team_id, attempt a team fallback.
+         if selected_team_id is None and db_team_fallback:

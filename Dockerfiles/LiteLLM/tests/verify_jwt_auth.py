@@ -9,6 +9,7 @@ import os
 import ssl
 import time
 from contextlib import ExitStack
+from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
 import httpx
@@ -180,6 +181,40 @@ async def _verify_tokens(call, token, load_user) -> None:
     # Master and virtual keys keep LiteLLM's native authentication.
     response = await call(headers={"Authorization": f"Bearer {_MASTER_KEY}"}, model="denied")
     assert response.json()["user_role"] == "proxy_admin", response.text
+
+
+async def _verify_profile(call, token, load_user, user) -> None:
+    """Tokens update the user's email and alias as the Admin UI SSO login does.
+
+    The email follows the provider, the alias is filled only while empty,
+    unchanged values and missing claims write nothing, and the email never
+    selects the user.
+    """
+    import litellm.proxy.auth.handle_jwt as jwt_module
+    from litellm.proxy import proxy_server
+
+    update = AsyncMock()
+    repository = SimpleNamespace(table=SimpleNamespace(update=update))
+    cases = (
+        ({"email": "Ada@Example.test", "name": "Ada"}, {"user_email": "ada@example.test", "user_alias": "Ada"}),
+        ({"email": "ada@example.test", "name": "Ada"}, None),
+        ({"email": "new@example.test", "name": "Renamed"}, {"user_email": "new@example.test"}),
+        ({}, None),
+    )
+    with (
+        patch.object(proxy_server, "prisma_client", object()),
+        patch.object(jwt_module, "UserRepository", lambda _client: repository),
+    ):
+        for claims, written in cases:
+            update.reset_mock()
+            response = await call(headers={"Authorization": f"Bearer {token(**claims)}"})
+            assert response.status_code == 200, (claims, response.text)
+            assert load_user.await_args.kwargs["user_email"] is None, claims
+            if written is None:
+                update.assert_not_awaited()
+            else:
+                update.assert_awaited_once_with(where={"user_id": _SUBJECT}, data=written)
+    user.user_email = user.user_alias = None
 
 
 async def _verify_routes(call, user) -> None:
@@ -367,6 +402,7 @@ async def _verify() -> None:
             await _verify_tokens(call, token, load_user)
             discover.assert_awaited_with(_DISCOVERY_URL)
             fetch_keys.assert_awaited_with(_JWKS_URL)
+            await _verify_profile(call, token, load_user, user)
             await _verify_routes(call, user)
             await _verify_models(client, call, user, headers)
             await _verify_budgets(call, user, headers["Authorization"])

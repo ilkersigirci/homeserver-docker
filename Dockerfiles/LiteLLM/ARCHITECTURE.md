@@ -132,11 +132,14 @@ in place, keeping its settings.
 
 The first OIDC request (`user_id_upsert`) or Admin UI SSO login creates the
 `sub`-keyed Internal User from `default_internal_user_params`
-(`max_budget: 0`, empty model list). Users created by an OIDC request have no
-email; look up their `sub` in the provider. An empty `models` list allows all
-models. Assign models (or a model access group) in the Admin UI to limit which
-models the user can see and invoke, and per-model budgets to cap spend on
-individual models. New users can list models immediately;
+(`max_budget: 0`, empty model list). OIDC requests update the user's email
+and alias from the token's `email` and `name` claims as an SSO login does
+([`jwt-user-profile.patch`](patches/permanent/jwt-user-profile.patch)): the
+email follows the provider and an empty alias is filled; `sub` alone still
+selects the user. An empty `models` list allows all models. Assign models (or
+a model access group) in the Admin UI to limit which models the user can see
+and invoke, and per-model budgets to cap spend on individual models. New users
+can list models immediately;
 their zero budget blocks paid model calls until an administrator assigns a
 budget. Zero-cost models are exempt from monetary budget checks.
 `fail_closed_budget_enforcement` rejects requests whose current spend cannot
@@ -185,7 +188,8 @@ independent.
 
 [`verify_jwt_auth.py`](tests/verify_jwt_auth.py) runs the installed auth chain
 with the settings described here: token validation, native credential
-fallback, route limits, model access and listings, budgets, and MCP grants.
+fallback, profile fields, route limits, model access and listings, budgets,
+and MCP grants.
 The MCP principal is internal to LiteLLM, so the check resolves grants with
 LiteLLM's own resolver on every build. Change it together with this document
 and [`config.yaml`](../../configs/litellm/config.yaml).

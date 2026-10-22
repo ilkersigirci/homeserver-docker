@@ -9,6 +9,7 @@ Enterprise source tree.
   Enterprise source and package entries before installation.
 - [`patches/permanent/`](patches/permanent/) unlocks LiteLLM's native JWT
   auth, SSO, and [other license-gated features](#unlocked-features), and
+  copies token users' email and name onto their Internal User;
   [`src/`](src/) ships the `access_token.py` claim validator that
   [authentication](ARCHITECTURE.md) configures.
 - [`patches/temporary/`](patches/temporary/) holds
