@@ -1,0 +1,66 @@
+Upstream bug: files_settings only routes POST /v1/files. On provider-only
+retrieve, content, delete, and list calls the proxy falls back to a team
+deployment's credentials or the environment, so a file uploaded to the
+files_settings backend cannot be read, listed, or deleted through the proxy.
+
+No upstream report yet.
+
+Apply the provider's files_settings entry after the team credentials on those
+four fallbacks, as create_file already does. Without files_settings, nothing
+changes.
+
+Removal check: files_settings routing check in tests/verify_files_settings.py
+
+diff --git a/litellm/proxy/openai_files_endpoints/files_endpoints.py b/litellm/proxy/openai_files_endpoints/files_endpoints.py
+index bdc7190..525791f 100644
+--- a/litellm/proxy/openai_files_endpoints/files_endpoints.py
++++ b/litellm/proxy/openai_files_endpoints/files_endpoints.py
+@@ -216,6 +216,16 @@ def get_files_provider_config(
+     return None
+
+
++def apply_files_provider_config(data: dict, custom_llm_provider: str) -> None:
++    """Send a provider-only file call to the provider's files_settings entry, the
++    backend create_file uploads to. Without files_settings, data is unchanged."""
++    if files_config is None:
++        return
++    llm_provider_config: Final = get_files_provider_config(custom_llm_provider=custom_llm_provider)
++    if llm_provider_config is not None:
++        data.update({key: value for key, value in llm_provider_config.items() if key != "custom_llm_provider"})
++
++
+ def _deployment_provider(llm_router: Router, model_id: str, team_id: str | None) -> str | None:
+     credentials: Final = llm_router.get_deployment_credentials_with_provider(model_id=model_id, team_id=team_id)
+     return None if credentials is None else credentials.get("custom_llm_provider")
+@@ -1133,6 +1143,7 @@ async def get_file_content(
+                     user_api_key_dict=user_api_key_dict,
+                     custom_llm_provider=custom_llm_provider,
+                 )
++                apply_files_provider_config(data=data, custom_llm_provider=custom_llm_provider)
+
+             from litellm.proxy.openai_files_endpoints.file_content_streaming_handler import (
+                 FileContentStreamingHandler,
+@@ -1399,6 +1410,7 @@ async def get_file(
+                 user_api_key_dict=user_api_key_dict,
+                 custom_llm_provider=custom_llm_provider,
+             )
++            apply_files_provider_config(data=data, custom_llm_provider=custom_llm_provider)
+             response = await litellm.afile_retrieve(
+                 custom_llm_provider=custom_llm_provider,
+                 file_id=file_id,
+@@ -1618,6 +1630,7 @@ async def delete_file(
+                 user_api_key_dict=user_api_key_dict,
+                 custom_llm_provider=custom_llm_provider,
+             )
++            apply_files_provider_config(data=data, custom_llm_provider=custom_llm_provider)
+             response = await litellm.afile_delete(
+                 custom_llm_provider=custom_llm_provider,
+                 file_id=file_id,
+@@ -1812,6 +1825,7 @@ async def list_files(
+                     user_api_key_dict=user_api_key_dict,
+                     custom_llm_provider=resolved_custom_llm_provider,
+                 )
++                apply_files_provider_config(data=data, custom_llm_provider=resolved_custom_llm_provider)
+
+                 response = await litellm.afile_list(
+                     custom_llm_provider=resolved_custom_llm_provider,

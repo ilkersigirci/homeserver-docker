@@ -66,6 +66,8 @@ the patch changes, and its removal check.
   provider trace context
 - [`realtime-turns.patch`](patches/temporary/realtime-turns.patch):
   client-owned realtime voice responses
+- [`files-settings-routing.patch`](patches/temporary/files-settings-routing.patch):
+  files_settings on file retrieve, content, delete, and list
 
 At each LiteLLM upgrade, test the pinned release without each workaround. Remove
 a patch, its source hashes, and its entry above only when its removal check
