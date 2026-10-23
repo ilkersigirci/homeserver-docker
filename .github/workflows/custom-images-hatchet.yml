@@ -79,27 +79,47 @@ jobs:
 
   validate:
     if: github.event_name == 'pull_request'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: lite
+            repository: homeserver-hatchet
+          - target: api
+            repository: homeserver-hatchet-api
+          - target: frontend
+            repository: homeserver-hatchet-frontend
     permissions:
       contents: read
     uses: ./.github/workflows/custom-images-build.yml
     with:
-      name: Hatchet
+      name: Hatchet ${{ matrix.target }}
       context: Dockerfiles/Hatchet
-      repository: homeserver-hatchet
-      platforms: linux/amd64
+      target: ${{ matrix.target }}
+      repository: ${{ matrix.repository }}
       publish: false
 
   publish:
     if: github.event_name == 'push'
     needs: auth-tests
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: lite
+            repository: homeserver-hatchet
+          - target: api
+            repository: homeserver-hatchet-api
+          - target: frontend
+            repository: homeserver-hatchet-frontend
     permissions:
       contents: read
       packages: write
       id-token: write
     uses: ./.github/workflows/custom-images-build.yml
     with:
-      name: Hatchet
+      name: Hatchet ${{ matrix.target }}
       context: Dockerfiles/Hatchet
-      repository: homeserver-hatchet
-      platforms: linux/amd64
+      target: ${{ matrix.target }}
+      repository: ${{ matrix.repository }}
       publish: true

@@ -350,6 +350,27 @@
       "enabled": false
     },
     {
+      "description": "Group upstream and homeserver Hatchet stack Docker image updates",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchFileNames": ["apps/hatchet-stack.yml"],
+      "matchPackageNames": [
+        "ghcr.io/hatchet-dev/hatchet/hatchet-admin",
+        "ghcr.io/hatchet-dev/hatchet/hatchet-engine",
+        "ghcr.io/hatchet-dev/hatchet/hatchet-migrate",
+        "ghcr.io/ilkersigirci/homeserver-hatchet-api",
+        "ghcr.io/ilkersigirci/homeserver-hatchet-frontend"
+      ],
+      "groupName": "Hatchet stack",
+      "groupSlug": "hatchet-stack",
+      "versioning": "semver",
+      "sourceUrl": "https://github.com/hatchet-dev/hatchet",
+      "changelogUrl": "https://github.com/hatchet-dev/hatchet/releases",
+      "prBodyNotes": [
+        "Merge after the homeserver API and frontend images reach the same Hatchet release as the upstream images."
+      ]
+    },
+    {
       "description": "Use GitHub releases for Headscale Docker image changelogs",
       "matchManagers": ["docker-compose"],
       "matchDatasources": ["docker"],

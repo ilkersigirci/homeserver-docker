@@ -3,7 +3,7 @@
 ARG IMAGE_VERSION=v0.110.5
 ARG UPSTREAM_COMMIT=56c617e0da399bc9d8a10d2ba74b4950f8a950b8
 
-FROM golang:1.27.1-alpine@sha256:4cb7ac979db5fcc41cae44b2227ba5ab8a51e8807f40d9ba4dee20a0ad960b5b AS server-build
+FROM golang:1.26.10-alpine@sha256:27f2d3b83cfc5803c8078f8e730af0f7c431bf067afaec8f60a36fb763187cba AS server-build
 
 ARG IMAGE_VERSION
 ARG UPSTREAM_COMMIT
@@ -32,7 +32,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     && go build -ldflags="-w -s -X 'github.com/hatchet-dev/hatchet/cmd/hatchet-admin/cli.Version=${IMAGE_VERSION}'" \
       -o /out/hatchet-admin ./cmd/hatchet-admin
 
-FROM node:24-alpine@sha256:d32cdf619f63fe0471182d08996dd516c6275bb5fd31ae06e55a570bd9e1ad43 AS frontend-build
+FROM node:22-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914 AS frontend-build
 
 WORKDIR /app
 
@@ -43,7 +43,45 @@ RUN corepack pnpm@10.16.1 install --frozen-lockfile \
 COPY --from=server-build /src/frontend/app/ ./
 RUN npm run build
 
-FROM alpine:3.24.1@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b
+# Split images replace only the patched upstream hatchet-api and
+# hatchet-frontend images, keeping their layout and default commands.
+FROM server-build AS api-build
+
+ARG IMAGE_VERSION
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg/mod \
+    go build -ldflags="-w -s -X 'main.Version=${IMAGE_VERSION}'" \
+      -o /out/hatchet-api ./cmd/hatchet-api
+
+FROM server-build AS staticfileserver-build
+
+RUN --mount=type=cache,target=/root/.cache/go-build \
+    --mount=type=cache,target=/go/pkg/mod \
+    go build -ldflags="-w -s" \
+      -o /out/hatchet-staticfileserver ./cmd/hatchet-staticfileserver
+
+FROM alpine:3.24.1@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b AS api
+
+WORKDIR /hatchet
+RUN apk add --no-cache bash ca-certificates openssl tzdata
+COPY --from=api-build /out/hatchet-api ./
+
+EXPOSE 8080
+
+CMD ["/hatchet/hatchet-api"]
+
+FROM alpine:3.24.1@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b AS frontend
+
+WORKDIR /app
+COPY --from=frontend-build /app/dist ./dist
+COPY --from=staticfileserver-build /out/hatchet-staticfileserver ./
+
+EXPOSE 80
+
+CMD ["/app/hatchet-staticfileserver", "-static-asset-dir", "/app/dist"]
+
+# Hatchet Lite stays last so it remains the default build target.
+FROM alpine:3.24.1@sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b AS lite
 
 ARG IMAGE_VERSION
 ARG UPSTREAM_COMMIT

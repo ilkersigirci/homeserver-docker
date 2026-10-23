@@ -18,6 +18,10 @@ on:
         default: linux/amd64,linux/arm64
         required: false
         type: string
+      target:
+        default: ""
+        required: false
+        type: string
       publish:
         required: true
         type: boolean
@@ -63,6 +67,7 @@ jobs:
       context: ${{ inputs.context }}
       output: image
       platforms: ${{ inputs.platforms }}
+      target: ${{ inputs.target }}
       push: ${{ inputs.publish }}
       meta-images: ghcr.io/${{ github.repository_owner }}/${{ inputs.repository }}
       meta-tags: type=raw,value=${{ needs.prepare.outputs.version }}

@@ -36,27 +36,79 @@ setting. Configure an issuer trusted to assert account email addresses.
 The repository deployment is OIDC-only, with a secure cookie scoped to the
 Hatchet hostname.
 
+## Images
+
+One patched source build publishes each upstream image the patch changes:
+
+| Target | Image | Replaces upstream |
+| --- | --- | --- |
+| `lite` (default) | `homeserver-hatchet` | `hatchet-lite` |
+| `api` | `homeserver-hatchet-api` | `hatchet-api` |
+| `frontend` | `homeserver-hatchet-frontend` | `hatchet-frontend` |
+
+The API and frontend images keep the upstream paths, ports, and effective
+default commands. Use the upstream engine, admin, and migrate images: the patch adds no
+migrations, and those binaries ignore the OIDC settings.
+
+### Compose
+
+`apps/hatchet.yml` runs Hatchet Lite. `apps/hatchet-stack.yml` follows the
+upstream Compose layout, but runs the API and frontend separately instead of the
+dashboard image, uses Postgres as the message queue, and has Traefik route `/api`
+to the API. Both files use the same database and generated config; include only
+one per host. When switching, remove the old containers, for example with
+`up -d --remove-orphans`, so their Traefik routers do not conflict.
+
+### Helm
+
+For the `hatchet-stack` or `hatchet-ha` chart, replace only the patched
+repositories. The published tag must match the chart's Hatchet release.
+
+```yaml
+api:
+  image:
+    repository: ghcr.io/ilkersigirci/homeserver-hatchet-api
+frontend:
+  image:
+    repository: ghcr.io/ilkersigirci/homeserver-hatchet-frontend
+sharedConfig:
+  serverAuthBasicAuthEnabled: "f"
+  serverAuthSetEmailVerified: "f"
+  env:
+    SERVER_AUTH_OIDC_ENABLED: "t"
+    SERVER_AUTH_OIDC_CLIENT_ID: <client-id>
+    SERVER_AUTH_OIDC_CLIENT_SECRET: <client-secret>
+    SERVER_AUTH_OIDC_ISSUER_URL: <issuer-url>
+```
+
+Each subchart reads its own `sharedConfig.image.tag`. To pin a digest, set
+`sharedConfig.image.tag: ""` and `image.tag: <tag>@sha256:<digest>` under `api`
+and `frontend`.
+
+The API performs OIDC discovery at startup, so its pods must reach the issuer.
+
 ## Updating and Validation
 
 `IMAGE_VERSION` selects the official release and published tag;
 `UPSTREAM_COMMIT` pins its peeled commit. The build verifies
 `base-sources.sha256`, applies the patch with zero fuzz, refreshes frontend
-snippets, runs focused tests, and builds matching server, admin, migration, and
-frontend artifacts.
+snippets, runs focused tests, and builds every image from that source.
 
 For an update:
 
-1. Update the release tag and peeled commit in `Dockerfile`.
+1. Update the release tag and peeled commit in `Dockerfile`. Match the Go image
+    to upstream's `build/package/servers.dockerfile` and the Node image to its
+    `lite.dockerfile`.
 2. Rebase `oidc.patch` onto that release. Regenerate the OpenAPI server with
     `hack/oas/generate-server.sh` if the contract changes.
 3. Refresh `base-sources.sha256` for existing upstream files touched by the patch.
-4. Build the image and run the PostgreSQL authentication tests.
+4. Build each target and run the PostgreSQL authentication tests.
 
 The image workflow runs the tagged integration tests, including PKCE code
 exchange, nonce validation, flow expiry, replay rejection, native account
 provisioning, and credential cleanup on first email verification. Publishing
 requires those tests to pass.
 
-Keep the Compose reference on its published `tag@digest` until the rebuilt image
-is published and Renovate resolves the new digest. Remove the patch when an
+Keep Compose references on their published `tag@digest` until the rebuilt images
+are published and Renovate resolves the new digests. Remove the patch when an
 official release provides equivalent OIDC support.

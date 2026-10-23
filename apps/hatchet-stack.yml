@@ -1,0 +1,250 @@
+# Split Hatchet deployment: upstream migrate, admin, and engine images plus the
+# OIDC-patched API and frontend images. Shares the database and generated config
+# with apps/hatchet.yml; include only one of them per host.
+networks:
+  hatchet_backend:
+
+x-hatchet-service: &hatchet-service
+  restart: $RESTART_POLICY_PROGRAMMING
+  profiles:
+    - programming
+    - hatchet
+  networks:
+    - hatchet_backend
+  user: $PUID:$PGID
+  read_only: true
+  tmpfs:
+    - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  cap_add: []
+  pids_limit: 256
+  ulimits:
+    nofile:
+      soft: 8192
+      hard: 16384
+
+x-hatchet-env: &hatchet-env
+  # Refer to https://docs.hatchet.run/self-hosting/configuration-options
+  # for a list of all supported environment variables
+  DATABASE_URL: "postgresql://postgres:postgres@hatchet-db:5432/postgres?sslmode=disable"
+  SERVER_MSGQUEUE_KIND: postgres
+  SERVER_AUTH_BASIC_AUTH_ENABLED: "f"
+  SERVER_AUTH_COOKIE_DOMAIN: hatchet.$DOMAINNAME
+  SERVER_AUTH_COOKIE_INSECURE: "f"
+  SERVER_AUTH_SET_EMAIL_VERIFIED: "f" # NOTE: Trust the OIDC provider's email_verified claim.
+  SERVER_GRPC_BIND_ADDRESS: "0.0.0.0"
+  SERVER_GRPC_INSECURE: "t"
+  SERVER_GRPC_BROADCAST_ADDRESS: hatchet-rpc.$DOMAINNAME:443
+  SERVER_GRPC_PORT: "7070"
+  SERVER_URL: https://hatchet.$DOMAINNAME
+  SERVER_DEFAULT_ENGINE_VERSION: "V1"
+  SERVER_INTERNAL_CLIENT_INTERNAL_GRPC_BROADCAST_ADDRESS: hatchet-engine:7070
+  SERVER_LIMITS_DEFAULT_TENANT_RETENTION_PERIOD: 720h # 30 days
+  SERVER_SECURITY_CHECK_ENABLED: "f" # NOTE: Hatchet Lite disables this check in code.
+
+x-hatchet-otel-env: &hatchet-otel-env
+  SERVER_OTEL_COLLECTOR_URL: otel-collector-agent:4317
+  SERVER_OTEL_INSECURE: "true"
+  SERVER_OTEL_TRACE_ID_RATIO: "0.1"
+
+services:
+  hatchet-db:
+    image: postgres:18.6@sha256:74935e72241653ca55e0414067e6d8763aceb8a810eb51b452253ec3dcfc4336
+    container_name: hatchet-db
+    restart: $RESTART_POLICY_PROGRAMMING
+    command: postgres -c 'max_connections=200'
+    profiles:
+      - programming
+      - hatchet
+    networks:
+      - hatchet_backend
+    expose:
+      - 5432
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /var/run/postgresql:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "2G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      - $REPO_PATH/data/hatchet-db:/var/lib/postgresql
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres -h 127.0.0.1 -p 5432"]
+      interval: 1m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  hatchet-migrate:
+    <<: *hatchet-service
+    image: ghcr.io/hatchet-dev/hatchet/hatchet-migrate:v0.110.5@sha256:b2112d73f37a11190fe08b3325a6495d76d100a325739291b9ddd0f6c9929067
+    container_name: hatchet-migrate
+    restart: "no"
+    command: ["/hatchet/hatchet-migrate"]
+    depends_on:
+      hatchet-db:
+        condition: service_healthy
+    cpus: "1.0"
+    mem_limit: "512M"
+    environment: *hatchet-env
+
+  hatchet-setup:
+    <<: *hatchet-service
+    image: ghcr.io/hatchet-dev/hatchet/hatchet-admin:v0.110.5@sha256:7c233e606095c30623e2592d718d013614097a3c164640a238d583c4d50b9023
+    container_name: hatchet-setup
+    restart: "no"
+    command:
+      - /hatchet/hatchet-admin
+      - quickstart
+      - --skip
+      - certs
+      - --generated-config-dir
+      - /hatchet/config
+      - --overwrite=false
+    depends_on:
+      hatchet-migrate:
+        condition: service_completed_successfully
+    cpus: "1.0"
+    mem_limit: "512M"
+    volumes:
+      - $REPO_PATH/configs/hatchet:/hatchet/config
+    environment: *hatchet-env
+
+  hatchet-engine:
+    <<: *hatchet-service
+    image: ghcr.io/hatchet-dev/hatchet/hatchet-engine:v0.110.5@sha256:185c4311d23fad2faecd5fdd771369a369f33cbfa0e9f4083a952c4fe1c15808
+    container_name: hatchet-engine
+    command: ["/hatchet/hatchet-engine", "--config", "/hatchet/config"]
+    depends_on:
+      hatchet-setup:
+        condition: service_completed_successfully
+    networks:
+      - t3_proxy
+      - hatchet_backend
+    expose:
+      - 7070 # gRPC API
+    pids_limit: 512
+    cpus: "2.0"
+    mem_limit: "2G"
+    volumes:
+      - $REPO_PATH/configs/hatchet:/hatchet/config:ro
+    environment:
+      <<: [*hatchet-env, *hatchet-otel-env]
+      SERVER_OTEL_SERVICE_NAME: hatchet-engine
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8733/ready"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 1m
+    labels:
+      traefik.enable: "true"
+      ## gRPC Router (RPC)
+      traefik.http.routers.hatchet-rpc-rtr.entrypoints: "websecure"
+      traefik.http.routers.hatchet-rpc-rtr.rule: "Host(`hatchet-rpc.$DOMAINNAME`)"
+      traefik.http.routers.hatchet-rpc-rtr.tls: "true"
+      traefik.http.routers.hatchet-rpc-rtr.middlewares: "chain-rpc@file"
+      traefik.http.routers.hatchet-rpc-rtr.service: "hatchet-rpc-svc"
+      ## gRPC Service (h2c)
+      traefik.http.services.hatchet-rpc-svc.loadbalancer.server.port: "7070"
+      traefik.http.services.hatchet-rpc-svc.loadbalancer.server.scheme: "h2c"
+
+  hatchet-api:
+    <<: *hatchet-service
+    image: ghcr.io/ilkersigirci/homeserver-hatchet-api:v0.110.5
+    container_name: hatchet-api
+    command: ["/hatchet/hatchet-api", "--config", "/hatchet/config"]
+    depends_on:
+      hatchet-setup:
+        condition: service_completed_successfully
+    networks:
+      - t3_proxy
+      - hatchet_backend
+    expose:
+      - 8080 # HTTP API
+    cpus: "1.0"
+    mem_limit: "1G"
+    volumes:
+      - $REPO_PATH/configs/hatchet:/hatchet/config:ro
+    environment:
+      <<: [*hatchet-env, *hatchet-otel-env]
+      SERVER_OTEL_SERVICE_NAME: hatchet-api
+      ##### CUSTOM IMAGE #####
+      SERVER_AUTH_OIDC_ENABLED: "t"
+      SERVER_AUTH_OIDC_CLIENT_ID: $HATCHET_CLIENT_ID
+      SERVER_AUTH_OIDC_CLIENT_SECRET: $HATCHET_CLIENT_SECRET
+      SERVER_AUTH_OIDC_ISSUER_URL: https://pocketid.$BASE_DOMAINNAME
+      SERVER_AUTH_OIDC_SCOPES: "openid profile email"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/api/ready"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 1m
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.hatchet-api-rtr.entrypoints: "websecure"
+      traefik.http.routers.hatchet-api-rtr.rule: "Host(`hatchet.$DOMAINNAME`) && PathPrefix(`/api`)"
+      ## Middlewares
+      traefik.http.routers.hatchet-api-rtr.middlewares: "chain-no-auth-relaxed@file"
+      ## HTTP Services
+      traefik.http.routers.hatchet-api-rtr.service: "hatchet-api-svc"
+      traefik.http.services.hatchet-api-svc.loadbalancer.server.port: "8080"
+
+  hatchet-frontend:
+    <<: *hatchet-service
+    image: ghcr.io/ilkersigirci/homeserver-hatchet-frontend:v0.110.5
+    container_name: hatchet-frontend
+    networks:
+      - t3_proxy
+    expose:
+      - 80 # HTTP UI
+    cpus: "0.5"
+    mem_limit: "128M"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:80/"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      traefik.http.routers.hatchet-rtr.entrypoints: "websecure"
+      traefik.http.routers.hatchet-rtr.rule: "Host(`hatchet.$DOMAINNAME`)"
+      ## Middlewares
+      traefik.http.routers.hatchet-rtr.middlewares: "chain-no-auth-relaxed@file" # NOTE: For task input loading
+      ## HTTP Services
+      traefik.http.routers.hatchet-rtr.service: "hatchet-svc"
+      traefik.http.services.hatchet-svc.loadbalancer.server.port: "80"
+      ####### HOMEPAGE #######
+      homepage.group: "Programming"
+      homepage.name: "hatchet"
+      homepage.icon: "hatchet.png"
+      homepage.href: "https://hatchet.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Run Background Tasks at Scale"
+      ####### GLANCE #######
+      glance.name: "hatchet"
+      glance.icon: "sh:hatchet"
+      glance.url: "https://hatchet.$DOMAINNAME"
+      glance.description: "Run Background Tasks at Scale"

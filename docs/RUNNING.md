@@ -92,7 +92,9 @@ The shared workflow reads the image version and calls the SHA-pinned
 [Docker GitHub Builder](https://github.com/docker/github-builder). Docker manages
 native `linux/amd64` and `linux/arm64` runners, per-image/per-platform caches,
 SBOM/provenance attestations, signing, and final manifest publication. Wrappers
-can restrict `platforms` to `linux/amd64` when required. No QEMU is used.
+can restrict `platforms` to `linux/amd64` when required. A wrapper can publish
+several images from one context with a matrix of Dockerfile `target` stages and
+`repository` names, as the Hatchet wrapper does. No QEMU is used.
 Only successful publish builds update the version tag; no `latest` tag is created.
 PR builds do not push images or publish a manifest. GHCR authentication uses the
 automatic GitHub token; no additional stored secrets are required.
