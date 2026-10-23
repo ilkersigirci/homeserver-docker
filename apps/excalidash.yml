@@ -2,7 +2,7 @@ services:
   # Keep the image's nodejs UID 1001: startup rewrites image-owned /app/dist/generated.
   # Overriding user with $PUID:$PGID requires changing those files and database ownership.
   excalidash-db:
-    image: zimengxiong/excalidash-backend:0.6.5@sha256:29937c62fbed5f4d417398c21c7ab261965231427bd5ae3c64f8d365fe2c02a3
+    image: zimengxiong/excalidash-backend:0.6.6@sha256:0ac551ef3dab403c182d208aae08208a343e973313a5d6a0a9f01220e4f5ad8a
     container_name: excalidash-db
     restart: $RESTART_POLICY_OTHERS
     profiles:
@@ -74,7 +74,7 @@ services:
       glance.description: "Excalidash prisma database"
 
   excalidash:
-    image: zimengxiong/excalidash-frontend:0.6.5@sha256:333a3f24bd599f69ebb3494e0393b6882f2f031fc0f05d02b0ede53ce7a743e0
+    image: zimengxiong/excalidash-frontend:0.6.6@sha256:081500ab351551b54184434d28cd7a3504df9c9e991f1ba3bf202e89e3312c53
     container_name: excalidash
     restart: $RESTART_POLICY_OTHERS
     depends_on:
