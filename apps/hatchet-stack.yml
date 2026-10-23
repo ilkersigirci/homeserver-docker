@@ -169,7 +169,7 @@ services:
 
   hatchet-api:
     <<: *hatchet-service
-    image: ghcr.io/ilkersigirci/homeserver-hatchet-api:v0.110.5
+    image: ghcr.io/ilkersigirci/homeserver-hatchet-api:v0.110.5@sha256:d4fb6542b32226077eea6972b219f05a98874d7428441f3fc18132f76764c950
     container_name: hatchet-api
     command: ["/hatchet/hatchet-api", "--config", "/hatchet/config"]
     depends_on:
@@ -212,7 +212,7 @@ services:
 
   hatchet-frontend:
     <<: *hatchet-service
-    image: ghcr.io/ilkersigirci/homeserver-hatchet-frontend:v0.110.5
+    image: ghcr.io/ilkersigirci/homeserver-hatchet-frontend:v0.110.5@sha256:af91739d3646b03b943842ad3396397f9e49b1ef2594a18aafa7f28ad47c353e
     container_name: hatchet-frontend
     networks:
       - t3_proxy
