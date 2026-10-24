@@ -31,8 +31,8 @@ services:
     # NOTE: https://docs.aiostreams.viren070.me/configuration/environment-variables
     environment:
       ADDON_NAME: AIOStreams
-      ADDON_ID: aiostreams.$BASE_DOMAINNAME
-      BASE_URL: https://aiostreams.$BASE_DOMAINNAME
+      ADDON_ID: aiostreams.$DOMAINNAME
+      BASE_URL: https://aiostreams.$DOMAINNAME
       SECRET_KEY: $AIOSTREAMS_SECRET_KEY
       TMDB_ACCESS_TOKEN: $TMDB_API_READ_ACCESS_TOKEN
       ## AUTH
@@ -58,7 +58,7 @@ services:
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.aiostreams-rtr.entrypoints: "websecure"
-      traefik.http.routers.aiostreams-rtr.rule: "Host(`aiostreams.$BASE_DOMAINNAME`)"
+      traefik.http.routers.aiostreams-rtr.rule: "Host(`aiostreams.$DOMAINNAME`)"
       ## Middlewares
       traefik.http.routers.aiostreams-rtr.middlewares: "chain-tinyauth-relaxed@file"
       ## HTTP Services
@@ -68,11 +68,11 @@ services:
       homepage.group: "Media"
       homepage.name: "aiostreams"
       homepage.icon: "aiostreams.png"
-      homepage.href: "https://aiostreams.$BASE_DOMAINNAME"
+      homepage.href: "https://aiostreams.$DOMAINNAME"
       homepage.target: "_blank"
       homepage.description: "Consolidates multiple Stremio addons and debrid services into a single addon"
       ####### GLANCE #######
       glance.name: "aiostreams"
       glance.icon: "sh:aiostreams"
-      glance.url: "https://aiostreams.$BASE_DOMAINNAME"
+      glance.url: "https://aiostreams.$DOMAINNAME"
       glance.description: "Consolidates multiple Stremio addons and debrid services into a single addon"
