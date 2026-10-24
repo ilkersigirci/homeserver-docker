@@ -51,7 +51,7 @@ services:
       start_period: 30s
 
   forgejo-dind-gc:
-    image: docker:29-cli@sha256:b1805116a6a86cc591b5d5f60a910a0715cdcc9d18d866ad68b1457ead25c35c
+    image: docker:29-cli@sha256:5e6baf67325a79f64ed3bed6863954d5e05d0f3d4e57cbdb14809346814bbfdb
     container_name: forgejo-dind-gc
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
