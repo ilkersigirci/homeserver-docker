@@ -92,7 +92,8 @@ grace period: tokens fail with 401 once the cache expires. LiteLLM refetches
 keys when that cache expires, not on an unknown `kid` as
 [OIDC Core](https://openid.net/specs/openid-connect-core-1_0.html#RotateSigKeys)
 describes. PocketID rotates its signing key only through `pocket-id
-key-rotate`, which replaces it at once, so restart LiteLLM after a rotation.
+key-rotate`, which replaces it at once, so restart LiteLLM after a rotation;
+each gateway and backend process caches the keys separately.
 There is no clock leeway, so keep hosts on NTP: a provider clock ahead of
 LiteLLM's rejects fresh tokens (`iat`).
 
@@ -110,7 +111,9 @@ environment variable, not `litellm_settings.ssl_verify`.
 ## Admin UI SSO
 
 The Admin UI uses LiteLLM's native generic OIDC SSO with PKCE against the same
-provider ([`apps/litellm.yml`](../../apps/litellm.yml)).
+provider ([`apps/litellm.yml`](../../apps/litellm.yml)). In
+[`apps/litellm-stack.yml`](../../apps/litellm-stack.yml) the backend serves SSO
+and keeps the PKCE verifier in Valkey, so the callback can reach any replica.
 `GENERIC_USER_ID_ATTRIBUTE: sub` resolves an SSO login and an OIDC request to
 the same Internal User. The `groups` claim maps `admin` to `proxy_admin`, and
 `ui_access_mode: admin_only` limits the UI to administrators.

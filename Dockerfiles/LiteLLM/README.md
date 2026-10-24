@@ -68,6 +68,8 @@ the patch changes, and its removal check.
   client-owned realtime voice responses
 - [`files-settings-routing.patch`](patches/temporary/files-settings-routing.patch):
   files_settings on file retrieve, content, delete, and list
+- [`key-delete-eviction.patch`](patches/temporary/key-delete-eviction.patch):
+  `/key/delete` eviction on other workers and components
 
 At each LiteLLM upgrade, test the pinned release without each workaround. Remove
 a patch, its source hashes, and its entry above only when its removal check
@@ -75,12 +77,66 @@ passes against unpatched upstream code; keep the check. The Dockerfile applies
 every patch under `patches/` and runs every `tests/verify_*` check, so neither
 needs a Dockerfile step.
 
+## Images
+
+One patched source build publishes the unified proxy and each upstream
+component image the patches change:
+
+| Target | Image | Replaces upstream |
+| --- | --- | --- |
+| `unified` (default) | `homeserver-litellm` | `litellm` |
+| `gateway` | `homeserver-litellm-gateway` | `litellm-gateway` |
+| `backend` | `homeserver-litellm-backend` | `litellm-backend` |
+| `ui` | `homeserver-litellm-ui` | `litellm-ui` |
+
+The gateway and backend images run the unified image's patched and checked
+Python environment with upstream's component entrypoints, ports, default
+commands, and non-root user (uid 65532). The UI image serves the same patched
+dashboard with upstream's `ui/nginx.conf`. Like upstream's unified image, the
+Python images include the SAML and Bedrock realtime extras and the in-container
+PgBouncer. They leave out the LiteAdmin MCP connector, which needs an Enterprise
+license to host, and the optional LiteAdmin Slack agent (`--admin-agent`).
+
+### Compose
+
+`apps/litellm.yml` runs the unified proxy. `apps/litellm-stack.yml` follows
+upstream's componentized Helm chart. `litellm-migrate` runs upstream's
+`litellm-migrations` image, since no patch changes the schema, and exits once
+the migrations and request-log indexes are in place. The gateway serves the LLM
+API, the backend serves the management API, SSO, and MCP, and the UI serves the
+dashboard. Traefik sends the chart's ingress gateway paths to the gateway,
+dashboard paths to the UI, and everything else to the backend. Features LiteLLM
+loads on first use, such as SCIM, run on the component that receives them.
+[`verify_components.py`](tests/verify_components.py) checks that each component
+serves the routes the patches and configuration use.
+
+Valkey is required even with one replica each, because the gateway and backend
+are separate processes. Through the `REDIS_*` settings, LiteLLM shares rate
+limits, spend counters, auth cache invalidation, SSO PKCE state, and job locks.
+A key deleted, blocked, or changed on the backend takes effect on every gateway
+at once; [`key-delete-eviction.patch`](patches/temporary/key-delete-eviction.patch)
+covers deletion. If Valkey is unreachable at startup, LiteLLM logs a warning and
+keeps that state per process.
+
+Both files use the same database and configuration; include only one per host.
+When switching, remove the old containers, for example with
+`up -d --remove-orphans`, so their Traefik routers do not conflict. The gateway
+and backend omit `container_name`; raise `deploy.replicas` to scale them. Each
+process opens its own Prisma pool of two connections per physical CPU core, plus
+one; before replicas approach PostgreSQL's `max_connections`, enable upstream's
+in-container PgBouncer on the gateway with `LITELLM_PGBOUNCER_ENABLED`, as the
+chart's `database.connectionPool` does. Replicas on one host share an
+OpenTelemetry `service.instance.id`, because Compose cannot set it per replica.
+
 ## Updating
 
 1. Clone the official `BerriAI/litellm` `v<version>` tag into a fresh temporary
     directory. Set `IMAGE_VERSION` and its resolved `UPSTREAM_COMMIT` in
     `Dockerfile`. Compare upstream's Dockerfile, Python/workspace metadata, UI
     build, and Prisma entrypoint with our stages; refresh base pins as needed.
+    Compare the `gateway/`, `backend/`, and `ui/` component images with our
+    targets, and the chart's ingress gateway paths with the gateway router in
+    `apps/litellm-stack.yml`.
 2. Refresh `base-sources.sha256` for every patched file from pristine upstream
     source. Run `scripts/strip_enterprise.py <checkout>` to remove proprietary source,
     package/workspace entries, and the enterprise UI override, preserving
@@ -106,5 +162,6 @@ needs a Dockerfile step.
 Renovate proposes version bumps; each needs the source commit, hashes, patches,
 and build checks refreshed. A version-only bump fails the source commit check.
 The shared [custom-image workflow](../../docs/RUNNING.md#custom-images)
-publishes `homeserver-litellm:<IMAGE_VERSION>` after merge; update Compose's tag
-and digest once that image exists.
+publishes every target as `<image>:<IMAGE_VERSION>` after merge; keep Compose
+references on their published `tag@digest` until the rebuilt images exist and
+Renovate resolves the new digests.

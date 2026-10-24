@@ -1,0 +1,346 @@
+# Split LiteLLM deployment following upstream's componentized chart: the
+# upstream migrations job plus the patched gateway, backend, and UI images, with
+# Valkey for cross-instance coordination. Shares the database and config with
+# apps/litellm.yml; include only one of them per host.
+networks:
+  litellm_backend:
+    internal: true
+
+x-litellm-service: &litellm-service
+  restart: $RESTART_POLICY_PROGRAMMING
+  profiles:
+    - programming
+    - litellm
+  user: $PUID:$PGID
+  read_only: true
+  tmpfs:
+    - /tmp:rw,noexec,nosuid,nodev,size=256m,uid=$PUID,gid=$PGID,mode=1777
+  security_opt:
+    - no-new-privileges:true
+  cap_drop:
+    - ALL
+  cap_add: []
+  pids_limit: 512
+  ulimits:
+    nofile:
+      soft: 4096
+      hard: 8192
+
+x-litellm-env: &litellm-env
+  LITELLM_MASTER_KEY: $LITELLM_MASTER_KEY
+  LITELLM_SALT_KEY: $LITELLM_SALT_KEY
+  SSL_VERIFY: ${LITELLM_SSL_VERIFY:-true}
+  STORE_MODEL_IN_DB: "true"
+  STORE_PROMPTS_IN_SPEND_LOGS: "true"
+  CONFIG_FILE_PATH: /app/litellm-config/config.yaml
+  DATABASE_URL: postgresql://litellm:${LITELLM_DATABASE_PASSWORD}@litellm-db:5432/litellm
+  DISABLE_SCHEMA_UPDATE: "true" # NOTE: litellm-migrate applies schema migrations.
+  # Coordination store: rate limits, spend counters, auth cache invalidation,
+  # SSO PKCE state, and job locks across components and replicas.
+  REDIS_HOST: litellm-redis
+  REDIS_PORT: "6379"
+  FORWARDED_ALLOW_IPS: 192.168.90.254 # NOTE: Traefik on t3_proxy
+  PROXY_BASE_URL: https://litellm.$DOMAINNAME
+  #### OpenTelemetry v2 #####
+  OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector-agent:4317
+  OTEL_EXPORTER_OTLP_INSECURE: "true"
+  OTEL_TRACES_EXPORTER: otlp
+  OTEL_PROPAGATORS: tracecontext
+  OTEL_SEMCONV_STABILITY_OPT_IN: http
+  OTEL_TRACES_SAMPLER: always_on
+  LITELLM_OTEL_V2: "true"
+  LITELLM_OTEL_INTEGRATION_ENABLE_METRICS: "true"
+  LITELLM_OTEL_LEGACY_COMPAT: "false" # NOTE: Keep prompts and responses out of telemetry.
+  OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT: no_content
+  ##### CUSTOM IMAGE #####
+  # OAuth 2.0 resource server (litellm native JWT auth)
+  JWT_PUBLIC_KEY_URL: https://pocketid.$BASE_DOMAINNAME/.well-known/openid-configuration
+  JWT_ISSUER: https://pocketid.$BASE_DOMAINNAME
+  JWT_AUDIENCE: https://llm.$BASE_DOMAINNAME
+
+services:
+  litellm-db:
+    image: postgres:18.6@sha256:74935e72241653ca55e0414067e6d8763aceb8a810eb51b452253ec3dcfc4336
+    container_name: litellm-db
+    restart: $RESTART_POLICY_PROGRAMMING
+    profiles:
+      - programming
+      - litellm
+    networks:
+      - litellm_backend
+    expose:
+      - 5432
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /var/run/postgresql:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "2G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    volumes:
+      - $REPO_PATH/data/litellm-db:/var/lib/postgresql
+    environment:
+      POSTGRES_USER: litellm
+      POSTGRES_PASSWORD: $LITELLM_DATABASE_PASSWORD
+      POSTGRES_DB: litellm
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} -h 127.0.0.1",
+        ]
+      interval: 1m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  litellm-redis:
+    image: docker.io/valkey/valkey:9@sha256:418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd
+    container_name: litellm-redis
+    restart: $RESTART_POLICY_PROGRAMMING
+    profiles:
+      - programming
+      - litellm
+    networks:
+      - litellm_backend
+    expose:
+      - 6379
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /data:rw,noexec,nosuid,nodev,size=256m,uid=$PUID,gid=$PGID,mode=770
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "512M"
+    ulimits:
+      nofile:
+        soft: 16384
+        hard: 16384
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1m
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  # Applies migrations and builds the request-log indexes, then exits. The
+  # patches add no migrations, so this is the upstream image.
+  litellm-migrate:
+    <<: *litellm-service
+    image: ghcr.io/berriai/litellm-migrations:v1.106.0@sha256:ab5b965c4979d77fcac40151837228893ee9509a63a11576a1863057f82af376
+    container_name: litellm-migrate
+    restart: "no"
+    depends_on:
+      litellm-db:
+        condition: service_healthy
+    networks:
+      - litellm_backend
+    cpus: "1.0"
+    mem_limit: "1G"
+    environment:
+      DATABASE_URL: postgresql://litellm:${LITELLM_DATABASE_PASSWORD}@litellm-db:5432/litellm
+      LITELLM_LOCAL_MODEL_COST_MAP: "true" # NOTE: No egress on litellm_backend.
+
+  # LLM API (data plane): inference, models, files, responses, realtime.
+  litellm-gateway:
+    <<: *litellm-service
+    image: ghcr.io/ilkersigirci/homeserver-litellm-gateway:1.106.0
+    # container_name: litellm-gateway # NOTE: Omit container_name so Compose can run multiple gateway replicas.
+    deploy:
+      replicas: 1
+    depends_on:
+      litellm-migrate:
+        condition: service_completed_successfully
+      litellm-redis:
+        condition: service_healthy
+      otel-collector-agent:
+        condition: service_healthy
+    networks:
+      - t3_proxy
+      - litellm_backend
+    expose:
+      - 4000
+    cpus: "2.0"
+    mem_limit: "2G"
+    volumes:
+      - $REPO_PATH/configs/litellm/config.yaml:/app/litellm-config/config.yaml:ro
+    environment:
+      <<: *litellm-env
+      OTEL_SERVICE_NAME: litellm-gateway
+      OTEL_RESOURCE_ATTRIBUTES: service.instance.id=litellm-gateway-$MY_HOSTNAME
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python3",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:4000/health/liveliness', timeout=3)",
+        ]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 2m
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      # Verbatim copy of the chart's gateway paths (helm/litellm/templates/ingress.yaml);
+      # Traefik v3 matchers take one path each, so keep one PathPrefix per entry.
+      traefik.http.routers.litellm-gateway-rtr.entrypoints: "websecure"
+      traefik.http.routers.litellm-gateway-rtr.rule: >-
+        Host(`litellm.$DOMAINNAME`) && (Path(`/test`) || Path(`/debug/memory/summary`)
+        || PathPrefix(`/v1/chat`) || PathPrefix(`/chat`) || PathPrefix(`/v1/completions`) || PathPrefix(`/completions`)
+        || PathPrefix(`/v1/embeddings`) || PathPrefix(`/embeddings`) || PathPrefix(`/v1/moderations`) || PathPrefix(`/moderations`)
+        || PathPrefix(`/v1/audio`) || PathPrefix(`/audio`) || PathPrefix(`/v1/images`) || PathPrefix(`/images`)
+        || PathPrefix(`/v1/files`) || PathPrefix(`/files`) || PathPrefix(`/v1/batches`) || PathPrefix(`/batches`)
+        || PathPrefix(`/v1/fine_tuning`) || PathPrefix(`/fine_tuning`) || PathPrefix(`/v1/fine-tuning`) || PathPrefix(`/fine-tuning`)
+        || PathPrefix(`/v1/responses`) || PathPrefix(`/responses`) || PathPrefix(`/v1/threads`) || PathPrefix(`/threads`)
+        || PathPrefix(`/v1/assistants`) || PathPrefix(`/assistants`) || PathPrefix(`/v1/vector_stores`) || PathPrefix(`/vector_stores`)
+        || PathPrefix(`/v1/indexes`) || PathPrefix(`/v1/models`) || PathPrefix(`/models`) || PathPrefix(`/openai`) || PathPrefix(`/engines`)
+        || PathPrefix(`/v1/messages`) || PathPrefix(`/messages`) || PathPrefix(`/v1/skills`) || PathPrefix(`/v1/a2a`) || PathPrefix(`/a2a`)
+        || PathPrefix(`/api/event_logging`) || PathPrefix(`/v1/rerank`) || PathPrefix(`/v2/rerank`) || PathPrefix(`/rerank`)
+        || PathPrefix(`/v1/ocr`) || PathPrefix(`/ocr`) || PathPrefix(`/v1/rag`) || PathPrefix(`/rag`)
+        || PathPrefix(`/v1/video`) || PathPrefix(`/v1/videos`) || PathPrefix(`/video`) || PathPrefix(`/videos`)
+        || PathPrefix(`/v1/search`) || PathPrefix(`/search`) || PathPrefix(`/v1/containers`) || PathPrefix(`/containers`)
+        || PathPrefix(`/v1/evals`) || PathPrefix(`/v1/memory`) || PathPrefix(`/queue/chat`) || PathPrefix(`/v1beta`) || PathPrefix(`/interactions`)
+        || PathPrefix(`/anthropic`) || PathPrefix(`/azure`) || PathPrefix(`/azure_ai`) || PathPrefix(`/azure_speech`) || PathPrefix(`/aws`)
+        || PathPrefix(`/bedrock`) || PathPrefix(`/comprehendmedical`) || PathPrefix(`/transcribe`) || PathPrefix(`/cohere`)
+        || PathPrefix(`/gemini`) || PathPrefix(`/google`) || PathPrefix(`/vertex_ai`) || PathPrefix(`/vertex-ai`)
+        || PathPrefix(`/assemblyai`) || PathPrefix(`/eu.assemblyai`) || PathPrefix(`/langfuse`) || PathPrefix(`/vllm`)
+        || PathPrefix(`/mistral`) || PathPrefix(`/groq`) || PathPrefix(`/voyage`) || PathPrefix(`/cursor`) || PathPrefix(`/milvus`)
+        || PathPrefix(`/openai_passthrough`) || PathPrefix(`/toolset`) || PathPrefix(`/v1/realtime`) || PathPrefix(`/realtime`)
+        || PathPrefix(`/health`) || PathPrefix(`/metrics`))
+      traefik.http.routers.litellm-gateway-rtr.priority: "200"
+      traefik.http.routers.litellm-gateway-rtr.middlewares: "chain-no-auth-relaxed@file"
+      traefik.http.routers.litellm-gateway-rtr.service: "litellm-gateway-svc"
+      ## HTTP Services
+      traefik.http.services.litellm-gateway-svc.loadbalancer.server.port: "4000"
+
+  # Management API (control plane) behind the Admin UI: keys, users, teams,
+  # models, spend, SSO, SCIM, and MCP.
+  litellm-backend:
+    <<: *litellm-service
+    image: ghcr.io/ilkersigirci/homeserver-litellm-backend:1.106.0
+    # container_name: litellm-backend # NOTE: Omit container_name so Compose can run multiple backend replicas.
+    deploy:
+      replicas: 1
+    depends_on:
+      litellm-migrate:
+        condition: service_completed_successfully
+      litellm-redis:
+        condition: service_healthy
+      otel-collector-agent:
+        condition: service_healthy
+    networks:
+      - t3_proxy
+      - litellm_backend
+    expose:
+      - 4001
+    cpus: "2.0"
+    mem_limit: "2G"
+    volumes:
+      - $REPO_PATH/configs/litellm/config.yaml:/app/litellm-config/config.yaml:ro
+    environment:
+      <<: *litellm-env
+      OTEL_SERVICE_NAME: litellm-backend
+      OTEL_RESOURCE_ATTRIBUTES: service.instance.id=litellm-backend-$MY_HOSTNAME
+      #### Admin UI OIDC login ####
+      AUTO_REDIRECT_UI_LOGIN_TO_SSO: "true"
+      GENERIC_AUTHORIZATION_ENDPOINT: https://pocketid.$BASE_DOMAINNAME/authorize
+      GENERIC_CLIENT_ID: $LITELLM_CLIENT_ID
+      GENERIC_CLIENT_SECRET: $LITELLM_CLIENT_SECRET
+      GENERIC_CLIENT_USE_PKCE: "true"
+      PKCE_STRICT_CACHE_MISS: "true"
+      GENERIC_ROLE_MAPPINGS_DEFAULT_ROLE: internal_user
+      GENERIC_ROLE_MAPPINGS_GROUP_CLAIM: groups
+      GENERIC_ROLE_MAPPINGS_ROLES: '{"proxy_admin": ["admin"]}'
+      GENERIC_SCOPE: openid email profile groups
+      GENERIC_TOKEN_ENDPOINT: https://pocketid.$BASE_DOMAINNAME/api/oidc/token
+      GENERIC_USER_DISPLAY_NAME_ATTRIBUTE: name
+      GENERIC_USER_EMAIL_ATTRIBUTE: email
+      GENERIC_USER_ID_ATTRIBUTE: sub
+      GENERIC_USERINFO_ENDPOINT: https://pocketid.$BASE_DOMAINNAME/api/oidc/userinfo
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python3",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:4001/health/liveliness', timeout=3)",
+        ]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 2m
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      # Catch-all for API paths the gateway and UI routers do not claim.
+      traefik.http.routers.litellm-backend-rtr.entrypoints: "websecure"
+      traefik.http.routers.litellm-backend-rtr.rule: "Host(`litellm.$DOMAINNAME`)"
+      traefik.http.routers.litellm-backend-rtr.priority: "10"
+      traefik.http.routers.litellm-backend-rtr.middlewares: "chain-no-auth-relaxed@file"
+      traefik.http.routers.litellm-backend-rtr.service: "litellm-backend-svc"
+      ## HTTP Services
+      traefik.http.services.litellm-backend-svc.loadbalancer.server.port: "4001"
+
+  # Admin UI: the dashboard's static export served by nginx.
+  litellm-ui:
+    <<: *litellm-service
+    image: ghcr.io/ilkersigirci/homeserver-litellm-ui:1.106.0
+    container_name: litellm-ui
+    networks:
+      - t3_proxy
+    expose:
+      - 3000
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+    pids_limit: 256
+    cpus: "0.5"
+    mem_limit: "256M"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3000/healthz"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    labels:
+      traefik.enable: "true"
+      ## HTTP Routers
+      # Dashboard pages, assets, and the root-level Next.js RSC payloads (*.txt).
+      traefik.http.routers.litellm-ui-rtr.entrypoints: "websecure"
+      traefik.http.routers.litellm-ui-rtr.rule: >-
+        Host(`litellm.$DOMAINNAME`) && (Path(`/`) || Path(`/favicon.ico`) || Path(`/ui`) || PathPrefix(`/ui/`)
+        || PathPrefix(`/_next/`) || PathPrefix(`/litellm-asset-prefix/`) || PathPrefix(`/assets/`) || PathRegexp(`\.txt$$`))
+      traefik.http.routers.litellm-ui-rtr.priority: "100"
+      traefik.http.routers.litellm-ui-rtr.middlewares: "chain-no-auth-relaxed@file"
+      traefik.http.routers.litellm-ui-rtr.service: "litellm-ui-svc"
+      ## HTTP Services
+      traefik.http.services.litellm-ui-svc.loadbalancer.server.port: "3000"
+      ####### HOMEPAGE #######
+      homepage.group: "Programming"
+      homepage.name: "LiteLLM"
+      homepage.icon: "litellm.png"
+      homepage.href: "https://litellm.$DOMAINNAME/ui"
+      homepage.target: "_blank"
+      homepage.description: "AI gateway"
+      ####### GLANCE #######
+      glance.name: "LiteLLM"
+      glance.icon: "sh:litellm"
+      glance.url: "https://litellm.$DOMAINNAME/ui"
+      glance.description: "AI gateway"

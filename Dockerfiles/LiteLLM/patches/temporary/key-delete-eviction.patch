@@ -1,0 +1,53 @@
+Upstream bug: /key/delete evicts the deleted keys only from the handling
+worker's auth cache. Every other worker, and in apps/litellm-stack.yml the
+gateway, keeps authenticating a deleted key from its cached copy until
+user_api_key_cache_ttl (60 s) expires, while /key/block and /key/update reach
+every worker through the coordination Redis.
+
+https://github.com/BerriAI/litellm/pull/47609
+https://github.com/BerriAI/litellm/pull/45296
+
+Backport the /key/delete part of #47609: evict the deleted rows through
+delete_cache_key_objects, which removes them locally, from Redis, and from
+every other worker over the auth cache invalidation channel.
+
+Removal check: tests/verify_key_delete.py
+
+diff --git a/litellm/proxy/management_endpoints/key_management_endpoints.py b/litellm/proxy/management_endpoints/key_management_endpoints.py
+--- a/litellm/proxy/management_endpoints/key_management_endpoints.py
++++ b/litellm/proxy/management_endpoints/key_management_endpoints.py
+@@ -57,6 +57,7 @@ from litellm.proxy.auth.auth_checks import (  # noqa: F401  # legacy module expo
+     _delete_cache_key_object,  # pyright: ignore[reportPrivateUsage,reportUnusedImport]  # backwards-compatible package export
+     can_team_access_model,
+     delete_cache_key_object,
++    delete_cache_key_objects,
+     get_jwt_key_mapping_cache_keys_for_token,
+     get_key_end_user_budget_id,
+     get_org_object,
+@@ -5028,7 +5029,7 @@ async def delete_verification_tokens(
+                 - List of keys being deleted, this contains information about the key_alias, token, and user_id being deleted,
+                 this is passed down to the KeyManagementEventHooks to delete the keys from the secret manager and handle audit logs
+     """
+-    from litellm.proxy.proxy_server import prisma_client
++    from litellm.proxy.proxy_server import prisma_client, proxy_logging_obj
+
+     failed_tokens: list = []
+     try:
+@@ -5112,11 +5113,12 @@ async def delete_verification_tokens(
+         verbose_proxy_logger.debug(traceback.format_exc())
+         raise e
+
+-    for key in tokens:
+-        user_api_key_cache.delete_cache(key)
+-        # remove hash token from cache
+-        hashed_token = hash_token(cast(str, key))
+-        user_api_key_cache.delete_cache(hashed_token)
++    # Evict the deleted keys on every worker, as /key/block does, not only here.
++    await delete_cache_key_objects(
++        hashed_tokens=tuple(key.token for key in authorized_keys if key.token is not None),
++        user_api_key_cache=user_api_key_cache,
++        proxy_logging_obj=proxy_logging_obj,
++    )
+
+     # After credential invalidation, so a failure here can never keep a deleted key alive.
+     for deleted_key in authorized_keys:

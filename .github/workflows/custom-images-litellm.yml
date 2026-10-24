@@ -21,24 +21,50 @@ concurrency:
 jobs:
   validate:
     if: github.event_name == 'pull_request'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: unified
+            repository: homeserver-litellm
+          - target: gateway
+            repository: homeserver-litellm-gateway
+          - target: backend
+            repository: homeserver-litellm-backend
+          - target: ui
+            repository: homeserver-litellm-ui
     permissions:
       contents: read
     uses: ./.github/workflows/custom-images-build.yml
     with:
-      name: LiteLLM
+      name: LiteLLM ${{ matrix.target }}
       context: Dockerfiles/LiteLLM
-      repository: homeserver-litellm
+      target: ${{ matrix.target }}
+      repository: ${{ matrix.repository }}
       publish: false
 
   publish:
     if: github.event_name == 'push'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: unified
+            repository: homeserver-litellm
+          - target: gateway
+            repository: homeserver-litellm-gateway
+          - target: backend
+            repository: homeserver-litellm-backend
+          - target: ui
+            repository: homeserver-litellm-ui
     permissions:
       contents: read
       packages: write
       id-token: write
     uses: ./.github/workflows/custom-images-build.yml
     with:
-      name: LiteLLM
+      name: LiteLLM ${{ matrix.target }}
       context: Dockerfiles/LiteLLM
-      repository: homeserver-litellm
+      target: ${{ matrix.target }}
+      repository: ${{ matrix.repository }}
       publish: true
