@@ -4,7 +4,7 @@ networks:
 
 services:
   langfuse-clickhouse:
-    image: clickhouse/clickhouse-server:26.9.12@sha256:5d6b622bbb109f40d12333187e44ae80864cf72aa71ae9a4704a53496615e941
+    image: clickhouse/clickhouse-server:26.10.2@sha256:b2bfa4d8399ee9973868cc5c1754cb506a6f4b86fbddc41010cc090beb55c85e
     container_name: langfuse-clickhouse
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
