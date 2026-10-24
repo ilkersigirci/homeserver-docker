@@ -10,7 +10,7 @@ networks:
 
 services:
   forgejo-dind:
-    image: docker:29-dind@sha256:7dcdfc4a20246236f558175182ccace1eb15a41bd3eb119dd2284f393498b7c1
+    image: docker:29-dind@sha256:9e79b879b177fbd72c34376a3dd3d91747da5db49e1f560f76aea59561471977
     container_name: forgejo-dind
     restart: $RESTART_POLICY_PROGRAMMING
     command: ["dockerd", "-H", "tcp://0.0.0.0:2375", "--tls=false"]
