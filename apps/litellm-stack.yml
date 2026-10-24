@@ -160,7 +160,7 @@ services:
   # LLM API (data plane): inference, models, files, responses, realtime.
   litellm-gateway:
     <<: *litellm-service
-    image: ghcr.io/ilkersigirci/homeserver-litellm-gateway:1.106.0
+    image: ghcr.io/ilkersigirci/homeserver-litellm-gateway:1.106.0@sha256:da57b7c6ce98ae446a0f637e73fb64bc10f576aea733fd27a3811b06b4eef8bb
     # container_name: litellm-gateway # NOTE: Omit container_name so Compose can run multiple gateway replicas.
     deploy:
       replicas: 1
@@ -235,7 +235,7 @@ services:
   # models, spend, SSO, SCIM, and MCP.
   litellm-backend:
     <<: *litellm-service
-    image: ghcr.io/ilkersigirci/homeserver-litellm-backend:1.106.0
+    image: ghcr.io/ilkersigirci/homeserver-litellm-backend:1.106.0@sha256:6a9b6b08e2a0e641bf53fee2d6b0ae8452de22fc9f9d9a64d80d7e9e062f2586
     # container_name: litellm-backend # NOTE: Omit container_name so Compose can run multiple backend replicas.
     deploy:
       replicas: 1
@@ -302,7 +302,7 @@ services:
   # Admin UI: the dashboard's static export served by nginx.
   litellm-ui:
     <<: *litellm-service
-    image: ghcr.io/ilkersigirci/homeserver-litellm-ui:1.106.0
+    image: ghcr.io/ilkersigirci/homeserver-litellm-ui:1.106.0@sha256:68f01ce67bb9f1a1eb76a7300ed1b726a804e1ec933bff44c197de9c937db049
     container_name: litellm-ui
     networks:
       - t3_proxy
