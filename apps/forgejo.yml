@@ -48,7 +48,7 @@ services:
 
   # NOTE: Configuration is located in: $REPO_PATH/data/forgejo/gitea/custom/conf/app.ini
   forgejo:
-    image: codeberg.org/forgejo/forgejo:16.0.5-rootless@sha256:5effb7305584aca479b29fde6f9631a6dbe86ae798ae02eeea33a3666f0c0bf8
+    image: codeberg.org/forgejo/forgejo:16.0.7-rootless@sha256:85c09de612c60347d3d44582ca8cb32e7ac46309a544e35b2cb27dad2e5ad5bd
     container_name: forgejo
     restart: $RESTART_POLICY_PROGRAMMING
     depends_on:
