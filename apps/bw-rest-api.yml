@@ -1,6 +1,6 @@
 services:
   bw-rest-api:
-    image: ghcr.io/kimdre/bitwarden-rest-api-server:2026.9.1@sha256:bcd1e8d2c1f26e80db7745640ff469d603da60b386531fa4c2aff912a8d5b12c
+    image: ghcr.io/kimdre/bitwarden-rest-api-server:2026.10.1@sha256:a2961286d91e094c2f2348be436d0de5c3c0f913d180263e56607449ac6471da
     container_name: bw-rest-api
     restart: $RESTART_POLICY_CORE
     init: true
