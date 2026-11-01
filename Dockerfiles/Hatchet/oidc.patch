@@ -1,8 +1,8 @@
 diff --git a/api-contracts/openapi/openapi.yaml b/api-contracts/openapi/openapi.yaml
-index 8cfe9bb..79034ee 100644
+index ab4c9c7..45d6be8 100644
 --- a/api-contracts/openapi/openapi.yaml
 +++ b/api-contracts/openapi/openapi.yaml
-@@ -104,4 +104,8 @@ paths:
+@@ -122,4 +122,8 @@ paths:
    /api/v1/users/github/callback:
      $ref: "./paths/user/user.yaml#/oauth-callback-github"
 +  /api/v1/users/oidc/start:
@@ -12,10 +12,10 @@ index 8cfe9bb..79034ee 100644
    /api/v1/tenants/{tenant}/slack/start:
      $ref: "./paths/user/user.yaml#/oauth-start-slack"
 diff --git a/api-contracts/openapi/paths/user/user.yaml b/api-contracts/openapi/paths/user/user.yaml
-index 5877c60..53565bb 100644
+index fcc3652..634738b 100644
 --- a/api-contracts/openapi/paths/user/user.yaml
 +++ b/api-contracts/openapi/paths/user/user.yaml
-@@ -241,4 +241,36 @@ oauth-callback-github:
+@@ -245,4 +245,36 @@ oauth-callback-github:
      tags:
        - User
 +oauth-start-oidc:
@@ -53,11 +53,11 @@ index 5877c60..53565bb 100644
  oauth-start-slack:
    get:
 diff --git a/api/v1/server/authz/rbac.yaml b/api/v1/server/authz/rbac.yaml
-index ec0c950..b72e1cc 100644
+index 964263a..f1fc5e7 100644
 --- a/api/v1/server/authz/rbac.yaml
 +++ b/api/v1/server/authz/rbac.yaml
-@@ -134,4 +134,6 @@ roles:
-       - UserUpdateSlackOauthStart
+@@ -147,4 +147,6 @@ roles:
+       - TenantEntitlementsGet
        - UserUpdateGoogleOauthStart
 +      - UserUpdateOidcOauthStart
 +      - UserUpdateOidcOauthCallback
@@ -940,10 +940,10 @@ index 0000000..30d0fa5
 +	}, nil
 +}
 diff --git a/api/v1/server/oas/gen/openapi.gen.go b/api/v1/server/oas/gen/openapi.gen.go
-index d462622..dd3fc79 100644
+index d90a8b9..c0edb91 100644
 --- a/api/v1/server/oas/gen/openapi.gen.go
 +++ b/api/v1/server/oas/gen/openapi.gen.go
-@@ -4018,4 +4018,10 @@ type ServerInterface interface {
+@@ -4545,4 +4545,10 @@ type ServerInterface interface {
  	// (GET /api/v1/users/memberships)
  	TenantMembershipsList(ctx echo.Context) error
 +	// Complete OIDC OAuth flow
@@ -954,7 +954,7 @@ index d462622..dd3fc79 100644
 +	UserUpdateOidcOauthStart(ctx echo.Context) error
  	// Change user password
  	// (POST /api/v1/users/password)
-@@ -7920,4 +7926,22 @@ func (w *ServerInterfaceWrapper) TenantMembershipsList(ctx echo.Context) error {
+@@ -8910,4 +8916,22 @@ func (w *ServerInterfaceWrapper) TenantMembershipsList(ctx echo.Context) error {
  }
 
 +// UserUpdateOidcOauthCallback converts echo context to params.
@@ -977,14 +977,14 @@ index d462622..dd3fc79 100644
 +
  // UserUpdatePassword converts echo context to params.
  func (w *ServerInterfaceWrapper) UserUpdatePassword(ctx echo.Context) error {
-@@ -8351,4 +8375,6 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL
+@@ -9354,4 +9378,6 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL
  	router.POST(baseURL+"/api/v1/users/logout", wrapper.UserUpdateLogout)
  	router.GET(baseURL+"/api/v1/users/memberships", wrapper.TenantMembershipsList)
 +	router.GET(baseURL+"/api/v1/users/oidc/callback", wrapper.UserUpdateOidcOauthCallback)
 +	router.GET(baseURL+"/api/v1/users/oidc/start", wrapper.UserUpdateOidcOauthStart)
  	router.POST(baseURL+"/api/v1/users/password", wrapper.UserUpdatePassword)
  	router.POST(baseURL+"/api/v1/users/register", wrapper.UserCreate)
-@@ -13487,4 +13513,46 @@ func (response TenantMembershipsList403JSONResponse) VisitTenantMembershipsListR
+@@ -16253,4 +16279,46 @@ func (response TenantMembershipsList429JSONResponse) VisitTenantMembershipsListR
  }
 
 +type UserUpdateOidcOauthCallbackRequestObject struct {
@@ -1031,7 +1031,7 @@ index d462622..dd3fc79 100644
 +
  type UserUpdatePasswordRequestObject struct {
  	Body *UserUpdatePasswordJSONRequestBody
-@@ -14317,4 +14385,8 @@ type StrictServerInterface interface {
+@@ -17220,4 +17288,8 @@ type StrictServerInterface interface {
  	TenantMembershipsList(ctx echo.Context, request TenantMembershipsListRequestObject) (TenantMembershipsListResponseObject, error)
 
 +	UserUpdateOidcOauthCallback(ctx echo.Context, request UserUpdateOidcOauthCallbackRequestObject) (UserUpdateOidcOauthCallbackResponseObject, error)
@@ -1040,7 +1040,7 @@ index d462622..dd3fc79 100644
 +
  	UserUpdatePassword(ctx echo.Context, request UserUpdatePasswordRequestObject) (UserUpdatePasswordResponseObject, error)
 
-@@ -17436,4 +17508,44 @@ func (sh *strictHandler) TenantMembershipsList(ctx echo.Context) error {
+@@ -20651,4 +20723,44 @@ func (sh *strictHandler) TenantMembershipsList(ctx echo.Context) error {
  }
 
 +// UserUpdateOidcOauthCallback operation
@@ -1085,38 +1085,57 @@ index d462622..dd3fc79 100644
 +
  // UserUpdatePassword operation
  func (sh *strictHandler) UserUpdatePassword(ctx echo.Context) error {
-@@ -18142,18 +18254,19 @@ var swaggerSpec = []string{
- 	"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",
-+	"8v3/CwAA///Jv5y3F6oDAA==",
+@@ -21434,28 +21546,28 @@ var swaggerSpec = []string{
+ 	"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",
+-	"oqUi+eq31er17vW/AAAA//8w2Ojvt0cEAA==",
++	"+K8Ie/baTopeegu2hWE0gYvGaQ+BD1qJ1hKWxQVF2XAD//eCz9WLErlLKpLNm+EVX8P5hsPhPLjSzz+M",
++	"aLOOIPhWAnwFyEZ05pGF6UiWLMtmPCcO/TDNNL4VcUV2CMP/AD/hLn+dZuAvgOxQykrSxXmOnsGJByxI",
++	"KgzJCztJEoQeIPhUUfH5/Y5Ky1bW1SabSuQwtulDTRcRGSS7anuRxHm+jZMHLTI26HGfAwI4PG7olKLe",
++	"U5KOzQ3/V6zrG7otG9l9Cyu/XH4c8dhJxLhpd9wdiFN25P5Y5Yjva3NL24fNa4u+DXLKBTbH6FIUFFRT",
++	"WOOYgDWLPaN9K43GlN4libFeDH2lvx5HadbUnsxsPv6JzGbnm8IIZTnww9Gs68DRffR2zNEHSgeOhsUT",
++	"JGC4gnLJ4pTlPYM3YNcZI22G9nDL2l6LsXw+utUGMgpTy2Epd7K5wKCJe9cyWGXcFtUPLH4r7uw2bHwR",
++	"JwnYE72R8xP7vVTGTDFuh3HrfMTbrPyY7njnfKCazU5jaxtgZL7yPlYObscnXyn5LnV45iRWxYDVmNSy",
++	"6t/sdztW5W08sSrv3AGr8pUHVvXCqnyX3LBqjjJY6Dn0M8rKCBZRzA7/8wGV6zPryJOLI9UxaP/jPDmd",
++	"3SRHWQbSCBbBXDIDc8nHqda9x4jyALP3/1EQSF6idfQU5zBlg9FNEZ/AIuNOOh2dqakiUcbWm2BOVP5z",
++	"lKGKjAAcVcQM4bSrmeCOTiUA7+3bKTnXecPHI3jcAlzu4N7iglxrZHZJ5kfyl0MzkcvLK5L6B7W/LddJ",
++	"FG7MU96Y65Q/yjyPYJpYmzKvf9+YWdluYJosz5rZWZ6NTNGQ2Nx6aU/cRRgwHRN1H5flM8IDrmyqYh9t",
++	"EMnvh9SXv2Sf/u4om11cZGqgOV1WEjazVBEqqE7hzjJ2Z5nitOOIaYLYh5qHQUb1Gjxki+NflIM3IeX0",
++	"6kuEyGnMSXhI4gUXkSA/3Ng8JJd7u9aVeZw8eHnE/0p7npXWO4mc9u0M8ARwKdaq9b+lxBLfSR9cHgvX",
++	"2a7r4h5dAfKP6PREAbrHtHcCeevaTA/Z7j+cX55f9uXTr7m+fldN79SHaMteczQu/P2LHQLWvyDCgFS4",
++	"aBCrZaOgIr0qCopVRb9eD0k5yhrtedrdrr7+DLY7hB7Wwhn64of4h0GKLHrSiq+7ztL8/+bZr0RHemdk",
++	"NdDEvsiG6aTk/MK5ulyTZjuFVZ29bTyQRaM7I5xdYDmHcfOl/FQEe42ATy7OtO7AbCHoJhyAz55HAwjS",
++	"UMoM5YqkVFHFHgV1cC12PCB96Uhn1trO1jqAu4I5++N1JC6Jf9UbcsRiDYzgy8MohqJ5eoKulxPLYx0K",
++	"IVYcnjychet0QqM1DxnD0Tm00WhutBFMmKc5mwUsfGUNa5xmuhNMUKCSJJsuZNgQtvUkYAG0hdv0W45x",
++	"2zrj2sG4RomVVeSfUZYtizvkLCNabZISqwmGsPiFhsULJq9xmrt41rMxFdIcVBY65XuIET8yLjzAdKkw",
++	"rQegO8aoiV5rDlQ7RXcWWHWv7DaJYZo3RxSjaAB2au3XSLi09d8gWpxrwM5xPqIHG5Wip/vdrDmvMPyk",
++	"Xr6057dF6fk5iIaemo284iIzrtYzmdkXbTym5Kks1Ng3sQyjas8KYR6mIDdKOxXW6E/wshrNLuZZ3pxY",
++	"51o+OoZS129Ix3FVW9tKBsp0ilqfrUNKbrt0hkdlMZylELztQd55dH3PnjrKijIaSM8YQPOYgJIoeMIy",
++	"ugck2YFUV3n5cIbMXL0TbHBkasSflhCxNl+rTIgh/+E7z3/oTsIKiJcGz4uNs91IugrvqwWZit6CePUs",
++	"rKRL3WnKYRBbb0IpPLCwQ6Ww7Za6BTEGWLmlnvU6qjI3Ri5aKpyvflutXu9e/w8AAP//h7b6YW9KBAA=",
  }
 
 diff --git a/frontend/app/src/pages/auth/components/auth-page.tsx b/frontend/app/src/pages/auth/components/auth-page.tsx
@@ -1165,10 +1184,10 @@ index 11e10fc..4b7b6a3 100644
  };
 
 diff --git a/frontend/docs/content/docs/self-hosting/configuration-options.mdx b/frontend/docs/content/docs/self-hosting/configuration-options.mdx
-index ed438a0..82358ce 100644
+index 2f773ad..663d10f 100644
 --- a/frontend/docs/content/docs/self-hosting/configuration-options.mdx
 +++ b/frontend/docs/content/docs/self-hosting/configuration-options.mdx
-@@ -305,4 +305,13 @@ Variables marked with ⚠️ are conditionally required when specific features a
+@@ -328,4 +328,13 @@ Variables marked with ⚠️ are conditionally required when specific features a
  | `SERVER_AUTH_GITHUB_CLIENT_SECRET` ⚠️  | GitHub auth client secret (required if GitHub auth enabled) |                                  |
  | `SERVER_AUTH_GITHUB_SCOPES`            | GitHub auth scopes                                          | `["read:user", "user:email"]`    |
 +| `SERVER_AUTH_OIDC_ENABLED`             | Whether generic OIDC auth is enabled                        | `false`                          |
@@ -1183,26 +1202,26 @@ index ed438a0..82358ce 100644
 
  ## Task Queue Configuration
 diff --git a/go.mod b/go.mod
-index 59db985..7662455 100644
+index 2272a04..541a6d4 100644
 --- a/go.mod
 +++ b/go.mod
-@@ -16,4 +16,5 @@ require (
+@@ -17,4 +17,5 @@ require (
  	github.com/cockroachdb/errors v1.14.0
  	github.com/containerd/errdefs v1.0.0
 +	github.com/coreos/go-oidc/v3 v3.18.0
  	github.com/creasty/defaults v1.11.0
- 	github.com/docker/docker v28.5.2+incompatible
+ 	github.com/docker/go-sdk/context v0.1.0-alpha013
 @@ -26,4 +27,5 @@ require (
- 	github.com/getkin/kin-openapi v0.149.0
+ 	github.com/go-chi/chi/v5 v5.5.0
  	github.com/go-co-op/gocron/v2 v2.22.0
 +	github.com/go-jose/go-jose/v4 v4.1.4
  	github.com/google/go-github/v57 v57.0.0
  	github.com/google/jsonschema-go v0.4.3
 diff --git a/go.sum b/go.sum
-index cfd09ac..d529923 100644
+index 70d5519..fa2ce1a 100644
 --- a/go.sum
 +++ b/go.sum
-@@ -133,4 +133,6 @@ github.com/containerd/log v0.1.0/go.mod h1:VRRf09a7mHDIRezVKTRCrOq78v577GXq3bSa3
+@@ -135,4 +135,6 @@ github.com/containerd/log v0.1.0/go.mod h1:VRRf09a7mHDIRezVKTRCrOq78v577GXq3bSa3
  github.com/containerd/platforms v0.2.1 h1:zvwtM3rz2YHPQsF2CHYM8+KtB5dvhISiXh5ZpSBQv6A=
  github.com/containerd/platforms v0.2.1/go.mod h1:XHCb+2/hzowdiut9rkudds9bE5yJ7npe7dG/wG+uFPw=
 +github.com/coreos/go-oidc/v3 v3.18.0 h1:V9orjXynvu5wiC9SemFTWnG4F45v403aIcjWo0d41+A=
@@ -1259,7 +1278,7 @@ index a0d1812..98701c5 100644
 +	}
 +}
 diff --git a/pkg/config/loader/loader.go b/pkg/config/loader/loader.go
-index 3de06c6..68457ad 100644
+index e79446c..98921d2 100644
 --- a/pkg/config/loader/loader.go
 +++ b/pkg/config/loader/loader.go
 @@ -23,4 +23,6 @@ import (
@@ -1269,7 +1288,7 @@ index 3de06c6..68457ad 100644
 +
  	"github.com/hatchet-dev/hatchet/internal/integrations/alerting"
  	"github.com/hatchet-dev/hatchet/internal/services/ingestor"
-@@ -769,4 +771,57 @@ func createControllerLayer(dc *database.Layer, cf *server.ServerConfigFile, vers
+@@ -724,4 +726,57 @@ func createControllerLayer(dc *database.Layer, cf *server.ServerConfigFile, vers
  	}
 
 +	if cf.Auth.OIDC.Enabled {
@@ -1328,7 +1347,7 @@ index 3de06c6..68457ad 100644
  	encryptionSvc, err := LoadEncryptionSvc(cf)
 
 diff --git a/pkg/config/server/server.go b/pkg/config/server/server.go
-index 97345d9..2d14a13 100644
+index 84273d9..5dca69c 100644
 --- a/pkg/config/server/server.go
 +++ b/pkg/config/server/server.go
 @@ -6,4 +6,5 @@ import (
@@ -1337,14 +1356,14 @@ index 97345d9..2d14a13 100644
 +	"github.com/coreos/go-oidc/v3/oidc"
  	"github.com/labstack/echo/v4"
  	"github.com/rs/zerolog"
-@@ -503,4 +504,6 @@ type ConfigFileAuth struct {
+@@ -531,4 +532,6 @@ type ConfigFileAuth struct {
  	Github ConfigFileAuthGithub `mapstructure:"github" json:"github,omitempty"`
 
 +	OIDC ConfigFileAuthOIDC `mapstructure:"oidc" json:"oidc,omitempty"`
 +
  	ControlPlaneExchangeTokenConfig ConfigFileAuthControlPlaneExchangeToken `mapstructure:"controlPlaneExchangeToken" json:"controlPlaneExchangeToken,omitempty"`
  }
-@@ -556,4 +559,16 @@ type ConfigFileAuthGithub struct {
+@@ -584,4 +587,16 @@ type ConfigFileAuthGithub struct {
  }
 
 +type ConfigFileAuthOIDC struct {
@@ -1361,7 +1380,7 @@ index 97345d9..2d14a13 100644
 +
  type ConfigFileAuthCookie struct {
  	Name     string `mapstructure:"name" json:"name,omitempty" default:"hatchet"`
-@@ -710,4 +725,10 @@ type AuthConfig struct {
+@@ -827,4 +842,10 @@ type AuthConfig struct {
  	GithubOAuthConfig *oauth2.Config
 
 +	OIDCOAuthConfig *oauth2.Config
@@ -1372,7 +1391,7 @@ index 97345d9..2d14a13 100644
 +
  	JWTManager token.JWTManager
 
-@@ -977,4 +998,10 @@ func BindAllEnv(v *viper.Viper) {
+@@ -1149,4 +1170,10 @@ func BindAllEnv(v *viper.Viper) {
  	_ = v.BindEnv("auth.github.clientSecret", "SERVER_AUTH_GITHUB_CLIENT_SECRET")
  	_ = v.BindEnv("auth.github.scopes", "SERVER_AUTH_GITHUB_SCOPES")
 +	_ = v.BindEnv("auth.oidc.enabled", "SERVER_AUTH_OIDC_ENABLED")
@@ -1384,10 +1403,10 @@ index 97345d9..2d14a13 100644
 
  	// task queue options
 diff --git a/pkg/repository/user.go b/pkg/repository/user.go
-index d530ab9..b4d0043 100644
+index 66a0608..ba6abe6 100644
 --- a/pkg/repository/user.go
 +++ b/pkg/repository/user.go
-@@ -25,5 +25,5 @@ type CreateUserOpts struct {
+@@ -33,5 +33,5 @@ type CreateUserOpts struct {
 
  type OAuthOpts struct {
 -	Provider       string     `validate:"required,oneof=google github sso"`

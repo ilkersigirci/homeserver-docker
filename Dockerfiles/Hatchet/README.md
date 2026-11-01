@@ -36,6 +36,22 @@ setting. Configure an issuer trusted to assert account email addresses.
 The repository deployment is OIDC-only, with a secure cookie scoped to the
 Hatchet hostname.
 
+## Durable Streams
+
+`SERVER_DEFAULT_TENANT_ENTITLEMENT_DURABLE_STREAMS` applies only to tenants
+created after it is set. Hatchet has no API for changing an existing tenant's
+entitlements, so grant them in the database. Publishing is otherwise rejected
+with `PERMISSION_DENIED`:
+
+```sql
+INSERT INTO tenant_entitlement (tenant_id, durable_streams)
+SELECT id, TRUE FROM "Tenant" WHERE slug <> 'internal'
+ON CONFLICT (tenant_id) DO UPDATE SET durable_streams = TRUE, updated_at = NOW();
+```
+
+Entitlement reads are cached for five minutes; restart Hatchet to apply the
+change immediately.
+
 ## Images
 
 One patched source build publishes each upstream image the patch changes:

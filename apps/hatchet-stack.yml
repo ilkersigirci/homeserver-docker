@@ -43,6 +43,7 @@ x-hatchet-env: &hatchet-env
   SERVER_DEFAULT_ENGINE_VERSION: "V1"
   SERVER_INTERNAL_CLIENT_INTERNAL_GRPC_BROADCAST_ADDRESS: hatchet-engine:7070
   SERVER_LIMITS_DEFAULT_TENANT_RETENTION_PERIOD: 720h # 30 days
+  SERVER_DEFAULT_TENANT_ENTITLEMENT_DURABLE_STREAMS: "t" # NOTE: New tenants only; see Dockerfiles/Hatchet/README.md.
   SERVER_SECURITY_CHECK_ENABLED: "f" # NOTE: Hatchet Lite disables this check in code.
 
 x-hatchet-otel-env: &hatchet-otel-env

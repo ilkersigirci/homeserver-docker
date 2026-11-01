@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.26@sha256:ecfaec9ed6d810b56388c508f4121597bfbba70d41a6dfeee4d8cad5f295fc32
 # renovate: datasource=github-releases depName=hatchet-dev/hatchet
-ARG IMAGE_VERSION=v0.110.5
-ARG UPSTREAM_COMMIT=56c617e0da399bc9d8a10d2ba74b4950f8a950b8
+ARG IMAGE_VERSION=v0.116.5
+ARG UPSTREAM_COMMIT=964f6bca03f58578f81c06b11f572aad1dbe1785
 
 FROM golang:1.26.10-alpine@sha256:27f2d3b83cfc5803c8078f8e730af0f7c431bf067afaec8f60a36fb763187cba AS server-build
 
@@ -32,7 +32,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
     && go build -ldflags="-w -s -X 'github.com/hatchet-dev/hatchet/cmd/hatchet-admin/cli.Version=${IMAGE_VERSION}'" \
       -o /out/hatchet-admin ./cmd/hatchet-admin
 
-FROM node:22-alpine@sha256:fe4f6d74e20370acb04ad889077d14d0f64a9c8ea6a42bc60cddf1e844699914 AS frontend-build
+FROM node:24-alpine@sha256:8a32c8cf649a49915a66e81e7a609223c708d0adabf288ee3f4077d765542f85 AS frontend-build
 
 WORKDIR /app
 
