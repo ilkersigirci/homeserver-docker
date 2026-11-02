@@ -56,6 +56,8 @@ the patch changes, and its removal check.
   Responses WebSocket per-model budgets
 - [`responses-background.patch`](patches/temporary/responses-background.patch):
   native background Responses
+- [`responses-retrieve-stream.patch`](patches/temporary/responses-retrieve-stream.patch):
+  resuming a background Response's stream
 - [`responses-streaming.patch`](patches/temporary/responses-streaming.patch):
   wildcard native streaming
 - [`responses-logging.patch`](patches/temporary/responses-logging.patch):
