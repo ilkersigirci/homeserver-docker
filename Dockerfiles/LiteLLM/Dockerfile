@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.25@sha256:0adf442eae370b6087e08edc7c50b552d80ddf261576f4ebd6421006b2461f12
 # renovate: datasource=github-tags depName=BerriAI/litellm
-ARG IMAGE_VERSION=1.106.0
-ARG UPSTREAM_COMMIT=955bdaafa8b72b2b6ff728048f272fbc06049f63
+ARG IMAGE_VERSION=1.106.6
+ARG UPSTREAM_COMMIT=61c6ab78393ef45683dd7d963d2a315bd845e20b
 # Upstream's in-container PgBouncer (LITELLM_PGBOUNCER_ENABLED), as pinned upstream.
 ARG PGBOUNCER_VERSION=1.26.0
 ARG PGBOUNCER_SHA256=afd25dd61ee6775d37b40629b87ce08736b3e6955f3057bb212e410fbf21c71d
@@ -119,8 +119,9 @@ USER 65532:65532
 ENTRYPOINT ["/app/docker/component_entrypoint.sh", "uvicorn", "backend.main:app"]
 CMD ["--host", "0.0.0.0", "--port", "4001"]
 
-FROM nginx:1.31.5-alpine3.24@sha256:34f40471dea485273c5e2a04dd5e97a682332ceb4a9adecd67de450dcb2fb390 AS ui
-RUN rm -f /etc/nginx/conf.d/default.conf
+FROM nginx:1.31.8-alpine3.24@sha256:1ef7ca94d7879df82421428ce13bd1eaa412404953859cf7a5b6512c25e67a60 AS ui
+RUN apk upgrade --no-cache brotli-libs \
+    && rm -f /etc/nginx/conf.d/default.conf
 COPY --from=ui-build /ui/out /usr/share/nginx/html
 COPY --from=source /app/ui/nginx.conf /etc/nginx/nginx.conf
 COPY --from=source /app/LICENSE /usr/share/licenses/litellm/LICENSE

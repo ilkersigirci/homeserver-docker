@@ -39,9 +39,10 @@ def main() -> None:
 
             carrier: Final = logger._open_llm_calls.pop("propagated-call")
             assert carrier.span is not None
+            span_context: Final = carrier.span.get_span_context()
             expected: Final = (
-                f"00-{carrier.span.get_span_context().trace_id:032x}-"
-                f"{carrier.span.get_span_context().span_id:016x}-01"
+                f"00-{span_context.trace_id:032x}-"
+                f"{span_context.span_id:016x}-{span_context.trace_flags:02x}"
             )
             assert headers["traceparent"] == expected
             assert headers["traceparent"] != original

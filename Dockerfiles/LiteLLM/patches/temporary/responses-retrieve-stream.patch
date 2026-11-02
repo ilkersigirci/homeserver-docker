@@ -13,7 +13,7 @@ Removal check: tests/verify_responses_retrieve_stream.py
 diff --git a/litellm/llms/custom_httpx/llm_http_handler.py b/litellm/llms/custom_httpx/llm_http_handler.py
 --- a/litellm/llms/custom_httpx/llm_http_handler.py
 +++ b/litellm/llms/custom_httpx/llm_http_handler.py
-@@ -3172,6 +3172,9 @@
+@@ -3174,6 +3174,9 @@ class BaseLLMHTTPHandler:
          extra_body: dict[str, object] | None = None,
          timeout: float | httpx.Timeout | None = None,
          client: HTTPHandler | AsyncHTTPHandler | None = None,
@@ -23,7 +23,7 @@ diff --git a/litellm/llms/custom_httpx/llm_http_handler.py b/litellm/llms/custom
          _is_async: bool = False,
          shared_session: Optional["ClientSession"] = None,
      ) -> ResponsesAPIResponse | Coroutine[object, object, ResponsesAPIResponse]:
-@@ -3190,6 +3193,9 @@
+@@ -3192,6 +3195,9 @@ class BaseLLMHTTPHandler:
                  extra_body=extra_body,
                  timeout=timeout,
                  client=client,
@@ -33,7 +33,7 @@ diff --git a/litellm/llms/custom_httpx/llm_http_handler.py b/litellm/llms/custom
                  shared_session=shared_session,
              )
 
-@@ -3253,8 +3259,11 @@
+@@ -3255,8 +3261,11 @@ class BaseLLMHTTPHandler:
          extra_body: dict[str, object] | None = None,
          timeout: float | httpx.Timeout | None = None,
          client: HTTPHandler | AsyncHTTPHandler | None = None,
@@ -46,7 +46,7 @@ diff --git a/litellm/llms/custom_httpx/llm_http_handler.py b/litellm/llms/custom
          """
          Async version of get_responses
          """
-@@ -3301,6 +3310,23 @@
+@@ -3303,6 +3312,23 @@ class BaseLLMHTTPHandler:
              },
          )
 
@@ -70,7 +70,7 @@ diff --git a/litellm/llms/custom_httpx/llm_http_handler.py b/litellm/llms/custom
          try:
              response: Final = await async_httpx_client.get(url=url, headers=headers, params=data)
              response.raise_for_status()
-@@ -3316,6 +3342,49 @@
+@@ -3318,6 +3344,49 @@ class BaseLLMHTTPHandler:
              logging_obj=logging_obj,
          )
 
@@ -123,7 +123,7 @@ diff --git a/litellm/llms/custom_httpx/llm_http_handler.py b/litellm/llms/custom
 diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/response_api_endpoints/endpoints.py
 --- a/litellm/proxy/response_api_endpoints/endpoints.py
 +++ b/litellm/proxy/response_api_endpoints/endpoints.py
-@@ -721,6 +721,10 @@
+@@ -723,6 +723,10 @@ async def get_response(
      # Normal provider response flow
      data: Final = await read_request_body(request=request)
      data["response_id"] = response_id
@@ -137,7 +137,7 @@ diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/r
 diff --git a/litellm/responses/main.py b/litellm/responses/main.py
 --- a/litellm/responses/main.py
 +++ b/litellm/responses/main.py
-@@ -1827,6 +1827,9 @@
+@@ -1833,6 +1833,9 @@ def get_responses(
              extra_headers=extra_headers,
              extra_body=extra_body,
              timeout=timeout or request_timeout,
