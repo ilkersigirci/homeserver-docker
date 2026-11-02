@@ -8,8 +8,11 @@ Enterprise source tree.
 - [`scripts/`](scripts/) holds build tooling: `strip_enterprise.py` removes
   Enterprise source and package entries before installation.
 - [`patches/permanent/`](patches/permanent/) unlocks LiteLLM's native JWT
-  auth, SSO, and [other license-gated features](#unlocked-features), and
-  copies token users' email and name onto their Internal User;
+  auth, SSO, and [other license-gated features](#unlocked-features), copies
+  token users' email and name onto their Internal User, and
+  [forwards `raw`](patches/permanent/files-raw-content.patch) on file content
+  downloads, so `GET /v1/files/{file_id}/content?raw=true` returns the original
+  upload from the files_settings backend;
   [`src/`](src/) ships the `access_token.py` claim validator that
   [authentication](ARCHITECTURE.md) configures.
 - [`patches/temporary/`](patches/temporary/) holds
