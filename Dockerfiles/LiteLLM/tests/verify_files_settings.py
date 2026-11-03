@@ -1,18 +1,14 @@
-"""Verify provider-only file calls use files_settings, like file create does, and
-that file content forwards `raw` to that backend."""
+"""Verify provider-only file calls use files_settings, like file create does."""
 
 import asyncio
 from collections.abc import Awaitable, Callable
 from typing import Any
 from unittest.mock import patch
 
-import httpx
 from fastapi import Response
-from openai import AsyncOpenAI
 from starlette.requests import Request
 
 import litellm
-from litellm.files.main import openai_files_instance
 from litellm.proxy._types import UserAPIKeyAuth
 from litellm.proxy.openai_files_endpoints import common_utils, files_endpoints
 from litellm.proxy.openai_files_endpoints.file_content_streaming_handler import (
@@ -35,7 +31,7 @@ class _Captured(Exception):
     """Stops the endpoint once the provider call's arguments are recorded."""
 
 
-def _request(method: str, path: str, query: bytes = b"") -> Request:
+def _request(method: str, path: str) -> Request:
     async def receive() -> dict[str, object]:
         return {"type": "http.request", "body": b"", "more_body": False}
 
@@ -47,7 +43,7 @@ def _request(method: str, path: str, query: bytes = b"") -> Request:
             "scheme": "http",
             "path": path,
             "raw_path": path.encode(),
-            "query_string": query,
+            "query_string": b"",
             "headers": [],
             "client": ("127.0.0.1", 1),
             "server": ("localhost", 4000),
@@ -130,53 +126,18 @@ def _assert_routed_to(
         assert routed == (backend["api_base"], backend["api_key"]), (name, routed[0])
 
 
-async def _assert_raw_forwarded() -> None:
-    """Run the endpoint, afile_content, and the OpenAI SDK; only the network is mocked."""
-    file_id = "file-raw-check"
-    path = f"/v1/files/{file_id}/content"
-    upload = b"%PDF original upload"
-    sent: list[httpx.Request] = []
-
-    def backend(request: httpx.Request) -> httpx.Response:
-        sent.append(request)
-        return httpx.Response(200, content=upload)
-
-    async def download(query: bytes) -> bytes:
-        response = await files_endpoints.get_file_content(
-            request=_request("GET", path, query),
-            fastapi_response=Response(),
-            user_api_key_dict=UserAPIKeyAuth(),
-            file_id=file_id,
-        )
-        return b"".join([chunk async for chunk in response.body_iterator])
-
-    async with httpx.AsyncClient(transport=httpx.MockTransport(backend)) as session:
-
-        def sdk_client(*, api_key: str, api_base: str, **_kwargs: Any) -> AsyncOpenAI:
-            return AsyncOpenAI(api_key=api_key, base_url=api_base, http_client=session)
-
-        with patch.object(openai_files_instance, "get_openai_client", sdk_client):
-            assert await download(b"raw=true&other=1") == upload
-            assert await download(b"") == upload
-
-    url = f"{FILES_BACKEND['api_base']}/files/{file_id}/content"
-    assert [str(request.url) for request in sent] == [f"{url}?raw=true", url], sent
-    assert sent[0].headers["authorization"] == f"Bearer {FILES_BACKEND['api_key']}"
-
-
 async def main() -> None:
     # files_settings check: its entry wins over the team deployment's credentials.
     files_endpoints.set_files_config([dict(FILES_BACKEND)])
     try:
         _assert_routed_to(FILES_BACKEND, await _provider_calls())
-        await _assert_raw_forwarded()
     finally:
         files_endpoints.files_config = None
 
     # Without files_settings, provider-only calls keep the team credentials.
     _assert_routed_to(TEAM_DEPLOYMENT, await _provider_calls())
 
-    print("files_settings routing and raw content: ok")
+    print("files_settings routing: ok")
 
 
 if __name__ == "__main__":

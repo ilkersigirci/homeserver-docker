@@ -1,0 +1,287 @@
+Let clients send files-api's own fields (language, parse_method, metadata, raw,
+...) through the proxy, and get the fields it adds to file objects back.
+
+The proxy drops upload form fields and query parameters it does not know, the
+OpenAI files retrieve, delete, and list calls take no extra_query, and
+OpenAIFileObject drops unknown response fields. These fields are files-api's,
+not OpenAI's, so this is not an upstream bug.
+
+On upload, content, retrieve, delete, and list, pass every form field and query
+parameter except the proxy's own upload, routing, and logging fields to the
+OpenAI SDK as extra_body and extra_query. They never become LiteLLM call
+kwargs, and `expires_after` keeps the team's enforced expiry. List pagination
+(limit, after, order) reaches the backend as well. Keep extra fields on file
+objects.
+
+Checks: tests/verify_files_extra_fields.py
+
+diff --git a/litellm/files/main.py b/litellm/files/main.py
+index 94fdb41..df744b2 100644
+--- a/litellm/files/main.py
++++ b/litellm/files/main.py
+@@ -219,6 +219,7 @@ def create_file(
+                 expires_after=expires_after,
+                 extra_headers=extra_headers,
+                 extra_body=extra_body,
++                extra_query=kwargs.get("extra_query"),
+             )
+         else:
+             _create_file_request = CreateFileRequest(
+@@ -226,6 +227,7 @@ def create_file(
+                 purpose=purpose,
+                 extra_headers=extra_headers,
+                 extra_body=extra_body,
++                extra_query=kwargs.get("extra_query"),
+             )
+
+         provider_config: Final = ProviderConfigManager.get_provider_files_config(
+@@ -373,6 +375,7 @@ def file_retrieve(
+                 organization=optional_params.organization,
+             )
+             response = openai_files_instance.retrieve_file(
++                extra_query=kwargs.get("extra_query"),
+                 file_id=file_id,
+                 _is_async=_is_async,
+                 api_base=openai_creds.api_base,
+@@ -554,6 +557,7 @@ def file_delete(
+                 organization=optional_params.organization,
+             )
+             response = openai_files_instance.delete_file(
++                extra_query=kwargs.get("extra_query"),
+                 file_id=file_id,
+                 _is_async=_is_async,
+                 api_base=openai_creds.api_base,
+@@ -760,6 +764,7 @@ def file_list(
+                 organization=optional_params.organization,
+             )
+             response = openai_files_instance.list_files(
++                extra_query=kwargs.get("extra_query"),
+                 purpose=purpose,
+                 _is_async=_is_async,
+                 api_base=openai_creds.api_base,
+@@ -901,6 +906,7 @@ def file_content(
+             file_id=file_id,
+             extra_headers=extra_headers,
+             extra_body=extra_body,
++            extra_query=kwargs.get("extra_query"),
+         )
+
+         _is_async: Final = kwargs.pop("afile_content", False) is True
+diff --git a/litellm/llms/openai/openai.py b/litellm/llms/openai/openai.py
+index a782bf3..c8bc076 100644
+--- a/litellm/llms/openai/openai.py
++++ b/litellm/llms/openai/openai.py
+@@ -1931,8 +1931,9 @@ class OpenAIFilesAPI(BaseLLM):
+         self,
+         file_id: str,
+         openai_client: AsyncOpenAI,
++        extra_query: Mapping[str, object] | None = None,
+     ) -> FileObject:
+-        response: Final = await openai_client.files.retrieve(file_id=file_id)
++        response: Final = await openai_client.files.retrieve(file_id=file_id, extra_query=extra_query)
+         return response
+
+     def retrieve_file(
+@@ -1945,6 +1946,7 @@ class OpenAIFilesAPI(BaseLLM):
+         max_retries: int | None,
+         organization: str | None,
+         client: OpenAI | AsyncOpenAI | None = None,
++        extra_query: Mapping[str, object] | None = None,
+     ):
+         openai_client: Final[OpenAI | AsyncOpenAI | None] = self.get_openai_client(
+             api_key=api_key,
+@@ -1968,8 +1970,9 @@ class OpenAIFilesAPI(BaseLLM):
+             return self.aretrieve_file(
+                 file_id=file_id,
+                 openai_client=openai_client,
++                extra_query=extra_query,
+             )
+-        response: Final = openai_client.files.retrieve(file_id=file_id)
++        response: Final = openai_client.files.retrieve(file_id=file_id, extra_query=extra_query)
+
+         return response
+
+@@ -1977,8 +1980,9 @@ class OpenAIFilesAPI(BaseLLM):
+         self,
+         file_id: str,
+         openai_client: AsyncOpenAI,
++        extra_query: Mapping[str, object] | None = None,
+     ) -> FileDeleted:
+-        response: Final = await openai_client.files.delete(file_id=file_id)
++        response: Final = await openai_client.files.delete(file_id=file_id, extra_query=extra_query)
+         return response
+
+     def delete_file(
+@@ -1991,6 +1995,7 @@ class OpenAIFilesAPI(BaseLLM):
+         max_retries: int | None,
+         organization: str | None,
+         client: OpenAI | AsyncOpenAI | None = None,
++        extra_query: Mapping[str, object] | None = None,
+     ):
+         openai_client: Final[OpenAI | AsyncOpenAI | None] = self.get_openai_client(
+             api_key=api_key,
+@@ -2014,8 +2019,9 @@ class OpenAIFilesAPI(BaseLLM):
+             return self.adelete_file(
+                 file_id=file_id,
+                 openai_client=openai_client,
++                extra_query=extra_query,
+             )
+-        response: Final = openai_client.files.delete(file_id=file_id)
++        response: Final = openai_client.files.delete(file_id=file_id, extra_query=extra_query)
+
+         return response
+
+@@ -2023,11 +2029,12 @@ class OpenAIFilesAPI(BaseLLM):
+         self,
+         openai_client: AsyncOpenAI,
+         purpose: str | None = None,
++        extra_query: Mapping[str, object] | None = None,
+     ):
+         if isinstance(purpose, str):
+-            response = await openai_client.files.list(purpose=purpose)
++            response = await openai_client.files.list(purpose=purpose, extra_query=extra_query)
+         else:
+-            response = await openai_client.files.list()
++            response = await openai_client.files.list(extra_query=extra_query)
+         return response
+
+     def list_files(
+@@ -2040,6 +2047,7 @@ class OpenAIFilesAPI(BaseLLM):
+         organization: str | None,
+         purpose: str | None = None,
+         client: OpenAI | AsyncOpenAI | None = None,
++        extra_query: Mapping[str, object] | None = None,
+     ):
+         openai_client: Final[OpenAI | AsyncOpenAI | None] = self.get_openai_client(
+             api_key=api_key,
+@@ -2063,12 +2071,13 @@ class OpenAIFilesAPI(BaseLLM):
+             return self.alist_files(
+                 purpose=purpose,
+                 openai_client=openai_client,
++                extra_query=extra_query,
+             )
+
+         if isinstance(purpose, str):
+-            response = openai_client.files.list(purpose=purpose)
++            response = openai_client.files.list(purpose=purpose, extra_query=extra_query)
+         else:
+-            response = openai_client.files.list()
++            response = openai_client.files.list(extra_query=extra_query)
+
+         return response
+
+diff --git a/litellm/proxy/openai_files_endpoints/files_endpoints.py b/litellm/proxy/openai_files_endpoints/files_endpoints.py
+index bdc7190..747e55f 100644
+--- a/litellm/proxy/openai_files_endpoints/files_endpoints.py
++++ b/litellm/proxy/openai_files_endpoints/files_endpoints.py
+@@ -23,6 +23,7 @@ from fastapi import (
+     status,
+ )
+ from pydantic import TypeAdapter
++from starlette.datastructures import ImmutableMultiDict
+ from typing_extensions import ReadOnly
+
+ import litellm
+@@ -185,6 +186,29 @@ class UploadedFileInfo(TypedDict):
+ files_config = None
+
+
++# The proxy's own upload, routing, and logging fields. Every other form field and query
++# parameter, list pagination included, belongs to the files backend.
++_FILE_PROXY_FIELDS: Final = frozenset({
++    "file", "purpose", "expires_after", "provider", "custom_llm_provider", "model",
++    "target_model_names", "target_storage", "passthrough", "litellm_metadata",
++})
++
++
++def _file_backend_fields(fields: ImmutableMultiDict) -> dict[str, Any]:
++    """The text fields that are not the proxy's own, as the OpenAI SDK's extra_body or extra_query.
++
++    The SDK encodes objects as key[sub] and arrays as key[]. Keys pass through as sent, but
++    key[] becomes key with a list, so the provider SDK sends key[] again, not key[][].
++    A repeated plain key keeps its last value, as FastAPI reads it.
++    """
++    backend_fields: dict[str, Any] = {}
++    for key in fields:
++        values = [value for value in fields.getlist(key) if isinstance(value, str)]
++        if values and key.split("[", 1)[0] not in _FILE_PROXY_FIELDS:
++            backend_fields[key.removesuffix("[]")] = values if key.endswith("[]") else values[-1]
++    return backend_fields
++
++
+ def set_files_config(config):
+     global files_config
+     if config is None:
+@@ -690,6 +714,8 @@ async def create_file(
+         # Parse expires_after if provided
+         expires_after: FileExpiresAfter | None = None
+         form_data_raw: Final = await request.form()
++        data["extra_body"] = _file_backend_fields(form_data_raw)
++        data["extra_query"] = _file_backend_fields(request.query_params)
+         form_data_dict: Final[Mapping[str, object]] = dict(form_data_raw)
+         extracted_litellm_metadata: Final[Mapping[str, object] | None] = extract_nested_form_metadata(
+             form_data=form_data_dict, prefix="litellm_metadata["
+@@ -985,7 +1011,7 @@ async def get_file_content(
+         version,
+     )
+
+-    data: dict = {"file_id": file_id}
++    data: dict = {"file_id": file_id, "extra_query": _file_backend_fields(request.query_params)}
+     try:
+         await validate_managed_id_requirement(
+             resource_id=file_id,
+@@ -1295,7 +1321,7 @@ async def get_file(
+         version,
+     )
+
+-    data: dict = {"file_id": file_id}
++    data: dict = {"file_id": file_id, "extra_query": _file_backend_fields(request.query_params)}
+     try:
+         await validate_managed_id_requirement(
+             resource_id=file_id,
+@@ -1496,7 +1522,7 @@ async def delete_file(
+         version,
+     )
+
+-    data: dict = {"file_id": file_id}
++    data: dict = {"file_id": file_id, "extra_query": _file_backend_fields(request.query_params)}
+     try:
+         await validate_managed_id_requirement(
+             resource_id=file_id,
+@@ -1722,7 +1748,7 @@ async def list_files(
+         version,
+     )
+
+-    data: dict = {}
++    data: dict = {"extra_query": _file_backend_fields(request.query_params)}
+     try:
+         validate_file_list_limit(limit)
+
+diff --git a/litellm/types/llms/openai.py b/litellm/types/llms/openai.py
+index cd77d60..52150f3 100644
+--- a/litellm/types/llms/openai.py
++++ b/litellm/types/llms/openai.py
+@@ -369,6 +369,9 @@ LITELLM_DETAILS_FALLBACK_RESPONSE_FIELD: Final = "litellm_details_fallback"
+
+
+ class OpenAIFileObject(LiteLLMBaseModel):
++    # OpenAI-compatible file backends can return metadata and parsing status.
++    model_config = ConfigDict(extra="allow")
++
+     id: str
+     """The file identifier, which can be referenced in the API endpoints."""
+
+@@ -516,6 +519,7 @@ class CreateFileRequest(TypedDict, total=False):
+     expires_after: FileExpiresAfter | None
+     extra_headers: dict[str, str] | None
+     extra_body: dict[str, str] | None
++    extra_query: dict[str, Any] | None
+     timeout: float | None
+
+
+@@ -536,6 +540,7 @@ class FileContentRequest(TypedDict, total=False):
+     file_id: str
+     extra_headers: dict[str, str] | None
+     extra_body: dict[str, str] | None
++    extra_query: dict[str, Any] | None
+     timeout: float | None

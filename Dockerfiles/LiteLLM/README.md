@@ -10,9 +10,8 @@ Enterprise source tree.
 - [`patches/permanent/`](patches/permanent/) unlocks LiteLLM's native JWT
   auth, SSO, and [other license-gated features](#unlocked-features), copies
   token users' email and name onto their Internal User, and
-  [forwards `raw`](patches/permanent/files-raw-content.patch) on file content
-  downloads, so `GET /v1/files/{file_id}/content?raw=true` returns the original
-  upload from the files_settings backend;
+  passes the files backend's [own fields](#file-extensions) through the
+  Files API;
   [`src/`](src/) ships the `access_token.py` claim validator that
   [authentication](ARCHITECTURE.md) configures.
 - [`patches/temporary/`](patches/temporary/) holds
@@ -81,6 +80,32 @@ a patch, its source hashes, and its entry above only when its removal check
 passes against unpatched upstream code; keep the check. The Dockerfile applies
 every patch under `patches/` and runs every `tests/verify_*` check, so neither
 needs a Dockerfile step.
+
+## File extensions
+
+[`files-extra-fields.patch`](patches/permanent/files-extra-fields.patch)
+forwards the OpenAI SDK's `extra_body` on upload and `extra_query` on every
+file endpoint to the files_settings backend, and returns the fields the backend
+adds to file objects.
+
+```python
+file = client.files.create(
+    file=open("document.pdf", "rb"),
+    purpose="user_data",
+    extra_body={"language": "tr", "parse_method": "ocr", "metadata": {"source": "archive"}},
+)
+file.model_extra  # e.g. {"metadata": {...}}, if the backend returns it
+content = client.files.content(file.id, extra_query={"language": "tr"})
+original = client.files.content(file.id, extra_query={"raw": "true"})
+```
+
+The backend receives the SDK's encoding: `metadata[source]=archive` for an
+object, repeated `tags[]` for an array; send `json.dumps(...)` for one JSON
+string instead. The proxy keeps its own fields (`file`, `purpose`,
+`expires_after`, `provider`, `custom_llm_provider`, `model`,
+`target_model_names`, `target_storage`, `passthrough`, `litellm_metadata`), so
+a team's enforced file expiry still applies. List's `limit`, `after`, and
+`order` reach the backend too.
 
 ## Images
 
