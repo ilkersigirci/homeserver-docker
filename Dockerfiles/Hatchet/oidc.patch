@@ -1403,7 +1403,7 @@ index 84273d9..5dca69c 100644
 
  	// task queue options
 diff --git a/pkg/repository/user.go b/pkg/repository/user.go
-index 66a0608..ba6abe6 100644
+index 28d64be..a399f2d 100644
 --- a/pkg/repository/user.go
 +++ b/pkg/repository/user.go
 @@ -33,5 +33,5 @@ type CreateUserOpts struct {
