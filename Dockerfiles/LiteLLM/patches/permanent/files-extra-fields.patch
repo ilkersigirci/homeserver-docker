@@ -35,7 +35,7 @@ index 94fdb41..df744b2 100644
              )
 
          provider_config: Final = ProviderConfigManager.get_provider_files_config(
-@@ -373,6 +375,7 @@ def file_retrieve(
+@@ -381,6 +383,7 @@ def file_retrieve(
                  organization=optional_params.organization,
              )
              response = openai_files_instance.retrieve_file(
@@ -43,7 +43,7 @@ index 94fdb41..df744b2 100644
                  file_id=file_id,
                  _is_async=_is_async,
                  api_base=openai_creds.api_base,
-@@ -554,6 +557,7 @@ def file_delete(
+@@ -562,6 +565,7 @@ def file_delete(
                  organization=optional_params.organization,
              )
              response = openai_files_instance.delete_file(
@@ -51,7 +51,7 @@ index 94fdb41..df744b2 100644
                  file_id=file_id,
                  _is_async=_is_async,
                  api_base=openai_creds.api_base,
-@@ -760,6 +764,7 @@ def file_list(
+@@ -768,6 +772,7 @@ def file_list(
                  organization=optional_params.organization,
              )
              response = openai_files_instance.list_files(
@@ -59,7 +59,7 @@ index 94fdb41..df744b2 100644
                  purpose=purpose,
                  _is_async=_is_async,
                  api_base=openai_creds.api_base,
-@@ -901,6 +906,7 @@ def file_content(
+@@ -909,6 +914,7 @@ def file_content(
              file_id=file_id,
              extra_headers=extra_headers,
              extra_body=extra_body,
@@ -71,7 +71,7 @@ diff --git a/litellm/llms/openai/openai.py b/litellm/llms/openai/openai.py
 index a782bf3..c8bc076 100644
 --- a/litellm/llms/openai/openai.py
 +++ b/litellm/llms/openai/openai.py
-@@ -1931,8 +1931,9 @@ class OpenAIFilesAPI(BaseLLM):
+@@ -1938,8 +1938,9 @@ class OpenAIFilesAPI(BaseLLM):
          self,
          file_id: str,
          openai_client: AsyncOpenAI,
@@ -82,7 +82,7 @@ index a782bf3..c8bc076 100644
          return response
 
      def retrieve_file(
-@@ -1945,6 +1946,7 @@ class OpenAIFilesAPI(BaseLLM):
+@@ -1952,6 +1953,7 @@ class OpenAIFilesAPI(BaseLLM):
          max_retries: int | None,
          organization: str | None,
          client: OpenAI | AsyncOpenAI | None = None,
@@ -90,7 +90,7 @@ index a782bf3..c8bc076 100644
      ):
          openai_client: Final[OpenAI | AsyncOpenAI | None] = self.get_openai_client(
              api_key=api_key,
-@@ -1968,8 +1970,9 @@ class OpenAIFilesAPI(BaseLLM):
+@@ -1975,8 +1977,9 @@ class OpenAIFilesAPI(BaseLLM):
              return self.aretrieve_file(
                  file_id=file_id,
                  openai_client=openai_client,
@@ -101,7 +101,7 @@ index a782bf3..c8bc076 100644
 
          return response
 
-@@ -1977,8 +1980,9 @@ class OpenAIFilesAPI(BaseLLM):
+@@ -1984,8 +1987,9 @@ class OpenAIFilesAPI(BaseLLM):
          self,
          file_id: str,
          openai_client: AsyncOpenAI,
@@ -112,7 +112,7 @@ index a782bf3..c8bc076 100644
          return response
 
      def delete_file(
-@@ -1991,6 +1995,7 @@ class OpenAIFilesAPI(BaseLLM):
+@@ -1998,6 +2002,7 @@ class OpenAIFilesAPI(BaseLLM):
          max_retries: int | None,
          organization: str | None,
          client: OpenAI | AsyncOpenAI | None = None,
@@ -120,7 +120,7 @@ index a782bf3..c8bc076 100644
      ):
          openai_client: Final[OpenAI | AsyncOpenAI | None] = self.get_openai_client(
              api_key=api_key,
-@@ -2014,8 +2019,9 @@ class OpenAIFilesAPI(BaseLLM):
+@@ -2021,8 +2026,9 @@ class OpenAIFilesAPI(BaseLLM):
              return self.adelete_file(
                  file_id=file_id,
                  openai_client=openai_client,
@@ -131,7 +131,7 @@ index a782bf3..c8bc076 100644
 
          return response
 
-@@ -2023,11 +2029,12 @@ class OpenAIFilesAPI(BaseLLM):
+@@ -2030,11 +2036,12 @@ class OpenAIFilesAPI(BaseLLM):
          self,
          openai_client: AsyncOpenAI,
          purpose: str | None = None,
@@ -146,7 +146,7 @@ index a782bf3..c8bc076 100644
          return response
 
      def list_files(
-@@ -2040,6 +2047,7 @@ class OpenAIFilesAPI(BaseLLM):
+@@ -2047,6 +2054,7 @@ class OpenAIFilesAPI(BaseLLM):
          organization: str | None,
          purpose: str | None = None,
          client: OpenAI | AsyncOpenAI | None = None,
@@ -154,7 +154,7 @@ index a782bf3..c8bc076 100644
      ):
          openai_client: Final[OpenAI | AsyncOpenAI | None] = self.get_openai_client(
              api_key=api_key,
-@@ -2063,12 +2071,13 @@ class OpenAIFilesAPI(BaseLLM):
+@@ -2070,12 +2078,13 @@ class OpenAIFilesAPI(BaseLLM):
              return self.alist_files(
                  purpose=purpose,
                  openai_client=openai_client,
@@ -261,7 +261,7 @@ diff --git a/litellm/types/llms/openai.py b/litellm/types/llms/openai.py
 index cd77d60..52150f3 100644
 --- a/litellm/types/llms/openai.py
 +++ b/litellm/types/llms/openai.py
-@@ -369,6 +369,9 @@ LITELLM_DETAILS_FALLBACK_RESPONSE_FIELD: Final = "litellm_details_fallback"
+@@ -382,6 +382,9 @@ LITELLM_DETAILS_FALLBACK_RESPONSE_FIELD: Final = "litellm_details_fallback"
 
 
  class OpenAIFileObject(LiteLLMBaseModel):
@@ -271,7 +271,7 @@ index cd77d60..52150f3 100644
      id: str
      """The file identifier, which can be referenced in the API endpoints."""
 
-@@ -516,6 +519,7 @@ class CreateFileRequest(TypedDict, total=False):
+@@ -529,6 +532,7 @@ class CreateFileRequest(TypedDict, total=False):
      expires_after: FileExpiresAfter | None
      extra_headers: dict[str, str] | None
      extra_body: dict[str, str] | None
@@ -279,7 +279,7 @@ index cd77d60..52150f3 100644
      timeout: float | None
 
 
-@@ -536,6 +540,7 @@ class FileContentRequest(TypedDict, total=False):
+@@ -549,6 +553,7 @@ class FileContentRequest(TypedDict, total=False):
      file_id: str
      extra_headers: dict[str, str] | None
      extra_body: dict[str, str] | None

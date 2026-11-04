@@ -1,6 +1,7 @@
 """Verify /key/delete evicts a deleted key on every worker, not only the handling one."""
 
 import asyncio
+from collections.abc import Sequence
 from typing import Final
 from unittest.mock import AsyncMock, patch
 
@@ -27,12 +28,12 @@ async def main() -> None:
     cache.set_cache(key=hashed_token, value=UserAPIKeyAuth(token=hashed_token, user_id="user-check"))
     broadcast: Final[list[str]] = []
 
-    async def publish(cache_key: str, **_: object) -> None:
-        broadcast.append(cache_key)
+    async def publish(cache_keys: Sequence[str]) -> None:
+        broadcast.extend(cache_keys)
 
     with (
         patch("litellm.proxy.proxy_server.prisma_client", prisma_client),
-        patch("litellm.proxy.auth.auth_checks.publish_auth_cache_invalidation", publish),
+        patch("litellm.proxy.auth.auth_checks.broadcast_evictions", publish),
     ):
         await delete_verification_tokens(
             tokens=["sk-key-delete-check"],

@@ -16,7 +16,7 @@ Removal check: tests/verify_key_delete.py
 diff --git a/litellm/proxy/management_endpoints/key_management_endpoints.py b/litellm/proxy/management_endpoints/key_management_endpoints.py
 --- a/litellm/proxy/management_endpoints/key_management_endpoints.py
 +++ b/litellm/proxy/management_endpoints/key_management_endpoints.py
-@@ -57,6 +57,7 @@ from litellm.proxy.auth.auth_checks import (  # noqa: F401  # legacy module expo
+@@ -58,6 +58,7 @@ from litellm.proxy.auth.auth_checks import (  # noqa: F401  # legacy module expo
      _delete_cache_key_object,  # pyright: ignore[reportPrivateUsage,reportUnusedImport]  # backwards-compatible package export
      can_team_access_model,
      delete_cache_key_object,
@@ -24,7 +24,7 @@ diff --git a/litellm/proxy/management_endpoints/key_management_endpoints.py b/li
      get_jwt_key_mapping_cache_keys_for_token,
      get_key_end_user_budget_id,
      get_org_object,
-@@ -5028,7 +5029,7 @@ async def delete_verification_tokens(
+@@ -5283,7 +5284,7 @@ async def delete_verification_tokens(
                  - List of keys being deleted, this contains information about the key_alias, token, and user_id being deleted,
                  this is passed down to the KeyManagementEventHooks to delete the keys from the secret manager and handle audit logs
      """
@@ -33,7 +33,7 @@ diff --git a/litellm/proxy/management_endpoints/key_management_endpoints.py b/li
 
      failed_tokens: list = []
      try:
-@@ -5112,11 +5113,12 @@ async def delete_verification_tokens(
+@@ -5367,11 +5368,12 @@ async def delete_verification_tokens(
          verbose_proxy_logger.debug(traceback.format_exc())
          raise e
 

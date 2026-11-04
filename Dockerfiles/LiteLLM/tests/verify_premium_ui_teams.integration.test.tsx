@@ -38,6 +38,8 @@ vi.mock("@/components/networking", () => ({
   getGuardrailsList: vi.fn().mockResolvedValue({ guardrails: [] }),
   getPoliciesList: vi.fn().mockResolvedValue({ policies: [] }),
   getDefaultTeamSettings: vi.fn().mockResolvedValue({ values: {} }),
+  vectorStoreListCall: vi.fn().mockResolvedValue({ data: [] }),
+  getPassThroughEndpointsCall: vi.fn().mockResolvedValue({ endpoints: [] }),
 }));
 vi.mock("@/app/(dashboard)/hooks/teams/useTeams", () => ({
   teamsTableKeys: { all: ["teamsTable"] },
@@ -147,8 +149,9 @@ describe("Teams without a license", () => {
       ).toBeGreaterThan(0),
     );
 
-    const switches = screen.getAllByRole("switch");
-    fireEvent.click(switches[switches.length - 1]);
+    fireEvent.click(
+      screen.getByRole("switch", { name: /Disable Global Guardrails/i }),
+    );
     const buttons = screen.getAllByRole("button", { name: /create team/i });
     fireEvent.click(buttons[buttons.length - 1]);
 

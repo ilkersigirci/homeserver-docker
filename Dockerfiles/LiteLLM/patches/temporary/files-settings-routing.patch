@@ -15,7 +15,7 @@ diff --git a/litellm/proxy/openai_files_endpoints/files_endpoints.py b/litellm/p
 index bdc7190..525791f 100644
 --- a/litellm/proxy/openai_files_endpoints/files_endpoints.py
 +++ b/litellm/proxy/openai_files_endpoints/files_endpoints.py
-@@ -216,6 +216,16 @@ def get_files_provider_config(
+@@ -240,6 +240,16 @@ def get_files_provider_config(
      return None
 
 
@@ -32,7 +32,7 @@ index bdc7190..525791f 100644
  def _deployment_provider(llm_router: Router, model_id: str, team_id: str | None) -> str | None:
      credentials: Final = llm_router.get_deployment_credentials_with_provider(model_id=model_id, team_id=team_id)
      return None if credentials is None else credentials.get("custom_llm_provider")
-@@ -1133,6 +1143,7 @@ async def get_file_content(
+@@ -1159,6 +1169,7 @@ async def get_file_content(
                      user_api_key_dict=user_api_key_dict,
                      custom_llm_provider=custom_llm_provider,
                  )
@@ -40,7 +40,7 @@ index bdc7190..525791f 100644
 
              from litellm.proxy.openai_files_endpoints.file_content_streaming_handler import (
                  FileContentStreamingHandler,
-@@ -1399,6 +1410,7 @@ async def get_file(
+@@ -1425,6 +1436,7 @@ async def get_file(
                  user_api_key_dict=user_api_key_dict,
                  custom_llm_provider=custom_llm_provider,
              )
@@ -48,7 +48,7 @@ index bdc7190..525791f 100644
              response = await litellm.afile_retrieve(
                  custom_llm_provider=custom_llm_provider,
                  file_id=file_id,
-@@ -1618,6 +1630,7 @@ async def delete_file(
+@@ -1644,6 +1656,7 @@ async def delete_file(
                  user_api_key_dict=user_api_key_dict,
                  custom_llm_provider=custom_llm_provider,
              )
@@ -56,7 +56,7 @@ index bdc7190..525791f 100644
              response = await litellm.afile_delete(
                  custom_llm_provider=custom_llm_provider,
                  file_id=file_id,
-@@ -1812,6 +1825,7 @@ async def list_files(
+@@ -1838,6 +1851,7 @@ async def list_files(
                      user_api_key_dict=user_api_key_dict,
                      custom_llm_provider=resolved_custom_llm_provider,
                  )

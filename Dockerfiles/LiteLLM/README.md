@@ -57,7 +57,7 @@ the patch changes, and its removal check.
 - [`responses-websocket-budget.patch`](patches/temporary/responses-websocket-budget.patch):
   Responses WebSocket per-model budgets
 - [`responses-background.patch`](patches/temporary/responses-background.patch):
-  native background Responses
+  background Response IDs on retrieve and cancel
 - [`responses-retrieve-stream.patch`](patches/temporary/responses-retrieve-stream.patch):
   resuming a background Response's stream
 - [`responses-background-lifecycle.patch`](patches/temporary/responses-background-lifecycle.patch):
@@ -70,8 +70,6 @@ the patch changes, and its removal check.
   Responses streams cancelled before any output
 - [`otel-propagation.patch`](patches/temporary/otel-propagation.patch):
   provider trace context
-- [`realtime-turns.patch`](patches/temporary/realtime-turns.patch):
-  client-owned realtime voice responses
 - [`files-settings-routing.patch`](patches/temporary/files-settings-routing.patch):
   files_settings on file retrieve, content, delete, and list
 - [`key-delete-eviction.patch`](patches/temporary/key-delete-eviction.patch):

@@ -15,7 +15,7 @@ Checks: tests/verify_jwt_auth.py
 diff --git a/litellm/proxy/auth/handle_jwt.py b/litellm/proxy/auth/handle_jwt.py
 --- a/litellm/proxy/auth/handle_jwt.py
 +++ b/litellm/proxy/auth/handle_jwt.py
-@@ -2148,6 +2148,47 @@ class JWTAuthManager:
+@@ -2222,6 +2222,47 @@ class JWTAuthManager:
                  )
          return
 
@@ -63,7 +63,7 @@ diff --git a/litellm/proxy/auth/handle_jwt.py b/litellm/proxy/auth/handle_jwt.py
      @staticmethod
      async def _attach_team_from_header_for_admin(
          admin_result: JWTAuthBuilderResult,
-@@ -2840,6 +2881,12 @@ class JWTAuthManager:
+@@ -2914,6 +2955,12 @@ class JWTAuthManager:
                  prisma_client=prisma_client,
                  user_api_key_cache=user_api_key_cache,
              )

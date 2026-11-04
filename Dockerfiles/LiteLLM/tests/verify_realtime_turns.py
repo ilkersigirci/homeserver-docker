@@ -1,4 +1,7 @@
-"""Verify realtime transcripts start a proxy response only when a transcript guardrail owns the turn."""
+"""Verify realtime transcripts start a proxy response only when a transcript guardrail owns the turn.
+
+Kept from the removed realtime-turns.patch, which upstream fixed in BerriAI/litellm#43791.
+"""
 
 import asyncio
 import json

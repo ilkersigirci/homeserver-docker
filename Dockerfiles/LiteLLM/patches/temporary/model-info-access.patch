@@ -8,7 +8,7 @@ Removal check: model-info scope check in tests/verify_jwt_auth.py
 diff --git a/litellm/proxy/proxy_server.py b/litellm/proxy/proxy_server.py
 --- a/litellm/proxy/proxy_server.py
 +++ b/litellm/proxy/proxy_server.py
-@@ -16882,8 +16882,23 @@ async def model_info_v1(
+@@ -17055,8 +17055,26 @@ async def model_info_v1(
                  status_code=400,
                  detail={"error": f"Model id = {litellm_model_id} not found on litellm proxy"},
              )
@@ -17,9 +17,12 @@ diff --git a/litellm/proxy/proxy_server.py b/litellm/proxy/proxy_server.py
 +        # Direct-ID reads must enforce the same model and team scope as listings.
 +        single_model_list = _filter_v1_model_info_deployments(
 +            all_models=[deployment_info.model_dump(exclude_none=True)],
-+            allowed_model_names=_get_v1_model_info_allowed_model_names(
++            allowed_model_names=await _get_v1_model_info_allowed_model_names_with_access_groups(
 +                user_api_key_dict=user_api_key_dict,
 +                llm_router=llm_router,
++                prisma_client=prisma_client,
++                user_api_key_cache=user_api_key_cache,
++                proxy_logging_obj=proxy_logging_obj,
 +            ),
 +        )
 +        allowed_team_ids = await _get_caller_byok_team_scope(

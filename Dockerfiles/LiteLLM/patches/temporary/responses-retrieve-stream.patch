@@ -13,7 +13,7 @@ Removal check: tests/verify_responses_retrieve_stream.py
 diff --git a/litellm/llms/custom_httpx/llm_http_handler.py b/litellm/llms/custom_httpx/llm_http_handler.py
 --- a/litellm/llms/custom_httpx/llm_http_handler.py
 +++ b/litellm/llms/custom_httpx/llm_http_handler.py
-@@ -3174,6 +3174,9 @@ class BaseLLMHTTPHandler:
+@@ -3197,6 +3197,9 @@ class BaseLLMHTTPHandler:
          extra_body: dict[str, object] | None = None,
          timeout: float | httpx.Timeout | None = None,
          client: HTTPHandler | AsyncHTTPHandler | None = None,
@@ -23,7 +23,7 @@ diff --git a/litellm/llms/custom_httpx/llm_http_handler.py b/litellm/llms/custom
          _is_async: bool = False,
          shared_session: Optional["ClientSession"] = None,
      ) -> ResponsesAPIResponse | Coroutine[object, object, ResponsesAPIResponse]:
-@@ -3192,6 +3195,9 @@ class BaseLLMHTTPHandler:
+@@ -3215,6 +3218,9 @@ class BaseLLMHTTPHandler:
                  extra_body=extra_body,
                  timeout=timeout,
                  client=client,
@@ -33,7 +33,7 @@ diff --git a/litellm/llms/custom_httpx/llm_http_handler.py b/litellm/llms/custom
                  shared_session=shared_session,
              )
 
-@@ -3255,8 +3261,11 @@ class BaseLLMHTTPHandler:
+@@ -3278,8 +3284,11 @@ class BaseLLMHTTPHandler:
          extra_body: dict[str, object] | None = None,
          timeout: float | httpx.Timeout | None = None,
          client: HTTPHandler | AsyncHTTPHandler | None = None,
@@ -46,7 +46,7 @@ diff --git a/litellm/llms/custom_httpx/llm_http_handler.py b/litellm/llms/custom
          """
          Async version of get_responses
          """
-@@ -3303,6 +3312,23 @@ class BaseLLMHTTPHandler:
+@@ -3326,6 +3335,23 @@ class BaseLLMHTTPHandler:
              },
          )
 
@@ -70,10 +70,11 @@ diff --git a/litellm/llms/custom_httpx/llm_http_handler.py b/litellm/llms/custom
          try:
              response: Final = await async_httpx_client.get(url=url, headers=headers, params=data)
              response.raise_for_status()
-@@ -3318,6 +3344,49 @@ class BaseLLMHTTPHandler:
+@@ -3340,6 +3366,49 @@ class BaseLLMHTTPHandler:
+             raw_response=response,
              logging_obj=logging_obj,
          )
-
++
 +    async def _stream_get_response(
 +        self,
 +        *,
@@ -116,16 +117,15 @@ diff --git a/litellm/llms/custom_httpx/llm_http_handler.py b/litellm/llms/custom
 +        )
 +        iterator._completed_response_logged = True
 +        return iterator
-+
+
      #####################################################################
      ################ LIST RESPONSES INPUT ITEMS HANDLER ###########################
-     #####################################################################
 diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/response_api_endpoints/endpoints.py
 --- a/litellm/proxy/response_api_endpoints/endpoints.py
 +++ b/litellm/proxy/response_api_endpoints/endpoints.py
-@@ -723,6 +723,10 @@ async def get_response(
-     # Normal provider response flow
+@@ -798,6 +798,10 @@ async def get_response(
      data: Final = await read_request_body(request=request)
+     read_settles_billing: Final = not carries_client_side_overrides(data)
      data["response_id"] = response_id
 +    if request.query_params.get("stream", "").lower() == "true":
 +        data["stream"] = True
@@ -133,11 +133,11 @@ diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/r
 +            data["starting_after"] = starting_after
      processor: Final = ProxyBaseLLMRequestProcessing(data=data)
      try:
-         response = await processor.base_process_llm_request(
+         response: Final[object] = await processor.base_process_llm_request(
 diff --git a/litellm/responses/main.py b/litellm/responses/main.py
 --- a/litellm/responses/main.py
 +++ b/litellm/responses/main.py
-@@ -1833,6 +1833,9 @@ def get_responses(
+@@ -1898,6 +1898,9 @@ def get_responses(
              extra_headers=extra_headers,
              extra_body=extra_body,
              timeout=timeout or request_timeout,

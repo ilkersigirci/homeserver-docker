@@ -28,7 +28,7 @@ diff --git a/litellm/integrations/otel/logger.py b/litellm/integrations/otel/log
  from typing_extensions import TypedDict, Unpack
 
  import litellm
-@@ -96,6 +97,7 @@ if TYPE_CHECKING:
+@@ -98,6 +99,7 @@ if TYPE_CHECKING:
      )
 
  LITELLM_TRACER_NAME: Final = "litellm"
@@ -36,7 +36,7 @@ diff --git a/litellm/integrations/otel/logger.py b/litellm/integrations/otel/log
  _published_v2_provider: ApiTracerProvider | None = None
 
 
-@@ -147,6 +149,16 @@ def _request_trace_links(context: Context | None) -> tuple[Link, ...] | None:
+@@ -149,6 +151,16 @@ def _request_trace_links(context: Context | None) -> tuple[Link, ...] | None:
      return (Link(anchor),) if anchor.is_valid else None
 
 
@@ -53,7 +53,7 @@ diff --git a/litellm/integrations/otel/logger.py b/litellm/integrations/otel/log
  class _CustomLoggerOptions(TypedDict, total=False, extra_items=object):
      pass
 
-@@ -339,6 +351,7 @@ class OpenTelemetryV2(CustomLogger):
+@@ -346,6 +358,7 @@ class OpenTelemetryV2(CustomLogger):
                  tracer=route.tracer,
                  links=_request_trace_links(parent_context) if route.detached else None,
              )

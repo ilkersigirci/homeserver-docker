@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.25@sha256:0adf442eae370b6087e08edc7c50b552d80ddf261576f4ebd6421006b2461f12
 # renovate: datasource=github-tags depName=BerriAI/litellm
-ARG IMAGE_VERSION=1.106.6
-ARG UPSTREAM_COMMIT=61c6ab78393ef45683dd7d963d2a315bd845e20b
+ARG IMAGE_VERSION=1.108.0
+ARG UPSTREAM_COMMIT=b48077ff9ef6b14dd3f188d020ee7f40e2c5ebca
 # Upstream's in-container PgBouncer (LITELLM_PGBOUNCER_ENABLED), as pinned upstream.
 ARG PGBOUNCER_VERSION=1.26.0
 ARG PGBOUNCER_SHA256=afd25dd61ee6775d37b40629b87ce08736b3e6955f3057bb212e410fbf21c71d
@@ -44,6 +44,7 @@ FROM --platform=$BUILDPLATFORM node:24.19-alpine3.24@sha256:d32cdf619f63fe047118
 ENV NEXT_TELEMETRY_DISABLED=1 npm_config_fund=false npm_config_audit=false
 WORKDIR /ui
 COPY --from=source /app/ui/litellm-dashboard/package*.json ./
+COPY --from=source /app/ui/litellm-dashboard/vendor/ ./vendor/
 RUN --mount=type=cache,target=/root/.npm npm ci --prefer-offline
 COPY --from=source /app/ui/litellm-dashboard/ ./
 COPY tests/verify_*.integration.test.tsx tests/
@@ -123,6 +124,7 @@ FROM nginx:1.31.8-alpine3.24@sha256:1ef7ca94d7879df82421428ce13bd1eaa41240495385
 RUN apk upgrade --no-cache brotli-libs \
     && rm -f /etc/nginx/conf.d/default.conf
 COPY --from=ui-build /ui/out /usr/share/nginx/html
+COPY --from=source /app/ui/docker-entrypoint.d/40-litellm-runtime-config.sh /docker-entrypoint.d/
 COPY --from=source /app/ui/nginx.conf /etc/nginx/nginx.conf
 COPY --from=source /app/LICENSE /usr/share/licenses/litellm/LICENSE
 COPY LICENSE.patches /usr/share/licenses/litellm/LICENSE.patches

@@ -14,7 +14,7 @@ Removal check: tests/verify_responses_background_lifecycle.py
 diff --git a/litellm/router.py b/litellm/router.py
 --- a/litellm/router.py
 +++ b/litellm/router.py
-@@ -3564,13 +3564,17 @@ class Router:
+@@ -3740,13 +3740,17 @@ class Router:
                  # async generators always expose aclose — no defensive check needed.
                  await self._async_generator.aclose()
 

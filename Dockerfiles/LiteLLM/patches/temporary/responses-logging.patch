@@ -11,7 +11,7 @@ Removal check: tests/verify_logging.py
 diff --git a/litellm/litellm_core_utils/litellm_logging.py b/litellm/litellm_core_utils/litellm_logging.py
 --- a/litellm/litellm_core_utils/litellm_logging.py
 +++ b/litellm/litellm_core_utils/litellm_logging.py
-@@ -4206,15 +4206,20 @@ class Logging(LiteLLMLoggingBaseClass):
+@@ -4373,15 +4373,20 @@ class Logging(LiteLLMLoggingBaseClass):
              result,
              (ResponseCompletedEvent, ResponseIncompleteEvent, ResponseFailedEvent),
          ):
@@ -36,7 +36,7 @@ diff --git a/litellm/litellm_core_utils/litellm_logging.py b/litellm/litellm_cor
                      "usage",
                      (
                          transformed_usage.model_dump()
-@@ -4222,7 +4227,7 @@ class Logging(LiteLLMLoggingBaseClass):
+@@ -4389,7 +4394,7 @@ class Logging(LiteLLMLoggingBaseClass):
                          else dict(transformed_usage)
                      ),
                  )

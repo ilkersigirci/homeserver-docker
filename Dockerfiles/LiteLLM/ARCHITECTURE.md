@@ -44,9 +44,10 @@ JWT_AUDIENCE: https://llm.$BASE_DOMAINNAME
 document, from which LiteLLM reads the `jwks_uri` signing keys, so it is always
 `<issuer>/.well-known/openid-configuration`, whatever the provider.
 
-The feature lives in MIT-licensed code outside `enterprise/`, behind a
-`premium_user` gate. The patch removes that gate and keeps every token acting
-as its Internal User:
+The feature lives in MIT-licensed code outside `enterprise/`, behind
+`premium_user` gates in proxy auth and in the MCP check that identifies the
+caller behind a bearer sent to `delegate_auth_to_upstream` servers. The patch
+removes both gates and keeps every token acting as its Internal User:
 
 - `/v1/models` and `/model/info` list the user's own models; upstream enforces
   them on calls but lists only key and team models.

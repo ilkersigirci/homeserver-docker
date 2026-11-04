@@ -284,20 +284,25 @@ async def _verify_budgets(call, user, authorization) -> None:
     assert response.status_code == 422, response.text
 
 
-async def _verify_mcp(call, app, user) -> None:
+async def _verify_mcp(call, app, user, authorization) -> None:
     """MCP routes resolve servers exactly as LiteLLM's own MCP login for the user.
 
     A user reaches open servers and their own and their teams' grants; an admin
     gets LiteLLM's admin view. Membership of a single team must not attach that
-    team's policy to other routes.
+    team's policy to other routes. A token sent to a delegate_auth_to_upstream
+    server is forwarded to it and still admits its user.
     """
     import litellm.proxy.auth.auth_checks as auth_checks
     import litellm.proxy.auth.handle_jwt as jwt_module
     import litellm.proxy.auth.user_api_key_auth as auth_module
     from litellm.proxy import proxy_server
-    from litellm.proxy._experimental.mcp_server.auth.user_api_key_auth_mcp import MCPRequestHandler
+    from litellm.proxy._experimental.mcp_server.auth.user_api_key_auth_mcp import (
+        MCPRequestHandler,
+        _admission_request,
+    )
     from litellm.proxy._experimental.mcp_server.mcp_server_manager import global_mcp_server_manager
     from litellm.proxy._types import LiteLLM_ObjectPermissionTable, LiteLLM_TeamTable, Member
+    from litellm.types.mcp import MCPAuth
     from litellm.types.mcp_server.mcp_server_manager import MCPServer
 
     servers = {
@@ -344,6 +349,27 @@ async def _verify_mcp(call, app, user) -> None:
                 assert (authorized.user_id, authorized.user_role) == (_SUBJECT, role), path
                 allowed = await global_mcp_server_manager.get_allowed_mcp_servers(authorized)
                 assert set(allowed) == servers_for_role, (role, path, allowed)
+
+        user.user_role = "internal_user"
+        delegate = MCPServer(
+            server_id="delegate",
+            name="delegate",
+            transport="http",
+            auth_type=MCPAuth.oauth2,
+            oauth2_flow="authorization_code",
+            delegate_auth_to_upstream=True,
+            allow_all_keys=True,
+        )
+        with patch.dict(global_mcp_server_manager.config_mcp_servers, {"delegate": delegate}, clear=True):
+            targets = MCPRequestHandler._legacy_delegate_targets(path="/mcp/delegate", mcp_servers=None, client_ip=None)
+            assert targets == (delegate,), targets
+            admitted = await MCPRequestHandler._admit_legacy_delegate_bearer(
+                authorization_value=authorization,
+                litellm_api_key=authorization,
+                targets=targets,
+                request=_admission_request({"type": "http", "method": "POST", "path": "/mcp/delegate", "headers": []}),
+            )
+        assert admitted.mcp_forwards_caller_authorization and admitted.user_id == _SUBJECT, admitted.user_id
 
 
 async def _verify() -> None:
@@ -407,7 +433,7 @@ async def _verify() -> None:
             await _verify_models(client, call, user, headers)
             await _verify_budgets(call, user, headers["Authorization"])
             user.max_budget = 10
-            await _verify_mcp(call, app, user)
+            await _verify_mcp(call, app, user, headers["Authorization"])
 
 
 def _verify_jwks_tls() -> None:

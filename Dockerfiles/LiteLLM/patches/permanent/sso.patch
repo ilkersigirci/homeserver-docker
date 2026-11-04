@@ -1,8 +1,8 @@
 diff --git a/litellm/proxy/management_endpoints/ui_sso.py b/litellm/proxy/management_endpoints/ui_sso.py
 --- a/litellm/proxy/management_endpoints/ui_sso.py
 +++ b/litellm/proxy/management_endpoints/ui_sso.py
-@@ -983,27 +983,6 @@ def _merge_sso_token_claims(
-     )
+@@ -1073,27 +1073,6 @@ async def _verify_generic_sso_or_fall_back_to_id_token(
+         )
 
 
 -async def _raise_if_sso_exceeds_free_user_limit(premium_user: bool, prisma_client: PrismaClient | None) -> None:
@@ -29,10 +29,11 @@ diff --git a/litellm/proxy/management_endpoints/ui_sso.py b/litellm/proxy/manage
  @router.get("/sso/key/generate", tags=["experimental"], include_in_schema=False)
  async def google_login(
      request: Request,
-@@ -1037,15 +1016,6 @@ async def google_login(
+@@ -1126,15 +1105,6 @@ async def google_login(
+     is_cli_sso_login: Final = source == LITELLM_CLI_SOURCE_IDENTIFIER
      if admin_ui_is_disabled and not is_cli_sso_login:
          return admin_ui_disabled()
-
+-
 -    ####### Check if user is a Enterprise / Premium User #######
 -    if (
 -        microsoft_client_id is not None
@@ -41,20 +42,19 @@ diff --git a/litellm/proxy/management_endpoints/ui_sso.py b/litellm/proxy/manage
 -        or SAMLAuthHandler.is_saml_configured()
 -    ):
 -        await _raise_if_sso_exceeds_free_user_limit(premium_user, prisma_client)
--
+
      ####### Detect DB + MASTER KEY in .env #######
      missing_env_vars: Final = show_missing_vars_in_env()
-     if missing_env_vars is not None:
-@@ -2209,8 +2179,6 @@ async def saml_callback(request: Request):
+@@ -2352,8 +2322,6 @@ async def saml_callback(request: Request):
+         raise HTTPException(status_code=400, detail="Missing SAMLResponse in callback request.")
 
-     result: Final = await SAMLAuthHandler.handle_acs(request=request, cache=user_api_key_cache, post_data=post_data)
-
--    await _raise_if_sso_exceeds_free_user_limit(premium_user, prisma_client)
+     user, retained = await SAMLAuthHandler.handle_acs(request=request, cache=saml_sso_cache, post_data=post_data)
 -
+-    await _raise_if_sso_exceeds_free_user_limit(premium_user, prisma_client)
+
      ui_access_mode: Final = general_settings.get("ui_access_mode", None)
      relay_state: Final = post_data.get("RelayState")
-     cp_return_to: Final[str | None] = (
-@@ -4720,22 +4688,10 @@ async def debug_sso_login(request: Request):
+@@ -4966,21 +4934,9 @@ async def debug_sso_login(request: Request):
      """
      _raise_if_sso_debug_disabled()
 
@@ -63,7 +63,7 @@ diff --git a/litellm/proxy/management_endpoints/ui_sso.py b/litellm/proxy/manage
      microsoft_client_id: Final = os.getenv("MICROSOFT_CLIENT_ID", None)
      google_client_id: Final = os.getenv("GOOGLE_CLIENT_ID", None)
      generic_client_id: Final = os.getenv("GENERIC_CLIENT_ID", None)
-
+-
 -    ####### Check if user is a Enterprise / Premium User #######
 -    if microsoft_client_id is not None or google_client_id is not None or generic_client_id is not None:
 -        if premium_user is not True:
@@ -73,7 +73,6 @@ diff --git a/litellm/proxy/management_endpoints/ui_sso.py b/litellm/proxy/manage
 -                param="premium_user",
 -                code=status.HTTP_403_FORBIDDEN,
 -            )
--
+
      # get url from request
      redirect_url: Final = SSOAuthenticationHandler.get_redirect_url_for_sso(
-         request=request,
