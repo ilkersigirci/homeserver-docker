@@ -1,0 +1,35 @@
+Upstream bug: the router holds a streamed Response's response.created,
+response.queued, and response.in_progress events until its first output, so
+that a failure before any output can fall back without announcing a second
+Response. A background Response is accepted by those events: its client sees
+neither the Response ID nor its queued state until the run produces output, so
+it cannot cancel a run that waits for a worker or works before its first
+output. A fallback cannot replace that run either, because it keeps going.
+
+Background streams forward their lifecycle events as they arrive; every other
+stream keeps upstream's hold.
+
+Removal check: tests/verify_responses_background_lifecycle.py
+
+diff --git a/litellm/router.py b/litellm/router.py
+--- a/litellm/router.py
++++ b/litellm/router.py
+@@ -3564,13 +3564,17 @@ class Router:
+                 # async generators always expose aclose — no defensive check needed.
+                 await self._async_generator.aclose()
+
++        # A background Response is accepted by its lifecycle events: the client needs its ID
++        # to cancel a run that keeps going, whatever a fallback does.
++        holds_lifecycle_events: Final = not initial_kwargs.get("background")
++
+         async def stream_with_fallbacks():
+             held_lifecycle_events: tuple[object, ...] = ()  # rebind-ok: flushed at first output, dropped on fallback
+             try:
+                 async for item in cast(  # cast-ok: response iterators are async streams
+                     AsyncIterator[object], source_iterator
+                 ):
+-                    if _responses_stream_holds_event(item, len(held_lifecycle_events)):
++                    if holds_lifecycle_events and _responses_stream_holds_event(item, len(held_lifecycle_events)):
+                         held_lifecycle_events = (*held_lifecycle_events, item)
+                         continue
+                     for held_event in held_lifecycle_events:

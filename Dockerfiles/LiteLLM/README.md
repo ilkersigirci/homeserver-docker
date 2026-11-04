@@ -60,6 +60,8 @@ the patch changes, and its removal check.
   native background Responses
 - [`responses-retrieve-stream.patch`](patches/temporary/responses-retrieve-stream.patch):
   resuming a background Response's stream
+- [`responses-background-lifecycle.patch`](patches/temporary/responses-background-lifecycle.patch):
+  a background Response's lifecycle events before its first output
 - [`responses-streaming.patch`](patches/temporary/responses-streaming.patch):
   wildcard native streaming
 - [`responses-logging.patch`](patches/temporary/responses-logging.patch):
