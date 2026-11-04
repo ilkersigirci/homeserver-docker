@@ -107,6 +107,7 @@ services:
       SERVER_OTEL_SERVICE_NAME: hatchet-server
       SERVER_OTEL_INSECURE: "true"
       SERVER_OTEL_TRACE_ID_RATIO: "0.1"
+      SERVER_OTEL_METRICS_ENABLED: "true"
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:8888/ >/dev/null || exit 1"]
       interval: 5m
