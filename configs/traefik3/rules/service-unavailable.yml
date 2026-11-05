@@ -1,0 +1,6 @@
+http:
+  services:
+    # No servers: Traefik answers 503.
+    unavailable-svc:
+      loadBalancer:
+        servers: []

@@ -22,6 +22,9 @@ services:
       - 8889 # Prometheus exporter metrics
       - 13133 # health_check extension
       - 55679 # zpages extension
+    ports:
+      - "${LOCAL_STATIC_IP}:4317:4317" # OTLP gRPC receiver
+      - "${LOCAL_STATIC_IP}:4318:4318" # OTLP http receiver
     user: $PUID:$PGID
     read_only: true
     tmpfs:

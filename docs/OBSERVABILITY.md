@@ -43,6 +43,8 @@ OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector-agent:4317
 OTEL_EXPORTER_OTLP_INSECURE=true
 ```
 
+Services outside `t3_proxy` use `http://<host LOCAL_STATIC_IP>:4317` (or `:4318` for HTTP).
+
 ## Host Metrics Responsibility
 
 The per-host collector agent is expected to export host metrics including:

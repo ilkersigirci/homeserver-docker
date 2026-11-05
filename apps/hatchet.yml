@@ -60,6 +60,9 @@ services:
     expose:
       - 8888 # HTTP UI
       - 7077 # gRPC API
+      - 9090 # Prometheus metrics
+    ports:
+      - "${LOCAL_STATIC_IP}:9090:9090" # Prometheus metrics
     user: $PUID:$PGID
     read_only: true
     tmpfs:
@@ -108,6 +111,11 @@ services:
       SERVER_OTEL_INSECURE: "true"
       SERVER_OTEL_TRACE_ID_RATIO: "0.1"
       SERVER_OTEL_METRICS_ENABLED: "true"
+      ###### PROMETHEUS #####
+      SERVER_PROMETHEUS_ENABLED: "true"
+      SERVER_PROMETHEUS_ADDRESS: ":9090"
+      ###### OBSERVABILITY #####
+      SERVER_OBSERVABILITY_ENABLED: "true" # Hatchet UI Traces tab
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS --max-time 3 http://127.0.0.1:8888/ >/dev/null || exit 1"]
       interval: 5m

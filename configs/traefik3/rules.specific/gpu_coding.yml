@@ -68,6 +68,22 @@ http:
         - chain-no-auth-relaxed
       service: lgos-openwebui-svc
 
+    # Answer 503 instead of 404 while Hatchet restarts, so gRPC clients retry.
+    hatchet-unavailable-rtr:
+      rule: "Host(`hatchet.{{env "DOMAINNAME"}}`)"
+      priority: 1
+      entryPoints:
+        - websecure
+      service: unavailable-svc
+
+    hatchet-rpc-unavailable-rtr:
+      rule: "Host(`hatchet-rpc.{{env "DOMAINNAME"}}`)"
+      priority: 1
+      entryPoints:
+        - websecure
+      tls: {} # Same TLS options as hatchet-rpc-rtr
+      service: unavailable-svc
+
   middlewares:
     # T3 loads ~160 assets at startup; the shared 100-request burst causes 429s.
     t3code-rate-limit:
