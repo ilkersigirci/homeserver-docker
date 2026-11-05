@@ -18,7 +18,7 @@ services:
       - 9090 # Prometheus
       - 9411 # Zipkin
     extra_hosts:
-      - "hatchet-host:${HATCHET_HOST_IP:-$LOCAL_STATIC_IP}"
+      - "hatchet-host:$HATCHET_HOST_IP"
     user: $PUID:$PGID # TODO: Harden
     read_only: true
     tmpfs:
