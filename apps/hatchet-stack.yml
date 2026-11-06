@@ -96,7 +96,7 @@ services:
 
   hatchet-migrate:
     <<: *hatchet-service
-    image: ghcr.io/hatchet-dev/hatchet/hatchet-migrate:v0.116.8@sha256:8490070159feca25f092b842e0681d3e7aa81ae98270de512481b03aad83a431
+    image: ghcr.io/hatchet-dev/hatchet/hatchet-migrate:v0.117.1@sha256:f2ffc17af0a237d21a867d86cbc65a0b360392803fd4f9907f8ce5d38c13fc2a
     container_name: hatchet-migrate
     restart: "no"
     command: ["/hatchet/hatchet-migrate"]
@@ -109,7 +109,7 @@ services:
 
   hatchet-setup:
     <<: *hatchet-service
-    image: ghcr.io/hatchet-dev/hatchet/hatchet-admin:v0.116.8@sha256:429c862946c856f25283df316bb7ecd9c54312538bf077671a24ebac24fab5a7
+    image: ghcr.io/hatchet-dev/hatchet/hatchet-admin:v0.117.1@sha256:128a39d09a7020d14d50a653c287e366c0fce8436fa85f3de5e59cce42e71801
     container_name: hatchet-setup
     restart: "no"
     command:
@@ -131,7 +131,7 @@ services:
 
   hatchet-engine:
     <<: *hatchet-service
-    image: ghcr.io/hatchet-dev/hatchet/hatchet-engine:v0.116.8@sha256:b33ba4cf3af532adad73dfe9d367956dc986872f6282020026bd15a7be95112d
+    image: ghcr.io/hatchet-dev/hatchet/hatchet-engine:v0.117.1@sha256:478ef9ef6b1f330bd35c8c7df2127e5903a2773a86e764a1e8fa9e4cc36bcc3e
     container_name: hatchet-engine
     command: ["/hatchet/hatchet-engine", "--config", "/hatchet/config"]
     depends_on:
