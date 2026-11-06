@@ -96,7 +96,7 @@ services:
       start_period: 2m
 
   hypothesis-rabbitmq:
-    image: rabbitmq:4.3-management-alpine@sha256:3ef7f7e89fed709a78f79b8b5f4e30e1312a1d4089da752e23595566d9d61a95
+    image: rabbitmq:4.3-management-alpine@sha256:d306c4fdd095ef42c10d428c5858e139bbcbddb2d4a2cd97c0ee87502305d7d5
     container_name: hypothesis-rabbitmq
     hostname: hypothesis-rabbitmq
     restart: $RESTART_POLICY_OTHERS
