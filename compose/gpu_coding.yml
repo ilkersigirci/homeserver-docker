@@ -56,3 +56,5 @@ include:
   - ../apps/degoog.yml
   # - ../apps/pgweb.yml
   # - ../apps/pgadmin.yml # TODO
+  #### READING ####
+  - ../apps/silverbullet.yml
