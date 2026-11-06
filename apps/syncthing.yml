@@ -2,7 +2,7 @@
 # NOTE: 22000:22000/tcp port is probably needed for other devices to see this device.
 services:
   syncthing:
-    image: lscr.io/linuxserver/syncthing:v2.1.6-ls231@sha256:8a381a5a11225475cc4a14ad4fee7c627fdc4fa5804fe3a34febe3aeda9f4e23
+    image: lscr.io/linuxserver/syncthing:v2.1.7-ls235@sha256:5c1276a655498fb9774e22e42ceeb5279eb2d7c46e3c209ce8285a7b0bae4925
     container_name: syncthing
     restart: $RESTART_POLICY_OTHERS
     profiles:
