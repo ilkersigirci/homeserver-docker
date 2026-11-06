@@ -1,5 +1,5 @@
-ARG IMAGE_VERSION=v0.12.2-slim
-FROM ghcr.io/open-webui/open-webui:${IMAGE_VERSION}@sha256:34db70a8e8f305dc996c4b459db0949b715400a489ca8a2d1a2a31ae5ddc67bb
+ARG IMAGE_VERSION=v0.13.0-slim
+FROM ghcr.io/open-webui/open-webui:${IMAGE_VERSION}@sha256:283efb20756785229a388bcd1e56a052f5284ae8c861717eed5eaaa3bba6b20a
 
 RUN --mount=type=bind,source=patches,target=/tmp/open-webui-patches \
     set -eux; \
