@@ -119,7 +119,13 @@ services:
       - --tracing.otlp.grpc.endpoint=otel-collector-agent:4317
       - --tracing.otlp.grpc.insecure=true
       - --tracing.addInternals=false
-      - --tracing.sampleRate=${TRAEFIK_OTEL_TRACING_SAMPLE_RATE:-0.50}
+      # Tracing is opt-in per router (docs/OBSERVABILITY.md); other requests
+      # would each be a lone root trace.
+      - --entrypoints.web.observability.tracing=false
+      - --entrypoints.websecure.observability.tracing=false
+      - --entrypoints.marimoagent.observability.tracing=false
+      # Traefik starts the trace, so its rate decides sampling for the request path.
+      - --tracing.sampleRate=${TRAEFIK_OTEL_TRACING_SAMPLE_RATE:-1.0}
       - --tracing.serviceName=traefik
     depends_on:
       docker-socket-proxy-read:

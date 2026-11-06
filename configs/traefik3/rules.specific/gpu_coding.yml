@@ -50,6 +50,8 @@ http:
       middlewares:
         - chain-no-auth-relaxed
       service: lgos-aigateway-svc
+      observability:
+        tracing: true # LGOS request path
 
     lgos-chainlit-rtr:
       rule: "Host(`lgos-chainlit.{{env "DOMAINNAME"}}`)"
@@ -58,6 +60,8 @@ http:
       middlewares:
         - chain-no-auth-relaxed
       service: lgos-chainlit-svc
+      observability:
+        tracing: true # LGOS request path
 
     # NOTE: Needed for plotly cdn js
     lgos-openwebui-rtr:
@@ -67,6 +71,8 @@ http:
       middlewares:
         - chain-no-auth-relaxed
       service: lgos-openwebui-svc
+      observability:
+        tracing: true # LGOS request path
 
     # Answer 503 instead of 404 while Hatchet restarts, so gRPC clients retry.
     hatchet-unavailable-rtr:

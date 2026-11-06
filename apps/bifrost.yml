@@ -63,6 +63,7 @@ services:
       traefik.http.routers.bifrost-rtr.middlewares: "chain-tinyauth-relaxed@file" # NOTE: For `List Models Output monaco editor`
       ## HTTP Services
       traefik.http.routers.bifrost-rtr.service: "bifrost-svc"
+      traefik.http.routers.bifrost-rtr.observability.tracing: "true"
       traefik.http.services.bifrost-svc.loadbalancer.server.port: "8080"
       ####### TINYAUTH #######
       tinyauth.apps.bifrost.config.domain: "aigateway.$DOMAINNAME"

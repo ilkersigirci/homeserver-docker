@@ -106,7 +106,7 @@ services:
       OTEL_TRACES_EXPORTER: otlp
       OTEL_PROPAGATORS: tracecontext
       OTEL_SEMCONV_STABILITY_OPT_IN: http
-      OTEL_TRACES_SAMPLER: always_on
+      OTEL_TRACES_SAMPLER: parentbased_always_on # Follow the caller; record own roots.
       OTEL_SERVICE_NAME: litellm
       OTEL_RESOURCE_ATTRIBUTES: service.instance.id=litellm-$MY_HOSTNAME
       LITELLM_OTEL_V2: "true"
@@ -141,6 +141,7 @@ services:
       traefik.http.routers.litellm-rtr.rule: "Host(`litellm.$DOMAINNAME`)"
       traefik.http.routers.litellm-rtr.middlewares: "chain-no-auth-relaxed@file"
       traefik.http.routers.litellm-rtr.service: "litellm-svc"
+      traefik.http.routers.litellm-rtr.observability.tracing: "true"
       ## HTTP Services
       traefik.http.services.litellm-svc.loadbalancer.server.port: "4000"
       ####### HOMEPAGE #######

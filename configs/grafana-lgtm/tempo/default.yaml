@@ -40,8 +40,8 @@ storage:
     blocklist_poll_stale_tenant_index: 10m
     blocklist_poll_fallback: true
     block:
-      # Keep the dashboard's common TraceQL filters and projected values on
-      # dedicated columns.
+      # Store attributes that dashboards filter or select on in dedicated
+      # columns. Changes apply only to blocks written afterwards.
       parquet_dedicated_columns:
         - name: service.namespace
           type: string
@@ -56,6 +56,12 @@ storage:
           type: string
           scope: span
         - name: session.id
+          type: string
+          scope: span
+        - name: gen_ai.operation.name
+          type: string
+          scope: span
+        - name: gen_ai.conversation.id
           type: string
           scope: span
 

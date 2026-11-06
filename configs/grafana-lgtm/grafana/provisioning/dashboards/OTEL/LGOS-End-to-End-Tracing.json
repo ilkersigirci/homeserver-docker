@@ -618,7 +618,7 @@
                   {
                     "targetBlank": false,
                     "title": "Show nested trace",
-                    "url": "/d/lgos-e2e-otel?orgId=1&var-trace_id=${__data.fields.traceIdHidden}&from=${__from}&to=${__to}"
+                    "url": "/d/lgos-e2e-otel?orgId=1&var-trace_id=${__data.fields.traceIdHidden}&${__url_time_range}&${environment:queryparam}&${graph_service:queryparam}"
                   },
                   {
                     "targetBlank": true,
@@ -741,7 +741,7 @@
                   {
                     "targetBlank": false,
                     "title": "Show nested trace",
-                    "url": "/d/lgos-e2e-otel?orgId=1&var-trace_id=${__data.fields.traceIdHidden}&from=${__from}&to=${__to}"
+                    "url": "/d/lgos-e2e-otel?orgId=1&var-trace_id=${__data.fields.traceIdHidden}&${__url_time_range}&${environment:queryparam}&${graph_service:queryparam}"
                   },
                   {
                     "targetBlank": true,

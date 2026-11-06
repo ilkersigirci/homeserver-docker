@@ -109,7 +109,9 @@ services:
       SERVER_OTEL_COLLECTOR_URL: otel-collector-agent:4317
       SERVER_OTEL_SERVICE_NAME: hatchet-server
       SERVER_OTEL_INSECURE: "true"
-      SERVER_OTEL_TRACE_ID_RATIO: "0.1"
+      # The engine samples with a plain ratio sampler and its spans never join application
+      # traces, so 0 keeps only OTLP metrics (still used by the Hatchet dashboard).
+      SERVER_OTEL_TRACE_ID_RATIO: "0"
       SERVER_OTEL_METRICS_ENABLED: "true"
       ###### PROMETHEUS #####
       SERVER_PROMETHEUS_ENABLED: "true"

@@ -213,12 +213,14 @@ services:
       traefik.http.routers.langflow-responses-rtr.middlewares: "chain-no-auth@file"
       traefik.http.routers.langflow-responses-rtr.priority: "200"
       traefik.http.routers.langflow-responses-rtr.service: "langflow-api-svc"
+      traefik.http.routers.langflow-responses-rtr.observability.tracing: "true"
       ## API router takes precedence over the frontend catch-all router.
       traefik.http.routers.langflow-api-rtr.entrypoints: "websecure"
       traefik.http.routers.langflow-api-rtr.rule: "Host(`langflow.$DOMAINNAME`) && (PathPrefix(`/api`) || PathPrefix(`/docs`) || Path(`/openapi.json`) || Path(`/health`) || Path(`/health_check`))"
       traefik.http.routers.langflow-api-rtr.middlewares: "chain-no-auth@file,langflow-oidc@file"
       traefik.http.routers.langflow-api-rtr.priority: "100"
       traefik.http.routers.langflow-api-rtr.service: "langflow-api-svc"
+      traefik.http.routers.langflow-api-rtr.observability.tracing: "true"
       traefik.http.services.langflow-api-svc.loadbalancer.server.port: "7860"
 
   langflow-frontend:
@@ -279,6 +281,7 @@ services:
       traefik.http.routers.langflow-rtr.middlewares: "chain-no-auth@file,langflow-oidc@file"
       traefik.http.routers.langflow-rtr.priority: "10"
       traefik.http.routers.langflow-rtr.service: "langflow-svc"
+      traefik.http.routers.langflow-rtr.observability.tracing: "true"
       traefik.http.services.langflow-svc.loadbalancer.server.port: "8080"
       ####### HOMEPAGE #######
       homepage.group: "Programming"

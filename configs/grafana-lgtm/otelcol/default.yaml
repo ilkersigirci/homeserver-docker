@@ -42,6 +42,17 @@ processors:
     limit_mib: 512
     spike_limit_mib: 128
   batch:
+  # Drop successful calls made outside any request: database and cache calls
+  # (LiteLLM config polling, Open WebUI Redis) and Traefik's own outbound calls
+  # (Docker provider polling, ACME). They are childless one-span traces, so they
+  # are also absent from span metrics and the service graph. Calls inside a
+  # request have a parent, and failed calls are always kept.
+  filter/background_spans:
+    error_mode: ignore
+    traces:
+      span:
+        - IsRootSpan() and kind == SPAN_KIND_CLIENT and status.code != STATUS_CODE_ERROR and (attributes["db.system"] != nil or attributes["db.system.name"] != nil)
+        - IsRootSpan() and kind == SPAN_KIND_CLIENT and status.code != STATUS_CODE_ERROR and resource.attributes["service.name"] == "traefik"
   delta_to_cumulative/chhoto_url:
     max_stale: 2160h
     max_streams: 50000
@@ -162,7 +173,7 @@ service:
   pipelines:
     traces:
       receivers: [otlp]
-      processors: [memory_limiter]
+      processors: [memory_limiter, filter/background_spans]
       exporters: [otlphttp/traces]
       #exporters: [otlphttp/traces,debug/traces]
     metrics:

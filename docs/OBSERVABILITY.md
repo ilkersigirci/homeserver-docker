@@ -59,4 +59,6 @@ The per-host collector agent is expected to export host metrics including:
 
 - Add OTLP environment variables to the service.
 - Ensure `otel-collector-agent` is included on that host.
+- Traefik tracing is opt-in. If the service's requests join application traces,
+  set `traefik.http.routers.<router>.observability.tracing: "true"`.
 - Verify telemetry appears in the configured backend dashboards/logs/traces.
