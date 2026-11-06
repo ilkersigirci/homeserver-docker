@@ -1,5 +1,5 @@
 x-socket-proxy-service: &socket_proxy_service
-  image: lscr.io/linuxserver/socket-proxy:3.4.6-r0-ls100@sha256:0357c479cc98e863917d1cd8b10e83d35a50ca46a0788f5a192bf792c3b7100d
+  image: lscr.io/linuxserver/socket-proxy:3.4.7-r0-ls104@sha256:4e5e59efd3338205561c54262581992036e5a36ccca97d487b1d4ec41f9adc58
   restart: $RESTART_POLICY_CORE
   read_only: true
   tmpfs:
