@@ -20,6 +20,11 @@ metastore:
 # Keep the legacy profile reader alongside the v2 storage components.
 architecture_storage: v1-v2-dual
 
+limits:
+  retention_period: 30d
+  # Apply the same retention to legacy v1 profile blocks.
+  compactor_blocks_retention_period: 30d
+
 storage:
   backend: filesystem
   filesystem:

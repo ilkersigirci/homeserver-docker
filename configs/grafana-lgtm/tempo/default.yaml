@@ -17,8 +17,8 @@ distributor:
 
 query_frontend:
   search:
-    # The dashboard retains traces for 90 days and must be able to search that range.
-    max_duration: 2160h
+    # Allow searches across the full 30-day trace retention window.
+    max_duration: 720h
 
 memberlist:
   bind_addr: [127.0.0.1]
@@ -69,12 +69,12 @@ backend_scheduler:
   provider:
     compaction:
       compaction:
-        block_retention: 2160h
+        block_retention: 720h
 
 backend_worker:
   compaction:
-    # Keep 90 days of trace blocks.
-    block_retention: 2160h
+    # Keep 30 days of trace blocks.
+    block_retention: 720h
 
 metrics_generator:
   processor:

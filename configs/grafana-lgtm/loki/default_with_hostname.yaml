@@ -29,6 +29,13 @@ schema_config:
         prefix: index_
         period: 24h
 
+compactor:
+  # Enforce the retention period passed through LOKI_EXTRA_ARGS.
+  # Keep deletion markers on the persistent /data mount across restarts.
+  working_directory: /data/loki/compactor
+  retention_enabled: true
+  delete_request_store: filesystem
+
 ruler:
   alertmanager_url: http://127.0.0.1:9093
 

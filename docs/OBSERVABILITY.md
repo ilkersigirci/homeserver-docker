@@ -14,6 +14,19 @@ This document describes the OpenTelemetry pattern used in this repository.
 - Run `apps/otel-collector-agent.yml` on every machine.
 - Instrumented services send OTLP to the local `otel-collector-agent`.
 
+## LGTM Retention
+
+- Metrics, logs, traces, and profiles all have a 30-day retention policy.
+- Prometheus and Loki retention periods are set in `apps/grafana-lgtm.yml`;
+  Tempo retention is set in `configs/grafana-lgtm/tempo/default.yaml`, and Pyroscope
+  retention for both v1 and v2 storage is set in
+  `configs/grafana-lgtm/pyroscope/default.yaml`.
+- Loki requires `compactor.retention_enabled` and
+  `compactor.delete_request_store: filesystem` to delete expired logs. Preserve
+  `/data/loki/compactor`, which holds pending deletion markers.
+- Cleanup is asynchronous: Prometheus removes expired whole blocks, and Loki
+  deletes marked chunks after its default two-hour delay.
+
 ## LGTM Readiness
 
 The container healthcheck covers Grafana, Loki, Tempo, Pyroscope, Prometheus, and
