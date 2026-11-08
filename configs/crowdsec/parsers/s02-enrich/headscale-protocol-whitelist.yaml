@@ -1,0 +1,20 @@
+name: local/headscale-protocol-whitelist
+description: "Avoid Headscale probe false positives and proxy-ban feedback loops"
+filter: >-
+  evt.Meta.service == 'http' &&
+  evt.Meta.traefik_router_name in ['headscale-rtr@docker', 'headplane-rtr@docker']
+whitelist:
+  reason: "Headscale probe callbacks or requests already denied by the proxy"
+  expression:
+    # Expired or unknown probe IDs return 404; clients behind one NAT send many IDs.
+    - >-
+      evt.Meta.traefik_router_name == 'headscale-rtr@docker' &&
+      evt.Meta.http_verb == 'HEAD' &&
+      Split(evt.Meta.http_path, '?')[0] == '/machine/ping-response' &&
+      evt.Meta.http_status == '404' &&
+      evt.Unmarshaled.traefik.OriginStatus == 404
+    # A proxy-generated denial must not create another ban on every client retry.
+    # Backend authentication failures still reach the detection scenarios.
+    - >-
+      evt.Meta.http_status == '403' &&
+      evt.Unmarshaled.traefik.OriginStatus == 0
