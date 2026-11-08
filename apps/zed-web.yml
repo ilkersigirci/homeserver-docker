@@ -13,7 +13,6 @@ services:
     read_only: true
     tmpfs:
       - /tmp:rw,noexec,nosuid,nodev,size=512m,uid=$PUID,gid=$PGID,mode=1777
-      - /home/zed:rw,nosuid,nodev,size=1g,uid=$PUID,gid=$PGID,mode=0700
     security_opt:
       - no-new-privileges:true
       # Codex's Bubblewrap sandbox needs unprivileged user namespaces and
@@ -31,7 +30,13 @@ services:
         hard: 32768
     volumes:
       # - $REPO_PATH/configs/zed-web/config:/workspace/.config
-      - $REPO_PATH/data/zed-web:/workspace
+      - $REPO_PATH/data/zed-web/workspace:/workspace
+      # Persistent home for ~/.gitconfig, ~/.ssh, and shell history.
+      - type: bind
+        source: $REPO_PATH/data/zed-web/home
+        target: /home/zed
+        bind:
+          create_host_path: false
       ####### codex-acp ######
       - type: bind
         source: $HOME/.codex
