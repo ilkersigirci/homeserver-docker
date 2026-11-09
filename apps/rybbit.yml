@@ -94,7 +94,7 @@ services:
       start_period: 30s
 
   rybbit-backend:
-    image: ghcr.io/rybbit-io/rybbit-backend:v2.6.1@sha256:d354b1abf15841fa107260546c524cc6254980fbcf0c3f9780fec669a4dc6297
+    image: ghcr.io/rybbit-io/rybbit-backend:v2.9.2@sha256:e5fc900b59251f4e43f8caef600b0cfd26a63c7b1732e725900bf4ea2ab8a3d7
     container_name: rybbit-backend
     restart: $RESTART_POLICY_MAINTENANCE
     depends_on:
@@ -172,7 +172,7 @@ services:
       glance.description: "OSS alternative API to Google Analytics"
 
   rybbit-client:
-    image: ghcr.io/rybbit-io/rybbit-client:v2.6.1@sha256:c8ea9acfad5c90695f262e91e111a7ba5b148c25bb6650ab34a0eae2a03d97ff
+    image: ghcr.io/rybbit-io/rybbit-client:v2.9.2@sha256:9beb1cfe74bbb3bf7d7a74cf5d3b07639610637909f0dfafaa87d3a76b91ce2a
     container_name: rybbit-client
     restart: $RESTART_POLICY_MAINTENANCE
     depends_on:
