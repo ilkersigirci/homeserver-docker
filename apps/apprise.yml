@@ -1,7 +1,7 @@
 # TODO: Harden
 services:
   apprise-api:
-    image: lscr.io/linuxserver/apprise-api:v2.0.1-ls264@sha256:742580f9c5e8e94e8009be3406bd557c012457d00acde7684066b3f897753d52
+    image: lscr.io/linuxserver/apprise-api:v2.1.0-ls269@sha256:b732c62450bfc805cbf0ad68f46137c144d8936bbd661857feb8879b3edcce7b
     container_name: apprise-api
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
