@@ -1,6 +1,6 @@
 services:
   open-webui:
-    image: ghcr.io/ilkersigirci/homeserver-open-webui:v0.13.3-slim@sha256:14c2ab2317b74521e17d6719fa0bfe307e5f1530108998a9ba55d5cbb2ddaa5d
+    image: ghcr.io/ilkersigirci/homeserver-open-webui:v0.13.3-slim@sha256:29e6326e52ed9f7e758cb24fa5ac2042ffc764c77c65721d5e0d9316a40add1f
     container_name: open-webui
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
@@ -149,6 +149,13 @@ services:
       # Disable local model downloads when using the full image.
       # OFFLINE_MODE: true
       # HF_HUB_OFFLINE: 1
+      ############# CUSTOM IMAGE SPECIFIC #############
+      ### OPENAI FILES API ###
+      # Saving Admin > Documents overwrites the engine; check GET /api/v1/retrieval/config afterwards.
+      # ENABLE_OPENAI_FILES_API: true
+      # CONTENT_EXTRACTION_ENGINE: openai_files
+      # OPENAI_FILES_API_BASE_URL: https://aigateway.$DOMAINNAME/v1
+      # OPENAI_FILES_API_TIMEOUT: 300 # Default
     healthcheck:
       test: ["CMD", "curl", "--silent", "--fail", "-o", "/dev/null", "http://127.0.0.1:8080/health"]
       interval: 2m
