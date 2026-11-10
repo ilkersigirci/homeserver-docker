@@ -3,7 +3,7 @@ networks:
 
 services:
   karakeep-chrome:
-    image: ghcr.io/karakeep-app/karakeep-chrome:151.0.7922.47-r1@sha256:5b19bbb160e9ff60681a3abd97e1c4ec9f64212301410de658c3900ab7ef31e7
+    image: ghcr.io/karakeep-app/karakeep-chrome:157.0.8103.38-r1@sha256:6c80ed470871bb8c129dc58692ca1714cddbc1392faad3ebf59aecd2e6e58eac
     container_name: karakeep-chrome
     restart: $RESTART_POLICY_OTHERS
     init: true
