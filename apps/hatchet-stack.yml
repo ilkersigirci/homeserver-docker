@@ -96,7 +96,7 @@ services:
 
   hatchet-migrate:
     <<: *hatchet-service
-    image: ghcr.io/hatchet-dev/hatchet/hatchet-migrate:v0.116.8@sha256:8490070159feca25f092b842e0681d3e7aa81ae98270de512481b03aad83a431
+    image: ghcr.io/hatchet-dev/hatchet/hatchet-migrate:v0.120.0@sha256:adb3a54ffdd855f951a3283e18085e441cb6faad9411b0987305d3fb072a6f46
     container_name: hatchet-migrate
     restart: "no"
     command: ["/hatchet/hatchet-migrate"]
@@ -109,7 +109,7 @@ services:
 
   hatchet-setup:
     <<: *hatchet-service
-    image: ghcr.io/hatchet-dev/hatchet/hatchet-admin:v0.116.8@sha256:429c862946c856f25283df316bb7ecd9c54312538bf077671a24ebac24fab5a7
+    image: ghcr.io/hatchet-dev/hatchet/hatchet-admin:v0.120.0@sha256:a3c762d487d5401955c2282bf668b979c39f0a99667e814a316932b3188842a9
     container_name: hatchet-setup
     restart: "no"
     command:
@@ -131,7 +131,7 @@ services:
 
   hatchet-engine:
     <<: *hatchet-service
-    image: ghcr.io/hatchet-dev/hatchet/hatchet-engine:v0.116.8@sha256:b33ba4cf3af532adad73dfe9d367956dc986872f6282020026bd15a7be95112d
+    image: ghcr.io/hatchet-dev/hatchet/hatchet-engine:v0.120.0@sha256:05e46e4dbfd5f90d361c99aaf3db2d6a181c56c14e41ede11340f34a7b4b4f4d
     container_name: hatchet-engine
     command: ["/hatchet/hatchet-engine", "--config", "/hatchet/config"]
     depends_on:
@@ -170,7 +170,7 @@ services:
 
   hatchet-api:
     <<: *hatchet-service
-    image: ghcr.io/ilkersigirci/homeserver-hatchet-api:v0.116.8@sha256:35f86b0b611ff80d3e4112621da71d6a896bc0e238beb92197fd7f0e943d5997
+    image: ghcr.io/ilkersigirci/homeserver-hatchet-api:v0.120.0@sha256:0eeb0d9676c13687a769cf0da06c6577f6197fec154f678728a49b60dac953ca
     container_name: hatchet-api
     command: ["/hatchet/hatchet-api", "--config", "/hatchet/config"]
     depends_on:
@@ -213,7 +213,7 @@ services:
 
   hatchet-frontend:
     <<: *hatchet-service
-    image: ghcr.io/ilkersigirci/homeserver-hatchet-frontend:v0.116.8@sha256:66fb241fa5c4c6b3429162efe1fd4b0b8b0bcd70411616812be809f462917a4c
+    image: ghcr.io/ilkersigirci/homeserver-hatchet-frontend:v0.120.0@sha256:1a4dded04209a0b9f671713c3c1c3688501f7843ae0897c892c80260c60ce01d
     container_name: hatchet-frontend
     networks:
       - t3_proxy
