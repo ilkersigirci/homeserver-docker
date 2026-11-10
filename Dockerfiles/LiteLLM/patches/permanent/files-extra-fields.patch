@@ -1,5 +1,5 @@
-Let clients send files-api's own fields (language, parse_method, metadata, raw,
-...) through the proxy, and get the fields it adds to file objects back.
+Let clients send files-api's own fields (language, parse_method, metadata,
+format, ...) through the proxy, and get the fields it adds to file objects back.
 
 The proxy drops upload form fields and query parameters it does not know, the
 OpenAI files retrieve, delete, and list calls take no extra_query, and
