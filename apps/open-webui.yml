@@ -152,7 +152,6 @@ services:
       ############# CUSTOM IMAGE SPECIFIC #############
       ### OPENAI FILES API ###
       # Saving Admin > Documents overwrites the engine; check GET /api/v1/retrieval/config afterwards.
-      # ENABLE_OPENAI_FILES_API: true
       # CONTENT_EXTRACTION_ENGINE: openai_files
       # OPENAI_FILES_API_BASE_URL: https://aigateway.$DOMAINNAME/v1
       # OPENAI_FILES_API_TIMEOUT: 300 # Default

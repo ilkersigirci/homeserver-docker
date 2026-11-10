@@ -36,8 +36,9 @@ patch changes, and its removal check.
   shared; the connection's custom headers still apply to chat only.
 - [`openai-files-api.patch`](patches/openai-files-api.patch): chat documents
   use an OpenAI-compatible Files API, such as one behind LiteLLM's
-  `files_settings`. Models that read files by ID receive them by ID, and the
-  Files API can extract every document's text; see [Files API](#files-api).
+  `files_settings`. Models that read files by ID receive them by ID, and
+  files-api can extract the text of the document types it parses; see
+  [Files API](#files-api).
   Upstream closed both native file input PRs unmerged
   ([open-webui#27627](https://github.com/open-webui/open-webui/pull/27627),
   [open-webui#27998](https://github.com/open-webui/open-webui/pull/27998)).
@@ -50,13 +51,13 @@ every build.
 
 | Variable | Meaning |
 | --- | --- |
-| `ENABLE_OPENAI_FILES_API` | `true` turns the integration on; default `false`. |
-| `OPENAI_FILES_API_BASE_URL` | Files API base URL, including `/v1`. |
+| `OPENAI_FILES_API_BASE_URL` | Files API base URL, including `/v1`; both features need it. |
 | `OPENAI_FILES_API_KEY` | Key used unless the OpenAI connection with the same base URL uses `system_oauth`. |
 | `OPENAI_FILES_API_PARAMS` | JSON object of string query parameters for every Files API request, such as `{"provider":"litellm_proxy"}` to select LiteLLM's `files_settings` entry. |
-| `OPENAI_FILES_API_MODELS_REGEX_PATTERN` | Model IDs that receive documents by file ID, such as `^langflow/`; a workspace model matches by its base model. Empty or invalid sends none. |
-| `OPENAI_FILES_API_TIMEOUT` | Seconds each Files API request may take, text extraction included; default `300`. |
-| `CONTENT_EXTRACTION_ENGINE` | `openai_files` extracts each processed upload's text through the Files API. |
+| `OPENAI_FILES_API_MODELS_REGEX_PATTERN` | Model IDs that receive documents by file ID, such as `^langflow/`; a workspace model matches by its base model. Empty, invalid, or set without a base URL sends none; the last two log an error at startup. |
+| `OPENAI_FILES_API_TIMEOUT` | Seconds each Files API request may take, and the longest wait for a document's text extraction; default `300`. |
+| `OPENAI_FILES_API_FILE_EXTENSIONS` | Comma-separated extensions the `openai_files` engine sends to the Files API, as upstream's `MINERU_FILE_EXTENSIONS` does for its `mineru` engine; default `pdf,docx,doc,pptx,ppt,xlsx,xls`. Extend it as files-api extracts more types. |
+| `CONTENT_EXTRACTION_ENGINE` | `openai_files` extracts those uploads' text through the Files API; without a base URL, their processing fails. |
 
 ### Sending files by ID
 
@@ -77,22 +78,26 @@ so the Files API must keep its files.
 
 ### Extracting text
 
-With the `openai_files` engine, processing an upload sends
-`GET /files/{file_id}/content?format=markdown` and stores a `text/markdown` or
-`text/plain` response, read as UTF-8 unless it names a charset, as the
-document's text. Without `format`, the Files API returns the original bytes, as
-OpenAI's does. Any other response fails the processing; Open WebUI shows the
-error and keeps the file attached, so models that read files by ID still
-receive it.
+With the `openai_files` engine, processing an upload with a listed extension
+waits, with the OpenAI SDK's `files.wait_for_processing` checking every 2
+seconds, until the Files API reports the file `processed`; an `error` status
+fails the processing with its `status_details`. It then stores the text of
+files-api's extracted content from `GET /files/{file_id}/content`, read by its
+`type`: a text file's `text`, a spreadsheet's row `chunks`, or, untyped, the
+`md_content` of a parsed document's `results`. Content of another type fails
+the processing, so a new files-api engine needs this patch to read its type. A
+failure shows the error and keeps the file attached, so models that read files
+by ID still receive it.
 
-Documents Open WebUI downloads from the web, such as PDFs in search results,
-have no upload, so the built-in loaders read them; in the slim image those read
-only text, HTML, and CSV. The admin **Documents** page lists no such engine, and
+Other uploads, and documents Open WebUI downloads from the web, such as PDFs in
+search results, use the built-in loaders; in the slim image those read only
+text, HTML, and CSV. The admin **Documents** page lists no such engine, and
 saving that page writes its engine value over `CONTENT_EXTRACTION_ENGINE`; after
 saving it, check that `GET /api/v1/retrieval/config` still reports
 `openai_files`.
 
-Requests authenticate like the OpenAI connection with the same base URL, as in
+Requests go through the image's OpenAI SDK, with its retries, and
+authenticate like the OpenAI connection with the same base URL, as in
 `speech-images-system-oauth.patch`. Open WebUI never deletes files from the
 Files API.
 

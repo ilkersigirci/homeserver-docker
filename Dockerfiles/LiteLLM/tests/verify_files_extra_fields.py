@@ -24,7 +24,7 @@ BACKEND = {
     "api_key": "files-backend-key",
 }
 UPLOAD = b"Original upload\n"
-PARSED = b"# Original upload\n"
+PARSED = b'{"text": "Original upload"}'
 METADATA = {"source": "archive", "tags": ["a", "b"]}
 FILE = {
     "id": "file-extra-fields-check",
@@ -53,9 +53,7 @@ async def backend(request: httpx.Request) -> httpx.Response:
             form.clear()
             form.update({key: fields.getlist(key) for key in fields if key != "file"})
     if request.url.path.endswith("/content"):
-        # files-api's content: the upload, or its text with format=markdown.
-        markdown = request.url.params.get("format") == "markdown"
-        return httpx.Response(200, content=PARSED if markdown else UPLOAD)
+        return httpx.Response(200, content=UPLOAD if "raw" in request.url.params else PARSED)
     if request.method == "DELETE":
         return httpx.Response(200, json={"id": FILE["id"], "object": "file", "deleted": True})
     if request.method == "GET" and request.url.path.endswith("/files"):
@@ -104,12 +102,12 @@ async def check(client: AsyncOpenAI) -> None:
     assert retrieved.model_dump()["metadata"] == METADATA
     assert sent[-1].url.params == forwarded, sent[-1].url
 
-    markdown = await client.files.content(file_id, extra_query={**query, "format": "markdown"})
-    assert markdown.content == PARSED
-    assert sent[-1].url.params == forwarded.merge({"format": "markdown"}), sent[-1].url
+    assert (await client.files.content(file_id, extra_query=query)).content == PARSED
+    assert sent[-1].url.params == forwarded, sent[-1].url
 
-    assert (await client.files.content(file_id)).content == UPLOAD
-    assert not sent[-1].url.query, sent[-1].url
+    raw = await client.files.content(file_id, extra_query={"raw": "true"})
+    assert raw.content == UPLOAD
+    assert sent[-1].url.params == httpx.QueryParams({"raw": "true"})
 
     listed = await client.files.list(
         purpose="user_data", limit=5, after="file-0", extra_query=query

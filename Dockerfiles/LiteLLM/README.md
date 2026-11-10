@@ -95,13 +95,9 @@ file = client.files.create(
     extra_body={"language": "tr", "parse_method": "ocr", "metadata": {"source": "archive"}},
 )
 file.model_extra  # e.g. {"metadata": {...}}, if the backend returns it
-original = client.files.content(file.id)
-markdown = client.files.content(file.id, extra_query={"format": "markdown", "language": "tr"})
+content = client.files.content(file.id, extra_query={"language": "tr"})
+original = client.files.content(file.id, extra_query={"raw": "true"})
 ```
-
-As in OpenAI's API, `content` returns the uploaded bytes; `format=markdown` asks
-files-api for the extracted text instead, as Open WebUI's `openai_files` engine
-does.
 
 The backend receives the SDK's encoding: `metadata[source]=archive` for an
 object, repeated `tags[]` for an array; send `json.dumps(...)` for one JSON

@@ -3,6 +3,7 @@
 import contextlib
 import copy
 import importlib.util
+import json
 import os
 import re
 import tempfile
@@ -11,8 +12,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock, patch
 
-import requests
-from open_webui.retrieval.loaders import openai_files as files_loader
+import httpx
 from open_webui.retrieval.loaders.main import Loader
 from open_webui.routers import retrieval
 from open_webui.utils import middleware, openai_files
@@ -27,88 +27,84 @@ MARKDOWN = "# Rapor\n\nÇıkarılan metin."
 CHAT_FILE_TOOLS = {"list_chat_files", "query_chat_files", "grep_chat_files", "view_file"}
 
 
-class FakeResponse:
-    def __init__(self, status: int, file_id: str) -> None:
-        self.status = status
-        self.file_id = file_id
+class FakeFilesApi:
+    """files-api behind httpx.MockTransport: numbers each upload, answers status checks
+    with `statuses` in turn (the last one repeating), and serves `content`."""
 
-    async def json(self) -> dict:
-        return {"id": self.file_id, "object": "file"}
+    def __init__(
+        self,
+        upload_status: int = 200,
+        statuses: tuple[dict, ...] = ({"status": "processed"},),
+        content: httpx.Response | None = None,
+    ) -> None:
+        self.upload_status = upload_status
+        self.statuses = statuses
+        self.content = content or httpx.Response(200, json={"results": [{"md_content": MARKDOWN}]})
+        self.requests: list[httpx.Request] = []
 
-    async def text(self) -> str:
-        return '{"error": {"message": "Unauthorized"}}'
+    def __call__(self, request: httpx.Request) -> httpx.Response:
+        self.requests.append(request)
+        if request.method == "POST":
+            if self.upload_status != 200:
+                return httpx.Response(self.upload_status, json={"error": {"message": "Unauthorized"}})
+            return httpx.Response(200, json=file_object(f"file-{len(self.uploads)}", status="uploaded"))
+        if request.url.path.endswith("/content"):
+            return self.content
+        fields = self.statuses[min(len(self.status_checks), len(self.statuses)) - 1]
+        return httpx.Response(200, json=file_object(request.url.path.rsplit("/", 1)[-1], **fields))
 
-    async def __aenter__(self) -> "FakeResponse":
-        return self
+    @property
+    def uploads(self) -> list[httpx.Request]:
+        return [request for request in self.requests if request.method == "POST"]
 
-    async def __aexit__(self, *_: object) -> None:
-        return None
-
-
-class FakeSession:
-    """Records each Files API upload and answers with a new file ID, or with an error status."""
-
-    def __init__(self, status: int = 200) -> None:
-        self.status = status
-        self.uploads: list[dict] = []
-
-    def post(self, url: str, **kwargs) -> FakeResponse:
-        self.uploads.append({"url": url, **kwargs})
-        return FakeResponse(self.status, f"file-{len(self.uploads)}")
+    @property
+    def status_checks(self) -> list[httpx.Request]:
+        return [r for r in self.requests if r.method == "GET" and not r.url.path.endswith("/content")]
 
 
-async def parse_upload(upload: dict):
+def file_object(id: str, **fields) -> dict:
+    return {"id": id, "object": "file", "bytes": 1, "created_at": 1, "filename": "f", "purpose": "user_data", **fields}
+
+
+async def parse_upload(upload: httpx.Request):
     """The upload's multipart form, parsed as a FastAPI Files API parses it."""
-    payload = upload["data"]()
-    chunks: list[bytes] = []
-
-    class Writer:
-        async def write(self, chunk: bytes) -> None:
-            chunks.append(bytes(chunk))
-
-    await payload.write(Writer())
-    body = b"".join(chunks)
 
     async def receive() -> dict:
-        return {"type": "http.request", "body": body, "more_body": False}
+        return {"type": "http.request", "body": upload.content, "more_body": False}
 
-    headers = [(b"content-type", payload.content_type.encode())]
+    headers = [(b"content-type", upload.headers["content-type"].encode())]
     return await Request({"type": "http", "method": "POST", "headers": headers}, receive).form()
 
 
-def http_response(status: int, content_type: str, body: bytes) -> requests.Response:
-    """A response as requests builds it, including its header-derived encoding."""
-    response = requests.Response()
-    response.status_code = status
-    response.headers["Content-Type"] = content_type
-    response.encoding = requests.utils.get_encoding_from_headers(response.headers)
-    response._content = body
-    return response
-
-
 @contextlib.contextmanager
-def files_api(session: FakeSession, *patches, token: object = TOKEN, pattern: str = "^langflow/"):
+def files_api(api: FakeFilesApi, *patches, token: object = TOKEN, pattern: str = "^langflow/"):
     """The image's Files API settings, behind a system_oauth connection to the same gateway."""
     connections = (True, [GATEWAY], [""], {"0": {"auth_type": "system_oauth"}})
+    clients: list[dict] = []
+
+    def http_client(**kwargs) -> httpx.AsyncClient:
+        clients.append(kwargs)
+        return httpx.AsyncClient(transport=httpx.MockTransport(api))
+
     with contextlib.ExitStack() as stack:
         for manager in (
             patch.multiple(
                 openai_files,
-                ENABLE_OPENAI_FILES_API=True,
                 OPENAI_FILES_API_BASE_URL=GATEWAY,
                 OPENAI_FILES_API_KEY="static-key",
                 OPENAI_FILES_API_PARAMS={"provider": "files"},
                 OPENAI_FILES_API_MODELS_REGEX=re.compile(pattern or "(?!)"),
                 OPENAI_FILES_API_TIMEOUT=300,
+                PROCESSING_POLL_SECONDS=0,
+                DefaultAsyncHttpxClient=http_client,
             ),
             patch("open_webui.routers.openai.get_openai_runtime_config", AsyncMock(return_value=connections)),
             patch("open_webui.utils.middleware.get_system_oauth_token", AsyncMock(return_value=token)),
-            patch.object(openai_files, "get_session", AsyncMock(return_value=session)),
             patch.object(openai_files.Storage, "get_file", side_effect=lambda path: path),
             *patches,
         ):
             stack.enter_context(manager)
-        yield
+        yield clients
 
 
 def stored_file(workdir: Path, id: str, name: str, content_type: str, **meta) -> SimpleNamespace:
@@ -145,13 +141,13 @@ class SendFileIdsTest(unittest.IsolatedAsyncioTestCase):
         ]
         self.files = [*(item(file) for file in self.records.values()), {"type": "collection", "id": "kb"}]
 
-    async def send(self, model: dict, session: FakeSession, save_id: AsyncMock, **settings) -> tuple[dict, dict]:
+    async def send(self, model: dict, api: FakeFilesApi, save_id: AsyncMock, **settings) -> tuple[dict, dict]:
         # As in a real request, metadata['files'] starts as the request's own files list.
         form_data = {"messages": copy.deepcopy(self.messages), "files": copy.deepcopy(self.files)}
         metadata = {"files": form_data["files"]}
         get_files = AsyncMock(side_effect=lambda ids: [self.records[id] for id in ids])
         with files_api(
-            session,
+            api,
             patch.object(openai_files.Files, "get_files_by_ids", get_files),
             patch.object(openai_files.Files, "update_file_metadata_by_id", save_id),
             patch.object(openai_files, "has_access_to_file", AsyncMock(return_value=False)),
@@ -161,8 +157,8 @@ class SendFileIdsTest(unittest.IsolatedAsyncioTestCase):
         return form_data, metadata
 
     async def test_matching_models_receive_each_message_documents_by_file_id(self) -> None:
-        session, save_id = FakeSession(), AsyncMock()
-        form_data, metadata = await self.send({"id": "langflow/flow"}, session, save_id)
+        api, save_id = FakeFilesApi(), AsyncMock()
+        form_data, metadata = await self.send({"id": "langflow/flow"}, api, save_id)
         _, first, _, second = form_data["messages"]
         new_part = {"type": "file", "file": {"file_id": "file-1", "filename": 'Rapor "son" şubat 2026.docx'}}
 
@@ -183,30 +179,33 @@ class SendFileIdsTest(unittest.IsolatedAsyncioTestCase):
             self.assertEqual([file["id"] for file in files], ["image", "audio", "foreign", "kb"])
 
         # The file without an ID is uploaded once, though two messages attach it, and keeps its ID.
-        [upload] = session.uploads
-        self.assertEqual(upload["url"], f"{GATEWAY}/files")
-        self.assertEqual(upload["params"], {"provider": "files"})
-        self.assertEqual(upload["headers"]["Authorization"], "Bearer user-token")
-        self.assertEqual(upload["timeout"].total, 300)
+        # Models that read files by ID do not wait for text extraction.
+        [upload] = api.requests
+        self.assertEqual(str(upload.url.copy_with(query=None)), f"{GATEWAY}/files")
+        self.assertEqual(dict(upload.url.params), {"provider": "files"})
+        self.assertEqual(upload.headers["Authorization"], "Bearer user-token")
+        self.assertEqual(upload.extensions["timeout"], {"connect": 5.0, "read": 300, "write": 300, "pool": 300})
         save_id.assert_awaited_once_with("new", {"openai_file_id": "file-1"})
 
-    async def test_the_files_api_receives_the_file_and_its_name_as_is(self) -> None:
-        session = FakeSession()
-        await self.send({"id": "langflow/flow"}, session, AsyncMock())
+    async def test_the_files_api_receives_the_file_and_its_name(self) -> None:
+        api = FakeFilesApi()
+        await self.send({"id": "langflow/flow"}, api, AsyncMock())
 
-        form = await parse_upload(session.uploads[0])
+        form = await parse_upload(api.uploads[0])
         self.addAsyncCleanup(form.close)
         self.assertEqual(form["purpose"], "user_data")
-        self.assertEqual(form["file"].filename, 'Rapor "son" şubat 2026.docx')
+        # httpx escapes quotes as HTML forms do; files-api and OpenAI decode them.
+        self.assertEqual(form["file"].filename, "Rapor %22son%22 şubat 2026.docx")
+        self.assertEqual(form["file"].content_type, "application/msword")
         self.assertEqual(await form["file"].read(), 'Rapor "son" şubat 2026.docx bytes'.encode())
 
     async def test_a_failed_upload_keeps_that_document_on_open_webui_handling(self) -> None:
         # Without an OAuth session, the upload carries no token, never the key, and is refused.
-        session = FakeSession(status=401)
-        form_data, metadata = await self.send({"id": "langflow/flow"}, session, AsyncMock(), token=None)
+        api = FakeFilesApi(upload_status=401)
+        form_data, metadata = await self.send({"id": "langflow/flow"}, api, AsyncMock(), token=None)
         _, first, _, second = form_data["messages"]
 
-        self.assertEqual(session.uploads[0]["headers"]["Authorization"], "Bearer ")
+        self.assertNotIn("Authorization", api.uploads[0].headers)
         self.assertEqual(second["content"], [{"type": "text", "text": "Compare."}])
         self.assertEqual([file["id"] for file in second["files"]], ["new", "audio", "foreign"])
         # The document with an ID is still sent by ID.
@@ -215,33 +214,31 @@ class SendFileIdsTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_workspace_models_match_through_their_base_model(self) -> None:
         model = {"id": "my-assistant", "info": {"base_model_id": "langflow/flow"}}
-        form_data, _ = await self.send(model, FakeSession(), AsyncMock())
+        form_data, _ = await self.send(model, FakeFilesApi(), AsyncMock())
 
         self.assertEqual(form_data["messages"][3]["content"][-1]["file"]["file_id"], "file-1")
 
     async def test_other_models_and_an_empty_pattern_keep_upstream_behavior(self) -> None:
         for model_id, pattern in (("openai/gpt", "^langflow/"), ("langflow/flow", "")):
             with self.subTest(model_id=model_id, pattern=pattern):
-                session = FakeSession()
-                form_data, metadata = await self.send({"id": model_id}, session, AsyncMock(), pattern=pattern)
+                api = FakeFilesApi()
+                form_data, metadata = await self.send({"id": model_id}, api, AsyncMock(), pattern=pattern)
 
                 self.assertEqual(form_data["messages"], self.messages)
                 self.assertEqual(metadata["files"], self.files)
-                self.assertEqual(session.uploads, [])
+                self.assertEqual(api.requests, [])
 
-    def test_an_invalid_pattern_turns_file_ids_off(self) -> None:
-        # A fresh copy of the module reads the settings, as Open WebUI's first import does.
-        spec = importlib.util.spec_from_file_location("openai_files_check", openai_files.__file__)
-        module = importlib.util.module_from_spec(spec)
-        env = {
-            "ENABLE_OPENAI_FILES_API": "true",
-            "OPENAI_FILES_API_BASE_URL": GATEWAY,
-            "OPENAI_FILES_API_MODELS_REGEX_PATTERN": "^langflow/(",
-        }
-        with patch.dict(os.environ, env), self.assertLogs("openai_files_check", level="ERROR"):
-            spec.loader.exec_module(module)
+    def test_an_invalid_pattern_or_a_missing_base_url_turns_file_ids_off(self) -> None:
+        for base_url, pattern in ((GATEWAY, "^langflow/("), ("", "^langflow/")):
+            with self.subTest(base_url=base_url, pattern=pattern):
+                # A fresh copy of the module reads the settings, as Open WebUI's first import does.
+                spec = importlib.util.spec_from_file_location("openai_files_check", openai_files.__file__)
+                module = importlib.util.module_from_spec(spec)
+                env = {"OPENAI_FILES_API_BASE_URL": base_url, "OPENAI_FILES_API_MODELS_REGEX_PATTERN": pattern}
+                with patch.dict(os.environ, env), self.assertLogs("openai_files_check", level="ERROR"):
+                    spec.loader.exec_module(module)
 
-        self.assertFalse(module.is_file_id_model({"id": "langflow/flow"}))
+                self.assertFalse(module.is_file_id_model({"id": "langflow/flow"}))
 
 
 class ChatPayloadTest(unittest.IsolatedAsyncioTestCase):
@@ -296,7 +293,7 @@ class ChatPayloadTest(unittest.IsolatedAsyncioTestCase):
             return tools
 
         with files_api(
-            FakeSession(),
+            FakeFilesApi(),
             patch.object(openai_files.Files, "get_files_by_ids", AsyncMock(return_value=[document])),
             patch.object(middleware, "get_event_emitter", AsyncMock(return_value=AsyncMock())),
             patch.object(middleware, "generate_queries", AsyncMock(side_effect=Exception("no task model"))),
@@ -338,61 +335,105 @@ class ExtractThroughFilesApiTest(unittest.IsolatedAsyncioTestCase):
         self.config = dict.fromkeys(retrieval.RETRIEVAL_CONFIG_KEYS.values())
         self.config.update({"rag.content_extraction_engine": "openai_files", "rag.bypass_embedding_and_retrieval": True})
 
-    async def test_processing_uploads_the_file_and_stores_its_extracted_text(self) -> None:
+    async def test_processing_uploads_the_file_and_stores_its_text_once_extracted(self) -> None:
         file = stored_file(self.workdir, "report", "report.pdf", "application/pdf")
-        session, save_id, save_data = FakeSession(), AsyncMock(), AsyncMock()
-        # Without a charset, the text is UTF-8.
-        get = Mock(return_value=http_response(200, "text/markdown", MARKDOWN.encode()))
+        api = FakeFilesApi(statuses=({"status": "uploaded"}, {"status": "processed"}))
+        save_id, save_data, get_file = AsyncMock(), AsyncMock(), Mock(side_effect=lambda path: path)
         with files_api(
-            session,
+            api,
+            patch.object(retrieval.Storage, "get_file", get_file),
             patch.object(retrieval.Config, "get_many", AsyncMock(return_value=self.config)),
             patch.object(retrieval.Files, "get_file_by_id", AsyncMock(return_value=file)),
             patch.object(retrieval.Files, "update_file_metadata_by_id", save_id),
             patch.object(retrieval.Files, "update_file_data_by_id", save_data),
             patch.object(retrieval.Files, "update_file_hash_by_id", AsyncMock()),
             patch.object(retrieval, "publish_event", AsyncMock()),
-            patch.object(files_loader.requests, "get", get),
-        ):
+        ) as clients:
             result = await retrieval.index_file(
                 SimpleNamespace(client=None), retrieval.ProcessFileForm(file_id=file.id), user=USER, db=None
             )
 
         self.assertEqual(result["content"], MARKDOWN)
         save_data.assert_any_await(file.id, {"content": MARKDOWN}, db=None)
-        [upload] = session.uploads
-        self.assertEqual(upload["headers"]["Authorization"], "Bearer user-token")
         save_id.assert_awaited_once_with(file.id, {"openai_file_id": "file-1"})
-        self.assertEqual(get.call_args.args, (f"{GATEWAY}/files/file-1/content",))
-        self.assertEqual(get.call_args.kwargs["params"], {"provider": "files", "format": "markdown"})
-        self.assertEqual(get.call_args.kwargs["headers"]["Authorization"], "Bearer user-token")
-        self.assertEqual(get.call_args.kwargs["timeout"], (10, 300))
-        self.assertIs(get.call_args.kwargs["verify"], files_loader.REQUESTS_VERIFY)
+        # The upload reuses the local copy processing downloaded.
+        get_file.assert_called_once_with(file.path)
+        # The upload, a status check until the file is processed, then its extracted content.
+        file_url = "/v1/files/file-1"
+        self.assertEqual(
+            [(request.method, request.url.path) for request in api.requests],
+            [("POST", "/v1/files"), ("GET", file_url), ("GET", file_url), ("GET", f"{file_url}/content")],
+        )
+        for request in api.requests:
+            self.assertEqual(dict(request.url.params), {"provider": "files"})
+            self.assertEqual(request.headers["Authorization"], "Bearer user-token")
+        self.assertEqual(clients, [{"verify": openai_files.AIOHTTP_CLIENT_SESSION_SSL}])
 
-    def test_only_extracted_text_becomes_the_document_text(self) -> None:
-        loader = files_loader.OpenAIFilesLoader(GATEWAY, "file-1", {}, {}, 300)
-        for response in (
-            http_response(200, "application/pdf", b"%PDF-1.7"),
-            # For example, a sign-in page a proxy answers with.
-            http_response(200, "text/html; charset=utf-8", b"<html>Sign in</html>"),
-            http_response(415, "application/json", b'{"error": {"message": "Unsupported file type"}}'),
+    def test_extracted_content_becomes_text(self) -> None:
+        results = [{"md_content": "# Page 1"}, {"md_content": None}, {"md_content": "Page 2"}]
+        sheets = [{"name": "A", "chunks": ["A: row 1"]}, {"name": "B", "chunks": ["B: row 1", "B: row 51"]}]
+        for content, text in (
+            ({"results": results}, "# Page 1\n\nPage 2"),
+            ({"type": "text", "version": 1, "text": "Notes."}, "Notes."),
+            ({"type": "spreadsheet", "version": 1, "sheets": sheets}, "A: row 1\n\nB: row 1\n\nB: row 51"),
         ):
-            with (
-                self.subTest(status=response.status_code, content_type=response.headers["Content-Type"]),
-                patch.object(files_loader.requests, "get", Mock(return_value=response)),
-            ):
-                with self.assertRaises(ValueError):
-                    loader.load()
+            with self.subTest(text=text):
+                self.assertEqual(openai_files.extracted_text(content), text)
+        # Content from an engine this patch does not read yet is never stored as empty text.
+        with self.assertRaisesRegex(ValueError, "transcript content"):
+            openai_files.extracted_text({"type": "transcript", "version": 1, "segments": []})
 
-    async def test_without_the_files_api_the_built_in_loaders_extract(self) -> None:
-        path = self.workdir / "notes.txt"
-        path.write_text("Local text.")
-        with patch.multiple(openai_files, ENABLE_OPENAI_FILES_API=False):
-            processed = await Loader(self.config).aload("notes.txt", "text/plain", str(path))
+    async def extract(self, api: FakeFilesApi, *patches, name: str = "report.pdf") -> list:
+        """Load a stored file as processing an upload does."""
+        file = stored_file(self.workdir, "report", name, "application/octet-stream")
+        loader = Loader(self.config)
+        loader.user, loader.request, loader.metadata = USER, SimpleNamespace(), {"file_id": file.id}
+        with files_api(
+            api,
+            patch.object(openai_files.Files, "get_file_by_id", AsyncMock(return_value=file)),
+            patch.object(openai_files.Files, "update_file_metadata_by_id", AsyncMock()),
+            *patches,
+        ):
+            return await loader.aload(file.filename, "application/octet-stream", file.path)
+
+    async def test_extracted_text_is_post_processed_like_any_engines(self) -> None:
+        # Loader.load fixes every engine's text, here a ligature PDFs often keep.
+        api = FakeFilesApi(content=httpx.Response(200, json={"results": [{"md_content": "\ufb01nal"}]}))
+        docs = await self.extract(api)
+
+        self.assertEqual([(doc.page_content, doc.metadata) for doc in docs], [("final", {"openai_file_id": "file-1"})])
+
+    async def test_a_failed_unfinished_or_unreadable_extraction_fails_processing(self) -> None:
+        failed = FakeFilesApi(statuses=({"status": "error", "status_details": "Failed to parse the file."},))
+        no_url = patch.multiple(openai_files, OPENAI_FILES_API_BASE_URL="")
+        no_wait = patch.multiple(openai_files, OPENAI_FILES_API_TIMEOUT=0)
+        for api, patches, error, message in (
+            (failed, (), ValueError, "Failed to parse"),
+            (FakeFilesApi(statuses=({"status": "uploaded"},)), (no_wait,), RuntimeError, "Giving up"),
+            # For example, a sign-in page a proxy answers with.
+            (FakeFilesApi(content=httpx.Response(200, text="<html>Sign in</html>")), (), json.JSONDecodeError, ""),
+            (FakeFilesApi(), (no_url,), ValueError, "needs OPENAI_FILES_API_BASE_URL"),
+        ):
+            with self.subTest(message=message or "not JSON"):
+                with self.assertRaisesRegex(error, message):
+                    await self.extract(api, *patches)
+
+    async def test_other_files_and_web_downloads_use_the_built_in_loaders(self) -> None:
+        api = FakeFilesApi()
+        # Other files need no Files API, so not its base URL either.
+        for base_url in (GATEWAY, ""):
+            with self.subTest(base_url=base_url):
+                setting = patch.multiple(openai_files, OPENAI_FILES_API_BASE_URL=base_url)
+                docs = await self.extract(api, setting, name="notes.txt")
+                self.assertEqual([doc.page_content for doc in docs], ["notes.txt bytes"])
         # Documents Open WebUI downloads from the web load synchronously, without an upload.
-        downloaded = Loader(self.config).load("notes.txt", "text/plain", str(path))
+        path = self.workdir / "page.txt"
+        path.write_text("Local text.")
+        with files_api(api):
+            downloaded = Loader(self.config).load("page.txt", "text/plain", str(path))
 
-        for docs in (processed, downloaded):
-            self.assertEqual([doc.page_content for doc in docs], ["Local text."])
+        self.assertEqual([doc.page_content for doc in downloaded], ["Local text."])
+        self.assertEqual(api.requests, [])
 
 
 if __name__ == "__main__":
