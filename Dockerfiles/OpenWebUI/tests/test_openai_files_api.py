@@ -124,7 +124,8 @@ class SendFileIdsTest(unittest.IsolatedAsyncioTestCase):
         audio = stored_file(workdir, "audio", "voice.mp3", "audio/mpeg")
         foreign = stored_file(workdir, "foreign", "d.pdf", "application/pdf")
         foreign.user_id = "other-user"
-        self.records = {file.id: file for file in (cached, new, image, audio, foreign)}
+        notes = stored_file(workdir, "notes", "notes.csv", "text/csv")
+        self.records = {file.id: file for file in (cached, new, image, audio, foreign, notes)}
 
         def item(file: SimpleNamespace) -> dict:
             return {"type": "image" if file is image else "file", "id": file.id, "name": file.filename}
@@ -136,7 +137,7 @@ class SendFileIdsTest(unittest.IsolatedAsyncioTestCase):
             {
                 "role": "user",
                 "content": [{"type": "text", "text": "Compare."}],
-                "files": [item(new), item(audio), item(foreign)],
+                "files": [item(new), item(audio), item(foreign), item(notes)],
             },
         ]
         self.files = [*(item(file) for file in self.records.values()), {"type": "collection", "id": "kb"}]
@@ -171,12 +172,13 @@ class SendFileIdsTest(unittest.IsolatedAsyncioTestCase):
             ],
         )
         self.assertEqual(second["content"], [{"type": "text", "text": "Compare."}, new_part])
-        # Images, audio, and another user's file keep Open WebUI's usual handling.
+        # Images, audio, another user's file, and types the Files API does not extract keep
+        # Open WebUI's usual handling.
         self.assertEqual([file["id"] for file in first["files"]], ["image"])
-        self.assertEqual([file["id"] for file in second["files"]], ["audio", "foreign"])
+        self.assertEqual([file["id"] for file in second["files"]], ["audio", "foreign", "notes"])
         # Retrieval and the file tools no longer see the documents sent by ID, in either list.
         for files in (metadata["files"], form_data["files"]):
-            self.assertEqual([file["id"] for file in files], ["image", "audio", "foreign", "kb"])
+            self.assertEqual([file["id"] for file in files], ["image", "audio", "foreign", "notes", "kb"])
 
         # The file without an ID is uploaded once, though two messages attach it, and keeps its ID.
         # Models that read files by ID do not wait for text extraction.
@@ -207,7 +209,7 @@ class SendFileIdsTest(unittest.IsolatedAsyncioTestCase):
 
         self.assertNotIn("Authorization", api.uploads[0].headers)
         self.assertEqual(second["content"], [{"type": "text", "text": "Compare."}])
-        self.assertEqual([file["id"] for file in second["files"]], ["new", "audio", "foreign"])
+        self.assertEqual([file["id"] for file in second["files"]], ["new", "audio", "foreign", "notes"])
         # The document with an ID is still sent by ID.
         self.assertEqual(first["content"][-1]["file"]["file_id"], "file-cached")
         self.assertIn("new", [file["id"] for file in metadata["files"]])

@@ -8,11 +8,12 @@ https://github.com/open-webui/open-webui/pull/27998
 
 A model whose ID, or whose workspace base model ID, matches
 OPENAI_FILES_API_MODELS_REGEX_PATTERN receives each user message's documents
-as standard Chat file parts with their Files API file_id, which Responses
-connections send as input_file. The request's files lists drop those
-documents, as for a Filter's file_handler, so retrieval and the builtin file
-tools skip them. Images, audio, video, and documents whose upload fails keep
-Open WebUI's usual handling.
+with an OPENAI_FILES_API_FILE_EXTENSIONS extension as standard Chat file parts
+with their Files API file_id, which Responses connections send as input_file.
+The request's files lists drop those documents, as for a Filter's
+file_handler, so retrieval and the builtin file tools skip them. Images, audio,
+video, other files, and documents whose upload fails keep Open WebUI's usual
+handling.
 
 CONTENT_EXTRACTION_ENGINE=openai_files sends processed uploads with an
 OPENAI_FILES_API_FILE_EXTENSIONS extension to the Files API, as upstream's
@@ -99,14 +100,14 @@ file ID and extracts their text through a Files API.
          output = message.get('output')
 --- /dev/null
 +++ b/open_webui/utils/openai_files.py
-@@ -0,0 +1,221 @@
+@@ -0,0 +1,230 @@
 +"""Chat documents in an OpenAI-compatible Files API (homeserver openai-files-api.patch).
 +
-+A model matching OPENAI_FILES_API_MODELS_REGEX_PATTERN receives each user message's
-+documents as standard file parts, and CONTENT_EXTRACTION_ENGINE=openai_files takes the
-+text of uploads with an OPENAI_FILES_API_FILE_EXTENSIONS extension from files-api's
-+extraction; both need OPENAI_FILES_API_BASE_URL. A file is uploaded once; its meta keeps
-+the Files API ID for later requests.
++Documents with an OPENAI_FILES_API_FILE_EXTENSIONS extension go through the Files API: a
++model matching OPENAI_FILES_API_MODELS_REGEX_PATTERN receives each user message's ones as
++standard file parts, and CONTENT_EXTRACTION_ENGINE=openai_files takes their text from
++files-api's extraction; both need OPENAI_FILES_API_BASE_URL. Other files keep Open WebUI's
++handling. A file is uploaded once; its meta keeps the Files API ID for later requests.
 +"""
 +
 +import asyncio
@@ -142,7 +143,7 @@ file ID and extracts their text through a Files API.
 +    OPENAI_FILES_API_TIMEOUT = int(os.getenv('OPENAI_FILES_API_TIMEOUT') or 300)
 +except ValueError:
 +    OPENAI_FILES_API_TIMEOUT = 300
-+# Uploads files-api extracts; others keep the built-in loaders, as upstream's
++# The document types files-api extracts; others keep Open WebUI's handling, as upstream's
 +# MINERU_FILE_EXTENSIONS does for its mineru engine. Extend it as files-api extracts more types.
 +OPENAI_FILES_API_FILE_EXTENSIONS = [
 +    ext.strip().lower()
@@ -160,6 +161,10 @@ file ID and extracts their text through a Files API.
 +    OPENAI_FILES_API_MODELS_REGEX = re.compile('(?!)')
 +# Seconds between status checks while the Files API extracts a document's text.
 +PROCESSING_POLL_SECONDS = 2
++
++
++def is_files_api_type(filename: str) -> bool:
++    return filename.split('.')[-1].lower() in OPENAI_FILES_API_FILE_EXTENSIONS
 +
 +
 +def is_file_id_model(model: dict) -> bool:
@@ -230,7 +235,7 @@ file ID and extracts their text through a Files API.
 +
 +    file_path is the file's local copy, which processing has already downloaded.
 +    """
-+    if request is None or not file_id or filename.split('.')[-1].lower() not in OPENAI_FILES_API_FILE_EXTENSIONS:
++    if request is None or not file_id or not is_files_api_type(filename):
 +        return None
 +    if not OPENAI_FILES_API_BASE_URL:
 +        # The engine is runtime config, so its base URL is checked where it is used.
@@ -250,10 +255,15 @@ file ID and extracts their text through a Files API.
 +
 +
 +async def _is_sendable_document(file, user) -> bool:
-+    """A stored document the user can read; images keep their image_url parts, audio and video their transcripts."""
++    """A stored document of a type the Files API extracts that the user can read.
++
++    Images keep their image_url parts, audio and video their transcripts, and other files the text
++    Open WebUI extracts, which a model reading file IDs could not read from the Files API.
++    """
 +    content_type = ((file.meta or {}).get('content_type') or '').split(';')[0].strip().lower()
 +    return (
 +        bool(file.path)
++        and is_files_api_type(file.filename)
 +        and not (is_raster_image_content_type(content_type) or content_type.startswith(('audio/', 'video/')))
 +        and (file.user_id == user.id or user.role == 'admin' or await has_access_to_file(file.id, 'read', user))
 +    )

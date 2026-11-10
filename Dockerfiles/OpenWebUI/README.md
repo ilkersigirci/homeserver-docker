@@ -54,22 +54,23 @@ every build.
 | `OPENAI_FILES_API_BASE_URL` | Files API base URL, including `/v1`; both features need it. |
 | `OPENAI_FILES_API_KEY` | Key used unless the OpenAI connection with the same base URL uses `system_oauth`. |
 | `OPENAI_FILES_API_PARAMS` | JSON object of string query parameters for every Files API request, such as `{"provider":"litellm_proxy"}` to select LiteLLM's `files_settings` entry. |
-| `OPENAI_FILES_API_MODELS_REGEX_PATTERN` | Model IDs that receive documents by file ID, such as `^langflow/`; a workspace model matches by its base model. Empty, invalid, or set without a base URL sends none; the last two log an error at startup. |
+| `OPENAI_FILES_API_MODELS_REGEX_PATTERN` | Model IDs that receive `OPENAI_FILES_API_FILE_EXTENSIONS` documents by file ID, such as `^langflow/`; a workspace model matches by its base model. Empty, invalid, or set without a base URL sends none; the last two log an error at startup. |
 | `OPENAI_FILES_API_TIMEOUT` | Seconds each Files API request may take, and the longest wait for a document's text extraction; default `300`. |
-| `OPENAI_FILES_API_FILE_EXTENSIONS` | Comma-separated extensions the `openai_files` engine sends to the Files API, as upstream's `MINERU_FILE_EXTENSIONS` does for its `mineru` engine; default `pdf,docx,doc,pptx,ppt,xlsx,xls`. Extend it as files-api extracts more types. |
+| `OPENAI_FILES_API_FILE_EXTENSIONS` | Comma-separated extensions of the document types files-api extracts: the `openai_files` engine extracts them there, and matching models receive them by file ID. Other files keep Open WebUI's handling, as upstream's `MINERU_FILE_EXTENSIONS` does for its `mineru` engine; default `pdf,docx,doc,pptx,ppt,xlsx,xls`. Extend it as files-api extracts more types. |
 | `CONTENT_EXTRACTION_ENGINE` | `openai_files` extracts those uploads' text through the Files API; without a base URL, their processing fails. |
 
 ### Sending files by ID
 
 Open WebUI uploads a file the first time it needs one, with
 `purpose=user_data`, and keeps the returned ID in the file's metadata. In a
-saved chat, each user message sent to a matching model carries its documents
-as standard Chat `file` parts with that ID. A connection with
+saved chat, each user message sent to a matching model carries its listed
+documents as standard Chat `file` parts with that ID. A connection with
 `"api_type": "responses"` sends them as `input_file`, and so does LiteLLM for a
 deployment with `model_info.mode: responses`, such as a Langflow flow. Open
 WebUI's retrieval and file tools leave those documents out.
 
-Open WebUI handles the rest as usual: images, audio, and video; files the user
+Open WebUI handles the rest as usual: images, audio, and video; other files,
+whose text it extracts itself, since the Files API could not; files the user
 cannot read; documents whose upload fails, which it logs; and temporary chats,
 whose messages carry no files. A file has one ID, sent for every user who can
 read the file, so the Files API must accept any user's request for it, as
