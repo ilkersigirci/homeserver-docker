@@ -40,20 +40,16 @@ def main() -> None:
                 assert not any(
                     alias.name.startswith("litellm_enterprise") for alias in node.names
                 ), path
+        # UserRepository.upsert_user caps new users at five only inside this scope.
+        assert not any(
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "free_sso_user_creation"
+            for node in ast.walk(tree)
+        ), f"{path} still applies the free-tier SSO user cap"
 
     sso = root / "litellm/proxy/management_endpoints/ui_sso.py"
-    tree = ast.parse(sso.read_text())
-    login = next(
-        node
-        for node in tree.body
-        if isinstance(node, ast.AsyncFunctionDef) and node.name == "google_login"
-    )
-    assert not any(
-        isinstance(node, ast.Attribute) and node.attr == "count_billable_users"
-        for node in ast.walk(login)
-    ), "SSO login still counts users for the free-tier gate"
-    assert "free SSO user" not in sso.read_text()
-    assert "_raise_if_sso_exceeds_free_user_limit" not in sso.read_text()
+    assert "count_billable_users" not in sso.read_text(), "SSO still counts users for the free-tier gate"
     print("OSS source and SSO checks passed")
 
 

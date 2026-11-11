@@ -10,7 +10,7 @@ Removal check: tests/verify_background.py
 diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/response_api_endpoints/endpoints.py
 --- a/litellm/proxy/response_api_endpoints/endpoints.py
 +++ b/litellm/proxy/response_api_endpoints/endpoints.py
-@@ -832,6 +832,8 @@ async def get_response(
+@@ -930,6 +930,8 @@ async def get_response(
          fastapi_response=fastapi_response,
          read_settles_billing=read_settles_billing,
      )
@@ -19,14 +19,10 @@ diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/r
      return response
 
 
-@@ -1730,8 +1732,10 @@ async def cancel_response(
+@@ -1974,6 +1976,8 @@ async def cancel_response(
          fastapi_response=fastapi_response,
          read_settles_billing=read_settles_billing,
      )
 +    if isinstance(response, ResponsesAPIResponse):
 +        response.id = response_id
      return response
-
-
- def _resolve_responses_ws_session_limit_seconds() -> float:
-     from litellm.proxy.proxy_server import general_settings

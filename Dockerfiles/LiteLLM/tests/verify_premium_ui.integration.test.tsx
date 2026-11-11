@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import KeysPanel from "@/components/chat/KeysPanel";
@@ -10,10 +10,8 @@ import {
 import {
   getCallbackConfigsCall,
   getCallbacksCall,
-  getPassThroughEndpointsCall,
   keyListCall,
 } from "@/components/networking";
-import PassThroughSettings from "@/components/PassThroughSettings/PassThroughSettings";
 import Settings from "@/components/settings";
 import { renderWithProviders } from "./test-utils";
 
@@ -24,49 +22,12 @@ vi.mock("@/components/networking", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/components/networking")>()),
   keyListCall: vi.fn(),
   regenerateKeyCall: vi.fn(),
-  getPassThroughEndpointsCall: vi.fn(),
-  deletePassThroughEndpointsCall: vi.fn(),
   getCallbacksCall: vi.fn(),
   getCallbackConfigsCall: vi.fn(),
   setCallbacksCall: vi.fn(),
   serviceHealthCheck: vi.fn(),
   deleteCallback: vi.fn(),
   alertingSettingsCall: vi.fn().mockResolvedValue([]),
-}));
-
-const passThroughProps = vi.hoisted(() => ({ add: vi.fn(), info: vi.fn() }));
-
-vi.mock("@/components/add_pass_through", () => ({
-  default: (props: { premiumUser?: boolean }) => {
-    passThroughProps.add(props);
-    return <div data-testid="add-pass-through" />;
-  },
-}));
-
-vi.mock("@/components/pass_through_info", () => ({
-  default: (props: { premiumUser?: boolean }) => {
-    passThroughProps.info(props);
-    return <div data-testid="endpoint-info" />;
-  },
-}));
-
-vi.mock("@/components/PassThroughSettings/PassThroughEndpointsTable", () => ({
-  PassThroughEndpointsTable: (props: {
-    endpoints: { id?: string }[];
-    onEndpointClick: (id: string) => void;
-  }) => (
-    <div>
-      {props.endpoints.map((endpoint) => (
-        <button
-          key={endpoint.id}
-          type="button"
-          onClick={() => endpoint.id && props.onEndpointClick(endpoint.id)}
-        >
-          open-{endpoint.id}
-        </button>
-      ))}
-    </div>
-  ),
 }));
 
 vi.mock("@/components/alerting/alerting_settings", () => ({
@@ -159,41 +120,6 @@ describe("chat key rotation", () => {
     );
 
     expect(await screen.findByRole("button", { name: /Rotate/ })).toBeEnabled();
-  });
-});
-
-describe("pass-through endpoint auth", () => {
-  it("lets the create and edit forms set auth", async () => {
-    const user = userEvent.setup();
-    vi.mocked(getPassThroughEndpointsCall).mockResolvedValue({
-      endpoints: [
-        {
-          id: "ep-1",
-          path: "/v1/rerank",
-          target: "https://example.com",
-          headers: {},
-        },
-      ],
-    });
-    render(
-      <PassThroughSettings
-        accessToken="token"
-        userRole="Admin"
-        userID="user-1"
-        premiumUser={false}
-      />,
-    );
-
-    await waitFor(() => expect(passThroughProps.add).toHaveBeenCalled());
-    expect(passThroughProps.add).toHaveBeenLastCalledWith(
-      expect.objectContaining({ premiumUser: true }),
-    );
-
-    await user.click(await screen.findByRole("button", { name: "open-ep-1" }));
-    await waitFor(() => expect(passThroughProps.info).toHaveBeenCalled());
-    expect(passThroughProps.info).toHaveBeenLastCalledWith(
-      expect.objectContaining({ premiumUser: true }),
-    );
   });
 });
 

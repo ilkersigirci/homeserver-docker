@@ -37,7 +37,8 @@ COMPLETED = {
 }
 
 
-async def _check_route_forwards_the_parameters() -> None:
+async def _forwarded_retrieve_data() -> dict[str, object]:
+    """Return what the retrieve route hands the proxy's request processing."""
     forwarded: dict[str, object] = {}
 
     async def process(
@@ -75,12 +76,13 @@ async def _check_route_forwards_the_parameters() -> None:
             fastapi_response=Response(),
             user_api_key_dict=UserAPIKeyAuth(),
         )
-
-    assert forwarded["stream"] is True
-    assert forwarded["starting_after"] == "2"
+    return forwarded
 
 
-async def _check_handler_streams_the_provider_events() -> None:
+async def _check_retrieve_streams_the_provider_events() -> None:
+    # The route's data reaches aget_responses as call kwargs, whichever form the
+    # route forwards stream and starting_after in.
+    forwarded = await _forwarded_retrieve_data()
     requests: list[httpx.Request] = []
 
     def provider(request: httpx.Request) -> httpx.Response:
@@ -97,12 +99,10 @@ async def _check_handler_streams_the_provider_events() -> None:
     client = AsyncHTTPHandler()
     client.client = httpx.AsyncClient(transport=httpx.MockTransport(provider))
     stream = await litellm.aget_responses(
-        response_id="resp_provider",
+        **{**forwarded, "response_id": "resp_provider"},
         custom_llm_provider="openai",
         api_base="http://provider/v1",
         api_key="key",
-        stream=True,
-        starting_after="2",
         client=client,
     )
     events = [event async for event in stream]
@@ -115,8 +115,7 @@ async def _check_handler_streams_the_provider_events() -> None:
 
 
 async def main() -> None:
-    await _check_route_forwards_the_parameters()
-    await _check_handler_streams_the_provider_events()
+    await _check_retrieve_streams_the_provider_events()
     print("Responses retrieve stream check passed")
 
 

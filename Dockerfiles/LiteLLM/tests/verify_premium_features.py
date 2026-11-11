@@ -101,6 +101,7 @@ async def _verify_audit_logs() -> None:
 
     repository = MagicMock()
     repository.return_value.table.create = AsyncMock()
+    repository.return_value.table.create_many = AsyncMock()
     entry = LiteLLM_AuditLogs(
         id="audit-1",
         updated_at=litellm.utils.get_utc_datetime(),
@@ -114,7 +115,11 @@ async def _verify_audit_logs() -> None:
         patch.object(audit_logs, "AuditLogRepository", repository),
     ):
         await audit_logs.create_audit_log_for_update(entry)
+        # /key/delete writes its rows through the bulk writer.
+        await audit_logs.create_audit_logs_for_updates([entry])
+        await audit_logs.drain_audit_tasks()
     repository.return_value.table.create.assert_awaited_once()
+    repository.return_value.table.create_many.assert_awaited_once()
 
 
 async def _verify_region_outage_alert_setting() -> None:

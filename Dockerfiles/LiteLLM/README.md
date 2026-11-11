@@ -58,10 +58,6 @@ the patch changes, and its removal check.
   Responses WebSocket per-model budgets
 - [`responses-background.patch`](patches/temporary/responses-background.patch):
   background Response IDs on retrieve and cancel
-- [`responses-retrieve-stream.patch`](patches/temporary/responses-retrieve-stream.patch):
-  resuming a background Response's stream
-- [`responses-background-lifecycle.patch`](patches/temporary/responses-background-lifecycle.patch):
-  a background Response's lifecycle events before its first output
 - [`responses-streaming.patch`](patches/temporary/responses-streaming.patch):
   wildcard native streaming
 - [`responses-logging.patch`](patches/temporary/responses-logging.patch):
@@ -72,8 +68,6 @@ the patch changes, and its removal check.
   provider trace context
 - [`files-settings-routing.patch`](patches/temporary/files-settings-routing.patch):
   files_settings on file retrieve, content, delete, and list
-- [`key-delete-eviction.patch`](patches/temporary/key-delete-eviction.patch):
-  `/key/delete` eviction on other workers and components
 
 At each LiteLLM upgrade, test the pinned release without each workaround. Remove
 a patch, its source hashes, and its entry above only when its removal check
@@ -144,9 +138,15 @@ Valkey is required even with one replica each, because the gateway and backend
 are separate processes. Through the `REDIS_*` settings, LiteLLM shares rate
 limits, spend counters, auth cache invalidation, SSO PKCE state, and job locks.
 A key deleted, blocked, or changed on the backend takes effect on every gateway
-at once; [`key-delete-eviction.patch`](patches/temporary/key-delete-eviction.patch)
-covers deletion. If Valkey is unreachable at startup, LiteLLM logs a warning and
-keeps that state per process.
+at once. If Valkey is unreachable at startup, LiteLLM logs a warning and keeps
+that state per process.
+
+Both files set `LITELLM_OFFLINE_MODE`, so LiteLLM fetches nothing on its own:
+the model cost map, Anthropic beta headers, blog posts, policy templates, and
+auto-router presets come from the image's LiteLLM release, and the
+latest-release check, breached-password check, and Hugging Face tokenizer
+downloads are skipped (those token counts fall back to tiktoken). Configured
+destinations, such as LLM providers and the identity provider, are unaffected.
 
 Both files use the same database and configuration; include only one per host.
 When switching, remove the old containers, for example with

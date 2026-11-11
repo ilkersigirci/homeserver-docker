@@ -29,9 +29,9 @@ diff --git a/litellm/integrations/otel/logger.py b/litellm/integrations/otel/log
 
  import litellm
 @@ -98,6 +99,7 @@ if TYPE_CHECKING:
+         StandardLoggingPayload,
      )
 
- LITELLM_TRACER_NAME: Final = "litellm"
 +_TRACE_CONTEXT_PROPAGATOR: Final = TraceContextTextMapPropagator()
  _published_v2_provider: ApiTracerProvider | None = None
 
@@ -53,7 +53,7 @@ diff --git a/litellm/integrations/otel/logger.py b/litellm/integrations/otel/log
  class _CustomLoggerOptions(TypedDict, total=False, extra_items=object):
      pass
 
-@@ -346,6 +358,7 @@ class OpenTelemetryV2(CustomLogger):
+@@ -349,6 +361,7 @@ class OpenTelemetryV2(CustomLogger):
                  tracer=route.tracer,
                  links=_request_trace_links(parent_context) if route.detached else None,
              )

@@ -26,7 +26,7 @@ Checks: tests/verify_jwt_auth.py
 diff --git a/litellm/proxy/auth/user_api_key_auth.py b/litellm/proxy/auth/user_api_key_auth.py
 --- a/litellm/proxy/auth/user_api_key_auth.py
 +++ b/litellm/proxy/auth/user_api_key_auth.py
-@@ -2239,15 +2239,6 @@ async def user_api_key_auth_builder(
+@@ -2311,15 +2311,6 @@ async def user_api_key_auth_builder(
              is_jwt = jwt_handler.is_jwt(token=api_key)
              verbose_proxy_logger.debug("is_jwt: %s", is_jwt)
              if is_jwt:
@@ -42,7 +42,7 @@ diff --git a/litellm/proxy/auth/user_api_key_auth.py b/litellm/proxy/auth/user_a
                  # Try JWT-to-Virtual-Key mapping first to avoid
                  # unnecessary DB queries in auth_builder
                  do_standard_jwt_auth = True
-@@ -2354,6 +2345,24 @@ async def user_api_key_auth_builder(
+@@ -2426,6 +2417,24 @@ async def user_api_key_auth_builder(
                              detail=f"User={user_id} has been deactivated via SCIM. Keys owned by this user cannot be used.",
                          )
 
@@ -67,10 +67,10 @@ diff --git a/litellm/proxy/auth/user_api_key_auth.py b/litellm/proxy/auth/user_a
                      if is_proxy_admin:
                          # Proxy admins authenticate via auth_builder (full
                          # access), not via a mapped virtual key. If
-diff --git a/litellm/proxy/_experimental/mcp_server/auth/user_api_key_auth_mcp.py b/litellm/proxy/_experimental/mcp_server/auth/user_api_key_auth_mcp.py
---- a/litellm/proxy/_experimental/mcp_server/auth/user_api_key_auth_mcp.py
-+++ b/litellm/proxy/_experimental/mcp_server/auth/user_api_key_auth_mcp.py
-@@ -302,7 +302,7 @@ def _identity_check(token: str, route: str, settings: Mapping[str, object]) -> _
+diff --git a/litellm/proxy/mcp_server/auth/user_api_key_auth_mcp.py b/litellm/proxy/mcp_server/auth/user_api_key_auth_mcp.py
+--- a/litellm/proxy/mcp_server/auth/user_api_key_auth_mcp.py
++++ b/litellm/proxy/mcp_server/auth/user_api_key_auth_mcp.py
+@@ -310,7 +310,7 @@ def _identity_check(token: str, route: str, settings: Mapping[str, object]) -> _
          return "oauth2" if premium_user is True else None
      if settings.get("enable_oauth2_proxy_auth") is True:
          return "oauth2_proxy"
@@ -92,7 +92,7 @@ diff --git a/litellm/proxy/auth/handle_jwt.py b/litellm/proxy/auth/handle_jwt.py
 
          verbose_proxy_logger.debug("header: %s", header)
 
-@@ -2942,20 +2945,7 @@ class JWTAuthManager:
+@@ -2958,20 +2961,7 @@ class JWTAuthManager:
                  team_allowed_routes=handler.litellm_jwtauth.team_allowed_routes,
              ):
                  JWTAuthManager._raise_team_passthrough_route_denial(route=route, team_object=team_object)
@@ -114,7 +114,7 @@ diff --git a/litellm/proxy/auth/handle_jwt.py b/litellm/proxy/auth/handle_jwt.py
          elif provisional_header_team is not None and selected_team_id == provisional_header_team.team_id:
              JWTAuthManager._validate_header_team_in_db_membership(
                  team_id=selected_team_id,
-@@ -3048,6 +3038,8 @@ class JWTAuthManager:
+@@ -3064,6 +3054,8 @@ class JWTAuthManager:
              user_tpm_limit=user.tpm_limit if user is not None and not admin else None,
              user_rpm_limit=user.rpm_limit if user is not None and not admin else None,
              user_model_max_budget=user.model_max_budget if user is not None and not admin else None,

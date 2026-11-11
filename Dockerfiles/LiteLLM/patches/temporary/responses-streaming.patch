@@ -15,31 +15,23 @@ Removal check: tests/verify_streaming.py
 diff --git a/litellm/responses/main.py b/litellm/responses/main.py
 --- a/litellm/responses/main.py
 +++ b/litellm/responses/main.py
-@@ -1546,6 +1546,12 @@ def responses(
+@@ -1822,8 +1822,17 @@ def responses(
          if custom_llm_provider is None:
              raise ValueError("custom_llm_provider is required but passed as None")
 
+-        fake_stream: Final = responses_api_provider_config.should_fake_stream(
+-            model=model, stream=stream, custom_llm_provider=custom_llm_provider
 +        # A wildcard deployment's resolved model may be missing from the model cost
 +        # map, which reads as "no native streaming"; its explicit model_info decides.
 +        native_streaming: Final = (
 +            deployment_model_info.get("supports_native_streaming") if isinstance(deployment_model_info, dict) else None
 +        )
-+
-         response = base_llm_http_handler.response_api_handler(
-             model=model,
-             input=input,
-@@ -1559,8 +1565,12 @@ def responses(
-             timeout=timeout or request_timeout,
-             _is_async=_is_async,
-             client=kwargs.get("client"),
--            fake_stream=responses_api_provider_config.should_fake_stream(
--                model=model, stream=stream, custom_llm_provider=custom_llm_provider
-+            fake_stream=(
-+                not native_streaming
-+                if stream is True and isinstance(native_streaming, bool)
-+                else responses_api_provider_config.should_fake_stream(
-+                    model=model, stream=stream, custom_llm_provider=custom_llm_provider
-+                )
-             ),
-             litellm_metadata=kwargs.get("litellm_metadata", {}),
-             shared_session=kwargs.get("shared_session"),
++        fake_stream: Final = (
++            not native_streaming
++            if stream is True and isinstance(native_streaming, bool)
++            else responses_api_provider_config.should_fake_stream(
++                model=model, stream=stream, custom_llm_provider=custom_llm_provider
++            )
+         )
+         applied_timeout: Final = CompletionTimeout.for_stream(
+             (StreamKind.FAKED if fake_stream else StreamKind.LIVE) if stream is True else StreamKind.NOT_STREAMED,

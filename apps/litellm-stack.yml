@@ -32,6 +32,7 @@ x-litellm-env: &litellm-env
   SSL_VERIFY: ${LITELLM_SSL_VERIFY:-true}
   STORE_MODEL_IN_DB: "true"
   STORE_PROMPTS_IN_SPEND_LOGS: "true"
+  LITELLM_OFFLINE_MODE: "true" # NOTE: Bundled cost map and catalogs; no self-initiated fetches.
   CONFIG_FILE_PATH: /app/litellm-config/config.yaml
   DATABASE_URL: postgresql://litellm:${LITELLM_DATABASE_PASSWORD}@litellm-db:5432/litellm
   DISABLE_SCHEMA_UPDATE: "true" # NOTE: litellm-migrate applies schema migrations.
@@ -155,7 +156,7 @@ services:
     mem_limit: "1G"
     environment:
       DATABASE_URL: postgresql://litellm:${LITELLM_DATABASE_PASSWORD}@litellm-db:5432/litellm
-      LITELLM_LOCAL_MODEL_COST_MAP: "true" # NOTE: No egress on litellm_backend.
+      LITELLM_OFFLINE_MODE: "true" # NOTE: No egress on litellm_backend.
 
   # LLM API (data plane): inference, models, files, responses, realtime.
   litellm-gateway:

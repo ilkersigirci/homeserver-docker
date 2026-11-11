@@ -13,15 +13,15 @@ Removal check: tests/verify_responses_disconnect.py
 diff --git a/litellm/proxy/common_request_processing.py b/litellm/proxy/common_request_processing.py
 --- a/litellm/proxy/common_request_processing.py
 +++ b/litellm/proxy/common_request_processing.py
-@@ -128,6 +128,7 @@ from litellm.proxy.utils import (  # noqa: F401  # legacy module exports
-     _check_and_merge_model_level_guardrails,  # pyright: ignore[reportPrivateUsage,reportUnusedImport]  # backwards-compatible package export
+@@ -145,6 +145,7 @@ from litellm.proxy.utils import (  # noqa: F401  # legacy module exports
      check_and_merge_model_level_guardrails,
  )
+ from litellm.responses.mcp.parked_stream_dispatch import in_flight_round_biller, parked_success
 +from litellm.responses.streaming_iterator import BaseResponsesAPIStreamingIterator
- from litellm.responses.streaming_iterator import partial_responses_incomplete_event_on_disconnect
+ from litellm.responses.streaming_iterator import partial_responses_incomplete_event_on_disconnect, spawn_logging_task
  from litellm.router import Router
- from litellm.router_utils.add_retry_fallback_headers import get_hidden_params_dict
-@@ -508,6 +509,41 @@ async def _dispatch_disconnect_billing_event(logging_obj: LiteLLMLoggingObj, par
+ from litellm.router_api import RoutingContext
+@@ -563,6 +564,41 @@ async def _dispatch_disconnect_billing_event(logging_obj: LiteLLMLoggingObj, par
      return True
 
 
@@ -63,7 +63,7 @@ diff --git a/litellm/proxy/common_request_processing.py b/litellm/proxy/common_r
  async def _cancel_pending_gather_tasks(tasks: Sequence["asyncio.Task[object]"]) -> None:
      pending_tasks: Final = [task for task in tasks if not task.done()]
      for task in pending_tasks:
-@@ -4305,7 +4341,10 @@ class ProxyBaseLLMRequestProcessing:
+@@ -4598,7 +4634,10 @@ class ProxyBaseLLMRequestProcessing:
                      and proxy_logging_obj is not None
                      and user_api_key_dict is not None
                  ):

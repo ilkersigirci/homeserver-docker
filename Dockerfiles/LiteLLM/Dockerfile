@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.25@sha256:0adf442eae370b6087e08edc7c50b552d80ddf261576f4ebd6421006b2461f12
 # renovate: datasource=github-tags depName=BerriAI/litellm
-ARG IMAGE_VERSION=1.108.0
-ARG UPSTREAM_COMMIT=b48077ff9ef6b14dd3f188d020ee7f40e2c5ebca
+ARG IMAGE_VERSION=1.109.0
+ARG UPSTREAM_COMMIT=55c9c6af17a9acc4b46e707e8761c4592d0e0954
 # Upstream's in-container PgBouncer (LITELLM_PGBOUNCER_ENABLED), as pinned upstream.
 ARG PGBOUNCER_VERSION=1.26.0
 ARG PGBOUNCER_SHA256=afd25dd61ee6775d37b40629b87ce08736b3e6955f3057bb212e410fbf21c71d
@@ -99,7 +99,7 @@ RUN chmod -R a+rX /opt/prisma \
     && test -f /opt/prisma/binaries/node_modules/prisma/build/index.js \
     && python3 -c "from prisma.client import BINARY_PATHS; paths = list(BINARY_PATHS.query_engine.values()); assert paths and all(p.startswith('/opt/prisma/') for p in paths), paths" \
     && for check in /tmp/litellm-checks/verify_*.py; do \
-        LITELLM_LOCAL_MODEL_COST_MAP=true python3 "$check" || exit 1; \
+        LITELLM_OFFLINE_MODE=true python3 "$check" || exit 1; \
     done \
     && python3 -c "import onelogin.saml2.auth, aws_sdk_bedrock_runtime" \
     && pgbouncer --version > /dev/null \

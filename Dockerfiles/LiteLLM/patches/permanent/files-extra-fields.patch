@@ -15,63 +15,10 @@ objects.
 
 Checks: tests/verify_files_extra_fields.py
 
-diff --git a/litellm/files/main.py b/litellm/files/main.py
-index 94fdb41..df744b2 100644
---- a/litellm/files/main.py
-+++ b/litellm/files/main.py
-@@ -219,6 +219,7 @@ def create_file(
-                 expires_after=expires_after,
-                 extra_headers=extra_headers,
-                 extra_body=extra_body,
-+                extra_query=kwargs.get("extra_query"),
-             )
-         else:
-             _create_file_request = CreateFileRequest(
-@@ -226,6 +227,7 @@ def create_file(
-                 purpose=purpose,
-                 extra_headers=extra_headers,
-                 extra_body=extra_body,
-+                extra_query=kwargs.get("extra_query"),
-             )
-
-         provider_config: Final = ProviderConfigManager.get_provider_files_config(
-@@ -381,6 +383,7 @@ def file_retrieve(
-                 organization=optional_params.organization,
-             )
-             response = openai_files_instance.retrieve_file(
-+                extra_query=kwargs.get("extra_query"),
-                 file_id=file_id,
-                 _is_async=_is_async,
-                 api_base=openai_creds.api_base,
-@@ -562,6 +565,7 @@ def file_delete(
-                 organization=optional_params.organization,
-             )
-             response = openai_files_instance.delete_file(
-+                extra_query=kwargs.get("extra_query"),
-                 file_id=file_id,
-                 _is_async=_is_async,
-                 api_base=openai_creds.api_base,
-@@ -768,6 +772,7 @@ def file_list(
-                 organization=optional_params.organization,
-             )
-             response = openai_files_instance.list_files(
-+                extra_query=kwargs.get("extra_query"),
-                 purpose=purpose,
-                 _is_async=_is_async,
-                 api_base=openai_creds.api_base,
-@@ -909,6 +914,7 @@ def file_content(
-             file_id=file_id,
-             extra_headers=extra_headers,
-             extra_body=extra_body,
-+            extra_query=kwargs.get("extra_query"),
-         )
-
-         _is_async: Final = kwargs.pop("afile_content", False) is True
 diff --git a/litellm/llms/openai/openai.py b/litellm/llms/openai/openai.py
-index a782bf3..c8bc076 100644
 --- a/litellm/llms/openai/openai.py
 +++ b/litellm/llms/openai/openai.py
-@@ -1938,8 +1938,9 @@ class OpenAIFilesAPI(BaseLLM):
+@@ -2036,8 +2036,9 @@ class OpenAIFilesAPI(BaseLLM):
          self,
          file_id: str,
          openai_client: AsyncOpenAI,
@@ -82,15 +29,15 @@ index a782bf3..c8bc076 100644
          return response
 
      def retrieve_file(
-@@ -1952,6 +1953,7 @@ class OpenAIFilesAPI(BaseLLM):
-         max_retries: int | None,
+@@ -2051,6 +2052,7 @@ class OpenAIFilesAPI(BaseLLM):
          organization: str | None,
          client: OpenAI | AsyncOpenAI | None = None,
+         litellm_params: Mapping[str, object] | None = None,
 +        extra_query: Mapping[str, object] | None = None,
      ):
          openai_client: Final[OpenAI | AsyncOpenAI | None] = self.get_openai_client(
              api_key=api_key,
-@@ -1975,8 +1977,9 @@ class OpenAIFilesAPI(BaseLLM):
+@@ -2075,8 +2077,9 @@ class OpenAIFilesAPI(BaseLLM):
              return self.aretrieve_file(
                  file_id=file_id,
                  openai_client=openai_client,
@@ -101,7 +48,7 @@ index a782bf3..c8bc076 100644
 
          return response
 
-@@ -1984,8 +1987,9 @@ class OpenAIFilesAPI(BaseLLM):
+@@ -2084,8 +2087,9 @@ class OpenAIFilesAPI(BaseLLM):
          self,
          file_id: str,
          openai_client: AsyncOpenAI,
@@ -112,15 +59,15 @@ index a782bf3..c8bc076 100644
          return response
 
      def delete_file(
-@@ -1998,6 +2002,7 @@ class OpenAIFilesAPI(BaseLLM):
-         max_retries: int | None,
+@@ -2099,6 +2103,7 @@ class OpenAIFilesAPI(BaseLLM):
          organization: str | None,
          client: OpenAI | AsyncOpenAI | None = None,
+         litellm_params: Mapping[str, object] | None = None,
 +        extra_query: Mapping[str, object] | None = None,
      ):
          openai_client: Final[OpenAI | AsyncOpenAI | None] = self.get_openai_client(
              api_key=api_key,
-@@ -2021,8 +2026,9 @@ class OpenAIFilesAPI(BaseLLM):
+@@ -2123,8 +2128,9 @@ class OpenAIFilesAPI(BaseLLM):
              return self.adelete_file(
                  file_id=file_id,
                  openai_client=openai_client,
@@ -131,7 +78,7 @@ index a782bf3..c8bc076 100644
 
          return response
 
-@@ -2030,11 +2036,12 @@ class OpenAIFilesAPI(BaseLLM):
+@@ -2132,11 +2138,12 @@ class OpenAIFilesAPI(BaseLLM):
          self,
          openai_client: AsyncOpenAI,
          purpose: str | None = None,
@@ -146,15 +93,15 @@ index a782bf3..c8bc076 100644
          return response
 
      def list_files(
-@@ -2047,6 +2054,7 @@ class OpenAIFilesAPI(BaseLLM):
-         organization: str | None,
+@@ -2150,6 +2157,7 @@ class OpenAIFilesAPI(BaseLLM):
          purpose: str | None = None,
          client: OpenAI | AsyncOpenAI | None = None,
+         litellm_params: Mapping[str, object] | None = None,
 +        extra_query: Mapping[str, object] | None = None,
      ):
          openai_client: Final[OpenAI | AsyncOpenAI | None] = self.get_openai_client(
              api_key=api_key,
-@@ -2070,12 +2078,13 @@ class OpenAIFilesAPI(BaseLLM):
+@@ -2174,12 +2182,13 @@ class OpenAIFilesAPI(BaseLLM):
              return self.alist_files(
                  purpose=purpose,
                  openai_client=openai_client,
@@ -171,10 +118,9 @@ index a782bf3..c8bc076 100644
          return response
 
 diff --git a/litellm/proxy/openai_files_endpoints/files_endpoints.py b/litellm/proxy/openai_files_endpoints/files_endpoints.py
-index bdc7190..747e55f 100644
 --- a/litellm/proxy/openai_files_endpoints/files_endpoints.py
 +++ b/litellm/proxy/openai_files_endpoints/files_endpoints.py
-@@ -23,6 +23,7 @@ from fastapi import (
+@@ -26,6 +26,7 @@ from fastapi import (
      status,
  )
  from pydantic import TypeAdapter
@@ -182,7 +128,7 @@ index bdc7190..747e55f 100644
  from typing_extensions import ReadOnly
 
  import litellm
-@@ -185,6 +186,29 @@ class UploadedFileInfo(TypedDict):
+@@ -193,6 +194,29 @@ class UploadedFileInfo(TypedDict):
  files_config = None
 
 
@@ -212,7 +158,7 @@ index bdc7190..747e55f 100644
  def set_files_config(config):
      global files_config
      if config is None:
-@@ -690,6 +714,8 @@ async def create_file(
+@@ -698,6 +722,8 @@ async def create_file(
          # Parse expires_after if provided
          expires_after: FileExpiresAfter | None = None
          form_data_raw: Final = await request.form()
@@ -221,7 +167,7 @@ index bdc7190..747e55f 100644
          form_data_dict: Final[Mapping[str, object]] = dict(form_data_raw)
          extracted_litellm_metadata: Final[Mapping[str, object] | None] = extract_nested_form_metadata(
              form_data=form_data_dict, prefix="litellm_metadata["
-@@ -985,7 +1011,7 @@ async def get_file_content(
+@@ -993,7 +1019,7 @@ async def get_file_content(
          version,
      )
 
@@ -230,7 +176,7 @@ index bdc7190..747e55f 100644
      try:
          await validate_managed_id_requirement(
              resource_id=file_id,
-@@ -1295,7 +1321,7 @@ async def get_file(
+@@ -1299,7 +1325,7 @@ async def get_file(
          version,
      )
 
@@ -239,7 +185,7 @@ index bdc7190..747e55f 100644
      try:
          await validate_managed_id_requirement(
              resource_id=file_id,
-@@ -1496,7 +1522,7 @@ async def delete_file(
+@@ -1500,7 +1526,7 @@ async def delete_file(
          version,
      )
 
@@ -248,7 +194,7 @@ index bdc7190..747e55f 100644
      try:
          await validate_managed_id_requirement(
              resource_id=file_id,
-@@ -1722,7 +1748,7 @@ async def list_files(
+@@ -1907,7 +1933,7 @@ async def list_files(
          version,
      )
 
@@ -258,10 +204,9 @@ index bdc7190..747e55f 100644
          validate_file_list_limit(limit)
 
 diff --git a/litellm/types/llms/openai.py b/litellm/types/llms/openai.py
-index cd77d60..52150f3 100644
 --- a/litellm/types/llms/openai.py
 +++ b/litellm/types/llms/openai.py
-@@ -382,6 +382,9 @@ LITELLM_DETAILS_FALLBACK_RESPONSE_FIELD: Final = "litellm_details_fallback"
+@@ -391,6 +391,9 @@ LITELLM_DETAILS_FALLBACK_RESPONSE_FIELD: Final = "litellm_details_fallback"
 
 
  class OpenAIFileObject(LiteLLMBaseModel):
@@ -271,7 +216,7 @@ index cd77d60..52150f3 100644
      id: str
      """The file identifier, which can be referenced in the API endpoints."""
 
-@@ -529,6 +532,7 @@ class CreateFileRequest(TypedDict, total=False):
+@@ -543,6 +546,7 @@ class CreateFileRequest(TypedDict, total=False):
      expires_after: FileExpiresAfter | None
      extra_headers: dict[str, str] | None
      extra_body: dict[str, str] | None
@@ -279,9 +224,62 @@ index cd77d60..52150f3 100644
      timeout: float | None
 
 
-@@ -549,6 +553,7 @@ class FileContentRequest(TypedDict, total=False):
+@@ -563,6 +567,7 @@ class FileContentRequest(TypedDict, total=False):
      file_id: str
      extra_headers: dict[str, str] | None
      extra_body: dict[str, str] | None
 +    extra_query: dict[str, Any] | None
      timeout: float | None
+
+
+diff --git a/litellm/files/main.py b/litellm/files/main.py
+--- a/litellm/files/main.py
++++ b/litellm/files/main.py
+@@ -219,6 +219,7 @@ def create_file(
+                 expires_after=expires_after,
+                 extra_headers=extra_headers,
+                 extra_body=extra_body,
++                extra_query=kwargs.get("extra_query"),
+             )
+         else:
+             _create_file_request = CreateFileRequest(
+@@ -226,6 +227,7 @@ def create_file(
+                 purpose=purpose,
+                 extra_headers=extra_headers,
+                 extra_body=extra_body,
++                extra_query=kwargs.get("extra_query"),
+             )
+
+         provider_config: Final = ProviderConfigManager.get_provider_files_config(
+@@ -390,6 +392,7 @@ def file_retrieve(
+                 organization=optional_params.organization,
+             )
+             response = openai_files_instance.retrieve_file(
++                extra_query=kwargs.get("extra_query"),
+                 file_id=file_id,
+                 _is_async=_is_async,
+                 api_base=openai_creds.api_base,
+@@ -572,6 +575,7 @@ def file_delete(
+                 organization=optional_params.organization,
+             )
+             response = openai_files_instance.delete_file(
++                extra_query=kwargs.get("extra_query"),
+                 file_id=file_id,
+                 _is_async=_is_async,
+                 api_base=openai_creds.api_base,
+@@ -779,6 +783,7 @@ def file_list(
+                 organization=optional_params.organization,
+             )
+             response = openai_files_instance.list_files(
++                extra_query=kwargs.get("extra_query"),
+                 purpose=purpose,
+                 _is_async=_is_async,
+                 api_base=openai_creds.api_base,
+@@ -921,6 +926,7 @@ def file_content(
+             file_id=file_id,
+             extra_headers=extra_headers,
+             extra_body=extra_body,
++            extra_query=kwargs.get("extra_query"),
+         )
+
+         _is_async: Final = kwargs.pop("afile_content", False) is True
