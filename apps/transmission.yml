@@ -3,7 +3,7 @@ services:
   # Diffent GUIs in web home:
   # /combustion-release/ -- /transmission-web-control/ -- /kettu/ -- /flood-for-transmission/
   transmission:
-    image: lscr.io/linuxserver/transmission:4.1.3-r0-ls357@sha256:81787bc706d3833d252e6d8b94545fea46bf2156f616320991a395619a477d2c
+    image: lscr.io/linuxserver/transmission:4.1.4-r0-ls369@sha256:aaf349cd859ca9d5f34f394c56b8097c267a513283698adc4d07ee61d7cb1a85
     container_name: transmission
     restart: $RESTART_POLICY_MEDIA
     profiles:
