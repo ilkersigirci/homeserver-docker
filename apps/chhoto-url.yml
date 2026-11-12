@@ -1,6 +1,6 @@
 services:
   chhoto-url:
-    image: ghcr.io/sintan1729/chhoto-url:7.8.3-alpine@sha256:1f2933a5fb5b88c3ce10b27747f5e591b56f4c5c7d4021a3e84e91df6798b630
+    image: ghcr.io/sintan1729/chhoto-url:7.11.4-alpine@sha256:c68314649b6bfc18dcb376842175e07161ef052b86af98c7fb4a6a6a46d69613
     container_name: chhoto-url
     restart: $RESTART_POLICY_CORE
     tty: true
