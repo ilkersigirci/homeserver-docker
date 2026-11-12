@@ -45,7 +45,7 @@ include:
   - ../apps/forgejo-runner.yml
   - ../apps/hatchet.yml
   - ../apps/langfuse.yml
-  - ../apps/langflow.yml
+  # - ../apps/langflow.yml
   - ../apps/litellm.yml
   - ../apps/cloudbeaver.yml
   - ../apps/jupyterlab.yml
