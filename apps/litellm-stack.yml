@@ -144,7 +144,7 @@ services:
   # patches add no migrations, so this is the upstream image.
   litellm-migrate:
     <<: *litellm-service
-    image: ghcr.io/berriai/litellm-migrations:v1.108.0@sha256:34b56043663c3612513f7a56ce6291a9b5ba60db9378427afe0fb45cd3dfe3ab
+    image: ghcr.io/berriai/litellm-migrations:v1.109.0@sha256:342bdd3c4cf60f1147c7230db9f49a0baf3c68b9d7aaef4ce0c6540924854816
     container_name: litellm-migrate
     restart: "no"
     depends_on:
@@ -161,7 +161,7 @@ services:
   # LLM API (data plane): inference, models, files, responses, realtime.
   litellm-gateway:
     <<: *litellm-service
-    image: ghcr.io/ilkersigirci/homeserver-litellm-gateway:1.108.0@sha256:43b2e5eb7496748117f6842c4e551f2a9b990a5183adc06d98e8fd416c63e1cd
+    image: ghcr.io/ilkersigirci/homeserver-litellm-gateway:1.109.0@sha256:cba37896ea8b640f6446fe29125039a041798fff8668bbabaff333871e4e8a25
     # container_name: litellm-gateway # NOTE: Omit container_name so Compose can run multiple gateway replicas.
     deploy:
       replicas: 1
@@ -236,7 +236,7 @@ services:
   # models, spend, SSO, SCIM, and MCP.
   litellm-backend:
     <<: *litellm-service
-    image: ghcr.io/ilkersigirci/homeserver-litellm-backend:1.108.0@sha256:58e8f584692998c5036bf3e16253dcc7dafb884e8e0717045b803a0884a5492e
+    image: ghcr.io/ilkersigirci/homeserver-litellm-backend:1.109.0@sha256:f537d92a30f827cb7d6b41a734ad7b57ab53dfc4011df8a64798d99e68633c21
     # container_name: litellm-backend # NOTE: Omit container_name so Compose can run multiple backend replicas.
     deploy:
       replicas: 1
@@ -303,7 +303,7 @@ services:
   # Admin UI: the dashboard's static export served by nginx.
   litellm-ui:
     <<: *litellm-service
-    image: ghcr.io/ilkersigirci/homeserver-litellm-ui:1.108.0@sha256:b8f20b6922d948f76822da5f16e00ce89fab3030d3aa471ed4f34c44af8a2e18
+    image: ghcr.io/ilkersigirci/homeserver-litellm-ui:1.109.0@sha256:72dd3260c8aff029603dfe1cfadb8a33aae7ffc58aa0c0d92c6a76a45795a329
     container_name: litellm-ui
     networks:
       - t3_proxy
