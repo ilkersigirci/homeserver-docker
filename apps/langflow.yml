@@ -261,14 +261,7 @@ services:
       LANGFLOW_MAX_FILE_SIZE_UPLOAD: "100"
       TZ: $TZ
     healthcheck:
-      test:
-        [
-          "CMD",
-          "perl",
-          "-MHTTP::Tiny",
-          "-e",
-          "exit(HTTP::Tiny->new(timeout=>3)->get(q(http://127.0.0.1:8080/))->{success} ? 0 : 1)",
-        ]
+      test: ["CMD", "curl", "-fsS", "--max-time", "3", "-o", "/dev/null", "http://127.0.0.1:8080/"]
       interval: 5m
       timeout: 5s
       retries: 3
