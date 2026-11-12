@@ -19,7 +19,7 @@ Optional OpenAI-compatible gateway
 ## Image contents
 
 [`openai-responses.patch`](patches/openai-responses.patch) makes stock
-Langflow 1.12.0's Responses-shaped endpoint wire compatible with standard
+Langflow 1.13.2's Responses-shaped endpoint wire compatible with standard
 OpenAI clients:
 
 - canonical string or message-array `input`, mapped onto Langflow's
@@ -30,31 +30,17 @@ OpenAI clients:
 - OpenAI-standard `Authorization: Bearer` authentication in addition to
   Langflow's `x-api-key`;
 - canonical typed Responses SSE events with monotonic sequence numbers,
-  replacing legacy `response.chunk` data and the `[DONE]` terminator;
-- token events as the authoritative text stream, preventing the duplicated
-  first delta described in
-  [langflow-ai/langflow#10719](https://github.com/langflow-ai/langflow/issues/10719).
+  replacing legacy `response.chunk` data and the `[DONE]` terminator. The
+  image build validates the events against the OpenAI SDK's event models and
+  its stream accumulator;
+- tool calls that the flow already ran kept out of the output unless the
+  caller asks for them, as described in the [endpoint contract](#endpoint-contract).
 
 The image also installs pinned `lfx-openai`, `lfx-openai-compatible`, and
 `langchain-openai`, so these providers work without the host package mount.
 The mount remains available for additional bundles. The **Responses Input**
 and **OpenaiFilesAPI** components are loaded from `/app/custom_components` through
 `LANGFLOW_COMPONENTS_PATH`.
-
-### Temporary S3 attachment backport
-
-[`s3-chat-attachments.patch`](patches/s3-chat-attachments.patch) backports the
-production changes from [langflow-ai/langflow#15249](https://github.com/langflow-ai/langflow/pull/15249)
-(merge commit `d9f36c06f448790b2cad5666407333e5c1d13e1e`, included in source
-release 1.12.3). It fixes Playground attachments being silently omitted when
-`LANGFLOW_STORAGE_TYPE=s3`, using native storage helpers for images and documents.
-
-**Remove this backport when upgrading the pinned `langflowai/langflow-backend`
-image to a published tag that includes #15249.** Confirm the fix is present in
-the image's installed LFX code; a GitHub source release alone is insufficient.
-Delete the patch and its Dockerfile copy, application, and cleanup entries,
-then remove this section. Patch application is strict so an upstream code
-change or an already-applied fix stops the build for review.
 
 ## Browser login
 
@@ -94,20 +80,35 @@ OpenAI-compatible `/models` endpoint, so clients and gateways need the
 Responses API and an explicit model mapping. Input supports text and file-ID
 references. Caller-provided tools and `input_image` are not supported, so
 disable tool calling and native image input for Langflow-backed models in
-clients such as Open WebUI. Gateways may forward caller headers, so the
+clients such as Open WebUI.
+
+Tools that the flow's components run are part of the flow, not tools the
+caller selected. OpenAI clients run every `function_call` they receive, and
+LiteLLM's Chat Completions bridge turns them into `tool_calls` that Open WebUI
+would try to run, so the response carries only the answer. To receive the
+flow's tool calls, send Langflow's `"include": ["tool_call.results"]`. Each
+result then arrives as a Langflow `tool_call` item: after the assistant
+message when streaming, before it otherwise.
+
+Gateways may forward caller headers, so the
 endpoint ignores `X-LANGFLOW-GLOBAL-VAR-*` overrides; use Langflow's `/run`
 API for per-request variables.
 
 ## Conversation history
 
 Langflow [groups chat history by session](https://docs.langflow.org/memory#session-id-and-chat-memory).
-A request with `previous_response_id` continues that response's session.
-Otherwise the input is the whole conversation. With an `X-Langflow-Session-Id`
-header, its value is the session, and the session's stored messages for this
-flow and caller are replaced by the request's earlier turns. The session therefore
-mirrors the client's conversation, including edited and regenerated messages,
-and each of its responses gets a unique ID; concurrent requests in one
-conversation and flow can interleave. Any other request starts a new session.
+With an `X-Langflow-Session-Id` header, its value is the session, and each of
+its responses gets a unique ID. Without the header, a request with
+`previous_response_id` continues that response's session, and any other request
+starts a new session. A response ID from a header-named session is not a
+session, so continue that conversation with the same header.
+
+A request with `previous_response_id` adds its input to the session. Otherwise
+the input is the whole conversation, and with the header the session's stored
+messages for this flow and caller are replaced by the request's earlier turns.
+The session therefore mirrors the client's conversation, including edited and
+regenerated messages; concurrent requests in one conversation and flow can
+interleave.
 
 A message-array `input` must end with a user message. Its text becomes the
 Chat Input message, so components receive only the current question. Earlier

@@ -1,13 +1,26 @@
 import json
 import unittest
 import uuid
-from contextlib import asynccontextmanager
 from types import SimpleNamespace
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, call, patch
 
 import httpx
-from fastapi import FastAPI, Request
+from fastapi import Depends, FastAPI, Request
 from openai import OpenAI
+from openai.types.responses import (
+    ResponseCompletedEvent,
+    ResponseContentPartAddedEvent,
+    ResponseContentPartDoneEvent,
+    ResponseCreatedEvent,
+    ResponseErrorEvent,
+    ResponseFunctionCallArgumentsDeltaEvent,
+    ResponseFunctionCallArgumentsDoneEvent,
+    ResponseInProgressEvent,
+    ResponseOutputItemAddedEvent,
+    ResponseOutputItemDoneEvent,
+    ResponseTextDeltaEvent,
+    ResponseTextDoneEvent,
+)
 
 from langflow.api.v1 import openai_responses
 from langflow.schema import OpenAIResponsesRequest
@@ -37,6 +50,37 @@ def _parse_sse(body: str) -> list[dict]:
         assert payload["type"] == event_name
         events.append(payload)
     return events
+
+
+def _validate_events(events: list[dict], models: list[type]) -> None:
+    """Validate each event against its OpenAI SDK model, which is the wire schema."""
+    assert [event["sequence_number"] for event in events] == list(range(len(events)))
+    for event, model in zip(events, models, strict=True):
+        if model is ResponseCompletedEvent:
+            # Langflow reports input, output, and total tokens only, not the token details.
+            event = {**event, "response": {**event["response"], "usage": None}}
+        model.model_validate(event)
+
+
+def _sdk_final_response(body: str):
+    """Consume the stream with the OpenAI SDK's own event accumulator."""
+    transport = httpx.MockTransport(
+        lambda request: httpx.Response(
+            200,
+            headers={"content-type": "text/event-stream"},
+            content=body.encode(),
+            request=request,
+        )
+    )
+    client = OpenAI(
+        api_key="test",
+        base_url="http://langflow.invalid/api/v1",
+        http_client=httpx.Client(transport=transport),
+    )
+    with client.responses.stream(model="FirstFlow", input="Hello") as stream:
+        for _event in stream:
+            pass
+        return stream.get_final_response()
 
 
 class ResponsesCompatibilityTests(unittest.IsolatedAsyncioTestCase):
@@ -69,12 +113,8 @@ class ResponsesCompatibilityTests(unittest.IsolatedAsyncioTestCase):
         user = SimpleNamespace(id="user-id")
         history = [("user", "Hello"), ("user", ""), ("assistant", "Hi")]
         calls = []
-        db = SimpleNamespace(exec=AsyncMock(side_effect=lambda _statement: calls.append("delete")))
+        delete = AsyncMock(side_effect=lambda *_args, **_kwargs: calls.append("delete"))
         store = AsyncMock(side_effect=lambda *_args, **_kwargs: calls.append("add"))
-
-        @asynccontextmanager
-        async def session_scope():
-            yield db
 
         async def store_history(*, replace, http_request=None):
             await openai_responses._store_history(
@@ -87,7 +127,7 @@ class ResponsesCompatibilityTests(unittest.IsolatedAsyncioTestCase):
             )
 
         with (
-            patch.object(openai_responses, "session_scope", session_scope),
+            patch.object(openai_responses, "adelete_messages", delete),
             patch.object(openai_responses, "aadd_messages", store),
         ):
             for replace in (False, True):
@@ -104,8 +144,7 @@ class ResponsesCompatibilityTests(unittest.IsolatedAsyncioTestCase):
                     self.assertEqual(store.call_args.kwargs, {"flow_id": "flow-id", "user_id": "user-id"})
                     self.assertEqual(calls, ["delete", "add"] if replace else ["add"])
             # Replacing removes only this session's messages for this flow and caller.
-            statement = db.exec.call_args.args[0]
-            self.assertEqual(sorted(statement.compile().params.values()), ["flow-id", "session-id", "user-id"])
+            self.assertEqual(delete.call_args_list, [call("session-id", flow_id="flow-id", user_id="user-id")])
 
             # End-user scoping would move the run to another session and owner.
             calls.clear()
@@ -125,7 +164,9 @@ class ResponsesCompatibilityTests(unittest.IsolatedAsyncioTestCase):
         header = ("X-Langflow-Session-Id", "chat-1")
         for headers, fields, session_id, mirrored in (
             ([header], {}, "chat-1", True),
-            ([header], {"previous_response_id": "response-1"}, "response-1", False),
+            # The header keeps naming the conversation; the input then holds only new turns.
+            ([header], {"previous_response_id": "response-1"}, "chat-1", False),
+            ([], {"previous_response_id": "response-1"}, "response-1", False),
             ([("X-Langflow-Session-Id", "")], {}, None, False),
             ([], {}, None, False),
         ):
@@ -149,8 +190,8 @@ class ResponsesCompatibilityTests(unittest.IsolatedAsyncioTestCase):
                     self.assertEqual(run_session_id, session_id)
                 self.assertEqual(store.call_args.kwargs["session_id"], run_session_id)
                 self.assertIs(store.call_args.kwargs["replace"], mirrored)
-                # Gateways log each response by ID, so every turn of a mirrored chat needs its own.
-                if mirrored:
+                # Gateways log each response by ID, so every turn of a header-named chat needs its own.
+                if session_id == "chat-1":
                     self.assertNotEqual(response.id, run_session_id)
                     self.assertEqual(str(uuid.UUID(response.id)), response.id)
                 else:
@@ -187,25 +228,47 @@ class ResponsesCompatibilityTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn("request_variables", run.call_args.kwargs["context"])
 
     async def test_accepts_openai_bearer_auth(self):
-        user = SimpleNamespace(id="user-id")
-        security = AsyncMock(return_value=user)
+        app = FastAPI()
 
+        @app.get("/user")
+        async def current_user(user=Depends(openai_responses.openai_api_key_security)):
+            return {"id": user.id}
+
+        security = AsyncMock(return_value=SimpleNamespace(id="user-id"))
         with patch.object(openai_responses, "api_key_security", security):
-            result = await openai_responses.openai_api_key_security(
-                _request(("Authorization", "Bearer langflow-key"))
-            )
-
-        self.assertIs(result, user)
-        security.assert_awaited_once_with(None, "langflow-key")
+            async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://langflow") as client:
+                for headers, key in (
+                    ({"Authorization": "Bearer langflow-key"}, "langflow-key"),
+                    # Langflow's own header keeps precedence.
+                    ({"x-api-key": "native-key", "Authorization": "Bearer other-key"}, "native-key"),
+                ):
+                    with self.subTest(headers=headers):
+                        security.reset_mock()
+                        response = await client.get("/user", headers=headers)
+                        self.assertEqual(response.json(), {"id": "user-id"})
+                        security.assert_awaited_once_with(None, key)
 
     async def test_emits_canonical_stream_without_duplicate_text(self):
+        # Chat Output publishes its first chunk as a partial message and then as a token
+        # (langflow-ai/langflow#10719); the client must receive that chunk once.
         body = await self._stream_body(
             [
-                {"event": "token", "data": {"chunk": "I"}},
-                {"event": "token", "data": {"chunk": " am Langflow"}},
                 {
                     "event": "add_message",
                     "data": {
+                        "id": "message-1",
+                        "sender": "Machine",
+                        "sender_name": "AI",
+                        "text": "I",
+                        "properties": {"state": "partial"},
+                    },
+                },
+                {"event": "token", "data": {"id": "message-1", "chunk": "I"}},
+                {"event": "token", "data": {"id": "message-1", "chunk": " am Langflow"}},
+                {
+                    "event": "add_message",
+                    "data": {
+                        "id": "message-1",
                         "sender": "Machine",
                         "sender_name": "AI",
                         "text": "I am Langflow",
@@ -218,49 +281,127 @@ class ResponsesCompatibilityTests(unittest.IsolatedAsyncioTestCase):
             ]
         )
         events = _parse_sse(body)
-        event_types = [event["type"] for event in events]
-
-        self.assertEqual(
-            event_types,
+        _validate_events(
+            events,
             [
-                "response.created",
-                "response.in_progress",
-                "response.output_item.added",
-                "response.content_part.added",
-                "response.output_text.delta",
-                "response.output_text.delta",
-                "response.output_text.done",
-                "response.content_part.done",
-                "response.output_item.done",
-                "response.completed",
+                ResponseCreatedEvent,
+                ResponseInProgressEvent,
+                ResponseOutputItemAddedEvent,
+                ResponseContentPartAddedEvent,
+                ResponseTextDeltaEvent,
+                ResponseTextDeltaEvent,
+                ResponseTextDoneEvent,
+                ResponseContentPartDoneEvent,
+                ResponseOutputItemDoneEvent,
+                ResponseCompletedEvent,
             ],
         )
-        self.assertEqual([event["sequence_number"] for event in events], list(range(len(events))))
         self.assertEqual(
             "".join(event["delta"] for event in events if event["type"] == "response.output_text.delta"),
             "I am Langflow",
         )
-        self.assertNotIn("response.chunk", body)
-        self.assertNotIn("[DONE]", body)
-        completed = events[-1]["response"]
-        self.assertEqual(completed["output"][0]["content"][0]["text"], "I am Langflow")
-        self.assertEqual(completed["usage"]["total_tokens"], 7)
+        final = _sdk_final_response(body)
+        self.assertEqual(final.output_text, "I am Langflow")
+        self.assertEqual(final.usage.total_tokens, 7)
 
-        transport = httpx.MockTransport(
-            lambda request: httpx.Response(
-                200,
-                headers={"content-type": "text/event-stream"},
-                content=body.encode(),
-                request=request,
-            )
+    async def test_flow_tool_calls_stay_private_unless_included(self):
+        # OpenAI clients run every function_call they receive, but the flow already ran its tools.
+        step = {"type": "tool_use", "name": "search", "tool_input": {"query": "Langflow"}, "output": "Found"}
+        flow_events = [
+            {"event": "token", "data": {"id": "message-1", "chunk": "Found it"}},
+            {
+                "event": "add_message",
+                "data": {
+                    "id": "message-1",
+                    "sender": "Machine",
+                    "sender_name": "AI",
+                    "text": "Found it",
+                    "properties": {"state": "complete"},
+                    "content_blocks": [{"title": "Agent Steps", "contents": [step]}],
+                },
+            },
+        ]
+        body = await self._stream_body(flow_events)
+        _validate_events(
+            _parse_sse(body),
+            [
+                ResponseCreatedEvent,
+                ResponseInProgressEvent,
+                ResponseOutputItemAddedEvent,
+                ResponseContentPartAddedEvent,
+                ResponseTextDeltaEvent,
+                ResponseTextDoneEvent,
+                ResponseContentPartDoneEvent,
+                ResponseOutputItemDoneEvent,
+                ResponseCompletedEvent,
+            ],
         )
-        client = OpenAI(
-            api_key="test",
-            base_url="http://langflow.invalid/api/v1",
-            http_client=httpx.Client(transport=transport),
+        final = _sdk_final_response(body)
+        self.assertEqual([item.type for item in final.output], ["message"])
+        self.assertEqual(final.output_text, "Found it")
+
+        # Langflow's include opt-in returns its tool results as items after the message.
+        events = _parse_sse(await self._stream_body(flow_events, include=["tool_call.results"]))
+        tool_events = [event for event in events if event.get("output_index") == 1]
+        self.assertEqual(
+            [event["type"] for event in tool_events],
+            [
+                "response.output_item.added",
+                "response.function_call_arguments.delta",
+                "response.function_call_arguments.done",
+                "response.output_item.done",
+            ],
         )
-        sdk_events = list(client.responses.create(model="FirstFlow", input="Hello", stream=True))
-        self.assertEqual([event.type for event in sdk_events], event_types)
+        ResponseFunctionCallArgumentsDeltaEvent.model_validate(tool_events[1])
+        ResponseFunctionCallArgumentsDoneEvent.model_validate(tool_events[2])
+        self.assertEqual([item["type"] for item in events[-1]["response"]["output"]], ["message", "tool_call"])
+
+    async def test_non_streaming_flow_tool_calls_stay_private_unless_included(self):
+        step = SimpleNamespace(type="tool_use", name="search", tool_input={"query": "Langflow"}, output="Found", error=None)
+        component_output = SimpleNamespace(
+            messages=[SimpleNamespace(message="Found it")],
+            results={"message": SimpleNamespace(content_blocks=[step])},
+        )
+        result = SimpleNamespace(outputs=[SimpleNamespace(outputs=[component_output])])
+        flow = SimpleNamespace(
+            id="flow-id",
+            user_id="user-id",
+            data={"nodes": [{"data": {"type": "ChatInput"}}, {"data": {"type": "ChatOutput"}}]},
+        )
+        for include, item_types in ((None, ["message"]), (["tool_call.results"], ["tool_call", "message"])):
+            with (
+                self.subTest(include=include),
+                patch.object(openai_responses, "_store_history", AsyncMock()),
+                patch.object(openai_responses, "simple_run_flow", AsyncMock(return_value=result)),
+            ):
+                response = await openai_responses.run_flow_for_openai_responses(
+                    flow=flow,
+                    request=OpenAIResponsesRequest(model="FirstFlow", input="Hello", include=include),
+                    api_key_user=SimpleNamespace(id="user-id"),
+                )
+                self.assertEqual([item["type"] for item in response.output], item_types)
+
+    async def test_final_text_matches_streamed_deltas(self):
+        # Chat Output can republish a streamed agent answer through a Prompt under its own id.
+        body = await self._stream_body(
+            [
+                {"event": "token", "data": {"id": "agent-message", "chunk": "The answer is X"}},
+                {
+                    "event": "add_message",
+                    "data": {
+                        "id": "chat-output",
+                        "sender": "Machine",
+                        "sender_name": "AI",
+                        "text": "Answer: The answer is X",
+                        "properties": {"state": "complete"},
+                    },
+                },
+            ]
+        )
+        events = _parse_sse(body)
+        streamed = "".join(event["delta"] for event in events if event["type"] == "response.output_text.delta")
+        self.assertEqual(_sdk_final_response(body).output_text, streamed)
+        self.assertEqual(next(event for event in events if event["type"] == "response.output_text.done")["text"], streamed)
 
     async def test_falls_back_to_completed_message_without_tokens(self):
         body = await self._stream_body(
@@ -287,13 +428,12 @@ class ResponsesCompatibilityTests(unittest.IsolatedAsyncioTestCase):
             body = await self._stream_body(raw_error)
 
         events = _parse_sse(body)
-        error = events[-1]
-        self.assertEqual(error["type"], "error")
-        self.assertEqual(error["message"], "Workflow execution failed.")
+        error = ResponseErrorEvent.model_validate(events[-1])
+        self.assertEqual(error.message, "Workflow execution failed.")
         self.assertNotIn(str(raw_error), body)
         log_exception.assert_awaited_once_with("Error in OpenAI Responses stream generator")
 
-    async def _stream_body(self, flow_events: list[dict] | Exception) -> str:
+    async def _stream_body(self, flow_events: list[dict] | Exception, **request_fields) -> str:
         async def run_flow_generator(**_kwargs):
             return None
 
@@ -312,7 +452,7 @@ class ResponsesCompatibilityTests(unittest.IsolatedAsyncioTestCase):
                 ]
             }
         )
-        request = OpenAIResponsesRequest(model="FirstFlow", input="Hello", stream=True)
+        request = OpenAIResponsesRequest(model="FirstFlow", input="Hello", stream=True, **request_fields)
         with (
             patch.object(openai_responses, "run_flow_generator", run_flow_generator),
             patch.object(openai_responses, "consume_and_yield", consume_and_yield),
