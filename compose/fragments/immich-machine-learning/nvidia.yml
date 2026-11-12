@@ -1,6 +1,6 @@
 services:
   immich-machine-learning:
-    image: ghcr.io/immich-app/immich-machine-learning:v3.3.4-cuda@sha256:d07d00a30cf1eaccc8ebfe681ce54b9016a21fb974c15af4782523a7ecb8018a
+    image: ghcr.io/immich-app/immich-machine-learning:v3.4.1-cuda@sha256:aaa7eb0f47e3815a1c575790085474e01c129df7c47ffbbcbfd80947d4c41339
     cpus: "4.0"
     mem_limit: 2G
     environment:
