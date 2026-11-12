@@ -144,7 +144,7 @@ services:
   # patches add no migrations, so this is the upstream image.
   litellm-migrate:
     <<: *litellm-service
-    image: ghcr.io/berriai/litellm-migrations:v1.109.0@sha256:342bdd3c4cf60f1147c7230db9f49a0baf3c68b9d7aaef4ce0c6540924854816
+    image: ghcr.io/berriai/litellm-migrations:v1.109.1@sha256:09966fa1a1b8e728229b59695ec75a836686611a3a0716faffa483432514699b
     container_name: litellm-migrate
     restart: "no"
     depends_on:
