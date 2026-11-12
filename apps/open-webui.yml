@@ -1,6 +1,6 @@
 services:
   open-webui:
-    image: ghcr.io/ilkersigirci/homeserver-open-webui:v0.13.3-slim@sha256:e4160e11afd867dff242c8f97bbdcc23389b0f6aefb8d85390c4c7b72a0ea5b9
+    image: ghcr.io/ilkersigirci/homeserver-open-webui:v0.13.3-slim@sha256:45d5b2e3c1e99cf2aec3937244e8db28f5ade45e519a5814c833d31abe359513
     container_name: open-webui
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
