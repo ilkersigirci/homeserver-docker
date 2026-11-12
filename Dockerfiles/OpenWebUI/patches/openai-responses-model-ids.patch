@@ -1,0 +1,44 @@
+Upstream gap: an OpenAI connection sends all its models through one API, the
+one its api_type selects. A gateway that serves Chat Completions models next
+to models it reaches natively only through the Responses API, such as
+Langflow flows behind LiteLLM, either translates Chat Completions requests for
+those models or needs a second connection to the same gateway with a fixed
+model_ids allowlist, which hides every model deployed later. Upstream closed
+a per-model API type request for this case as not planned:
+https://github.com/open-webui/open-webui/issues/22905
+
+Add responses_model_ids to a connection's config in OPENAI_API_CONFIGS: a
+list of glob patterns such as ["langflow/*"], matched case-sensitively against
+the provider's model IDs before prefix_id applies, as exclude_model_ids is; a
+workspace model matches by its base model. Requests for matching models use
+the Responses API, as api_type "responses" does for a whole connection; the
+connection's other models keep its api_type. Any other value matches no
+model, so a mistyped config keeps Chat Completions rather than sending every
+model to the Responses API.
+
+Removal check: an Open WebUI release whose Model IDs filter accepts patterns
+(https://github.com/open-webui/open-webui/discussions/23711), so a second
+connection with api_type "responses" can list the matching models while the
+first leaves them out, or one that selects the API type per model.
+--- a/open_webui/routers/openai.py
++++ b/open_webui/routers/openai.py
+@@ -1525,7 +1525,18 @@
+
+     headers, cookies = await get_headers_and_cookies(request, url, key, api_config, metadata, user=user)
+
+-    is_responses = api_config.get('api_type') == 'responses'
++    from fnmatch import fnmatchcase
++
++    # Patterns match the provider's own model IDs, before prefix_id applies.
++    # Only a list of strings matches; a string would match by its characters.
++    responses_model_ids = api_config.get('responses_model_ids')
++    is_responses = api_config.get('api_type') == 'responses' or (
++        isinstance(responses_model_ids, list)
++        and any(
++            isinstance(pattern, str) and fnmatchcase(str(payload['model']), pattern)
++            for pattern in responses_model_ids
++        )
++    )
+
+     # Explicit continuation keeps llama.cpp from echoing the prefill in streamed replies.
+     if (

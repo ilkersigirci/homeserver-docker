@@ -3,25 +3,30 @@ unless its model_ids allowlist replaces that list with fixed IDs, which also
 hides every model the provider adds later. Hiding a model otherwise takes a
 stored model record, so a deployment cannot leave out one family of a
 provider's models, such as the ones a Pipe already serves, while still listing
-the rest as the provider changes them.
+the rest as the provider changes them. Upstream tracks patterns, excludes
+included, in the Model IDs filter as an open idea:
+https://github.com/open-webui/open-webui/discussions/23711 (open-webui#33080
+was closed as its duplicate).
 
-Add exclude_model_ids to a connection's config in OPENAI_API_CONFIGS: glob
-patterns such as "acme/*" or "*embedding*", matched case-sensitively against
-the provider's model IDs before prefix_id applies. Each time Open WebUI lists
-models, it leaves the matching ones out of that connection's list, so they
-cannot be selected or chatted with through it. Other connections are
-unaffected.
+Add exclude_model_ids to a connection's config in OPENAI_API_CONFIGS: a list
+of glob patterns such as ["acme/*", "*embedding*"], matched case-sensitively
+against the provider's model IDs before prefix_id applies. Each time Open
+WebUI lists models, it leaves the matching ones out of that connection's
+list, so they cannot be selected or chatted with through it. Other
+connections are unaffected. Any other value hides no model, so a mistyped
+config can neither hide a connection's whole list nor break model listing.
 
-Removal check: an Open WebUI release that can exclude a connection's models
-by pattern.
+Removal check: an Open WebUI release whose Model IDs filter accepts exclude
+patterns (discussion #23711); move these patterns there.
 --- a/open_webui/routers/openai.py
 +++ b/open_webui/routers/openai.py
-@@ -656,6 +656,24 @@
+@@ -650,6 +650,26 @@
                  # Catch non-list responses
                  model_list = []
 
-+            exclude_model_ids = api_config.get('exclude_model_ids', [])
-+            if exclude_model_ids:
++            exclude_model_ids = api_config.get('exclude_model_ids')
++            # Only a list of strings matches; a string would match by its characters.
++            if isinstance(exclude_model_ids, list) and exclude_model_ids:
 +                from fnmatch import fnmatchcase
 +
 +                # Patterns match the provider's own model IDs, before prefix_id applies.
@@ -29,7 +34,8 @@ by pattern.
 +                    model
 +                    for model in model_list
 +                    if not any(
-+                        fnmatchcase(str(model.get('id', model.get('name', ''))), pattern)
++                        isinstance(pattern, str)
++                        and fnmatchcase(str(model.get('id', model.get('name', ''))), pattern)
 +                        for pattern in exclude_model_ids
 +                    )
 +                ]

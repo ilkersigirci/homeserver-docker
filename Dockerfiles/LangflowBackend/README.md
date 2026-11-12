@@ -83,12 +83,13 @@ disable tool calling and native image input for Langflow-backed models in
 clients such as Open WebUI.
 
 Tools that the flow's components run are part of the flow, not tools the
-caller selected. OpenAI clients run every `function_call` they receive, and
-LiteLLM's Chat Completions bridge turns them into `tool_calls` that Open WebUI
-would try to run, so the response carries only the answer. To receive the
-flow's tool calls, send Langflow's `"include": ["tool_call.results"]`. Each
-result then arrives as a Langflow `tool_call` item: after the assistant
-message when streaming, before it otherwise.
+caller selected. OpenAI clients, Open WebUI among them, run every
+`function_call` they receive, and LiteLLM's Chat Completions bridge turns them
+into `tool_calls` that Chat clients run, so the response carries only the
+answer. To receive the flow's tool calls, send Langflow's
+`"include": ["tool_call.results"]`. Each result then arrives as a Langflow
+`tool_call` item: after the assistant message when streaming, before it
+otherwise.
 
 Gateways may forward caller headers, so the
 endpoint ignores `X-LANGFLOW-GLOBAL-VAR-*` overrides; use Langflow's `/run`
@@ -137,10 +138,11 @@ message, which Chat Input stores before other components run.
 
 Langflow chat history has no system role, so `instructions` and system or
 developer messages are not stored. Responses Input's **Instructions** output
-joins them in input order; LiteLLM sends leading chat system messages, such
-as Open WebUI system prompts, as `instructions`. Flows ignore them unless
-the author connects this output; leave it unconnected to keep API runs
-identical to Playground runs, where it is empty. To apply them, add a
+joins them in input order. Open WebUI sends its system prompts as
+`instructions`, and LiteLLM's Chat Completions bridge sends leading chat
+system messages the same way. Flows ignore them unless the author connects
+this output; leave it unconnected to keep API runs identical to Playground
+runs, where it is empty. To apply them, add a
 `{caller_instructions}` variable to a **Prompt Template** that holds the
 flow's instructions, connect **Instructions** to it, and connect the prompt
 to **Agent Instructions**. Custom Python components can read
@@ -226,10 +228,15 @@ that host as with other API Request components. Redirects are disabled.
 
 ## Open WebUI
 
-Each Open WebUI chat keeps one Langflow session through native configuration:
+Open WebUI reaches flows through LiteLLM's Responses API, and each chat keeps
+one Langflow session:
 
 - Open WebUI's LiteLLM connection in [`apps/open-webui.yml`](../../apps/open-webui.yml)
-  sends the chat ID as `X-Langflow-Session-Id: {{CHAT_ID}}`.
+  sets `"responses_model_ids": ["langflow/*"]`
+  ([image patch](../OpenWebUI/README.md#image-contents)), so `langflow/*`
+  models use the Responses API while other models keep Chat Completions.
+  LiteLLM passes these requests to Langflow unchanged.
+- The same connection sends the chat ID as `X-Langflow-Session-Id: {{CHAT_ID}}`.
 - LiteLLM's `model_group_settings` in
   [`configs/litellm/config.yaml`](../../configs/litellm/config.yaml) forwards
   caller `x-` headers to `langflow/*` models only, so
@@ -310,7 +317,10 @@ field; tools configured inside the flow still work. Future Open WebUI
 `ask_user` HITL support requires Langflow to accept tool definitions and
 results, plus a pause/resume bridge, before removing these drops.
 
-Leave `use_chat_completions_api` off ([endpoint contract](#endpoint-contract)).
+LiteLLM sends Responses requests, such as Open WebUI's, to the flow
+unchanged; `mode: responses` lets Chat Completions callers reach it through
+LiteLLM's bridge. Leave `use_chat_completions_api` off
+([endpoint contract](#endpoint-contract)).
 The flow runs as the Langflow API key's owner, so its nested LiteLLM calls use
 that owner's key and budget. Control who may call the flow with LiteLLM model
 access.

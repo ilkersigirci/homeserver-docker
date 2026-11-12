@@ -3,8 +3,8 @@
 Thin wrapper over the pinned official Open WebUI slim image. Its patches let an
 Open WebUI that signs users in with OIDC send each user's own OAuth token where
 upstream allows only a shared key, let a Pipe describe the models it lists, let
-a connection leave out models by pattern, and let chat documents go through an
-OpenAI-compatible Files API.
+a connection leave out models or send them to the Responses API by pattern,
+and let chat documents go through an OpenAI-compatible Files API.
 
 ## Image contents
 
@@ -21,12 +21,28 @@ patch changes, and its removal check.
   tools, Filters, and Chat Variables form. A stored record still replaces it.
   Upstream declined this ([open-webui#23047](https://github.com/open-webui/open-webui/issues/23047)).
 - [`openai-exclude-model-ids.patch`](patches/openai-exclude-model-ids.patch):
-  an OpenAI connection's `exclude_model_ids` in `OPENAI_API_CONFIGS` holds glob
-  patterns, such as `acme/*`, matched against the provider's model IDs. Each
-  time Open WebUI lists models, the matching ones are left out of that
-  connection, so a deployment can hide a model family, such as the models a
-  Pipe already serves, while new provider models still appear, without stored
-  model records or a `model_ids` allowlist.
+  an OpenAI connection's `exclude_model_ids` in `OPENAI_API_CONFIGS` holds a
+  list of glob patterns, such as `["acme/*"]`, matched against the provider's
+  model IDs. Each time Open WebUI lists models, the matching ones are left out
+  of that connection, so a deployment can hide a model family, such as the
+  models a Pipe already serves, while new provider models still appear,
+  without stored model records or a `model_ids` allowlist. Any other value
+  hides no model. Upstream tracks pattern support in the Model IDs filter as
+  an open idea ([open-webui#23711](https://github.com/open-webui/open-webui/discussions/23711)).
+- [`openai-responses-model-ids.patch`](patches/openai-responses-model-ids.patch):
+  an OpenAI connection's `responses_model_ids` in `OPENAI_API_CONFIGS` holds a
+  list of glob patterns, such as `["langflow/*"]`, matched like
+  `exclude_model_ids`; a workspace model matches by its base model. Matching
+  models use the Responses API, as `"api_type": "responses"` does for a whole
+  connection, and the connection's other models keep its API type. Any other
+  value matches no model. A gateway's Responses-only models, such as Langflow
+  flows behind LiteLLM, then get Responses end to end next to Chat
+  Completions models, such as vLLM ones, without a second connection whose
+  `model_ids` allowlist every new model would have to join. Upstream closed a
+  per-model API type request as not planned
+  ([open-webui#22905](https://github.com/open-webui/open-webui/issues/22905));
+  once that filter accepts patterns (open-webui#23711), such a second
+  connection replaces this patch.
 - [`speech-images-system-oauth.patch`](patches/speech-images-system-oauth.patch):
   speech-to-text, text-to-speech (the `openai` and `openai-realtime` engines),
   realtime voice calls, image generation, and image editing authenticate like
@@ -47,6 +63,12 @@ A user without an OAuth session gets no token, never a fallback to a shared
 key. [`tests/`](tests/) checks every patch against the patched modules on
 every build.
 
+The connection dialog in Admin Settings does not show `exclude_model_ids` or
+`responses_model_ids`, and saving that connection there drops both. With
+`ENABLE_PERSISTENT_CONFIG: false`, as in
+[`apps/open-webui.yml`](../../apps/open-webui.yml), the next restart restores
+them from `OPENAI_API_CONFIGS`, so change that connection there.
+
 ## Files API
 
 | Variable | Meaning |
@@ -64,10 +86,11 @@ every build.
 Open WebUI uploads a file the first time it needs one, with
 `purpose=user_data`, and keeps the returned ID in the file's metadata. In a
 saved chat, each user message sent to a matching model carries its listed
-documents as standard Chat `file` parts with that ID. A connection with
-`"api_type": "responses"` sends them as `input_file`, and so does LiteLLM for a
-deployment with `model_info.mode: responses`, such as a Langflow flow. Open
-WebUI's retrieval and file tools leave those documents out.
+documents as standard Chat `file` parts with that ID. A model that uses the
+Responses API, through `"api_type": "responses"` or `responses_model_ids`,
+receives them as `input_file`, as a Langflow flow does; LiteLLM converts Chat
+`file` parts the same way for a deployment with `model_info.mode: responses`.
+Open WebUI's retrieval and file tools leave those documents out.
 
 Open WebUI handles the rest as usual: images, audio, and video; other files,
 whose text it extracts itself, since the Files API could not; files the user

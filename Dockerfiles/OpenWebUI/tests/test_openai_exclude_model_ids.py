@@ -36,6 +36,13 @@ class ExcludeModelIdsTest(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(ids, [["gw.openai/gpt", "gw.acme-docs/search"], ["acme/graph", "other/model"]])
 
+    async def test_values_other_than_a_list_of_patterns_hide_no_model(self) -> None:
+        for value in (None, "*", {"*": True}, [None, 3]):
+            with self.subTest(value=value):
+                ids = await listed_ids({"0": {"exclude_model_ids": value}, "1": {}})
+
+                self.assertEqual(ids, [["acme/graph", "openai/gpt", "acme-docs/search"], ["acme/graph", "other/model"]])
+
 
 if __name__ == "__main__":
     unittest.main()
