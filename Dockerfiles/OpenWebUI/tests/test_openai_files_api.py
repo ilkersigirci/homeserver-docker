@@ -1,4 +1,4 @@
-"""Chat documents go through an OpenAI-compatible Files API: sent by file ID or extracted there."""
+"""Chat documents and images go through an OpenAI-compatible Files API: sent by file ID or extracted there."""
 
 import contextlib
 import copy
@@ -14,7 +14,7 @@ from unittest.mock import AsyncMock, Mock, patch
 
 import httpx
 from open_webui.retrieval.loaders.main import Loader
-from open_webui.routers import retrieval
+from open_webui.routers import openai, retrieval
 from open_webui.utils import middleware, openai_files
 from open_webui.utils import tools as builtin_tools
 from starlette.requests import Request
@@ -115,7 +115,26 @@ def stored_file(workdir: Path, id: str, name: str, content_type: str, **meta) ->
     )
 
 
-class SendFileIdsTest(unittest.IsolatedAsyncioTestCase):
+class FileIdsCase(unittest.IsolatedAsyncioTestCase):
+    """Sends self.messages, with self.files as the request's files, from the stored self.records."""
+
+    async def send(self, model: dict, api: FakeFilesApi, save_id: AsyncMock, **settings) -> tuple[dict, dict]:
+        # As in a real request, metadata['files'] starts as the request's own files list.
+        form_data = {"messages": copy.deepcopy(self.messages), "files": copy.deepcopy(self.files)}
+        metadata = {"files": form_data["files"]}
+        get_files = AsyncMock(side_effect=lambda ids: [self.records[id] for id in ids])
+        with files_api(
+            api,
+            patch.object(openai_files.Files, "get_files_by_ids", get_files),
+            patch.object(openai_files.Files, "update_file_metadata_by_id", save_id),
+            patch.object(openai_files, "has_access_to_file", AsyncMock(return_value=False)),
+            **settings,
+        ):
+            await openai_files.add_file_id_parts(SimpleNamespace(), form_data, metadata, USER, model)
+        return form_data, metadata
+
+
+class SendFileIdsTest(FileIdsCase):
     def setUp(self) -> None:
         workdir = Path(self.enterContext(tempfile.TemporaryDirectory()))
         cached = stored_file(workdir, "cached", "a.pdf", "application/pdf", openai_file_id="file-cached")
@@ -142,21 +161,6 @@ class SendFileIdsTest(unittest.IsolatedAsyncioTestCase):
         ]
         self.files = [*(item(file) for file in self.records.values()), {"type": "collection", "id": "kb"}]
 
-    async def send(self, model: dict, api: FakeFilesApi, save_id: AsyncMock, **settings) -> tuple[dict, dict]:
-        # As in a real request, metadata['files'] starts as the request's own files list.
-        form_data = {"messages": copy.deepcopy(self.messages), "files": copy.deepcopy(self.files)}
-        metadata = {"files": form_data["files"]}
-        get_files = AsyncMock(side_effect=lambda ids: [self.records[id] for id in ids])
-        with files_api(
-            api,
-            patch.object(openai_files.Files, "get_files_by_ids", get_files),
-            patch.object(openai_files.Files, "update_file_metadata_by_id", save_id),
-            patch.object(openai_files, "has_access_to_file", AsyncMock(return_value=False)),
-            **settings,
-        ):
-            await openai_files.add_file_id_parts(SimpleNamespace(), form_data, metadata, USER, model)
-        return form_data, metadata
-
     async def test_matching_models_receive_each_message_documents_by_file_id(self) -> None:
         api, save_id = FakeFilesApi(), AsyncMock()
         form_data, metadata = await self.send({"id": "langflow/flow"}, api, save_id)
@@ -172,8 +176,8 @@ class SendFileIdsTest(unittest.IsolatedAsyncioTestCase):
             ],
         )
         self.assertEqual(second["content"], [{"type": "text", "text": "Compare."}, new_part])
-        # Images, audio, another user's file, and types the Files API does not extract keep
-        # Open WebUI's usual handling.
+        # An image no image_url part shows, audio, another user's file, and types the Files API
+        # does not extract keep Open WebUI's usual handling.
         self.assertEqual([file["id"] for file in first["files"]], ["image"])
         self.assertEqual([file["id"] for file in second["files"]], ["audio", "foreign", "notes"])
         # Retrieval and the file tools no longer see the documents sent by ID, in either list.
@@ -243,12 +247,123 @@ class SendFileIdsTest(unittest.IsolatedAsyncioTestCase):
                 self.assertFalse(module.is_file_id_model({"id": "langflow/flow"}))
 
 
+class SendImageIdsTest(FileIdsCase):
+    """Stored images go by file ID too, in place of the image_url parts that show them."""
+
+    def setUp(self) -> None:
+        workdir = Path(self.enterContext(tempfile.TemporaryDirectory()))
+        photo = stored_file(workdir, "photo", "photo.png", "image/png")
+        cached = stored_file(workdir, "cached", "scan.jpg", "image/jpeg", openai_file_id="file-cached")
+        drawing = stored_file(workdir, "drawing", "drawing.svg", "image/svg+xml")
+        foreign = stored_file(workdir, "foreign", "theirs.png", "image/png")
+        foreign.user_id = "other-user"
+        self.records = {file.id: file for file in (photo, cached, drawing, foreign)}
+        # Open WebUI lists a chat image as a file and shows it as an image_url part with its ID.
+        self.files = [
+            {"type": "file", "id": file.id, "url": file.id, "name": file.filename, **file.meta}
+            for file in self.records.values()
+        ]
+        self.messages = [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": "Compare them."},
+                    {"type": "image_url", "image_url": {"url": "photo", "detail": "high"}},
+                    {"type": "image_url", "image_url": {"url": "/api/v1/files/cached/content"}},
+                    {"type": "image_url", "image_url": {"url": "drawing"}},
+                    {"type": "image_url", "image_url": {"url": "foreign"}},
+                    {"type": "image_url", "image_url": {"url": "data:image/png;base64,iVBORw0KGgo="}},
+                ],
+                "files": copy.deepcopy(self.files),
+            }
+        ]
+
+    async def test_matching_models_receive_stored_images_by_file_id(self) -> None:
+        api, save_id = FakeFilesApi(), AsyncMock()
+        form_data, metadata = await self.send({"id": "langflow/flow"}, api, save_id)
+        [message] = form_data["messages"]
+
+        # In place and with their detail, whether the part names the file or its content URL. An
+        # SVG, another user's image, and a data URL keep their parts, which Open WebUI inlines.
+        self.assertEqual(
+            message["content"],
+            [
+                {"type": "text", "text": "Compare them."},
+                {"type": "input_image", "file_id": "file-1", "detail": "high"},
+                {"type": "input_image", "file_id": "file-cached", "detail": "auto"},
+                *self.messages[0]["content"][3:],
+            ],
+        )
+        # Retrieval and the file tools no longer see the images sent by ID, in any list.
+        for files in (message["files"], metadata["files"], form_data["files"]):
+            self.assertEqual([file["id"] for file in files], ["drawing", "foreign"])
+
+        # The image without an ID is uploaded once, as itself, and keeps its ID.
+        [upload] = api.requests
+        form = await parse_upload(upload)
+        self.addAsyncCleanup(form.close)
+        self.assertEqual((form["purpose"], form["file"].filename), ("user_data", "photo.png"))
+        self.assertEqual(form["file"].content_type, "image/png")
+        save_id.assert_awaited_once_with("photo", {"openai_file_id": "file-1"})
+
+    async def test_the_attached_files_context_leaves_out_images_sent_by_id(self) -> None:
+        sent, _ = await self.send({"id": "langflow/flow"}, FakeFilesApi(), AsyncMock())
+        upstream, _ = await self.send({"id": "openai/gpt"}, FakeFilesApi(), AsyncMock())
+
+        [sent_message] = middleware.add_file_context(sent["messages"])
+        [upstream_message] = middleware.add_file_context(upstream["messages"])
+        self.assertNotIn('id="photo"', sent_message["content"][0]["text"])
+        self.assertIn('id="drawing"', sent_message["content"][0]["text"])
+        self.assertIn('id="photo"', upstream_message["content"][0]["text"])
+
+    async def test_a_failed_upload_keeps_that_image_inline(self) -> None:
+        form_data, metadata = await self.send({"id": "langflow/flow"}, FakeFilesApi(upload_status=401), AsyncMock())
+        [message] = form_data["messages"]
+
+        self.assertEqual(message["content"][1], self.messages[0]["content"][1])
+        self.assertIn("photo", [file["id"] for file in metadata["files"]])
+        # The image with an ID is still sent by ID.
+        self.assertEqual(message["content"][2], {"type": "input_image", "file_id": "file-cached", "detail": "auto"})
+
+    async def test_other_models_keep_upstream_inline_images(self) -> None:
+        api = FakeFilesApi()
+        form_data, metadata = await self.send({"id": "openai/gpt"}, api, AsyncMock())
+
+        self.assertEqual(form_data["messages"], self.messages)
+        self.assertEqual(metadata["files"], self.files)
+        self.assertEqual(api.requests, [])
+
+    async def test_open_webui_does_not_inline_images_sent_by_id(self) -> None:
+        part = {"type": "input_image", "file_id": "file-1", "detail": "high"}
+        form_data = {"messages": [{"role": "user", "content": [part]}]}
+        inline = AsyncMock(return_value="data:image/png;base64,iVBORw0KGgo=")
+        with patch.object(middleware, "get_image_base64_from_url", inline):
+            await middleware.convert_url_images_to_base64(form_data, user=USER)
+
+        self.assertEqual(form_data["messages"][0]["content"], [part])
+        inline.assert_not_awaited()
+
+    def test_responses_connections_receive_images_sent_by_id(self) -> None:
+        image = {"type": "input_image", "file_id": "file-1", "detail": "high"}
+        messages = [{"role": "user", "content": [{"type": "text", "text": "Compare them."}, image]}]
+        payload = openai.convert_to_responses_payload({"model": "langflow/flow", "messages": messages})
+
+        self.assertEqual(payload["input"][0]["content"], [{"type": "input_text", "text": "Compare them."}, image])
+
+
 class ChatPayloadTest(unittest.IsolatedAsyncioTestCase):
     """The hook inside Open WebUI's own chat request processing."""
 
-    async def process(self, model_id: str, function_calling: str, session_id: str | None) -> dict:
+    async def process(
+        self,
+        model_id: str,
+        function_calling: str,
+        session_id: str | None,
+        file: SimpleNamespace | None = None,
+        user_content: str | list = "Summarize",
+    ) -> dict:
         """Process one chat request; record what retrieval, the builtin tools, and the model receive."""
-        document = SimpleNamespace(
+        file = file or SimpleNamespace(
             id="doc",
             user_id=USER.id,
             path="/tmp/doc.pdf",
@@ -256,14 +371,14 @@ class ChatPayloadTest(unittest.IsolatedAsyncioTestCase):
             meta={"content_type": "application/pdf", "openai_file_id": "file-doc"},
             data={"content": "DOC TEXT"},
         )
-        item = {"type": "file", "id": "doc", "name": "doc.pdf"}
+        item = {"type": "file", "id": file.id, "name": file.filename}
         model = {"id": model_id, "owned_by": "openai", "info": {"meta": {"capabilities": {"file_upload": True}}}}
         state = SimpleNamespace(MODELS={model_id: model}, RERANKING_FUNCTION=None, EMBEDDING_FUNCTION=None)
         request = SimpleNamespace(app=SimpleNamespace(state=state), state=SimpleNamespace(), cookies={}, headers={})
         form_data = {
             "model": model_id,
             "stream": False,
-            "messages": [{"role": "user", "content": "Summarize", "files": [item]}],
+            "messages": [{"role": "user", "content": user_content, "files": [item]}],
             "files": [item],
         }
         metadata = {
@@ -296,7 +411,7 @@ class ChatPayloadTest(unittest.IsolatedAsyncioTestCase):
 
         with files_api(
             FakeFilesApi(),
-            patch.object(openai_files.Files, "get_files_by_ids", AsyncMock(return_value=[document])),
+            patch.object(openai_files.Files, "get_files_by_ids", AsyncMock(return_value=[file])),
             patch.object(middleware, "get_event_emitter", AsyncMock(return_value=AsyncMock())),
             patch.object(middleware, "generate_queries", AsyncMock(side_effect=Exception("no task model"))),
             patch.object(middleware, "get_sources_from_items", get_sources_from_items),
@@ -307,7 +422,9 @@ class ChatPayloadTest(unittest.IsolatedAsyncioTestCase):
 
         content = form_data["messages"][-1]["content"]
         seen["text"] = " ".join(part.get("text", "") for part in content) if isinstance(content, list) else content
-        seen["parts"] = [part for part in content if part.get("type") == "file"] if isinstance(content, list) else []
+        parts = content if isinstance(content, list) else []
+        seen["parts"] = [part for part in parts if part.get("type") == "file"]
+        seen["images"] = [part for part in parts if part.get("type") in ("image_url", "input_image")]
         seen["files"] = [file["id"] for file in metadata.get("files") or []]
         return seen
 
@@ -329,6 +446,26 @@ class ChatPayloadTest(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(sent["parts"]), 1)
         self.assertFalse(CHAT_FILE_TOOLS & set(sent["tools"]), sent["tools"])
         self.assertEqual(CHAT_FILE_TOOLS & set(upstream["tools"]), CHAT_FILE_TOOLS)
+
+    async def test_stored_images_reach_matching_models_by_id_not_inline(self) -> None:
+        image = SimpleNamespace(
+            id="photo",
+            user_id=USER.id,
+            path="/tmp/photo.png",
+            filename="photo.png",
+            meta={"content_type": "image/png", "openai_file_id": "file-photo"},
+            data={},
+        )
+        content = [{"type": "text", "text": "Describe"}, {"type": "image_url", "image_url": {"url": "photo"}}]
+        inline = AsyncMock(return_value="data:image/png;base64,iVBORw0KGgo=")
+        with patch.object(middleware, "get_image_base64_from_url", inline):
+            sent = await self.process("langflow/flow", "legacy", None, image, copy.deepcopy(content))
+            upstream = await self.process("openai/gpt", "legacy", None, image, copy.deepcopy(content))
+
+        self.assertEqual(sent["images"], [{"type": "input_image", "file_id": "file-photo", "detail": "auto"}])
+        self.assertEqual(sent["files"], [])
+        # Upstream, Open WebUI inlines the same image as a data URL.
+        self.assertEqual(upstream["images"], [{"type": "image_url", "image_url": {"url": inline.return_value}}])
 
 
 class ExtractThroughFilesApiTest(unittest.IsolatedAsyncioTestCase):

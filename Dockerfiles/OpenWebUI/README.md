@@ -4,7 +4,7 @@ Thin wrapper over the pinned official Open WebUI slim image. Its patches let an
 Open WebUI that signs users in with OIDC send each user's own OAuth token where
 upstream allows only a shared key, let a Pipe describe the models it lists, let
 a connection leave out models or send them to the Responses API by pattern,
-and let chat documents go through an OpenAI-compatible Files API.
+and let chat documents and images go through an OpenAI-compatible Files API.
 
 ## Image contents
 
@@ -51,8 +51,8 @@ patch changes, and its removal check.
   their configured key; otherwise they keep the key. Only the auth type is
   shared; the connection's custom headers still apply to chat only.
 - [`openai-files-api.patch`](patches/openai-files-api.patch): chat documents
-  use an OpenAI-compatible Files API, such as one behind LiteLLM's
-  `files_settings`. Models that read files by ID receive them by ID, and
+  and images use an OpenAI-compatible Files API, such as one behind LiteLLM's
+  `files_settings`. Models that read files by ID receive both by ID, and
   files-api can extract the text of the document types it parses; see
   [Files API](#files-api).
   Upstream closed both native file input PRs unmerged
@@ -76,7 +76,7 @@ them from `OPENAI_API_CONFIGS`, so change that connection there.
 | `OPENAI_FILES_API_BASE_URL` | Files API base URL, including `/v1`; both features need it. |
 | `OPENAI_FILES_API_KEY` | Key used unless the OpenAI connection with the same base URL uses `system_oauth`. |
 | `OPENAI_FILES_API_PARAMS` | JSON object of string query parameters for every Files API request, such as `{"provider":"litellm_proxy"}` to select LiteLLM's `files_settings` entry. |
-| `OPENAI_FILES_API_MODELS_REGEX_PATTERN` | Model IDs that receive `OPENAI_FILES_API_FILE_EXTENSIONS` documents by file ID, such as `^langflow/`; a workspace model matches by its base model. Empty, invalid, or set without a base URL sends none; the last two log an error at startup. |
+| `OPENAI_FILES_API_MODELS_REGEX_PATTERN` | Model IDs that receive `OPENAI_FILES_API_FILE_EXTENSIONS` documents and stored images by file ID, such as `^langflow/`; they must read Responses parts. A workspace model matches by its base model. Empty, invalid, or set without a base URL sends none; the last two log an error at startup. |
 | `OPENAI_FILES_API_TIMEOUT` | Seconds each Files API request may take, and the longest wait for a document's text extraction; default `300`. |
 | `OPENAI_FILES_API_FILE_EXTENSIONS` | Comma-separated extensions of the document types files-api extracts: the `openai_files` engine extracts them there, and matching models receive them by file ID. Other files keep Open WebUI's handling, as upstream's `MINERU_FILE_EXTENSIONS` does for its `mineru` engine; default `pdf,docx,doc,pptx,ppt,xlsx,xls`. Extend it as files-api extracts more types. |
 | `CONTENT_EXTRACTION_ENGINE` | `openai_files` extracts those uploads' text through the Files API; without a base URL, their processing fails. |
@@ -86,16 +86,24 @@ them from `OPENAI_API_CONFIGS`, so change that connection there.
 Open WebUI uploads a file the first time it needs one, with
 `purpose=user_data`, and keeps the returned ID in the file's metadata. In a
 saved chat, each user message sent to a matching model carries its listed
-documents as standard Chat `file` parts with that ID. A model that uses the
-Responses API, through `"api_type": "responses"` or `responses_model_ids`,
-receives them as `input_file`, as a Langflow flow does; LiteLLM converts Chat
-`file` parts the same way for a deployment with `model_info.mode: responses`.
-Open WebUI's retrieval and file tools leave those documents out.
+documents as standard Chat `file` parts with that ID. Each raster image Open
+WebUI stores and the message shows becomes, in place of its `image_url` part,
+an `input_image` part with that ID and the image's `detail`, so the model
+reads the image from the Files API instead of a data URL that every later
+turn would send again. A model that uses the Responses API, through
+`"api_type": "responses"` or `responses_model_ids`, receives the documents as
+`input_file`, as a Langflow flow does, and the images unchanged; LiteLLM
+converts Chat `file` parts the same way for a deployment with
+`model_info.mode: responses`. Chat Completions has no image part with a file
+ID, so a matching model must read Responses parts, as such a connection or a
+Pipe that calls the Responses API does. Open WebUI's retrieval, file tools,
+and attached files context leave the files sent by ID out.
 
-Open WebUI handles the rest as usual: images, audio, and video; other files,
-whose text it extracts itself, since the Files API could not; files the user
-cannot read; documents whose upload fails, which it logs; and temporary chats,
-whose messages carry no files. A file has one ID, sent for every user who can
+Open WebUI handles the rest as usual: audio and video; images it does not
+store, such as data URLs, and SVG images; other files, whose text it extracts
+itself, since the Files API could not; files the user cannot read; files whose
+upload fails, which it logs; and documents in temporary chats, whose messages
+carry no files. A file has one ID, sent for every user who can
 read the file, so the Files API must accept any user's request for it, as
 LiteLLM's `files_settings` backend does. Open WebUI never checks an ID again,
 so the Files API must keep its files.
