@@ -1,0 +1,65 @@
+services:
+  edentext:
+    image: ghcr.io/stffnb/edentext:v0.14.0@sha256:4f82cb15a37aa681d6165a05a38d29dee10883eb304fd0010daab9b1a085434d
+    container_name: edentext
+    restart: $RESTART_POLICY_OTHERS
+    profiles:
+      - reading
+      - edentext
+    # NOTE: Static files only: no server-side storage or outbound access is needed.
+    networks:
+      - app_internal
+    expose:
+      - 80
+    user: $PUID:$PGID
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
+      - /run:rw,noexec,nosuid,nodev,size=16m,uid=$PUID,gid=$PGID,mode=755
+      - /var/cache/nginx:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=755
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 256
+    cpus: "1.0"
+    mem_limit: "1G"
+    ulimits:
+      nofile:
+        soft: 4096
+        hard: 8192
+    environment:
+      TZ: $TZ
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "-T", "3", "http://127.0.0.1/"]
+      interval: 5m
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: "app_internal"
+      ## HTTP Routers
+      traefik.http.routers.edentext-rtr.entrypoints: "websecure"
+      traefik.http.routers.edentext-rtr.rule: "Host(`edentext.$DOMAINNAME`)"
+      ## Middlewares
+      # The editor uses WebAssembly, blob workers, and optional browser-side AI requests.
+      traefik.http.routers.edentext-rtr.middlewares: "chain-tinyauth-relaxed@file"
+      ## HTTP Services
+      traefik.http.routers.edentext-rtr.service: "edentext-svc"
+      traefik.http.services.edentext-svc.loadbalancer.server.port: "80"
+      ####### TINYAUTH #######
+      tinyauth.apps.edentext.config.domain: "edentext.$DOMAINNAME"
+      ####### HOMEPAGE #######
+      homepage.group: "Reading"
+      homepage.name: "EdenText"
+      homepage.icon: "https://edentext.$DOMAINNAME/favicon.svg"
+      homepage.href: "https://edentext.$DOMAINNAME"
+      homepage.target: "_blank"
+      homepage.description: "Private browser-based word processor for DOCX and ODT"
+      ####### GLANCE #######
+      glance.name: "EdenText"
+      glance.icon: "https://edentext.$DOMAINNAME/favicon.svg"
+      glance.url: "https://edentext.$DOMAINNAME"
+      glance.description: "Private browser-based word processor for DOCX and ODT"

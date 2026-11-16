@@ -57,4 +57,5 @@ include:
   # - ../apps/pgweb.yml
   # - ../apps/pgadmin.yml # TODO
   #### READING ####
+  - ../apps/edentext.yml
   - ../apps/silverbullet.yml
