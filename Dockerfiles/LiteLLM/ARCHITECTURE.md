@@ -167,6 +167,37 @@ independent.
   WebUI's [Langflow session header](../LangflowBackend/README.md#open-webui).
   Langflow's Responses endpoint ignores its variable-override headers.
 
+## Files API ownership
+
+LiteLLM tells Files API who is calling, from the authenticated key only
+([file ownership](README.md#file-ownership)). Files API decides what the
+caller may do.
+
+| Caller | Identified by | Access |
+| --- | --- | --- |
+| User | the key's `user_id` | Own files. The key's team does not matter. |
+| Service account | the key's `team_id` and `metadata.service_account_id` | Own files. |
+| Administrator | the service account set in `FILES_ADMIN_SERVICE_ACCOUNT_ID` and `FILES_ADMIN_TEAM_ID` | Every file. Its uploads stay its own. |
+| Model server | `FILES_MODEL_TOKEN`, sent directly to Files API | Read any file by ID. No listing, upload, or delete. |
+
+- LiteLLM sends nothing else, so nothing else selects the owner: not a key
+  alias, a key hash, an email, the request's `user` field, or end-user tracking.
+- A key with neither a `user_id` nor a service-account id is rejected. So is
+  key metadata over 16 KiB.
+- A LiteLLM `proxy_admin` gets no extra access. Set both administrator
+  variables, or leave both empty to have no administrator.
+- Regenerating a key keeps its owner.
+- Open WebUI's cross-owner re-indexing must use the administrator's key.
+- The model server can read any file, so the application must check that a
+  caller may use a file ID before passing it on.
+- `FILES_GATEWAY_TOKEN` lets its holder claim any owner. Never give it to
+  users, restrict who can reach Files API, and protect the connection.
+- LiteLLM's `/key/generate` and `/key/update` accept any
+  `metadata.service_account_id` on a team key. Anyone who can create or edit
+  keys in a team can therefore act as any of that team's service accounts,
+  including the administrator. Keep ordinary users out of the administrator's
+  team.
+
 ## Provider notes
 
 - PocketID issues RFC 9068 tokens for its APIs: define the API resource, add
@@ -197,3 +228,8 @@ and MCP grants.
 The MCP principal is internal to LiteLLM, so the check resolves grants with
 LiteLLM's own resolver on every build. Change it together with this document
 and [`config.yaml`](../../configs/litellm/config.yaml).
+
+[`verify_files_ownership.py`](tests/verify_files_ownership.py) checks on every
+build that each file operation gives the files backend exactly the
+authenticated key's user_id, team_id, and metadata, and nothing the caller sent
+([file ownership](README.md#file-ownership)).

@@ -1,0 +1,137 @@
+Not an upstream bug: the files_settings backend (files-api) scopes every file
+to its owner, so the proxy has to tell it who is calling.
+
+On the provider-only upload, retrieve, content, delete and list calls, add the
+key's user_id, team_id and metadata to extra_headers. They are taken from the
+sanitized key details that add_user_information_to_llm_headers sends on model
+calls (callback credentials removed), with its x-litellm-user_api_key_* names
+and encoding. Only these three go: the backend needs nothing else, and the
+other details (aliases, email) can hold characters httpx refuses in a header.
+They are built from the authenticated key with no request headers, so a caller
+cannot set them. They go in after the team credentials and the files_settings
+entry are merged, and any header of these names from those or any other source
+is dropped. Model-routed and managed-file calls, and providers without a
+files_settings entry, are unchanged. add_user_information_to_llm_headers is not
+needed and does not change what the backend receives.
+
+Needs temporary/files-settings-routing.patch (the four non-upload calls reach the
+backend) and temporary/files-extra-headers.patch (retrieve, list and delete
+send extra_headers).
+
+Checks: tests/verify_files_ownership.py
+
+diff --git a/litellm/proxy/openai_files_endpoints/files_endpoints.py b/litellm/proxy/openai_files_endpoints/files_endpoints.py
+--- a/litellm/proxy/openai_files_endpoints/files_endpoints.py
++++ b/litellm/proxy/openai_files_endpoints/files_endpoints.py
+@@ -8,6 +8,7 @@
+ import asyncio
+ import functools
+ import itertools
++import json
+ import traceback
+ from collections.abc import Iterable, Iterator, Mapping, Sequence
+ from dataclasses import dataclass
+@@ -62,6 +63,7 @@ from litellm.proxy.common_utils.openai_error_payload import (
+     openai_error_param,
+     openai_error_type,
+ )
++from litellm.proxy.litellm_pre_call_utils import LiteLLMProxyRequestSetup
+ from litellm.proxy.openai_files_endpoints.batch_file_validation import (
+     BATCH_LINE_SHAPE,
+     PASSTHROUGH_BATCH_LINE_SHAPE,
+@@ -234,6 +236,35 @@ def set_files_config(config):
+     files_config = config
+
+
++FILES_IDENTITY_FIELDS: Final = ("user_api_key_user_id", "user_api_key_team_id", "user_api_key_auth_metadata")
++
++
++def add_user_information_headers(data: dict, user_api_key_dict: UserAPIKeyAuth, custom_llm_provider: str) -> None:
++    """Tell the provider's files_settings backend who is calling: the key's user_id, team_id and
++    metadata, from the sanitized key details add_user_information_to_llm_headers sends, named and
++    encoded as it does. Only these three go, built from the authenticated key alone.
++
++    Call it after every other merge into data: a header of these names from any other source is
++    dropped, so only the authenticated key can supply one. The dict is rebuilt, never changed in
++    place, because it can be the shared files_settings entry's own.
++    Without a files_settings entry for the provider, data is unchanged."""
++    if files_config is None or get_files_provider_config(custom_llm_provider=custom_llm_provider) is None:
++        return
++    key: Final = LiteLLMProxyRequestSetup.get_sanitized_user_information_from_key(user_api_key_dict=user_api_key_dict)
++    data["extra_headers"] = {
++        **{
++            name: value
++            for name, value in (data.get("extra_headers") or {}).items()
++            if not name.lower().startswith("x-litellm-user_api_key_")
++        },
++        **{
++            f"x-litellm-{field}": json.dumps(value) if isinstance(value, dict) else str(value)
++            for field in FILES_IDENTITY_FIELDS
++            if (value := key.get(field)) is not None
++        },
++    }
++
++
+ def get_files_provider_config(
+     custom_llm_provider: str,
+ ):
+@@ -560,6 +591,11 @@ async def route_create_file(
+             # add llm_provider_config to data
+             _create_file_request.update(llm_provider_config)
+         _create_file_request.pop("custom_llm_provider", None)
++        add_user_information_headers(
++            data=cast(dict, _create_file_request),  # cast-ok: TypedDict is a plain dict at runtime; merged in place
++            user_api_key_dict=user_api_key_dict,
++            custom_llm_provider=custom_llm_provider,
++        )
+         # for now use custom_llm_provider=="openai" -> this will change as LiteLLM adds more providers for acreate_batch
+         response = await litellm.acreate_file(**_create_file_request, custom_llm_provider=custom_llm_provider)
+
+@@ -1163,6 +1199,11 @@ async def get_file_content(
+                     user_api_key_dict=user_api_key_dict,
+                     custom_llm_provider=custom_llm_provider,
+                 )
++                add_user_information_headers(
++                    data=data,
++                    user_api_key_dict=user_api_key_dict,
++                    custom_llm_provider=custom_llm_provider,
++                )
+
+             from litellm.proxy.openai_files_endpoints.file_content_streaming_handler import (
+                 FileContentStreamingHandler,
+@@ -1429,6 +1470,11 @@ async def get_file(
+                 user_api_key_dict=user_api_key_dict,
+                 custom_llm_provider=custom_llm_provider,
+             )
++            add_user_information_headers(
++                data=data,
++                user_api_key_dict=user_api_key_dict,
++                custom_llm_provider=custom_llm_provider,
++            )
+             response = await litellm.afile_retrieve(
+                 custom_llm_provider=custom_llm_provider,
+                 file_id=file_id,
+@@ -1648,6 +1694,11 @@ async def delete_file(
+                 user_api_key_dict=user_api_key_dict,
+                 custom_llm_provider=custom_llm_provider,
+             )
++            add_user_information_headers(
++                data=data,
++                user_api_key_dict=user_api_key_dict,
++                custom_llm_provider=custom_llm_provider,
++            )
+             response = await litellm.afile_delete(
+                 custom_llm_provider=custom_llm_provider,
+                 file_id=file_id,
+@@ -2050,6 +2101,11 @@ async def list_files(
+                     user_api_key_dict=user_api_key_dict,
+                     custom_llm_provider=resolved_custom_llm_provider,
+                 )
++                add_user_information_headers(
++                    data=data,
++                    user_api_key_dict=user_api_key_dict,
++                    custom_llm_provider=resolved_custom_llm_provider,
++                )
+
+                 response = await litellm.afile_list(
+                     custom_llm_provider=resolved_custom_llm_provider,

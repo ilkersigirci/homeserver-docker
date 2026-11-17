@@ -14,7 +14,7 @@ Removal check: files_settings routing check in tests/verify_files_settings.py
 diff --git a/litellm/proxy/openai_files_endpoints/files_endpoints.py b/litellm/proxy/openai_files_endpoints/files_endpoints.py
 --- a/litellm/proxy/openai_files_endpoints/files_endpoints.py
 +++ b/litellm/proxy/openai_files_endpoints/files_endpoints.py
-@@ -248,6 +248,16 @@ def get_files_provider_config(
+@@ -279,6 +279,16 @@ def get_files_provider_config(
      return None
 
 
@@ -31,35 +31,35 @@ diff --git a/litellm/proxy/openai_files_endpoints/files_endpoints.py b/litellm/p
  def _deployment_provider(llm_router: Router, model_id: str, team_id: str | None) -> str | None:
      credentials: Final = llm_router.registry().credentials(model_id, form="with_provider", team_id=team_id)
      return None if credentials is None else credentials.get("custom_llm_provider")
-@@ -1163,6 +1173,7 @@ async def get_file_content(
+@@ -1199,6 +1209,7 @@ async def get_file_content(
                      user_api_key_dict=user_api_key_dict,
                      custom_llm_provider=custom_llm_provider,
                  )
 +                apply_files_provider_config(data=data, custom_llm_provider=custom_llm_provider)
-
-             from litellm.proxy.openai_files_endpoints.file_content_streaming_handler import (
-                 FileContentStreamingHandler,
-@@ -1429,6 +1440,7 @@ async def get_file(
+                 add_user_information_headers(
+                     data=data,
+                     user_api_key_dict=user_api_key_dict,
+@@ -1470,6 +1481,7 @@ async def get_file(
                  user_api_key_dict=user_api_key_dict,
                  custom_llm_provider=custom_llm_provider,
              )
 +            apply_files_provider_config(data=data, custom_llm_provider=custom_llm_provider)
-             response = await litellm.afile_retrieve(
-                 custom_llm_provider=custom_llm_provider,
-                 file_id=file_id,
-@@ -1648,6 +1660,7 @@ async def delete_file(
+             add_user_information_headers(
+                 data=data,
+                 user_api_key_dict=user_api_key_dict,
+@@ -1694,6 +1706,7 @@ async def delete_file(
                  user_api_key_dict=user_api_key_dict,
                  custom_llm_provider=custom_llm_provider,
              )
 +            apply_files_provider_config(data=data, custom_llm_provider=custom_llm_provider)
-             response = await litellm.afile_delete(
-                 custom_llm_provider=custom_llm_provider,
-                 file_id=file_id,
-@@ -2050,6 +2063,7 @@ async def list_files(
+             add_user_information_headers(
+                 data=data,
+                 user_api_key_dict=user_api_key_dict,
+@@ -2101,6 +2114,7 @@ async def list_files(
                      user_api_key_dict=user_api_key_dict,
                      custom_llm_provider=resolved_custom_llm_provider,
                  )
 +                apply_files_provider_config(data=data, custom_llm_provider=resolved_custom_llm_provider)
-
-                 response = await litellm.afile_list(
-                     custom_llm_provider=resolved_custom_llm_provider,
+                 add_user_information_headers(
+                     data=data,
+                     user_api_key_dict=user_api_key_dict,

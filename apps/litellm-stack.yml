@@ -27,6 +27,8 @@ x-litellm-service: &litellm-service
       hard: 8192
 
 x-litellm-env: &litellm-env
+  FILES_API_BASE_URL: ${FILES_API_BASE_URL:?Set the owned Files API URL including /v1}
+  FILES_GATEWAY_TOKEN: ${FILES_GATEWAY_TOKEN:?Set the shared Files API gateway secret}
   LITELLM_MASTER_KEY: $LITELLM_MASTER_KEY
   LITELLM_SALT_KEY: $LITELLM_SALT_KEY
   SSL_VERIFY: ${LITELLM_SSL_VERIFY:-true}

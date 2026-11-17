@@ -11,7 +11,7 @@ Enterprise source tree.
   auth, SSO, and [other license-gated features](#unlocked-features), copies
   token users' email and name onto their Internal User, and
   passes the files backend's [own fields](#file-extensions) through the
-  Files API;
+  Files API and tells it [who is calling](#file-ownership);
   [`src/`](src/) ships the `access_token.py` claim validator that
   [authentication](ARCHITECTURE.md) configures.
 - [`patches/temporary/`](patches/temporary/) holds
@@ -68,6 +68,8 @@ the patch changes, and its removal check.
   provider trace context
 - [`files-settings-routing.patch`](patches/temporary/files-settings-routing.patch):
   files_settings on file retrieve, content, delete, and list
+- [`files-extra-headers.patch`](patches/temporary/files-extra-headers.patch):
+  per-request headers on OpenAI file retrieve, list, and delete
 
 At each LiteLLM upgrade, test the pinned release without each workaround. Remove
 a patch, its source hashes, and its entry above only when its removal check
@@ -100,6 +102,58 @@ string instead. The proxy keeps its own fields (`file`, `purpose`,
 `target_model_names`, `target_storage`, `passthrough`, `litellm_metadata`), so
 a team's enforced file expiry still applies. List's `limit`, `after`, and
 `order` reach the backend too.
+
+### File ownership
+
+[`files-identity.patch`](patches/permanent/files-identity.patch) tells the
+files_settings backend who is calling, so
+[Files API](ARCHITECTURE.md#files-api-ownership) can scope each file to its
+owner. On every file operation it adds three of LiteLLM's
+`x-litellm-user_api_key_*` headers to the backend request: `user_id`,
+`team_id`, and `auth_metadata` (the key's metadata as JSON, without callback
+credentials). They are named and encoded as
+`add_user_information_to_llm_headers` does on model calls. The key's other
+details, such as aliases, email, and spend, are not sent.
+
+The headers come from the authenticated key only. A caller cannot set them or
+fill in one the key lacks. User and team ids must be ASCII, as LiteLLM's
+generated ids and PocketID subjects are; httpx refuses other characters in a
+header.
+
+Settings:
+
+- `litellm_settings.add_user_information_to_llm_headers` is not needed and
+  changes nothing on file calls. Leave it unset: on model calls that forward
+  client headers (`langflow/*`) it sends every key detail, and a non-ASCII
+  alias makes those calls fail.
+- `files_settings` chooses the backend. A provider without an entry, or a file
+  call routed by `model`, gets no headers. `extra_headers` in the entry are
+  sent too, except any `x-litellm-user_api_key_*` name.
+- `forward_client_headers_to_llm_api` has no effect on file calls. Caller `x-`
+  headers never reach the files backend, whether it is on or off.
+- `forward_traceparent_to_llm_provider` is unaffected. A `traceparent` it adds
+  is kept.
+- Leave `general_settings.user_header_mappings` unset. It lets a request header
+  replace the key's user id.
+
+Setup:
+
+- [`configs/litellm/config.yaml`](../../configs/litellm/config.yaml) sets
+  `files_settings`.
+- [`apps/litellm.yml`](../../apps/litellm.yml) and
+  [`apps/litellm-stack.yml`](../../apps/litellm-stack.yml) require
+  `FILES_API_BASE_URL` (including `/v1`) and `FILES_GATEWAY_TOKEN`, which must
+  equal Files API's own `FILES_GATEWAY_TOKEN`.
+- On `.212` the running container mounts
+  `core-services/configs/litellm/config.yaml`, not this template. Give it the
+  same `files_settings` entry when rolling out.
+
+The patch needs two [temporary workarounds](#temporary-upstream-workarounds):
+`files-settings-routing.patch` and `files-extra-headers.patch`.
+[`verify_files_ownership.py`](tests/verify_files_ownership.py) runs every file
+operation as a user key, a service-account key, and a key with neither, while
+the caller sends forged headers. The user and service-account keys have
+non-ASCII aliases, and the backend must receive exactly the three headers.
 
 ## Images
 
