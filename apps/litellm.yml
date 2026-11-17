@@ -91,8 +91,6 @@ services:
     volumes:
       - $REPO_PATH/configs/litellm/config.yaml:/app/litellm-config/config.yaml:ro
     environment:
-      FILES_API_BASE_URL: ${FILES_API_BASE_URL:?Set the owned Files API URL including /v1}
-      FILES_GATEWAY_TOKEN: ${FILES_GATEWAY_TOKEN:?Set the shared Files API gateway secret}
       LITELLM_MASTER_KEY: $LITELLM_MASTER_KEY
       LITELLM_SALT_KEY: $LITELLM_SALT_KEY
       SSL_VERIFY: ${LITELLM_SSL_VERIFY:-true}
@@ -132,6 +130,9 @@ services:
       GENERIC_USER_EMAIL_ATTRIBUTE: email
       GENERIC_USER_ID_ATTRIBUTE: sub
       GENERIC_USERINFO_ENDPOINT: https://pocketid.$BASE_DOMAINNAME/api/oidc/userinfo
+      ## FILES API Config
+      # FILES_API_BASE_URL: $FILES_API_BASE_URL
+      # FILES_GATEWAY_TOKEN: $FILES_GATEWAY_TOKEN
       ##### CUSTOM IMAGE #####
       # OAuth 2.0 resource server (litellm native JWT auth)
       JWT_PUBLIC_KEY_URL: https://pocketid.$BASE_DOMAINNAME/.well-known/openid-configuration

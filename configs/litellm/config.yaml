@@ -46,8 +46,7 @@ callback_settings:
         - gen_ai.operation.name
         - gen_ai.provider.name
 
-# Backend URL includes /v1; the secret must match Files API FILES_GATEWAY_TOKEN.
-files_settings:
-  - custom_llm_provider: openai
-    api_base: os.environ/FILES_API_BASE_URL
-    api_key: os.environ/FILES_GATEWAY_TOKEN
+# files_settings:
+#   - custom_llm_provider: openai
+#     api_base: os.environ/FILES_API_BASE_URL
+#     api_key: os.environ/FILES_GATEWAY_TOKEN
