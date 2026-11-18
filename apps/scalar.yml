@@ -39,17 +39,6 @@ services:
         {
           "sources": [
             {
-              "title": "Kreuzberg API",
-              "slug": "kreuzberg",
-              "url": "https://docparse.${DOMAINNAME}/openapi.json",
-              "servers": [
-                {
-                  "url": "https://docparse.${DOMAINNAME}",
-                  "description": "Kreuzberg via Traefik"
-                }
-              ]
-            },
-            {
               "title": "Readeck API",
               "slug": "readeck",
               "url": "/openapi/readeck.json",
