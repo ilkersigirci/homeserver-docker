@@ -487,6 +487,14 @@
       "sourceUrl": "https://codeberg.org/readeck/readeck"
     },
     {
+      "description": "Track RSSHub date tags as year-month-day versions",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/diygod/rsshub"],
+      "versioning": "regex:^(?<major>\\d{4})-(?<minor>\\d{2})-(?<patch>\\d{2})$",
+      "sourceUrl": "https://github.com/DIYgod/RSSHub"
+    },
+    {
       "description": "Group Rybbit backend and client Docker image updates",
       "matchManagers": ["docker-compose"],
       "matchDatasources": ["docker"],
