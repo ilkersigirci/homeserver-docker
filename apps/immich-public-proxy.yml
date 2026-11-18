@@ -1,7 +1,7 @@
 services:
   # NOTE: On Immich -> Admin -> Settings -> Server Settings -> External Domain
   immich-public-proxy:
-    image: ghcr.io/alangrainger/immich-public-proxy:3.4.1@sha256:d29ffe35c81f784685b6e06bc8b7d62bfb654f6e6e7ef8db95bb8aa3d7122694
+    image: ghcr.io/alangrainger/immich-public-proxy:4.2.0@sha256:ebf84972652c4cf5a7ef7d2359db35ddca46a5cf17714975abf5a8674b05935d
     container_name: immich-public-proxy
     restart: $RESTART_POLICY_MEDIA
     depends_on:
