@@ -35,6 +35,8 @@ services:
       BASE_URL: https://aiostreams.$DOMAINNAME
       SECRET_KEY: $AIOSTREAMS_SECRET_KEY
       TMDB_ACCESS_TOKEN: $TMDB_API_READ_ACCESS_TOKEN
+      TRAKT_CLIENT_ID: $TRAKT_CLIENT_ID
+      FETCH_TRAKT_ALIASES: true
       ## AUTH
       AIOSTREAMS_AUTH_REQUIRED: true
       AIOSTREAMS_AUTH: $AIOSTREAMS_AUTH # NOTE: Needed for built-in proxy and usenet engine
