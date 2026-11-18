@@ -28,7 +28,7 @@ services:
         hard: 16384
     volumes:
       - $REPO_PATH/data/aiostreams:/app/data
-    # NOTE: https://docs.aiostreams.viren070.me/configuration/environment-variables
+    # NOTE: https://aiostreams.org/configuration/environment-variables/
     environment:
       ADDON_NAME: AIOStreams
       ADDON_ID: aiostreams.$DOMAINNAME
