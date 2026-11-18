@@ -208,7 +208,7 @@ services:
   immich-folder-album-creator:
     image: salvoxia/immich-folder-album-creator:2.0.3@sha256:0bcb08e37a5de9bf2a2d7c1b1b6898351cd4a244306983e1d8126777dc34e789
     container_name: immich-folder-album-creator
-    restart: "no"
+    restart: $RESTART_POLICY_MEDIA
     depends_on:
       immich-server:
         condition: service_healthy
@@ -240,7 +240,7 @@ services:
       ALBUM_LEVELS: 1
       LOG_LEVEL: INFO
       SYNC_MODE: "2" # Remove offline assets and delete empty albums after each run
-      # RUN_IMMEDIATELY: "true" # Run the script immediately after start
+      # RUN_IMMEDIATELY: "true" # Startup dry run; also set UNATTENDED=true to apply changes
     healthcheck:
       test:
         [
