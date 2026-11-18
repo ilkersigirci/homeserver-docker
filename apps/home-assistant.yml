@@ -46,7 +46,7 @@ services:
       start_period: 30s
 
   home-assistant:
-    image: ghcr.io/home-assistant/home-assistant:2026.9.4@sha256:3e6710a7ab2a61311d9d899b719f6c3657791c63e8f4942cec4ebc42401d6b76
+    image: ghcr.io/home-assistant/home-assistant:2026.11.2@sha256:493a07e8f6530fc640223f4a0a5248f20a61ca2f718bb1d31efbf08a2c5ea28f
     container_name: home-assistant
     restart: $RESTART_POLICY_MAINTENANCE
     depends_on:
@@ -105,7 +105,7 @@ services:
       glance.description: "Home automation"
 
   home-assistant-proxied:
-    image: ghcr.io/home-assistant/home-assistant:2026.9.4@sha256:3e6710a7ab2a61311d9d899b719f6c3657791c63e8f4942cec4ebc42401d6b76
+    image: ghcr.io/home-assistant/home-assistant:2026.11.2@sha256:493a07e8f6530fc640223f4a0a5248f20a61ca2f718bb1d31efbf08a2c5ea28f
     container_name: home-assistant-proxied
     restart: $RESTART_POLICY_MAINTENANCE
     depends_on:
