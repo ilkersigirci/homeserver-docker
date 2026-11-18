@@ -55,7 +55,6 @@ include:
   # - ../apps/dufs.yml
   - ../apps/mazanoke.yml
   - ../apps/metube.yml
-  - ../apps/stremio.yml
   #### MONITORING ####
   - ../apps/rybbit.yml
   - ../apps/victoriametrics.yml
