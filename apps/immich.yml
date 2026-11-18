@@ -81,7 +81,7 @@ services:
       start_period: 1m
 
   immich-server:
-    image: ghcr.io/immich-app/immich-server:v3.3.4@sha256:f6475c58b07a8d89ec845aa8782731d36656c3c17d943e0a101dc6ed99a2e53f
+    image: ghcr.io/immich-app/immich-server:v3.4.1@sha256:7c489add298fc2f92cda4c777de6462aa206877e04087b815f62c7664af0b53b
     container_name: immich-server
     restart: $RESTART_POLICY_MEDIA
     depends_on:
