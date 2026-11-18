@@ -135,7 +135,7 @@ services:
     environment:
       TZ: $TZ
       IMMICH_ENV: production
-      IMMICH_LOG_LEVEL: ${IMMICH_LOG_LEVEL:-error}
+      IMMICH_LOG_LEVEL: ${IMMICH_LOG_LEVEL:-warn}
       IMMICH_LOG_FORMAT: console
       IMMICH_MEDIA_LOCATION: /data
       # IMMICH_CONFIG_FILE: DUMMY
@@ -161,7 +161,8 @@ services:
       # REDIS_PASSWORD: DUMMY
       # REDIS_DBINDEX: 0
       ## Prometheus
-      # IMMICH_TELEMETRY_INCLUDE: "all" # host, api, io, repo, job
+      IMMICH_TELEMETRY_INCLUDE: "api,job,repo" # all
+      OTEL_TRACES_EXPORTER: none # Metrics are scraped by the local collector.
       # IMMICH_TELEMETRY_EXCLUDE: DUMMY # host, api, io, repo, job
     healthcheck:
       disable: false
@@ -235,6 +236,7 @@ services:
       API_URL: http://immich-server:2283/api
       API_KEY: $IMMICH_API_KEY
       ROOT_PATH: /mnt/media/Photos/Pictures
+      # NOTE: Admin library settings: watching disabled for SMB; scan at "30 * * * *".
       CRON_EXPRESSION: "0 * * * *"
       TZ: Europe/Istanbul
       ALBUM_LEVELS: 1

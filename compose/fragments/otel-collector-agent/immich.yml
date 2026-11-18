@@ -1,0 +1,14 @@
+services:
+  otel-collector-agent:
+    command:
+      - --config=/etc/otelcol/config.yaml
+      - --config=/etc/otelcol/immich-metrics.yaml
+    volumes:
+      - $REPO_PATH/configs/otel-collector/immich-metrics.yaml:/etc/otelcol/immich-metrics.yaml:ro
+    healthcheck:
+      test:
+        - CMD
+        - /otelcol-contrib
+        - validate
+        - --config=/etc/otelcol/config.yaml
+        - --config=/etc/otelcol/immich-metrics.yaml

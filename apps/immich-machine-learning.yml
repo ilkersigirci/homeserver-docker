@@ -8,11 +8,12 @@ services:
     profiles:
       - media
       - immich
+      - root
     networks:
       - t3_proxy
     ports:
       - "3003:3003"
-    user: $PUID:$PGID
+    # user: $PUID:$PGID # NOTE: Use the image default user so TensorRT-RTX can initialize its library links.
     security_opt:
       - no-new-privileges:true
     cap_drop:
