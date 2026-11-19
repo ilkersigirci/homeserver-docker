@@ -19,6 +19,7 @@ from litellm.proxy.hooks.proxy_track_cost_callback import _ProxyDBLogger
 from litellm.proxy.spend_tracking.spend_tracking_utils import get_logging_payload
 from litellm.proxy.utils import ProxyLogging
 from litellm.responses.streaming_iterator import ResponsesAPIStreamingIterator
+from litellm.router_rust.invoke.streaming import StreamAttempt, wrap_responses_stream
 
 
 async def verify_disconnect(
@@ -123,8 +124,20 @@ async def verify_disconnect(
         stream.completed_response = Mock()
     if wrapped:
         source = stream
-        stream = await litellm.Router(model_list=[])._aresponses_streaming_iterator(
-            source, {"model": "gpt-4o"}
+        stream = wrap_responses_stream(
+            StreamAttempt(
+                core=litellm.Router(model_list=[]),
+                op="aresponses",
+                request={"model": "gpt-4o", "stream": True},
+                kwargs={"model": "gpt-4o", "stream": True},
+                group="gpt-4o",
+                order=None,
+                depth=0,
+                level=0,
+                deployment_id=None,
+                attempted_retries=0,
+            ),
+            source,
         )
         # The router wrapper sees the terminal event on the chunks it forwards.
         stream.completed_response = source.completed_response
@@ -144,6 +157,9 @@ async def verify_disconnect(
         )
         for event in before_output if before_text else events:
             delivered = await anext(generator)
+            # Upstream sends serialized chunks as bytes and other frames as str.
+            if isinstance(delivered, bytes):
+                delivered = delivered.decode()
             assert event["type"] in delivered
         # Cleanup must finish under cancellation, and repeated cleanup must not
         # produce duplicate callbacks or database writes.

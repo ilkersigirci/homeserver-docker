@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import KeysPanel from "@/components/chat/KeysPanel";
@@ -132,7 +132,7 @@ describe("region outage alerts", () => {
       alerts: [],
     });
     vi.mocked(getCallbackConfigsCall).mockResolvedValue([]);
-    render(
+    renderWithProviders(
       <Settings
         accessToken="token"
         userRole="admin"

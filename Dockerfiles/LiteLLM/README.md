@@ -173,7 +173,9 @@ commands, and non-root user (uid 65532). The UI image serves the same patched
 dashboard with upstream's `ui/nginx.conf`. Like upstream's unified image, the
 Python images include the SAML and Bedrock realtime extras and the in-container
 PgBouncer. They leave out the LiteAdmin MCP connector, which needs an Enterprise
-license to host, and the optional LiteAdmin Slack agent (`--admin-agent`).
+license to host, the optional LiteAdmin Slack agent (`--admin-agent`), and the
+opt-in Rust HTTP server (`litellm-gateway`, from the `litellm-proxy` package),
+which runs none of the patched Python code.
 
 ### Compose
 

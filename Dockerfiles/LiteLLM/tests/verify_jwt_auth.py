@@ -241,6 +241,10 @@ async def _verify_models(client, call, user, headers) -> None:
     async def model_info_ids(model_id=None):
         params = {"litellm_model_id": model_id} if model_id else {}
         response = await client.get("/v1/model/info", headers=headers, params=params)
+        if model_id and response.status_code == 400:
+            # A direct-ID read outside the caller's scope answers "not found".
+            assert "not found" in response.text, response.text
+            return set()
         assert response.status_code == 200, response.text
         rows = response.json()["data"]
         assert all("api_key" not in row["litellm_params"] for row in rows)

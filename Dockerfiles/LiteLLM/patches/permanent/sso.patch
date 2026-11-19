@@ -1,9 +1,9 @@
 diff --git a/litellm/proxy/management_endpoints/ui_sso.py b/litellm/proxy/management_endpoints/ui_sso.py
 --- a/litellm/proxy/management_endpoints/ui_sso.py
 +++ b/litellm/proxy/management_endpoints/ui_sso.py
-@@ -2929,20 +2929,10 @@ async def insert_sso_user(
-     if result_openid and hasattr(result_openid, "provider"):
-         new_user_request.metadata = {"auth_provider": getattr(result_openid, "provider")}
+@@ -2927,20 +2927,10 @@ async def insert_sso_user(
+         metadata={"auth_provider": getattr(result_openid, "provider")} if hasattr(result_openid, "provider") else {},
+     )
 
 -    from litellm.proxy.proxy_server import premium_user
 -
@@ -26,7 +26,7 @@ diff --git a/litellm/proxy/management_endpoints/ui_sso.py b/litellm/proxy/manage
 
 
  DefaultTeamJoin: TypeAlias = Callable[
-@@ -5123,22 +5113,10 @@ async def debug_sso_login(request: Request):
+@@ -5121,22 +5111,10 @@ async def debug_sso_login(request: Request):
      """
      _raise_if_sso_debug_disabled()
 

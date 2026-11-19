@@ -9,7 +9,7 @@ Removal check: WebSocket budget check in tests/verify_jwt_auth.py
 diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/response_api_endpoints/endpoints.py
 --- a/litellm/proxy/response_api_endpoints/endpoints.py
 +++ b/litellm/proxy/response_api_endpoints/endpoints.py
-@@ -2125,7 +2125,9 @@ async def _enforce_responses_ws_first_frame_model_auth(
+@@ -2130,7 +2130,9 @@ async def _enforce_responses_ws_first_frame_model_auth(
      user_api_key_dict: UserAPIKeyAuth,
      llm_router: "Router | None",
  ) -> None:
@@ -19,7 +19,7 @@ diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/r
          enforce_key_and_fallback_model_access,
          run_centralized_common_checks,
      )
-@@ -2133,6 +2135,7 @@ async def _enforce_responses_ws_first_frame_model_auth(
+@@ -2138,6 +2140,7 @@ async def _enforce_responses_ws_first_frame_model_auth(
          general_settings,
          llm_model_list,
          master_key,
@@ -27,7 +27,7 @@ diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/r
          user_custom_auth,
      )
 
-@@ -2154,6 +2157,13 @@ async def _enforce_responses_ws_first_frame_model_auth(
+@@ -2159,6 +2162,13 @@ async def _enforce_responses_ws_first_frame_model_auth(
          llm_model_list=llm_model_list,
          llm_router=llm_router,
      )

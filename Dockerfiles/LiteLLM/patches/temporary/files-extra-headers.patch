@@ -11,7 +11,7 @@ upstream forwards the headers (with the permanent ownership integration enabled)
 
 --- a/litellm/files/main.py
 +++ b/litellm/files/main.py
-@@ -392,6 +392,7 @@
+@@ -391,6 +391,7 @@
                  organization=optional_params.organization,
              )
              response = openai_files_instance.retrieve_file(
@@ -19,7 +19,7 @@ upstream forwards the headers (with the permanent ownership integration enabled)
                  extra_query=kwargs.get("extra_query"),
                  file_id=file_id,
                  _is_async=_is_async,
-@@ -575,6 +576,7 @@
+@@ -566,6 +567,7 @@
                  organization=optional_params.organization,
              )
              response = openai_files_instance.delete_file(
@@ -27,7 +27,7 @@ upstream forwards the headers (with the permanent ownership integration enabled)
                  extra_query=kwargs.get("extra_query"),
                  file_id=file_id,
                  _is_async=_is_async,
-@@ -783,6 +785,7 @@
+@@ -770,6 +772,7 @@
                  organization=optional_params.organization,
              )
              response = openai_files_instance.list_files(
@@ -37,7 +37,7 @@ upstream forwards the headers (with the permanent ownership integration enabled)
                  _is_async=_is_async,
 --- a/litellm/llms/openai/openai.py
 +++ b/litellm/llms/openai/openai.py
-@@ -2037,8 +2037,9 @@
+@@ -2001,8 +2001,9 @@
          file_id: str,
          openai_client: AsyncOpenAI,
          extra_query: Mapping[str, object] | None = None,
@@ -48,7 +48,7 @@ upstream forwards the headers (with the permanent ownership integration enabled)
          return response
 
      def retrieve_file(
-@@ -2053,6 +2054,7 @@
+@@ -2017,6 +2018,7 @@
          client: OpenAI | AsyncOpenAI | None = None,
          litellm_params: Mapping[str, object] | None = None,
          extra_query: Mapping[str, object] | None = None,
@@ -56,7 +56,7 @@ upstream forwards the headers (with the permanent ownership integration enabled)
      ):
          openai_client: Final[OpenAI | AsyncOpenAI | None] = self.get_openai_client(
              api_key=api_key,
-@@ -2078,8 +2080,9 @@
+@@ -2042,8 +2044,9 @@
                  file_id=file_id,
                  openai_client=openai_client,
                  extra_query=extra_query,
@@ -68,7 +68,7 @@ upstream forwards the headers (with the permanent ownership integration enabled)
 
          return response
 
-@@ -2088,8 +2091,9 @@
+@@ -2052,8 +2055,9 @@
          file_id: str,
          openai_client: AsyncOpenAI,
          extra_query: Mapping[str, object] | None = None,
@@ -79,7 +79,7 @@ upstream forwards the headers (with the permanent ownership integration enabled)
          return response
 
      def delete_file(
-@@ -2104,6 +2108,7 @@
+@@ -2068,6 +2072,7 @@
          client: OpenAI | AsyncOpenAI | None = None,
          litellm_params: Mapping[str, object] | None = None,
          extra_query: Mapping[str, object] | None = None,
@@ -87,7 +87,7 @@ upstream forwards the headers (with the permanent ownership integration enabled)
      ):
          openai_client: Final[OpenAI | AsyncOpenAI | None] = self.get_openai_client(
              api_key=api_key,
-@@ -2129,8 +2134,9 @@
+@@ -2093,8 +2098,9 @@
                  file_id=file_id,
                  openai_client=openai_client,
                  extra_query=extra_query,
@@ -99,7 +99,7 @@ upstream forwards the headers (with the permanent ownership integration enabled)
 
          return response
 
-@@ -2139,11 +2145,12 @@
+@@ -2103,11 +2109,12 @@
          openai_client: AsyncOpenAI,
          purpose: str | None = None,
          extra_query: Mapping[str, object] | None = None,
@@ -114,7 +114,7 @@ upstream forwards the headers (with the permanent ownership integration enabled)
          return response
 
      def list_files(
-@@ -2158,6 +2165,7 @@
+@@ -2122,6 +2129,7 @@
          client: OpenAI | AsyncOpenAI | None = None,
          litellm_params: Mapping[str, object] | None = None,
          extra_query: Mapping[str, object] | None = None,
@@ -122,7 +122,7 @@ upstream forwards the headers (with the permanent ownership integration enabled)
      ):
          openai_client: Final[OpenAI | AsyncOpenAI | None] = self.get_openai_client(
              api_key=api_key,
-@@ -2183,12 +2191,13 @@
+@@ -2147,12 +2155,13 @@
                  purpose=purpose,
                  openai_client=openai_client,
                  extra_query=extra_query,

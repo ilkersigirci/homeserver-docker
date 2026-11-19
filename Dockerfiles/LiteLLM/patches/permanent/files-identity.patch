@@ -39,7 +39,7 @@ diff --git a/litellm/proxy/openai_files_endpoints/files_endpoints.py b/litellm/p
  from litellm.proxy.openai_files_endpoints.batch_file_validation import (
      BATCH_LINE_SHAPE,
      PASSTHROUGH_BATCH_LINE_SHAPE,
-@@ -234,6 +236,35 @@ def set_files_config(config):
+@@ -233,6 +235,35 @@ def set_files_config(config):
      files_config = config
 
 
@@ -75,7 +75,7 @@ diff --git a/litellm/proxy/openai_files_endpoints/files_endpoints.py b/litellm/p
  def get_files_provider_config(
      custom_llm_provider: str,
  ):
-@@ -560,6 +591,11 @@ async def route_create_file(
+@@ -559,6 +590,11 @@ async def route_create_file(
              # add llm_provider_config to data
              _create_file_request.update(llm_provider_config)
          _create_file_request.pop("custom_llm_provider", None)
@@ -87,7 +87,7 @@ diff --git a/litellm/proxy/openai_files_endpoints/files_endpoints.py b/litellm/p
          # for now use custom_llm_provider=="openai" -> this will change as LiteLLM adds more providers for acreate_batch
          response = await litellm.acreate_file(**_create_file_request, custom_llm_provider=custom_llm_provider)
 
-@@ -1163,6 +1199,11 @@ async def get_file_content(
+@@ -1161,6 +1197,11 @@ async def get_file_content(
                      user_api_key_dict=user_api_key_dict,
                      custom_llm_provider=custom_llm_provider,
                  )
@@ -99,7 +99,7 @@ diff --git a/litellm/proxy/openai_files_endpoints/files_endpoints.py b/litellm/p
 
              from litellm.proxy.openai_files_endpoints.file_content_streaming_handler import (
                  FileContentStreamingHandler,
-@@ -1429,6 +1470,11 @@ async def get_file(
+@@ -1425,6 +1466,11 @@ async def get_file(
                  user_api_key_dict=user_api_key_dict,
                  custom_llm_provider=custom_llm_provider,
              )
@@ -111,7 +111,7 @@ diff --git a/litellm/proxy/openai_files_endpoints/files_endpoints.py b/litellm/p
              response = await litellm.afile_retrieve(
                  custom_llm_provider=custom_llm_provider,
                  file_id=file_id,
-@@ -1648,6 +1694,11 @@ async def delete_file(
+@@ -1643,6 +1689,11 @@ async def delete_file(
                  user_api_key_dict=user_api_key_dict,
                  custom_llm_provider=custom_llm_provider,
              )
@@ -123,7 +123,7 @@ diff --git a/litellm/proxy/openai_files_endpoints/files_endpoints.py b/litellm/p
              response = await litellm.afile_delete(
                  custom_llm_provider=custom_llm_provider,
                  file_id=file_id,
-@@ -2050,6 +2101,11 @@ async def list_files(
+@@ -2045,6 +2096,11 @@ async def list_files(
                      user_api_key_dict=user_api_key_dict,
                      custom_llm_provider=resolved_custom_llm_provider,
                  )

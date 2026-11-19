@@ -10,7 +10,7 @@ Removal check: tests/verify_background.py
 diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/response_api_endpoints/endpoints.py
 --- a/litellm/proxy/response_api_endpoints/endpoints.py
 +++ b/litellm/proxy/response_api_endpoints/endpoints.py
-@@ -930,6 +930,8 @@ async def get_response(
+@@ -935,6 +935,8 @@ async def get_response(
          fastapi_response=fastapi_response,
          read_settles_billing=read_settles_billing,
      )
@@ -19,7 +19,7 @@ diff --git a/litellm/proxy/response_api_endpoints/endpoints.py b/litellm/proxy/r
      return response
 
 
-@@ -1974,6 +1976,8 @@ async def cancel_response(
+@@ -1979,6 +1981,8 @@ async def cancel_response(
          fastapi_response=fastapi_response,
          read_settles_billing=read_settles_billing,
      )

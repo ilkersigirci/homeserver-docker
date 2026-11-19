@@ -14,7 +14,7 @@ Removal check: files_settings routing check in tests/verify_files_settings.py
 diff --git a/litellm/proxy/openai_files_endpoints/files_endpoints.py b/litellm/proxy/openai_files_endpoints/files_endpoints.py
 --- a/litellm/proxy/openai_files_endpoints/files_endpoints.py
 +++ b/litellm/proxy/openai_files_endpoints/files_endpoints.py
-@@ -279,6 +279,16 @@ def get_files_provider_config(
+@@ -278,6 +278,16 @@ def get_files_provider_config(
      return None
 
 
@@ -31,7 +31,7 @@ diff --git a/litellm/proxy/openai_files_endpoints/files_endpoints.py b/litellm/p
  def _deployment_provider(llm_router: Router, model_id: str, team_id: str | None) -> str | None:
      credentials: Final = llm_router.registry().credentials(model_id, form="with_provider", team_id=team_id)
      return None if credentials is None else credentials.get("custom_llm_provider")
-@@ -1199,6 +1209,7 @@ async def get_file_content(
+@@ -1197,6 +1207,7 @@ async def get_file_content(
                      user_api_key_dict=user_api_key_dict,
                      custom_llm_provider=custom_llm_provider,
                  )
@@ -39,7 +39,7 @@ diff --git a/litellm/proxy/openai_files_endpoints/files_endpoints.py b/litellm/p
                  add_user_information_headers(
                      data=data,
                      user_api_key_dict=user_api_key_dict,
-@@ -1470,6 +1481,7 @@ async def get_file(
+@@ -1466,6 +1477,7 @@ async def get_file(
                  user_api_key_dict=user_api_key_dict,
                  custom_llm_provider=custom_llm_provider,
              )
@@ -47,7 +47,7 @@ diff --git a/litellm/proxy/openai_files_endpoints/files_endpoints.py b/litellm/p
              add_user_information_headers(
                  data=data,
                  user_api_key_dict=user_api_key_dict,
-@@ -1694,6 +1706,7 @@ async def delete_file(
+@@ -1689,6 +1701,7 @@ async def delete_file(
                  user_api_key_dict=user_api_key_dict,
                  custom_llm_provider=custom_llm_provider,
              )
@@ -55,7 +55,7 @@ diff --git a/litellm/proxy/openai_files_endpoints/files_endpoints.py b/litellm/p
              add_user_information_headers(
                  data=data,
                  user_api_key_dict=user_api_key_dict,
-@@ -2101,6 +2114,7 @@ async def list_files(
+@@ -2096,6 +2109,7 @@ async def list_files(
                      user_api_key_dict=user_api_key_dict,
                      custom_llm_provider=resolved_custom_llm_provider,
                  )

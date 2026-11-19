@@ -26,7 +26,7 @@ Checks: tests/verify_jwt_auth.py
 diff --git a/litellm/proxy/auth/user_api_key_auth.py b/litellm/proxy/auth/user_api_key_auth.py
 --- a/litellm/proxy/auth/user_api_key_auth.py
 +++ b/litellm/proxy/auth/user_api_key_auth.py
-@@ -2311,15 +2311,6 @@ async def user_api_key_auth_builder(
+@@ -2598,15 +2598,6 @@ async def user_api_key_auth_builder(
              is_jwt = jwt_handler.is_jwt(token=api_key)
              verbose_proxy_logger.debug("is_jwt: %s", is_jwt)
              if is_jwt:
@@ -42,7 +42,7 @@ diff --git a/litellm/proxy/auth/user_api_key_auth.py b/litellm/proxy/auth/user_a
                  # Try JWT-to-Virtual-Key mapping first to avoid
                  # unnecessary DB queries in auth_builder
                  do_standard_jwt_auth = True
-@@ -2426,6 +2417,24 @@ async def user_api_key_auth_builder(
+@@ -2713,6 +2704,24 @@ async def user_api_key_auth_builder(
                              detail=f"User={user_id} has been deactivated via SCIM. Keys owned by this user cannot be used.",
                          )
 

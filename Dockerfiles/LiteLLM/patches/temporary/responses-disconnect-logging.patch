@@ -13,7 +13,7 @@ Removal check: tests/verify_responses_disconnect.py
 diff --git a/litellm/proxy/common_request_processing.py b/litellm/proxy/common_request_processing.py
 --- a/litellm/proxy/common_request_processing.py
 +++ b/litellm/proxy/common_request_processing.py
-@@ -145,6 +145,7 @@ from litellm.proxy.utils import (  # noqa: F401  # legacy module exports
+@@ -161,6 +161,7 @@ from litellm.proxy.utils import (  # noqa: F401  # legacy module exports
      check_and_merge_model_level_guardrails,
  )
  from litellm.responses.mcp.parked_stream_dispatch import in_flight_round_biller, parked_success
@@ -21,7 +21,7 @@ diff --git a/litellm/proxy/common_request_processing.py b/litellm/proxy/common_r
  from litellm.responses.streaming_iterator import partial_responses_incomplete_event_on_disconnect, spawn_logging_task
  from litellm.router import Router
  from litellm.router_api import RoutingContext
-@@ -563,6 +564,41 @@ async def _dispatch_disconnect_billing_event(logging_obj: LiteLLMLoggingObj, par
+@@ -596,6 +597,41 @@ async def _dispatch_disconnect_billing_event(logging_obj: LiteLLMLoggingObj, par
      return True
 
 
@@ -60,10 +60,10 @@ diff --git a/litellm/proxy/common_request_processing.py b/litellm/proxy/common_r
 +    return True
 +
 +
- async def _cancel_pending_gather_tasks(tasks: Sequence["asyncio.Task[object]"]) -> None:
-     pending_tasks: Final = [task for task in tasks if not task.done()]
-     for task in pending_tasks:
-@@ -4598,7 +4634,10 @@ class ProxyBaseLLMRequestProcessing:
+ _TOTAL_TIMEOUT_ROUTE_TYPES: Final = frozenset({"acompletion", "aresponses", "anthropic_messages"})
+
+
+@@ -4855,7 +4891,10 @@ class ProxyBaseLLMRequestProcessing:
                      and proxy_logging_obj is not None
                      and user_api_key_dict is not None
                  ):
@@ -73,5 +73,5 @@ diff --git a/litellm/proxy/common_request_processing.py b/litellm/proxy/common_r
 +                    ):
 +                        await proxy_logging_obj.arelease_max_parallel_requests_on_disconnect(user_api_key_dict)
 
-             if hasattr(response, "aclose"):
+             if has_attributes(response, _ClosesAsync, "aclose"):
                  try:

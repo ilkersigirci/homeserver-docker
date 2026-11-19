@@ -17,7 +17,7 @@ Checks: tests/verify_premium_ui.integration.test.tsx
 diff --git a/ui/litellm-dashboard/src/components/Teams.tsx b/ui/litellm-dashboard/src/components/Teams.tsx
 --- a/ui/litellm-dashboard/src/components/Teams.tsx
 +++ b/ui/litellm-dashboard/src/components/Teams.tsx
-@@ -215,7 +215,9 @@ const getAdminOrganizations = (
+@@ -220,7 +220,9 @@ const getAdminOrganizations = (
  };
 
  // @deprecated
@@ -25,13 +25,13 @@ diff --git a/ui/litellm-dashboard/src/components/Teams.tsx b/ui/litellm-dashboar
 +const Teams: React.FC<TeamProps> = ({ accessToken, userID, userRole, isViewOnly = false }) => {
 +  // This image's proxy serves these features without a license (premium-features.patch).
 +  const premiumUser = true;
+   const { t } = useTranslation();
    const { data: organizationsData } = useOrganizations();
    const organizations = organizationsData ?? null;
-   const { data: teamMetadataSchemaFields = [], isLoading: isTeamMetadataSchemaLoading } = useTeamMetadataSchema();
 diff --git a/ui/litellm-dashboard/src/components/chat/KeysPanel.tsx b/ui/litellm-dashboard/src/components/chat/KeysPanel.tsx
 --- a/ui/litellm-dashboard/src/components/chat/KeysPanel.tsx
 +++ b/ui/litellm-dashboard/src/components/chat/KeysPanel.tsx
-@@ -67,7 +67,9 @@ interface FormState {
+@@ -70,7 +70,9 @@ interface FormState {
    grace_period: string;
  }
 
@@ -39,13 +39,13 @@ diff --git a/ui/litellm-dashboard/src/components/chat/KeysPanel.tsx b/ui/litellm
 +const KeysPanel: React.FC<Props> = ({ accessToken, userId }) => {
 +  // This image's proxy serves these features without a license (premium-features.patch).
 +  const premiumUser = true;
+   const { t } = useTranslation();
    const queryClient = useQueryClient();
    const [rotateTarget, setRotateTarget] = useState<KeyResponse | null>(null);
-   const [regeneratedKey, setRegeneratedKey] = useState<string | null>(null);
 diff --git a/ui/litellm-dashboard/src/components/key_team_helpers/ModelMaxBudgetEditor.tsx b/ui/litellm-dashboard/src/components/key_team_helpers/ModelMaxBudgetEditor.tsx
 --- a/ui/litellm-dashboard/src/components/key_team_helpers/ModelMaxBudgetEditor.tsx
 +++ b/ui/litellm-dashboard/src/components/key_team_helpers/ModelMaxBudgetEditor.tsx
-@@ -89,9 +89,10 @@ export function ModelMaxBudgetEditor({
+@@ -95,9 +95,10 @@ export function ModelMaxBudgetEditor({
    value,
    onChange,
    availableModels,
@@ -54,13 +54,13 @@ diff --git a/ui/litellm-dashboard/src/components/key_team_helpers/ModelMaxBudget
  }: ModelMaxBudgetEditorProps) {
 +  // This image's proxy serves these features without a license (premium-features.patch).
 +  const premiumUser = true;
+   const { t } = useTranslation();
    const [entries, setEntries] = useState<ModelBudgetEntry[]>(() => modelMaxBudgetToEntries(value));
 
-   const incoming = JSON.stringify(value ?? {});
 diff --git a/ui/litellm-dashboard/src/components/organisms/create_key_button.tsx b/ui/litellm-dashboard/src/components/organisms/create_key_button.tsx
 --- a/ui/litellm-dashboard/src/components/organisms/create_key_button.tsx
 +++ b/ui/litellm-dashboard/src/components/organisms/create_key_button.tsx
-@@ -227,7 +227,9 @@ export const fetchUserModels = async (
+@@ -247,7 +247,9 @@ export const fetchUserModels = async (
   * ─────────────────────────────────────────────────────────────────────────
   */
  const CreateKey: React.FC<CreateKeyProps> = ({ team, teams, data, addKey, autoOpenCreate, prefillData }) => {
@@ -69,12 +69,12 @@ diff --git a/ui/litellm-dashboard/src/components/organisms/create_key_button.tsx
 +  // This image's proxy serves these features without a license (premium-features.patch).
 +  const premiumUser = true;
    const term = useTerminology();
+   const { t } = useTranslation();
    const keyTypeOptions = KEY_TYPE_OPTIONS.map((option) => ({
-     ...option,
 diff --git a/ui/litellm-dashboard/src/components/settings.tsx b/ui/litellm-dashboard/src/components/settings.tsx
 --- a/ui/litellm-dashboard/src/components/settings.tsx
 +++ b/ui/litellm-dashboard/src/components/settings.tsx
-@@ -627,29 +627,13 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID,
+@@ -671,29 +671,13 @@ const Settings: React.FC<SettingsPageProps> = ({ accessToken, userRole, userID,
                    {Object.entries(alerts_to_UI_NAME).map(([key, value], index) => (
                      <TableRow key={index}>
                        <TableCell>
@@ -89,7 +89,7 @@ diff --git a/ui/litellm-dashboard/src/components/settings.tsx b/ui/litellm-dashb
 -                          ) : (
 -                            <Button className="flex items-center justify-center">
 -                              <a href="https://forms.gle/W3U4PZpJGFHWtHyA9" target="_blank">
--                                ✨ Enterprise Feature
+-                                {t("loggingAndAlerts.alertTypes.enterpriseFeature")}
 -                              </a>
 -                            </Button>
 -                          )
@@ -110,11 +110,11 @@ diff --git a/ui/litellm-dashboard/src/components/settings.tsx b/ui/litellm-dashb
 +                        />
                        </TableCell>
                        <TableCell className="whitespace-normal break-words">
-                         <p>{value}</p>
+                         <p>{t(value)}</p>
 diff --git a/ui/litellm-dashboard/src/components/team/TeamInfo.tsx b/ui/litellm-dashboard/src/components/team/TeamInfo.tsx
 --- a/ui/litellm-dashboard/src/components/team/TeamInfo.tsx
 +++ b/ui/litellm-dashboard/src/components/team/TeamInfo.tsx
-@@ -594,9 +594,10 @@ const TeamInfoView: React.FC<TeamInfoProps> = ({
+@@ -615,9 +615,10 @@ const TeamInfoView: React.FC<TeamInfoProps> = ({
    is_proxy_admin,
    userModels,
    editTeam,
@@ -123,16 +123,16 @@ diff --git a/ui/litellm-dashboard/src/components/team/TeamInfo.tsx b/ui/litellm-
  }) => {
 +  // This image's proxy serves these features without a license (premium-features.patch).
 +  const premiumUser = true;
+   const { t } = useTranslation();
    const teamUpdateSchema = useMemo(
      () =>
-       teamUpdateFieldsSchema.superRefine((values, ctx) => {
 diff --git a/ui/litellm-dashboard/src/components/templates/key_info_view.tsx b/ui/litellm-dashboard/src/components/templates/key_info_view.tsx
 --- a/ui/litellm-dashboard/src/components/templates/key_info_view.tsx
 +++ b/ui/litellm-dashboard/src/components/templates/key_info_view.tsx
-@@ -103,7 +103,9 @@ export default function KeyInfoView({
-   onDelete,
-   backButtonText = "Back to Keys",
+@@ -107,7 +107,9 @@ export default function KeyInfoView({
+   backButtonText = i18n.t("keyDetail.keyInfoView.backToKeys"),
  }: KeyInfoViewProps) {
+   const { t } = useTranslation();
 -  const { accessToken, userId: userID, userRole, premiumUser } = useAuthorized();
 +  const { accessToken, userId: userID, userRole } = useAuthorized();
 +  // This image's proxy serves these features without a license (premium-features.patch).
