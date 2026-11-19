@@ -1,7 +1,7 @@
 # NOTE
 # sudo nvidia-ctk runtime configure --runtime=docker --set-as-default && sudo systemctl restart docker
 
-name: gpu_nvidia
+name: titan
 
 networks:
   dockervlan:
