@@ -47,7 +47,7 @@ and **OpenaiFilesAPI** components are loaded from `/app/custom_components` throu
 Traefik's `traefik-oidc-auth` plugin, registered in
 [`apps/traefik.yml`](../../apps/traefik.yml), handles Langflow's browser login
 through the `langflow-oidc` middleware in
-[`gpu_coding.yml`](../../configs/traefik3/rules.specific/gpu_coding.yml). It
+[`coding.yml`](../../configs/traefik3/rules.specific/coding.yml). It
 runs the authorization-code flow with PKCE, keeps the encrypted session
 cookie, refreshes tokens, and sets `Authorization: Bearer <ID token>` on
 upstream requests. Langflow's native external auth validates the issuer, the

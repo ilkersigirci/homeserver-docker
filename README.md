@@ -14,9 +14,9 @@ Compose-based homelab repository for running services across multiple machines (
 
 ## Deploy from the controller
 
-From this checkout on `gpu_coding`, run `./ansible/run deploy.yml --limit gpu`
+From this checkout on `coding`, run `./ansible/run deploy.yml --limit gpu`
 to update the target checkout, sync its environment and apply Compose. See the
-[deployment runbook](docs/RUNNING.md#deploy-from-gpu_coding) for setup and other targets.
+[deployment runbook](docs/RUNNING.md#deploy-from-coding) for setup and other targets.
 
 ## Quick Start
 

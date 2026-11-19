@@ -1,4 +1,4 @@
-name: gpu_coding
+name: coding
 
 networks:
   dockervlan:

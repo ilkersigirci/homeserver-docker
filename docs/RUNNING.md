@@ -2,9 +2,9 @@
 
 This is the operator quick reference for humans and coding agents.
 
-## Deploy from gpu_coding
+## Deploy from coding
 
-Run deployment playbooks from the Docker checkout on `gpu_coding`. The launcher
+Run deployment playbooks from the Docker checkout on `coding`. The launcher
 uses the inventory, SSH configuration, shared `check_rbw` role and pinned uv
 environment in `~/Repos/Mine/ansible-automations`. Set `ANSIBLE_AUTOMATIONS_DIR`
 if the infrastructure checkout is elsewhere.
@@ -26,7 +26,7 @@ rbw unlock
 
 The playbook updates the selected host's checkout of `main`, writes its `.env`
 with mode `0600`, and runs Compose `up` with the configured image pull policy.
-Use an SSH agent with access to the Git remote. On `gpu_coding`, `~/docker` is the
+Use an SSH agent with access to the Git remote. On `coding`, `~/docker` is the
 controller's own working checkout. Update it yourself (for example with
 `git pull --ff-only` on `main`) before deploying. Its host vars skip the Git
 task even when the deployment includes the entire `homeserver` group.

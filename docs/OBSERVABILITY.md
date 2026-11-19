@@ -10,7 +10,7 @@ This document describes the OpenTelemetry pattern used in this repository.
 
 ## Topology
 
-- Run `apps/grafana-lgtm.yml` on the coding machine (`compose/gpu_coding.yml`).
+- Run `apps/grafana-lgtm.yml` on the coding machine (`compose/coding.yml`).
 - Grafana is available at `https://grafana.coding.ilkerflix.com`.
 - Run `apps/otel-collector-agent.yml` on every machine.
 - Instrumented services send OTLP to the local `otel-collector-agent`.
