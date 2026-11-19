@@ -1,32 +1,22 @@
 ---
-- name: Load the required environment
-  block:
-    - name: Read mapped vault fields on the controller
-      ansible.builtin.command:
-        argv:
-          - rbw
-          - get
-          - "{{ item.value.item }}"
-          - --field
-          - "{{ item.value.field | default(item.key) }}"
-        expand_argument_vars: false
-      vars:
-        mapping: "{{ homeserver_rbw_env_default_mapping | combine(homeserver_rbw_env_custom_mapping) }}"
-      loop: "{{ mapping | dict2items | sort(attribute='key') }}"
-      delegate_to: localhost
-      become: false
-      check_mode: false
-      changed_when: false
-      register: homeserver_rbw_env_fields
-      failed_when: homeserver_rbw_env_fields.rc != 0 or homeserver_rbw_env_fields.stdout | length == 0
-      no_log: true
-  rescue:
-    - name: Report unreadable or empty fields
-      ansible.builtin.fail:
-        msg: >-
-          Check the rbw mappings for {{ inventory_hostname }}.
-          Failed variables: {{ ansible_failed_result.results | default([])
-          | selectattr('failed', 'defined') | selectattr('failed') | map(attribute='item.key') | join(', ') }}.
+- name: Read the mapped fields on the controller
+  ansible.builtin.command:
+    argv:
+      - "{{ ansible_playbook_python }}"
+      - "{{ role_path }}/files/read_fields.py"
+    stdin: "{{ homeserver_rbw_env_default_mapping | combine(homeserver_rbw_env_custom_mapping) | to_json }}"
+  delegate_to: localhost
+  become: false
+  check_mode: false
+  changed_when: false
+  register: homeserver_rbw_env_result
+  no_log: true
+  failed_when: false
+
+- name: Report a vault lookup failure
+  ansible.builtin.fail:
+    msg: "{{ homeserver_rbw_env_result.stderr | default('Could not run the controller vault reader.', true) }}"
+  when: homeserver_rbw_env_result.rc | default(1) != 0
 
 - name: Resolve the managed user's home directory
   ansible.builtin.getent:

@@ -31,7 +31,12 @@ controller's own working checkout. Update it yourself (for example with
 `git pull --ff-only` on `main`) before deploying. Its host vars skip the Git
 task even when the deployment includes the entire `homeserver` group.
 
-Store literal secret values in Bitwarden. The template quotes them for Compose. Add shared variable-to-field mappings in
+Store literal secret values in Bitwarden. The controller reads each mapped vault
+item once per host and selects custom fields by full name, ignoring case. Use
+canonical names such as `username` or `password` for built-in fields, which
+`rbw` resolves separately. Only the selected values go into the Compose template.
+A missing, ambiguous, or empty field stops the sync before it writes `.env`.
+Add shared variable-to-field mappings in
 `ansible/roles/homeserver_rbw_env/defaults/main.yml` and host overrides in
 `ansible/host_vars/<inventory_hostname>.yml`. Keep SSH users, addresses, and host
 membership in the infrastructure inventory. Each mapping needs an `item`. Add

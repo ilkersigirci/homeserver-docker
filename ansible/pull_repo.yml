@@ -8,6 +8,7 @@
     - name: Check the controller vault session
       ansible.builtin.import_role:
         name: check_rbw
+      when: inventory_hostname == ansible_play_hosts_all[0]
       delegate_to: localhost
       become: false
   tasks:
