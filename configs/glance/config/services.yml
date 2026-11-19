@@ -43,8 +43,8 @@
               height: 1000
 
             - type: iframe
-              title: GPU2
-              source: https://homepage.gpu2.${BASE_DOMAINNAME}
+              title: Titan
+              source: https://homepage.titan.${BASE_DOMAINNAME}
               height: 1000
 
             - type: iframe

@@ -26,17 +26,11 @@ env_vars_mapping:
     item: "Homeserver.dell"
   IMMICH_API_KEY:
     item: "Homeserver.dell"
-  IMMICH_DB_DATABASE_NAME:
-    item: "Homeserver.dell"
   IMMICH_DATA_PATH:
-    item: "Homeserver.dell"
-  IMMICH_DB_HOSTNAME:
     item: "Homeserver.dell"
   IMMICH_DB_PASSWORD:
     item: "Homeserver.dell"
   IMMICH_DB_USERNAME:
-    item: "Homeserver.dell"
-  IMMICH_REDIS_HOSTNAME:
     item: "Homeserver.dell"
   IMMICH_THUMBS_PATH:
     item: "Homeserver.dell"

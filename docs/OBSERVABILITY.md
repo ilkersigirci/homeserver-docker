@@ -56,11 +56,10 @@ Services outside `t3_proxy` use `http://<host LOCAL_STATIC_IP>:4317` (or `:4318`
 
 ## Immich Metrics
 
-On `gpu`, the collector merges `configs/otel-collector/immich-metrics.yaml` with
-its base configuration through `compose/fragments/otel-collector-agent/immich.yml`.
-It scrapes Immich API and microservices metrics on internal ports 8081 and 8082
-every 30 seconds and forwards them through the existing OTLP exporter. The
-`immich_worker` label distinguishes the two workers. Application metrics are
+On `nas`, the collector scrapes the Immich API at `immich-server:8081`.
+On `titan`, it scrapes the background worker at `immich-worker:8082`.
+Both use `configs/otel-collector/immich-metrics.yaml` at a 30-second interval.
+The `immich_worker` label identifies the worker role. Application metrics are
 enabled with `IMMICH_TELEMETRY_INCLUDE=api,job,repo`; trace export is disabled.
 
 ## Host Metrics Responsibility

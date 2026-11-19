@@ -12,10 +12,22 @@ env_vars_mapping:
     item: "Homeserver.nas"
   DIR_NOTES:
     item: "Homeserver.nas"
+  DIR_PHOTOS:
+    item: "Homeserver.nas"
   DOMAINNAME:
     item: "Homeserver.nas"
   FILESTASH_ADMIN_PASSWORD_BCRYPT:
     item: "drive.nas"
+  IMMICH_API_KEY:
+    item: "photos.nas.ilker"
+  IMMICH_DATA_PATH:
+    item: "Homeserver.nas"
+  IMMICH_DB_PASSWORD:
+    item: "Homeserver.gpu"
+  IMMICH_DB_USERNAME:
+    item: "Homeserver.gpu"
+  IMMICH_THUMBS_PATH:
+    item: "Homeserver.nas"
   JELLYFIN_API_KEY:
     item: "jellyfin.nas"
   JELLYFIN_MEILI_MASTER_KEY:

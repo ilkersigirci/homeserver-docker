@@ -1,0 +1,23 @@
+services:
+  immich-worker:
+    extends:
+      file: ./immich-server.yml
+      service: immich-server
+    container_name: immich-worker
+    networks:
+      - t3_proxy
+    environment:
+      IMMICH_WORKERS_EXCLUDE: api
+      DB_HOSTNAME: 192.168.2.23
+      DB_SKIP_MIGRATIONS: true
+      REDIS_HOSTNAME: 192.168.2.23
+      NVIDIA_DRIVER_CAPABILITIES: compute,video,utility
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "-o", "/dev/null", "http://localhost:8082/metrics"]

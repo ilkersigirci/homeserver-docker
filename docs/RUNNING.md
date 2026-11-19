@@ -82,6 +82,33 @@ The legacy script wrapper is available as `./ansible/run docker_manage.yml
 --limit gpu -e homeserver_docker_manage_action=update`. Its `update` also prunes
 dangling images.
 
+## Immich on NAS and Titan
+
+NAS serves `photos.${DOMAINNAME}` and runs the API, PostgreSQL, Valkey,
+and public-share proxy. Titan runs the background worker and CUDA ML service.
+In Vaultwarden, set `IMMICH_DATA_PATH`, `IMMICH_THUMBS_PATH`, and `DIR_PHOTOS`
+in `Homeserver.nas` and `Homeserver.titan` to the paths visible on each host.
+Both containers mount them at the same internal paths.
+
+Before starting Titan (CT 102), its Proxmox host must mount `Tank-Services`,
+`Jet-Services`, and `Tank-Critical` from the NAS. CT 102's systemd drop-in
+requires those mounts, and its pre-start check reads the Immich storage markers.
+If startup fails after a NAS outage, restore the host mounts and check them
+before retrying `pct start 102`:
+
+```bash
+/usr/local/sbin/ct102-check-immich-storage
+```
+
+Titan needs write access as UID/GID 1000 to `tank/services/gpu/immich` and
+`jet/services/immich/thumbs` under `/mnt/nas`, plus access to the external
+libraries in `tank/critical/Photos`. The worker connects directly to NAS
+at `192.168.2.23` on TCP 5432 (PostgreSQL) and 6379 (Valkey). NAS publishes
+both ports on its LAN address. PostgreSQL uses password authentication.
+Valkey trusts clients with access to the LAN.
+The NAS API uses its Docker network. The edge proxy serves public shared links
+at `share.${DOMAINNAME}` using its own `DOMAINNAME`.
+
 ## Local operations on one host
 
 - Docker installed

@@ -18,8 +18,6 @@ env_vars_mapping:
     item: "Homeserver.gpu"
   DIR_NOTES:
     item: "Homeserver.gpu"
-  DIR_PHOTOS:
-    item: "Homeserver.gpu"
   DOMAINNAME:
     item: "Homeserver.gpu"
   HYPOTHESIS_API_AUTH_COOKIE_SALT:
@@ -39,16 +37,6 @@ env_vars_mapping:
     item: "hypothesis.gpu"
     field: "CLIENT_OAUTH_ID"
   HYPOTHESIS_SECRET_KEY:
-    item: "Homeserver.gpu"
-  IMMICH_API_KEY:
-    item: "immich.photos.me"
-  IMMICH_DATA_PATH:
-    item: "Homeserver.gpu"
-  IMMICH_DB_PASSWORD:
-    item: "Homeserver.gpu"
-  IMMICH_DB_USERNAME:
-    item: "Homeserver.gpu"
-  IMMICH_THUMBS_PATH:
     item: "Homeserver.gpu"
   KARAKEEP_CLIENT_ID:
     item: "pocketid.ilker"

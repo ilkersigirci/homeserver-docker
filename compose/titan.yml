@@ -34,7 +34,10 @@ include:
   - ../apps/logrotate.yml
   - ../apps/tinyauth.yml
   - ../apps/traefik.yml
-  - ../apps/otel-collector-agent.yml
+  - path:
+      - ../apps/otel-collector-agent.yml
+      - ./fragments/otel-collector-agent/immich.yml
+      - ./fragments/otel-collector-agent/immich-worker.yml
   #### DESKTOP APPS ####
   # - ../apps/bambustudio.yml
   # - ../apps/krita.yml
@@ -46,6 +49,7 @@ include:
   # - ../apps/vscodium.yml
   # - ../apps/webtop.yml
   #### MEDIA ####
+  - ../apps/immich-worker.yml
   - path:
       - ../apps/immich-machine-learning.yml
       - ./fragments/immich-machine-learning/nvidia.yml

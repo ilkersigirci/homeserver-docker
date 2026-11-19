@@ -67,7 +67,6 @@ services:
       POSTGRES_USER: $IMMICH_DB_USERNAME
       POSTGRES_DB: immich
       POSTGRES_INITDB_ARGS: "--data-checksums"
-      PG_DATA: /var/lib/postgresql/data
       DB_STORAGE_TYPE: "SSD" # Change to "HDD" if your database isn't stored on SSDs
     healthcheck:
       test:
@@ -81,107 +80,27 @@ services:
       start_period: 1m
 
   immich-server:
-    image: ghcr.io/immich-app/immich-server:v3.4.1@sha256:7c489add298fc2f92cda4c777de6462aa206877e04087b815f62c7664af0b53b
+    extends:
+      file: ./immich-server.yml
+      service: immich-server
     container_name: immich-server
-    restart: $RESTART_POLICY_MEDIA
     depends_on:
       immich-redis:
         condition: service_healthy
       immich-postgres:
         condition: service_healthy
-    profiles:
-      - media
-      - immich
     networks:
       - t3_proxy
       - immich_backend
     expose:
       - 2283
-    user: $PUID:$PGID
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    cap_add: []
-    pids_limit: 1024
-    cpus: "4.0"
-    mem_limit: "6G"
-    ulimits:
-      nofile:
-        soft: 8192
-        hard: 16384
-    volumes:
-      - type: bind
-        source: $IMMICH_THUMBS_PATH
-        target: /data/thumbs
-        bind:
-          create_host_path: false
-      - type: bind
-        source: $IMMICH_DATA_PATH
-        target: /data
-        bind:
-          create_host_path: false
-      - type: bind
-        source: $DIR_PHOTOS/Pictures
-        target: /mnt/media/Photos/Pictures
-        bind:
-          create_host_path: false
-      - type: bind
-        source: $DIR_PHOTOS/Videos
-        target: /mnt/media/Photos/Videos
-        read_only: true
-        bind:
-          create_host_path: false
-    environment:
-      TZ: $TZ
-      IMMICH_ENV: production
-      IMMICH_LOG_LEVEL: ${IMMICH_LOG_LEVEL:-warn}
-      IMMICH_LOG_FORMAT: console
-      IMMICH_MEDIA_LOCATION: /data
-      # IMMICH_CONFIG_FILE: DUMMY
-      NO_COLOR: false
-      IMMICH_API_METRICS_PORT: 8081
-      IMMICH_MICROSERVICES_METRICS_PORT: 8082
-      IMMICH_PROCESS_INVALID_IMAGES: false
-      IMMICH_ALLOW_SETUP: false
-      ## Ports
-      IMMICH_HOST: 0.0.0.0
-      IMMICH_PORT: 2283
-      ## Database
-      DB_HOSTNAME: immich-postgres
-      DB_PORT: 5432
-      DB_USERNAME: $IMMICH_DB_USERNAME
-      DB_PASSWORD: $IMMICH_DB_PASSWORD
-      DB_DATABASE_NAME: immich
-      DB_SKIP_MIGRATIONS: false
-      ## Redis
-      REDIS_HOSTNAME: immich-redis
-      REDIS_PORT: 6379
-      # REDIS_USERNAME: DUMMY
-      # REDIS_PASSWORD: DUMMY
-      # REDIS_DBINDEX: 0
-      ## Prometheus
-      IMMICH_TELEMETRY_INCLUDE: "api,job,repo" # all
-      OTEL_TRACES_EXPORTER: none # Metrics are scraped by the local collector.
-      # IMMICH_TELEMETRY_EXCLUDE: DUMMY # host, api, io, repo, job
-    healthcheck:
-      disable: false
-      test: ["CMD", "immich-healthcheck"]
-      interval: 2m
-      timeout: 5s
-      retries: 3
-      start_period: 2m
     labels:
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.immich-server-rtr.entrypoints: "websecure"
       traefik.http.routers.immich-server-rtr.rule: "Host(`photos.$DOMAINNAME`)"
-      # - "traefik.http.routers.immich-server-rtr.rule=Host(`photos.$DOMAINNAME`) && Pathprefix(`/api`)"
       ## Middlewares
       traefik.http.routers.immich-server-rtr.middlewares: "chain-tinyauth-relaxed@file" # NOTE: relaxed needed for `Map` tab to work
-      # traefik.http.routers.immich-server-rtr.middlewares: "chain-no-auth-relaxed@file" # NOTE: relaxed needed for `Map` tab to work
-      # - "traefik.http.routers.immich-server-rtr.middlewares=add-api"
-      # - "traefik.http.middlewares.add-api.stripprefix.prefixes=/api"
       ## HTTP Services
       traefik.http.routers.immich-server-rtr.service: "immich-server-svc"
       traefik.http.services.immich-server-svc.loadbalancer.server.port: "2283"

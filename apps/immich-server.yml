@@ -1,0 +1,76 @@
+services:
+  immich-server:
+    image: ghcr.io/immich-app/immich-server:v3.4.1@sha256:7c489add298fc2f92cda4c777de6462aa206877e04087b815f62c7664af0b53b
+    restart: $RESTART_POLICY_MEDIA
+    profiles:
+      - media
+      - immich
+    user: $PUID:$PGID
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add: []
+    pids_limit: 1024
+    cpus: "4.0"
+    mem_limit: "6G"
+    ulimits:
+      nofile:
+        soft: 8192
+        hard: 16384
+    volumes:
+      - type: bind
+        source: $IMMICH_THUMBS_PATH
+        target: /data/thumbs
+        bind:
+          create_host_path: false
+      - type: bind
+        source: $IMMICH_DATA_PATH
+        target: /data
+        bind:
+          create_host_path: false
+      - type: bind
+        source: $DIR_PHOTOS/Pictures
+        target: /mnt/media/Photos/Pictures
+        bind:
+          create_host_path: false
+      - type: bind
+        source: $DIR_PHOTOS/Videos
+        target: /mnt/media/Photos/Videos
+        read_only: true
+        bind:
+          create_host_path: false
+    environment:
+      TZ: $TZ
+      IMMICH_ENV: production
+      IMMICH_LOG_LEVEL: ${IMMICH_LOG_LEVEL:-warn}
+      IMMICH_LOG_FORMAT: console
+      IMMICH_MEDIA_LOCATION: /data
+      NO_COLOR: false
+      IMMICH_API_METRICS_PORT: 8081
+      IMMICH_MICROSERVICES_METRICS_PORT: 8082
+      IMMICH_PROCESS_INVALID_IMAGES: false
+      IMMICH_ALLOW_SETUP: false
+      ## Ports
+      IMMICH_HOST: 0.0.0.0
+      IMMICH_PORT: 2283
+      ## Database
+      DB_HOSTNAME: immich-postgres
+      DB_PORT: 5432
+      DB_USERNAME: $IMMICH_DB_USERNAME
+      DB_PASSWORD: $IMMICH_DB_PASSWORD
+      DB_DATABASE_NAME: immich
+      DB_SKIP_MIGRATIONS: false
+      ## Redis
+      REDIS_HOSTNAME: immich-redis
+      REDIS_PORT: 6379
+      ## Prometheus
+      IMMICH_TELEMETRY_INCLUDE: "api,job,repo"
+      OTEL_TRACES_EXPORTER: none # Metrics are scraped by the local collector.
+    healthcheck:
+      disable: false
+      test: ["CMD", "immich-healthcheck"]
+      interval: 2m
+      timeout: 5s
+      retries: 3
+      start_period: 2m

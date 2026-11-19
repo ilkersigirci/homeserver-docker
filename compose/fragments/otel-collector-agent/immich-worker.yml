@@ -1,0 +1,5 @@
+services:
+  otel-collector-agent:
+    environment:
+      IMMICH_METRICS_TARGET: immich-worker:8082
+      IMMICH_METRICS_WORKER: microservices

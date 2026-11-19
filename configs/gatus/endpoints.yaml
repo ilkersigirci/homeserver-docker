@@ -185,6 +185,12 @@ endpoints:
 
   ################# NAS #################
 
+  - name: Immich-NAS
+    <<: [*https-default, *maintenance-window-default]
+    group: NAS
+    interval: 1h
+    url: "https://photos.nas.$DOMAINNAME"
+
   - name: Jellyfin-NAS
     <<: [*https-default, *maintenance-window-default]
     group: NAS
@@ -210,12 +216,6 @@ endpoints:
     group: GPU
     interval: 1h
     url: "icmp://homepage.gpu.$DOMAINNAME"
-
-  - name: Immich-GPU
-    <<: [*https-default, *maintenance-window-default]
-    group: GPU
-    interval: 1h
-    url: "https://photos.gpu.$DOMAINNAME"
 
   - name: vllm/Qwen3.6-35B-A3B
     <<: *ai-gateway-model-default

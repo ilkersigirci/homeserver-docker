@@ -2,5 +2,15 @@
 env_vars_mapping:
   ARCANE_AGENT_TOKEN:
     item: "Homeserver.titan"
+  DIR_PHOTOS:
+    item: "Homeserver.titan"
   DOMAINNAME:
+    item: "Homeserver.titan"
+  IMMICH_DATA_PATH:
+    item: "Homeserver.titan"
+  IMMICH_DB_PASSWORD:
+    item: "Homeserver.gpu"
+  IMMICH_DB_USERNAME:
+    item: "Homeserver.gpu"
+  IMMICH_THUMBS_PATH:
     item: "Homeserver.titan"

@@ -1,0 +1,12 @@
+services:
+  immich-server:
+    environment:
+      IMMICH_WORKERS_INCLUDE: api
+  immich-postgres:
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "${LOCAL_STATIC_IP}:5432:5432"
+  immich-redis:
+    ports:
+      - "${LOCAL_STATIC_IP}:6379:6379"

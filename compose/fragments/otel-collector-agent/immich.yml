@@ -3,6 +3,9 @@ services:
     command:
       - --config=/etc/otelcol/config.yaml
       - --config=/etc/otelcol/immich-metrics.yaml
+    environment:
+      IMMICH_METRICS_TARGET: immich-server:8081
+      IMMICH_METRICS_WORKER: api
     volumes:
       - $REPO_PATH/configs/otel-collector/immich-metrics.yaml:/etc/otelcol/immich-metrics.yaml:ro
     healthcheck:

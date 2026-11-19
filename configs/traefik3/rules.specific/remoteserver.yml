@@ -55,4 +55,4 @@ http:
     immich-public-proxy-svc:
       loadBalancer:
         servers:
-          - url: "http://100.64.0.9:1003"
+          - url: "http://100.64.0.23:1003"
