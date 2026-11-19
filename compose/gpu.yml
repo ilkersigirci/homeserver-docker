@@ -32,39 +32,25 @@ include:
   - path:
       - ../apps/otel-collector-agent.yml
       - ./fragments/otel-collector-agent/immich.yml
-  # - ../apps/vaultwarden.yml
   ###### MAINTENANCE ####
-  # - ../apps/healthchecks.yml
-  # - ../apps/rustic.yml
-  # - ../apps/syncthing.yml
-  # - ../apps/termix.yml
   - ../apps/whoami.yml
-  # - ../apps/watchtower.yml
   #### MEDIA ####
   - ../apps/bichon.yml
-  # - ../apps/feishin.yml
-  # - ../apps/mediamanager.yml
-  # - ../apps/oxicloud.yml
   - ../apps/pinchflat.yml
-  # - ../apps/scotty.yml
   # - ../apps/splitpro.yml
   # - ../apps/strava-statistics.yml
   # - ../apps/ytptube.yml # TODO: restart always
   #### MONITORING ####
   - ../apps/gatus-container-health.yml
-  # - ../apps/watchyourlan.yml
   #### PHOTO ####
   - ../apps/immich.yml
   - ../apps/immich-public-proxy.yml
-  # - ../apps/immich-machine-learning.yml
-  # - ./fragments/immich-machine-learning/nvidia.yml
   #### PROGRAMMING ####
   - ../apps/scalar.yml
   #### READING ####
   # - ../apps/hypothesis.yml
   # - ../apps/karakeep.yml
   - ../apps/rsshub.yml
-  # - ../apps/quartz.yml
   #### OTHERS ####
   - ../apps/excalidash.yml
   - ../apps/bambuddy.yml
