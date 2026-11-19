@@ -62,12 +62,6 @@ env_vars_mapping:
     item: "Homeserver.gpu"
   IMMICH_THUMBS_PATH:
     item: "Homeserver.gpu"
-  JELLYFIN_API_KEY:
-    item: "jellyfin.gpu"
-  JELLYFIN_MEILI_MASTER_KEY:
-    item: "Homeserver.gpu"
-  JELLYSEERR_API_KEY:
-    item: "jellyseerr.gpu"
   KARAKEEP_CLIENT_ID:
     item: "pocketid.ilker"
   KARAKEEP_CLIENT_SECRET:

@@ -43,8 +43,6 @@ include:
   #### MEDIA ####
   - ../apps/bichon.yml
   # - ../apps/feishin.yml
-  - ../apps/jellyfin.yml
-  - ../apps/jellyseerr.yml
   - ../apps/kiwix-serve.yml
   # - ../apps/mediamanager.yml
   # - ../apps/oxicloud.yml

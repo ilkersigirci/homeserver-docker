@@ -90,7 +90,12 @@ services:
       - $REPO_PATH/appdata/jellyfin:/config
       - $REPO_PATH/appdata/jellyfin/cache:/cache
       - $REPO_PATH/data/jellyfin/metadata:/config/metadata
-      - $REPO_PATH/data/downloads:/media/downloads:ro
+      - type: bind
+        source: $DIR_MEDIA/Downloads
+        target: /media/downloads
+        read_only: true
+        bind:
+          create_host_path: false
       - type: bind
         source: $DIR_MEDIA
         target: /media/local

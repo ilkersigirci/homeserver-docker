@@ -14,6 +14,12 @@ env_vars_mapping:
     item: "Homeserver.nas"
   FILESTASH_ADMIN_PASSWORD_BCRYPT:
     item: "drive.nas"
+  JELLYFIN_API_KEY:
+    item: "jellyfin.nas"
+  JELLYFIN_MEILI_MASTER_KEY:
+    item: "Homeserver.nas"
+  JELLYSEERR_API_KEY:
+    item: "jellyseerr.nas"
   SABNZBD_API_KEY:
     item: "sabnzbd.nas"
   VERSITYGW_ROOT_ACCESS_KEY:

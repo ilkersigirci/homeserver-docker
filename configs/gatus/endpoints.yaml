@@ -183,6 +183,14 @@ endpoints:
       - "[BODY] == 192.168.2.9"
       - "[DNS_RCODE] == NOERROR"
 
+  ################# NAS #################
+
+  - name: Jellyfin-NAS
+    <<: [*https-default, *maintenance-window-default]
+    group: NAS
+    interval: 1h
+    url: "https://jellyfin.nas.$DOMAINNAME"
+
   ################# GPU #################
 
   - name: DNS - gpu
@@ -202,12 +210,6 @@ endpoints:
     group: GPU
     interval: 1h
     url: "icmp://homepage.gpu.$DOMAINNAME"
-
-  - name: Jellyfin-GPU
-    <<: [*https-default, *maintenance-window-default]
-    group: GPU
-    interval: 1h
-    url: "https://jellyfin.gpu.$DOMAINNAME"
 
   - name: Immich-GPU
     <<: [*https-default, *maintenance-window-default]

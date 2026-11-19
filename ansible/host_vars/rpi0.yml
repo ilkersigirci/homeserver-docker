@@ -33,11 +33,11 @@ env_vars_mapping:
   HEADSCALE_API_KEY:
     item: "headscale.remoteserver"
   JELLYFIN_API_KEY:
-    item: "jellyfin.gpu"
+    item: "jellyfin.nas"
   JELLYFIN_URL:
     item: "Homeserver.rpi0"
   JELLYFIN_USER_ID:
-    item: "jellyfin.gpu"
+    item: "jellyfin.nas"
   MAXMIND_LICENSE_KEY:
     item: "maxmind.com"
   NETWORK_INTERFACE_NAMES:

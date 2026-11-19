@@ -37,6 +37,8 @@ include:
   #### MEDIA ####
   # - ../apps/filebrowser.yml
   - ../apps/filestash.yml
+  - ../apps/jellyfin.yml
+  - ../apps/jellyseerr.yml
   - ../apps/sabnzbd.yml
   - ../apps/transmission.yml
   - ../apps/versitygw.yml
