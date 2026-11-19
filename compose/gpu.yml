@@ -43,15 +43,12 @@ include:
   #### MEDIA ####
   - ../apps/bichon.yml
   # - ../apps/feishin.yml
-  - ../apps/kiwix-serve.yml
   # - ../apps/mediamanager.yml
   # - ../apps/oxicloud.yml
   - ../apps/pinchflat.yml
-  - ../apps/prowlarr.yml
   # - ../apps/scotty.yml
   # - ../apps/splitpro.yml
   # - ../apps/strava-statistics.yml
-  - ../apps/yamtrack.yml
   # - ../apps/ytptube.yml # TODO: restart always
   #### MONITORING ####
   - ../apps/gatus-container-health.yml
@@ -66,8 +63,6 @@ include:
   #### READING ####
   # - ../apps/hypothesis.yml
   # - ../apps/karakeep.yml
-  - ../apps/linkwarden.yml
-  - ../apps/readeck.yml
   - ../apps/rsshub.yml
   # - ../apps/quartz.yml
   #### OTHERS ####

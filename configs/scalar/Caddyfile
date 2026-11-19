@@ -4,10 +4,10 @@
 }
 
 (readeck_proxy) {
-	reverse_proxy http://readeck:8000 {
-		header_up Host "readeck.{$DOMAINNAME}"
+	reverse_proxy https://{$READECK_HOST} {
+		header_up Host "{$READECK_HOST}"
 		header_up Authorization "Bearer {$READECK_API_TOKEN_ALLROLES}"
-		header_up X-Forwarded-Host "readeck.{$DOMAINNAME}"
+		header_up X-Forwarded-Host "{$READECK_HOST}"
 		header_up X-Forwarded-Proto "https"
 	}
 }

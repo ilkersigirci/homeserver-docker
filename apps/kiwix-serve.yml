@@ -27,7 +27,7 @@ services:
         hard: 8192
     volumes:
       - type: bind
-        source: $DIR_KIWIX
+        source: $DIR_MEDIA/Kiwix
         target: /data
         bind:
           create_host_path: false

@@ -51,7 +51,8 @@ services:
       traefik.http.routers.readeck-rtr.entrypoints: "websecure"
       traefik.http.routers.readeck-rtr.rule: "Host(`readeck.$DOMAINNAME`)"
       ## Middlewares
-      traefik.http.routers.readeck-rtr.middlewares: "middlewares-scalar-openapi-cors@file,chain-tinyauth@file"
+      # Readeck sets a nonce-based CSP that permits its Pocket ID form redirect.
+      traefik.http.routers.readeck-rtr.middlewares: "chain-tinyauth-relaxed@file"
       ## HTTP Services
       traefik.http.routers.readeck-rtr.service: "readeck-svc"
       traefik.http.services.readeck-svc.loadbalancer.server.port: "8000"

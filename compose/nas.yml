@@ -39,10 +39,15 @@ include:
   - ../apps/filestash.yml
   - ../apps/jellyfin.yml
   - ../apps/jellyseerr.yml
+  - ../apps/kiwix-serve.yml
+  - ../apps/prowlarr.yml
   - ../apps/sabnzbd.yml
   - ../apps/transmission.yml
   - ../apps/versitygw.yml
+  - ../apps/yamtrack.yml
   #### MONITORING ####
   - ../apps/gatus-container-health.yml
   #### READING ####
+  - ../apps/linkwarden.yml
+  - ../apps/readeck.yml
   - ../apps/silverbullet.yml

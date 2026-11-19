@@ -20,6 +20,18 @@ env_vars_mapping:
     item: "Homeserver.nas"
   JELLYSEERR_API_KEY:
     item: "jellyseerr.nas"
+  LINKWARDEN_ACCESS_TOKEN:
+    item: "linkwarden.nas"
+  LINKWARDEN_CLIENT_ID:
+    item: "pocketid.ilker"
+  LINKWARDEN_CLIENT_SECRET:
+    item: "pocketid.ilker"
+  LINKWARDEN_NEXTAUTH_SECRET:
+    item: "Homeserver.nas"
+  READECK_CLIENT_ID:
+    item: "pocketid.ilker"
+  READECK_CLIENT_SECRET:
+    item: "pocketid.ilker"
   SABNZBD_API_KEY:
     item: "sabnzbd.nas"
   VERSITYGW_ROOT_ACCESS_KEY:
@@ -28,3 +40,9 @@ env_vars_mapping:
   VERSITYGW_ROOT_SECRET_KEY:
     item: "s3-ui.nas"
     field: "password"
+  YAMTRACK_CLIENT_ID:
+    item: "pocketid.ilker"
+  YAMTRACK_CLIENT_SECRET:
+    item: "pocketid.ilker"
+  YAMTRACK_SECRET:
+    item: "Homeserver.nas"

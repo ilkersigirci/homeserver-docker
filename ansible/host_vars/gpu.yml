@@ -14,8 +14,6 @@ env_vars_mapping:
     item: "Homeserver.gpu"
   DIR_HARDDISKROOT:
     item: "Homeserver.gpu"
-  DIR_KIWIX:
-    item: "Homeserver.gpu"
   DIR_MEDIA:
     item: "Homeserver.gpu"
   DIR_MYREPOS:
@@ -74,21 +72,9 @@ env_vars_mapping:
     item: "Homeserver.gpu"
   KOMODO_DB_USERNAME:
     item: "Homeserver.gpu"
-  LINKWARDEN_ACCESS_TOKEN:
-    item: "linkwarden.gpu"
-  LINKWARDEN_CLIENT_ID:
-    item: "Homeserver.gpu"
-  LINKWARDEN_CLIENT_SECRET:
-    item: "Homeserver.gpu"
-  LINKWARDEN_NEXTAUTH_SECRET:
-    item: "Homeserver.gpu"
   READECK_API_TOKEN_ALLROLES:
-    item: "readeck.gpu"
+    item: "readeck.nas"
     field: "API_TOKEN_ALLROLES"
-  READECK_CLIENT_ID:
-    item: "pocketid.ilker"
-  READECK_CLIENT_SECRET:
-    item: "pocketid.ilker"
   SPLITPRO_CLIENT_ID:
     item: "pocketid.ilker"
   SPLITPRO_CLIENT_SECRET:
@@ -109,9 +95,3 @@ env_vars_mapping:
     item: "Homeserver.gpu"
   TWITTER_AUTH_TOKEN:
     item: "twitter.com"
-  YAMTRACK_CLIENT_ID:
-    item: "pocketid.ilker"
-  YAMTRACK_CLIENT_SECRET:
-    item: "pocketid.ilker"
-  YAMTRACK_SECRET:
-    item: "Homeserver.gpu"
