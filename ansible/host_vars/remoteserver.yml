@@ -1,0 +1,85 @@
+---
+env_vars_mapping:
+  ADGUARD_PASSWORD:
+    item: "adguardhome.rpi1"
+    field: "password"
+  ADGUARD_USERNAME:
+    item: "adguardhome.rpi1"
+    field: "username"
+  ARCANE_AGENT_TOKEN:
+    item: "Homeserver.remoteserver"
+  CHHOTO_API_KEY:
+    item: "go.remoteserver"
+    field: "API_KEY"
+  CONVERTX_JWT_SECRET:
+    item: "Homeserver.remoteserver"
+  CROWDSEC_ENROLL_CONTEXT:
+    item: "Homeserver.remoteserver"
+  CROWDSEC_LOG_GROUP_GID:
+    item: "Homeserver.remoteserver"
+  CROWDSEC_TRAEFIK_BOUNCER_API_KEY:
+    item: "Homeserver.remoteserver"
+  DIR_HARDDISKROOT:
+    item: "Homeserver.remoteserver"
+  DIR_MEDIA:
+    item: "Homeserver.remoteserver"
+  DIR_NOTES:
+    item: "Homeserver.remoteserver"
+  DOMAINNAME:
+    item: "Homeserver.remoteserver"
+  # LOCAL_STATIC_IP:
+  #   item: "cloud.oracle.com"
+  #   field: "REMOTE_SERVER_PRIVATE_IP"
+  FILEBROWSER_CLIENT_ID:
+    item: "pocketid.ilker"
+  FILEBROWSER_CLIENT_SECRET:
+    item: "pocketid.ilker"
+  FILEBROWSER_JWT_TOKEN_SECRET:
+    item: "Homeserver.remoteserver"
+  FILEBROWSER_ONLYOFFICE_SECRET:
+    item: "Homeserver.remoteserver"
+  GATUS_TITLE:
+    item: "Homeserver.remoteserver"
+  GOTIFY_CLIENT_ID:
+    item: "pocketid.ilker"
+  GOTIFY_CLIENT_SECRET:
+    item: "pocketid.ilker"
+  GOTIFY_CROWDSEC_TOKEN:
+    item: "gotify.remoteserver"
+  GOTIFY_DEFAULT_USER_NAME:
+    item: "gotify.remoteserver"
+    field: "username"
+  GOTIFY_DEFAULT_USER_PASS:
+    item: "gotify.remoteserver"
+    field: "password"
+  GOTIFY_HOMEPAGE_CLIENT_TOKEN:
+    item: "gotify.remoteserver"
+    field: "GOTIFY_HOMEPAGE_TOKEN"
+  HEADPLANE_COOKIE_SECRET:
+    item: "Homeserver.remoteserver"
+  HEADPLANE_AGENT_HOST_NAME:
+    item: "Homeserver.remoteserver"
+  HEADSCALE_API_KEY:
+    item: "headscale.remoteserver"
+  HEADSCALE_CLIENT_ID:
+    item: "pocketid.ilker"
+  HEADSCALE_CLIENT_SECRET:
+    item: "pocketid.ilker"
+  PGID:
+    item: "Homeserver.remoteserver"
+  PUID:
+    item: "Homeserver.remoteserver"
+  REMOTE_SERVER_PRIVATE_IP:
+    item: "cloud.oracle.ilker4fun"
+  REMOTE_SERVER_PUBLIC_IP:
+    item: "cloud.oracle.ilker4fun"
+  RYBBIT_BETTER_AUTH_SECRET:
+    item: "Homeserver.remoteserver"
+  SYNCTHING_API_KEY:
+    item: "syncthing.remoteserver"
+  TMDB_API_READ_ACCESS_TOKEN:
+    item: "tmdb.themoviedb"
+  TRAEFIK_ACCESSLOG_STATUS_CODES:
+    item: "Homeserver.remoteserver"
+  ZIPLINE_CORE_SECRET:
+    item: "Homeserver.remoteserver"

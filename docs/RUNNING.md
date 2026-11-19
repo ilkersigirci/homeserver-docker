@@ -2,14 +2,87 @@
 
 This is the operator quick reference for humans and coding agents.
 
-## Prerequisites
+## Deploy from gpu_coding
+
+Run deployment playbooks from the Docker checkout on `gpu_coding`. The launcher
+uses the inventory, SSH configuration, shared `check_rbw` role and pinned uv
+environment in `~/Repos/Mine/ansible-automations`. Set `ANSIBLE_AUTOMATIONS_DIR`
+if the infrastructure checkout is elsewhere.
+
+Provision Docker and the Compose plugin on the targets first.
+From the Docker repository root, install the deployment collection once:
+
+```bash
+uv run --frozen --project "${ANSIBLE_AUTOMATIONS_DIR:-$HOME/Repos/Mine/ansible-automations}" \
+  ansible-galaxy collection install -r ansible/collections/requirements.yml
+```
+
+After pushing a stack or mapping change to `main`, deploy to a host:
+
+```bash
+rbw unlock
+./ansible/run deploy.yml --limit gpu
+```
+
+The playbook updates the selected host's checkout of `main`, writes its `.env`
+with mode `0600`, and runs Compose `up` with the configured image pull policy.
+Use an SSH agent with access to the Git remote. On `gpu_coding`, `~/docker` is the
+controller's own working checkout. Update it yourself (for example with
+`git pull --ff-only` on `main`) before deploying. Its host vars skip the Git
+task even when the deployment includes the entire `homeserver` group.
+
+Store literal secret values in Bitwarden. The template quotes them for Compose. Add shared variable-to-field mappings in
+`ansible/roles/homeserver_rbw_env/defaults/main.yml` and host overrides in
+`ansible/host_vars/<inventory_hostname>.yml`. Keep SSH users, addresses, and host
+membership in the infrastructure inventory. Each mapping needs an `item`. Add
+`field` only when the vault field differs from the environment variable name:
+
+```yaml
+env_vars_mapping:
+  GRAFANA_CLIENT_ID:
+    item: pocketid.ilker
+  ADGUARD_PASSWORD:
+    item: adguardhome.rpi1
+    field: password
+```
+
+Run the full deployment once per host to install `compose/profiles.env`. For
+later value changes in Bitwarden, sync and apply the environment on that host:
+
+```bash
+./ansible/run deploy.yml --limit gpu --tags env,compose
+```
+
+Use `--tags checkout`, `--tags env`, or `--tags compose` for an individual phase.
+Use `--list-hosts` to preview the target selection. Omitting `--limit` selects
+the whole homeserver group. A full `--check` requires an existing target
+checkout and environment because Compose validates files on disk.
+
+For a standalone lifecycle action on an existing deployment:
+
+```bash
+./ansible/run docker_compose.yml --limit gpu -e task=restart
+```
+
+| Action | Fleet playbook behavior |
+| --- | --- |
+| `up` | Apply configuration and recreate changed services. |
+| `update` | Pull images and reconcile the stack. |
+| `pull` | Pull images only. |
+| `restart` | Take the selected stack down and bring it back up. |
+| `down` | Take the stack down and remove orphans. |
+| `prune` | Remove dangling images on the selected host. |
+
+The legacy script wrapper is available as `./ansible/run docker_manage.yml
+--limit gpu -e homeserver_docker_manage_action=update`. Its `update` also prunes
+dangling images.
+
+## Local operations on one host
 
 - Docker installed
 - Docker Compose 5.4.0 or later for automatic pulling of `pre_start` images
 - Repo `.env` exists at `$HOME/docker/.env`
 - `MY_HOSTNAME` is set and matches a file in `compose/` (examples: `gpu`, `remoteserver`, `remoteserver2`, `rpi3`)
-
-## Preferred Commands (Repository Script)
 
 ```bash
 # Start selected profiles
@@ -47,14 +120,8 @@ image reference from the error, including its digest, then retry
 Use these when you need to bypass `scripts/docker-manage.sh` and stay behavior-compatible.
 
 ```bash
-PROFILES="core,desktop_apps,maintenance,media,monitoring,programming,reading,others"
-COMPOSE_FILE="$HOME/docker/compose/$MY_HOSTNAME.yml"
-ENV_FILE="$HOME/docker/.env"
-
-COMPOSE_PROFILES="$PROFILES" docker compose --env-file "$ENV_FILE" --file "$COMPOSE_FILE" up -d
-COMPOSE_PROFILES="$PROFILES" docker compose --env-file "$ENV_FILE" --file "$COMPOSE_FILE" down --remove-orphans
-COMPOSE_PROFILES="$PROFILES" docker compose --env-file "$ENV_FILE" --file "$COMPOSE_FILE" pull
-COMPOSE_PROFILES="$PROFILES" docker compose --env-file "$ENV_FILE" --file "$COMPOSE_FILE" up -d
+cd ~/docker
+docker compose -f "compose/$MY_HOSTNAME.yml" --env-file .env --env-file compose/profiles.env up -d
 ```
 
 ## Service Log Rotation

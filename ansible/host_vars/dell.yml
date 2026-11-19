@@ -1,0 +1,50 @@
+---
+# When enabling this host with the root account:
+# repo_path: "/{{ user_name }}/docker"
+env_vars_mapping:
+  ADGUARD_PASSWORD:
+    item: "adguardhome.rpi1"
+    field: "password"
+  ADGUARD_USERNAME:
+    item: "adguardhome.rpi1"
+    field: "username"
+  DIR_HARDDISKROOT:
+    item: "Homeserver.dell"
+  DIR_MEDIA:
+    item: "Homeserver.dell"
+  DIR_PHOTOS:
+    item: "Homeserver.dell"
+  DOMAINNAME:
+    item: "Homeserver.dell"
+  FRIGATE_RTSP_HOST:
+    item: "Homeserver.dell"
+  FRIGATE_RTSP_PORT:
+    item: "Homeserver.dell"
+  FRIGATE_RTSP_USER:
+    item: "Homeserver.dell"
+  FRIGATE_RTSP_PASSWORD:
+    item: "Homeserver.dell"
+  IMMICH_API_KEY:
+    item: "Homeserver.dell"
+  IMMICH_DB_DATABASE_NAME:
+    item: "Homeserver.dell"
+  IMMICH_DATA_PATH:
+    item: "Homeserver.dell"
+  IMMICH_DB_HOSTNAME:
+    item: "Homeserver.dell"
+  IMMICH_DB_PASSWORD:
+    item: "Homeserver.dell"
+  IMMICH_DB_USERNAME:
+    item: "Homeserver.dell"
+  IMMICH_REDIS_HOSTNAME:
+    item: "Homeserver.dell"
+  IMMICH_THUMBS_PATH:
+    item: "Homeserver.dell"
+  NETWORK_INTERFACE_NAMES:
+    item: "Homeserver.dell"
+  PGID:
+    item: "Homeserver.dell"
+  PUID:
+    item: "Homeserver.dell"
+  TRAEFIK_OTEL_ENABLED:
+    item: "Homeserver.dell"

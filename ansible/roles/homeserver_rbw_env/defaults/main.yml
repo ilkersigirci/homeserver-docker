@@ -1,0 +1,87 @@
+---
+# Default mapping of environment variables to rbw items and fields
+# Omit field when the vault field matches the environment variable name.
+homeserver_rbw_env_default_mapping:
+  AIGATEWAY_API_KEY:
+    item: "aigateway.home"
+    field: "API_KEY_GENERAL"
+  AIGATEWAY_BASE_URL:
+    item: "Homeserver.COMMON"
+  AIGATEWAY_HOST:
+    item: "Homeserver.COMMON"
+  # ARCANE_AGENT_BOOTSTRAP_TOKEN:
+  #   item: "Homeserver.COMMON"
+  BASE_DOMAINNAME:
+    item: "Homeserver.COMMON"
+  BESZEL_AGENT_KEY:
+    item: "beszel.gpu"
+  BESZEL_AGENT_TOKEN:
+    item: "beszel.gpu"
+  CLOUDFLARE_DNS_API_TOKEN:
+    item: "Cloudflare.me"
+  CLOUDFLARE_EMAIL:
+    item: "Cloudflare.me"
+    field: "username"
+  CLOUDFLARE_IPS:
+    item: "Homeserver.COMMON"
+  DIR_NAS_JET_SERVICES:
+    item: "Homeserver.COMMON"
+  DIR_NAS_TANK_SERVICES:
+    item: "Homeserver.COMMON"
+  GOTIFY_GATUS_NOTIFICATION_TOKEN:
+    item: "gotify.remoteserver"
+    field: "GOTIFY_GATUS_TOKEN"
+  LANGFUSE_BASE_URL:
+    item: "Homeserver.COMMON"
+  LOCAL_IPS:
+    item: "Homeserver.COMMON"
+  OTEL_COLLECTOR_GATEWAY_ENDPOINT:
+    item: "Homeserver.COMMON"
+  OTEL_COLLECTOR_GATEWAY_INSECURE:
+    item: "Homeserver.COMMON"
+  OTEL_DEPLOYMENT_ENVIRONMENT:
+    item: "Homeserver.COMMON"
+  PGID:
+    item: "Homeserver.COMMON"
+  PUID:
+    item: "Homeserver.COMMON"
+  RENOVATE_GITHUB_COM_TOKEN:
+    item: "github.sigirciilker"
+    field: "GITHUB_TOKEN_READONLY_PUBLIC"
+  RESTART_POLICY_CORE:
+    item: "Homeserver.COMMON"
+  RESTART_POLICY_DESKTOP_IMAGES:
+    item: "Homeserver.COMMON"
+  RESTART_POLICY_MAINTENANCE:
+    item: "Homeserver.COMMON"
+  RESTART_POLICY_MEDIA:
+    item: "Homeserver.COMMON"
+  RESTART_POLICY_PROGRAMMING:
+    item: "Homeserver.COMMON"
+  RESTART_POLICY_OTHERS:
+    item: "Homeserver.COMMON"
+  S3_REGION:
+    item: "Homeserver.COMMON"
+  S3_URL:
+    item: "Homeserver.COMMON"
+  TINYAUTH_CLIENT_ID:
+    item: "pocketid.ilker"
+  TINYAUTH_CLIENT_SECRET:
+    item: "pocketid.ilker"
+  TINYAUTH_USERS:
+    item: "Homeserver.COMMON"
+  TRAEFIK_OTEL_ENABLED:
+    item: "Homeserver.COMMON"
+  TZ:
+    item: "Homeserver.COMMON"
+  WEBFINGER_USERNAME:
+    item: "Homeserver.COMMON"
+
+# Custom mapping to merge with defaults (override in group_vars/host_vars)
+homeserver_rbw_env_custom_mapping: "{{ env_vars_mapping | default({}) }}"
+
+# Destination path for .env file
+homeserver_rbw_env_file_path: "{{ repo_path }}/.env"
+
+# File permissions
+homeserver_rbw_env_file_mode: "0600"

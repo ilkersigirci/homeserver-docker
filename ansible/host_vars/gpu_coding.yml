@@ -1,0 +1,129 @@
+---
+# This is the working checkout that runs the deployment playbooks.
+homeserver_manage_checkout: false
+env_vars_mapping:
+  ARCANE_AGENT_TOKEN:
+    item: "Homeserver.gpu_coding"
+  CROWDSEC_VICTORIAMETRICS_URL:
+    item: "Homeserver.gpu_coding"
+  DEGOOG_SETTINGS_PASSWORDS:
+    item: "Homeserver.gpu_coding"
+  DIR_NOTES:
+    item: "Homeserver.gpu_coding"
+  DOCO_CD_API_SECRET:
+    item: "doco-cd.coding"
+  DOCO_CD_WEBHOOK_SECRET:
+    item: "doco-cd.coding"
+  DOMAINNAME:
+    item: "Homeserver.gpu_coding"
+  FORGEJO_REPO_READ_TOKEN:
+    item: "git.coding-forgejo"
+    field: "REPO_READ_TOKEN"
+  # GOTIFY_DOCO_CD_APPRISE_URL:
+  #   item: "gotify.remoteserver"
+  GRAFANA_CLIENT_ID:
+    item: "pocketid.ilker"
+  GRAFANA_CLIENT_SECRET:
+    item: "pocketid.ilker"
+  HATCHET_CLIENT_ID:
+    item: "pocketid.ilker"
+  HATCHET_CLIENT_SECRET:
+    item: "pocketid.ilker"
+  HATCHET_HOST_IP:
+    item: "Homeserver.gpu_coding"
+  LANGFLOW_CLIENT_ID:
+    item: "pocketid.ilker"
+  LANGFLOW_CLIENT_SECRET:
+    item: "pocketid.ilker"
+  LANGFLOW_DATABASE_PASSWORD:
+    item: "Homeserver.gpu_coding"
+  LANGFLOW_OIDC_SESSION_SECRET:
+    item: "Homeserver.gpu_coding"
+  LANGFLOW_SECRET_KEY:
+    item: "Homeserver.gpu_coding"
+  LANGFLOW_SUPERUSER_PASSWORD:
+    item: "Homeserver.gpu_coding"
+  LANGFUSE_CLICKHOUSE_PASSWORD:
+    item: "Homeserver.gpu_coding"
+  LANGFUSE_CLICKHOUSE_USER:
+    item: "Homeserver.gpu_coding"
+  LANGFUSE_CLIENT_ID:
+    item: "pocketid.ilker"
+  LANGFUSE_CLIENT_SECRET:
+    item: "pocketid.ilker"
+  LANGFUSE_ENCRYPTION_KEY:
+    item: "Homeserver.gpu_coding"
+  LANGFUSE_PUBLIC_KEY_LANGFLOW:
+    item: "langfuse.coding"
+  LANGFUSE_SECRET_KEY_LANGFLOW:
+    item: "langfuse.coding"
+  LANGFUSE_REDIS_PASSWORD:
+    item: "Homeserver.gpu_coding"
+  LANGFUSE_SALT_NEXTAUTH_SECRET:
+    item: "Homeserver.gpu_coding"
+  LANGFUSE_SALT:
+    item: "Homeserver.gpu_coding"
+  LGOS_API_KEY:
+    item: "Homeserver.gpu_coding"
+  LGOS_HOST_IP:
+    item: "Homeserver.gpu_coding"
+  LITELLM_CLIENT_ID:
+    item: "pocketid.ilker"
+  LITELLM_CLIENT_SECRET:
+    item: "pocketid.ilker"
+  LITELLM_DATABASE_PASSWORD:
+    item: "Homeserver.gpu_coding"
+  LITELLM_MASTER_KEY:
+    item: "Homeserver.gpu_coding"
+  LITELLM_SALT_KEY:
+    item: "Homeserver.gpu_coding"
+  MARIMO_PATH_LGOS_NOTEBOOK:
+    item: "Homeserver.gpu_coding"
+  MINIO_CLIENT_ID:
+    item: "pocketid.ilker"
+  MINIO_CLIENT_SECRET:
+    item: "pocketid.ilker"
+  MINIO_ROOT_PASSWORD:
+    item: "minio.gpu"
+    field: "password"
+  MINIO_ROOT_USER:
+    item: "minio.gpu"
+    field: "username"
+  MISTRAL_API_KEY:
+    item: "mistral.ai"
+  NAS_SERVICES_PATH:
+    item: "Homeserver.gpu_coding"
+  NETWORK_INTERFACE_NAMES:
+    item: "Homeserver.gpu"
+  OPENWEBUI_CLIENT_ID:
+    item: "pocketid.ilker"
+  OPENWEBUI_CLIENT_SECRET:
+    item: "pocketid.ilker"
+  OPENWEBUI_WEBUI_SECRET_KEY:
+    item: "Homeserver.gpu_coding"
+  OTEL_COLLECTOR_GATEWAY_ENDPOINT:
+    item: "Homeserver.gpu_coding"
+  OTEL_COLLECTOR_GATEWAY_INSECURE:
+    item: "Homeserver.gpu_coding"
+  PGADMIN_DEFAULT_EMAIL:
+    item: "pgadmin.gpu"
+    field: "username"
+  PGADMIN_DEFAULT_PASSWORD:
+    item: "pgadmin.gpu"
+    field: "password"
+  RUSTFS_ACCESS_KEY:
+    item: "rustfs.coding"
+    field: "username"
+  RUSTFS_SECRET_KEY:
+    item: "rustfs.coding"
+    field: "password"
+  TRAEFIK_OTEL_TRACING_SAMPLE_RATE:
+    item: "Homeserver.gpu_coding"
+  VERSITYGW_ROOT_ACCESS_KEY:
+    item: "s3-ui.nas"
+    field: "username"
+  VERSITYGW_ROOT_SECRET_KEY:
+    item: "s3-ui.nas"
+    field: "password"
+  ZED_WEB_TOKEN:
+    item: "Homeserver.gpu_coding"

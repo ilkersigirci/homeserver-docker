@@ -1,0 +1,61 @@
+---
+- name: Manage homeserver Docker natively
+  hosts: homeserver
+  gather_facts: false
+  any_errors_fatal: true
+  become: true
+  become_user: "{{ user_name }}"
+  module_defaults:
+    community.docker.docker_compose_v2: &compose_project
+      files: "{{ homeserver_docker_compose_files }}"
+      env_files: "{{ homeserver_docker_compose_env_files }}"
+      profiles: "{{ homeserver_docker_compose_profiles | default(omit) }}"
+    community.docker.docker_compose_v2_pull: *compose_project
+  pre_tasks:
+    - name: Validate Docker action
+      ansible.builtin.assert:
+        that:
+          - task | default('') | length > 0
+          - task in homeserver_docker_compose_allowed_actions
+        fail_msg: >-
+          Set task to one of:
+          {{ homeserver_docker_compose_allowed_actions | sort | join(', ') }}.
+        quiet: true
+
+    - name: Check required Compose files before changing any stack
+      ansible.builtin.file:
+        path: "{{ homeserver_docker_compose_project_src }}/{{ item }}"
+        state: file
+      loop: "{{ homeserver_docker_compose_files + homeserver_docker_compose_env_files }}"
+      when: task != 'prune'
+
+  tasks:
+    - name: Stop Docker Compose stack
+      community.docker.docker_compose_v2:
+        project_src: "{{ homeserver_docker_compose_project_src }}"
+        remove_orphans: true
+        state: absent
+      no_log: true # Container labels returned by the module can contain secrets.
+      when: task in ['down', 'restart']
+
+    - name: Reconcile Docker Compose stack
+      community.docker.docker_compose_v2:
+        project_src: "{{ homeserver_docker_compose_project_src }}"
+        pull: "{{ 'always' if task == 'update' else 'policy' }}"
+        state: present
+      no_log: true # Container labels returned by the module can contain secrets.
+      when: task in ['up', 'update', 'restart']
+
+    - name: Pull Docker Compose images
+      community.docker.docker_compose_v2_pull:
+        project_src: "{{ homeserver_docker_compose_project_src }}"
+        policy: always
+      no_log: true
+      when: task == 'pull'
+
+    - name: Prune dangling Docker images
+      community.docker.docker_prune:
+        images: true
+        images_filters:
+          dangling: true
+      when: task == 'prune' and not ansible_check_mode

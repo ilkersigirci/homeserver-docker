@@ -1,0 +1,74 @@
+---
+env_vars_mapping:
+  AIOSTREAMS_AUTH:
+    item: "aiostreams.home"
+  AIOSTREAMS_CLIENT_ID:
+    item: "pocketid.ilker"
+  AIOSTREAMS_CLIENT_SECRET:
+    item: "pocketid.ilker"
+  AIOSTREAMS_SECRET_KEY:
+    item: "Homeserver.rpi0"
+  ARCANE_AGENT_TOKEN:
+    item: "Homeserver.rpi0"
+  BIFROST_ADMIN_PASSWORD:
+    item: "aigateway.home"
+    field: "password"
+  BIFROST_ADMIN_USERNAME:
+    item: "aigateway.home"
+    field: "username"
+  CHANGEDETECTION_API_KEY:
+    item: "changedetection.rpi2"
+  DIR_HARDDISKROOT:
+    item: "Homeserver.rpi0"
+  DIR_NOTES:
+    item: "Homeserver.rpi0"
+  DOMAINNAME:
+    item: "Homeserver.rpi0"
+  GITHUB_DASHBOARD_TOKEN:
+    item: "github.sigirciilker"
+  GLANCE_SECRET_TOKEN:
+    item: "Homeserver.rpi0"
+  HASS_API_KEY:
+    item: "homeassistant.home"
+  HEADSCALE_API_KEY:
+    item: "headscale.remoteserver"
+  JELLYFIN_API_KEY:
+    item: "jellyfin.gpu"
+  JELLYFIN_URL:
+    item: "Homeserver.rpi0"
+  JELLYFIN_USER_ID:
+    item: "jellyfin.gpu"
+  MAXMIND_LICENSE_KEY:
+    item: "maxmind.com"
+  NETWORK_INTERFACE_NAMES:
+    item: "Homeserver.rpi0"
+  OPENAI_API_KEY:
+    item: "openai.work"
+    field: "litellm.service_account.key"
+  OPENROUTER_API_KEY:
+    item: "openrouter.ai"
+  OPENAI_HOMESERVER_API_KEY:
+    item: "api.coding"
+    field: "API_KEY_LANGFUSE"
+  POCKETID_ENCRYPTION_KEY:
+    item: "Homeserver.rpi0"
+  SYNCTHING_API_KEY:
+    item: "syncthing.home"
+  SYNCTHING_NOTES_FOLDER_ID:
+    item: "syncthing.home"
+  QUARTZ_REBUILD_WEBHOOK_SECRET:
+    item: "Homeserver.rpi0"
+  TMDB_API_READ_ACCESS_TOKEN:
+    item: "tmdb.themoviedb"
+  TRAKT_CLIENT_ID:
+    item: "trakt.tv"
+    field: "TRAKT_GLANCE_CLIENT_ID"
+  TRAKT_USERNAME:
+    item: "trakt.tv"
+    field: "username"
+  VAULTWARDEN_ADMIN_TOKEN:
+    item: "Homeserver.rpi0"
+  VAULTWARDEN_CLIENT_ID:
+    item: "pocketid.ilker"
+  VAULTWARDEN_CLIENT_SECRET:
+    item: "pocketid.ilker"

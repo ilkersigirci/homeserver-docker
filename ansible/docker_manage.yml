@@ -1,0 +1,16 @@
+---
+- name: Manage homeserver Docker Compose
+  hosts: homeserver
+  gather_facts: false
+  become: true
+  become_user: "{{ user_name }}"
+  tasks:
+    - name: Run the local management script
+      ansible.builtin.command:
+        argv:
+          - bash
+          - "{{ homeserver_docker_manage_script_path | default(repo_path ~ '/scripts/docker-manage.sh') }}"
+          - "{{ homeserver_docker_manage_action | mandatory }}"
+        chdir: "{{ repo_path }}"
+      changed_when: true
+      no_log: true

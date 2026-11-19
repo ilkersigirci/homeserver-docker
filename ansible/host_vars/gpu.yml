@@ -1,0 +1,123 @@
+---
+env_vars_mapping:
+  ARCANE_AGENT_TOKEN:
+    item: "Homeserver.gpu"
+  BESZEL_EMAIL:
+    item: "beszel.gpu"
+    field: "username"
+  BESZEL_PASSWORD:
+    item: "beszel.gpu"
+    field: "password"
+  BICHON_ENCRYPT_PASSWORD:
+    item: "Homeserver.gpu"
+  DIR_BACKUP:
+    item: "Homeserver.gpu"
+  DIR_HARDDISKROOT:
+    item: "Homeserver.gpu"
+  DIR_KIWIX:
+    item: "Homeserver.gpu"
+  DIR_MEDIA:
+    item: "Homeserver.gpu"
+  DIR_MYREPOS:
+    item: "Homeserver.gpu"
+  DIR_NOTES:
+    item: "Homeserver.gpu"
+  DIR_PHOTOS:
+    item: "Homeserver.gpu"
+  DOMAINNAME:
+    item: "Homeserver.gpu"
+  EXCALIDASH_CLIENT_ID:
+    item: "pocketid.ilker"
+  EXCALIDASH_CLIENT_SECRET:
+    item: "pocketid.ilker"
+  EXCALIDASH_CSRF_SECRET:
+    item: "Homeserver.gpu"
+  EXCALIDASH_JWT_SECRET:
+    item: "Homeserver.gpu"
+  HYPOTHESIS_API_AUTH_COOKIE_SALT:
+    item: "Homeserver.gpu"
+  HYPOTHESIS_API_AUTH_COOKIE_SECRET_KEY:
+    item: "Homeserver.gpu"
+  HYPOTHESIS_BOOTSTRAP_EMAIL:
+    item: "hypothesis.gpu"
+    field: "email"
+  HYPOTHESIS_BOOTSTRAP_PASSWORD:
+    item: "hypothesis.gpu"
+    field: "password"
+  HYPOTHESIS_BOOTSTRAP_USERNAME:
+    item: "hypothesis.gpu"
+    field: "username"
+  HYPOTHESIS_CLIENT_OAUTH_ID:
+    item: "hypothesis.gpu"
+    field: "CLIENT_OAUTH_ID"
+  HYPOTHESIS_SECRET_KEY:
+    item: "Homeserver.gpu"
+  IMMICH_API_KEY:
+    item: "immich.photos.me"
+  IMMICH_DATA_PATH:
+    item: "Homeserver.gpu"
+  IMMICH_DB_PASSWORD:
+    item: "Homeserver.gpu"
+  IMMICH_DB_USERNAME:
+    item: "Homeserver.gpu"
+  IMMICH_THUMBS_PATH:
+    item: "Homeserver.gpu"
+  JELLYFIN_API_KEY:
+    item: "jellyfin.gpu"
+  JELLYFIN_MEILI_MASTER_KEY:
+    item: "Homeserver.gpu"
+  JELLYSEERR_API_KEY:
+    item: "jellyseerr.gpu"
+  KARAKEEP_CLIENT_ID:
+    item: "pocketid.ilker"
+  KARAKEEP_CLIENT_SECRET:
+    item: "pocketid.ilker"
+  KARAKEEP_MEILI_MASTER_KEY:
+    item: "Homeserver.gpu"
+  KARAKEEP_NEXTAUTH_SECRET:
+    item: "Homeserver.gpu"
+  KOMODO_DB_PASSWORD:
+    item: "Homeserver.gpu"
+  KOMODO_DB_USERNAME:
+    item: "Homeserver.gpu"
+  LINKWARDEN_ACCESS_TOKEN:
+    item: "linkwarden.gpu"
+  LINKWARDEN_CLIENT_ID:
+    item: "Homeserver.gpu"
+  LINKWARDEN_CLIENT_SECRET:
+    item: "Homeserver.gpu"
+  LINKWARDEN_NEXTAUTH_SECRET:
+    item: "Homeserver.gpu"
+  READECK_API_TOKEN_ALLROLES:
+    item: "readeck.gpu"
+    field: "API_TOKEN_ALLROLES"
+  READECK_CLIENT_ID:
+    item: "pocketid.ilker"
+  READECK_CLIENT_SECRET:
+    item: "pocketid.ilker"
+  SPLITPRO_CLIENT_ID:
+    item: "pocketid.ilker"
+  SPLITPRO_CLIENT_SECRET:
+    item: "pocketid.ilker"
+  SPLITPRO_NEXTAUTH_SECRET:
+    item: "Homeserver.gpu"
+  STRAVA_CLIENT_ID:
+    item: "strava.com"
+    field: "STRAVA_STATISTICS_CLIENT_ID"
+  STRAVA_CLIENT_SECRET:
+    item: "strava.com"
+    field: "STRAVA_STATISTICS_CLIENT_SECRET"
+  STRAVA_REFRESH_TOKEN:
+    item: "Homeserver.gpu"
+  TMDB_API_READ_ACCESS_TOKEN:
+    item: "tmdb.themoviedb"
+  TRAEFIK_AUTH_BYPASS_KEY:
+    item: "Homeserver.gpu"
+  TWITTER_AUTH_TOKEN:
+    item: "twitter.com"
+  YAMTRACK_CLIENT_ID:
+    item: "pocketid.ilker"
+  YAMTRACK_CLIENT_SECRET:
+    item: "pocketid.ilker"
+  YAMTRACK_SECRET:
+    item: "Homeserver.gpu"

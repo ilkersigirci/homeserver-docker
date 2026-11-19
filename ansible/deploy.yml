@@ -1,0 +1,14 @@
+---
+- name: Update the application checkout
+  ansible.builtin.import_playbook: pull_repo.yml
+  tags: [checkout]
+
+- name: Generate the host environment
+  ansible.builtin.import_playbook: sync_env.yml
+  tags: [env]
+
+- name: Apply the host Compose configuration
+  ansible.builtin.import_playbook: docker_compose.yml
+  vars:
+    task: up
+  tags: [compose]

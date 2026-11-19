@@ -1,0 +1,21 @@
+---
+- name: Update the homeserver Docker checkout
+  hosts: homeserver
+  gather_facts: false
+  any_errors_fatal: true
+  become: false
+  pre_tasks:
+    - name: Check the controller vault session
+      ansible.builtin.import_role:
+        name: check_rbw
+      delegate_to: localhost
+      become: false
+  tasks:
+    - name: Update the application checkout
+      ansible.builtin.git:
+        repo: "{{ repo_url }}"
+        dest: "{{ repo_path }}"
+        version: main
+        accept_newhostkey: true
+        force: false
+      when: homeserver_manage_checkout | default(true) | bool

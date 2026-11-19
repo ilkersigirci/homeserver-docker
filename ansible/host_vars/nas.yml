@@ -1,0 +1,24 @@
+---
+env_vars_mapping:
+  ARCANE_AGENT_TOKEN:
+    item: "Homeserver.nas"
+  DIR_MEDIA:
+    item: "Homeserver.nas"
+  DIR_NAS_JET_SERVICES:
+    item: "Homeserver.nas"
+  DIR_NAS_TANK_SERVICES:
+    item: "Homeserver.nas"
+  DIR_NOTES:
+    item: "Homeserver.nas"
+  DOMAINNAME:
+    item: "Homeserver.nas"
+  FILESTASH_ADMIN_PASSWORD_BCRYPT:
+    item: "drive.nas"
+  SABNZBD_API_KEY:
+    item: "sabnzbd.nas"
+  VERSITYGW_ROOT_ACCESS_KEY:
+    item: "s3-ui.nas"
+    field: "username"
+  VERSITYGW_ROOT_SECRET_KEY:
+    item: "s3-ui.nas"
+    field: "password"

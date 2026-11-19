@@ -1,0 +1,15 @@
+---
+- name: Sync the homeserver environment from rbw
+  hosts: homeserver
+  gather_facts: false
+  any_errors_fatal: true
+  become: true
+  become_user: "{{ user_name }}"
+  pre_tasks:
+    - name: Check the controller vault session
+      ansible.builtin.import_role:
+        name: check_rbw
+      delegate_to: localhost
+      become: false
+  roles:
+    - homeserver_rbw_env

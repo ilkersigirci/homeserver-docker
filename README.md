@@ -12,6 +12,12 @@ Compose-based homelab repository for running services across multiple machines (
 - Service fragments are grouped by compose profiles (`core`, `desktop_apps`, `maintenance`, `media`, `monitoring`, `programming`, `reading`, `others`).
 - Runtime configs live in `configs/`; persistent state lives in `appdata/` and `data/`.
 
+## Deploy from the controller
+
+From this checkout on `gpu_coding`, run `./ansible/run deploy.yml --limit gpu`
+to update the target checkout, sync its environment and apply Compose. See the
+[deployment runbook](docs/RUNNING.md#deploy-from-gpu_coding) for setup and other targets.
+
 ## Quick Start
 
 Prerequisites:
@@ -27,7 +33,7 @@ bash scripts/docker-manage.sh up
 # Stop the stack
 bash scripts/docker-manage.sh down
 
-# Pull images and recreate
+# Pull images
 bash scripts/docker-manage.sh pull
 ```
 

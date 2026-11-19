@@ -1,0 +1,22 @@
+---
+env_vars_mapping:
+  ARCANE_API_KEY:
+    item: "arcane.rpi2"
+  ARCANE_CLIENT_ID:
+    item: "pocketid.ilker"
+  ARCANE_CLIENT_SECRET:
+    item: "pocketid.ilker"
+  ARCANE_ENCRYPTION_KEY:
+    item: "arcane.rpi2"
+  ARCANE_JWT_SECRET:
+    item: "arcane.rpi2"
+  CHANGEDETECTION_API_KEY:
+    item: "changedetection.rpi2"
+  DIR_HARDDISKROOT:
+    item: "Homeserver.rpi2"
+  DOCKER_REMOTE_HOSTS:
+    item: "Homeserver.rpi2"
+  DOMAINNAME:
+    item: "Homeserver.rpi2"
+  GOTIFY_LOGGIFLY_APPRISE_URL:
+    item: "gotify.remoteserver"

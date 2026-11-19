@@ -41,6 +41,8 @@ Deployment is host-driven:
   - Keep these here instead of deleting when a service is temporarily unused.
 - `configs/`
   - Versioned service configuration mounted into containers.
+- `ansible/`
+  - Fleet deployment playbooks, shared and per-host environment mappings, and Compose actions. The infrastructure inventory supplies target addresses and connection users.
 - `scripts/`
   - Operational entrypoints (`docker-manage.sh`) and maintenance helpers.
 - `scripts/database/`
@@ -85,7 +87,7 @@ Deployment is host-driven:
 - Security:
   - Edge hardening, Docker socket segmentation, container least-privilege defaults.
 - Operability:
-  - `scripts/docker-manage.sh` is the standard operator entrypoint.
+  - `ansible/run deploy.yml` deploys from the controller. `scripts/docker-manage.sh` runs local operations and supports backup jobs.
 - Data safety:
   - Stateful paths are explicit and DB upgrades are runbook/script driven.
 - Observability:
@@ -102,6 +104,6 @@ Deployment is host-driven:
 - Change ingress/routing/TLS behavior:
   - edit `apps/traefik.yml` and `configs/traefik3/`.
 - Change deploy/operations workflow:
-  - edit `scripts/docker-manage.sh` and related scripts.
+  - edit fleet playbooks in `ansible/`, local commands in `scripts/docker-manage.sh`, and shared profile defaults in `compose/profiles.env`.
 - Change DB backup behavior:
   - edit `scripts/database/` and keep its README aligned.
