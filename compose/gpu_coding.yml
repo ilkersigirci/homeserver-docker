@@ -39,6 +39,7 @@ include:
   - ../apps/whoami.yml
   #### MONITORING ####
   - ../apps/gatus-container-health.yml
+  - ../apps/grafana-lgtm.yml
   #### PROGRAMMING ####
   - ../apps/doco-cd.yml
   - ../apps/forgejo.yml

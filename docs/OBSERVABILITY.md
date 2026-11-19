@@ -10,9 +10,14 @@ This document describes the OpenTelemetry pattern used in this repository.
 
 ## Topology
 
-- Run `apps/grafana-lgtm.yml` on the `gpu` machine.
+- Run `apps/grafana-lgtm.yml` on the coding machine (`compose/gpu_coding.yml`).
+- Grafana is available at `https://grafana.coding.ilkerflix.com`.
 - Run `apps/otel-collector-agent.yml` on every machine.
 - Instrumented services send OTLP to the local `otel-collector-agent`.
+- On coding, set `OTEL_COLLECTOR_GATEWAY_ENDPOINT=grafana-lgtm:4317` and
+  `OTEL_COLLECTOR_GATEWAY_INSECURE=true`. Other hosts use
+  `OTEL_COLLECTOR_GATEWAY_ENDPOINT=grafana-rpc.coding.ilkerflix.com:443` and
+  `OTEL_COLLECTOR_GATEWAY_INSECURE=false`.
 
 ## LGTM Retention
 
