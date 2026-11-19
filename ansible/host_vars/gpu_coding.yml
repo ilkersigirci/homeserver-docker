@@ -16,6 +16,14 @@ env_vars_mapping:
     item: "doco-cd.coding"
   DOMAINNAME:
     item: "Homeserver.gpu_coding"
+  EXCALIDASH_CLIENT_ID:
+    item: "pocketid.ilker"
+  EXCALIDASH_CLIENT_SECRET:
+    item: "pocketid.ilker"
+  EXCALIDASH_CSRF_SECRET:
+    item: "Homeserver.nas"
+  EXCALIDASH_JWT_SECRET:
+    item: "Homeserver.nas"
   FORGEJO_REPO_READ_TOKEN:
     item: "git.coding-forgejo"
     field: "REPO_READ_TOKEN"
@@ -111,6 +119,9 @@ env_vars_mapping:
   PGADMIN_DEFAULT_PASSWORD:
     item: "pgadmin.gpu"
     field: "password"
+  READECK_API_TOKEN_ALLROLES:
+    item: "readeck.nas"
+    field: "API_TOKEN_ALLROLES"
   RUSTFS_ACCESS_KEY:
     item: "rustfs.coding"
     field: "username"

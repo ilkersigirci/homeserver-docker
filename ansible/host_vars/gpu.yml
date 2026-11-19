@@ -24,14 +24,6 @@ env_vars_mapping:
     item: "Homeserver.gpu"
   DOMAINNAME:
     item: "Homeserver.gpu"
-  EXCALIDASH_CLIENT_ID:
-    item: "pocketid.ilker"
-  EXCALIDASH_CLIENT_SECRET:
-    item: "pocketid.ilker"
-  EXCALIDASH_CSRF_SECRET:
-    item: "Homeserver.gpu"
-  EXCALIDASH_JWT_SECRET:
-    item: "Homeserver.gpu"
   HYPOTHESIS_API_AUTH_COOKIE_SALT:
     item: "Homeserver.gpu"
   HYPOTHESIS_API_AUTH_COOKIE_SECRET_KEY:
@@ -68,13 +60,6 @@ env_vars_mapping:
     item: "Homeserver.gpu"
   KARAKEEP_NEXTAUTH_SECRET:
     item: "Homeserver.gpu"
-  KOMODO_DB_PASSWORD:
-    item: "Homeserver.gpu"
-  KOMODO_DB_USERNAME:
-    item: "Homeserver.gpu"
-  READECK_API_TOKEN_ALLROLES:
-    item: "readeck.nas"
-    field: "API_TOKEN_ALLROLES"
   SPLITPRO_CLIENT_ID:
     item: "pocketid.ilker"
   SPLITPRO_CLIENT_SECRET:

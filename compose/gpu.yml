@@ -45,12 +45,9 @@ include:
   #### PHOTO ####
   - ../apps/immich.yml
   - ../apps/immich-public-proxy.yml
-  #### PROGRAMMING ####
-  - ../apps/scalar.yml
   #### READING ####
   # - ../apps/hypothesis.yml
   # - ../apps/karakeep.yml
   - ../apps/rsshub.yml
   #### OTHERS ####
-  - ../apps/excalidash.yml
   - ../apps/bambuddy.yml

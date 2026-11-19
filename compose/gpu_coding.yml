@@ -53,6 +53,7 @@ include:
   - ../apps/zed-web.yml
   - ../apps/marimo.yml
   - ../apps/open-webui.yml
+  - ../apps/scalar.yml
   - ../apps/searxng.yml
   - ../apps/degoog.yml
   # - ../apps/pgweb.yml
@@ -60,3 +61,5 @@ include:
   #### READING ####
   - ../apps/edentext.yml
   - ../apps/silverbullet.yml
+  #### OTHERS ####
+  - ../apps/excalidash.yml
