@@ -8,8 +8,6 @@ env_vars_mapping:
   BESZEL_PASSWORD:
     item: "beszel.gpu"
     field: "password"
-  BICHON_ENCRYPT_PASSWORD:
-    item: "Homeserver.gpu"
   DIR_BACKUP:
     item: "Homeserver.gpu"
   DIR_HARDDISKROOT:

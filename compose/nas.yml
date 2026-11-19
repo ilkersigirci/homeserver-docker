@@ -35,11 +35,13 @@ include:
   # - ../apps/syncthing.yml
   - ../apps/whoami.yml
   #### MEDIA ####
+  - ../apps/bichon.yml
   # - ../apps/filebrowser.yml
   - ../apps/filestash.yml
   - ../apps/jellyfin.yml
   - ../apps/jellyseerr.yml
   - ../apps/kiwix-serve.yml
+  - ../apps/pinchflat.yml
   - ../apps/prowlarr.yml
   - ../apps/sabnzbd.yml
   - ../apps/transmission.yml

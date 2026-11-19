@@ -2,6 +2,8 @@
 env_vars_mapping:
   ARCANE_AGENT_TOKEN:
     item: "Homeserver.nas"
+  BICHON_ENCRYPT_PASSWORD:
+    item: "Homeserver.nas"
   DIR_MEDIA:
     item: "Homeserver.nas"
   DIR_NAS_JET_SERVICES:

@@ -35,8 +35,6 @@ include:
   ###### MAINTENANCE ####
   - ../apps/whoami.yml
   #### MEDIA ####
-  - ../apps/bichon.yml
-  - ../apps/pinchflat.yml
   # - ../apps/splitpro.yml
   # - ../apps/strava-statistics.yml
   # - ../apps/ytptube.yml # TODO: restart always
