@@ -378,6 +378,18 @@
       "sourceUrl": "https://github.com/juanfont/headscale"
     },
     {
+      "description": "Group Immich server, CUDA and OpenVINO version updates",
+      "matchManagers": ["docker-compose"],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": [
+        "ghcr.io/immich-app/immich-server",
+        "ghcr.io/immich-app/immich-machine-learning"
+      ],
+      "matchUpdateTypes": ["major", "minor", "patch"],
+      "groupName": "Immich {{newVersion}}",
+      "minimumGroupSize": 3
+    },
+    {
       "description": "Disable Renovate updates for Immich Redis and PostgreSQL images",
       "matchFileNames": ["apps/immich.yml"],
       "matchPackageNames": [
