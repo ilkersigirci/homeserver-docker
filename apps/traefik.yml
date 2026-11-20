@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: ghcr.io/traefik/traefik:v3.7.14@sha256:e849695bc5c317da0cec22bfee4794fd9e15871fe554f864d31b625983e883ff
+    image: ghcr.io/traefik/traefik:v3.7.19@sha256:a6c0194dda77bcb804824580f36fa7edc56e315b1acfe933366c8b52844a78a4
     container_name: traefik
     restart: $RESTART_POLICY_CORE
     command: # CLI arguments. OTEL / OTLP Export (env-gated; local file logs stay enabled)
