@@ -13,10 +13,6 @@ homeserver_rbw_env_default_mapping:
   #   item: "Homeserver.COMMON"
   BASE_DOMAINNAME:
     item: "Homeserver.COMMON"
-  BESZEL_AGENT_KEY:
-    item: "beszel.gpu"
-  BESZEL_AGENT_TOKEN:
-    item: "beszel.gpu"
   CLOUDFLARE_DNS_API_TOKEN:
     item: "Cloudflare.me"
   CLOUDFLARE_EMAIL:

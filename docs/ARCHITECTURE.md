@@ -24,14 +24,13 @@ Deployment is host-driven:
 ## Host Inventory
 
 - Proxmox LXC: `dell.yml`, `coding.yml`, `titan.yml`, `nas.yml`
-- Proxmox VM: `gpu.yml`
 - Bare metal: `l13.yml` (Lenovo laptop), `rpi0.yml`, `rpi1.yml`, `rpi2.yml`, and `rpi3.yml` (Raspberry Pi 4)
 - Oracle Cloud VM: `remoteserver.yml` and `remoteserver2.yml`
 
 ## Codemap
 
 - `compose/`
-  - Entry points per host (`gpu.yml`, `nas.yml`, `remoteserver.yml`, `remoteserver2.yml`, etc.).
+  - Entry points per host (`titan.yml`, `nas.yml`, `remoteserver.yml`, `remoteserver2.yml`, etc.).
   - Defines shared networks and the selected app fragments for that machine.
 - `apps/`
   - Active compose fragments referenced by one or more host files.

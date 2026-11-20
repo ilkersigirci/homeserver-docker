@@ -91,18 +91,10 @@ env_vars_mapping:
     item: "pocketid.ilker"
   MINIO_CLIENT_SECRET:
     item: "pocketid.ilker"
-  MINIO_ROOT_PASSWORD:
-    item: "minio.gpu"
-    field: "password"
-  MINIO_ROOT_USER:
-    item: "minio.gpu"
-    field: "username"
   MISTRAL_API_KEY:
     item: "mistral.ai"
   NAS_SERVICES_PATH:
     item: "Homeserver.coding"
-  NETWORK_INTERFACE_NAMES:
-    item: "Homeserver.gpu"
   OPENWEBUI_CLIENT_ID:
     item: "pocketid.ilker"
   OPENWEBUI_CLIENT_SECRET:
@@ -113,12 +105,6 @@ env_vars_mapping:
     item: "Homeserver.coding"
   OTEL_COLLECTOR_GATEWAY_INSECURE:
     item: "Homeserver.coding"
-  PGADMIN_DEFAULT_EMAIL:
-    item: "pgadmin.gpu"
-    field: "username"
-  PGADMIN_DEFAULT_PASSWORD:
-    item: "pgadmin.gpu"
-    field: "password"
   READECK_API_TOKEN_ALLROLES:
     item: "readeck.nas"
     field: "API_TOKEN_ALLROLES"

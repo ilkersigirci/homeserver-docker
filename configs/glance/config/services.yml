@@ -6,19 +6,6 @@
 
     - size: full
       widgets:
-        # - type: server-stats
-        #   servers:
-        #     - type: local
-        #       name: GPU
-        #       # optionally override the sensor used to determine CPU temperature
-        #       cpu-temp-sensor: k10temp_tctl
-        #       hide-swap: true
-        #       # optionally hide or rename mountpoints
-        #       # mountpoints:
-        #       #   "/boot/efi":
-        #       #     hide: true
-        #       #     name: EFI
-
         # - type: docker-containers
         #   hide-by-default: false
         #   # providers:
@@ -35,11 +22,6 @@
             - type: iframe
               title: HOME
               source: https://homepage.home.${BASE_DOMAINNAME}
-              height: 1000
-
-            - type: iframe
-              title: GPU
-              source: https://homepage.gpu.${BASE_DOMAINNAME}
               height: 1000
 
             - type: iframe
@@ -69,7 +51,7 @@
 
             - type: iframe
               title: ARCANE
-              source: https://arcane.gpu.${BASE_DOMAINNAME}
+              source: https://arcane.rpi2.${BASE_DOMAINNAME}
               # source: http://dozzle:8080
               height: 1000
 

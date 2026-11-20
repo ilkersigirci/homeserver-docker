@@ -18,9 +18,11 @@ Controlled outbound HTTP(S) for normal Traefik-backed Docker apps.
 - Keep one shared allowlist for one trust class; use Squid auth if apps need different allowlists.
 - Squid enforces destination host, IP, and port; it cannot enforce HTTPS paths without TLS interception.
 
-## Current App
+## Optional Deployment
 
-- `apps/presenton.yml` routes outbound HTTP(S) through `egress-proxy`.
+- Move `apps-not-used/egress-proxy.yml` into `apps/` and include it in the target
+  host before enabling the proxy.
+- `apps-not-used/presenton.yml` routes outbound HTTP(S) through `egress-proxy`.
 - `configs/egress-proxy/allow-domains.txt` contains the host from `$AIGATEWAY_BASE_URL`.
 
 ## Out Of Scope
@@ -34,8 +36,8 @@ Controlled outbound HTTP(S) for normal Traefik-backed Docker apps.
 Run from the target host after deployment:
 
 ```bash
-COMPOSE_PROFILES=core,testing docker compose --env-file .env -f compose/gpu.yml up -d egress-proxy
-COMPOSE_PROFILES=core,testing docker compose --env-file .env -f compose/gpu.yml run --rm egress-proxy-test
+COMPOSE_PROFILES=core,testing docker compose --env-file .env -f "compose/$MY_HOSTNAME.yml" up -d egress-proxy
+COMPOSE_PROFILES=core,testing docker compose --env-file .env -f "compose/$MY_HOSTNAME.yml" run --rm egress-proxy-test
 docker exec -u proxy egress-proxy tail -n 80 /var/log/squid/access.log
 ```
 

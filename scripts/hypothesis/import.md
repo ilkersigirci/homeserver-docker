@@ -49,7 +49,7 @@ Take a backup before importing:
 scripts/database/postgres-backup.sh \
   --service hypothesis-db \
   --profiles reading,hypothesis \
-  --compose-file compose/gpu.yml
+  --compose-file "compose/$MY_HOSTNAME.yml"
 ```
 
 If the backup helper cannot resolve the compose service, use the direct

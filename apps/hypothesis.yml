@@ -251,7 +251,7 @@ services:
       HYPOTHESIS_BOOTSTRAP_PASSWORD: $HYPOTHESIS_BOOTSTRAP_PASSWORD
       HYPOTHESIS_BOOTSTRAP_ADMIN: true
       HYPOTHESIS_BOOTSTRAP_OAUTH_CLIENT_NAME: HypothesisClient
-      HYPOTHESIS_BOOTSTRAP_OAUTH_REDIRECT_URI: https://hypothesis.gpu.ilkerflix.com/app.html
+      HYPOTHESIS_BOOTSTRAP_OAUTH_REDIRECT_URI: https://hypothesis.$DOMAINNAME/app.html
     volumes:
       - $REPO_PATH/configs/hypothesis/command.py:/tmp/hypothesis-command.py:ro
     command: ["python", "/tmp/hypothesis-command.py"]

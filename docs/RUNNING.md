@@ -21,7 +21,7 @@ After pushing a stack or mapping change to `main`, deploy to a host:
 
 ```bash
 rbw unlock
-./ansible/run deploy.yml --limit gpu
+./ansible/run deploy.yml --limit titan
 ```
 
 The playbook updates the selected host's checkout of `main`, writes its `.env`
@@ -55,7 +55,7 @@ Run the full deployment once per host to install `compose/profiles.env`. For
 later value changes in Bitwarden, sync and apply the environment on that host:
 
 ```bash
-./ansible/run deploy.yml --limit gpu --tags env,compose
+./ansible/run deploy.yml --limit titan --tags env,compose
 ```
 
 Use `--tags checkout`, `--tags env`, or `--tags compose` for an individual phase.
@@ -66,7 +66,7 @@ checkout and environment because Compose validates files on disk.
 For a standalone lifecycle action on an existing deployment:
 
 ```bash
-./ansible/run docker_compose.yml --limit gpu -e task=restart
+./ansible/run docker_compose.yml --limit titan -e task=restart
 ```
 
 | Action | Fleet playbook behavior |
@@ -79,7 +79,7 @@ For a standalone lifecycle action on an existing deployment:
 | `prune` | Remove dangling images on the selected host. |
 
 The legacy script wrapper is available as `./ansible/run docker_manage.yml
---limit gpu -e homeserver_docker_manage_action=update`. Its `update` also prunes
+--limit titan -e homeserver_docker_manage_action=update`. Its `update` also prunes
 dangling images.
 
 ## Immich on NAS and Titan
@@ -100,10 +100,11 @@ before retrying `pct start 102`:
 /usr/local/sbin/ct102-check-immich-storage
 ```
 
-Titan needs write access as UID/GID 1000 to `tank/services/gpu/immich` and
-`jet/services/immich/thumbs` under `/mnt/nas`, plus access to the external
-libraries in `tank/critical/Photos`. The worker connects directly to NAS
-at `192.168.2.23` on TCP 5432 (PostgreSQL) and 6379 (Valkey). NAS publishes
+Titan needs write access as UID/GID 1000 to the directories configured by
+`IMMICH_DATA_PATH` and `IMMICH_THUMBS_PATH`, plus access to the external
+libraries configured by `DIR_PHOTOS`. Its Proxmox bind mounts must expose
+those paths at the same locations inside CT 102. The worker connects directly
+to NAS at `192.168.2.23` on TCP 5432 (PostgreSQL) and 6379 (Valkey). NAS publishes
 both ports on its LAN address. PostgreSQL uses password authentication.
 Valkey trusts clients with access to the LAN.
 The NAS API uses its Docker network. The edge proxy serves public shared links
@@ -114,7 +115,7 @@ at `share.${DOMAINNAME}` using its own `DOMAINNAME`.
 - Docker installed
 - Docker Compose 5.4.0 or later for automatic pulling of `pre_start` images
 - Repo `.env` exists at `$HOME/docker/.env`
-- `MY_HOSTNAME` is set and matches a file in `compose/` (examples: `gpu`, `remoteserver`, `remoteserver2`, `rpi3`)
+- `MY_HOSTNAME` is set and matches a file in `compose/` (examples: `titan`, `remoteserver`, `remoteserver2`, `rpi3`)
 
 ```bash
 # Start selected profiles

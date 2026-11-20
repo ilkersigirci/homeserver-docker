@@ -4,7 +4,8 @@ This runbook covers local service bootstrap for the self-hosted `hypothesis`
 stack: database/search initialization, local user creation, password/admin
 sync, and OAuth client setup.
 
-Run all commands from the repository root:
+Select a host that includes `apps/hypothesis.yml` and export its
+`MY_HOSTNAME` before running commands from the repository root:
 
 ```bash
 cd $HOME/docker
@@ -51,7 +52,7 @@ Normal day-to-day restarts do not need `hypothesis-init`.
 ```bash
 COMPOSE_PROFILES=reading,hypothesis,hypothesis-init docker compose \
   --env-file .env \
-  -f compose/gpu.yml \
+  -f "compose/$MY_HOSTNAME.yml" \
   run --rm hypothesis-init
 ```
 
@@ -69,7 +70,7 @@ After init, recreate the app container:
 ```bash
 COMPOSE_PROFILES=reading,hypothesis docker compose \
   --env-file .env \
-  -f compose/gpu.yml \
+  -f "compose/$MY_HOSTNAME.yml" \
   up -d --force-recreate hypothesis
 ```
 
@@ -78,17 +79,17 @@ COMPOSE_PROFILES=reading,hypothesis docker compose \
 ```bash
 COMPOSE_PROFILES=reading,hypothesis docker compose \
   --env-file .env \
-  -f compose/gpu.yml \
+  -f "compose/$MY_HOSTNAME.yml" \
   up -d
 
 COMPOSE_PROFILES=reading,hypothesis,hypothesis-init docker compose \
   --env-file .env \
-  -f compose/gpu.yml \
+  -f "compose/$MY_HOSTNAME.yml" \
   run --rm hypothesis-init
 
 COMPOSE_PROFILES=reading,hypothesis docker compose \
   --env-file .env \
-  -f compose/gpu.yml \
+  -f "compose/$MY_HOSTNAME.yml" \
   up -d --force-recreate hypothesis
 ```
 

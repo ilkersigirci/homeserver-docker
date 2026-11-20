@@ -14,7 +14,7 @@ from botocore.exceptions import ClientError
 
 
 def main():
-    minio_endpoint = "https://minio.gpu.ilkerflix.com"
+    minio_endpoint = os.environ["MINIO_ENDPOINT"]
     minio_access_key = "admin"
     minio_secret_key = "password"
     bucket_name = "ilkerflix-bucket"

@@ -1,1 +1,1 @@
-aigateway.gpu.ilkerflix.com
+aigateway.home.ilkerflix.com

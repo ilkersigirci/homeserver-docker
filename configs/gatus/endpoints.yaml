@@ -172,17 +172,6 @@ endpoints:
       - "[BODY] == 192.168.2.13"
       - "[DNS_RCODE] == NOERROR"
 
-  - name: LocalDNS - gpu
-    group: RPI1
-    url: "100.64.0.13" # Address of the DNS server to use
-    interval: 1h
-    dns:
-      query-name: "homepage.gpu.$DOMAINNAME"
-      query-type: "A"
-    conditions:
-      - "[BODY] == 192.168.2.9"
-      - "[DNS_RCODE] == NOERROR"
-
   ################# NAS #################
 
   - name: Immich-NAS
@@ -196,26 +185,6 @@ endpoints:
     group: NAS
     interval: 1h
     url: "https://jellyfin.nas.$DOMAINNAME"
-
-  ################# GPU #################
-
-  - name: DNS - gpu
-    <<: *maintenance-window-default
-    group: GPU
-    url: "1.1.1.1" # Address of the DNS server to use
-    interval: 1h
-    dns:
-      query-name: "homepage.gpu.$DOMAINNAME"
-      query-type: "A"
-    conditions:
-      - "[BODY] == 100.64.0.9"
-      - "[DNS_RCODE] == NOERROR"
-
-  - name: Homepage-GPU-PING
-    <<: [*ping-default, *maintenance-window-default]
-    group: GPU
-    interval: 1h
-    url: "icmp://homepage.gpu.$DOMAINNAME"
 
   - name: vllm/Qwen3.6-35B-A3B
     <<: *ai-gateway-model-default

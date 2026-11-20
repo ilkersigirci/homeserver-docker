@@ -1,6 +1,6 @@
 # Homeserver Docker
 
-Compose-based homelab repository for running services across multiple machines (`gpu`, `nas`, `remoteserver`, and others).
+Compose-based homelab repository for running services across multiple machines (`titan`, `nas`, `remoteserver`, and others).
 
 ![Services](./resources/services.png)
 
@@ -14,7 +14,7 @@ Compose-based homelab repository for running services across multiple machines (
 
 ## Deploy from the controller
 
-From this checkout on `coding`, run `./ansible/run deploy.yml --limit gpu`
+From this checkout on `coding`, run `./ansible/run deploy.yml --limit titan`
 to update the target checkout, sync its environment and apply Compose. See the
 [deployment runbook](docs/RUNNING.md#deploy-from-coding) for setup and other targets.
 
