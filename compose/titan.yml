@@ -55,3 +55,5 @@ include:
       - ./fragments/immich-machine-learning/nvidia.yml
   #### MONITORING ####
   - ../apps/gatus-container-health.yml
+  #### OTHERS ####
+  - ../apps/bambuddy.yml

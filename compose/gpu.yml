@@ -42,5 +42,3 @@ include:
   # - ../apps/hypothesis.yml
   # - ../apps/karakeep.yml
   - ../apps/rsshub.yml
-  #### OTHERS ####
-  - ../apps/bambuddy.yml
