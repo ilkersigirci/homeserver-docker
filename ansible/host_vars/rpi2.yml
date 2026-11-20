@@ -20,3 +20,5 @@ env_vars_mapping:
     item: "Homeserver.rpi2"
   GOTIFY_LOGGIFLY_APPRISE_URL:
     item: "gotify.remoteserver"
+  TWITTER_AUTH_TOKEN:
+    item: "twitter.com"

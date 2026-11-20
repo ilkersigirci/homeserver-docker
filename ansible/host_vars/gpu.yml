@@ -64,5 +64,3 @@ env_vars_mapping:
     item: "tmdb.themoviedb"
   TRAEFIK_AUTH_BYPASS_KEY:
     item: "Homeserver.gpu"
-  TWITTER_AUTH_TOKEN:
-    item: "twitter.com"

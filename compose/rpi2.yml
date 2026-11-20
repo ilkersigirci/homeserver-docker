@@ -36,3 +36,5 @@ include:
   #### MONITORING ####
   - ../apps/changedetection.yml
   - ../apps/gatus-container-health.yml
+  #### READING ####
+  - ../apps/rsshub.yml

@@ -12,6 +12,8 @@ services:
     networks:
       - rsshub_backend
     user: blessuser
+    environment:
+      XDG_CONFIG_HOME: /tmp/config
     read_only: true
     tmpfs:
       - /tmp:rw,noexec,nosuid,nodev,size=256m,mode=1777
