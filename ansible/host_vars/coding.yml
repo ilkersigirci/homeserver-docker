@@ -21,9 +21,9 @@ env_vars_mapping:
   EXCALIDASH_CLIENT_SECRET:
     item: "pocketid.ilker"
   EXCALIDASH_CSRF_SECRET:
-    item: "Homeserver.nas"
+    item: "Homeserver.coding"
   EXCALIDASH_JWT_SECRET:
-    item: "Homeserver.nas"
+    item: "Homeserver.coding"
   FORGEJO_REPO_READ_TOKEN:
     item: "git.coding-forgejo"
     field: "REPO_READ_TOKEN"
