@@ -277,27 +277,30 @@ policy:
 # all the fields under `dns` should be set to empty values.
 dns:
   # Whether to use [MagicDNS](https://tailscale.com/kb/1081/magicdns/).
-  magic_dns: false
+  magic_dns: true
 
   # Defines the base domain to create the hostnames for MagicDNS.
   # This domain _must_ be different from the server_url domain.
   # `base_domain` must be a FQDN, without the trailing dot.
   # The FQDN of the hosts will be
   # `hostname.base_domain` (e.g., _myhost.example.com_).
-  # base_domain: example.com
+  # NOTE: Keep this outside BASE_DOMAINNAME; Cloudflare's *.BASE_DOMAINNAME
+  # wildcard would resolve MagicDNS names to remoteserver on nodes without
+  # accept-dns.
+  base_domain: ts.internal
 
   # Whether to use the local DNS settings of a node or override the local DNS
   # settings (default) and force the use of Headscale's DNS configuration.
   override_local_dns: true
 
   # List of DNS servers to expose to clients.
+  # NOTE: Tailscale clients query all global nameservers in parallel and take
+  # the first answer; list only resolvers with identical filtering and rewrites.
   nameservers:
     global:
-      - 100.64.0.1
-      - 1.1.1.1
-      - 1.0.0.1
-      - 2606:4700:4700::1111
-      - 2606:4700:4700::1001
+      - 100.64.0.1 # remoteserver AdGuard Home
+      # - 1.1.1.1
+      # - 2606:4700:4700::1111
 
       # NextDNS (see https://tailscale.com/kb/1218/nextdns/).
       # "abc123" is example NextDNS ID, replace with yours.

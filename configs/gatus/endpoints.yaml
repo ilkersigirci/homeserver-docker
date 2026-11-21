@@ -102,7 +102,7 @@ endpoints:
     url: "100.64.0.1" # Address of the DNS server to use
     interval: 30s
     dns:
-      query-name: "rpi0"
+      query-name: "traefik.home.$DOMAINNAME" # Tailnet record for rpi0
       query-type: "A"
     conditions:
       - "[BODY] == 100.64.0.12"
