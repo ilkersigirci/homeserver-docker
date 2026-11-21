@@ -1,12 +1,5 @@
 http:
   routers:
-    adguardhome-rtr:
-      rule: "Host(`adguardhome.{{env "DOMAINNAME"}}`)"
-      entryPoints:
-        - websecure
-      middlewares:
-        - chain-no-auth-relaxed
-      service: adguardhome-svc
     pocket-id-rtr:
       rule: "Host(`pocketid.{{env "BASE_DOMAINNAME"}}`)"
       entryPoints:
@@ -23,10 +16,6 @@ http:
       service: gotify-svc
 
   services:
-    adguardhome-svc:
-      loadBalancer:
-        servers:
-          - url: "http://192.168.2.13:81"
     pocket-id-svc:
       loadBalancer:
         servers:

@@ -46,8 +46,8 @@ membership in the infrastructure inventory. Each mapping needs an `item`. Add
 env_vars_mapping:
   GRAFANA_CLIENT_ID:
     item: pocketid.ilker
-  ADGUARD_PASSWORD:
-    item: adguardhome.rpi1
+  VERSITYGW_ROOT_SECRET_KEY:
+    item: s3-ui.nas
     field: password
 ```
 

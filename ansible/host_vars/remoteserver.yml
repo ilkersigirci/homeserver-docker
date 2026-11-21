@@ -1,11 +1,5 @@
 ---
 env_vars_mapping:
-  ADGUARD_PASSWORD:
-    item: "adguardhome.rpi1"
-    field: "password"
-  ADGUARD_USERNAME:
-    item: "adguardhome.rpi1"
-    field: "username"
   ARCANE_AGENT_TOKEN:
     item: "Homeserver.remoteserver"
   CHHOTO_API_KEY:
@@ -46,12 +40,6 @@ env_vars_mapping:
     item: "pocketid.ilker"
   GOTIFY_CROWDSEC_TOKEN:
     item: "gotify.remoteserver"
-  GOTIFY_DEFAULT_USER_NAME:
-    item: "gotify.remoteserver"
-    field: "username"
-  GOTIFY_DEFAULT_USER_PASS:
-    item: "gotify.remoteserver"
-    field: "password"
   GOTIFY_HOMEPAGE_CLIENT_TOKEN:
     item: "gotify.remoteserver"
     field: "GOTIFY_HOMEPAGE_TOKEN"

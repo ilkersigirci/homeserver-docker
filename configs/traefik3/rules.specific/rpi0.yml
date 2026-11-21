@@ -46,14 +46,6 @@ http:
         - chain-no-auth-relaxed
       service: aile-svc
 
-    adguardhome-rtr:
-      rule: "Host(`adguardhome.{{env "DOMAINNAME"}}`)"
-      entryPoints:
-        - websecure
-      middlewares:
-        - chain-no-auth-relaxed
-      service: adguardhome-svc
-
     home-assistant-rtr:
       rule: "Host(`smarthome.{{env "DOMAINNAME"}}`)"
       entryPoints:
@@ -131,11 +123,6 @@ http:
         servers:
           - url: "https://192.168.2.119:8006"
         serversTransport: proxmox-transport
-
-    adguardhome-svc:
-      loadBalancer:
-        servers:
-          - url: "http://192.168.2.12:81"
 
     home-assistant-svc:
       loadBalancer:

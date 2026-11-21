@@ -108,12 +108,6 @@ env_vars_mapping:
   READECK_API_TOKEN_ALLROLES:
     item: "readeck.nas"
     field: "API_TOKEN_ALLROLES"
-  RUSTFS_ACCESS_KEY:
-    item: "rustfs.coding"
-    field: "username"
-  RUSTFS_SECRET_KEY:
-    item: "rustfs.coding"
-    field: "password"
   TRAEFIK_OTEL_TRACING_SAMPLE_RATE:
     item: "Homeserver.coding"
   VERSITYGW_ROOT_ACCESS_KEY:

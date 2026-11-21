@@ -49,7 +49,9 @@ services:
         soft: 4096
         hard: 8192
     volumes:
-      - $REPO_PATH/configs/adguardhome:/opt/adguardhome/conf:rw # TODO: Find a way to add AdGuardHome.yaml into git tracking.
+      # Tracked per-host config. AdGuard reads it only at start and writes web UI
+      # changes back into it, so commit those and restart after pulling changes.
+      - $REPO_PATH/configs/adguardhome/$MY_HOSTNAME:/opt/adguardhome/conf:rw
       - $REPO_PATH/appdata/adguardhome:/opt/adguardhome/work:rw
     environment:
       TZ: $TZ
@@ -63,13 +65,11 @@ services:
       traefik.enable: "true"
       ## HTTP Routers
       traefik.http.routers.adguardhome-rtr.entrypoints: "websecure"
-      traefik.http.routers.adguardhome-rtr.rule: "Host(`adguardhome.$DOMAINNAME`)" # Also used for DoH
+      traefik.http.routers.adguardhome-rtr.rule: "Host(`adguardhome.$DOMAINNAME`)" # Admin UI only; DoH is disabled (tailnet clients use plain DNS inside WireGuard)
       ## Middlewares
-      traefik.http.routers.adguardhome-rtr.middlewares: "chain-tinyauth@file"
-      # traefik.http.routers.adguardhome-rtr.middlewares: "chain-no-auth@file" # NOTE: Needed for AdGuard Home Manager Android app
+      traefik.http.routers.adguardhome-rtr.middlewares: "chain-no-auth-relaxed@file"
       ## HTTP Services
       traefik.http.routers.adguardhome-rtr.service: "adguardhome-svc"
-      # traefik.http.services.adguardhome-svc.loadbalancer.server.port: "3000" # Initial wizard port
       traefik.http.services.adguardhome-svc.loadbalancer.server.port: "80" # Admin UI port
       ## Dot - DNS over TLS
       # traefik.tcp.routers.adguard-tls.rule: "HostSNI(`dns.$DOMAINNAME`)" # Used for DoT
@@ -86,9 +86,7 @@ services:
       homepage.target: "_blank"
       homepage.description: "Network-wide ads & trackers blocking DNS server"
       homepage.widget.type: "adguard"
-      homepage.widget.url: "http://adguardhome:80"
-      homepage.widget.username: "$ADGUARD_USERNAME"
-      homepage.widget.password: "$ADGUARD_PASSWORD"
+      homepage.widget.url: "https://adguardhome.$DOMAINNAME"
       ####### GLANCE #######
       glance.name: "adguardhome"
       glance.icon: "sh:adguard-home"

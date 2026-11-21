@@ -1,11 +1,5 @@
 ---
 env_vars_mapping:
-  ADGUARD_PASSWORD:
-    item: "adguardhome.rpi1"
-    field: "password"
-  ADGUARD_USERNAME:
-    item: "adguardhome.rpi1"
-    field: "username"
   ARCANE_AGENT_TOKEN:
     item: "Homeserver.rpi1"
   DIR_HARDDISKROOT:

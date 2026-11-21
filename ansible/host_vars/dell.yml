@@ -2,12 +2,6 @@
 # When enabling this host with the root account:
 # repo_path: "/{{ user_name }}/docker"
 env_vars_mapping:
-  ADGUARD_PASSWORD:
-    item: "adguardhome.rpi1"
-    field: "password"
-  ADGUARD_USERNAME:
-    item: "adguardhome.rpi1"
-    field: "username"
   DIR_HARDDISKROOT:
     item: "Homeserver.dell"
   DIR_MEDIA:
