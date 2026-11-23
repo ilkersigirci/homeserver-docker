@@ -86,7 +86,7 @@ Deployment is host-driven:
 - Security:
   - Edge hardening, Docker socket segmentation, container least-privilege defaults.
 - Operability:
-  - `ansible/run deploy.yml` deploys from the controller. `scripts/docker-manage.sh` runs local operations and supports backup jobs.
+  - `just ansible-deploy` deploys from the controller. `just local <action>` and the backup jobs both call `scripts/docker-manage.sh`.
 - Data safety:
   - Stateful paths are explicit and DB upgrades are runbook/script driven.
 - Observability:
@@ -103,6 +103,6 @@ Deployment is host-driven:
 - Change ingress/routing/TLS behavior:
   - edit `apps/traefik.yml` and `configs/traefik3/`.
 - Change deploy/operations workflow:
-  - edit fleet playbooks in `ansible/`, local commands in `scripts/docker-manage.sh`, and shared profile defaults in `compose/profiles.env`.
+  - edit command names in `justfile`, fleet playbooks in `ansible/`, local stack behavior in `scripts/docker-manage.sh`, and shared profile defaults in `compose/profiles.env`.
 - Change DB backup behavior:
   - edit `scripts/database/` and keep its README aligned.

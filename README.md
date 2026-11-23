@@ -14,28 +14,20 @@ Compose-based homelab repository for running services across multiple machines (
 
 ## Deploy from the controller
 
-From this checkout on `coding`, run `./ansible/run deploy.yml --limit titan`
+From this checkout on `coding`, run `just ansible-deploy --limit titan`
 to update the target checkout, sync its environment and apply Compose. See the
 [deployment runbook](docs/RUNNING.md#deploy-from-coding) for setup and other targets.
 
 ## Quick Start
 
-Prerequisites:
-- Docker
-- Docker Compose 5.4.0 or later for automatic pulling of `pre_start` images
-- A configured `.env`
-- `MY_HOSTNAME` set to a host with a matching file in `compose/`
+On the host you want to manage, export `MY_HOSTNAME` and start the stack from
+its configured Docker checkout.
 
 ```bash
-# Start selected profiles for this host
-bash scripts/docker-manage.sh up
-
-# Stop the stack
-bash scripts/docker-manage.sh down
-
-# Pull images
-bash scripts/docker-manage.sh pull
+just local up
 ```
+
+See the [local operations runbook](docs/RUNNING.md#local-operations-on-one-host) for prerequisites and actions.
 
 ## Repository Layout
 

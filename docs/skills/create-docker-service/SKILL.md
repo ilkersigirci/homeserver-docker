@@ -69,7 +69,7 @@ Add the app fragment near related services in `compose/$MY_HOSTNAME.yml`:
 Start with the repository workflow:
 
 ```bash
-bash scripts/docker-manage.sh up
+just local up
 ```
 
 - Validate compose syntax with the command pattern in `docs/RUNNING.md`.

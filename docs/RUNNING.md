@@ -2,26 +2,28 @@
 
 This is the operator quick reference for humans and coding agents.
 
+`just` must be installed on each machine where you run recipes. See the
+[official just documentation](https://github.com/casey/just) for installation options.
+
 ## Deploy from coding
 
-Run deployment playbooks from the Docker checkout on `coding`. The launcher
-uses the inventory, SSH configuration, shared `check_rbw` role and pinned uv
-environment in `~/Repos/Mine/ansible-automations`. Set `ANSIBLE_AUTOMATIONS_DIR`
-if the infrastructure checkout is elsewhere.
+Run `just` in the Docker checkout to list commands. The Ansible recipes use
+the inventory, SSH configuration, shared `check_rbw` role, and pinned uv environment in
+`~/Repos/Mine/ansible-automations`. Set `ANSIBLE_AUTOMATIONS_DIR` if the
+infrastructure checkout is elsewhere.
 
 Provision Docker and the Compose plugin on the targets first.
 From the Docker repository root, install the deployment collection once:
 
 ```bash
-uv run --frozen --project "${ANSIBLE_AUTOMATIONS_DIR:-$HOME/Repos/Mine/ansible-automations}" \
-  ansible-galaxy collection install -r ansible/collections/requirements.yml
+just ansible-collections
 ```
 
 After pushing a stack or mapping change to `main`, deploy to a host:
 
 ```bash
 rbw unlock
-./ansible/run deploy.yml --limit titan
+just ansible-deploy --limit titan
 ```
 
 The playbook updates the selected host's checkout of `main`, writes its `.env`
@@ -55,7 +57,7 @@ Run the full deployment once per host to install `compose/profiles.env`. For
 later value changes in Bitwarden, sync and apply the environment on that host:
 
 ```bash
-./ansible/run deploy.yml --limit titan --tags env,compose
+just ansible-deploy --limit titan --tags env,compose
 ```
 
 Use `--tags checkout`, `--tags env`, or `--tags compose` for an individual phase.
@@ -66,21 +68,17 @@ checkout and environment because Compose validates files on disk.
 For a standalone lifecycle action on an existing deployment:
 
 ```bash
-./ansible/run docker_compose.yml --limit titan -e task=restart
+just ansible-compose restart --limit titan
 ```
 
-| Action | Fleet playbook behavior |
-| --- | --- |
-| `up` | Apply configuration and recreate changed services. |
-| `update` | Pull images and reconcile the stack. |
-| `pull` | Pull images only. |
-| `restart` | Take the selected stack down and bring it back up. |
-| `down` | Take the stack down and remove orphans. |
-| `prune` | Remove dangling images on the selected host. |
+See [stack actions](#stack-actions) for the other lifecycle commands.
 
-The legacy script wrapper is available as `./ansible/run docker_manage.yml
---limit titan -e homeserver_docker_manage_action=update`. Its `update` also prunes
-dangling images.
+Use `just ansible <playbook> [args...]` to run any playbook in `ansible/`.
+For example, the script-based update also prunes dangling images.
+
+```bash
+just ansible docker_manage.yml --limit titan -e homeserver_docker_manage_action=update
+```
 
 ## Immich on NAS and Titan
 
@@ -112,30 +110,27 @@ at `share.${DOMAINNAME}` using its own `DOMAINNAME`.
 
 ## Local operations on one host
 
+Run `just local <action>` from the Docker checkout on the host you want to manage.
+
 - Docker installed
 - Docker Compose 5.4.0 or later for automatic pulling of `pre_start` images
-- Repo `.env` exists at `$HOME/docker/.env`
-- `MY_HOSTNAME` is set and matches a file in `compose/` (examples: `titan`, `remoteserver`, `remoteserver2`, `rpi3`)
+- A configured `.env` in the repository root
+- `MY_HOSTNAME` exported in the shell so the script can select `compose/$MY_HOSTNAME.yml`
 
 ```bash
-# Start selected profiles
-bash scripts/docker-manage.sh up
-
-# Stop stack
-bash scripts/docker-manage.sh down
-
-# Pull, recreate, and prune dangling images
-bash scripts/docker-manage.sh update
-
-# Pull latest images without restarting
-bash scripts/docker-manage.sh pull
-
-# Remove dangling images
-bash scripts/docker-manage.sh prune
-
-# Restart
-bash scripts/docker-manage.sh restart
+just local update
 ```
+
+## Stack actions
+
+| Action | Behavior of `just local` and `just ansible-compose` |
+| --- | --- |
+| `up` | Apply the configuration and start the stack. |
+| `down` | Take down the stack and remove orphan containers. |
+| `restart` | Take down the stack and bring it back up. |
+| `pull` | Pull images without restarting services. |
+| `update` | Pull images and apply the stack. `just local update` also prunes dangling images. |
+| `prune` | Remove dangling images on the selected host. |
 
 ## Missing `pre_start` Images After Pruning
 
@@ -146,11 +141,11 @@ container references them. Upgrade to Compose 5.4.0 or later, which includes the
 [hook image pull fix](https://github.com/docker/compose/releases/tag/v5.4.0).
 For immediate recovery on an older version, run `docker pull` with the exact
 image reference from the error, including its digest, then retry
-`bash scripts/docker-manage.sh up`.
+`just local up`.
 
 ## Direct Docker Compose Commands
 
-Use these when you need to bypass `scripts/docker-manage.sh` and stay behavior-compatible.
+The equivalent direct Compose command for `just local up` with the default host file is
 
 ```bash
 cd ~/docker
@@ -281,11 +276,13 @@ dedicated Git author. Keep that author stable so Renovate recognizes its commits
 
 ## Renovate Local Checks
 
+Export `RENOVATE_GITHUB_COM_TOKEN` to include GitHub dependency lookups.
+
 ```bash
-make renovate-validate
+just renovate-validate
 
 # lookup-only; it does not create branches or PRs.
-make renovate-local
+just renovate-local
 ```
 
 ## Destructive Operations

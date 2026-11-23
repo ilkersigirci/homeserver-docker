@@ -68,7 +68,7 @@ Keep custom image Compose updates grouped under `homeserver custom images`.
 
 - Run `uvx prek run --files <changed-files>`.
 - Run `uvx --from actionlint-py actionlint <changed-workflow-files>` when workflows changed.
-- Run `make renovate-validate` when `renovate.json` changed.
+- Run `just renovate-validate` when `renovate.json` changed.
 - Run `version_tagging.sh` when added or changed and confirm stdout is one valid Docker tag.
 
 ## Done Criteria

@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-infra_repo="${ANSIBLE_AUTOMATIONS_DIR:-$HOME/Repos/Mine/ansible-automations}"
-infra_repo="$(cd -- "$infra_repo" && pwd)"
-cd -- "$(dirname -- "$0")"
-export ANSIBLE_CONFIG="$infra_repo/ansible.cfg"
-exec uv run --frozen --project "$infra_repo" ansible-playbook "$@"
