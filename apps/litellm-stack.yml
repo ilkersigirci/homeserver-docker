@@ -186,14 +186,13 @@ services:
     environment:
       <<: *litellm-env
       OTEL_SERVICE_NAME: litellm-gateway
-      OTEL_RESOURCE_ATTRIBUTES: service.instance.id=litellm-gateway-$MY_HOSTNAME
     healthcheck:
       test:
         [
           "CMD",
           "python3",
           "-c",
-          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:4000/health/liveliness', timeout=3)",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:4000/health/readiness', timeout=3)",
         ]
       interval: 2m
       timeout: 5s
@@ -202,32 +201,21 @@ services:
     labels:
       traefik.enable: "true"
       ## HTTP Routers
-      # Verbatim copy of the chart's gateway paths (helm/litellm/templates/ingress.yaml);
-      # Traefik v3 matchers take one path each, so keep one PathPrefix per entry.
+      # Match gateway/routes/allowlist.py on path segments. The unversioned chat
+      # API shares /chat with the UI's static export.
       traefik.http.routers.litellm-gateway-rtr.entrypoints: "websecure"
       traefik.http.routers.litellm-gateway-rtr.rule: >-
         Host(`litellm.$DOMAINNAME`) && (Path(`/test`) || Path(`/debug/memory/summary`)
-        || PathPrefix(`/v1/chat`) || PathPrefix(`/chat`) || PathPrefix(`/v1/completions`) || PathPrefix(`/completions`)
-        || PathPrefix(`/v1/embeddings`) || PathPrefix(`/embeddings`) || PathPrefix(`/v1/moderations`) || PathPrefix(`/moderations`)
-        || PathPrefix(`/v1/audio`) || PathPrefix(`/audio`) || PathPrefix(`/v1/images`) || PathPrefix(`/images`)
-        || PathPrefix(`/v1/files`) || PathPrefix(`/files`) || PathPrefix(`/v1/batches`) || PathPrefix(`/batches`)
-        || PathPrefix(`/v1/fine_tuning`) || PathPrefix(`/fine_tuning`) || PathPrefix(`/v1/fine-tuning`) || PathPrefix(`/fine-tuning`)
-        || PathPrefix(`/v1/responses`) || PathPrefix(`/responses`) || PathPrefix(`/v1/threads`) || PathPrefix(`/threads`)
-        || PathPrefix(`/v1/assistants`) || PathPrefix(`/assistants`) || PathPrefix(`/v1/vector_stores`) || PathPrefix(`/vector_stores`)
-        || PathPrefix(`/v1/indexes`) || PathPrefix(`/v1/models`) || PathPrefix(`/models`) || PathPrefix(`/openai`) || PathPrefix(`/engines`)
-        || PathPrefix(`/v1/messages`) || PathPrefix(`/messages`) || PathPrefix(`/v1/skills`) || PathPrefix(`/v1/a2a`) || PathPrefix(`/a2a`)
-        || PathPrefix(`/api/event_logging`) || PathPrefix(`/v1/rerank`) || PathPrefix(`/v2/rerank`) || PathPrefix(`/rerank`)
-        || PathPrefix(`/v1/ocr`) || PathPrefix(`/ocr`) || PathPrefix(`/v1/rag`) || PathPrefix(`/rag`)
-        || PathPrefix(`/v1/video`) || PathPrefix(`/v1/videos`) || PathPrefix(`/video`) || PathPrefix(`/videos`)
-        || PathPrefix(`/v1/search`) || PathPrefix(`/search`) || PathPrefix(`/v1/containers`) || PathPrefix(`/containers`)
-        || PathPrefix(`/v1/evals`) || PathPrefix(`/v1/memory`) || PathPrefix(`/queue/chat`) || PathPrefix(`/v1beta`) || PathPrefix(`/interactions`)
-        || PathPrefix(`/anthropic`) || PathPrefix(`/azure`) || PathPrefix(`/azure_ai`) || PathPrefix(`/azure_speech`) || PathPrefix(`/aws`)
-        || PathPrefix(`/bedrock`) || PathPrefix(`/comprehendmedical`) || PathPrefix(`/transcribe`) || PathPrefix(`/cohere`)
-        || PathPrefix(`/gemini`) || PathPrefix(`/google`) || PathPrefix(`/vertex_ai`) || PathPrefix(`/vertex-ai`)
-        || PathPrefix(`/assemblyai`) || PathPrefix(`/eu.assemblyai`) || PathPrefix(`/langfuse`) || PathPrefix(`/vllm`)
-        || PathPrefix(`/mistral`) || PathPrefix(`/groq`) || PathPrefix(`/voyage`) || PathPrefix(`/cursor`) || PathPrefix(`/milvus`)
-        || PathPrefix(`/openai_passthrough`) || PathPrefix(`/toolset`) || PathPrefix(`/v1/realtime`) || PathPrefix(`/realtime`)
-        || PathPrefix(`/health`) || PathPrefix(`/metrics`))
+        || Path(`/api/event_logging/batch`) || Path(`/eu_jev/v1/systemone`)
+        || PathRegexp(`^/(v1/)?(chat/completions|completions|embeddings|moderations|audio|images|files|batches|fine[-_]tuning)(/|$$)`)
+        || PathRegexp(`^/(v1/)?(responses|threads|assistants|vector_stores|models|messages|a2a|decisions|systemone|extraction)(/|$$)`)
+        || PathRegexp(`^/(v1/)?(ocr|rag|videos?|search|containers|realtime|live/sessions)(/|$$)`)
+        || PathRegexp(`^/v1/(indexes|skills|evals|memory)(/|$$)`) || PathRegexp(`^/(v[12]/)?rerank(/|$$)`)
+        || PathRegexp(`^/[^/]+/v1/(files|batches)(/|$$)`)
+        || PathRegexp(`^/(search_tools|queue/chat|v1beta|interactions|openai|engines|anthropic|azure|azure_ai|azure_speech|aws|bedrock)(/|$$)`)
+        || PathRegexp(`^/(comprehendmedical|transcribe|cohere|gemini|gigachat|google|vertex_ai|vertex-ai|assemblyai|eu\.assemblyai)(/|$$)`)
+        || PathRegexp(`^/(deepgram|fal_ai|langfuse|vllm|mistral|typesafe|openrouter|nvidia_nim|groq|voyage|cursor|milvus)(/|$$)`)
+        || PathRegexp(`^/(openai_passthrough|tinyfish|toolset|watsonx|health|metrics)(/|$$)`))
       traefik.http.routers.litellm-gateway-rtr.priority: "200"
       traefik.http.routers.litellm-gateway-rtr.middlewares: "chain-no-auth-relaxed@file"
       traefik.http.routers.litellm-gateway-rtr.service: "litellm-gateway-svc"
@@ -261,7 +249,6 @@ services:
     environment:
       <<: *litellm-env
       OTEL_SERVICE_NAME: litellm-backend
-      OTEL_RESOURCE_ATTRIBUTES: service.instance.id=litellm-backend-$MY_HOSTNAME
       #### Admin UI OIDC login ####
       AUTO_REDIRECT_UI_LOGIN_TO_SSO: "true"
       GENERIC_AUTHORIZATION_ENDPOINT: https://pocketid.$BASE_DOMAINNAME/authorize
@@ -284,7 +271,7 @@ services:
           "CMD",
           "python3",
           "-c",
-          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:4001/health/liveliness', timeout=3)",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:4001/health/readiness', timeout=3)",
         ]
       interval: 2m
       timeout: 5s
@@ -306,7 +293,6 @@ services:
   litellm-ui:
     <<: *litellm-service
     image: ghcr.io/ilkersigirci/homeserver-litellm-ui:1.110.0@sha256:257b991a0a373534c3db68a40db8d652827dca284ec50097efbe876d03eb600a
-    container_name: litellm-ui
     networks:
       - t3_proxy
     expose:
@@ -325,11 +311,11 @@ services:
     labels:
       traefik.enable: "true"
       ## HTTP Routers
-      # Dashboard pages, assets, and the root-level Next.js RSC payloads (*.txt).
+      # Dashboard pages, assets, and the Next.js static export's navigation payloads.
       traefik.http.routers.litellm-ui-rtr.entrypoints: "websecure"
       traefik.http.routers.litellm-ui-rtr.rule: >-
         Host(`litellm.$DOMAINNAME`) && (Path(`/`) || Path(`/favicon.ico`) || Path(`/ui`) || PathPrefix(`/ui/`)
-        || PathPrefix(`/_next/`) || PathPrefix(`/litellm-asset-prefix/`) || PathPrefix(`/assets/`) || PathRegexp(`\.txt$$`))
+        || PathPrefix(`/_next/`) || PathPrefix(`/litellm-asset-prefix/`) || PathPrefix(`/assets/`) || PathRegexp(`/(index|__next\.[^/]+)\.txt$$`))
       traefik.http.routers.litellm-ui-rtr.priority: "100"
       traefik.http.routers.litellm-ui-rtr.middlewares: "chain-no-auth-relaxed@file"
       traefik.http.routers.litellm-ui-rtr.service: "litellm-ui-svc"

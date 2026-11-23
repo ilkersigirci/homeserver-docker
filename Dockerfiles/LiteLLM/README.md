@@ -184,8 +184,8 @@ upstream's componentized Helm chart. `litellm-migrate` runs upstream's
 `litellm-migrations` image, since no patch changes the schema, and exits once
 the migrations and request-log indexes are in place. The gateway serves the LLM
 API, the backend serves the management API, SSO, and MCP, and the UI serves the
-dashboard. Traefik sends the chart's ingress gateway paths to the gateway,
-dashboard paths to the UI, and everything else to the backend. Features LiteLLM
+dashboard. On the shared hostname, Traefik sends inference requests to the
+gateway, dashboard pages and navigation assets to the UI, and other routes to the backend. Features LiteLLM
 loads on first use, such as SCIM, run on the component that receives them.
 [`verify_components.py`](tests/verify_components.py) checks that each component
 serves the routes the patches and configuration use.
@@ -211,8 +211,8 @@ and backend omit `container_name`; raise `deploy.replicas` to scale them. Each
 process opens its own Prisma pool of two connections per physical CPU core, plus
 one; before replicas approach PostgreSQL's `max_connections`, enable upstream's
 in-container PgBouncer on the gateway with `LITELLM_PGBOUNCER_ENABLED`, as the
-chart's `database.connectionPool` does. Replicas on one host share an
-OpenTelemetry `service.instance.id`, because Compose cannot set it per replica.
+chart's `database.connectionPool` does. Leave `service.instance.id` unset so the
+OpenTelemetry SDK assigns each process its own ID.
 
 ## Updating
 
@@ -221,8 +221,8 @@ OpenTelemetry `service.instance.id`, because Compose cannot set it per replica.
     `Dockerfile`. Compare upstream's Dockerfile, Python/workspace metadata, UI
     build, and Prisma entrypoint with our stages; refresh base pins as needed.
     Compare the `gateway/`, `backend/`, and `ui/` component images with our
-    targets, and the chart's ingress gateway paths with the gateway router in
-    `apps/litellm-stack.yml`.
+    targets. Check the gateway and backend route allowlists and the dashboard's
+    exported assets against the Traefik rules in `apps/litellm-stack.yml`.
 2. Refresh `base-sources.sha256` for every patched file from pristine upstream
     source. Run `scripts/strip_enterprise.py <checkout>` to remove proprietary source,
     package/workspace entries, and the enterprise UI override, preserving

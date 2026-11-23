@@ -4,6 +4,14 @@
 networks:
   hatchet_backend:
 
+# Restore this directory with an existing database to keep its encryption and signing keys.
+x-hatchet-config: &hatchet-config
+  type: bind
+  source: $REPO_PATH/configs/hatchet
+  target: /hatchet/config
+  bind:
+    create_host_path: false
+
 x-hatchet-service: &hatchet-service
   restart: $RESTART_POLICY_PROGRAMMING
   profiles:
@@ -112,27 +120,34 @@ services:
     image: ghcr.io/hatchet-dev/hatchet/hatchet-admin:v0.120.0@sha256:a3c762d487d5401955c2282bf668b979c39f0a99667e814a316932b3188842a9
     container_name: hatchet-setup
     restart: "no"
+    # The upstream admin rewrites generated YAML during quickstart. Preserve the
+    # patched OIDC fields and existing keys when seeding an initialized config.
     command:
-      - /hatchet/hatchet-admin
-      - quickstart
-      - --skip
-      - certs
-      - --generated-config-dir
-      - /hatchet/config
-      - --overwrite=false
+      - /bin/sh
+      - -ec
+      - |
+        cd /hatchet/config
+        if [ -s server.yaml ] && [ -s database.yaml ]; then
+          exec /hatchet/hatchet-admin seed --config /hatchet/config
+        fi
+        if [ -e server.yaml ] || [ -e database.yaml ]; then
+          echo "Incomplete Hatchet config. Restore the server.yaml and database.yaml pair for this database." >&2
+          exit 1
+        fi
+        exec /hatchet/hatchet-admin quickstart --skip certs --config /hatchet/config \
+          --generated-config-dir /hatchet/config --overwrite=false
     depends_on:
       hatchet-migrate:
         condition: service_completed_successfully
     cpus: "1.0"
     mem_limit: "512M"
     volumes:
-      - $REPO_PATH/configs/hatchet:/hatchet/config
+      - *hatchet-config
     environment: *hatchet-env
 
   hatchet-engine:
     <<: *hatchet-service
     image: ghcr.io/hatchet-dev/hatchet/hatchet-engine:v0.120.0@sha256:05e46e4dbfd5f90d361c99aaf3db2d6a181c56c14e41ede11340f34a7b4b4f4d
-    container_name: hatchet-engine
     command: ["/hatchet/hatchet-engine", "--config", "/hatchet/config"]
     depends_on:
       hatchet-setup:
@@ -146,7 +161,8 @@ services:
     cpus: "2.0"
     mem_limit: "2G"
     volumes:
-      - $REPO_PATH/configs/hatchet:/hatchet/config:ro
+      - <<: *hatchet-config
+        read_only: true
     environment:
       <<: [*hatchet-env, *hatchet-otel-env]
       SERVER_OTEL_SERVICE_NAME: hatchet-engine
@@ -171,7 +187,6 @@ services:
   hatchet-api:
     <<: *hatchet-service
     image: ghcr.io/ilkersigirci/homeserver-hatchet-api:v0.120.0@sha256:0eeb0d9676c13687a769cf0da06c6577f6197fec154f678728a49b60dac953ca
-    container_name: hatchet-api
     command: ["/hatchet/hatchet-api", "--config", "/hatchet/config"]
     depends_on:
       hatchet-setup:
@@ -184,7 +199,8 @@ services:
     cpus: "1.0"
     mem_limit: "1G"
     volumes:
-      - $REPO_PATH/configs/hatchet:/hatchet/config:ro
+      - <<: *hatchet-config
+        read_only: true
     environment:
       <<: [*hatchet-env, *hatchet-otel-env]
       SERVER_OTEL_SERVICE_NAME: hatchet-api
@@ -214,7 +230,6 @@ services:
   hatchet-frontend:
     <<: *hatchet-service
     image: ghcr.io/ilkersigirci/homeserver-hatchet-frontend:v0.120.0@sha256:1a4dded04209a0b9f671713c3c1c3688501f7843ae0897c892c80260c60ce01d
-    container_name: hatchet-frontend
     networks:
       - t3_proxy
     expose:
