@@ -45,11 +45,11 @@ patch changes, and its removal check.
   connection replaces this patch.
 - [`speech-images-system-oauth.patch`](patches/speech-images-system-oauth.patch):
   speech-to-text, text-to-speech (the `openai` and `openai-realtime` engines),
-  realtime voice calls, image generation, and image editing authenticate like
-  the OpenAI connection with the same base URL. When that connection's
-  `auth_type` is `system_oauth`, they send the user's OAuth token instead of
-  their configured key; otherwise they keep the key. Only the auth type is
-  shared; the connection's custom headers still apply to chat only.
+  and realtime voice calls use the user's OAuth token when the OpenAI
+  connection with the same base URL uses `system_oauth`. When Open WebUI
+  migrates legacy image generation and edit settings, the patch carries that
+  auth type into the new image connection. Open WebUI then handles image
+  authentication natively. Chat-specific headers stay on the chat connection.
 - [`openai-files-api.patch`](patches/openai-files-api.patch): chat documents
   and images use an OpenAI-compatible Files API, such as one behind LiteLLM's
   `files_settings`. Models that read files by ID receive both by ID, and

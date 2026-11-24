@@ -13,6 +13,7 @@ import aiohttp
 from fastapi import HTTPException
 from open_webui.routers import audio, images
 from open_webui.routers.audio import realtime
+from open_webui.utils.images.connections import migrate_legacy_image_config
 
 GATEWAY = "https://gateway.example/v1"
 # An admin, so the realtime call needs no separate call permission.
@@ -30,6 +31,7 @@ FLOWS = (
 
 
 class FakeResponse:
+    ok = True
     status = 200
     headers = {"Content-Type": "audio/mpeg"}
 
@@ -148,21 +150,21 @@ async def request_headers(
         "audio.realtime.transcription_model": "transcribe",
         "user.permissions": {},
     }
-    image_config = SimpleNamespace(
-        IMAGE_GENERATION_ENGINE="openai",
-        IMAGES_OPENAI_API_BASE_URL=feature_url,
-        IMAGES_OPENAI_API_KEY="static-key",
-        IMAGES_OPENAI_API_VERSION="",
-        IMAGES_OPENAI_API_PARAMS=None,
-        IMAGE_GENERATION_MODEL="gpt-image-1",
-        IMAGE_SIZE="1024x1024",
-        IMAGE_EDIT_ENGINE="openai",
-        IMAGES_EDIT_OPENAI_API_BASE_URL=feature_url,
-        IMAGES_EDIT_OPENAI_API_KEY="static-key",
-        IMAGES_EDIT_OPENAI_API_VERSION="",
-        IMAGE_EDIT_MODEL="gpt-image-1",
-        IMAGE_EDIT_SIZE="1024x1024",
-    )
+    settings.update({
+        "image_generation.enable": True,
+        "image_generation.engine": "openai",
+        "image_generation.openai.api_base_url": feature_url,
+        "image_generation.openai.api_key": "static-key",
+        "images.edit.enable": True,
+        "images.edit.engine": "openai",
+        "images.edit.openai.api_base_url": feature_url,
+        "images.edit.openai.api_key": "static-key",
+    })
+
+    async def resolve_image_model(request, user, capability, model, *, strict):
+        [connection] = await migrate_legacy_image_config()
+        return connection, connection["config"]["model_ids"][0]
+
     connections = (True, [GATEWAY], [""], {"0": {"auth_type": auth_type}})
     session = FakeSession()
 
@@ -182,8 +184,9 @@ async def request_headers(
         patch.object(realtime, "get_session", AsyncMock(return_value=session)),
         patch.object(realtime.Models, "get_model_by_id", AsyncMock(return_value=None)),
         patch.object(images, "get_session", AsyncMock(return_value=session)),
-        patch.object(images, "get_image_config", AsyncMock(return_value=image_config)),
-        patch.object(images, "get_image_model", AsyncMock(return_value="gpt-image-1")),
+        patch.object(images.Config, "upsert", AsyncMock()),
+        patch.object(images, "resolve_image_model", resolve_image_model),
+        patch("open_webui.utils.headers.get_system_oauth_token", AsyncMock(return_value=token)),
         patch.object(images, "upload_image", AsyncMock(return_value=(None, {"url": "/image"}))),
     ):
         await send(flow, user, feature_url, Path(workdir))

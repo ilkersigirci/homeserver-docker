@@ -31,8 +31,9 @@ async def chat(config: dict, model_id: str, workspace_base_model_id: str | None 
         else None
     )
     listed_id = workspace_base_model_id or model_id
+    models = {listed_id: {"urlIdx": 0}}
     request = SimpleNamespace(
-        state=SimpleNamespace(), app=SimpleNamespace(state=SimpleNamespace(OPENAI_MODELS={listed_id: {"urlIdx": 0}}))
+        state=SimpleNamespace(), app=SimpleNamespace(state=SimpleNamespace(MODELS=models, OPENAI_MODELS=models))
     )
     form_data = {
         "model": model_id,
