@@ -3,7 +3,6 @@
 import contextlib
 import copy
 import importlib.util
-import json
 import os
 import re
 import tempfile
@@ -39,7 +38,7 @@ class FakeFilesApi:
     ) -> None:
         self.upload_status = upload_status
         self.statuses = statuses
-        self.content = content or httpx.Response(200, json={"results": [{"md_content": MARKDOWN}]})
+        self.content = content or markdown(MARKDOWN)
         self.requests: list[httpx.Request] = []
 
     def __call__(self, request: httpx.Request) -> httpx.Response:
@@ -60,6 +59,11 @@ class FakeFilesApi:
     @property
     def status_checks(self) -> list[httpx.Request]:
         return [r for r in self.requests if r.method == "GET" and not r.url.path.endswith("/content")]
+
+
+def markdown(text: str) -> httpx.Response:
+    """files-api's content of a file read with format=markdown."""
+    return httpx.Response(200, text=text, headers={"content-type": "text/markdown"})
 
 
 def file_object(id: str, **fields) -> dict:
@@ -497,30 +501,17 @@ class ExtractThroughFilesApiTest(unittest.IsolatedAsyncioTestCase):
         save_id.assert_awaited_once_with(file.id, {"openai_file_id": "file-1"})
         # The upload reuses the local copy processing downloaded.
         get_file.assert_called_once_with(file.path)
-        # The upload, a status check until the file is processed, then its extracted content.
+        # The upload, a status check until the file is processed, then its markdown.
         file_url = "/v1/files/file-1"
         self.assertEqual(
             [(request.method, request.url.path) for request in api.requests],
             [("POST", "/v1/files"), ("GET", file_url), ("GET", file_url), ("GET", f"{file_url}/content")],
         )
         for request in api.requests:
-            self.assertEqual(dict(request.url.params), {"provider": "files"})
+            markdown_read = {"format": "markdown"} if request.url.path.endswith("/content") else {}
+            self.assertEqual(dict(request.url.params), {"provider": "files", **markdown_read})
             self.assertEqual(request.headers["Authorization"], "Bearer user-token")
         self.assertEqual(clients, [{"verify": openai_files.AIOHTTP_CLIENT_SESSION_SSL}])
-
-    def test_extracted_content_becomes_text(self) -> None:
-        results = [{"md_content": "# Page 1"}, {"md_content": None}, {"md_content": "Page 2"}]
-        sheets = [{"name": "A", "chunks": ["A: row 1"]}, {"name": "B", "chunks": ["B: row 1", "B: row 51"]}]
-        for content, text in (
-            ({"results": results}, "# Page 1\n\nPage 2"),
-            ({"type": "text", "version": 1, "text": "Notes."}, "Notes."),
-            ({"type": "spreadsheet", "version": 1, "sheets": sheets}, "A: row 1\n\nB: row 1\n\nB: row 51"),
-        ):
-            with self.subTest(text=text):
-                self.assertEqual(openai_files.extracted_text(content), text)
-        # Content from an engine this patch does not read yet is never stored as empty text.
-        with self.assertRaisesRegex(ValueError, "transcript content"):
-            openai_files.extracted_text({"type": "transcript", "version": 1, "segments": []})
 
     async def extract(self, api: FakeFilesApi, *patches, name: str = "report.pdf") -> list:
         """Load a stored file as processing an upload does."""
@@ -537,7 +528,7 @@ class ExtractThroughFilesApiTest(unittest.IsolatedAsyncioTestCase):
 
     async def test_extracted_text_is_post_processed_like_any_engines(self) -> None:
         # Loader.load fixes every engine's text, here a ligature PDFs often keep.
-        api = FakeFilesApi(content=httpx.Response(200, json={"results": [{"md_content": "\ufb01nal"}]}))
+        api = FakeFilesApi(content=markdown("\ufb01nal"))
         docs = await self.extract(api)
 
         self.assertEqual([(doc.page_content, doc.metadata) for doc in docs], [("final", {"openai_file_id": "file-1"})])
@@ -550,10 +541,10 @@ class ExtractThroughFilesApiTest(unittest.IsolatedAsyncioTestCase):
             (failed, (), ValueError, "Failed to parse"),
             (FakeFilesApi(statuses=({"status": "uploaded"},)), (no_wait,), RuntimeError, "Giving up"),
             # For example, a sign-in page a proxy answers with.
-            (FakeFilesApi(content=httpx.Response(200, text="<html>Sign in</html>")), (), json.JSONDecodeError, ""),
+            (FakeFilesApi(content=httpx.Response(200, html="<html>Sign in</html>")), (), ValueError, "text/html instead"),
             (FakeFilesApi(), (no_url,), ValueError, "needs OPENAI_FILES_API_BASE_URL"),
         ):
-            with self.subTest(message=message or "not JSON"):
+            with self.subTest(message=message):
                 with self.assertRaisesRegex(error, message):
                     await self.extract(api, *patches)
 

@@ -126,13 +126,13 @@ so the Files API must keep its files.
 With the `openai_files` engine, processing an upload with a listed extension
 waits, with the OpenAI SDK's `files.wait_for_processing` checking every 2
 seconds, until the Files API reports the file `processed`; an `error` status
-fails the processing with its `status_details`. It then stores the text of
-files-api's extracted content from `GET /files/{file_id}/content`, read by its
-`type`: a text file's `text`, a spreadsheet's row `chunks`, or, untyped, the
-`md_content` of a parsed document's `results`. Content of another type fails
-the processing, so a new files-api engine needs this patch to read its type. A
-failure shows the error and keeps the file attached, so models that read files
-by ID still receive it.
+fails the processing with its `status_details`. It then stores the markdown
+files-api's parser made of it, from `GET /files/{file_id}/content?format=markdown`
+(without `format` that path returns the original upload). Every files-api parser
+writes one markdown document, whatever the file type; a response that is not
+`text/markdown`, such as a proxy's sign-in page, fails the processing. A failure
+shows the error and keeps the file attached, so models that read files by ID
+still receive it.
 
 Other uploads, and documents Open WebUI downloads from the web, such as PDFs in
 search results, use the built-in loaders; in the slim image those read only

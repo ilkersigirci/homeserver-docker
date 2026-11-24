@@ -130,7 +130,7 @@ Files API file ID and extracts document text through a Files API.
          output = message.get('output')
 --- /dev/null
 +++ b/open_webui/utils/openai_files.py
-@@ -0,0 +1,280 @@
+@@ -0,0 +1,270 @@
 +"""Chat documents and images in an OpenAI-compatible Files API (homeserver openai-files-api.patch).
 +
 +A model matching OPENAI_FILES_API_MODELS_REGEX_PATTERN receives each user message's documents
@@ -235,22 +235,6 @@ Files API file ID and extracts document text through a Files API.
 +    return uploaded.id
 +
 +
-+def extracted_text(content: dict) -> str:
-+    """files-api's extracted content as text, by its type: a text file's text, a
-+    spreadsheet's row chunks, or, untyped, a parsed document's markdown results.
-+
-+    Another type fails, so content from a new files-api engine is never stored empty.
-+    """
-+    content_type = content.get('type')
-+    if content_type == 'text':
-+        return content['text']
-+    if content_type == 'spreadsheet':
-+        return '\n\n'.join(chunk for sheet in content['sheets'] for chunk in sheet['chunks'])
-+    if content_type is None:
-+        return '\n\n'.join(result['md_content'] for result in content.get('results') or [] if result.get('md_content'))
-+    raise ValueError(f'The Files API returned {content_type} content, which Open WebUI cannot read yet')
-+
-+
 +class OpenAIFilesLoader(BaseLoader):
 +    """The text the Files API extracted, which Loader.load post-processes like any engine's."""
 +
@@ -282,8 +266,14 @@ Files API file ID and extracts document text through a Files API.
 +        )
 +        if processed.status == 'error':
 +            raise ValueError(f'Files API text extraction failed: {processed.status_details or "no details"}')
-+        content = (await client.files.content(openai_file_id)).json()
-+    return OpenAIFilesLoader(extracted_text(content), openai_file_id)
++        # Every files-api parser writes its text as one markdown document; without
++        # format, content is the original upload.
++        content = await client.files.content(openai_file_id, extra_query={'format': 'markdown'})
++    content_type = content.response.headers.get('content-type', '').split(';')[0].strip()
++    if content_type != 'text/markdown':
++        # For example a proxy's sign-in page: never stored as the document's text.
++        raise ValueError(f'The Files API returned {content_type or "no content type"} instead of markdown')
++    return OpenAIFilesLoader(content.text, openai_file_id)
 +
 +
 +def _content_type(file) -> str:
