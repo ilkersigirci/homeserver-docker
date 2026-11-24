@@ -99,7 +99,7 @@ def files_api(api: FakeFilesApi, *patches, token: object = TOKEN, pattern: str =
                 DefaultAsyncHttpxClient=http_client,
             ),
             patch("open_webui.routers.openai.get_openai_runtime_config", AsyncMock(return_value=connections)),
-            patch("open_webui.utils.middleware.get_system_oauth_token", AsyncMock(return_value=token)),
+            patch("open_webui.utils.oauth.get_system_oauth_token", AsyncMock(return_value=token)),
             patch.object(openai_files.Storage, "get_file", side_effect=lambda path: path),
             *patches,
         ):

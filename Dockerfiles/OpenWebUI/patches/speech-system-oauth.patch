@@ -1,7 +1,7 @@
-Upstream gap: Open WebUI's OpenAI speech and legacy image settings take only a static
-key, so speech-to-text, text-to-speech, realtime voice calls, image generation,
-and image editing cannot send the signed-in user's OAuth token (requested in
-open-webui#21281; open-webui#21282 was closed unmerged).
+Upstream gap: Open WebUI's OpenAI speech settings take only a static key, so
+speech-to-text, text-to-speech, and realtime voice calls cannot send the
+signed-in user's OAuth token (requested in open-webui#21281; open-webui#21282
+was closed unmerged).
 
 Authenticate each of them like the OpenAI connection with the same base URL:
 when that connection's auth_type is system_oauth, send the user's OAuth token
@@ -9,8 +9,8 @@ instead of the configured key. Text-to-speech covers both the openai and the
 openai-realtime engines. Other connection settings, such as custom headers,
 still apply to chat only.
 
-Removal check: an Open WebUI release with an auth type for OpenAI speech and
-legacy image settings. Migrated image connections use native system_oauth.
+Removal check: an Open WebUI release with an auth type for the OpenAI speech
+settings.
 
 --- a/open_webui/routers/audio/__init__.py
 +++ b/open_webui/routers/audio/__init__.py
@@ -73,21 +73,20 @@ legacy image settings. Migrated image connections use native system_oauth.
                      headers = include_user_info_headers(headers, user)
 --- a/open_webui/routers/openai.py
 +++ b/open_webui/routers/openai.py
-@@ -255,6 +255,23 @@ async def get_openai_connection(idx: int) -> tuple[str, str, dict]:
+@@ -255,6 +255,22 @@ async def get_openai_connection(idx: int) -> tuple[str, str, dict]:
      return url, key, api_config
 
 
-+async def uses_system_oauth(base_url: str) -> bool:
++async def get_connection_api_key(request, user, base_url: str, api_key: str) -> str:
++    """Authenticate like the OpenAI connection with this base URL: its system_oauth sends the user's token."""
++    # Not get_openai_connection(idx): Open WebUI pads api_keys to the URLs only when it lists models.
 +    _, api_base_urls, _, api_configs = await get_openai_runtime_config()
 +    for idx, url in enumerate(api_base_urls):
-+        if url.rstrip('/') == base_url.rstrip('/'):
-+            return api_configs.get(str(idx), api_configs.get(url, {})).get('auth_type') == 'system_oauth'
-+    return False
-+
-+
-+async def get_connection_api_key(request, user, base_url: str, api_key: str) -> str:
-+    if await uses_system_oauth(base_url):
-+        from open_webui.utils.middleware import get_system_oauth_token
++        if url.rstrip('/') != base_url.rstrip('/'):
++            continue
++        if api_configs.get(str(idx), api_configs.get(url, {})).get('auth_type') != 'system_oauth':
++            break
++        from open_webui.utils.oauth import get_system_oauth_token
 +
 +        oauth_token = await get_system_oauth_token(request, user) if user else None
 +        return (oauth_token or {}).get('access_token', '')
@@ -97,17 +96,3 @@ legacy image settings. Migrated image connections use native system_oauth.
  @cached(ttl=MODELS_CACHE_TTL, key_builder=lambda _func, user: f'openai_tether_models_{user.id}')
  async def get_tether_models(user) -> dict[str, dict]:
      """Models of the OpenAI-compatible connections the user added in Tether, listed through it."""
---- a/open_webui/utils/images/connections.py
-+++ b/open_webui/utils/images/connections.py
-@@ -547,6 +547,11 @@ async def migrate_legacy_image_config() -> list[dict]:
-     ):
-         if legacy is None:
-             continue
-+        if legacy['type'] == 'openai':
-+            from open_webui.routers.openai import uses_system_oauth
-+
-+            if await uses_system_oauth(legacy['url']):
-+                legacy['config']['auth_type'] = 'system_oauth'
-         legacy['config']['access_grants'] = PUBLIC_ACCESS_GRANTS
-         connection = normalize_image_connection(
-             {**legacy, 'name': f'{LEGACY_IMAGE_CONNECTION_NAMES[legacy["type"]]}{suffix}'}

@@ -79,23 +79,19 @@ services:
       OPENAI_API_KEY: "" # NOTE: Fill it when not using system_oauth
       OPENAI_API_CONFIGS: '{"0":{"auth_type":"system_oauth","responses_model_ids":["langflow/*"],"headers":{"X-Langflow-Session-Id":"{{CHAT_ID}}"}}}' # NOTE: langflow/* models use the Responses API, which Langflow serves natively, while other models keep Chat Completions; X-Langflow-Session-Id keeps one Langflow session per chat, and LiteLLM forwards it to langflow/* models only.
       ENABLE_BASE_MODELS_CACHE: false
-      ############# IMAGE GENERATION #############
+      ############# IMAGE GENERATION AND EDIT #############
       ENABLE_IMAGE_GENERATION: true
-      IMAGE_GENERATION_ENGINE: openai
-      IMAGES_OPENAI_API_BASE_URL: https://litellm.coding.$BASE_DOMAINNAME/v1
-      # IMAGES_OPENAI_API_KEY:  "" # NOTE: Fill it when not using system_oauth
-      IMAGES_OPENAI_PARAMS: '{"additional_drop_params":["extra_headers"]}' # NOTE: LiteLLM duplicates forwarded headers into the generation body. Remove this when https://github.com/BerriAI/litellm/issues/40628 fixed
-      IMAGE_GENERATION_MODEL: ${OPENAI_IMAGE_GENERATION_MODEL:-openai/gpt-image-2.5-flare}
-      IMAGE_SIZE: ${OPENWEBUI_IMAGE_SIZE:-1024x1024}
-      IMAGE_URL_RESPONSE_MODELS_REGEX_PATTERN: '^(openai/)?gpt-image' # NOTE: Prevents Open WebUI from sending unsupported response_format for your openai/gpt-image-* models
-      ############# IMAGE EDIT #############
       ENABLE_IMAGE_EDIT: true
-      IMAGE_EDIT_ENGINE: openai
-      IMAGES_EDIT_OPENAI_API_BASE_URL: https://litellm.coding.$BASE_DOMAINNAME/v1
-      # IMAGES_EDIT_OPENAI_API_KEY: "" # NOTE: Fill it when not using system_oauth
-      IMAGE_EDIT_MODEL: ${OPENWEBUI_IMAGE_EDIT_MODEL:-openai/gpt-image-2.5-flare}
-      IMAGE_EDIT_SIZE: ${OPENWEBUI_IMAGE_SIZE:-1024x1024}
-      IMAGE_AUTO_SIZE_MODELS_REGEX_PATTERN: '^(openai/)?gpt-image' # NOTE: Prevents Open WebUI from sending unsupported response_format for your openai/gpt-image-* models
+      # NOTE: One LiteLLM connection generates and edits images with the user's OAuth token; set "auth_type":"bearer" and a "key" when not using system_oauth. additional_drop_params stops LiteLLM duplicating forwarded headers into the generation body; remove it when https://github.com/BerriAI/litellm/issues/40628 is fixed.
+      IMAGE_CONNECTIONS: >-
+        [{"id": "litellm", "name": "LiteLLM", "type": "openai",
+          "url": "https://litellm.coding.$BASE_DOMAINNAME/v1",
+          "config": {"auth_type": "system_oauth",
+            "model_ids": ["${OPENAI_IMAGE_GENERATION_MODEL:-openai/gpt-image-2.5-flare}"],
+            "size": "${OPENWEBUI_IMAGE_SIZE:-1024x1024}", "edit_size": "${OPENWEBUI_IMAGE_SIZE:-1024x1024}",
+            "params": {"additional_drop_params": ["extra_headers"]},
+            "access_grants": [{"principal_type": "user", "principal_id": "*", "permission": "read"}]}}]
+      IMAGE_URL_RESPONSE_MODELS_REGEX_PATTERN: '^(openai/)?gpt-image' # NOTE: Prevents Open WebUI from sending unsupported response_format for your openai/gpt-image-* models
       ############# AUDIO #############
       AUDIO_STT_ENGINE: openai
       AUDIO_STT_OPENAI_API_BASE_URL: https://litellm.coding.$BASE_DOMAINNAME/v1

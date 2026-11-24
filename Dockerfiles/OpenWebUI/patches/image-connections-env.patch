@@ -1,0 +1,52 @@
+Upstream gap: Open WebUI runs image generation and editing on image
+connections, each with its own auth type, such as system_oauth, but no
+environment variable sets them. Without persistent config, it builds them at
+every start from the legacy single-engine settings, which send a static key.
+
+IMAGE_CONNECTIONS holds a JSON array of image connections, in the shape the
+IMAGE_CONNECTIONS field of POST /api/v1/images/config/update takes. When no
+image connections are stored, startup loads it in place of the legacy
+settings, normalized and checked for unique IDs as that route does. An invalid
+value stops startup instead of falling back to the legacy defaults, which send
+OPENAI_API_KEY to OPENAI_API_BASE_URL. As with other environment settings,
+connections that persistent config stores win.
+
+Removal check: an Open WebUI release that sets image connections from the
+environment.
+
+--- a/open_webui/config.py
++++ b/open_webui/config.py
+@@ -1557,6 +1557,9 @@ except JSONCodec.JSONDecodeError:
+
+ IMAGES_EDIT_COMFYUI_WORKFLOW_NODES = images_edit_comfyui_workflow_nodes
+
++# A JSON array of image connections, as the IMAGE_CONNECTIONS field of POST /api/v1/images/config/update takes them.
++IMAGE_CONNECTIONS = os.getenv('IMAGE_CONNECTIONS', '')
++
+ # Videos
+
+ ENABLE_VIDEO_GENERATION = os.getenv('ENABLE_VIDEO_GENERATION', '').lower() == 'true'
+--- a/open_webui/utils/images/connections.py
++++ b/open_webui/utils/images/connections.py
+@@ -513,6 +513,21 @@ async def migrate_legacy_image_config() -> list[dict]:
+     if connections is not None:
+         return connections
+
++    from open_webui.config import IMAGE_CONNECTIONS
++
++    if IMAGE_CONNECTIONS:
++        # Connections from the environment replace the legacy settings, validated as the config route does.
++        # An invalid value stops startup: the legacy defaults would send OPENAI_API_KEY to OPENAI_API_BASE_URL.
++        connections = JSONCodec.loads(IMAGE_CONNECTIONS)
++        if not isinstance(connections, list) or not all(isinstance(connection, dict) for connection in connections):
++            raise ValueError('IMAGE_CONNECTIONS must be a JSON array of image connections')
++        connections = [normalize_image_connection(connection) for connection in connections]
++        if len({connection['id'] for connection in connections}) != len(connections):
++            raise ValueError('Image connection IDs must be unique')
++        await Config.upsert({IMAGE_CONNECTIONS_CONFIG_KEY: connections})
++        log.info('Loaded %d image connection(s) from IMAGE_CONNECTIONS', len(connections))
++        return connections
++
+     values = await Config.get_many(*LEGACY_IMAGE_CONFIG_KEYS)
+     generation = _legacy_generation_connection(values)
+     edit = _legacy_edit_connection(values)

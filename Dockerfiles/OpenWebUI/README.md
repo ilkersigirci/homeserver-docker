@@ -4,7 +4,8 @@ Thin wrapper over the pinned official Open WebUI slim image. Its patches let an
 Open WebUI that signs users in with OIDC send each user's own OAuth token where
 upstream allows only a shared key, let a Pipe describe the models it lists, let
 a connection leave out models or send them to the Responses API by pattern,
-and let chat documents and images go through an OpenAI-compatible Files API.
+set image connections from the environment, and let chat documents and images
+go through an OpenAI-compatible Files API.
 
 ## Image contents
 
@@ -43,13 +44,24 @@ patch changes, and its removal check.
   ([open-webui#22905](https://github.com/open-webui/open-webui/issues/22905));
   once that filter accepts patterns (open-webui#23711), such a second
   connection replaces this patch.
-- [`speech-images-system-oauth.patch`](patches/speech-images-system-oauth.patch):
+- [`speech-system-oauth.patch`](patches/speech-system-oauth.patch):
   speech-to-text, text-to-speech (the `openai` and `openai-realtime` engines),
-  and realtime voice calls use the user's OAuth token when the OpenAI
-  connection with the same base URL uses `system_oauth`. When Open WebUI
-  migrates legacy image generation and edit settings, the patch carries that
-  auth type into the new image connection. Open WebUI then handles image
-  authentication natively. Chat-specific headers stay on the chat connection.
+  and realtime voice calls authenticate like the OpenAI connection with the
+  same base URL. When that connection's `auth_type` is `system_oauth`, they
+  send the user's OAuth token instead of their configured key; otherwise they
+  keep the key. Only the auth type is shared; the connection's custom headers
+  still apply to chat only.
+- [`image-connections-env.patch`](patches/image-connections-env.patch):
+  `IMAGE_CONNECTIONS` holds a JSON array of the image connections that image
+  generation and editing run on, in the shape the Admin Settings **Images**
+  page saves through `POST /api/v1/images/config/update`. Unless persistent
+  config already stores image connections, startup loads it in place of the
+  legacy single-engine image settings, which it then ignores, so a connection
+  can use any upstream auth type, such as `system_oauth`, and keep a stable
+  `id` for its `{id}:{model}` model references. An invalid value, such as bad
+  JSON, an invalid connection, or a repeated `id`, stops startup rather than
+  falling back to the legacy defaults, which send `OPENAI_API_KEY`. A
+  connection without `access_grants` is admin-only, as upstream treats it.
 - [`openai-files-api.patch`](patches/openai-files-api.patch): chat documents
   and images use an OpenAI-compatible Files API, such as one behind LiteLLM's
   `files_settings`. Models that read files by ID receive both by ID, and
@@ -67,7 +79,8 @@ The connection dialog in Admin Settings does not show `exclude_model_ids` or
 `responses_model_ids`, and saving that connection there drops both. With
 `ENABLE_PERSISTENT_CONFIG: false`, as in
 [`apps/open-webui.yml`](../../apps/open-webui.yml), the next restart restores
-them from `OPENAI_API_CONFIGS`, so change that connection there.
+them from `OPENAI_API_CONFIGS`, and the image connections from
+`IMAGE_CONNECTIONS`, so change those connections there.
 
 ## Files API
 
@@ -130,7 +143,7 @@ saving it, check that `GET /api/v1/retrieval/config` still reports
 
 Requests go through the image's OpenAI SDK, with its retries, and
 authenticate like the OpenAI connection with the same base URL, as in
-`speech-images-system-oauth.patch`. Open WebUI never deletes files from the
+`speech-system-oauth.patch`. Open WebUI never deletes files from the
 Files API.
 
 ## Updating

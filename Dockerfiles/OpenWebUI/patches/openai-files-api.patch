@@ -37,7 +37,7 @@ change at runtime, fails each upload it would send instead.
 Open WebUI uploads a file on first use with purpose=user_data and keeps its ID
 in the file's meta as openai_file_id. Requests go through the OpenAI SDK,
 authenticate like the OpenAI connection with the same base URL
-(get_connection_api_key from speech-images-system-oauth.patch), send
+(get_connection_api_key from speech-system-oauth.patch), send
 OPENAI_FILES_API_PARAMS as query parameters, and time out after
 OPENAI_FILES_API_TIMEOUT seconds, which also bounds the wait for processing.
 Files are never deleted from the Files API.
@@ -207,7 +207,7 @@ Files API file ID and extracts document text through a Files API.
 +
 +async def get_client(request, user) -> AsyncOpenAI:
 +    """A Files API client that authenticates like the OpenAI connection with the same base URL."""
-+    # Defined by speech-images-system-oauth.patch.
++    # Defined by speech-system-oauth.patch.
 +    from open_webui.routers.openai import get_connection_api_key
 +
 +    headers = include_user_info_headers({}, user, request=request) if ENABLE_FORWARD_USER_INFO_HEADERS else {}
