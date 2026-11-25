@@ -146,7 +146,7 @@ services:
   # patches add no migrations, so this is the upstream image.
   litellm-migrate:
     <<: *litellm-service
-    image: ghcr.io/berriai/litellm-migrations:v1.110.0@sha256:a76d6c1c672db7156b98a00f10a3df69541a7f14710bc6ac03e44c6c77a6889c
+    image: ghcr.io/berriai/litellm-migrations:1.110.4@sha256:06e5a974d014fb80199a60bb29d7f33cf134e6d50b77709fd65f4a2b66d7dbae
     container_name: litellm-migrate
     restart: "no"
     depends_on:
@@ -163,7 +163,7 @@ services:
   # LLM API (data plane): inference, models, files, responses, realtime.
   litellm-gateway:
     <<: *litellm-service
-    image: ghcr.io/ilkersigirci/homeserver-litellm-gateway:1.110.0@sha256:cec25168b37af2ed65920a3bcfafc84bbc381b2ff07a8a8a780d530037f91ef1
+    image: ghcr.io/ilkersigirci/homeserver-litellm-gateway:1.110.0@sha256:476412b777309b7453df4c860757695d8ebbf25a58445aba95a7a172889bcf14
     # container_name: litellm-gateway # NOTE: Omit container_name so Compose can run multiple gateway replicas.
     deploy:
       replicas: 1
@@ -226,7 +226,7 @@ services:
   # models, spend, SSO, SCIM, and MCP.
   litellm-backend:
     <<: *litellm-service
-    image: ghcr.io/ilkersigirci/homeserver-litellm-backend:1.110.0@sha256:016477a5667eb2232aee04901cce8ab497ce9bf1c9760bda98fd1a4d029fba9d
+    image: ghcr.io/ilkersigirci/homeserver-litellm-backend:1.110.0@sha256:fa6f55c58fc3b456e5a3f132d561500db16adce32b9a25a7f5d0ab2e112deb95
     # container_name: litellm-backend # NOTE: Omit container_name so Compose can run multiple backend replicas.
     deploy:
       replicas: 1
@@ -292,7 +292,7 @@ services:
   # Admin UI: the dashboard's static export served by nginx.
   litellm-ui:
     <<: *litellm-service
-    image: ghcr.io/ilkersigirci/homeserver-litellm-ui:1.110.0@sha256:257b991a0a373534c3db68a40db8d652827dca284ec50097efbe876d03eb600a
+    image: ghcr.io/ilkersigirci/homeserver-litellm-ui:1.110.0@sha256:dd9c84791abc5c1fa83ca129b9d3bab8e55d8fc7afff0e4dd55b5b4752b4ca8a
     networks:
       - t3_proxy
     expose:
