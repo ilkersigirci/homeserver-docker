@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.25@sha256:0adf442eae370b6087e08edc7c50b552d80ddf261576f4ebd6421006b2461f12
 # renovate: datasource=github-tags depName=BerriAI/litellm
-ARG IMAGE_VERSION=1.110.0
+ARG IMAGE_VERSION=1.111.0
 ARG UPSTREAM_COMMIT=096ff016817c1d26928ef984e5ee16ee285ccd28
 # Upstream's in-container PgBouncer (LITELLM_PGBOUNCER_ENABLED), as pinned upstream.
 ARG PGBOUNCER_VERSION=1.26.0
