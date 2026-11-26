@@ -4,7 +4,7 @@ networks:
 
 services:
   litellm-db:
-    image: postgres:18.6@sha256:74935e72241653ca55e0414067e6d8763aceb8a810eb51b452253ec3dcfc4336
+    image: postgres:18.7@sha256:64c8b0d31e4ab6ea665e8426ea406a94bf52de3c05b3a4a8bf713704eefa9328
     container_name: litellm-db
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
