@@ -1,6 +1,6 @@
 services:
   scalar:
-    image: scalarapi/api-reference:0.6.12@sha256:720f243b22561e621bf4a87b23595ed2f7aeae366ff38be1fe68bde8ef4aaa9d
+    image: scalarapi/api-reference:0.6.32@sha256:36b48038bfa053c005d24984a0a5fdd46008e5b81c711521b37f1e6dcb96de40
     container_name: scalar
     restart: $RESTART_POLICY_PROGRAMMING
     profiles:
