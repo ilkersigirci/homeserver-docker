@@ -1,0 +1,31 @@
+default_config:
+
+recorder:
+  # Batch database writes to reduce wear on rpi0's SD card.
+  commit_interval: 30
+
+tts:
+  - platform: google_translate
+
+lovelace:
+  dashboards:
+    dashboard-main:
+      mode: yaml
+      filename: dashboards/main.yaml
+      title: Home
+      icon: mdi:home
+    dashboard-smart-devices:
+      mode: yaml
+      filename: dashboards/smart-devices.yaml
+      title: Devices
+      icon: mdi:devices
+    dashboard-dreame:
+      mode: yaml
+      filename: dashboards/dreame.yaml
+      title: Vacuum
+      icon: mdi:robot-vacuum
+    dashboard-tv:
+      mode: yaml
+      filename: dashboards/tv.yaml
+      title: TV
+      icon: mdi:television

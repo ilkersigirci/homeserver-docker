@@ -1,0 +1,47 @@
+views:
+  - title: Home
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Weather
+          - type: weather-forecast
+            entity: weather.forecast_home
+            forecast_type: daily
+      - type: grid
+        cards:
+          - type: heading
+            heading: Equipment
+          - type: tile
+            entity: fan.air_purifier
+            name: Air purifier
+            tap_action:
+              action: navigate
+              navigation_path: /dashboard-smart-devices/0
+          - type: tile
+            entity: vacuum.l10s_pro
+            name: Vacuum
+            tap_action:
+              action: navigate
+              navigation_path: /dashboard-dreame/0
+          - type: tile
+            entity: media_player.vesteltvmibox
+            name: TV
+            tap_action:
+              action: navigate
+              navigation_path: /dashboard-tv/0
+          - type: heading
+            heading: Phones
+          - type: tile
+            entity: sensor.android_phone_battery
+            name: Android battery
+          - type: tile
+            entity: sensor.iphone_battery
+            name: iPhone battery
+          - type: heading
+            heading: Internet
+          - type: tile
+            entity: sensor.fast_com_download
+            name: Download speed

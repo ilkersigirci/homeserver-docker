@@ -1,0 +1,174 @@
+views:
+  - title: Controls
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Lights
+          - type: tile
+            entity: light.bedroom_lightbulb
+            name: Bedroom
+            features:
+              - type: light-brightness
+          - type: tile
+            entity: light.led_strip_1
+            name: LED strip
+            features:
+              - type: light-brightness
+          - type: heading
+            heading: Air purifier
+          - type: tile
+            entity: fan.air_purifier
+            name: Air purifier
+            features:
+              - type: fan-speed
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: number.air_purifier_favorite_level
+                name: Favorite level
+              - entity: select.air_purifier_aqi_interval
+                name: Air quality update interval
+              - entity: select.air_purifier_display_brightness
+                name: Display brightness
+              - entity: switch.air_purifier_child_lock
+                name: Child lock
+              - entity: switch.air_purifier_buzzer
+                name: Buzzer
+              - entity: button.air_purifier_reset_filter
+                name: Reset filter life
+              - entity: button.air_purifier_toggle
+                name: Toggle power
+      - type: grid
+        cards:
+          - type: heading
+            heading: Power
+          - type: tile
+            entity: switch.kitchen_smart_plug
+            name: Kitchen plug
+          - type: tile
+            entity: sensor.kitchen_smart_plug_current_consumption
+            name: Kitchen power
+          - type: tile
+            entity: switch.bedroom_smart_plug
+            name: Bedroom plug
+          - type: tile
+            entity: sensor.bedroom_smart_plug_current_consumption
+            name: Bedroom power
+          - type: tile
+            entity: switch.homeserver_smart_plug
+            name: Server plug
+            icon_tap_action:
+              action: more-info
+          - type: tile
+            entity: sensor.homeserver_smart_plug_current_consumption
+            name: Server power
+          - type: tile
+            entity: switch.smart_plug_nas
+            name: NAS plug
+            icon_tap_action:
+              action: more-info
+          - type: tile
+            entity: sensor.smart_plug_nas_current_consumption
+            name: NAS power
+          - type: heading
+            heading: Wake on LAN
+          - type: tile
+            entity: button.wake_desktop
+            name: Wake desktop
+          - type: tile
+            entity: button.wake_nas
+            name: Wake NAS
+
+  - title: Camera
+    path: camera
+    type: sections
+    max_columns: 1
+    sections:
+      - type: grid
+        cards:
+          - type: custom:advanced-camera-card
+            cameras:
+              - camera_entity: camera.livingroomcamera_fluent
+          - type: button
+            name: Open two-way talk
+            icon: mdi:microphone
+            tap_action:
+              action: navigate
+              navigation_path: /dashboard-smart-devices/talk
+
+  - title: Two-way talk
+    path: talk
+    subview: true
+    back_path: /dashboard-smart-devices/camera
+    type: sections
+    max_columns: 1
+    sections:
+      - type: grid
+        cards:
+          - type: custom:webrtc-camera
+            url: e1pro
+            mode: webrtc
+            media: video,audio,microphone
+            ui: true
+            muted: false
+
+  - title: Printer
+    path: printer
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Print status
+          - type: custom:ha-bambulab-print_status-card
+            printer: !env_var HA_BAMBU_PRINTER_DEVICE_ID
+          - type: custom:ha-bambulab-ams-card
+            ams: !env_var HA_BAMBU_AMS_DEVICE_ID
+            style: graphic
+            show_info_bar: true
+            show_type: true
+            spool_anim_reflection: true
+            custom_humidity: sensor.printer_ams_humidity
+            custom_temperature: sensor.printer_ams_temperature
+      - type: grid
+        cards:
+          - type: heading
+            heading: Printer controls
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: button.printer_pause
+                name: Pause print
+              - entity: button.printer_resume
+                name: Resume print
+              - entity: button.printer_stop
+                name: Stop print
+              - entity: select.printer_speed
+                name: Printing speed
+              - entity: light.printer_chamber
+                name: Chamber light
+              - entity: button.printer_refresh
+                name: Refresh printer data
+          - type: button
+            name: Unload filament
+            icon: mdi:eject
+            tap_action:
+              action: perform-action
+              perform_action: bambu_lab.unload_filament
+              data:
+                device_id: !env_var HA_BAMBU_AMS_DEVICE_ID
+          - type: picture-entity
+            entity: camera.printer
+            camera_view: live
+            show_name: false
+            show_state: false
+
+  - title: All entities
+    path: overview
+    icon: mdi:view-dashboard
+    strategy:
+      type: original-states

@@ -1,0 +1,93 @@
+views:
+  - title: Clean
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Cleaning
+          - type: tile
+            entity: vacuum.l10s_pro
+            name: Vacuum
+            grid_options:
+              columns: full
+            features:
+              - type: vacuum-commands
+                commands:
+                  - start_pause
+                  - stop
+                  - return_home
+                  - locate
+          - type: entities
+            entities:
+              - entity: select.l10s_pro_cleaning_mode
+                name: Cleaning mode
+              - entity: select.l10s_pro_suction_level
+                name: Suction level
+      - type: grid
+        cards:
+          - type: custom:dreame-vacuum-map-card
+            entity: vacuum.l10s_pro
+            title: Cleaning map
+            map_entity: camera.l10s_pro_map
+            language: auto
+            default_mode: all
+            default_room_view: map
+            grid_options:
+              columns: full
+            map_overlays:
+              - room_labels
+              - vacuum
+              - charger
+            map_height: 520px
+            room_label_scale: 0.6
+            buttons:
+              - type: stop
+                action: stop
+
+  - title: Targeted cleaning
+    path: zones
+    type: sections
+    max_columns: 1
+    sections:
+      - type: grid
+        cards:
+          - type: custom:xiaomi-vacuum-map-card
+            map_source:
+              camera: camera.l10s_pro_map
+            calibration_source:
+              camera: true
+            entity: vacuum.l10s_pro
+            vacuum_platform: Tasshack/dreame-vacuum
+            title: Zones and points
+            map_locked: true
+            map_modes:
+              - template: vacuum_clean_zone
+              - template: vacuum_clean_point
+              - template: vacuum_goto
+
+  - title: Settings
+    path: settings
+    type: sections
+    max_columns: 1
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Cleaning preferences
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: switch.l10s_pro_carpet_avoidance
+                name: Avoid carpets
+              - entity: switch.l10s_pro_carpet_boost
+                name: Carpet boost
+              - entity: switch.l10s_pro_carpet_recognition
+                name: Detect carpets
+              - entity: switch.l10s_pro_obstacle_avoidance
+                name: Avoid obstacles
+              - entity: switch.l10s_pro_resume_cleaning
+                name: Resume cleaning
+              - entity: number.l10s_pro_volume
+                name: Voice volume

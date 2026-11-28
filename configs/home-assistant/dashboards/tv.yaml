@@ -1,0 +1,25 @@
+views:
+  - title: TV
+    type: sections
+    max_columns: 2
+    sections:
+      - type: grid
+        cards:
+          - type: heading
+            heading: Playback
+          - type: media-control
+            entity: media_player.vesteltvmibox
+      - type: grid
+        cards:
+          - type: heading
+            heading: Remote
+          - type: custom:firemote-card
+            entity: media_player.vesteltvmibox
+            device_family: xiaomi
+            device_type: mi-box-s
+            compatibility_mode: strong
+            visible_name_text: Mi Box
+            app_launch_1: jellyfin
+            app_launch_2: smart-tube-next
+            app_launch_3: stremio
+            app_launch_4: spotify
