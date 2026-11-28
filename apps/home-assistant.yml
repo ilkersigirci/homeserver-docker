@@ -1,57 +1,8 @@
-networks:
-  home_assistant_backend:
-
 services:
-  home-assistant-db:
-    image: postgres:18.6@sha256:74935e72241653ca55e0414067e6d8763aceb8a810eb51b452253ec3dcfc4336
-    container_name: home-assistant-db
-    restart: $RESTART_POLICY_MAINTENANCE
-    profiles:
-      - maintenance
-      - home-assistant
-    networks:
-      - home_assistant_backend
-    expose:
-      - 5432
-    ports:
-      - "127.0.0.1:5400:5432"
-    user: $PUID:$PGID
-    read_only: true
-    tmpfs:
-      - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=1777
-      - /var/run/postgresql:rw,noexec,nosuid,nodev,size=32m,uid=$PUID,gid=$PGID,mode=775
-    security_opt:
-      - no-new-privileges:true
-    cap_drop:
-      - ALL
-    cap_add: []
-    pids_limit: 256
-    cpus: "1.0"
-    mem_limit: "2G"
-    ulimits:
-      nofile:
-        soft: 4096
-        hard: 8192
-    volumes:
-      - $REPO_PATH/data/home-assistant-db:/var/lib/postgresql
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres -h 127.0.0.1 -p 5432"]
-      interval: 1m
-      timeout: 5s
-      retries: 3
-      start_period: 30s
-
   home-assistant:
     image: ghcr.io/home-assistant/home-assistant:2026.9.4@sha256:3e6710a7ab2a61311d9d899b719f6c3657791c63e8f4942cec4ebc42401d6b76
     container_name: home-assistant
     restart: $RESTART_POLICY_MAINTENANCE
-    depends_on:
-      home-assistant-db:
-        condition: service_healthy
     profiles:
       - maintenance
       - home-assistant
@@ -78,8 +29,11 @@ services:
         read_only: true
         bind:
           create_host_path: false
-      # - /run/dbus:/run/dbus:ro
     environment:
+      REOLINK_USER: $REOLINK_USER
+      REOLINK_PASSWORD: $REOLINK_PASSWORD
+      HA_BAMBU_AMS_DEVICE_ID: $HA_BAMBU_AMS_DEVICE_ID
+      HA_BAMBU_PRINTER_DEVICE_ID: $HA_BAMBU_PRINTER_DEVICE_ID
       # Persist HACS deps (currently mini-racer for Dreame) while remaining read-only/non-root.
       # This path can shadow HA packages; review or clear it after Python/HA upgrades.
       PYTHONPATH: /config/deps
@@ -91,77 +45,6 @@ services:
       retries: 3
       start_period: 3m
     labels:
-      ####### HOMEPAGE #######
-      homepage.group: "Maintenance"
-      homepage.name: "home-assistant"
-      homepage.icon: "home-assistant.png"
-      homepage.href: "https://smarthome.$DOMAINNAME"
-      homepage.target: "_blank"
-      homepage.description: "Home automation"
-      ####### GLANCE #######
-      glance.name: "home-assistant"
-      glance.icon: "sh:home-assistant"
-      glance.url: "https://smarthome.$DOMAINNAME"
-      glance.description: "Home automation"
-
-  home-assistant-proxied:
-    image: ghcr.io/home-assistant/home-assistant:2026.9.4@sha256:3e6710a7ab2a61311d9d899b719f6c3657791c63e8f4942cec4ebc42401d6b76
-    container_name: home-assistant-proxied
-    restart: $RESTART_POLICY_MAINTENANCE
-    depends_on:
-      home-assistant-db:
-        condition: service_healthy
-    profiles:
-      - not-used
-    networks:
-      - t3_proxy
-      - home_assistant_backend
-    user: $PUID:$PGID
-    read_only: true
-    tmpfs:
-      - /run:rw,exec,nosuid,nodev,size=64m,uid=$PUID,gid=$PGID,mode=755
-      - /tmp:rw,noexec,nosuid,nodev,size=256m,uid=$PUID,gid=$PGID,mode=1777
-    security_opt:
-      - no-new-privileges:true
-    pids_limit: 512
-    cpus: "2.0"
-    mem_limit: "2G"
-    ulimits:
-      nofile:
-        soft: 8192
-        hard: 16384
-    volumes:
-      - $REPO_PATH/configs/home-assistant:/config
-      - type: bind
-        source: /etc/localtime
-        target: /etc/localtime
-        read_only: true
-        bind:
-          create_host_path: false
-      # - /run/dbus:/run/dbus:ro
-    environment:
-      # Persist HACS deps (currently mini-racer for Dreame) while remaining read-only/non-root.
-      # This path can shadow HA packages; review or clear it after Python/HA upgrades.
-      PYTHONPATH: /config/deps
-      TZ: $TZ
-    healthcheck:
-      test: ["CMD", "curl", "-fsS", "--max-time", "3", "-o", "/dev/null", "http://127.0.0.1:8123/manifest.json"]
-      interval: 5m
-      timeout: 5s
-      retries: 3
-      start_period: 3m
-    labels:
-      traefik.enable: "true"
-      ## HTTP Routers
-      traefik.http.routers.home-assistant-rtr.entrypoints: "websecure"
-      traefik.http.routers.home-assistant-rtr.rule: "Host(`smarthome.$DOMAINNAME`)"
-      ## Middlewares
-      traefik.http.routers.home-assistant-rtr.middlewares: "chain-tinyauth-relaxed@file"
-      ## HTTP Services
-      traefik.http.routers.home-assistant-rtr.service: "home-assistant-svc"
-      traefik.http.services.home-assistant-svc.loadbalancer.server.port: "8123"
-      ####### TINYAUTH #######
-      tinyauth.apps.home-assistant.config.domain: "smarthome.$DOMAINNAME"
       ####### HOMEPAGE #######
       homepage.group: "Maintenance"
       homepage.name: "home-assistant"

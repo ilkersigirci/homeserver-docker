@@ -14,14 +14,6 @@ http:
         - chain-no-auth-relaxed
       service: proxmox-svc
 
-    home-assistant-rtr:
-      rule: "Host(`smarthome.{{env "DOMAINNAME"}}`)"
-      entryPoints:
-        - websecure
-      middlewares:
-        - chain-no-auth-relaxed
-      service: home-assistant-svc
-
     watchyourlan-rtr:
       rule: "Host(`lan.{{env "DOMAINNAME"}}`)"
       entryPoints:
@@ -44,11 +36,6 @@ http:
         servers:
           - url: "https://192.168.2.119:8006"
         serversTransport: proxmox-transport
-
-    home-assistant-svc:
-      loadBalancer:
-        servers:
-          - url: "http://{{env "LOCAL_STATIC_IP"}}:8123"
 
     watchyourlan-svc:
       loadBalancer:

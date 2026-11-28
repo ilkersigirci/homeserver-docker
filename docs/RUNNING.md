@@ -80,6 +80,49 @@ For example, the script-based update also prunes dangling images.
 just ansible docker_manage.yml --limit titan -e homeserver_docker_manage_action=update
 ```
 
+## Home Assistant on rpi0
+
+Edit sidebar dashboards in `configs/home-assistant/dashboards/` and use
+**⋮ → Refresh** on the dashboard. Home Assistant registers their URLs in
+`configuration.yaml` and manages the Map dashboard and card resources in its UI.
+
+| Dashboard | URL | Custom cards or integrations used for its controls |
+| --- | --- | --- |
+| Home | `/dashboard-main` | The overview uses native cards. |
+| Devices | `/dashboard-smart-devices` | Advanced Camera Card and WebRTC Camera for the Reolink, Bambu Lab for print status and AMS, Xiaomi Miot for the purifier. |
+| Vacuum | `/dashboard-dreame` | Dreame Vacuum and its map card provide live room selection. Xiaomi Vacuum Map Card handles zones and points. |
+| TV | `/dashboard-tv` | Firemote for the Mi Box remote. |
+
+Use readable entity IDs in dashboard YAML, such as `button.wake_nas`. Set the ID
+in **Settings → Devices & services → Entities**. When replacing a device, assign
+its dashboard IDs to the replacement. Keep the integration's unique IDs, raw MAC
+addresses and serials in Home Assistant's registry.
+
+| Bitwarden item | Values used by Home Assistant on rpi0 |
+| --- | --- |
+| `homeassistant.home` | `HA_BAMBU_PRINTER_DEVICE_ID` and `HA_BAMBU_AMS_DEVICE_ID`. The Bambu cards and unload action use the HA device registry. |
+| `reolink.camera` | The built-in username and password supply `REOLINK_USER` and `REOLINK_PASSWORD` for go2rtc. |
+
+For recovery, include the SQLite database in Home Assistant backups. For a manual
+backup or restore, stop Home Assistant and copy the entire `configs/home-assistant/`
+directory. It holds the registry, custom integrations and cards, and Recorder
+history in `home-assistant_v2.db` and its journal files.
+
+Start a new installation with the host's `.env`.
+
+```bash
+docker compose -f compose/rpi0.yml --env-file .env --profile home-assistant up -d home-assistant
+```
+
+With a new HA registry, the two Bambu IDs and Glance's `HASS_API_KEY` can be
+empty in the local `.env` during onboarding. Install the integrations and cards
+listed above, pair the devices, and assign the entity IDs used in the YAML.
+Save the new printer and AMS device IDs and a Home Assistant long-lived access
+token for Glance in `homeassistant.home` before running the regular Ansible
+environment sync.
+
+For camera credentials and talkback, see the [Reolink setup](home-assistant/reolink-camera.md).
+
 ## Immich on NAS and Titan
 
 NAS serves `photos.${DOMAINNAME}` and runs the API, PostgreSQL, Valkey,

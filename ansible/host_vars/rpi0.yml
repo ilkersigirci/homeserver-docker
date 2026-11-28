@@ -30,6 +30,10 @@ env_vars_mapping:
     item: "Homeserver.rpi0"
   HASS_API_KEY:
     item: "homeassistant.home"
+  HA_BAMBU_AMS_DEVICE_ID:
+    item: "homeassistant.home"
+  HA_BAMBU_PRINTER_DEVICE_ID:
+    item: "homeassistant.home"
   HEADSCALE_API_KEY:
     item: "headscale.remoteserver"
   JELLYFIN_API_KEY:
@@ -52,6 +56,12 @@ env_vars_mapping:
     field: "API_KEY_LANGFUSE"
   POCKETID_ENCRYPTION_KEY:
     item: "Homeserver.rpi0"
+  REOLINK_PASSWORD:
+    item: "reolink.camera"
+    field: "password"
+  REOLINK_USER:
+    item: "reolink.camera"
+    field: "username"
   SYNCTHING_API_KEY:
     item: "syncthing.home"
   SYNCTHING_NOTES_FOLDER_ID:

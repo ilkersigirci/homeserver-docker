@@ -30,7 +30,6 @@ include:
   - ../apps/traefik.yml
   - ../apps/otel-collector-agent.yml
   ###### MAINTENANCE ####
-  # - ../apps/home-assistant.yml
   - ../apps/watchyourlan.yml
   - ../apps/whoami.yml
   #### MEDIA ####
