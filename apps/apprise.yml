@@ -57,7 +57,7 @@ services:
 
   # NOTE: By default, bind volume user is 1000.
   apprise-original:
-    image: caronc/apprise:2.0.1@sha256:0b2913b15c8eb47c25345722985ffbfae701326edde21909c205d296d62dd52c
+    image: caronc/apprise:2.2.0@sha256:8a7654c329ce3821848b8052ba915bcf5a3e02dd3ce817c8fa1427fb60bdeae7
     container_name: apprise
     restart: $RESTART_POLICY_MAINTENANCE
     profiles:
