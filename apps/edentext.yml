@@ -1,6 +1,6 @@
 services:
   edentext:
-    image: ghcr.io/stffnb/edentext:v0.14.0@sha256:4f82cb15a37aa681d6165a05a38d29dee10883eb304fd0010daab9b1a085434d
+    image: ghcr.io/stffnb/edentext:v0.15.0@sha256:c3cca5f55bd8f0a19d5da3394f666e06ac2e40d8f3c404b9320d512b0b36cfdb
     container_name: edentext
     restart: $RESTART_POLICY_OTHERS
     profiles:
